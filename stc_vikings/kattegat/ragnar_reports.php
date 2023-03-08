@@ -1,0 +1,3371 @@
+<?php
+include "../../MCU/obdb.php";
+session_start();
+// reports merchant ledger
+class ragnarReportsViewMerchantLedger extends tesseract{
+   // call merchant
+   public function stc_call_merchants(){
+      $ivar='<option value="NA">Please Select Merchant</option>';
+      $ivarmerchantsqry=mysqli_query($this->stc_dbs, "
+         SELECT 
+            `stc_merchant_id`,
+            `stc_merchant_name` 
+         FROM `stc_merchant` 
+         ORDER BY `stc_merchant_name` ASC
+      ");
+      foreach($ivarmerchantsqry as $ivarrow){
+         $ivar.='
+            <option value="'.$ivarrow['stc_merchant_id'].'">'.$ivarrow['stc_merchant_name'].'</option>
+         ';
+      }
+      return $ivar;
+   }
+    
+   // call ledger
+   public function stc_call_ledger($bjornebegdate, $bjorneenddate, $bjornemerchantid){
+      $ivar='';
+      $invoicetotal=0;
+      $paidtotal=0;
+      $duetotal=0;
+      // get merchant qeury
+      $merchantget=mysqli_query($this->stc_dbs, "
+         SELECT 
+            `stc_merchant_name` 
+         FROM 
+            `stc_merchant` 
+         WHERE `stc_merchant_id`='".mysqli_real_escape_string($this->stc_dbs, $bjornemerchantid)."'
+      ");
+      $mername='';
+      // get merchant loop
+      foreach($merchantget as $merchantrow){
+         $mername=$merchantrow['stc_merchant_name'];
+      }
+
+      // merchant name row
+      $ivar.='
+         <tr>
+            <td colspan="2" align="Right"><h3><b>Merchant Name :</b></h3></td>
+            <td colspan="2"><h3><b>'.$mername.'</b></h3></td>
+         </tr>
+      ';
+
+      // grn query & grn loop
+      $ivarledgerqry=mysqli_query($this->stc_dbs, "
+         SELECT 
+            `stc_product_grn_id`,
+            `stc_product_grn_date`,
+            `stc_product_grn_purchase_order_id`,
+            `stc_product_grn_purchase_order_date`,
+            `stc_product_grn_invoice_number`,
+            `stc_product_grn_invoice_date`,
+            `stc_merchant_name`
+         FROM 
+            `stc_product_grn` 
+         INNER JOIN 
+            `stc_merchant` 
+         ON 
+            `stc_merchant_id`=`stc_product_grn_merchant_id` 
+         WHERE 
+            `stc_merchant_id`='".mysqli_real_escape_string($this->stc_dbs, $bjornemerchantid)."'
+         AND
+            (DATE(`stc_product_grn_invoice_date`) 
+         BETWEEN
+            '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
+         AND 
+            '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."')
+         ORDER BY DATE(`stc_product_grn_invoice_date`) ASC 
+      ");
+
+      if(mysqli_num_rows($ivarledgerqry)>0){
+         foreach($ivarledgerqry as $ledgerrow){
+            if(isset($_SESSION["stc_merchant_invoice_sort"])) {  
+               $is_available = 0;
+               foreach($_SESSION["stc_merchant_invoice_sort"] as $keys => $values){  
+               }  
+               if($is_available < 1) {  
+                  $item_array = array(  
+                     'ledger_poid'        => $ledgerrow['stc_product_grn_purchase_order_id'],
+                     'ledger_podate'      => $ledgerrow['stc_product_grn_purchase_order_date'],
+                     'ledger_id'          => $ledgerrow['stc_product_grn_id'],
+                     'ledger_date'        => $ledgerrow['stc_product_grn_date'],
+                     'ledger_invoice_no'  => $ledgerrow['stc_product_grn_invoice_number'],
+                     'ledger_invoice_date'   => $ledgerrow['stc_product_grn_invoice_date'],
+                     'ledger_type'        => 'grn'
+                  );  
+                  $_SESSION["stc_merchant_invoice_sort"][] = $item_array;  
+               }
+            }else{  
+               $item_array = array(  
+                  'ledger_poid'        => $ledgerrow['stc_product_grn_purchase_order_id'],
+                  'ledger_podate'      => $ledgerrow['stc_product_grn_purchase_order_date'],
+                  'ledger_id'          => $ledgerrow['stc_product_grn_id'],
+                  'ledger_date'        => $ledgerrow['stc_product_grn_date'],
+                  'ledger_invoice_no'  => $ledgerrow['stc_product_grn_invoice_number'],
+                  'ledger_invoice_date'   => $ledgerrow['stc_product_grn_invoice_date'],
+                  'ledger_type'        => 'grn'
+               );  
+               $_SESSION["stc_merchant_invoice_sort"][] = $item_array;  
+            }  
+         }
+      }
+
+      // direct challan query
+      $ivarledgerqry2=mysqli_query($this->stc_dbs, "
+         SELECT
+             `stc_sale_product_id`,
+             `stc_sale_product_date`,
+             `stc_sale_product_dc_invo_no`,
+             `stc_sale_product_dc_invo_date`,
+             `stc_merchant_name`
+         FROM
+             `stc_sale_product`
+         INNER JOIN `stc_merchant` ON `stc_merchant_id` = `stc_sale_product_dc_merchant`
+         WHERE
+            `stc_merchant_id`='".mysqli_real_escape_string($this->stc_dbs, $bjornemerchantid)."'
+         AND
+            (DATE(`stc_sale_product_dc_invo_date`) 
+         BETWEEN
+            '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
+         AND 
+            '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."')
+         ORDER BY DATE(`stc_sale_product_dc_invo_date`) ASC 
+      ");
+
+      if(mysqli_num_rows($ivarledgerqry2)>0){
+         foreach($ivarledgerqry2 as $ledgerrow){
+            if(isset($_SESSION["stc_merchant_invoice_sort"])) {  
+               $is_available = 0;
+               foreach($_SESSION["stc_merchant_invoice_sort"] as $keys => $values){  
+                  if($_SESSION["stc_merchant_invoice_sort"][$keys]['ledger_id'] == $ledgerrow['stc_sale_product_id']){  
+                     $is_available++; 
+                  }  
+               }  
+               if($is_available < 1) {  
+                  $item_array = array(  
+                     'ledger_poid'        => '',
+                     'ledger_podate'      => '',
+                     'ledger_id'          => $ledgerrow['stc_sale_product_id'],
+                     'ledger_date'        => $ledgerrow['stc_sale_product_date'],
+                     'ledger_invoice_no'  => $ledgerrow['stc_sale_product_dc_invo_no'],
+                     'ledger_invoice_date'   => $ledgerrow['stc_sale_product_dc_invo_date'],
+                     'ledger_type'        => 'dc'
+                  );  
+                  $_SESSION["stc_merchant_invoice_sort"][] = $item_array;  
+               }
+            }else{  
+               $item_array = array(  
+                  'ledger_poid'        => '',
+                  'ledger_podate'      => '',
+                  'ledger_id'          => $ledgerrow['stc_sale_product_id'],
+                  'ledger_date'        => $ledgerrow['stc_sale_product_date'],
+                  'ledger_invoice_no'  => $ledgerrow['stc_sale_product_dc_invo_no'],
+                  'ledger_invoice_date'   => $ledgerrow['stc_sale_product_dc_invo_date'],
+                  'ledger_type'        => 'dc'
+               );  
+               $_SESSION["stc_merchant_invoice_sort"][] = $item_array;  
+            }  
+         }
+      }
+
+      // po query & loops
+      $ivarledgerqry3=mysqli_query($this->stc_dbs, "
+         SELECT
+            `stc_purchase_product_id`,
+            `stc_purchase_product_order_date`,
+            `stc_merchant_name`
+         FROM
+            `stc_purchase_product`
+         INNER JOIN 
+            `stc_merchant_advance_payment` 
+         ON 
+            `stc_merchant_advance_payment_purhcase_product_id` = `stc_purchase_product_id`
+         INNER JOIN 
+            `stc_merchant` 
+         ON 
+            `stc_merchant_id` = `stc_purchase_product_merchant_id`
+         WHERE
+            `stc_merchant_id`='".mysqli_real_escape_string($this->stc_dbs, $bjornemerchantid)."'
+         AND
+            (DATE(`stc_purchase_product_order_date`) 
+         BETWEEN
+            '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
+         AND 
+            '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."')
+         ORDER BY DATE(`stc_purchase_product_order_date`) ASC 
+      ");
+
+      if(mysqli_num_rows($ivarledgerqry3)>0){
+         foreach($ivarledgerqry3 as $ledgerrow){
+            if(isset($_SESSION["stc_merchant_invoice_sort"])) {  
+               $is_available = 0;
+               foreach($_SESSION["stc_merchant_invoice_sort"] as $keys => $values){  
+                  if($_SESSION["stc_merchant_invoice_sort"][$keys]['ledger_id'] == $ledgerrow['stc_purchase_product_id']){  
+                     $is_available++; 
+                  }  
+               }  
+               if($is_available < 1) {  
+                  $item_array = array(  
+                     'ledger_poid'        => $ledgerrow['stc_purchase_product_id'],
+                     'ledger_podate'      => $ledgerrow['stc_purchase_product_order_date'],
+                     'ledger_id'          => '',
+                     'ledger_date'        => '',
+                     'ledger_invoice_no'  => '',
+                     'ledger_invoice_date'   => '',
+                     'ledger_type'        => 'po'
+                  );  
+                  $_SESSION["stc_merchant_invoice_sort"][] = $item_array;  
+               }
+            }else{  
+               $item_array = array(  
+                  'ledger_poid'        => $ledgerrow['stc_purchase_product_id'],
+                  'ledger_podate'      => $ledgerrow['stc_purchase_product_order_date'],
+                  'ledger_id'          => '',
+                  'ledger_date'        => '',
+                  'ledger_invoice_no'  => '',
+                  'ledger_invoice_date'   => '',
+                  'ledger_type'        => 'po'
+               );  
+               $_SESSION["stc_merchant_invoice_sort"][] = $item_array;  
+            }  
+         }
+      }
+
+      // loop for get grn or direct challan records from session
+      foreach($_SESSION['stc_merchant_invoice_sort'] as $reportsessrow){
+         $basicamount=0;
+         $totalamount=0;
+         $total=0;
+         $refr_id='';
+         $po_id='';
+         $pv='';
+         $paidamount='';
+         if($reportsessrow['ledger_type']=='grn'){
+            $po_id='STC/'.substr("0000{$reportsessrow["ledger_poid"]}", -5);
+            $refr_id='GRN/'.substr("0000{$reportsessrow["ledger_id"]}", -5);
+         }elseif($reportsessrow['ledger_type']=='dc'){
+            $refr_id='STC/DC/'.substr("0000{$reportsessrow["ledger_id"]}", -5);
+         }else{
+            $po_id='STC/'.substr("0000{$reportsessrow["ledger_poid"]}", -5);
+            $pv='';
+         }
+
+         // check ledger type means grn or direct challan
+         if($reportsessrow['ledger_type']=='grn'){
+            // invoice amount get query & loops
+            $invoicerateqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                  `stc_product_grn_items_qty`,
+                  `stc_product_grn_items_rate`,
+                  `stc_product_gst`
+               FROM 
+                  `stc_product_grn_items`
+               INNER JOIN 
+                  `stc_product` 
+               ON 
+                  `stc_product_id` = `stc_product_grn_items_product_id`
+               WHERE
+                   `stc_product_grn_items_grn_order_id`='".mysqli_real_escape_string($this->stc_dbs, $reportsessrow['ledger_id'])."'
+            ");
+
+            foreach($invoicerateqry as $itemsraterow){
+               $amount=0;
+               $gstamount=0;
+               $bqrty=$itemsraterow['stc_product_grn_items_qty'];
+               $bqrate=$itemsraterow['stc_product_grn_items_rate'];
+               $amount=$bqrty * $bqrate;
+               $gstamount=($amount * $itemsraterow["stc_product_gst"])/100;
+               $basicamount+=$amount;
+               $totalamount+=$gstamount;
+            }
+
+            // regular payment query & loops
+            $rppaymentqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                  `stc_merchant_regular_payment_id`,
+                  `stc_merchant_regular_payment_date`,
+                  `stc_merchant_regular_payment_amount`
+               FROM
+                  `stc_merchant_regular_payment`
+               WHERE
+                  `stc_merchant_regular_payment_grn_number`='".mysqli_real_escape_string($this->stc_dbs, $reportsessrow['ledger_id'])."'
+            ");
+
+            foreach($rppaymentqry as $rppaymentrow){
+               $pv.=
+                  'RP/'.substr("0000{$rppaymentrow['stc_merchant_regular_payment_id']}", -5).'<br>'
+                  .date('d-m-Y', strtotime($rppaymentrow['stc_merchant_regular_payment_date'])).'<br>'
+               ;
+               $paidamount.=number_format($rppaymentrow['stc_merchant_regular_payment_amount'], 2).'<br>';
+               $paidtotal += $rppaymentrow['stc_merchant_regular_payment_amount'];
+            }
+         }elseif($reportsessrow['ledger_type']=='dc'){
+            // invoice amount query
+            $invoicerateqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                  `stc_sale_product_dc_items_product_qty`,
+                  `stc_sale_product_dc_items_product_rate`,
+                  `stc_product_gst`
+               FROM 
+                  `stc_sale_product_dc_items`
+               INNER JOIN 
+                  `stc_product` 
+               ON 
+                  `stc_product_id` = `stc_sale_product_dc_items_product_id`
+               WHERE
+                   `stc_sale_product_dc_items_sale_product_id`='".mysqli_real_escape_string($this->stc_dbs, $reportsessrow['ledger_id'])."'
+            ");
+
+            foreach($invoicerateqry as $itemsraterow){
+               $amount=0;
+               $gstamount=0;
+               $bqrty=$itemsraterow['stc_sale_product_dc_items_product_qty'];
+               $bqrate=$itemsraterow['stc_sale_product_dc_items_product_rate'];
+               $amount=$bqrty * $bqrate;
+               $gstamount=($amount * $itemsraterow["stc_product_gst"])/100;
+               $basicamount+=$amount;
+               $totalamount+=$gstamount;
+            }
+
+            // dc payment founder qry & loop
+            $dcpaymentqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                  `stc_sale_product_dc_payment_id`,
+                   `stc_sale_product_dc_payment_date`,
+                  `stc_sale_product_dc_payment_value`
+               FROM 
+                  `stc_sale_product_dc_payment` 
+               WHERE 
+                  `stc_sale_product_dc_payment_order_id`='".mysqli_real_escape_string($this->stc_dbs, $reportsessrow['ledger_id'])."'
+            ");
+
+            foreach($dcpaymentqry as $dcpaymentrow){
+               $pv.=
+                  'STC/DC/PV/'.substr("0000{$dcpaymentrow['stc_sale_product_dc_payment_id']}", -5).'<br>'
+                  .date('d-m-Y', strtotime($dcpaymentrow['stc_sale_product_dc_payment_date'])).'<br>'
+               ;
+               $paidamount.=number_format($dcpaymentrow['stc_sale_product_dc_payment_value'], 2).'<br>';
+               $paidtotal += $dcpaymentrow['stc_sale_product_dc_payment_value'];
+            }
+         }else{
+            // advance payment founder qry & loop
+            $appaymentqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                  `stc_merchant_advance_payment_id`,
+                  `stc_merchant_advance_payment_date`,
+                  `stc_merchant_advance_payment_advance_value`
+               FROM
+                  `stc_merchant_advance_payment`
+               WHERE
+                  `stc_merchant_advance_payment_purhcase_product_id`='".mysqli_real_escape_string($this->stc_dbs, $reportsessrow['ledger_poid'])."'
+            ");
+
+            foreach($appaymentqry as $popaymentrow){
+               $pv.=
+                  'AP/'.substr("0000{$popaymentrow['stc_merchant_advance_payment_id']}", -5).'<br>'
+                  .date('d-m-Y', strtotime($popaymentrow['stc_merchant_advance_payment_date'])).'<br>'
+               ;
+               $paidamount.=number_format($popaymentrow['stc_merchant_advance_payment_advance_value'], 2).'<br>';
+               $paidtotal += $popaymentrow['stc_merchant_advance_payment_advance_value'];
+            }
+         }
+         // calculate total for plus minus in total section
+         $total=$basicamount + $totalamount;
+         
+         $invoicetotal += $total;
+         // middle grn or direct challan section row
+         $podate=(!empty($reportsessrow['ledger_podate']) ? date('d-m-Y', strtotime($reportsessrow['ledger_podate'])) : '');
+
+         if(!empty($basicamount)){
+            $ratesec=
+               number_format($basicamount, 2).'<br>
+               '.number_format($totalamount, 2).'<br>
+               -------------'.'<br>
+               '.number_format($total, 2)
+            ;
+         }else{
+            $ratesec='';
+         }
+         $ivar.='
+            <tr>
+               <td class="text-center">
+                  '.$po_id.'<br>
+                  '.$podate.'
+               </td>             
+               <td class="text-center">
+                  '.$refr_id.'<br>
+                  '.(!empty($reportsessrow['ledger_date']) ? date('d-m-Y', strtotime($reportsessrow['ledger_date'])) : '').'
+               </td>
+               <td class="text-center">
+                  '.$reportsessrow['ledger_invoice_no'].'<br>
+                  '.(!empty($reportsessrow['ledger_invoice_date']) ? date('d-m-Y', strtotime($reportsessrow['ledger_invoice_date'])) : '').'
+               </td>
+               <td align="right">
+                  '.$ratesec.'
+               </td>
+               <td align="right"></td>
+            </tr>
+         ';
+
+         // middle & payment voucher section row
+         $ivar.='
+            <tr>
+               <td></td>
+               <td>
+                  '.$pv.'
+               </td>
+               <td></td>
+               <td></td>
+               <td align="right">'.$paidamount.'</td>
+            </tr>
+         ';
+      }
+
+      // perform whether number is not in minus, greater than or smaller then
+      if($invoicetotal>=$paidtotal){
+         $duetotal=$invoicetotal-$paidtotal;
+      }else{
+         $duetotal=$paidtotal-$invoicetotal;
+      }
+
+      // if due is in .or something than show yes
+      if($duetotal<=1){
+         $duetotal=0;
+      }
+      // total section row
+      $ivar.='
+         <tr>
+            <td colspan="3" align="right">
+               <h4><b>Total Invoice Amount :</b></h4>
+            </td>
+            <td align="right">
+               '.number_format($invoicetotal, 2).'
+            </td>
+            <td align="right"></td>
+         </tr>
+         <tr>
+            <td colspan="3" align="right">
+               <h4><b>Total Paid Amount :</b></h4>
+            </td>
+            <td align="right"></td>
+            <td align="right">
+               '.number_format($paidtotal, 2).'
+            </td>
+         </tr>
+         <tr>
+            <td colspan="3" align="right">
+               <h4><b>Total Due Amount :</b></h4>
+            </td>
+            <td align="right"></td>
+            <td align="right">
+               '.number_format($duetotal, 2).'
+            </td>
+         </tr>
+      '; 
+      return $ivar;
+   }
+}
+
+class ragnarReportsViewRequiReports extends tesseract{
+   // call std
+   public function stc_call_std(){
+      $ivar='
+         <table class="table table-bordered table-responsive" id="stc-show-std-details-table">
+            <thead>
+               <tr>
+                  <th class="text-center">DATE</th>
+                  <th class="text-center">LOCATION</th>
+                  <th class="text-center">DEPTARTMENT</th>
+                  <th class="text-center">AREA</th>
+                  <th class="text-center">EQUIPMENT TYPE</th>
+                  <th class="text-center">EQUIPMENT NO</th>
+                  <th class="text-center">EQUIPMENT STATUS</th>
+                  <th class="text-center">JOB TYPE</th>
+                  <th class="text-center">PERMIT NO</th>
+                  <th class="text-center">CREATED BY</th>
+                  <th class="text-center">CREATER NAME & MOBILE NO</th>
+                  <th class="text-center">RESPONSIBLE PERSON NAME & MOBILE NO</th>
+                  <th class="text-center">REASON</th>
+                  <th class="text-center">MATERIALS REQ</th>
+                  <th class="text-center">MANPOWER REQ</th>
+                  <th class="text-center">WORK COMPLETION TARGET PERIOD</th>
+                  <th class="text-center">ACTUAL WORK COMPLETION PERIOD</th>
+                  <th class="text-center">USED MATERIAL</th>
+                  <th class="text-center">STOCK MATERIAL</th>
+                  <th class="text-center">DOWN PERIOD</th>
+                  <th class="text-center">WORK STATUS</th>
+                  <th class="text-center" style="width:10%">PENDING REASON</th>
+                  <th class="text-center" style="width:10%">JOB DONE DETAILS</th>
+                  <th class="text-center" style="width:10%">REMARKS</th>
+               </tr>
+            </thead>
+            <tbody>
+      ';
+      $ivarqry=mysqli_query($this->stc_dbs, "
+         SELECT 
+             `stc_status_down_list_id`,
+             `stc_status_down_list_date`,
+             `stc_cust_project_title`,
+             `stc_status_down_list_sub_location`,
+             `stc_status_down_list_area`,
+             `stc_status_down_list_equipment_type`,
+             `stc_status_down_list_equipment_number`,
+             `stc_status_down_list_equipment_status`,
+             `stc_status_down_list_reason`,
+             `stc_status_down_list_manpower_req`,
+             `stc_status_down_list_material_desc`,
+             `stc_status_down_list_from_date`,
+             `stc_status_down_list_rect_date`,
+             `stc_status_down_list_remarks`,
+             `stc_status_down_list_jobdone_details`,
+             `stc_status_down_list_jobpending_details`,
+             `stc_status_down_list_jobtype`,
+             `stc_status_down_list_created_by_select`,
+             `stc_status_down_list_permit_no`,
+             `stc_status_down_list_creator_details`,
+             `stc_status_down_list_responsive_person`,
+             `stc_status_down_list_target_date`,
+             `stc_status_down_list_status`,
+             `stc_status_down_list_created_by`
+         FROM `stc_status_down_list` 
+         INNER JOIN `stc_cust_project` 
+         ON `stc_cust_project_id`=`stc_status_down_list_location` 
+         WHERE `stc_status_down_list_status`<>5
+         ORDER BY DATE(`stc_status_down_list_date`) DESC
+      ");
+      if(mysqli_num_rows($ivarqry)>0){
+         foreach($ivarqry as $row){
+
+            $list_date=(date('Y', strtotime($row['stc_status_down_list_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_date'])) : 'NA';
+            $rec_date=(date('Y', strtotime($row['stc_status_down_list_rect_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_rect_date'])) : 'NA';
+            $tar_date=(date('Y', strtotime($row['stc_status_down_list_target_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_target_date'])) : 'NA';
+
+            $status='';
+
+            if($row['stc_status_down_list_status']==1){
+               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">PENDING</span></b>';
+            }elseif($row['stc_status_down_list_status']==2){
+               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-IN-PROGRESS</span></b>';
+            }elseif($row['stc_status_down_list_status']==3){
+               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-DONE</span></b>';
+            }elseif($row['stc_status_down_list_status']==4){
+               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-COMPLETE</span></b>';
+            }else{
+               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">CLOSE</span></b>';
+            }
+            
+            $eqstatus='
+                  <td class="text-center" style="font-weight:bold;background: #5cd25c;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
+            ';
+
+            $dperiod='0';
+
+            if($row['stc_status_down_list_equipment_status']=="Down"){
+               $eqstatus='
+                     <td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
+               ';
+               
+               $today = date("Y/m/d"); 
+               $startTimeStamp = strtotime(date('Y-m-d', strtotime($row['stc_status_down_list_date'])));
+                  $endTimeStamp = strtotime($today);
+
+                  $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+                  $dperiod = $timeDiff/86400;
+            }
+
+            $actionsec='';
+            if($row['stc_status_down_list_status']==3){
+               $actionsec='
+                  <a href="#" class="stc-set-to-complete" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
+               ';
+            }elseif($row['stc_status_down_list_status']==4){
+               $actionsec='
+                  <a href="#" class="stc-set-to-close" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
+               ';
+            }else{
+               $actionsec='#';
+            }
+
+            $eq_type='';
+            $eq_number='';
+            $sup_det='';
+            $stc_call_eqtypeqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                   `stc_cpumpd_equipment_type`
+               FROM
+                   `stc_customer_pump_details`
+               WHERE
+                   `stc_cpumpd_id`='".$row['stc_status_down_list_equipment_type']."'
+            ");
+            foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
+               $eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
+            }
+
+            $stc_call_eqnumberqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                   `stc_cpumpd_equipment_number`
+               FROM
+                   `stc_customer_pump_details`
+               WHERE
+                   `stc_cpumpd_id`='".$row['stc_status_down_list_equipment_number']."'
+            ");
+            foreach($stc_call_eqnumberqry as $stc_call_eqnumberrow){
+               $eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
+            }
+
+            $stc_call_supqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                   `stc_cust_pro_supervisor_fullname`,
+                   `stc_cust_pro_supervisor_contact`
+               FROM
+                   `stc_cust_pro_supervisor`
+               WHERE
+                   `stc_cust_pro_supervisor_id`='".$row['stc_status_down_list_created_by']."'
+            ");
+            foreach($stc_call_supqry as $stc_call_suprow){
+               $sup_det=$stc_call_suprow['stc_cust_pro_supervisor_fullname'].'<br>'.$stc_call_suprow['stc_cust_pro_supervisor_contact'];
+            }
+
+            
+            $ivar.='
+               <tr>
+                  <td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
+                  <td>'.$row['stc_cust_project_title'].'</td>
+                  <td>'.$row['stc_status_down_list_sub_location'].'</td>
+                  <td>'.$row['stc_status_down_list_area'].'</td>
+                  <td>'.$eq_type.'</td>
+                  <td>'.$eq_number.'</td>
+                  '.$eqstatus.'
+                  <td>'.$row['stc_status_down_list_jobtype'].'</td>
+                  <td>'.$row['stc_status_down_list_permit_no'].'</td>
+                  <td>'.$row['stc_status_down_list_created_by_select'].'</td>
+                  <td>'.$row['stc_status_down_list_creator_details'].'</td>
+                  <td>'.$row['stc_status_down_list_responsive_person'].'</td>
+                  <td>'.$row['stc_status_down_list_reason'].'</td>
+                  <td>'.$row['stc_status_down_list_material_desc'].'</td>
+                  <td>'.$row['stc_status_down_list_manpower_req'].'</td>
+                  <td>'.$tar_date.'</td>
+                  <td>'.$rec_date.'</td>
+                  <td>NA</td>
+                  <td>NA</td>
+                  <td>'.$dperiod.' Days</td>
+                  <td>'.$status.'</td>
+                  <td style="width:10%">'.$row['stc_status_down_list_jobpending_details'].'</td>
+                  <td style="width:10%">'.$row['stc_status_down_list_jobdone_details'].'</td>
+                  <td style="width:10%">'.$row['stc_status_down_list_remarks'].'</td>
+               </tr>
+            ';
+         }
+      }else{
+         $ivar.='
+            <tr>
+               <td colspan="14">No Record Found.</td>
+            </tr>
+         ';
+      }
+
+      $ivar.='
+            </tbody>
+         </table>
+      ';
+      return $ivar;
+   }
+
+   // call customer
+   public function stc_call_customer(){
+      $ivar='<option value="NA">Please Select Customer</option>';
+      $ivarcustomerqry=mysqli_query($this->stc_dbs, "
+         SELECT DISTINCT 
+            `stc_customer_id`,
+            `stc_customer_name` 
+         FROM `stc_customer` 
+         INNER JOIN `stc_agent_requested_customer`
+         ON `stc_customer_id`=`stc_agent_requested_customer_cust_id`
+         ORDER BY `stc_customer_name` ASC
+      ");
+      foreach($ivarcustomerqry as $ivarrow){
+         $ivar.='
+            <option value="'.$ivarrow['stc_customer_id'].'">'.$ivarrow['stc_customer_name'].'</option>
+         ';
+      }
+      return $ivar;
+   }
+
+   // call agent on change customer
+   public function stc_call_agent_on_customer($custid){
+      $ivar='<option value="NA">Please Select Agent</option>';
+      $ivarcustomerqry=mysqli_query($this->stc_dbs, "
+         SELECT DISTINCT
+            `stc_agents_id`,
+            `stc_agents_name`
+         FROM `stc_agents` 
+         INNER JOIN `stc_agent_requested_customer` 
+         ON `stc_agent_requested_customer_agent_id`=`stc_agents_id`
+         INNER JOIN `stc_customer` 
+         ON `stc_customer_id`=`stc_agent_requested_customer_cust_id` 
+         WHERE `stc_customer_id`='".mysqli_real_escape_string($this->stc_dbs, $custid)."'
+         ORDER BY `stc_agents_name` ASC
+      ");
+      foreach($ivarcustomerqry as $ivarrow){
+         $ivar.='
+            <option value="'.$ivarrow['stc_agents_id'].'">'.strtoupper($ivarrow['stc_agents_name']).'</option>
+         ';
+      }
+      return $ivar;
+   }
+
+   // call project on change agent
+   public function stc_call_project_on_agent($agentid, $custid){
+      $ivar='<option value="NA">Please Select Project</option>';
+      $ivarcustomerqry=mysqli_query($this->stc_dbs, "
+         SELECT 
+            `stc_cust_project_id`,
+             `stc_cust_project_title`
+         FROM `stc_cust_project` 
+         INNER JOIN `stc_customer` 
+         ON `stc_customer_id`=`stc_cust_project_cust_id` 
+         WHERE `stc_cust_project_createdby`='".mysqli_real_escape_string($this->stc_dbs, $agentid)."'
+         AND `stc_customer_id`='".mysqli_real_escape_string($this->stc_dbs, $custid)."'
+         ORDER BY `stc_cust_project_title` ASC
+      ");
+      foreach($ivarcustomerqry as $ivarrow){
+         $ivar.='
+            <option value="'.$ivarrow['stc_cust_project_id'].'">'.strtoupper($ivarrow['stc_cust_project_title']).'</option>
+         ';
+      }
+      return $ivar;
+   }
+
+   // get supervisors order & requisitions 
+   public function stc_get_supervisors_requisition_records($stc_begdate, $stc_enddate, $stc_custid, $stc_agentid, $stc_projeid, $stc_count_id){
+      $optimusprime='';
+      // $stc_count_id+=$stc_count_id;
+      $slno=$stc_count_id;
+      $loopcount=0;
+      $countgetrequisitionsqry=mysqli_query($this->stc_dbs, "
+         SELECT DISTINCT
+            `stc_requisition_combiner_id`,
+            DATE(`stc_requisition_combiner_date`) as stc_req_comb_date,
+            `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
+            DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
+            `stc_cust_super_requisition_list_items_req_id`,
+            `stc_cust_super_requisition_list_items_title`,
+            `stc_cust_super_requisition_list_items_unit`,
+            `stc_cust_super_requisition_list_items_reqqty`,
+            `stc_cust_super_requisition_list_items_approved_qty`,
+            `stc_cust_super_requisition_items_finalqty`,
+            `stc_cust_super_requisition_list_items_status`
+         FROM `stc_cust_super_requisition_list_items`
+         INNER JOIN `stc_cust_super_requisition_list` 
+         ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+            INNER JOIN `stc_requisition_combiner_req` 
+            ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` 
+            INNER JOIN `stc_requisition_combiner` 
+            ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id` 
+         WHERE 
+            `stc_cust_super_requisition_items_finalqty`!=0
+         AND 
+            `stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_projeid)."'
+         AND (
+            DATE(`stc_cust_super_requisition_list_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $stc_begdate)."'
+            AND '".mysqli_real_escape_string($this->stc_dbs, $stc_enddate)."' 
+         ) ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
+      ");
+      $getrequisitionsqry=mysqli_query($this->stc_dbs, "
+         SELECT DISTINCT
+            `stc_requisition_combiner_id`,
+            DATE(`stc_requisition_combiner_date`) as stc_req_comb_date,
+            `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
+            DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
+            `stc_cust_super_requisition_list_items_req_id`,
+            `stc_cust_super_requisition_list_items_title`,
+            `stc_cust_super_requisition_list_items_unit`,
+            `stc_cust_super_requisition_list_items_reqqty`,
+            `stc_cust_super_requisition_list_items_approved_qty`,
+            `stc_cust_super_requisition_items_finalqty`,
+            `stc_cust_super_requisition_list_items_status`
+         FROM `stc_cust_super_requisition_list_items`
+         INNER JOIN `stc_cust_super_requisition_list` 
+         ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+            INNER JOIN `stc_requisition_combiner_req` 
+            ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` 
+            INNER JOIN `stc_requisition_combiner` 
+            ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id` 
+         WHERE 
+            `stc_cust_super_requisition_items_finalqty`!=0
+         AND 
+            `stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_projeid)."'
+         AND (
+            DATE(`stc_cust_super_requisition_list_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $stc_begdate)."'
+            AND '".mysqli_real_escape_string($this->stc_dbs, $stc_enddate)."' 
+         ) ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
+         LIMIT ".$stc_count_id.",25
+      ");
+      if(mysqli_num_rows($getrequisitionsqry)>0){
+         foreach($getrequisitionsqry as$requisitionrow){
+            $loopcount++;
+            $slno++;
+            $rqitemstts='';
+            $stcdispatchedqty=0;
+            $stcrecievedqty=0;
+            $stcpendingqty=0;
+            if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
+               $rqitemstts='ALLOW';
+            }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
+               $rqitemstts='DIRECT';
+            }else{
+               $rqitemstts='NOT ALLOW';
+            }
+            $stcdecqtyqry=mysqli_query($this->stc_dbs, "
+               SELECT 
+                  `stc_cust_super_requisition_list_items_rec_recqty`
+               FROM `stc_cust_super_requisition_list_items_rec` 
+               WHERE 
+                  `stc_cust_super_requisition_list_items_rec_list_id`='".$requisitionrow['stc_cust_super_requisition_list_items_req_id']."' 
+               AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$requisitionrow['reqlistid']."'  
+            ");
+            foreach($stcdecqtyqry as $dispatchedrow){
+               $stcdispatchedqty+=$dispatchedrow['stc_cust_super_requisition_list_items_rec_recqty'];
+            }
+
+            $stcrecqtyqry=mysqli_query($this->stc_dbs, "
+               SELECT 
+                  `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+               FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
+               WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$requisitionrow['reqlistid']."'  
+            ");
+            foreach($stcrecqtyqry as $recievedrow){
+               $stcrecievedqty+=$recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
+            }
+
+            $stcconsumedqty=0;
+            $stcconsrecqtyqry=mysqli_query($this->stc_dbs, "
+               SELECT 
+                  SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
+               FROM `stc_cust_super_list_items_consumption_items` 
+               WHERE `stc_cust_super_list_items_consumption_items_name`='".$requisitionrow['reqlistid']."'  
+            ");
+            foreach($stcconsrecqtyqry as $consumedrow){
+               $stcconsumedqty+=$consumedrow['consumable_qty'];
+            }
+
+            $challanqry=mysqli_query($this->stc_dbs, "
+               SELECT DISTINCT
+                  `stc_sale_product_id`,
+                  `stc_sale_product_date`
+               FROM
+                  `stc_sale_product`
+               INNER JOIN 
+                  `stc_sale_product_items` 
+               ON 
+                  `stc_sale_product_items_sale_product_id`=`stc_sale_product_id`
+               INNER JOIN 
+                  `stc_cust_super_requisition_list_items` 
+               ON 
+                  `stc_cust_super_requisition_list_items_req_id`=`stc_sale_product_order_id`
+               INNER JOIN 
+                  `stc_cust_super_requisition_list_items_rec` 
+               ON 
+                  `stc_cust_super_requisition_list_items_rec_list_item_id`=`stc_cust_super_requisition_list_id`
+               WHERE
+                  `stc_sale_product_order_id`='".mysqli_real_escape_string($this->stc_dbs, $requisitionrow['stc_cust_super_requisition_list_items_req_id'])."'
+               AND 
+                  `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $requisitionrow['reqlistid'])."'
+            ");
+            $challaninfo='';
+            foreach($challanqry as $challanrow){
+               $challaninfo.=
+                   '<a href="challan-preview.php?pid='.$challanrow['stc_sale_product_id'].'">'.
+                        date('d-m-Y',strtotime($challanrow['stc_sale_product_date'])).
+                     '<br>'.
+                        $challanrow['stc_sale_product_id'].
+                     '<br>
+                   </a>
+                  '
+               ;
+            }
+            $stcpendingqty=$requisitionrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
+            if($stcpendingqty>0){
+               $stcpendingqty='
+                  <p class="form-control" style="
+                      background: #ffd81a;
+                      color: red;
+                  ">
+                     '.number_format($stcpendingqty, 2).'
+                  </b>
+               ';
+            }else{
+               $stcpendingqty=number_format($stcpendingqty, 2);
+            }
+                $cosump_bal_qty = $stcrecievedqty - $stcconsumedqty;
+                $stcbalqtymark = '';
+                if($cosump_bal_qty>0){
+               $stcbalqtymark='
+                  <p class="form-control" style="
+                      background: #ffd81a;
+                      color: red;
+                  ">
+                     '.number_format($cosump_bal_qty, 2).'
+                  </b>
+               ';
+            }else{
+               $stcbalqtymark=number_format($cosump_bal_qty, 2);
+            }
+            $optimusprime.='
+                  <tr>
+                     <td>'.$slno.'</td>
+                     <td>
+                         <a href="stc-requisition-combiner-fshow.php?requi_id='.$requisitionrow['stc_requisition_combiner_id'].'">
+                           '.$requisitionrow['stc_req_comb_date'].'<br>
+                           '.$requisitionrow['stc_requisition_combiner_id'].'
+                        </a>
+                     </td>
+                     <td>
+                        '.$requisitionrow['stc_req_date'].'<br>
+                        '.$requisitionrow['stc_cust_super_requisition_list_items_req_id'].'
+                     </td>
+                     <td>
+                        '.$challaninfo.'
+                     </td>
+                     <td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
+                     <td>'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
+                     <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+                     <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+                     <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+                     <td align="right">'.number_format($stcdispatchedqty, 2).'</td>
+                     <td align="right">'.$stcpendingqty.'</td>
+                     <td align="right">'.number_format($stcrecievedqty, 2).'</td>
+                     <td align="right">'.number_format($stcconsumedqty, 2).'</td>
+                     <td align="right">'.$stcbalqtymark.'</td>
+                     <td>'.$rqitemstts.'</td>
+                  </tr>
+            ';
+         }
+         $totalcount=mysqli_num_rows($countgetrequisitionsqry);
+         $showmorecol='
+               <td colspan="5" class="text-center">
+                  <a href="#" class="show_more_requisition" data-val="'.$slno.'">Show More</a>
+               </td>
+         ';
+         if($slno>=$totalcount){
+            $showmorecol='';
+         }
+         $optimusprime.='
+            <tr class="show_more_requisition_row">
+               <td colspan="2" class="text-center">Result Shown '.$slno.' out of '.$totalcount.'</td>
+               '.$showmorecol.'
+            </tr>
+         ';
+      }else{
+         $optimusprime.='
+               <tr>
+                  <td colspan="10">No requisition found!!!</td>
+               </tr>
+         ';
+      }
+      return $optimusprime;
+   }
+    
+   // get supervisors pending requisitions 
+   public function stc_get_supervisors_pending_records($stc_begdate, $stc_enddate, $stc_custid, $stc_agentid, $stc_projeid){
+      $optimusprime='';
+      $slno=0;
+      $loopcount=0;
+      $getrequisitionsqry=mysqli_query($this->stc_dbs, "
+         SELECT DISTINCT
+            `stc_requisition_combiner_id`,
+            DATE(`stc_requisition_combiner_date`) as stc_req_comb_date,
+            `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
+            DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
+            `stc_cust_super_requisition_list_items_req_id`,
+            `stc_cust_super_requisition_list_items_title`,
+            `stc_cust_super_requisition_list_items_unit`,
+            `stc_cust_super_requisition_list_items_reqqty`,
+            `stc_cust_super_requisition_list_items_approved_qty`,
+            `stc_cust_super_requisition_items_finalqty`,
+            `stc_cust_super_requisition_list_items_status`
+         FROM `stc_cust_super_requisition_list_items`
+         INNER JOIN `stc_cust_super_requisition_list` 
+         ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+            INNER JOIN `stc_requisition_combiner_req` 
+            ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` 
+            INNER JOIN `stc_requisition_combiner` 
+            ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id` 
+         WHERE 
+            `stc_cust_super_requisition_items_finalqty`!=0
+         AND 
+            `stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_projeid)."'
+         AND (
+            DATE(`stc_cust_super_requisition_list_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $stc_begdate)."'
+            AND '".mysqli_real_escape_string($this->stc_dbs, $stc_enddate)."' 
+         ) ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
+      ");
+      if(mysqli_num_rows($getrequisitionsqry)>0){
+         foreach($getrequisitionsqry as$requisitionrow){
+            $loopcount++;
+            $slno++;
+            $rqitemstts='';
+            $stcdispatchedqty=0;
+            $stcrecievedqty=0;
+            $stcpendingqty=0;
+            if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
+               $rqitemstts='ALLOW';
+            }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
+               $rqitemstts='DIRECT';
+            }else{
+               $rqitemstts='NOT ALLOW';
+            }
+            $stcdecqtyqry=mysqli_query($this->stc_dbs, "
+               SELECT 
+                  `stc_cust_super_requisition_list_items_rec_recqty`
+               FROM `stc_cust_super_requisition_list_items_rec` 
+               WHERE 
+                  `stc_cust_super_requisition_list_items_rec_list_id`='".$requisitionrow['stc_cust_super_requisition_list_items_req_id']."' 
+               AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$requisitionrow['reqlistid']."'  
+            ");
+            foreach($stcdecqtyqry as $dispatchedrow){
+               $stcdispatchedqty+=$dispatchedrow['stc_cust_super_requisition_list_items_rec_recqty'];
+            }
+
+            $stcrecqtyqry=mysqli_query($this->stc_dbs, "
+               SELECT 
+                  `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+               FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
+               WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$requisitionrow['reqlistid']."'  
+            ");
+            foreach($stcrecqtyqry as $recievedrow){
+               $stcrecievedqty+=$recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
+            }
+
+            $stcconsumedqty=0;
+            $stcconsrecqtyqry=mysqli_query($this->stc_dbs, "
+               SELECT 
+                  SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
+               FROM `stc_cust_super_list_items_consumption_items` 
+               WHERE `stc_cust_super_list_items_consumption_items_name`='".$requisitionrow['reqlistid']."'  
+            ");
+            foreach($stcconsrecqtyqry as $consumedrow){
+               $stcconsumedqty+=$consumedrow['consumable_qty'];
+            }
+
+            $challanqry=mysqli_query($this->stc_dbs, "
+               SELECT DISTINCT
+                  `stc_sale_product_id`,
+                  `stc_sale_product_date`
+               FROM
+                  `stc_sale_product`
+               INNER JOIN 
+                  `stc_sale_product_items` 
+               ON 
+                  `stc_sale_product_items_sale_product_id`=`stc_sale_product_id`
+               INNER JOIN 
+                  `stc_cust_super_requisition_list_items` 
+               ON 
+                  `stc_cust_super_requisition_list_items_req_id`=`stc_sale_product_order_id`
+               INNER JOIN 
+                  `stc_cust_super_requisition_list_items_rec` 
+               ON 
+                  `stc_cust_super_requisition_list_items_rec_list_item_id`=`stc_cust_super_requisition_list_id`
+               WHERE
+                  `stc_sale_product_order_id`='".mysqli_real_escape_string($this->stc_dbs, $requisitionrow['stc_cust_super_requisition_list_items_req_id'])."'
+               AND 
+                  `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $requisitionrow['reqlistid'])."'
+            ");
+            $challaninfo='';
+            foreach($challanqry as $challanrow){
+               $challaninfo.=
+                   '<a href="challan-preview.php?pid='.$challanrow['stc_sale_product_id'].'">'.
+                        date('d-m-Y',strtotime($challanrow['stc_sale_product_date'])).
+                     '<br>'.
+                        $challanrow['stc_sale_product_id'].
+                     '<br>
+                   </a>
+                  '
+               ;
+            }
+            $stcpendingqty=$requisitionrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
+                
+                $cosump_bal_qty = $stcrecievedqty - $stcconsumedqty;
+                $stcbalqtymark = '';
+                if($cosump_bal_qty>0){
+               $stcbalqtymark='
+                  <p class="form-control" style="
+                      background: #ffd81a;
+                      color: red;
+                  ">
+                     '.number_format($cosump_bal_qty, 2).'
+                  </b>
+               ';
+            }else{
+               $stcbalqtymark=number_format($cosump_bal_qty, 2);
+            }
+            if($stcpendingqty>0){
+               $stcpendingqty='
+                  <p class="form-control" style="
+                      background: #ffd81a;
+                      color: red;
+                  ">
+                     '.number_format($stcpendingqty, 2).'
+                  </b>
+               ';
+                    $optimusprime.='
+                            <tr>
+                                <td>'.$slno.'</td>
+                                <td>
+                                    <a href="stc-requisition-combiner-fshow.php?requi_id='.$requisitionrow['stc_requisition_combiner_id'].'">
+                                        '.$requisitionrow['stc_req_comb_date'].'<br>
+                                        '.$requisitionrow['stc_requisition_combiner_id'].'
+                                    </a>
+                                </td>
+                                <td>
+                                    '.$requisitionrow['stc_req_date'].'<br>
+                                    '.$requisitionrow['stc_cust_super_requisition_list_items_req_id'].'
+                                </td>
+                                <td>
+                                    '.$challaninfo.'
+                                </td>
+                                <td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
+                                <td>'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
+                                <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+                                <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+                                <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+                                <td align="right">'.number_format($stcdispatchedqty, 2).'</td>
+                                <td align="right">'.$stcpendingqty.'</td>
+                                <td align="right">'.number_format($stcrecievedqty, 2).'</td>
+                                <td align="right">'.number_format($stcconsumedqty, 2).'</td>
+                                <td align="right">'.$stcbalqtymark.'</td>
+                                <td>'.$rqitemstts.'</td>
+                            </tr>
+                    ';
+            }
+                    
+         }
+      }else{
+         $optimusprime.='
+               <tr>
+                  <td colspan="10">No requisition found!!!</td>
+               </tr>
+         ';
+      }
+      return $optimusprime;
+   }
+}
+
+class ragnarReportsViewProjReports extends tesseract{
+   // call project details
+   public function stc_get_project_details($stc_custid, $stc_agentid){
+      $optimusprime='';
+      $slno=0;
+      $loopcount=0;
+      $getrequisitionsqry=mysqli_query($this->stc_dbs, "
+         SELECT 
+                `stc_cust_project_id`,
+                `stc_cust_project_date`,
+                `stc_cust_project_title`,
+                `stc_cust_project_address`,
+                `stc_cust_project_responsive_person`,
+                `stc_cust_project_status`
+            FROM 
+                `stc_cust_project` 
+            WHERE 
+                `stc_cust_project_createdby`='".mysqli_real_escape_string($this->stc_dbs, $stc_agentid)."'
+         ORDER BY `stc_cust_project_title` ASC
+      ");
+      if(mysqli_num_rows($getrequisitionsqry)>0){
+         foreach($getrequisitionsqry as$requisitionrow){
+            $loopcount++;
+            $status='';
+            $actionattr='';
+               if($requisitionrow['stc_cust_project_status']==1){
+                   $status="Live";
+               }else{
+                   $status="Closed";
+               }
+               $checkact_qry=mysqli_query($this->stc_dbs, "
+                  SELECT 
+                     `stc_cust_project_details_id` 
+                  FROM 
+                     `stc_cust_project_details` 
+                  WHERE 
+                     `stc_cust_project_details_pro_title_id`='".mysqli_real_escape_string($this->stc_dbs, $requisitionrow['stc_cust_project_id'])."'
+               ");
+               if(mysqli_num_rows($checkact_qry)>0){
+                     $actionattr='
+                        <a href="#" id="'.$requisitionrow['stc_cust_project_id'].'" class="stc-project-show-ret" style="font-size: 25px;color: #cc7676;">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                     ';
+               }else{
+                     $actionattr='#';
+               }
+            $optimusprime.='
+                  <tr>
+                         <td>'.$requisitionrow['stc_cust_project_id'].'<br>'.date('d-m-Y', strtotime($requisitionrow['stc_cust_project_date'])).'</td>
+                         <td>'.$requisitionrow['stc_cust_project_title'].'</td>
+                         <td>'.$requisitionrow['stc_cust_project_address'].'</td>
+                         <td>'.$requisitionrow['stc_cust_project_responsive_person'].'</td>
+                         <td>'.$status.'</td>
+                         <td align="center">'.$actionattr.'</td>
+                     </tr>
+            ';
+         }
+      }else{
+         $optimusprime.='
+               <tr>
+                  <td colspan="10">No requisition found!!!</td>
+               </tr>
+         ';
+      }
+
+      $optimusprime.= '
+         <tr>
+            <td colspan="2">
+               '.$bjornebegval.' to '.$bjorneendval.'
+               <button type="button" class="btn btn-primary begbuttoninvsearch" style="float:right;">
+                  <i class="fas fa-arrow-left"></i>
+               </button>
+               <input type="hidden" class="begvalueinput" value="0">
+               <input type="hidden" class="begvalueinputsearch" value="'.$bjornebegval.'">
+            </td>
+            <td colspan="11">
+               <button type="button" class="btn btn-primary endbuttoninvsearch">
+                  <i class="fas fa-arrow-right"></i>
+               </button>
+               <input type="hidden" class="endvalueinput" value="20">
+               <input type="hidden" class="endvalueinputsearch" value="'.$bjorneendval.'">
+            </td>
+         </tr>
+      ';
+      return $optimusprime;
+   }
+
+   // call project details
+   public function stc_call_project_details($project_id){
+      $blackpearl='';
+      $blackpearl_pd_qry=mysqli_query($this->stc_dbs, "
+         SELECT
+            `stc_cust_project_title`,
+            `stc_cust_project_details_cust_name`,
+            `stc_cust_project_details_email_id`,
+            `stc_cust_project_details_cont_no`,
+            `stc_cust_project_details_purpose`,
+            `stc_cust_project_details_ref_contact`,
+            `stc_cust_project_details_job_details`,
+            `stc_cust_project_details_quote_number`,
+            `stc_cust_project_details_quote_date`,
+            `stc_cust_project_details_basic_val`,
+            `stc_cust_project_details_gst_val`,
+            `stc_cust_project_details_quotation_by`,
+            `stc_cust_project_details_mode_of_quote`,
+            `stc_cust_project_details_tar_price`,
+            `stc_cust_project_details_status`,
+            `stc_cust_project_details_remarks`,
+            `stc_cust_project_details_po_number`,
+            `stc_cust_project_details_po_value`
+         FROM
+            `stc_cust_project_details`
+         INNER JOIN 
+            `stc_cust_project` ON `stc_cust_project_id` = `stc_cust_project_details_pro_title_id`
+         WHERE
+            `stc_cust_project_details_pro_title_id`='".mysqli_real_escape_string($this->stc_dbs, $project_id)."'
+      ");
+      $blackpearl=((mysqli_num_rows($blackpearl_pd_qry)>0) ? mysqli_fetch_assoc($blackpearl_pd_qry) : 'NA');
+      return $blackpearl;
+   }
+}
+
+class ragnarReportsViewElectronicsPurchaseSaleReports extends tesseract{
+   // call purchase
+   public function stc_electronics_call_purchase($bjornebegdate, $bjorneenddate){
+      $grandtotal=0;
+      $totaldues=0;
+      $check_loki=mysqli_query($this->stc_dbs, "
+         SELECT
+            `stc_daily_purchase_id`,
+            `stc_daily_purchase_party_name`,
+            `stc_daily_purchase_items_material_desc`,
+            `stc_daily_purchase_refr_no`,
+            `stc_daily_purchase_refr_date`,
+            `stc_daily_purchase_items_id`,
+            `stc_daily_purchase_items_qty`,
+            `stc_daily_purchase_items_rate`,
+            `stc_daily_purchase_items_unit`,
+            `stc_daily_purchase_items_tax`,
+            `stc_daily_purchase_remarks`,
+            `stc_electronics_user_fullName`
+         FROM
+            `stc_daily_purchase_items`
+         INNER JOIN 
+            `stc_daily_purchase` 
+         ON 
+            `stc_daily_purchase_id` = `stc_daily_purchase_items_order_id`
+         INNER JOIN 
+            `stc_electronics_user` 
+         ON 
+            `stc_electronics_user_id` = `stc_daily_purchase_createdby`
+         WHERE
+            (DATE(`stc_daily_purchase_refr_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
+            AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."') 
+         ORDER BY DATE(`stc_daily_purchase_refr_date`) DESC
+      ");
+      $odin='
+         <table class="mb-0 table table-bordered table-responsive" id="stc-reports-electronics-pending-view">
+            <thead>
+              <tr>
+                <th scope="col">Party Name</th>
+                <th scope="col">Material Details</th>
+                <th scope="col">Invoice/ <br>Challan No</th>
+                <th scope="col">Invoice/ <br>Challan Date</th>
+                <th scope="col">Material Quantity</th>
+                <th scope="col">Material Rate</th>
+                <th scope="col">Tax</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Payment Mode</th>
+                <th scope="col">Payment Date</th>     
+                <th scope="col">Due Amount</th>                         
+                <th scope="col">Remarks</th>                          
+                <th scope="col">Created By</th>  
+              </tr>
+            </thead>
+            <tbody>  
+       ';
+      $do_action=mysqli_num_rows($check_loki);
+      if($do_action == 0){
+         $odin .= "<tr><td colspan='13' align='center'>No Record Found!!!</td></tr>";
+      }else{
+         foreach ($check_loki as $row) {
+            $check_loki_nest=mysqli_query($this->stc_dbs, "
+                  SELECT
+                     `stc_daily_purchase_payments_date`,
+                     `stc_daily_purchase_payments_type`,
+                     `stc_daily_purchase_payments_amount`
+                  FROM
+                     `stc_daily_purchase_payments`
+                  WHERE
+                     `stc_daily_purchase_payments_order_no`='".$row["stc_daily_purchase_items_id"]."'
+            ");
+            $paydate='';
+            $paytype='';
+            $payamount=0;
+            foreach ($check_loki_nest as $row2nd) {
+               $paydate=date('d-m-Y', strtotime($row2nd['stc_daily_purchase_payments_date']));
+               $paytype=$row2nd['stc_daily_purchase_payments_type'];
+               $payamount+=$row2nd['stc_daily_purchase_payments_amount'];
+            }
+
+            if($paytype==1){
+               $paytype='Account';
+            }elseif($paytype==2){
+               $paytype='Advance';
+            }elseif($paytype==3){
+               $paytype='Cash';
+            }else{
+               $paytype='Credit';
+            }
+            $basic=$row['stc_daily_purchase_items_qty'] * $row['stc_daily_purchase_items_rate'];
+            $gstamount=$basic * ($row['stc_daily_purchase_items_tax']/100);
+            $total=$basic + $gstamount;
+
+            $dues=$total - $payamount;
+            $grandtotal+=$total;
+            $totaldues+=$dues;
+
+            $coldues='';
+            if($dues>10){
+               $coldues='<h6 style="color:red;">'.number_format($dues, 2).'</h6>';
+            }else{
+               $coldues='<h6>'.number_format($dues, 2).'</h6>';
+            }
+
+            $odin.='
+               <tr>
+                     <td class="text-center">
+                       <b>'.$row["stc_daily_purchase_party_name"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_daily_purchase_items_material_desc"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$row["stc_daily_purchase_refr_no"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.date('d-m-y', strtotime($row["stc_daily_purchase_refr_date"])).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($row["stc_daily_purchase_items_qty"], 2).'/'.$row["stc_daily_purchase_items_unit"].'</b>
+                     </td>          
+                     <td class="text-right">
+                       <b>'.number_format($row["stc_daily_purchase_items_rate"], 2).'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_daily_purchase_items_tax"].'%</b>
+                     </td>
+                     <td class="text-right">
+                       <h6>'.number_format($total, 2).'</h6>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$paytype.'.</b>
+                     </td>
+                     <td>
+                       <b>'.$paydate.'</b>
+                     </td>
+                     <td class="text-right">
+                       '.$coldues.'
+                     </td>
+                     <td>
+                       <b>'.$row["stc_daily_purchase_remarks"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_electronics_user_fullName"].'</b>
+                     </td>
+                  </tr>          
+            ';          
+         }
+         
+      }
+
+      if($totaldues>10){
+         $coltotaldues='<b style="color: red;">'.number_format($totaldues, 2).'</b>';
+      }else{
+         $coltotaldues='<b>'.number_format($totaldues, 2).'</b>';
+      }
+      $odin.='
+               <tr>
+                  <td class="text-center" colspan="7">Total Purchased</td>
+                  <td class="text-right"><b>'.$grandtotal.'</b></td>
+                  <td class="text-center" colspan="2">Total Dues</td>
+                  <td class="text-right">'.$coltotaldues.'</td>
+                  <td colspan="2"></td>
+               </tr>
+            </tbody>
+            </table>
+      ';
+      return $odin;
+   }
+
+   // call sale
+   public function stc_electronics_call_sale($bjornebegdate, $bjorneenddate){
+      $grandtotal=0;
+      $totaldues=0;
+      $check_loki=mysqli_query($this->stc_dbs, "
+         SELECT
+            `stc_daily_sale_id`,
+            `stc_daily_sale_party_name`,
+            `stc_daily_sale_items_material_desc`,
+            `stc_daily_sale_refr_no`,
+            `stc_daily_sale_refr_date`,
+            `stc_daily_sale_items_id`,
+            `stc_daily_sale_items_qty`,
+            `stc_daily_sale_items_rate`,
+            `stc_daily_sale_items_unit`,
+            `stc_daily_sale_items_tax`,
+            `stc_daily_sale_remarks`,
+            `stc_daily_sale_by`,
+            `stc_electronics_user_fullName`
+         FROM
+            `stc_daily_sale_items`
+         INNER JOIN 
+            `stc_daily_sale` 
+         ON 
+            `stc_daily_sale_id` = `stc_daily_sale_items_order_id`
+         INNER JOIN 
+            `stc_electronics_user` 
+         ON 
+            `stc_electronics_user_id` = `stc_daily_sale_createdby`
+         WHERE
+            DATE(`stc_daily_sale_refr_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
+            AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."'
+         ORDER BY DATE(`stc_daily_sale_refr_date`) DESC
+      ");
+      $odin='
+         <table class="mb-0 table table-bordered table-responsive" id="stc-reports-electronics-pending-view">
+            <thead>
+              <tr>
+               <th scope="col">Party Name</th>
+               <th scope="col">Material Details</th>
+               <th scope="col">Invoice/ <br>Challan No</th>
+               <th scope="col">Invoice/ <br>Challan Date</th>
+               <th scope="col">Material Quantity</th>
+               <th scope="col">Material Rate</th>
+               <th scope="col">Tax</th>
+               <th scope="col">Amount</th>
+               <th scope="col">Payment Mode</th>
+               <th scope="col">Payment Date</th> 
+               <th scope="col">Due Amount</th> 
+               <th scope="col">Remarks</th> 
+               <th scope="col">Order By</th> 
+               <th scope="col">Created By</th> 
+              </tr>
+            </thead>
+            <tbody>  
+       ';
+      $do_action=mysqli_num_rows($check_loki);
+      if($do_action == 0){
+         $odin .= "<tr><td colspan='14' align='center'>No Record Found!!!</td></tr>";
+      }else{
+         foreach ($check_loki as $row) {
+            $check_loki_nest=mysqli_query($this->stc_dbs, "
+                  SELECT
+                     `stc_daily_sale_payments_date`,
+                     `stc_daily_sale_payments_type`,
+                     `stc_daily_sale_payments_amount`
+                  FROM
+                     `stc_daily_sale_payments`
+                  WHERE
+                     `stc_daily_sale_payments_order_no`='".$row["stc_daily_sale_items_id"]."'
+            ");
+            $paydate='';
+            $paytype='';
+            $payamount=0;
+            foreach ($check_loki_nest as $row2nd) {
+               $paydate=date('d-m-Y', strtotime($row2nd['stc_daily_sale_payments_date']));
+               $paytype=$row2nd['stc_daily_sale_payments_type'];
+               $payamount+=$row2nd['stc_daily_sale_payments_amount'];
+            }
+
+            if($paytype==1){
+               $paytype='Account';
+            }elseif($paytype==2){
+               $paytype='Advance';
+            }elseif($paytype==3){
+               $paytype='Cash';
+            }else{
+               $paytype='Credit';
+            }
+            $basic=$row['stc_daily_sale_items_qty'] * $row['stc_daily_sale_items_rate'];
+            $gstamount=$basic * ($row['stc_daily_sale_items_tax']/100);
+            $total=$basic + $gstamount;
+
+            $dues=$total - $payamount;
+            $grandtotal+=$total;
+            $totaldues+=$dues;
+
+            $coldues='';
+            if($dues>10){
+               $coldues='<h6 style="color:red;">'.number_format($dues, 2).'</h6>';
+            }else{
+               $coldues='<h6>'.number_format($dues, 2).'</h6>';
+            }
+            $odin.='
+               <tr>
+                     <td class="text-center">
+                       <b>'.$row["stc_daily_sale_party_name"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_daily_sale_items_material_desc"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$row["stc_daily_sale_refr_no"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.date('d-m-y', strtotime($row["stc_daily_sale_refr_date"])).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($row["stc_daily_sale_items_qty"], 2).'/'.$row["stc_daily_sale_items_unit"].'</b>
+                     </td>          
+                     <td class="text-right">
+                       <b>'.number_format($row["stc_daily_sale_items_rate"], 2).'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_daily_sale_items_tax"].'%</b>
+                     </td>
+                     <td class="text-right">
+                       <h6>'.number_format($total, 2).'</h6>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$paytype.'.</b>
+                     </td>
+                     <td>
+                       <b>'.$paydate.'</b>
+                     </td>
+                     <td class="text-right">
+                       '.$coldues.'
+                     </td>
+                     <td>
+                       <b>'.$row["stc_daily_sale_remarks"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_daily_sale_by"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_electronics_user_fullName"].'</b>
+                     </td>
+                  </tr>          
+            ';          
+         }
+      }
+
+      if($totaldues>10){
+         $coltotaldues='<b style="color: red;">'.number_format($totaldues, 2).'</b>';
+      }else{
+         $coltotaldues='<b>'.number_format($totaldues, 2).'</b>';
+      }
+      $odin.='
+               <tr>
+                  <td class="text-center" colspan="7">Total Sale</td>
+                  <td class="text-right"><b>'.number_format($grandtotal, 2).'</b></td>
+                  <td class="text-center" colspan="2">Total Dues</td>
+                  <td class="text-right">'.$coltotaldues.'</td>
+               </tr>
+            </tbody>
+            </table>
+      ';
+      return $odin;
+   }
+}
+
+class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
+   // trading purchase sale
+   // call purchase
+   public function stc_trading_call_purchase($bjornebegdate, $bjorneenddate){
+      $grandtotal=0;
+      $totaldues=0;
+      $check_loki=mysqli_query($this->stc_dbs, "
+         SELECT
+            `stc_trading_purchase_id`,
+            `stc_trading_purchase_date`,
+            `stc_trading_product_title`,
+            `stc_merchant_name`,
+            `stc_trading_purchase_refrence_no`,
+            `stc_trading_purchase_refrence_date`,
+            `stc_trading_purchase_items_qty`,
+            `stc_trading_purchase_items_price`,
+            `stc_trading_purchase_items_unit`,
+            `stc_trading_purchase_items_gst`,
+            `stc_trading_purchase_remarks`,
+            `stc_trading_user_name`
+         FROM
+            `stc_trading_purchase_items`
+         INNER JOIN 
+            `stc_trading_purchase` 
+         ON 
+            `stc_trading_purchase_items_purchase_id` = `stc_trading_purchase_id` 
+         INNER JOIN 
+            `stc_merchant` 
+         ON 
+            `stc_trading_purchase_purchaser_id` = `stc_merchant_id` 
+         INNER JOIN 
+            `stc_trading_product` 
+         ON 
+            `stc_trading_purchase_items_item_id` = `stc_trading_product_id`
+         INNER JOIN 
+            `stc_trading_user` 
+         ON 
+            `stc_trading_purchase_createdby` = `stc_trading_user_id`
+         WHERE
+             DATE(`stc_trading_purchase_refrence_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
+            AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."'
+         ORDER BY DATE(`stc_trading_purchase_date`) DESC
+      ");
+      $odin='
+         <table class="mb-0 table table-bordered table-responsive" id="stc-reports-trading-pending-view">
+            <thead>
+              <tr>
+                <th class="text-center" scope="col">Party Name</th>
+                <th class="text-center" scope="col">Material Details</th>
+                <th class="text-center" scope="col">Invoice/ <br>Challan No</th>
+                <th class="text-center" scope="col">Invoice/ <br>Challan Date</th>
+                <th class="text-center" scope="col">Material Quantity</th>
+                <th class="text-center" scope="col">Material Rate</th>
+                <th class="text-center" scope="col">Tax</th>
+                <th class="text-center" scope="col">Amount</th>
+                <th class="text-center" scope="col">Payment Mode</th>
+                <th class="text-center" scope="col">Payment Date</th>     
+                <th class="text-center" scope="col">Due Amount</th>                         
+                <th class="text-center" scope="col">Remarks</th>                          
+                <th class="text-center" scope="col">Created By</th>  
+              </tr>
+            </thead>
+            <tbody>  
+       ';
+      $do_action=mysqli_num_rows($check_loki);
+      if($do_action == 0){
+         $odin .= "<tr><td colspan='13' align='center'>No Record Found!!!</td></tr>";
+      }else{
+         foreach ($check_loki as $row) {
+            $check_loki_nest=mysqli_query($this->stc_dbs, "
+               SELECT
+                   `stc_trading_purchase_payment_date`,
+                   `stc_trading_purchase_payment_type`,
+                   `stc_trading_purchase_payment_value`
+               FROM
+                   `stc_trading_purchase_payment`
+               WHERE
+                   `stc_trading_purchase_payment_purchase_id`='".$row["stc_trading_purchase_id"]."'
+            ");
+            $paydate='';
+            $paytype='';
+            $payamount=0;
+            foreach ($check_loki_nest as $row2nd) {
+               $paydate=date('d-m-Y', strtotime($row2nd['stc_trading_purchase_payment_date']));
+               $paytype=$row2nd['stc_trading_purchase_payment_type'];
+               $payamount+=$row2nd['stc_trading_purchase_payment_value'];
+            }
+
+            if($paytype=='Cash'){
+               $paytype='Cash';
+            }elseif($paytype=='Account'){
+               $paytype='Account';
+            }else{
+               $paytype='Credit';
+            }
+            $basic=$row['stc_trading_purchase_items_qty'] * $row['stc_trading_purchase_items_price'];
+            $gstamount=$basic * ($row['stc_trading_purchase_items_gst']/100);
+            $total=$basic + $gstamount;
+
+            $dues=$total - $payamount;
+
+            if(mysqli_num_rows($check_loki_nest)>0){
+               $dues=0;
+            }
+            
+            $grandtotal+=$total;
+            $totaldues+=$dues;
+            $coldues='';
+            if($dues>10){
+               $coldues='<h6 style="color:red;">'.number_format($dues, 2).'</h6>';
+            }else{
+               $coldues='<h6>'.number_format($dues, 2).'</h6>';
+            }
+            $odin.='
+               <tr>
+                     <td class="text-center">
+                       <b>'.$row["stc_merchant_name"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_trading_product_title"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$row["stc_trading_purchase_refrence_no"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.date('d-m-y', strtotime($row["stc_trading_purchase_refrence_date"])).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($row["stc_trading_purchase_items_qty"], 2).'/'.$row["stc_trading_purchase_items_unit"].'</b>
+                     </td>          
+                     <td class="text-right">
+                       <b>'.number_format($row["stc_trading_purchase_items_price"], 2).'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_trading_purchase_items_gst"].'%</b>
+                     </td>
+                     <td class="text-right">
+                       <h6>'.number_format($total, 2).'</h6>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$paytype.'.</b>
+                     </td>
+                     <td>
+                       <b>'.$paydate.'</b>
+                     </td>
+                     <td class="text-right">
+                       '.$coldues.'
+                     </td>
+                     <td>
+                       <b>'.$row["stc_trading_purchase_remarks"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_trading_user_name"].'</b>
+                     </td>
+                  </tr>          
+            ';          
+         }
+      }
+
+      if($totaldues>10){
+         $coltotaldues='<b style="color: red;">'.number_format($totaldues, 2).'</b>';
+      }else{
+         $coltotaldues='<b>'.number_format($totaldues, 2).'</b>';
+      }
+      $odin.='
+               <tr>
+                  <td class="text-center" colspan="7">Total Purchased</td>
+                  <td class="text-right"><b>'.number_format($grandtotal, 2).'</b></td>
+                  <td class="text-center" colspan="2">Total Dues</td>
+                  <td class="text-right">'.$coltotaldues.'</td>
+                  <td colspan="2"></td>
+               </tr>
+            </tbody>
+            </table>
+      ';
+      return $odin;
+   }
+
+   // call sale
+   public function stc_trading_call_sale($bjornebegdate, $bjorneenddate){
+      $grandtotal=0;
+      $totaldues=0;
+      $check_loki=mysqli_query($this->stc_dbs, "
+         SELECT
+            `stc_trading_sale_id`,
+            `stc_trading_sale_date`,
+            `stc_trading_product_title`,
+            `stc_trading_customer_title`,
+            `stc_trading_sale_items_item_qty`,
+            `stc_trading_sale_items_item_price`,
+            `stc_trading_sale_items_item_unit`,
+            `stc_trading_sale_items_item_gst`,
+            `stc_trading_sale_remarks`,
+            `stc_trading_user_name`,
+            `stc_trading_sale_order_by`
+         FROM
+            `stc_trading_sale`
+         INNER JOIN 
+            `stc_trading_customer` 
+         ON 
+            `stc_trading_sale_cust_id` = `stc_trading_customer_id` 
+         INNER JOIN 
+            `stc_trading_sale_items` 
+         ON 
+            `stc_trading_sale_id` = `stc_trading_sale_items_sale_id` 
+         INNER JOIN 
+            `stc_trading_product` 
+         ON 
+            `stc_trading_sale_items_item_id` = `stc_trading_product_id` 
+         INNER JOIN 
+            `stc_trading_user` 
+         ON 
+            `stc_trading_sale_created_by` = `stc_trading_user_id` 
+         WHERE
+            DATE(`stc_trading_sale_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
+            AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."'
+         ORDER BY DATE(`stc_trading_sale_date`) DESC
+      ");
+      $odin='
+         <table class="mb-0 table table-bordered table-hover table-responsive" id="stc-reports-trading-pending-view">
+            <thead>
+              <tr>
+               <th class="text-center" scope="col">Party Name</th>
+               <th class="text-center" scope="col">Material Details</th>
+               <th class="text-center" scope="col">Invoice/ <br>Challan No</th>
+               <th class="text-center" scope="col">Invoice/ <br>Challan Date</th>
+               <th class="text-center" scope="col">Quantity</th>
+               <th class="text-center" scope="col">Unit</th>
+               <th class="text-center" scope="col">Rate</th>
+               <th class="text-center" scope="col">28%</th>
+               <th class="text-center" scope="col">18%</th>
+               <th class="text-center" scope="col">Amount</th>
+               <th class="text-center" scope="col">Payment Mode</th>
+               <th class="text-center" scope="col">Payment Trans</th> 
+               <th class="text-center" scope="col">Due Amount</th> 
+               <th class="text-center" scope="col">Due (In Days)</th> 
+               <th class="text-center" scope="col">Remarks</th> 
+               <th class="text-center" scope="col">Order By</th> 
+               <th class="text-center" scope="col">Created By</th> 
+              </tr>
+            </thead>
+            <tbody>  
+       ';
+      $do_action=mysqli_num_rows($check_loki);
+      if($do_action == 0){
+         $odin .= "<tr><td colspan='14' align='center'>No Record Found!!!</td></tr>";
+      }else{
+         foreach ($check_loki as $row) {
+            $check_loki_nest=mysqli_query($this->stc_dbs, "
+               SELECT
+                  `stc_trading_sale_payment_date`,
+                  `stc_trading_sale_payment_type`,
+                  `stc_trading_sale_payment_value`
+               FROM
+                  `stc_trading_sale_payment`
+               WHERE
+                  `stc_trading_sale_payment_sale_id`='".$row["stc_trading_sale_id"]."'
+            ");
+            $paydate='';
+            $paytype='';
+            $payamount=0;
+            $paytrans='';
+            foreach ($check_loki_nest as $row2nd) {
+               $paydate=date('d-m-Y', strtotime($row2nd['stc_trading_sale_payment_date']));
+               $paytype=$row2nd['stc_trading_sale_payment_type'];
+               $payamount+=$row2nd['stc_trading_sale_payment_value'];
+               $paytrans.='<span>'.number_format($row2nd['stc_trading_sale_payment_value'], 2).' on '.$paydate.'</span>.<br>';
+            }
+            if($paytype=='Cash'){
+               $paytype='Cash';
+            }elseif($paytype=='Account'){
+               $paytype='Account';
+            }else{
+               $paytype='Credit';
+            }
+            $basic=$row['stc_trading_sale_items_item_qty'] * $row['stc_trading_sale_items_item_price'];
+            $gstamount=$basic * ($row['stc_trading_sale_items_item_gst']/100);
+            $total=$basic + $gstamount;
+
+            $dues=$total - $payamount;
+
+            if(mysqli_num_rows($check_loki_nest)>0){
+               $dues=0;
+            }
+
+            $price=$row["stc_trading_sale_items_item_price"] + ($row["stc_trading_sale_items_item_price"] * $row["stc_trading_sale_items_item_gst"]/100);
+            $gst18=0;
+            $gst28=0;
+            if($row["stc_trading_sale_items_item_gst"]==18){
+               $gst18=$basic * $row["stc_trading_sale_items_item_gst"]/100;
+            }else{
+               $gst28=$basic * $row["stc_trading_sale_items_item_gst"]/100;
+            }
+
+            $grandtotal+=$total;
+            $totaldues+=$dues;
+
+            $coldues='';
+            $numberDays=''; 
+
+            $today = date("Y/m/d"); 
+            $startTimeStamp = strtotime($row["stc_trading_sale_date"]);
+            $endTimeStamp = strtotime($today);
+
+            $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+            $numberDays = $timeDiff/86400;  // 86400 seconds in one day
+
+            if($dues>10){
+               $coldues='<h6 style="color:red;">'.number_format($dues, 2).'</h6>';
+               // and you might want to convert to integer
+               $numberDays = '<h6 style="color:red;">'.intval($numberDays).'</h6>';
+            }else{
+               $coldues='<h6>'.number_format($dues, 2).'</h6>';
+               $numberDays = '<h6">0 </h6>';
+            }
+
+            $odin.='
+               <tr>
+                     <td class="text-center">
+                       <b>'.$row["stc_trading_customer_title"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_trading_product_title"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$row["stc_trading_sale_id"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.date('d-m-y', strtotime($row["stc_trading_sale_date"])).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($row["stc_trading_sale_items_item_qty"], 2).'</b>
+                     </td>          
+                     <td class="text-right">
+                       <b>'.$row["stc_trading_sale_items_item_unit"].'</b>
+                     </td>          
+                     <td class="text-right">
+                       <b>'.number_format($price, 2).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($gst18, 2).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($gst28, 2).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($total, 2).'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$paytype.'.</b>
+                     </td>
+                     <td>
+                       <b>'.$paytrans.'</b>
+                     </td>
+                     <td class="text-right">
+                        '.$coldues.'
+                     </td>
+                     <td class="text-center">
+                        '.$numberDays.'
+                     </td>
+                     <td>
+                       <b>'.$row["stc_trading_sale_remarks"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_trading_sale_order_by"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_trading_user_name"].'</b>
+                     </td>
+                  </tr>          
+            ';          
+         }
+      }
+      if($totaldues>10){
+         $coltotaldues='<b style="color: red;">'.number_format($totaldues, 2).'</b>';
+      }else{
+         $coltotaldues='<b>'.number_format($totaldues, 2).'</b>';
+      }
+      $odin.='
+               <tr>
+                  <td class="text-right" colspan="9">Total Sale :</td>
+                  <td class="text-right"><b>'.number_format($grandtotal, 2).'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+               <tr>
+                  <td class="text-right" colspan="9">Total Recieved :</td>
+                  <td class="text-right"><b>'.number_format(($grandtotal - $totaldues), 2).'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+               <tr>
+                  <td class="text-right" colspan="9">Total Dues :</td>
+                  <td class="text-right"><b>'.$coltotaldues.'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+            </tbody>
+            </table>
+      ';
+      return $odin;
+   }
+}
+
+class ragnarReportsViewgroceriesPurchaseSaleReports extends tesseract{
+   // groceries purchase sale
+   // call purchase
+   public function stc_groceries_call_purchase($bjornebegdate, $bjorneenddate){
+      $grandtotal=0;
+      $totaldues=0;
+      $check_loki=mysqli_query($this->stc_dbs, "
+         SELECT
+            `stc_groceries_purchase_id`,
+            `stc_groceries_purchase_date`,
+            `stc_groceries_product_title`,
+            `stc_groceries_merchant_title`,
+            `stc_groceries_purchase_refrence_no`,
+            `stc_groceries_purchase_refrence_date`,
+            `stc_groceries_purchase_items_qty`,
+            `stc_groceries_purchase_items_price`,
+            `stc_groceries_purchase_items_unit`,
+            `stc_groceries_purchase_items_gst`,
+            `stc_groceries_purchase_remarks`,
+            `stc_groceries_user_name`
+         FROM
+            `stc_groceries_purchase_items`
+         INNER JOIN 
+            `stc_groceries_purchase` 
+         ON 
+            `stc_groceries_purchase_items_purchase_id` = `stc_groceries_purchase_id` 
+         INNER JOIN 
+            `stc_groceries_merchant` 
+         ON 
+            `stc_groceries_purchase_purchaser_id` = `stc_groceries_merchant_id` 
+         INNER JOIN 
+            `stc_groceries_product` 
+         ON 
+            `stc_groceries_purchase_items_item_id` = `stc_groceries_product_id`
+         INNER JOIN 
+            `stc_groceries_user` 
+         ON 
+            `stc_groceries_purchase_createdby` = `stc_groceries_user_id`
+         WHERE
+             DATE(`stc_groceries_purchase_refrence_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
+            AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."'
+         ORDER BY DATE(`stc_groceries_purchase_date`) DESC
+      ");
+      $odin='
+         <table class="mb-0 table table-bordered table-responsive" id="stc-reports-groceries-pending-view">
+            <thead>
+              <tr>
+                <th class="text-center" scope="col">Party Name</th>
+                <th class="text-center" scope="col">Material Details</th>
+                <th class="text-center" scope="col">Invoice/ <br>Challan No</th>
+                <th class="text-center" scope="col">Invoice/ <br>Challan Date</th>
+                <th class="text-center" scope="col">Material Quantity</th>
+                <th class="text-center" scope="col">Material Rate</th>
+                <th class="text-center" scope="col">Tax</th>
+                <th class="text-center" scope="col">Amount</th>
+                <th class="text-center" scope="col">Payment Mode</th>
+                <th class="text-center" scope="col">Payment Date</th>     
+                <th class="text-center" scope="col">Due Amount</th>                         
+                <th class="text-center" scope="col">Remarks</th>                          
+                <th class="text-center" scope="col">Created By</th>  
+              </tr>
+            </thead>
+            <tbody>  
+       ';
+      $do_action=mysqli_num_rows($check_loki);
+      if($do_action == 0){
+         $odin .= "<tr><td colspan='13' align='center'>No Record Found!!!</td></tr>";
+      }else{
+         foreach ($check_loki as $row) {
+            $check_loki_nest=mysqli_query($this->stc_dbs, "
+               SELECT
+                   `stc_groceries_purchase_payment_date`,
+                   `stc_groceries_purchase_payment_type`,
+                   `stc_groceries_purchase_payment_value`
+               FROM
+                   `stc_groceries_purchase_payment`
+               WHERE
+                   `stc_groceries_purchase_payment_purchase_id`='".$row["stc_groceries_purchase_id"]."'
+            ");
+            $paydate='';
+            $paytype='';
+            $payamount=0;
+            foreach ($check_loki_nest as $row2nd) {
+               $paydate=date('d-m-Y', strtotime($row2nd['stc_groceries_purchase_payment_date']));
+               $paytype=$row2nd['stc_groceries_purchase_payment_type'];
+               $payamount+=$row2nd['stc_groceries_purchase_payment_value'];
+            }
+
+            if($paytype=='Cash'){
+               $paytype='Cash';
+            }elseif($paytype=='Account'){
+               $paytype='Account';
+            }else{
+               $paytype='Credit';
+            }
+            $basic=$row['stc_groceries_purchase_items_qty'] * $row['stc_groceries_purchase_items_price'];
+            $gstamount=$basic * ($row['stc_groceries_purchase_items_gst']/100);
+            $total=$basic + $gstamount;
+
+            $dues=$total - $payamount;
+
+            if(mysqli_num_rows($check_loki_nest)>0){
+               $dues=0;
+            }
+            
+            $grandtotal+=$total;
+            $totaldues+=$dues;
+            $coldues='';
+            if($dues>10){
+               $coldues='<h6 style="color:red;">'.number_format($dues, 2).'</h6>';
+            }else{
+               $coldues='<h6>'.number_format($dues, 2).'</h6>';
+            }
+            $odin.='
+               <tr>
+                     <td class="text-center">
+                       <b>'.$row["stc_groceries_merchant_title"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_groceries_product_title"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$row["stc_groceries_purchase_refrence_no"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.date('d-m-y', strtotime($row["stc_groceries_purchase_refrence_date"])).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($row["stc_groceries_purchase_items_qty"], 2).'/'.$row["stc_groceries_purchase_items_unit"].'</b>
+                     </td>          
+                     <td class="text-right">
+                       <b>'.number_format($row["stc_groceries_purchase_items_price"], 2).'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_groceries_purchase_items_gst"].'%</b>
+                     </td>
+                     <td class="text-right">
+                       <h6>'.number_format($total, 2).'</h6>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$paytype.'.</b>
+                     </td>
+                     <td>
+                       <b>'.$paydate.'</b>
+                     </td>
+                     <td class="text-right">
+                       '.$coldues.'
+                     </td>
+                     <td>
+                       <b>'.$row["stc_groceries_purchase_remarks"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_groceries_user_name"].'</b>
+                     </td>
+                  </tr>          
+            ';          
+         }
+      }
+
+      if($totaldues>10){
+         $coltotaldues='<b style="color: red;">'.number_format($totaldues, 2).'</b>';
+      }else{
+         $coltotaldues='<b>'.number_format($totaldues, 2).'</b>';
+      }
+      $odin.='
+               <tr>
+                  <td class="text-center" colspan="7">Total Purchased</td>
+                  <td class="text-right"><b>'.number_format($grandtotal, 2).'</b></td>
+                  <td class="text-center" colspan="2">Total Dues</td>
+                  <td class="text-right">'.$coltotaldues.'</td>
+                  <td colspan="2"></td>
+               </tr>
+            </tbody>
+            </table>
+      ';
+      return $odin;
+   }
+
+   // call sale
+   public function stc_groceries_call_sale($bjornebegdate, $bjorneenddate){
+      $grandtotal=0;
+      $totaldues=0;
+      $check_loki=mysqli_query($this->stc_dbs, "
+         SELECT
+            `stc_groceries_sale_id`,
+            `stc_groceries_sale_date`,
+            `stc_groceries_product_title`,
+            `stc_groceries_customer_title`,
+            `stc_groceries_sale_items_item_qty`,
+            `stc_groceries_sale_items_item_price`,
+            `stc_groceries_sale_items_item_unit`,
+            `stc_groceries_sale_items_item_gst`,
+            `stc_groceries_sale_remarks`,
+            `stc_groceries_user_name`,
+            `stc_groceries_sale_order_by`
+         FROM
+            `stc_groceries_sale`
+         INNER JOIN 
+            `stc_groceries_customer` 
+         ON 
+            `stc_groceries_sale_cust_id` = `stc_groceries_customer_id` 
+         INNER JOIN 
+            `stc_groceries_sale_items` 
+         ON 
+            `stc_groceries_sale_id` = `stc_groceries_sale_items_sale_id` 
+         INNER JOIN 
+            `stc_groceries_product` 
+         ON 
+            `stc_groceries_sale_items_item_id` = `stc_groceries_product_id` 
+         INNER JOIN 
+            `stc_groceries_user` 
+         ON 
+            `stc_groceries_sale_created_by` = `stc_groceries_user_id` 
+         WHERE
+            DATE(`stc_groceries_sale_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
+            AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."'
+         ORDER BY DATE(`stc_groceries_sale_date`) DESC
+      ");
+      $odin='
+         <table class="mb-0 table table-bordered table-hover table-responsive" id="stc-reports-groceries-pending-view">
+            <thead>
+              <tr>
+               <th class="text-center" scope="col">Party Name</th>
+               <th class="text-center" scope="col">Material Details</th>
+               <th class="text-center" scope="col">Invoice/ <br>Challan No</th>
+               <th class="text-center" scope="col">Invoice/ <br>Challan Date</th>
+               <th class="text-center" scope="col">Quantity</th>
+               <th class="text-center" scope="col">Unit</th>
+               <th class="text-center" scope="col">Rate</th>
+               <th class="text-center" scope="col">28%</th>
+               <th class="text-center" scope="col">18%</th>
+               <th class="text-center" scope="col">Amount</th>
+               <th class="text-center" scope="col">Payment Mode</th>
+               <th class="text-center" scope="col">Payment Trans</th> 
+               <th class="text-center" scope="col">Due Amount</th> 
+               <th class="text-center" scope="col">Due (In Days)</th> 
+               <th class="text-center" scope="col">Remarks</th> 
+               <th class="text-center" scope="col">Order By</th> 
+               <th class="text-center" scope="col">Created By</th> 
+              </tr>
+            </thead>
+            <tbody>  
+       ';
+      $do_action=mysqli_num_rows($check_loki);
+      if($do_action == 0){
+         $odin .= "<tr><td colspan='14' align='center'>No Record Found!!!</td></tr>";
+      }else{
+         foreach ($check_loki as $row) {
+            $check_loki_nest=mysqli_query($this->stc_dbs, "
+               SELECT
+                  `stc_groceries_sale_payment_date`,
+                  `stc_groceries_sale_payment_type`,
+                  `stc_groceries_sale_payment_value`
+               FROM
+                  `stc_groceries_sale_payment`
+               WHERE
+                  `stc_groceries_sale_payment_sale_id`='".$row["stc_groceries_sale_id"]."'
+            ");
+            $paydate='';
+            $paytype='';
+            $payamount=0;
+            $paytrans='';
+            foreach ($check_loki_nest as $row2nd) {
+               $paydate=date('d-m-Y', strtotime($row2nd['stc_groceries_sale_payment_date']));
+               $paytype=$row2nd['stc_groceries_sale_payment_type'];
+               $payamount+=$row2nd['stc_groceries_sale_payment_value'];
+               $paytrans.='<span>'.number_format($row2nd['stc_groceries_sale_payment_value'], 2).' on '.$paydate.'</span>.<br>';
+            }
+            if($paytype=='Cash'){
+               $paytype='Cash';
+            }elseif($paytype=='Account'){
+               $paytype='Account';
+            }else{
+               $paytype='Credit';
+            }
+            $basic=$row['stc_groceries_sale_items_item_qty'] * $row['stc_groceries_sale_items_item_price'];
+            $gstamount=$basic * ($row['stc_groceries_sale_items_item_gst']/100);
+            $total=$basic + $gstamount;
+
+            $dues=$total - $payamount;
+
+            if(mysqli_num_rows($check_loki_nest)>0){
+               $dues=0;
+            }
+
+            $price=$row["stc_groceries_sale_items_item_price"] + ($row["stc_groceries_sale_items_item_price"] * $row["stc_groceries_sale_items_item_gst"]/100);
+            $gst18=0;
+            $gst28=0;
+            if($row["stc_groceries_sale_items_item_gst"]==18){
+               $gst18=$basic * $row["stc_groceries_sale_items_item_gst"]/100;
+            }else{
+               $gst28=$basic * $row["stc_groceries_sale_items_item_gst"]/100;
+            }
+
+            $grandtotal+=$total;
+            $totaldues+=$dues;
+
+            $coldues='';
+            $numberDays=''; 
+
+            $today = date("Y/m/d"); 
+            $startTimeStamp = strtotime($row["stc_groceries_sale_date"]);
+            $endTimeStamp = strtotime($today);
+
+            $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+            $numberDays = $timeDiff/86400;  // 86400 seconds in one day
+
+            if($dues>10){
+               $coldues='<h6 style="color:red;">'.number_format($dues, 2).'</h6>';
+               // and you might want to convert to integer
+               $numberDays = '<h6 style="color:red;">'.intval($numberDays).'</h6>';
+            }else{
+               $coldues='<h6>'.number_format($dues, 2).'</h6>';
+               $numberDays = '<h6">0 </h6>';
+            }
+
+            $odin.='
+               <tr>
+                     <td class="text-center">
+                       <b>'.$row["stc_groceries_customer_title"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_groceries_product_title"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$row["stc_groceries_sale_id"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.date('d-m-y', strtotime($row["stc_groceries_sale_date"])).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($row["stc_groceries_sale_items_item_qty"], 2).'</b>
+                     </td>          
+                     <td class="text-right">
+                       <b>'.$row["stc_groceries_sale_items_item_unit"].'</b>
+                     </td>          
+                     <td class="text-right">
+                       <b>'.number_format($price, 2).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($gst18, 2).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($gst28, 2).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($total, 2).'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$paytype.'.</b>
+                     </td>
+                     <td>
+                       <b>'.$paytrans.'</b>
+                     </td>
+                     <td class="text-right">
+                        '.$coldues.'
+                     </td>
+                     <td class="text-center">
+                        '.$numberDays.'
+                     </td>
+                     <td>
+                       <b>'.$row["stc_groceries_sale_remarks"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_groceries_sale_order_by"].'</b>
+                     </td>
+                     <td>
+                       <b>'.$row["stc_groceries_user_name"].'</b>
+                     </td>
+                  </tr>          
+            ';          
+         }
+      }
+      if($totaldues>10){
+         $coltotaldues='<b style="color: red;">'.number_format($totaldues, 2).'</b>';
+      }else{
+         $coltotaldues='<b>'.number_format($totaldues, 2).'</b>';
+      }
+      $odin.='
+               <tr>
+                  <td class="text-right" colspan="9">Total Sale :</td>
+                  <td class="text-right"><b>'.number_format($grandtotal, 2).'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+               <tr>
+                  <td class="text-right" colspan="9">Total Recieved :</td>
+                  <td class="text-right"><b>'.number_format(($grandtotal - $totaldues), 2).'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+               <tr>
+                  <td class="text-right" colspan="9">Total Dues :</td>
+                  <td class="text-right"><b>'.$coltotaldues.'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+            </tbody>
+            </table>
+      ';
+      return $odin;
+   }
+}
+
+class ragnarReportsViewSchoolCanteenReports extends tesseract{
+   // call canteen
+   public function stc_school_call_canteen($bjornebegdate, $bjorneenddate){
+      $odin='';
+      $odin_get_req_qry=mysqli_query($this->stc_dbs, "
+         SELECT DISTINCT
+             `stc_school_canteen_date`
+         FROM
+             `stc_school_canteen`
+         WHERE 
+            DATE(`stc_school_canteen_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
+            AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."'
+         ORDER BY DATE(`stc_school_canteen_date`) DESC
+      ");
+      if(mysqli_num_rows($odin_get_req_qry)>0){
+         $maxtotal=0;
+         $maxstudent=0;
+         $maxteacher=0;
+         $maxstaff=0;
+         $maxguest=0;
+
+         $studtotbreakfast=0;
+         $studtotlunch=0;
+         $studtoteveningsnacks=0;
+         $studtotdinner=0;
+
+         $teachertotbreakfast=0;
+         $teachertotlunch=0;
+         $teachertoteveningsnacks=0;
+         $teachertotdinner=0;
+
+         $stafftotbreakfast=0;
+         $stafftotlunch=0;
+         $stafftoteveningsnacks=0;
+         $stafftotdinner=0;
+
+         $guesttotbreakfast=0;
+         $guesttotlunch=0;
+         $guesttoteveningsnacks=0;
+         $guesttotdinner=0;
+         foreach($odin_get_req_qry as $req_row){
+            $student=0;
+            $teacher=0;
+            $staff=0;
+            $guest=0;
+            $total=0;
+
+            $odin_getstudentqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                   `stc_school_canteen_serve_quantity`
+               FROM
+                   `stc_school_canteen`
+               WHERE 
+                  DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_canteen_date'])."'
+               AND 
+                  `stc_school_canteen_serve_type`='student'
+               ORDER BY DATE(`stc_school_canteen_date`) DESC
+            ");
+
+            foreach($odin_getstudentqry as $odin_getstudentrow){
+               $student+=$odin_getstudentrow['stc_school_canteen_serve_quantity'];
+            }
+
+            $odin_getteacherqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                   `stc_school_canteen_serve_quantity`
+               FROM
+                   `stc_school_canteen`
+               WHERE 
+                  DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_canteen_date'])."'
+               AND 
+                  `stc_school_canteen_serve_type`='teacher'
+               ORDER BY DATE(`stc_school_canteen_date`) DESC
+            ");
+
+            foreach($odin_getteacherqry as $odin_getteacherrow){
+               $teacher+=$odin_getteacherrow['stc_school_canteen_serve_quantity'];
+            }
+
+            $odin_getstaffqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                   `stc_school_canteen_serve_quantity`
+               FROM
+                   `stc_school_canteen`
+               WHERE 
+                  DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_canteen_date'])."'
+               AND 
+                  `stc_school_canteen_serve_type`='staff'
+               ORDER BY DATE(`stc_school_canteen_date`) DESC
+            ");
+
+            foreach($odin_getstaffqry as $odin_getstaffrow){
+               $staff+=$odin_getstaffrow['stc_school_canteen_serve_quantity'];
+            }
+
+            $odin_getguestqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                   `stc_school_canteen_serve_quantity`
+               FROM
+                   `stc_school_canteen`
+               WHERE 
+                  DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_canteen_date'])."'
+               AND 
+                  `stc_school_canteen_serve_type`='guest'
+               ORDER BY DATE(`stc_school_canteen_date`) DESC
+            ");
+
+            foreach($odin_getguestqry as $odin_getguestrow){
+               $guest+=$odin_getguestrow['stc_school_canteen_serve_quantity'];
+            }
+
+            $total= $student + $teacher + $staff + $guest;
+            $maxtotal+=$total;
+            $maxstudent+=$student;
+            $maxteacher+=$teacher;
+            $maxstaff+=$staff;
+            $maxguest+=$guest;
+            $odin.='
+               <tr>
+                  <td class="text-center">'.date('d-m-Y', strtotime($req_row['stc_school_canteen_date'])).'</td>
+                  <td class="text-right">'.number_format($student, 2).'</td>
+                  <td class="text-right">'.number_format($teacher, 2).'</td>
+                  <td class="text-right">'.number_format($staff, 2).'</td>
+                  <td class="text-right">'.number_format($guest, 2).'</td>
+                  <td class="text-right"><a href="#" class="stc-school-showdeep-req" id="'.$req_row['stc_school_canteen_date'].'">'.number_format($total, 2).'</a></td>
+               </tr>
+            ';
+
+            // for total serving time qry
+            $odin_getqry=mysqli_query($this->stc_dbs, "
+               SELECT
+                   `stc_school_canteen_serve_type`,
+                   `stc_school_canteen_serve_time`,
+                   `stc_school_canteen_serve_quantity`
+               FROM
+                   `stc_school_canteen`
+               WHERE
+                   DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_canteen_date'])."'
+            ");
+            foreach($odin_getqry as $odin_getrow){
+               if($odin_getrow['stc_school_canteen_serve_type']=="student" && $odin_getrow['stc_school_canteen_serve_time']=="breakfast"){
+                  $studtotbreakfast+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="student" && $odin_getrow['stc_school_canteen_serve_time']=="lunch"){
+                  $studtotlunch+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="student" && $odin_getrow['stc_school_canteen_serve_time']=="evening snacks"){
+                  $studtoteveningsnacks+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="student" && $odin_getrow['stc_school_canteen_serve_time']=="dinner"){
+                  $studtotdinner+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="teacher" && $odin_getrow['stc_school_canteen_serve_time']=="breakfast"){
+                  $teachertotbreakfast+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="teacher" && $odin_getrow['stc_school_canteen_serve_time']=="lunch"){
+                  $teachertotlunch+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="teacher" && $odin_getrow['stc_school_canteen_serve_time']=="evening snacks"){
+                  $teachertoteveningsnacks+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="teacher" && $odin_getrow['stc_school_canteen_serve_time']=="dinner"){
+                  $teachertotdinner+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="staff" && $odin_getrow['stc_school_canteen_serve_time']=="breakfast"){
+                  $stafftotbreakfast+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="staff" && $odin_getrow['stc_school_canteen_serve_time']=="lunch"){
+                  $stafftotlunch+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="staff" && $odin_getrow['stc_school_canteen_serve_time']=="evening snacks"){
+                  $stafftoteveningsnacks+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="staff" && $odin_getrow['stc_school_canteen_serve_time']=="dinner"){
+                  $stafftotdinner+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="guest" && $odin_getrow['stc_school_canteen_serve_time']=="breakfast"){
+                  $guesttotbreakfast+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="guest" && $odin_getrow['stc_school_canteen_serve_time']=="lunch"){
+                  $guesttotlunch+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="guest" && $odin_getrow['stc_school_canteen_serve_time']=="evening snacks"){
+                  $guesttoteveningsnacks+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }elseif($odin_getrow['stc_school_canteen_serve_type']=="guest" && $odin_getrow['stc_school_canteen_serve_time']=="dinner"){
+                  $guesttotdinner+=$odin_getrow['stc_school_canteen_serve_quantity'];
+               }
+            }  
+         }
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-center">Total</td>
+               <td class="text-right">'.number_format($maxstudent, 2).' NOS</td>
+               <td class="text-right">'.number_format($maxteacher, 2).' NOS</td>
+               <td class="text-right">'.number_format($maxstaff, 2).' NOS</td>
+               <td class="text-right">'.number_format($maxguest, 2).' NOS</td>
+               <td class="text-right">'.number_format($maxtotal, 2).' NOS</td>
+            </tr>
+         ';
+
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-center">Total Breakfast</td>
+               <td class="text-right">'.number_format($studtotbreakfast, 2).' NOS</td>
+               <td class="text-right">'.number_format($teachertotbreakfast, 2).' NOS</td>
+               <td class="text-right">'.number_format($stafftotbreakfast, 2).' NOS</td>
+               <td class="text-right">'.number_format($guesttotbreakfast, 2).' NOS</td>
+               <td class="text-right">'.number_format($studtotbreakfast + $teachertotbreakfast + $stafftotbreakfast + $guesttotbreakfast, 2).' NOS</td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-center">Total Lunch</td>
+               <td class="text-right">'.number_format($studtotlunch, 2).' NOS</td>
+               <td class="text-right">'.number_format($teachertotlunch, 2).' NOS</td>
+               <td class="text-right">'.number_format($stafftotlunch, 2).' NOS</td>
+               <td class="text-right">'.number_format($guesttotlunch, 2).' NOS</td>
+               <td class="text-right">'.number_format($studtotlunch + $teachertotlunch + $stafftotlunch + $guesttotlunch, 2).' NOS</td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-center">Total Evening Snacks</td>
+               <td class="text-right">'.number_format($studtoteveningsnacks, 2).' NOS</td>
+               <td class="text-right">'.number_format($teachertoteveningsnacks, 2).' NOS</td>
+               <td class="text-right">'.number_format($stafftoteveningsnacks, 2).' NOS</td>
+               <td class="text-right">'.number_format($guesttoteveningsnacks, 2).' NOS</td>
+               <td class="text-right">'.number_format($studtoteveningsnacks + $teachertoteveningsnacks + $stafftoteveningsnacks + $guesttoteveningsnacks, 2).' NOS</td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-center">Total Dinner</td>
+               <td class="text-right">'.number_format($studtotdinner, 2).' NOS</td>
+               <td class="text-right">'.number_format($teachertotdinner, 2).' NOS</td>
+               <td class="text-right">'.number_format($stafftotdinner, 2).' NOS</td>
+               <td class="text-right">'.number_format($guesttotdinner, 2).' NOS</td>
+               <td class="text-right">'.number_format($studtotdinner + $teachertotdinner + $stafftotdinner + $guesttotdinner, 2).' NOS</td>
+            </tr>
+         ';
+      }else{
+         $odin.='
+            <tr>
+               <td colspan="6" class="text-center">No Records Found!!!</td>
+            </tr>
+         ';
+      }
+      return $odin;
+   }
+
+   // search by date
+   public function stc_search_by_date($search){
+      $odin='';
+      $stbf=0;
+      $stlunch=0;
+      $stes=0;
+      $stdinner=0;
+
+      $tebf=0;
+      $telunch=0;
+      $tees=0;
+      $tedinner=0;
+
+      $sfbf=0;
+      $sflunch=0;
+      $sfes=0;
+      $sfdinner=0;
+
+      $gsbf=0;
+      $gslunch=0;
+      $gses=0;
+      $gsdinner=0;
+
+      $odin_getqry=mysqli_query($this->stc_dbs, "
+         SELECT
+             `stc_school_canteen_serve_type`,
+             `stc_school_canteen_serve_time`,
+             `stc_school_canteen_serve_quantity`
+         FROM
+             `stc_school_canteen`
+         WHERE
+             DATE(`stc_school_canteen_date`)='".mysqli_real_escape_string($this->stc_dbs, $search)."'
+      ");
+      foreach($odin_getqry as $odin_getrow){
+         if($odin_getrow['stc_school_canteen_serve_type']=="student" && $odin_getrow['stc_school_canteen_serve_time']=="breakfast"){
+            $stbf+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="student" && $odin_getrow['stc_school_canteen_serve_time']=="lunch"){
+            $stlunch+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="student" && $odin_getrow['stc_school_canteen_serve_time']=="evening snacks"){
+            $stes+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="student" && $odin_getrow['stc_school_canteen_serve_time']=="dinner"){
+            $stdinner+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="teacher" && $odin_getrow['stc_school_canteen_serve_time']=="breakfast"){
+            $tebf+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="teacher" && $odin_getrow['stc_school_canteen_serve_time']=="lunch"){
+            $telunch+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="teacher" && $odin_getrow['stc_school_canteen_serve_time']=="evening snacks"){
+            $tees+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="teacher" && $odin_getrow['stc_school_canteen_serve_time']=="dinner"){
+            $tedinner+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="staff" && $odin_getrow['stc_school_canteen_serve_time']=="breakfast"){
+            $sfbf+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="staff" && $odin_getrow['stc_school_canteen_serve_time']=="lunch"){
+            $sflunch+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="staff" && $odin_getrow['stc_school_canteen_serve_time']=="evening snacks"){
+            $sfes+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="staff" && $odin_getrow['stc_school_canteen_serve_time']=="dinner"){
+            $sfdinner+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="guest" && $odin_getrow['stc_school_canteen_serve_time']=="breakfast"){
+            $gsbf+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="guest" && $odin_getrow['stc_school_canteen_serve_time']=="lunch"){
+            $gslunch+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="guest" && $odin_getrow['stc_school_canteen_serve_time']=="evening snacks"){
+            $gses+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }elseif($odin_getrow['stc_school_canteen_serve_type']=="guest" && $odin_getrow['stc_school_canteen_serve_time']=="dinner"){
+            $gsdinner+=$odin_getrow['stc_school_canteen_serve_quantity'];
+         }
+      }
+      $odin='
+            <tr>
+                    <td class="text-center">Breakfast</td>
+                    <td class="text-right">'.number_format($stbf, 2).'</td>
+                    <td class="text-right">'.number_format($tebf, 2).'</td>
+                    <td class="text-right">'.number_format($sfbf, 2).'</td>
+                    <td class="text-right">'.number_format($gsbf, 2).'</td>
+                </tr>
+                <tr>
+                    <td class="text-center">Lunch</td>
+                    <td class="text-right">'.number_format($stlunch, 2).'</td>
+                    <td class="text-right">'.number_format($telunch, 2).'</td>
+                    <td class="text-right">'.number_format($sflunch, 2).'</td>
+                    <td class="text-right">'.number_format($gslunch, 2).'</td>
+                </tr>
+                <tr>
+                    <td class="text-center">Evening Snacks</td>
+                    <td class="text-right">'.number_format($stes, 2).'</td>
+                    <td class="text-right">'.number_format($tees, 2).'</td>
+                    <td class="text-right">'.number_format($sfes, 2).'</td>
+                    <td class="text-right">'.number_format($gses, 2).'</td>
+                </tr>
+                <tr>
+                    <td class="text-center">Dinner</td>
+                    <td class="text-right">'.number_format($stdinner, 2).'</td>
+                    <td class="text-right">'.number_format($tedinner, 2).'</td>
+                    <td class="text-right">'.number_format($sfdinner, 2).'</td>
+                    <td class="text-right">'.number_format($gsdinner, 2).'</td>
+                </tr>
+                <tr>
+                    <td class="text-center">Total</td>
+                    <td class="text-right">'.number_format(($stbf + $stlunch + $stes + $stdinner), 2).' NOS</td>
+                    <td class="text-right">'.number_format(($tebf + $telunch + $tees + $tedinner), 2).' NOS</td>
+                    <td class="text-right">'.number_format(($sfbf + $sflunch + $sfes + $sfdinner), 2).' NOS</td>
+                    <td class="text-right">'.number_format(($gsbf + $gslunch + $gses + $gsdinner), 2).' NOS</td>
+                </tr>
+      ';
+      return $odin;
+   }
+}
+
+class ragnarReportsViewSchoolFeeReports extends tesseract{
+   // call fee
+   public function stc_school_call_fee($bjornebegdate, $bjorneenddate, $bjorneschool){
+            
+      if($bjorneschool==""){
+         $school_attr='';
+      }else{
+            $school_attr='(';
+            $count_filter=count($bjorneschool);
+            $incountfilter=0;
+            foreach($bjorneschool as $bjorneschoolrow){
+                $addor='';
+                $incountfilter++;
+                if($count_filter==4){
+                    $addor='OR';
+                }elseif($count_filter==3){
+                    $addor='OR';
+                }elseif($count_filter==2){
+                    $addor='OR';
+                }
+                $count_filter = $count_filter - 1;
+              $school_attr.="`stc_school_fee_which_school`='".$bjorneschoolrow."' ".$addor;
+            }
+            $school_attr.=') AND';
+        }
+      $odin='';
+      $odin_get_req_qry=mysqli_query($this->stc_dbs, "
+         SELECT 
+            `stc_school_fee_id`,
+             `stc_school_fee_which_school`,
+             `stc_school_fee_date`
+         FROM
+             `stc_school_fee`
+         WHERE ".$school_attr."(
+            DATE(`stc_school_fee_date`) 
+            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
+            AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."'
+         )
+         ORDER BY DATE(`stc_school_fee_date`) DESC
+      ");
+      if(mysqli_num_rows($odin_get_req_qry)>0){
+         $prevtcharges=0;
+         $prevtexpanses=0;
+         $totalprevmonthincome=0;
+         // $date = date("d-m-Y", strtotime($bjornebegdate));
+         $calculatedate = date('Y-m-d', strtotime("-1 months", strtotime($bjornebegdate)));
+         $year = date("Y", strtotime($calculatedate));
+         $month = date("m", strtotime($calculatedate));
+         $day = 1;
+         $combinedtodate=$day.'-'.$month.'-'.$year;
+         $effectiveDate = date('Y-m-d', strtotime($combinedtodate));
+         $odin_get_prevreq_qry=mysqli_query($this->stc_dbs, "
+            SELECT 
+               `stc_school_month_closing_id`,
+                `stc_school_fee_which_school`,
+                `stc_school_month_closing_date`
+            FROM
+                `stc_school_month_closing`
+            WHERE ".$school_attr."(
+               DATE(`stc_school_month_closing_date`) 
+               BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $effectiveDate)."'
+               AND '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
+            )
+            ORDER BY DATE(`stc_school_month_closing_date`) DESC
+         ");
+         $prevmaxmonthfee=0;
+         $prevmaxadmfee=0;
+         $prevmaxbook=0;
+         $prevmaxtransport=0;
+         $prevmaxdonation=0;
+         $prevmaxother=0;
+         $prevmaxcashback=0;
+         $prevmaxdsal=0;
+         $prevmaxssal=0;
+         $prevmaxvfuel=0;
+         $prevmaxvmaint=0;
+         $prevmaxelectricity=0;
+         $prevmaxcanteen=0;
+         $prevmaxexpense=0;
+         $prevmaxtotal=0;
+         foreach($odin_get_prevreq_qry as $odin_get_prevreq_row){
+            $odin_getstudentqry=mysqli_query($this->stc_dbs, "
+               SELECT 
+                   `stc_school_month_closing_value`
+               FROM
+                   `stc_school_month_closing`
+               WHERE
+                  `stc_school_month_closing_id`='".mysqli_real_escape_string($this->stc_dbs, $odin_get_prevreq_row['stc_school_month_closing_id'])."'
+               AND 
+                  `stc_school_fee_which_school`='".mysqli_real_escape_string($this->stc_dbs, $odin_get_prevreq_row['stc_school_fee_which_school'])."'
+               ORDER BY DATE(`stc_school_month_closing_date`) DESC
+            ");
+
+            foreach($odin_getstudentqry as $odin_getstudentrow){
+               $totalprevmonthincome+=$odin_getstudentrow['stc_school_month_closing_value'];
+            }
+         }
+
+         // current situtations
+         $maxmonthfee=0;
+         $maxadmfee=0;
+         $maxbook=0;
+         $maxtransport=0;
+         $maxdonation=0;
+         $maxother=0;
+         $maxcashback=0;
+         $maxdsal=0;
+         $maxssal=0;
+         $maxvfuel=0;
+         $maxvmaint=0;
+         $maxelectricity=0;
+         $maxcanteen=0;
+         $maxexpense=0;
+         $maxtotal=0;
+         foreach($odin_get_req_qry as $req_row){
+            $school='';
+            $monthfee=0;
+            $admmfee=0;
+            $book=0;
+            $transport=0;
+            $donation=0;
+            $others=0;
+            $cashback=0;
+            $dsal=0;
+            $ssal=0;
+            $vfuel=0;
+            $vmaint=0;
+            $electricity=0;
+            $canteen=0;
+            $expense=0;
+            $remarks='';
+            $user='';
+
+            $odin_getstudentqry=mysqli_query($this->stc_dbs, "
+               SELECT 
+                   `stc_school_fee_which_school`,
+                   `stc_school_fee_monthly_fee`,
+                   `stc_school_fee_admission_fee`,
+                   `stc_school_fee_book_charge`,
+                   `stc_school_fee_transportation`,
+                   `stc_school_fee_donation`,
+                   `stc_school_fee_others`,
+                   `stc_school_fee_cashback`,
+                   `stc_school_fee_dstaffsal`,
+                   `stc_school_fee_teacherssal`,
+                   `stc_school_fee_vehiclefuel`,
+                   `stc_school_fee_vehiclemaintenance`,
+                   `stc_school_fee_electricity`,
+                   `stc_school_fee_canteen`,
+                   `stc_school_fee_expense`,
+                   `stc_school_fee_remarks`,
+                   `stc_school_user_fullName`
+               FROM
+                   `stc_school_fee`
+                INNER JOIN 
+                    `stc_school` 
+                ON 
+                    `stc_school_fee_created_by`=`stc_school_user_id`
+               WHERE
+                        `stc_school_fee_id`='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_fee_id'])."'
+               AND 
+                  `stc_school_fee_which_school`='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_fee_which_school'])."'
+               ORDER BY DATE(`stc_school_fee_date`) DESC
+            ");
+
+            foreach($odin_getstudentqry as $odin_getstudentrow){
+               $school=$odin_getstudentrow['stc_school_fee_which_school'];
+               $monthfee=$odin_getstudentrow['stc_school_fee_monthly_fee'];
+               $admmfee=$odin_getstudentrow['stc_school_fee_admission_fee'];
+               $book=$odin_getstudentrow['stc_school_fee_book_charge'];
+               $transport=$odin_getstudentrow['stc_school_fee_transportation'];
+               $donation=$odin_getstudentrow['stc_school_fee_donation'];
+               $dsal=$odin_getstudentrow['stc_school_fee_dstaffsal'];
+               $ssal=$odin_getstudentrow['stc_school_fee_teacherssal'];
+               $vfuel=$odin_getstudentrow['stc_school_fee_vehiclefuel'];
+               $vmaint=$odin_getstudentrow['stc_school_fee_vehiclemaintenance'];
+               $electricity=$odin_getstudentrow['stc_school_fee_electricity'];
+               $canteen=$odin_getstudentrow['stc_school_fee_canteen'];
+               $others=$odin_getstudentrow['stc_school_fee_others'];
+               $cashback=$odin_getstudentrow['stc_school_fee_cashback'];
+               $expense=$odin_getstudentrow['stc_school_fee_expense'];
+               $remarks=$odin_getstudentrow['stc_school_fee_remarks'];
+               $user=$odin_getstudentrow['stc_school_user_fullName'];
+            }
+
+            $total= $monthfee + $admmfee + $book + $transport + $donation + $others + $cashback;
+            $maxmonthfee+=$monthfee;
+            $maxadmfee+=$admmfee;
+            $maxbook+=$book;
+            $maxtransport+=$transport;
+            $maxdonation+=$donation;
+            $maxother+=$others;
+            $maxcashback+=$cashback;
+            $maxdsal+=$dsal;
+            $maxssal+=$ssal;
+            $maxvfuel+=$vfuel;
+            $maxvmaint+=$vmaint;
+            $maxelectricity+=$electricity;
+            $maxcanteen+=$canteen;
+            $maxexpense+=$expense;
+            $odin.='
+               <tr>
+                  <td title="date" class="text-center">'.$school.'</td>
+                  <td title="date" class="text-center">'.date('d-m-Y', strtotime($req_row['stc_school_fee_date'])).'</td>
+                  <td title="Monthly Fee" class="text-right">'.number_format($monthfee, 2).'</td>
+                  <td title="Admission Fee" class="text-right">'.number_format($admmfee, 2).'</td>
+                  <td title="Books" class="text-right">'.number_format($book, 2).'</td>
+                  <td title="Transportation" class="text-right">'.number_format($transport, 2).'</td>
+                  <td title="Donation" class="text-right">'.number_format($donation, 2).'</td>
+                  <td title="Others" class="text-right">'.number_format($others, 2).'</td>
+                  <td title="Cashback" class="text-right">'.number_format($cashback, 2).'</td>
+                  <td title="D Staff Salary" class="text-right">'.number_format($dsal, 2).'</td>
+                  <td title="Teachers Salary" class="text-right">'.number_format($ssal, 2).'</td>
+                  <td title="Vehicle Fuels" class="text-right">'.number_format($vfuel, 2).'</td>
+                  <td title="Vehicle Maintenance" class="text-right">'.number_format($vmaint, 2).'</td>
+                  <td title="Electricity" class="text-right">'.number_format($electricity, 2).'</td>
+                  <td title="Canteen" class="text-right">'.number_format($canteen, 2).'</td>
+                  <td title="Other Expense" class="text-right">'.number_format($expense, 2).'</td>
+                  <td title="Total" class="text-right">'.number_format($total, 2).'</td>
+                  <td title="Temarks" class="text-right">'.$remarks.'</td>
+                  <td title="Created By" class="text-right">'.$user.'</td>
+               </tr>
+            ';
+            $maxtotal+=$total;
+         }
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Label :</td>
+               <th class="text-center"><b>Monthly Fee</b></th>
+               <th class="text-center"><b>Admission Fee</b></th>
+               <th class="text-center"><b>Books</b></th>
+               <th class="text-center"><b>Transportation</b></th>
+               <th class="text-center"><b>Donation</b></th>
+               <th class="text-center"><b>Others</b></th>
+               <th class="text-center"><b>Cashback</b></th>
+               <th class="text-center"><b>D Staff Salary</b></th>
+               <th class="text-center"><b>Teachers Salary</b></th>
+               <th class="text-center"><b>Vehicle Fuels</b></th>
+               <th class="text-center"><b>Vehicle Maintenance</b></th>
+               <th class="text-center"><b>Electricity</b></th>
+               <th class="text-center"><b>Canteen</b></th>
+               <th class="text-center"><b>Other Expenses</b></th>
+            </tr>
+
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total :</td>
+               <td class="text-right">'.number_format($maxmonthfee, 2).'</td>
+               <td class="text-right">'.number_format($maxadmfee, 2).'</td>
+               <td class="text-right">'.number_format($maxbook, 2).'</td>
+               <td class="text-right">'.number_format($maxtransport, 2).'</td>
+               <td class="text-right">'.number_format($maxdonation, 2).'</td>
+               <td class="text-right">'.number_format($maxother, 2).'</td>
+               <td class="text-right">'.number_format($maxcashback, 2).'</td>
+               <td class="text-right">'.number_format($maxdsal, 2).'</td>
+               <td class="text-right">'.number_format($maxssal, 2).'</td>
+               <td class="text-right">'.number_format($maxvfuel, 2).'</td>
+               <td class="text-right">'.number_format($maxvmaint, 2).'</td>
+               <td class="text-right">'.number_format($maxelectricity, 2).'</td>
+               <td class="text-right">'.number_format($maxcanteen, 2).'</td>
+               <td class="text-right">'.number_format($maxexpense, 2).'</td>
+               <td class="text-right" colspan="2"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 25px;font-weight: bold;background: rgb(9,9,121);background: radial-gradient(circle, rgb(255 149 164) 27%, rgb(192 188 255) 53%, rgb(140 231 249) 100%);">
+               <td class="text-center" colspan="3">Income <i class="fa fa-arrow-down"></i></td>
+               <td class="text-center" colspan="3">Expenditure <i class="fa fa-arrow-down"></i></td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Previous Total Income :</td>
+               <td class="text-right">'.number_format($totalprevmonthincome, 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Monthly Fee Amount :</td>
+               <td class="text-right">'.number_format($maxmonthfee, 2).'</td>
+               <td class="text-right" colspan="2">Total D Staff Salary :</td>
+               <td class="text-right">'.number_format($maxdsal, 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Admission Fee Amount :</td>
+               <td class="text-right">'.number_format($maxadmfee, 2).'</td>
+               <td class="text-right" colspan="2">Total Teachers Salary :</td>
+               <td class="text-right">'.number_format($maxssal, 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Books Amount:</td>
+               <td class="text-right">'.number_format($maxbook, 2).'</td>
+               <td class="text-right" colspan="2">Total Vehicle Fuel Amount :</td>
+               <td class="text-right">'.number_format($maxvfuel, 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Transportation Amount :</td>
+               <td class="text-right">'.number_format($maxtransport, 2).'</td>
+               <td class="text-right" colspan="2">Total Vehicle Maintenance Amount :</td>
+               <td class="text-right">'.number_format($maxvmaint, 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Donation Amount :</td>
+               <td class="text-right">'.number_format($maxdonation, 2).'</td>
+               <td class="text-right" colspan="2">Total Electricity Expenses Amount :</td>
+               <td class="text-right">'.number_format($maxelectricity, 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Other Charges Amount :</td>
+               <td class="text-right">'.number_format($maxother, 2).'</td>
+               <td class="text-right" colspan="2">Total Canteen Expenses Amount :</td>
+               <td class="text-right">'.number_format($maxcanteen, 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Cashback Amount :</td>
+               <td class="text-right">'.number_format($maxcashback, 2).'</td>
+               <td class="text-right" colspan="2">Total Other Expenses Amount :</td>
+               <td class="text-right">'.number_format($maxexpense, 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Income Amount :</td>
+               <td class="text-right">'.number_format($totalprevmonthincome + $maxtotal, 2).'</td>
+               <td class="text-right" colspan="2">Total Expenditure Amount :</td>
+               <td class="text-right">'.number_format(($maxexpense + $maxdsal + $maxssal + $maxvfuel + $maxvmaint + $maxelectricity + $maxcanteen), 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+
+         $tcharges = $prevtcharges + $maxexpense + $maxdsal + $maxssal + $maxvfuel + $maxvmaint + $maxelectricity + $maxcanteen;
+         $texpanses = $totalprevmonthincome + $prevtexpanses + $maxtotal;
+         $grandtotal = $texpanses - $tcharges;
+
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="5">Grand Total (Inc Previous Month) = '.number_format($texpanses, 2).' - '.number_format($tcharges, 2).' = '.number_format($grandtotal, 2).'</td>
+               <td class="text-right" colspan="2"></td>
+            </tr>
+         ';
+
+      }else{
+         $odin.='
+            <tr>
+               <td colspan="10" class="text-center">No Records Found!!!</td>
+            </tr>
+         ';
+      }
+      return $odin;
+   }
+}
+#<--------------------------------------------------------------------------------------------------------->
+#<--------------------------------------Object sections of reports class----------------------------------->
+#<--------------------------------------------------------------------------------------------------------->
+// merchant ledger merchant all
+if(isset($_POST['Stc_merchant_reporsts_call_merchant'])){
+   $bjornecustomer=new ragnarReportsViewMerchantLedger();
+   $outbjornecustomer=$bjornecustomer->stc_call_merchants();
+   echo $outbjornecustomer;
+}
+
+if(isset($_POST['Stc_call_reports_on_merchants'])){   
+   unset($_SESSION["stc_merchant_invoice_sort"]);
+   $bjornebegdate=date('Y-m-d',strtotime($_POST['begdate']));
+   $bjorneenddate=date('Y-m-d',strtotime($_POST['enddate']));
+   $bjornemerchantid=$_POST['merchantid'];
+   $bjorneledger=new ragnarReportsViewMerchantLedger();
+   // $out='';
+   $outbjorneledger=$bjorneledger->stc_call_ledger($bjornebegdate, $bjorneenddate, $bjornemerchantid);
+   echo $outbjorneledger;
+}
+
+#<-----------------------------Object sections of requisition reports class-------------------------------->
+// call std details
+if(isset($_POST['Stc_std_details'])){
+   $bjornecustomer=new ragnarReportsViewRequiReports();
+   $outbjornecustomer=$bjornecustomer->stc_call_std();
+   echo $outbjornecustomer;
+}
+// call customer
+if(isset($_POST['Stc_customer_reporsts_call_customer'])){
+   $bjornecustomer=new ragnarReportsViewRequiReports();
+   $outbjornecustomer=$bjornecustomer->stc_call_customer();
+   echo $outbjornecustomer;
+}
+
+// call agent
+if(isset($_POST['Stc_on_change_customer_agent_call'])){
+   $custid=$_POST['custid'];
+   $bjorneagent=new ragnarReportsViewRequiReports();
+   $outbjorneagent=$bjorneagent->stc_call_agent_on_customer($custid);
+   echo $outbjorneagent;
+}
+
+// call project
+if(isset($_POST['Stc_on_change_agent_project_call'])){
+   $agentid=$_POST['agentid'];
+   $custid=$_POST['custid'];
+   $bjorneproject=new ragnarReportsViewRequiReports();
+   $outbjorneproject=$bjorneproject->stc_call_project_on_agent($agentid, $custid);
+   echo $outbjorneproject;
+}
+
+// get supervisors orders requisitions
+if(isset($_POST['stc_requisition_reports_req'])){
+   $stc_begdate=date("Y-m-d", strtotime($_POST['stc_begdate']));
+   $stc_enddate=date("Y-m-d", strtotime($_POST['stc_enddate']));
+   $stc_custid=$_POST['stc_custid'];
+   $stc_agentid=$_POST['stc_agentid'];
+   $stc_projeid=$_POST['stc_projeid'];
+   @$stc_count_id=$_POST['stc_count_id'];
+   $start_date = strtotime($stc_begdate);
+   $end_date = strtotime($stc_enddate);
+   if($stc_count_id==0){
+      $stc_count_id=0;
+   }
+   $out='';
+      $objloki=new ragnarReportsViewRequiReports();
+      if(empty($stc_begdate) || empty($stc_enddate) || $stc_custid=='NA' || $stc_agentid=='NA' || $stc_projeid=='NA'){
+         $out='
+            <tr>
+               <td colspan="10">Dont late any fields empty</td>
+            </tr>
+         ';
+      }else{
+         $opobjloki=$objloki->stc_get_supervisors_requisition_records($stc_begdate, $stc_enddate, $stc_custid, $stc_agentid, $stc_projeid, $stc_count_id);
+         $out.=$opobjloki;
+      }
+   echo $out;
+}
+
+// get supervisors orders requisitions
+if(isset($_POST['stc_pending_reports_req'])){
+   $stc_begdate=date("Y-m-d", strtotime($_POST['stc_begdate']));
+   $stc_enddate=date("Y-m-d", strtotime($_POST['stc_enddate']));
+   $stc_custid=$_POST['stc_custid'];
+   $stc_agentid=$_POST['stc_agentid'];
+   $stc_projeid=$_POST['stc_projeid'];
+   $start_date = strtotime($stc_begdate);
+   $end_date = strtotime($stc_enddate);
+   $out='';
+      $objloki=new ragnarReportsViewRequiReports();
+      if(empty($stc_begdate) || empty($stc_enddate) || $stc_custid=='NA' || $stc_agentid=='NA' || $stc_projeid=='NA'){
+         $out='
+            <tr>
+               <td colspan="10">Dont late any fields empty</td>
+            </tr>
+         ';
+      }else{
+         $opobjloki=$objloki->stc_get_supervisors_pending_records($stc_begdate, $stc_enddate, $stc_custid, $stc_agentid, $stc_projeid);
+         $out.=$opobjloki;
+      }
+   echo $out;
+}
+
+#<-------------------------------Object sections of projects reports class-------------------------------->
+// get supervisors orders requisitions
+if(isset($_POST['stc_proj_reports_req'])){
+   $stc_custid=$_POST['stc_custid'];
+   $stc_agentid=$_POST['stc_agentid'];
+   $out='';
+   $objloki=new ragnarReportsViewProjReports();
+   if($stc_custid=='NA' || $stc_agentid=='NA'){
+      $out='
+         <tr>
+            <td colspan="10">Dont late any fields empty</td>
+         </tr>
+      ';
+   }else{
+      $opobjloki=$objloki->stc_get_project_details($stc_custid, $stc_agentid);
+      $out=$opobjloki;
+   }
+   echo $out;
+}
+
+// retrieve project details
+if(isset($_POST['stc_ag_rproject_retrive'])){
+   $project_id=$_POST['project_id'];
+   $objcrproj=new ragnarReportsViewProjReports();
+   $opobjcrproj=$objcrproj->stc_call_project_details($project_id);
+   echo json_encode($opobjcrproj);
+   // echo $opobjcrproj;
+}
+
+#<----------------------------------Object sections of sandp reports class-------------------------------->
+// call sale purchase electronics
+if(isset($_POST['stc_find_purchase_sale_reports'])){
+   $out='';
+   $bjornebegdate=date('Y-m-d',strtotime($_POST['beg_date']));
+   $bjorneenddate=date('Y-m-d',strtotime($_POST['end_date']));
+   $cat_id=$_POST['cat_id'];
+
+   $bjornepurchase=new ragnarReportsViewElectronicsPurchaseSaleReports();
+   $bjornesale=new ragnarReportsViewElectronicsPurchaseSaleReports();
+
+   if($cat_id==1){
+      $out=$bjornepurchase->stc_electronics_call_purchase($bjornebegdate, $bjorneenddate);
+   }else{
+      $out=$bjornesale->stc_electronics_call_sale($bjornebegdate, $bjorneenddate);
+   }
+   echo $out;
+}
+
+#<----------------------------------Object sections of sandp reports class-------------------------------->
+// call sale purchase trading
+if(isset($_POST['stc_find_trading_purchase_sale_reports'])){
+   $out='';
+   $bjornebegdate=date('Y-m-d',strtotime($_POST['beg_date']));
+   $bjorneenddate=date('Y-m-d',strtotime($_POST['end_date']));
+   $cat_id=$_POST['cat_id'];
+
+   $bjornepurchase=new ragnarReportsViewTradingPurchaseSaleReports();
+   $bjornesale=new ragnarReportsViewTradingPurchaseSaleReports();
+
+   if($cat_id==1){
+      $out=$bjornepurchase->stc_trading_call_purchase($bjornebegdate, $bjorneenddate);
+   }else{
+      $out=$bjornesale->stc_trading_call_sale($bjornebegdate, $bjorneenddate);
+   }
+   echo $out;
+}
+
+#<----------------------------------Object sections of sandp reports class-------------------------------->
+// call sale purchase groceries
+if(isset($_POST['stc_find_groceries_purchase_sale_reports'])){
+   $out='';
+   $bjornebegdate=date('Y-m-d',strtotime($_POST['beg_date']));
+   $bjorneenddate=date('Y-m-d',strtotime($_POST['end_date']));
+   $cat_id=$_POST['cat_id'];
+
+   $bjornepurchase=new ragnarReportsViewGroceriesPurchaseSaleReports();
+   $bjornesale=new ragnarReportsViewGroceriesPurchaseSaleReports();
+
+   if($cat_id==1){
+      $out=$bjornepurchase->stc_groceries_call_purchase($bjornebegdate, $bjorneenddate);
+   }else{
+      $out=$bjornesale->stc_groceries_call_sale($bjornebegdate, $bjorneenddate);
+   }
+   echo $out;
+}
+
+#<------------------------Object sections of school canteen reports class--------------------------------->
+// call school canteen
+if(isset($_POST['stc_find_school_canteen_reports'])){
+   $out='';
+   $bjornebegdate=date('Y-m-d',strtotime($_POST['beg_date']));
+   $bjorneenddate=date('Y-m-d',strtotime($_POST['end_date']));
+
+   $bjorneschool=new ragnarReportsViewSchoolCanteenReports();
+
+   $out=$bjorneschool->stc_school_call_canteen($bjornebegdate, $bjorneenddate);
+   echo $out;
+}
+
+// call by date
+if(isset($_POST['stc_call_by_date'])){ 
+   $search=$_POST['req_date'];
+   $valkyrie=new ragnarReportsViewSchoolCanteenReports();
+   $lokiheck=$valkyrie->stc_search_by_date($search);
+   echo $lokiheck;
+}
+
+#<----------------------------Object sections of school fee reports class--------------------------------->
+// call school fee
+if(isset($_POST['stc_find_school_fee_reports'])){
+   $out='';
+   $bjornebegdate=date('Y-m-d',strtotime($_POST['beg_date']));
+   $bjorneenddate=date('Y-m-d',strtotime($_POST['end_date']));
+   $bjorneschool=@$_POST['school_name'];
+
+   $bjorneschoolfee=new ragnarReportsViewSchoolFeeReports();
+
+   $out=$bjorneschoolfee->stc_school_call_fee($bjornebegdate, $bjorneenddate, $bjorneschool);
+   echo $out;
+}
+?>

@@ -1,0 +1,550 @@
+<?php  
+session_start(); 
+if(isset($_SESSION["stc_agent_id"])){ 
+}else{ 
+    header("Location:index.html"); 
+} 
+include_once("../MCU/db.php");
+?> 
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Order Management - STC</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+    <meta name="description" content="">
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- Latest compiled and minified CSS -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="./main.css" rel="stylesheet">
+    <!-- <link href="assets/css/style.css" rel="stylesheet"> -->
+    <style> 
+        .fade:not(.show) {
+          opacity: 10;
+        }    
+
+        .close-tag-beg{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
+        <?php include_once("header-nav.php");?>
+        <?php include_once("ui-setting.php");?>        
+        <div class="app-main">
+                <?php include_once("sidebar-nav.php");?>                   
+                <div class="app-main__outer">
+                    <div class="app-main__inner">
+                        <div class="app-page-title">
+                            <div class="page-title-wrapper">
+                                <div class="page-title-heading">
+                                    <div class="page-title-icon">
+                                        <i class="pe-7s-display1 icon-gradient bg-premium-dark">
+                                        </i>
+                                    </div>
+                                    <div>Order Management
+                                        <div class="page-title-subheading">This sections shows you your supervisor orders & requirements here.<h3>&#9786;</h3>.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>            
+                        <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-0" data-toggle="tab" href="#check-order">
+                                    <span>Check Order <b><i class="pe-7s-look"></i></b></span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link active" id="tab-1" data-toggle="tab" href="#sup-requis">
+                                    <span>Check Requisition <b><i class="pe-7s-look"></i></b></span>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane tabs-animation fade " id="check-order" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body"><h5 class="card-title">Supervisor Order</h5>
+                                                <form class="#">
+                                                   <div class="row">
+                                                        <div class="col-md-12">
+                                                            <table class="mb-0 table table-hover">
+                                                                <thead>
+                                                                    <th>Order No</th>
+                                                                    <th>Order Date</th>
+                                                                    <th>Requisition By<br> <span>Supervisor ID</span><br><span>Supervisor name</span></th>
+                                                                    <th>Requisition For<br> <span>Project name</span><br><span>project address</span></th>
+                                                                    <th>Status</th>
+                                                                    <th>View</th>
+                                                                </thead>
+                                                                <tbody>
+                                                                <?php
+                                                                    $requisbysupforproqry=mysqli_query($con, "
+                                                                        SELECT 
+                                                                            `stc_cust_super_requisition_id`,
+                                                                            `stc_cust_super_requisition_date`, 
+                                                                            `stc_cust_project_title`, 
+                                                                            `stc_cust_project_address`, 
+                                                                            `stc_cust_pro_supervisor_id`, 
+                                                                            `stc_cust_pro_supervisor_fullname`,
+                                                                            `stc_cust_super_requisition_status` 
+                                                                        FROM `stc_cust_super_requisition`
+                                                                        INNER JOIN `stc_cust_pro_supervisor` 
+                                                                        ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_super_id`
+                                                                        INNER JOIN `stc_cust_project` 
+                                                                        ON `stc_cust_project_id`=`stc_cust_super_requisition_project_id`
+                                                                        INNER JOIN `stc_agents` 
+                                                                        ON `stc_agents_id`=`stc_cust_pro_supervisor_created_by`
+                                                                        WHERE `stc_agents_id`='".$_SESSION['stc_agent_id']."'
+                                                                        ORDER BY `stc_cust_super_requisition_id` DESC
+                                                                    ");
+                                                                    if(mysqli_num_rows($requisbysupforproqry)!=0){
+                                                                        foreach($requisbysupforproqry as $currrow){
+                                                                            $currentstatus='';
+                                                                            if($currrow['stc_cust_super_requisition_status']==1){
+                                                                                $currentstatus="PROCESS";
+                                                                            }elseif($currrow['stc_cust_super_requisition_status']==0){
+                                                                                $currentstatus="CANCEL";
+                                                                            }else{
+                                                                                $currentstatus="ACCEPTED";
+                                                                            }
+                                                                            echo "
+                                                                                <tr>
+                                                                                    <td>STC/O/A/S/".substr("0000{$currrow['stc_cust_super_requisition_id']}", -5)."</td>
+                                                                                    <td>".date('d-M-Y', strtotime($currrow['stc_cust_super_requisition_date']))."</td>
+                                                                                    <td>STC/A/S/".substr("0000{$currrow['stc_cust_pro_supervisor_id']}", -5)."<br>".$currrow['stc_cust_pro_supervisor_fullname']."</td>
+                                                                                    <td>".$currrow['stc_cust_project_title']."<br>".$currrow['stc_cust_project_address']."</td>
+                                                                                    <td>".$currentstatus."</td>
+                                                                                    <td><a href='#' style='font-size: 25px;font-weight: bold;color: black;' class='ag-show-grid' id='".$currrow['stc_cust_super_requisition_id']."'><i class='fas fa-eye'></i></a></td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td colspan='6'>
+                                                                                        <div style='display:none;' id='togdiv".$currrow['stc_cust_super_requisition_id']."'>
+                                                                                            Loading...
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            ";
+                                                                        }
+                                                                    }else{}
+                                                                ?>
+                                                                </tbody>                                                                   
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane tabs-animation fade show active" id="sup-requis" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body"><h5 class="card-title">Supervisor Requisition</h5>
+                                                <form class="#">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search By Requisition ID" class="form-control">
+                                                            <table class="mb-0 table table-hover" id="stc-requis-table">
+                                                                <thead>
+                                                                    <th>Requisition ID</th>
+                                                                    <th>Requisition Date</th>
+                                                                    <th>Requisition From</th>
+                                                                    <th>Requisition For</th>
+                                                                    <th>Requisition Status</th>
+                                                                    <th>View</th>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <?php 
+                                                                        $reqstatus='';
+                                                                        $requissuperqry=mysqli_query($con, "
+                                                                            SELECT 
+                                                                                `stc_cust_super_requisition_list_id`,
+                                                                                `stc_cust_super_requisition_list_date`,
+                                                                                `stc_cust_project_title`,
+                                                                                `stc_cust_pro_supervisor_fullname`,
+                                                                                `stc_cust_super_requisition_list_status`
+                                                                            FROM `stc_cust_super_requisition_list`
+                                                                            INNER JOIN `stc_cust_pro_supervisor` 
+                                                                            ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id`
+                                                                            INNER JOIN `stc_cust_project` 
+                                                                            ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
+                                                                            WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'
+                                                                            AND stc_cust_super_requisition_list_status<2
+                                                                            ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
+                                                                        ");
+                                                                        if(mysqli_num_rows($requissuperqry)!=0){
+                                                                            foreach($requissuperqry as $requisrow){
+
+                                                                                if($requisrow['stc_cust_super_requisition_list_status']==1){
+                                                                                    $reqstatus="PROCESS";
+                                                                                }elseif($requisrow['stc_cust_super_requisition_list_status']==2){
+                                                                                    $reqstatus="PASSED";
+                                                                                }elseif($requisrow['stc_cust_super_requisition_list_status']==3){
+                                                                                    $reqstatus="CLEARED";
+                                                                                }else{
+                                                                                    $reqstatus="ACCEPTED";
+                                                                                }
+                                                                                echo '
+                                                                                    <tr>
+                                                                                        <td>'.$requisrow['stc_cust_super_requisition_list_id'].'</td>
+                                                                                        <td>'.$requisrow['stc_cust_super_requisition_list_date'].'</td>
+                                                                                        <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
+                                                                                        <td>'.$requisrow['stc_cust_project_title'].'</td>
+                                                                                        <td>'.$reqstatus.'</td>
+                                                                                        <td>
+                                                                                            <a href="#" 
+                                                                                                style="font-size: 25px;font-weight: bold;color: black;" 
+                                                                                                class="ag-req-show-grid" id="'.$requisrow['stc_cust_super_requisition_list_id'].'"
+                                                                                            ><i class="fas fa-eye"></i></a>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                    <td colspan="6">
+                                                                                        <div style="display:none;"" id="togreqdiv'.$requisrow['stc_cust_super_requisition_list_id'].'">
+                                                                                            Loading...
+                                                                                        </div>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                ';
+                                                                            }
+                                                                        }else{
+                                                                                echo '
+                                                                                    <tr>
+                                                                                        <td colspan="6">
+                                                                                            <b>No Requisition Found!!!</b>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                ';
+                                                                        }
+                                                                    ?>
+                                                                </tbody>                                                                   
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
+    <!-- <script src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
+    <script type="text/javascript" src="./assets/scripts/main.js"></script>
+    <script>
+        function myFunction() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("stc-requis-table");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[0];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }       
+            }
+        }
+        $(document).ready(function(){
+            $('body').delegate('.search-icon', 'click', function(e){
+                e.preventDefault();
+                $(this).hide();
+                $('.search-icon-2').show();
+                // var pd_title=$('.agent-pro-search').val();
+                // window.location.href="stc-product.php?pd_name="+pd_title;
+            });
+
+            $('body').delegate('.search-icon-2', 'click', function(e){
+                var pd_title=$('.agent-pro-search').val();
+                if(pd_title!=""){
+                    window.location.href="stc-product.php?pd_name="+pd_title;
+                }
+            });    
+        });
+    </script>
+    <script>
+        $(document).ready(function(){
+            // supervisor order
+            $('body').delegate('.ag-show-grid', 'click', function(e){
+                e.preventDefault();
+                var odid=$(this).attr("id");
+                $('#togdiv'+odid).toggle(400);
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        get_orders_pert:1,
+                        odid:odid
+                    },
+                    success : function(orders){
+                        // console.log(orders);
+                        $('#togdiv'+odid).html(orders);
+                    }
+                });
+                // alert(odid);
+            });
+
+            // change order item status
+            $('body').delegate('.setforwardaction', 'click', function(e){
+                e.preventDefault();
+                var odid=$(this).attr("id");
+                var validate_value=$('#setforwardactionvalue'+odid).val();
+                // $('#togdiv'+odid).toggle(400);
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        set_for_validate:1,
+                        odid:odid,
+                        validate_value:validate_value
+                    },
+                    dataType: "JSON",
+                    success : function(action){
+                        // console.log(orders);
+                        // $('#togdiv'+odid).html(orders);
+                        alert(action['action']);
+                        $('#togdiv'+odid).html(action['reaction']);
+
+                    }
+                });
+                // alert(odid+validate_value);
+            });
+
+            // place order
+            $('body').delegate('.placeorder', 'click', function(e){
+                e.preventDefault();
+                var odid=$(this).attr("id");
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        place_order:1,
+                        odid:odid
+                    },
+                    success : function(orders){
+                        // console.log(orders);
+                        // $('#togdiv'+odid).html(orders);
+                        if(orders == "reload"){
+                            alert("Session expired. Reloading....");
+                            window.location.reload();
+                        }else if(orders == "no"){
+                            alert("Cant placed your requisition. Please check remains quantity & enable item first!!!");
+                        }else{
+                            alert(orders);
+                            $('#togdiv'+odid).toggle(400);
+                        }                        
+                    }
+                });
+            });
+
+            // set to clean
+            $('body').delegate('.settoclean', 'click', function(e){
+                var odid=$(this).attr("id");
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        clean_requisition:1,
+                        odid:odid
+                    },
+                    success : function(orders){
+                            alert(orders);
+                            $('#togdiv'+odid).toggle(400);
+                    }
+                });
+            });
+
+            /*--------------------------Requistion Section-------------------------*/
+
+            // supervisor requist
+            $('body').delegate('.ag-req-show-grid', 'click', function(e){
+                e.preventDefault();
+                var odid=$(this).attr("id");
+                $('#togreqdiv'+odid).toggle(400);
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        get_req_orders_pert:1,
+                        odid:odid
+                    },
+                    success : function(orders){
+                        // console.log(orders);
+                        $('#togreqdiv'+odid).html(orders);
+                    }
+                });            
+            });
+
+            // add to cart per line items
+            $('body').delegate('.add_to_accept_cart', 'click', function(e){
+                e.preventDefault();
+                // $(this).css('color','red');
+                $(this).css('display','none');
+                var item_id=$(this).attr("atc-ic");
+                var itemqty=$('.stc-sup-appr-qty'+item_id).val();
+                var itemstatus=$('.stc-sup-items-status'+item_id).val();
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        go_for_req_sess:1,
+                        item_id:item_id,
+                        itemqty:itemqty,
+                        itemstatus:itemstatus
+                    },
+                    success : function(requisition){
+                        // console.log(requisition);
+                        alert(requisition);
+                        $('#rem_from_accept_cart'+item_id).css('display','block');
+                    }
+                });
+            });
+
+
+            // remove from cart per line items
+            $('body').delegate('.rem_from_accept_cart', 'click', function(e){
+                e.preventDefault();
+                $(this).css('display','none');
+                var item_id=$(this).attr("operat-ic");
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        remove_from_req_sess:1,
+                        item_id:item_id
+                    },
+                    success : function(requisition){
+                        // console.log(requisition);
+                        // alert(requisition);
+                        $('#add_to_accept_cart'+item_id).css('display','block');
+                    }
+                });
+            });
+
+            // placed this requisiton 
+            $('body').delegate('.placerequisition', 'click', function(e){
+                var odid=$(this).attr("id");
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        place_requisition:1,
+                        odid:odid
+                    },
+                    success : function(orders){
+                        // console.log(orders);
+                        if(orders == "reload"){
+                            alert("Session expired. Reloading....");
+                            window.location.reload();
+                        }else if(orders == "no"){
+                            alert("Cant placed your requisition. Please check remains quantity & enable item first!!!");
+                        }else{
+                            alert(orders);
+                            $('#togreqdiv'+odid).toggle(400);
+                        }                        
+                    }
+                });
+            });
+
+            // call req list items edit
+            $('body').delegate('.edit-req-item', 'click', function(e){
+                e.preventDefault();
+                var req_id=$(this).attr("id");
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_req_edit_item_show:1,
+                        req_id:req_id
+                    }, 
+                    success     : function(response_items){
+                        // console.log(response_items);
+                        $("#stc-sup-requisition-item-edit-modal").modal("show");
+                        $(".stc-super-own-name-text").val(response_items);
+                        $('.stc-super-own-req-id-hidd').val(req_id);
+                    }
+                });
+            });
+
+            // update  req list items edit
+            $('body').delegate('.stc-super-own-edit-btn', 'click', function(e){
+                e.preventDefault();
+                var req_item_id=$('.stc-super-own-req-id-hidd').val();
+                var req_item_name=$('.stc-super-own-name-text').val();
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_req_edit_item_update:1,
+                        req_item_id:req_item_id,
+                        req_item_name:req_item_name
+                    }, 
+                    success     : function(response_items){
+                        // console.log(response_items);
+                        response_items=response_items.trim();
+                        if(response_items=="Item Updated Successfully."){
+                            alert(response_items);
+                            $('#stc-sup-requisition-item-edit-modal').modal('hide');
+                        }else{
+                            alert(response_items);
+                        }
+
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+<div class="modal fade" id="stc-sup-requisition-item-edit-modal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Requisition Item Change</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <h3>Item Name :</h3>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                   <input type="text" class="form-control stc-super-own-name-text">
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <input type="hidden" class="stc-super-own-req-id-hidd">
+                    <button class="btn btn-success stc-super-own-edit-btn" href="#">Save</button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

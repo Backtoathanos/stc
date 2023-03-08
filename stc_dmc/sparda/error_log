@@ -1,0 +1,237 @@
+[27-Oct-2020 14:56:51 Asia/Kolkata] PHP Warning:  include(../../MCU/obdb.php): failed to open stream: No such file or directory in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 14:56:51 Asia/Kolkata] PHP Warning:  include(): Failed opening '../../MCU/obdb.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 14:56:51 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Class 'tesseract' not found in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 8
+[27-Oct-2020 14:56:52 Asia/Kolkata] PHP Warning:  include(../../MCU/obdb.php): failed to open stream: No such file or directory in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 14:56:52 Asia/Kolkata] PHP Warning:  include(): Failed opening '../../MCU/obdb.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 14:56:52 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Class 'tesseract' not found in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 8
+[27-Oct-2020 14:58:43 Asia/Kolkata] PHP Warning:  include(../../MCU/obdb.php): failed to open stream: No such file or directory in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 14:58:43 Asia/Kolkata] PHP Warning:  include(): Failed opening '../../MCU/obdb.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 14:58:43 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Class 'tesseract' not found in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 8
+[27-Oct-2020 14:58:47 Asia/Kolkata] PHP Warning:  include(../../MCU/obdb.php): failed to open stream: No such file or directory in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 14:58:47 Asia/Kolkata] PHP Warning:  include(): Failed opening '../../MCU/obdb.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 14:58:47 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Class 'tesseract' not found in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 8
+[27-Oct-2020 14:59:01 Asia/Kolkata] PHP Warning:  include(../../MCU/obdb.php): failed to open stream: No such file or directory in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 14:59:01 Asia/Kolkata] PHP Warning:  include(): Failed opening '../../MCU/obdb.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 14:59:01 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Class 'tesseract' not found in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 8
+[27-Oct-2020 15:03:52 Asia/Kolkata] PHP Warning:  include(../../MCU/obdb.php): failed to open stream: No such file or directory in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 15:03:52 Asia/Kolkata] PHP Warning:  include(): Failed opening '../../MCU/obdb.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 15:03:52 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Class 'tesseract' not found in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 8
+[27-Oct-2020 15:08:11 Asia/Kolkata] PHP Warning:  include(../../MCU/obdb.php): failed to open stream: No such file or directory in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 15:08:11 Asia/Kolkata] PHP Warning:  include(): Failed opening '../../MCU/obdb.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 4
+[27-Oct-2020 15:08:11 Asia/Kolkata] PHP Fatal error:  Uncaught Error: Class 'tesseract' not found in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php:8
+Stack trace:
+#0 {main}
+  thrown in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/useroath.php on line 8
+[27-Oct-2020 15:26:52 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:26:53 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:27:20 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:27:20 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:41:20 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:41:22 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:41:40 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:41:40 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:44:34 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:44:37 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:44:47 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:44:47 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:48:34 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:48:34 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:48:35 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:48:36 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:48:48 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:48:48 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:49:08 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:49:08 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:49:35 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:49:35 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:53:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_agents_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:53:28 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 15:53:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_agents_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 15:53:34 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 16:19:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_agents_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 16:19:50 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 16:23:36 Asia/Kolkata] PHP Notice:  Undefined index: stc_agents_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 16:23:36 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 16:23:54 Asia/Kolkata] PHP Notice:  Undefined index: stc_agents_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 16:23:54 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 16:23:56 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 16:23:56 Asia/Kolkata] PHP Notice:  Undefined index: stc_agents_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 16:24:44 Asia/Kolkata] PHP Notice:  Undefined index: stc_agents_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 16:24:44 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 16:24:56 Asia/Kolkata] PHP Notice:  Undefined index: stc_agents_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 16:24:56 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 16:25:02 Asia/Kolkata] PHP Notice:  Undefined index: stc_agents_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Oct-2020 16:25:02 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 16:25:48 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 16:26:37 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[27-Oct-2020 16:26:39 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:20:27 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:24:35 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:24:44 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:24:48 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:24:50 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:24:52 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:25:06 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:26:00 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:26:49 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:26:54 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:27:48 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 133
+[28-Oct-2020 09:27:54 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:27:54 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 239
+[28-Oct-2020 09:27:54 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 247
+[28-Oct-2020 09:32:01 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:32:01 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 239
+[28-Oct-2020 09:32:01 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 247
+[28-Oct-2020 09:32:06 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:32:06 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 239
+[28-Oct-2020 09:32:06 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 247
+[28-Oct-2020 09:32:13 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:32:13 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 239
+[28-Oct-2020 09:32:13 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 247
+[28-Oct-2020 09:35:05 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:35:12 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:35:24 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:35:31 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:47:06 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:47:15 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:47:18 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:48:36 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:48:38 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:48:52 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:48:58 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:49:18 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:49:20 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:49:29 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:49:42 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:49:51 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 04:22:10 UTC] PHP Parse error:  syntax error, unexpected 'else' (T_ELSE) in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 272
+[28-Oct-2020 09:52:10 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 04:22:10 UTC] PHP Parse error:  syntax error, unexpected 'else' (T_ELSE) in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 272
+[28-Oct-2020 04:26:21 UTC] PHP Parse error:  syntax error, unexpected 'else' (T_ELSE) in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 272
+[28-Oct-2020 04:26:21 UTC] PHP Parse error:  syntax error, unexpected 'else' (T_ELSE) in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 272
+[28-Oct-2020 09:56:21 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:56:52 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:56:59 Asia/Kolkata] PHP Notice:  Undefined variable: out in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 270
+[28-Oct-2020 09:57:03 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:57:05 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:59:24 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:59:29 Asia/Kolkata] PHP Notice:  Undefined variable: out in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 260
+[28-Oct-2020 09:59:32 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 09:59:35 Asia/Kolkata] PHP Notice:  Undefined index: agentsperforme in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 228
+[28-Oct-2020 10:01:40 Asia/Kolkata] PHP Warning:  mysqli_connect(): (HY000/2003): Can't connect to MySQL server on 'a2plcpnl0682' (111) in /home/c2484kn1eg0y/public_html/MCU/obdb.php on line 10
+[28-Oct-2020 10:01:40 Asia/Kolkata] PHP Warning:  mysqli_set_charset() expects parameter 1 to be mysqli, bool given in /home/c2484kn1eg0y/public_html/MCU/obdb.php on line 11
+[28-Oct-2020 10:01:40 Asia/Kolkata] PHP Warning:  mysqli_connect(): (HY000/2003): Can't connect to MySQL server on 'a2plcpnl0682' (111) in /home/c2484kn1eg0y/public_html/MCU/obdb.php on line 10
+[28-Oct-2020 10:01:40 Asia/Kolkata] PHP Warning:  mysqli_set_charset() expects parameter 1 to be mysqli, bool given in /home/c2484kn1eg0y/public_html/MCU/obdb.php on line 11
+[28-Oct-2020 10:01:40 Asia/Kolkata] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[28-Oct-2020 10:01:40 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, null given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 106
+[28-Oct-2020 10:01:40 Asia/Kolkata] PHP Warning:  mysqli_connect(): (HY000/2003): Can't connect to MySQL server on 'a2plcpnl0682' (111) in /home/c2484kn1eg0y/public_html/MCU/obdb.php on line 10
+[28-Oct-2020 10:01:40 Asia/Kolkata] PHP Warning:  mysqli_set_charset() expects parameter 1 to be mysqli, bool given in /home/c2484kn1eg0y/public_html/MCU/obdb.php on line 11
+[28-Oct-2020 10:01:40 Asia/Kolkata] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 208
+[28-Oct-2020 10:01:40 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, null given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 211
+[28-Oct-2020 10:01:48 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:01:48 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:01:48 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:01:48 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:01:54 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:01:55 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:01:55 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:01:56 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:01:57 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:01:58 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:04:09 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:04:09 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:04:11 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:04:11 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:04:11 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:04:12 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:04:14 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:04:15 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:04:16 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:04:17 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:10:30 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:10:51 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:10:51 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:10:51 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:10:51 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:10:55 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:10:55 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:10:55 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:10:55 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:10:57 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 290
+[28-Oct-2020 10:22:09 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_order_pd_items_price in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 317
+[28-Oct-2020 10:22:09 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_order_pd_items_price in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 318
+[28-Oct-2020 10:22:09 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_order_pd_items_price in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 317
+[28-Oct-2020 10:22:09 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_order_pd_items_price in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 318
+[28-Oct-2020 10:22:11 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_order_pd_items_price in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 317
+[28-Oct-2020 10:22:11 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_order_pd_items_price in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 318
+[28-Oct-2020 10:22:46 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:22:46 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:22:46 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:22:46 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:22:48 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_order_pd_items_price in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 317
+[28-Oct-2020 10:22:48 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_order_pd_items_price in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 318
+[28-Oct-2020 10:22:56 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_order_pd_items_price in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 317
+[28-Oct-2020 10:22:56 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_order_pd_items_price in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 318
+[28-Oct-2020 10:23:31 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:23:31 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:23:31 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 219
+[28-Oct-2020 10:23:31 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 227
+[28-Oct-2020 10:24:38 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 220
+[28-Oct-2020 10:30:12 Asia/Kolkata] PHP Warning:  mysqli_connect(): (HY000/1130): Host 'a2plcpnl0682.prod.iad2.secureserver.net' is not allowed to connect to this MySQL server in /home/c2484kn1eg0y/public_html/MCU/obdb.php on line 10
+[28-Oct-2020 10:30:13 Asia/Kolkata] PHP Warning:  mysqli_set_charset() expects parameter 1 to be mysqli, bool given in /home/c2484kn1eg0y/public_html/MCU/obdb.php on line 11
+[28-Oct-2020 10:30:13 Asia/Kolkata] PHP Warning:  mysqli_query() expects parameter 1 to be mysqli, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[28-Oct-2020 10:30:13 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, null given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 106
+[29-Oct-2020 09:39:36 Asia/Kolkata] PHP Notice:  Undefined variable: out in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 260
+[29-Oct-2020 09:39:41 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 09:41:34 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 09:41:48 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:02:07 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:03:40 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:04:21 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:05:02 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:05:46 Asia/Kolkata] PHP Notice:  Undefined variable: out in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 260
+[29-Oct-2020 10:05:51 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:13:33 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:13:50 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:14:46 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:19:44 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:21:51 Asia/Kolkata] PHP Notice:  Undefined variable: out in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 260
+[29-Oct-2020 10:21:54 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:24:51 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 10:25:01 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 306
+[29-Oct-2020 11:37:32 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 11:37:34 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 307
+[29-Oct-2020 11:37:36 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 307
+[29-Oct-2020 11:37:44 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 307
+[29-Oct-2020 11:38:09 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 11:38:11 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 307
+[29-Oct-2020 11:39:17 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 307
+[29-Oct-2020 11:39:19 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 307
+[29-Oct-2020 11:39:23 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 307
+[29-Oct-2020 14:15:53 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 14:16:14 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 14:17:11 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 14:18:55 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 14:19:39 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 14:20:29 Asia/Kolkata] PHP Notice:  Undefined variable: out in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 260
+[29-Oct-2020 14:20:33 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 17:48:10 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223
+[29-Oct-2020 17:48:20 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 223

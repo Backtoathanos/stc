@@ -1,0 +1,775 @@
+<?php
+session_start();
+date_default_timezone_set('Asia/Kolkata');
+include "../../MCU/obdb.php";
+/*------------------------------------------------------------------------------------------------*/
+/*------------------------------------------For Agents--------------------------------------------*/
+/*------------------------------------------------------------------------------------------------*/
+class transformers extends tesseract{
+
+	public function stc_load_cart_ag(){
+		$sl=1;
+		$order_table='
+			<table class="mb-0 table table-hover">
+    	    	<thead>
+    	    	    <th style="width:10%;">Sl No.</th>
+    	    	    <th style="width:50%;">Item Desc</th>
+    	    	    <th>Unit</th>
+    	    	    <th>Action</th>
+    	    	</thead>
+    	    	<tbody>
+		';
+		if(!empty($_SESSION["stc_agent_sup_cart_sess"])){  		
+			foreach($_SESSION["stc_agent_sup_cart_sess"] as $cartpditem){
+				$total = 0;  
+				$totalgst = 0;
+			
+				$bumblebeequery=mysqli_query($this->stc_dbs, "
+					SELECT * FROM `stc_product`
+					INNER JOIN `stc_category`
+					ON `stc_product_cat_id`=`stc_cat_id`
+					INNER JOIN `stc_sub_category`
+					ON `stc_product_sub_cat_id`=`stc_sub_cat_id`
+					WHERE `stc_product_id`='".$cartpditem['product_id']."'
+				");
+				$bumblebeetakeit=mysqli_fetch_assoc($bumblebeequery);
+
+				if($bumblebeetakeit['stc_sub_cat_name']=="OTHERS"){
+					$subcat='';
+				}else{
+					$subcat=$bumblebeetakeit['stc_sub_cat_name'];
+				}
+				$order_table.='
+					<tr>
+						<td>'.$sl.'</td>
+						<td>'.$subcat.' '.$bumblebeetakeit['stc_product_name'].'<br>
+							<input 
+								type="text" 
+								style="float: left;width: 80%;background: #8787ff;border-radius: 15px;padding: 3px 15px;" 
+								value="'.number_format($cartpditem['product_quantity'], 2).'" 
+								id="itemqty'.$cartpditem['product_id'].'"
+							>
+							<a href="#" id="'.$cartpditem['product_id'].'" class="updateitem">
+								<span style="font-size: 15px;background: yellow;border-radius: 11px;padding: 5px;">
+									<i class="fas fa-arrow-right"></i>
+								</span>
+							</a>
+						</td>
+						<td>'.$bumblebeetakeit['stc_product_unit'].'</td>
+						<td><a href="#" class="btn btn-success removitems" id="'.$cartpditem['product_id'].'"><i class="fas fa-trash"></i></a></td>
+					</tr>
+				';
+				$total=+$cartpditem['product_quantity'];
+				$sl++;
+			}
+
+			$order_table.='
+				<tr>
+					<td colspan=""></td>
+					<td><b>Total</b></td>
+					<td>: '.number_format($total, 2).'</td>
+				</tr>
+			';
+		}else{
+			$order_table.='
+					<tr>
+						<td colspan="4" align="center">Cart Empty!!!</td>
+					</tr>
+			';
+		}
+		$order_table.='
+				</tbody>
+			</table>
+		';
+		return $odin=$order_table;
+	}
+
+	public function stc_call_cust_for_agent(){
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT
+				`stc_cust_project_id`, 
+				`stc_cust_project_title` 
+			FROM 
+				`stc_cust_pro_attend_supervise`
+			INNER JOIN 
+				`stc_cust_project` 
+			ON 
+				`stc_cust_project_id`=`stc_cust_pro_attend_supervise_pro_id` 
+			WHERE 
+				`stc_cust_pro_attend_supervise_super_id`='".$_SESSION['stc_agent_sub_id']."'
+		");
+		$optimusprime='<option value="NA" selected>Select Site</option>';
+		$do_action=mysqli_num_rows($optimusprimequery);
+		if($do_action == 0){
+			$optimusprime = "<option value='NA' selected>No Site Found !!</option>";
+		}else{
+			foreach ($optimusprimequery as $row) {
+				$optimusprime.='
+							<option value="'.$row["stc_cust_project_id"].'">'.$row["stc_cust_project_title"].'</option>		               	
+		            	';				
+			}
+			
+		}
+		return $optimusprime;
+	}
+
+	public function stc_agent_order_add($site_id){
+		$optimusprime='';
+		$date=date("Y-m-d H:i:s");
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_super_requisition`(
+				`stc_cust_super_requisition_date`, 
+				`stc_cust_super_requisition_super_id`, 
+				`stc_cust_super_requisition_project_id`, 
+				`stc_cust_super_requisition_status`, 
+				`stc_cust_super_requisition_approvedby`
+			) VALUES (
+				'".$date."',
+				'".$_SESSION['stc_agent_sub_id']."',
+				'".$site_id."',
+				'1',
+				'0'
+			)
+		");
+		if($optimusprimequery){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
+
+	public function stc_agent_order_items_add(){
+	    $optimusprime='';
+		$optimusprimegetid=mysqli_query($this->stc_dbs, "
+			SELECT MAX(`stc_cust_super_requisition_id`) AS orderid 
+			FROM `stc_cust_super_requisition` 
+			ORDER BY `stc_cust_super_requisition_id` DESC
+		");
+		$getorderid=mysqli_fetch_assoc($optimusprimegetid);
+		foreach($_SESSION['stc_agent_sup_cart_sess'] as $getitems){
+			$optimusprimegoitems=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_items`(
+					`stc_cust_super_requisition_items_sup_req_id`, 
+					`stc_cust_super_requisition_items_product_id`,  
+					`stc_cust_super_requisition_items_product_qty`,
+					`stc_cust_super_requisition_items_status`
+				) VALUES (
+					'".$getorderid['orderid']."',
+					'".$getitems['product_id']."',
+					'".$getitems['product_quantity']."',
+					'1'
+				)
+			");
+		}
+		$optimusprime="success";
+		return $optimusprime;
+	}
+}
+
+class witcher_supervisor extends tesseract{
+	public function stc_super_list_add($sup_site){
+		$optimusprime='';
+		$date=date("Y-m-d H:i:s");
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_super_requisition_list`(
+				`stc_cust_super_requisition_list_date`, 
+				`stc_cust_super_requisition_list_super_id`, 
+				`stc_cust_super_requisition_list_project_id`, 
+				`stc_cust_super_requisition_list_status`, 
+				`stc_cust_super_requisition_list_approved_by`
+			) VALUES (
+				'".$date."',
+				'".$_SESSION['stc_agent_sub_id']."',
+				'".$sup_site."',
+				'1',
+				'0'
+			)
+		");
+		if($optimusprimequery){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
+
+	public function stc_super_list_items_add(){
+		$optimusprime='';
+		$optimusprimegetid=mysqli_query($this->stc_dbs, "
+			SELECT MAX(`stc_cust_super_requisition_list_id`) AS orderid 
+			FROM `stc_cust_super_requisition_list` 
+			ORDER BY `stc_cust_super_requisition_list_id` DESC
+		");
+		$getorderid=mysqli_fetch_assoc($optimusprimegetid);
+		foreach($_SESSION['stc_agent_sup_dailylist_cart_sess'] as $getitems){
+			$optimusprimegoitems=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items`(
+					`stc_cust_super_requisition_list_items_req_id`,
+					`stc_cust_super_requisition_list_items_title`, 
+					`stc_cust_super_requisition_list_items_unit`, 
+					`stc_cust_super_requisition_list_items_reqqty`, 
+					`stc_cust_super_requisition_list_items_approved_qty`, 
+					`stc_cust_super_requisition_items_type`,
+					`stc_cust_super_requisition_list_items_status`
+				) VALUES (
+					'".$getorderid['orderid']."',
+					'".mysqli_real_escape_string($this->stc_dbs, $getitems['items_title'])."',
+					'".mysqli_real_escape_string($this->stc_dbs, $getitems['items_unit'])."',
+					'".mysqli_real_escape_string($this->stc_dbs, $getitems['items_quantity'])."',
+					'0',
+					'".mysqli_real_escape_string($this->stc_dbs, $getitems['items_type'])."',
+					'1'
+				)
+			");
+		}
+		$optimusprime="success";
+		return $optimusprime;
+	}
+
+	public function stc_search_requisitions($supreqfromdate, $supreqtodate){ 
+		$requisition_table='
+			<table class="mb-0 table table-hover">
+    	    	<thead>
+    	    	    <th style="width:10%;">Req No.</th>
+    	    	    <th style="width:10%;">Req Date.</th>
+    	    	    <th style="width:50%;">Req Site Name.</th>
+    	    	    <th>Action</th>
+    	    	</thead>
+    	    	<tbody>
+		';
+
+		$requisition_qry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_cust_super_requisition_list_id`,
+				DATE(`stc_cust_super_requisition_list_date`) as req_date,
+				`stc_cust_project_title`,
+				`stc_cust_super_requisition_list_status`
+			FROM `stc_cust_super_requisition_list` 
+			INNER JOIN `stc_cust_project` 
+			ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
+			WHERE (
+				DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $supreqfromdate)."'
+				AND '".mysqli_real_escape_string($this->stc_dbs, $supreqtodate)."'
+			) AND `stc_cust_super_requisition_list_super_id`='".$_SESSION['stc_agent_sub_id']."'
+			LIMIT 0,30
+		");
+
+		if(mysqli_num_rows($requisition_qry)>0){
+			foreach($requisition_qry as $reqrow){
+				$primerowstatus="";
+				if($reqrow['stc_cust_super_requisition_list_status']=="1"){
+					$primerowstatus="PROCESS";
+				}elseif($reqrow['stc_cust_super_requisition_list_status']=="2"){
+					$primerowstatus="PASSED";
+				}elseif($reqrow['stc_cust_super_requisition_list_status']=="3"){
+					$primerowstatus="CLEARED";
+				}else{
+					$primerowstatus="ACCEPTED";
+				}
+				$requisition_table.="
+					<tr>
+						<td>STC/R/A/S/".substr("0000{$reqrow['stc_cust_super_requisition_list_id']}", -5)."</td>
+						<td style='width: 20%'>".date('d-M-Y', strtotime($reqrow['req_date']))."</td>
+						<td>".$reqrow['stc_cust_project_title']."</td>
+						<td>".$primerowstatus."</td>
+						<td><a href='#' style='font-size: 25px;font-weight: bold;color: black;' class='ag-show-requisition-items-hit' id='".$reqrow['stc_cust_super_requisition_list_id']."'><i class='fas fa-eye'></i></a></td>
+					</tr>
+					<tr>
+						<td colspan='6'>
+							<div style='display:none;' id='togdiv".$reqrow['stc_cust_super_requisition_list_id']."'>
+								Loading...
+							</div>
+						</td>
+					</tr>
+				";
+			}
+		}else{
+			$requisition_table.='
+				<tr>
+					<td colspan="4" align="center">No Requisition Found!!!</td>
+				</tr>
+			';
+		}
+		$requisition_table.='
+    	    	</tbody>
+			</table>
+		';
+		return $requisition_table;
+	}
+
+	public function stc_ag_requisition_items_call($odid){
+		$sl=0;
+		$subcat='';
+		$countqty=0;
+		$transformers='
+			<table class="mb-0 table table-hover table-bordered">
+				<thead>
+				    <th>Sl No</th>
+				    <th width="45%">Material Desc</th>
+				    <th>Unit</th>
+				    <th>Order Qty</th>
+				    <th>Approved Qty</th>
+				    <th>Dispatched Qty</th>
+				    <th>Recieved Qty</th>
+				    <th>Balance Qty</th>
+				    <th>Consumed Qty</th>
+				    <th>Status</th>
+				    <th>Add Recieving</th>
+				</thead>
+				<tbody>
+		';
+		$transformersquery=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_cust_super_requisition_list_id`,
+				`stc_cust_super_requisition_list_items_title`,
+				`stc_cust_super_requisition_list_items_unit`,
+				`stc_cust_super_requisition_list_items_reqqty`,
+				`stc_cust_super_requisition_items_finalqty`,
+				`stc_cust_super_requisition_list_items_status`
+			FROM `stc_cust_super_requisition_list_items` 
+			WHERE `stc_cust_super_requisition_list_items_req_id`='".$odid."'
+		");
+		if(mysqli_num_rows($transformersquery)>0){
+			foreach($transformersquery as $firstrow){
+				$sl++;
+				$reqstaus='';
+				if($firstrow['stc_cust_super_requisition_list_items_status']==1){
+					$reqstaus='ALLOW';
+				}elseif($firstrow['stc_cust_super_requisition_list_items_status']==2){
+					$reqstaus='ALLOW';
+				}else{
+					$reqstaus='NOT ALLOW';
+				}
+				$getdispatchedtransformers=mysqli_query($this->stc_dbs, "
+					SELECT 
+						SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+					FROM `stc_cust_super_requisition_list_items_rec` 
+					WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$firstrow['stc_cust_super_requisition_list_id']."'
+				");
+				$recievingqty=0;
+				$sumbalanceqty=0;
+				$dispatchedgqty=0;
+				foreach($getdispatchedtransformers as $decqtyrow){
+					$dispatchedgqty+=$decqtyrow['dispatched_qty'];
+				}
+
+				$getrecivedtransformers=mysqli_query($this->stc_dbs, "
+					SELECT 
+						SUM(`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`) AS received_qty
+					FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
+					WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$firstrow['stc_cust_super_requisition_list_id']."'
+				");
+				$recievingqty=0;
+				$sumbalanceqty=0;
+				foreach($getrecivedtransformers as $recqtyrow){
+					$recievingqty+=$recqtyrow['received_qty'];
+				}
+
+				$getconsrecivedtransformers=mysqli_query($this->stc_dbs, "
+					SELECT 
+						SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
+					FROM `stc_cust_super_list_items_consumption_items` 
+					WHERE `stc_cust_super_list_items_consumption_items_name`='".$firstrow['stc_cust_super_requisition_list_id']."'
+				");
+				$consrecievingqty=0;
+				foreach($getconsrecivedtransformers as $consrecqtyrow){
+					$consrecievingqty+=$consrecqtyrow['consumable_qty'];
+				}
+
+				$sumbalanceqty=$firstrow['stc_cust_super_requisition_items_finalqty'] - $recievingqty;
+				if(
+					(
+						number_format($firstrow['stc_cust_super_requisition_items_finalqty'], 2)>0
+					) 
+					&& 
+					(
+						number_format($dispatchedgqty, 2)>0
+					)
+					&& 
+					(
+						number_format($sumbalanceqty, 2)!=0
+					)
+				){
+					$transformers.='					
+						<tr>
+							<td>'.$sl.'</td>
+							<td>'.$firstrow['stc_cust_super_requisition_list_items_title'].'</td>
+							<td>'.$firstrow['stc_cust_super_requisition_list_items_unit'].'</td>
+							<td>'.number_format($firstrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+							<td>'.number_format($firstrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+							<td>'.number_format($dispatchedgqty, 2).'</td>
+							<td>'.number_format($recievingqty, 2).'</td>
+							<td>'.number_format($sumbalanceqty, 2).'</td>
+							<td>'.number_format($recievingqty, 2).'</td>
+							<td>'.$reqstaus.'</td>
+							<td>
+								<a 
+									href="#" 
+									stc-req-item-id="'.$firstrow['stc_cust_super_requisition_list_id'].'"
+									stc-req-id="'.$odid.'"
+									class="btn btn-info btn-sm stc-sup-requisition-rece-modal-btn">	 
+									Recieving
+								</a>
+							</td>
+						</tr>
+					';
+				}else{
+					$transformers.='
+						<tr>
+							<td>'.$sl.'</td>
+							<td>'.$firstrow['stc_cust_super_requisition_list_items_title'].'</td>
+							<td>'.$firstrow['stc_cust_super_requisition_list_items_unit'].'</td>
+							<td>'.number_format($firstrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+							<td>'.number_format($firstrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+							<td>'.number_format($dispatchedgqty, 2).'</td>
+							<td>'.number_format($recievingqty, 2).'</td>
+							<td>'.number_format($sumbalanceqty, 2).'</td>
+							<td>'.number_format($recievingqty, 2).'</td>
+							<td>'.$reqstaus.'</td>
+							<td>#</td>
+						</tr>
+					';
+				}
+			}
+		}else{
+			$transformers.='
+					<tr>
+						<td colspan="7"><h4>No Items Found!!!</h6></td>
+					</tr>
+			';
+		}
+		$transformers.='
+				</tbody>
+			</table>
+		';
+		return $transformers;
+	}
+
+	public function stc_supervisor_list_rec_items_hit($stc_req_id, $stc_req_item_id, $stc_rec_qty){
+		$returnrecieve='';
+		$stcinitvalue=0;
+		$stcsuporderqty=0;
+		$stcsupdisqty=0;
+		$stcfinalvalue=0;
+		$date=date("Y-m-d H:i:s");
+		$stcceckqntyqry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+			FROM `stc_cust_super_requisition_rec_items_fr_supervisor`
+			WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_item_id)."'
+		");
+		foreach($stcceckqntyqry as $qry){
+			$stcinitvalue+=$qry['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
+		}
+		if($stc_rec_qty<=$stcinitvalue){
+			$returnrecieve="This item is already recieved.";
+		}else{
+			$stccheckrecqry=mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_cust_super_requisition_items_finalqty`,
+				    `stc_cust_super_requisition_list_items_rec_recqty`
+				FROM `stc_cust_super_requisition_list_items`
+				INNER JOIN `stc_cust_super_requisition_list_items_rec` 
+				ON `stc_cust_super_requisition_list_items_rec_list_item_id`=`stc_cust_super_requisition_list_id` 
+				WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_item_id)."' 
+				AND `stc_cust_super_requisition_list_items_req_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."'
+			");
+			foreach($stccheckrecqry as $stccheckrow){
+				$stcsuporderqty+=$stccheckrow['stc_cust_super_requisition_items_finalqty'];
+				$stcsupdisqty+=$stccheckrow['stc_cust_super_requisition_list_items_rec_recqty'];
+			}
+			$stcfinalvalue=$stcsuporderqty - $stcsupdisqty;
+			if($stc_rec_qty>$stcsupdisqty){
+				$returnrecieve="Invalid Quantity!!!";
+			}else{
+				$stcinsertqry=mysqli_query($this->stc_dbs, "
+					INSERT INTO `stc_cust_super_requisition_rec_items_fr_supervisor`(
+						`stc_cust_super_requisition_rec_items_fr_supervisor_date`, 
+						`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`, 
+						`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+					) VALUES (
+						'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+						'".mysqli_real_escape_string($this->stc_dbs, $stc_req_item_id)."',
+						'".mysqli_real_escape_string($this->stc_dbs, $stc_rec_qty)."'
+					)
+				");
+				if($stcinsertqry){
+					$returnrecieve="yes";
+				}else{
+					$stcinsertqry="Hmmm!!! Something went wrong. Please check quantity & try again.";
+				}
+			}
+		}
+		return $returnrecieve;
+	}
+}
+
+/*-----------------------------------------------------------------------------------*/
+/*---------------------------------For Order items-----------------------------------*/
+/*-----------------------------------------------------------------------------------*/
+
+if(isset($_POST['prodsuccess'])){
+	if($_POST["prod_qty"]==0){
+		echo "Please Add Quantity First!!!";		
+	}else{
+		if(isset($_SESSION["stc_agent_sup_cart_sess"])) {  
+			$is_available = 0;  
+			foreach($_SESSION["stc_agent_sup_cart_sess"] as $keys => $values) {  
+				if($_SESSION["stc_agent_sup_cart_sess"][$keys]['product_id'] == $_POST["prod_id"]) {  
+				     $is_available++;  
+				     $_SESSION["stc_agent_sup_cart_sess"][$keys]['product_quantity'] = $_SESSION["stc_agent_sup_cart_sess"][$keys]['product_quantity'] + $_POST["prod_qty"];  
+				     echo "Cart Item Quantity Increased!!!";
+				}  
+			}  
+			if($is_available < 1) {  
+				$item_array = array(  
+				     'product_id'             =>     $_POST["prod_id"],  
+				     'product_quantity'       =>     $_POST["prod_qty"],
+				     'product_price'       =>     $_POST["prod_price"]
+				);  
+				$_SESSION["stc_agent_sup_cart_sess"][] = $item_array;  
+				echo "Created & Item Added to Cart!!!";
+			}  
+		}else{  
+			$item_array = array(  
+				     'product_id'             =>     $_POST["prod_id"],  
+				     'product_quantity'       =>     $_POST["prod_qty"],
+				     'product_price'       =>     $_POST["prod_price"]
+			);   
+			$_SESSION["stc_agent_sup_cart_sess"][] = $item_array;  
+			echo "Item Added to Cart!!!";
+		}
+	}  
+}
+
+if(isset($_POST['load_cart_ag'])){
+	$objlogin=new transformers();
+	$opobjlogin=$objlogin->stc_load_cart_ag();
+	$out = $opobjlogin;
+	echo $out;
+}
+
+if(isset($_POST['delitems'])){
+	$prod_id=$_POST['items_id'];
+	foreach($_SESSION["stc_agent_sup_cart_sess"] as $keys => $values){  
+		if($values["product_id"] == $prod_id){  
+			unset($_SESSION["stc_agent_sup_cart_sess"][$keys]);  
+			echo "Item Removed!!!";  
+		}  
+	} 
+}
+
+if(isset($_POST["updateitems"])){
+  	foreach($_SESSION["stc_agent_sup_cart_sess"] as $keys => $values){
+	    if($_SESSION["stc_agent_sup_cart_sess"][$keys]['product_id'] == $_POST["items_id"]){
+	         $_SESSION["stc_agent_sup_cart_sess"][$keys]['product_quantity'] = $_POST["pd_qty"];
+    	}
+  	}
+  	echo "Quanty Updated!!!";
+}
+
+if(isset($_POST['load_cust'])){
+	$bumblebee=new transformers();
+	$outbumblebee=$bumblebee->stc_call_cust_for_agent();
+	echo $outbumblebee;
+}
+
+if(isset($_POST['order_add'])){
+	$out='';
+	$site_id=$_POST['site_id'];
+
+	$bumblebee=new transformers();
+	$megatron=new transformers();
+
+	if(empty($site_id)){
+		$out="Please Fill All Fields!!!";
+	}elseif($site_id=="NA"){
+		$out="Please Select Customer First!!!";
+	}elseif(empty($_SESSION['stc_agent_sup_cart_sess'])){
+		$out="Please Buy Something!!!";
+	}else{
+		$outbumblembee=$bumblebee->stc_agent_order_add($site_id);
+		if($outbumblembee=="success"){
+			$outmegatron=$megatron->stc_agent_order_items_add();
+    			
+			if($outmegatron=="success"){
+			    $out.="Thank You!!!Your Order Will Be Placed ASAP.";
+			    unset($_SESSION['stc_agent_sup_cart_sess']);
+    			// mail("stc111213@gmail.com", "Order Alert", "Some order from ".$_SESSION['stc_agent_sub_name']."!!!:)", "info@stcassociate.com");
+			}else{
+			    $out.="Items not inserted.";
+			}
+		}else{
+			$out.="Something Went Not Good!!! Please Try Again Later.";
+		}
+		$out;
+	}
+	echo $out;
+}
+
+/*-----------------------------------------------------------------------------------*/
+/*---------------------------------For list items------------------------------------*/
+/*-----------------------------------------------------------------------------------*/
+
+if(isset($_POST['stc-sup-hit'])){
+	if(empty($_POST["stc-sup-desc"])){
+		echo "Please Add Atleast One Item Before Saving!!!";	
+	}elseif(empty($_POST["stc-sup-qty"])){
+		echo "Please Add Quantity First!!!";	
+	}else{
+		if(isset($_SESSION["stc_agent_sup_dailylist_cart_sess"])) {  
+			$is_available = 0;  
+			foreach($_SESSION["stc_agent_sup_dailylist_cart_sess"] as $keys => $values) {  
+				if($_SESSION["stc_agent_sup_dailylist_cart_sess"][$keys]['items_title'] == $_POST["stc-sup-desc"]) {  
+				     $is_available++;  
+				     $_SESSION["stc_agent_sup_dailylist_cart_sess"][$keys]['stc-sup-qty'] = $_SESSION["stc_agent_sup_dailylist_cart_sess"][$keys]['items_quantity'] + $_POST["stc-sup-qty"];  
+				     echo "List Item Quantity Increased!!!";
+				}  
+			}  
+			if($is_available < 1) {  
+				$item_array = array(  
+				     'items_title'				=>     $_POST["stc-sup-desc"],  
+				     'items_quantity'       	=>     $_POST["stc-sup-qty"],
+				     'items_unit'				=>     $_POST["stc-sup-unit"],
+				     'items_type'				=>     $_POST["stc-sup-type"]
+				);  
+				$_SESSION["stc_agent_sup_dailylist_cart_sess"][] = $item_array;  
+				echo "List Created & Item Added to List!!!";
+			}  
+		}else{  
+			$item_array = array(  
+				     'items_title'				=>     $_POST["stc-sup-desc"],  
+				     'items_quantity'       	=>     $_POST["stc-sup-qty"],
+				     'items_unit'				=>     $_POST["stc-sup-unit"],
+				     'items_type'				=>     $_POST["stc-sup-type"]
+			);   
+			$_SESSION["stc_agent_sup_dailylist_cart_sess"][] = $item_array;  
+			echo "Items Added to List!!!";
+		}
+	}  
+}
+
+if(isset($_POST['show_Dailylist'])){
+	$out='
+		<table class="mb-0 table table-hover table-responsive">
+			<thead>
+				<th>Sl No</th>
+				<th>Items Description</th>
+				<th>Items Qty</th>
+				<th>Items Unit</th>
+				<th>Items Type</th>
+				<th>Action</th>
+			</thead>
+			<tbody>
+	';
+	$slno=0;
+	if(!empty($_SESSION["stc_agent_sup_dailylist_cart_sess"])){
+		foreach($_SESSION["stc_agent_sup_dailylist_cart_sess"] as $listrow){
+			$slno++;
+			$out.='
+				<tr>
+					<td>'.$slno.'</td>
+					<td>'.$listrow['items_title'].'</td>
+					<td>'.number_format($listrow['items_quantity'], 2).'</td>
+					<td>'.$listrow['items_unit'].'</td>
+					<td>'.$listrow['items_type'].'</td>
+					<td>
+						<a href="#" class="btn btn-success removlistitems" id="'.$listrow['items_title'].'">
+							<i class="fas fa-trash"></i>
+						</a>
+					</td>
+				</tr>
+			';
+		}
+		$out.='
+			<tr>
+				<td colspan="5">
+					<a class="btn btn-success stc-save-requisition">Save</a>
+				</td>
+			</tr>
+		';
+
+	}else{
+			$out.='
+				<tr>
+					<td colspan="5" align="center">Requisition List is Empty:(</td>
+				</tr>
+			';
+	}
+	$out.='
+			</tbody>
+		</table>
+	';
+	echo $out;
+}
+
+if(isset($_POST['delete_Dailylist'])){
+	$prod_id=$_POST['del_item'];
+	foreach($_SESSION["stc_agent_sup_dailylist_cart_sess"] as $keys => $values){  
+		if($values["items_title"] == $prod_id){  
+			unset($_SESSION["stc_agent_sup_dailylist_cart_sess"][$keys]);  
+			echo "Item Removed!!!";  
+		}  
+	} 
+}
+
+if(isset($_POST['save_Dailylist'])){
+	$out='';
+	$sup_site=$_POST['sup_site'];
+	$bumblebee=new witcher_supervisor();
+	$megatron=new witcher_supervisor();
+
+	if(empty($sup_site)){
+		$out="Please Fill All Fields!!!";
+	}elseif($sup_site=="NA"){
+		$out="Please Select Your Site First!!!";
+	}elseif(empty($_SESSION['stc_agent_sup_dailylist_cart_sess'])){
+		$out="Please Order atleast One Product!!!";
+	}else{
+		$outbumblembee=$bumblebee->stc_super_list_add($sup_site);
+		if($outbumblembee=="success"){
+			$outmegatron=$megatron->stc_super_list_items_add();
+    			
+			if($outmegatron=="success"){
+			    $out.="Thank You!!!Your Order Will Be Placed ASAP.";
+			    unset($_SESSION['stc_agent_sup_dailylist_cart_sess']);
+			}else{
+			    $out.="Items not inserted.";
+			}
+		}else{
+			$out.="Something Went Not Good!!! Please Try Again Later.";
+		}
+		$out;
+	}
+	echo $out;
+}
+
+if(isset($_POST['call_searched_requisition'])){
+	$supreqfromdate=date("Y-m-d", strtotime($_POST['supreqfromdate']));
+	$supreqtodate=date("Y-m-d", strtotime($_POST['supreqtodate']));
+	$objsearchreq=new witcher_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_search_requisitions($supreqfromdate, $supreqtodate);
+	echo $opobjsearchreq;
+}
+
+if(isset($_POST['get_requisition_pert'])){
+	$odid=$_POST['odid'];
+	$megabots=new witcher_supervisor();
+	$outmegabots=$megabots->stc_ag_requisition_items_call($odid);
+	echo $outmegabots;
+}
+
+if(isset($_POST['stc_rec_qntyhit'])){
+	$stc_rec_qty=$_POST['stc_super_rec_qnty_text'];
+	$stc_req_id=$_POST['super_rec_value'];
+	$stc_req_item_id=$_POST['super_rec_item_value'];
+	$objloki=new witcher_supervisor();
+	if(!empty($_SESSION["stc_agent_sub_id"])){
+		$opobjloki=$objloki->stc_supervisor_list_rec_items_hit($stc_req_id, $stc_req_item_id, $stc_rec_qty);
+		echo $opobjloki;
+	}else{
+		echo "exit";
+	}
+}
+?>

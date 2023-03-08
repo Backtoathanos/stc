@@ -1,0 +1,609 @@
+[15-Feb-2022 17:38:53 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 976
+[15-Feb-2022 17:38:53 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1005
+[15-Feb-2022 17:38:53 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1021
+[23-May-2022 18:41:23 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1543
+[23-May-2022 18:41:23 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1544
+[23-May-2022 18:41:23 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1544
+[23-May-2022 18:41:23 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1546
+[23-May-2022 18:41:23 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1574
+[23-May-2022 18:41:23 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1588
+[28-May-2022 10:52:04 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/request-raised.php on line 375
+[31-May-2022 12:06:03 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 35
+[02-Jun-2022 11:32:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 533
+[02-Jun-2022 11:32:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 533
+[02-Jun-2022 11:33:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 533
+[21-Jun-2022 11:03:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[21-Jun-2022 11:03:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[04-Jul-2022 18:55:29 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[04-Jul-2022 18:55:29 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1578
+[04-Jul-2022 18:55:29 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[04-Jul-2022 18:55:30 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[04-Jul-2022 18:55:30 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1578
+[04-Jul-2022 18:55:30 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[05-Jul-2022 16:13:07 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 459
+[21-Jul-2022 16:47:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[21-Jul-2022 16:47:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[21-Jul-2022 16:47:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[21-Jul-2022 16:47:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[21-Jul-2022 16:47:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[21-Jul-2022 16:47:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[21-Jul-2022 16:47:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[21-Jul-2022 16:47:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[24-Jul-2022 17:01:09 Asia/Kolkata] PHP Notice:  Undefined index: silent_order_stcfc in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1769
+[24-Jul-2022 17:01:09 Asia/Kolkata] PHP Notice:  Undefined index: silent_order_stcpf in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1770
+[27-Jul-2022 13:28:58 Asia/Kolkata] PHP Notice:  Undefined index: silent_order_stcfc in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1769
+[27-Jul-2022 13:28:58 Asia/Kolkata] PHP Notice:  Undefined index: silent_order_stcpf in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1770
+[30-Jul-2022 16:26:57 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1671
+[30-Jul-2022 16:26:57 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[30-Jul-2022 16:26:57 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1562
+[30-Jul-2022 16:26:57 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1569
+[30-Jul-2022 16:26:57 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[09-Aug-2022 14:54:40 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 684
+[09-Aug-2022 14:54:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 684
+[09-Aug-2022 14:54:55 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 684
+[09-Aug-2022 14:54:59 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 684
+[09-Aug-2022 14:55:10 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 684
+[09-Aug-2022 14:55:24 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 684
+[09-Aug-2022 14:55:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 684
+[09-Aug-2022 14:55:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 684
+[09-Aug-2022 14:55:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 684
+[10-Aug-2022 10:41:09 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 710
+[13-Aug-2022 11:24:43 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1671
+[13-Aug-2022 11:24:44 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[13-Aug-2022 11:24:44 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1562
+[13-Aug-2022 11:24:44 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1569
+[13-Aug-2022 11:24:44 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[13-Aug-2022 11:25:30 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[13-Aug-2022 11:25:30 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1562
+[13-Aug-2022 11:25:30 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1569
+[13-Aug-2022 11:25:30 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[13-Aug-2022 11:25:45 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[13-Aug-2022 11:25:45 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1562
+[13-Aug-2022 11:25:45 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1569
+[13-Aug-2022 11:25:45 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[23-Aug-2022 11:19:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 11:19:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 11:19:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 11:19:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 11:20:36 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 11:20:36 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 11:20:36 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 11:20:36 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 11:20:36 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 11:20:36 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 11:20:36 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 11:20:36 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 11:43:41 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 11:43:41 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 11:43:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 11:43:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:24:20 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[23-Aug-2022 14:24:24 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[23-Aug-2022 14:24:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[23-Aug-2022 14:24:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:24:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:18 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 108
+[23-Aug-2022 14:25:25 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 108
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 14:25:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 15:57:06 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 15:57:06 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 16:18:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 16:18:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 16:18:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 16:18:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 16:18:31 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 16:18:31 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 16:18:31 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 16:18:31 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 16:18:33 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 16:18:33 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 16:18:35 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 16:18:35 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 16:18:41 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 16:18:41 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 16:19:33 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 16:19:33 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 16:19:35 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 16:19:35 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[23-Aug-2022 16:20:55 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[23-Aug-2022 16:20:55 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[24-Aug-2022 11:49:08 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[24-Aug-2022 11:49:45 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[24-Aug-2022 18:33:51 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[01-Sep-2022 16:16:38 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 108
+[01-Sep-2022 16:16:48 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:16:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:16:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:16:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:16:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:16:55 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 108
+[01-Sep-2022 16:17:03 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 108
+[01-Sep-2022 16:17:05 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 108
+[01-Sep-2022 16:17:05 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 108
+[01-Sep-2022 16:17:06 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:17:24 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:17:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:17:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:17:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:17:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:19:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 108
+[01-Sep-2022 16:19:31 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 108
+[01-Sep-2022 16:19:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 108
+[01-Sep-2022 16:19:43 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:19:45 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:19:45 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:19:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:19:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:19:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 253
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:20:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[01-Sep-2022 16:31:21 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[01-Sep-2022 16:31:21 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:14:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:14:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:14:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:14:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:14:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:14:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:14:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:14:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:14:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:14:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:14:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:14:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:15:16 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:15:16 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:15:16 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:15:16 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:15:16 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:15:16 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:15:17 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:15:17 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:15:17 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:15:17 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:15:17 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:15:17 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:15:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:15:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:15:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:15:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 11:15:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[03-Sep-2022 11:15:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[03-Sep-2022 12:43:18 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 710
+[03-Sep-2022 12:44:26 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 710
+[03-Sep-2022 15:02:18 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 459
+[04-Sep-2022 15:11:43 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 710
+[10-Sep-2022 15:40:08 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[10-Sep-2022 15:40:35 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[10-Sep-2022 15:40:37 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[10-Sep-2022 15:40:37 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[10-Sep-2022 15:41:28 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[10-Sep-2022 16:24:45 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[10-Sep-2022 16:25:07 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:25:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:26:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[10-Sep-2022 16:30:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[10-Sep-2022 16:30:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:39:46 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/request-raised.php on line 375
+[11-Sep-2022 10:40:08 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[11-Sep-2022 10:41:08 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[11-Sep-2022 10:41:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:41:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:41:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:41:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:41:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:41:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:41:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:41:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 10:53:32 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:39 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 278
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:02:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:14:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:15:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:15:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:15:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:15:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:15:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:15:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[11-Sep-2022 12:15:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[11-Sep-2022 12:15:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:31:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:31:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:31:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:31:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:31:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:31:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:31:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:31:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 291
+[12-Sep-2022 11:50:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_daily_purchase_items_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 355
+[12-Sep-2022 15:05:04 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 254
+[13-Sep-2022 14:37:09 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 711
+[14-Sep-2022 11:31:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:31:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:31:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:32:00 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:34:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:34:37 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:34:37 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:34:37 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:34:37 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:34:38 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:34:38 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:35:04 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:35:04 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:35:04 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:35:04 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:35:17 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:36:45 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 534
+[14-Sep-2022 11:36:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:36:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:36:52 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:36:52 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:36:52 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:36:53 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:36:53 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:36:53 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:36:58 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:37:07 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:37:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:37:16 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:37:17 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:37:48 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:37:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:37:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:37:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[14-Sep-2022 11:37:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
+[15-Sep-2022 14:50:17 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1671
+[15-Sep-2022 14:50:17 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[15-Sep-2022 14:50:17 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1562
+[15-Sep-2022 14:50:17 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1569
+[15-Sep-2022 14:50:17 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[15-Sep-2022 14:51:51 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[15-Sep-2022 14:51:51 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1562
+[15-Sep-2022 14:51:51 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1569
+[15-Sep-2022 14:51:51 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[15-Sep-2022 14:52:03 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[15-Sep-2022 14:52:03 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1562
+[15-Sep-2022 14:52:03 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1569
+[15-Sep-2022 14:52:03 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[15-Sep-2022 14:52:11 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[15-Sep-2022 14:52:11 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1562
+[15-Sep-2022 14:52:11 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1569
+[15-Sep-2022 14:52:11 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[06-Oct-2022 11:31:30 Asia/Kolkata] PHP Notice:  Undefined index: silent_order_stcfc in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1769
+[06-Oct-2022 11:31:30 Asia/Kolkata] PHP Notice:  Undefined index: silent_order_stcpf in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1770

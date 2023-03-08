@@ -1,0 +1,13 @@
+[23-Jun-2022 12:34:12 Asia/Kolkata] PHP Notice:  Undefined variable: stcelectotal in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/silent-invoice-print-preview.php on line 596
+[23-Jun-2022 12:34:12 Asia/Kolkata] PHP Notice:  Undefined variable: stcelectotal in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/silent-invoice-print-preview.php on line 652
+[23-Jun-2022 12:34:12 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/silent-invoice-print-preview.php on line 617
+[23-Jun-2022 12:34:17 Asia/Kolkata] PHP Notice:  Undefined variable: stcelectotal in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/silent-invoice-print-preview.php on line 596
+[23-Jun-2022 12:34:17 Asia/Kolkata] PHP Notice:  Undefined variable: stcelectotal in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/silent-invoice-print-preview.php on line 652
+[23-Jun-2022 12:34:17 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/silent-invoice-print-preview.php on line 617
+[23-Jun-2022 12:37:04 Asia/Kolkata] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/dashboard.php on line 344
+[23-Jun-2022 12:37:04 Asia/Kolkata] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/dashboard.php on line 359
+[23-Jun-2022 13:16:28 Asia/Kolkata] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/dashboard.php on line 344
+[23-Jun-2022 13:16:28 Asia/Kolkata] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/dashboard.php on line 359
+[16-Aug-2022 12:11:02 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/dashboard.php on line 243
+[16-Aug-2022 12:11:02 Asia/Kolkata] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/dashboard.php on line 344
+[16-Aug-2022 12:11:02 Asia/Kolkata] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_trading/stc_mazeRunner/dashboard.php on line 359

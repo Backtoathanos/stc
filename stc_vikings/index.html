@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Administration Log In - STC</title>
+<!--===============================================================================================-->  
+    <link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
+<!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/bootstrap/css/bootstrap.min.css">
+<!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/fonts/font-awesome-4.7.0/css/font-awesome.min.css">
+<!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/animate/animate.css">
+<!--===============================================================================================-->  
+    <link rel="stylesheet" type="text/css" href="assets/vendor/css-hamburgers/hamburgers.min.css">
+<!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/vendor/select2/select2.min.css">
+<!--===============================================================================================-->
+    <link rel="stylesheet" type="text/css" href="assets/css/util.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/login-main.css">
+<!--===============================================================================================-->
+</head>
+<body>
+    <div class="limiter">
+        <div class="container-login100">
+            <div class="wrap-login100">
+                <div class="login100-pic js-tilt" data-tilt>
+                    <img src="images/img-01.png" alt="IMG">
+                </div>
+
+                <form class="login100-form validate-form register-form" method="POST" id="login-form">
+                    <span class="login100-form-title">
+                        Administration Login
+                    </span>
+
+                    <div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+                        <input class="input100" type="text" name="employee_name" id="your_name" placeholder="Enter User Id">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-user" aria-hidden="true"></i>
+                        </span>
+                    </div>
+
+                    <div class="wrap-input100 validate-input" data-validate = "Password is required">
+                        <input class="input100" type="password" name="employee_pass" id="your_pass" placeholder="Password">
+                        <span class="focus-input100"></span>
+                        <span class="symbol-input100">
+                            <i class="fa fa-lock" aria-hidden="true"></i>
+                        </span>
+                    </div>
+                    
+                    <div class="container-login100-form-btn">
+                        <input type="hidden" name="employee_signin">
+                        <button class="login100-form-btn" id="signin">
+                            Login
+                        </button>
+                    </div>
+
+                    <div class="text-center p-t-136">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+<!--===============================================================================================-->  
+    <script src="assets/vendor/jquery/jquery-3.2.1.min.js"></script>
+<!--===============================================================================================-->
+    <script src="assets/vendor/bootstrap/js/popper.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+<!--===============================================================================================-->
+    <script src="assets/vendor/select2/select2.min.js"></script>
+<!--===============================================================================================-->
+    <script src="assets/vendor/tilt/tilt.jquery.min.js"></script>
+    <script >
+        $('.js-tilt').tilt({
+            scale: 1.1
+        })
+    </script>
+<!--===============================================================================================-->
+    <script src="js/login-main.js"></script>
+<!--===============================================================================================-->
+    <!-- JS -->
+    <script>
+        $(document).ready(function(){
+            $('#login-form').on('submit', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url         : "kattegat/useroath.php",
+                    method      : "POST",
+                    data        : new FormData(this),
+                    contentType : false,
+                    processData : false,
+                    success     : function(argument) {
+                        // console.log(argument);
+                        var argument=argument.trim();
+                        if(argument=="success"){
+                            window.location.href="dashboard.php";
+                            $('#login-form')[0].reset();
+                        }else{
+                            alert('Please check username or password!!!')
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Coming Soon</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" >
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style type="text/css">
+body {
+  /*background: linear-gradient(90deg, white, gray);*/
+  background-color: #eee;
+}
+
+body, h1, p {
+  font-family: "Helvetica Neue", "Segoe UI", Segoe, Helvetica, Arial, "Lucida Grande", sans-serif;
+  font-weight: normal;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.container {
+  margin-left:  auto;
+  margin-right:  auto;
+  margin-top: 177px;
+  max-width: 1170px;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.row:before, .row:after {
+  display: table;
+  content: " ";
+}
+
+h1 {
+  font-size: 48px;
+  font-weight: 300;
+  margin: 0 0 20px 0;
+}
+
+.lead {
+  font-size: 21px;
+  font-weight: 200;
+  margin-bottom: 20px;
+}
+
+p {
+  margin: 0 0 10px;
+}
+
+a {
+  color: #3282e6;
+  text-decoration: none;
+}
+
+#myProgress {
+  width: 100%;
+  background-color: #ddd;
+}
+
+#myBar {
+  width: 78%;
+  height: 30px;
+  background-color: #4CAF50;
+}
+img {
+  border-radius: 50%;
+  width: 115px;
+}
+</style>
+</head>
+
+<body>
+<div class="container text-center" id="error">
+
+  <div height="100" width="100">
+    <div><img src="stc_logo.jpg"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="main-icon text-success"><span class="uxicon uxicon-clock-refresh"></span></div>
+      <h1>STC</h1>
+      <p class="lead"><strong>Loading...</strong></p>
+      <!--<h1>JavaScript Progress Bar</h1>-->
+
+        <div id="myProgress">
+          <div id="myBar">78%</div>
+        </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var i = 0;
+// function move() {
+  if (i == 0) {
+    i = 1;
+    var elem = document.getElementById("myBar");
+    var width = 1;
+    var id = setInterval(frame, 10);
+    function frame() {
+      if (width >= 78) {
+        clearInterval(id);
+        i = 0;
+      } else {
+        width++;
+        elem.style.width = width + "%";
+      }
+    }
+  }
+// }
+</script>
+
+</body>
+</html>
+
+
