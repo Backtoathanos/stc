@@ -104,6 +104,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="procurement-tracker.php" class="mm-active">
+                        <i class="metismenu-icon pe-7s-note2"></i>
+                        Procurement Tracker
+                    </a>
+                </li>
+                <li>
                     <a href="stc-supervisor-balance-reports.php" class="mm-active">
                         <i class="metismenu-icon pe-7s-note2"></i>
                         Reports
