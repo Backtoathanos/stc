@@ -45,7 +45,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                         <i class="pe-7s-display1 icon-gradient bg-premium-dark">
                                         </i>
                                     </div>
-                                    <div>Supervisor Management
+                                    <div>Procurement tracker
                                         <div class="page-title-subheading">You can add your supervisor information here for your experience with us<h3>&#9786;</h3>.
                                         </div>
                                     </div>
@@ -55,17 +55,12 @@ if(isset($_SESSION["stc_agent_id"])){
                         <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                             <li class="nav-item">
                                 <a role="tab" class="nav-link active" id="tab-0" data-toggle="tab" href="#create-project">
-                                    <span>Create Supervisor <b>X</b></span>
+                                    <span>Create Procuremnet Tracker <b>X</b></span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#show-supervisor">
-                                    <span>Show Supervisor<b><i class="pe-7s-look"></i></b></span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#alot-budget">
-                                    <span>Alot Project <b>O</b></span>
+                                    <span>Show Procurement Tracker<b><i class="pe-7s-look"></i></b></span>
                                 </a>
                             </li>
                         </ul>
@@ -74,8 +69,8 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Create Supervisor</h5>
-                                                <form class="create-supervisor-form">
+                                            <div class="card-body"><h5 class="card-title">Create Procurment Tracker</h5>
+                                                <form class="create-procurment-tracker">
                                                     <div class="row">
                                                         <div class="col-sm-12 col-md-12">
                                                             <div class="position-relative form-group">
@@ -84,7 +79,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                     <?php 
                                                                         include_once("../MCU/db.php");
                                                                         $cityqry=mysqli_query($con, "
-                                                                            SELECT `stc_customer_id`, `stc_customer_name` FROM `stc_customer`
+                                                                            SELECT DISTINCT `stc_customer_id`, `stc_customer_name` FROM `stc_customer`
                                                                             INNER JOIN `stc_agent_requested_customer` 
                                                                             ON `stc_agent_requested_customer_cust_id`=`stc_customer_id` 
                                                                             ORDER BY `stc_customer_name` ASC
@@ -99,79 +94,58 @@ if(isset($_SESSION["stc_agent_id"])){
                                                         </div>
                                                         <div class="col-sm-6 col-md-6">
                                                             <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Supervisor fullname</label>
-                                                                <input placeholder="Enter your supervisor name" type="text" name="stc_cust_sup_fullname" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Supervisor contact</label>
-                                                                <input placeholder="Enter your supervisor contact number" type="number" name="stc_cust_sup_contnumber" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Supervisor whatsapp</label>
-                                                                <input placeholder="Enter your supervisor Whatsapp" type="number" name="stc_cust_sup_whatsapp" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Supervisor email</label>
-                                                                <input placeholder="Enter your supervisor E-mail" type="text" name="stc_cust_sup_email" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                    </div>                                                        
-                                                    <div class="position-relative form-group">
-                                                        <label for="exampleText" class="">Supervisor address</label>
-                                                        <textarea id="exampleText" class="form-control" name="stc_cust_sup_address" placeholder="Enter your supervisor address" required></textarea>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-sm-6 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Supervisor pincode</label>
-                                                                <input placeholder="Enter your supervisor pincode" type="text" name="stc_cust_sup_pincode" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">City</label>
-                                                                <select name="stc_cust_sup_city" class="form-control" required>
+                                                                <label for="exampleEmail" class="">Project Name</label>
+                                                                <select name="stc_alot_pro_project" id="#" class="form-control" required>
                                                                     <?php 
-                                                                        $cityqry=mysqli_query($con, "
-                                                                            SELECT * FROM `stc_city` ORDER BY `stc_city_name` ASC
+                                                                        $proseleqry=mysqli_query($con, "
+                                                                            SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
+                                                                            FROM `stc_cust_project` 
+                                                                            INNER JOIN `stc_agent_requested_customer` 
+                                                                            ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
+                                                                            WHERE `stc_agent_requested_customer_agent_id`='".$_SESSION['stc_agent_id']."'
+                                                                            ORDER BY `stc_cust_project_title` ASC
                                                                         ");
-                                                                        foreach($cityqry as $cityrow){
-                                                                            echo '<option value="'.$cityrow['stc_city_id'].'">'.$cityrow['stc_city_name'].'</option>';
+                                                                        foreach($proseleqry as $proselrow){
+                                                                            echo '<option value="'.$proselrow['stc_cust_project_id'].'">'.$proselrow['stc_cust_project_title'].'</option>';
                                                                         }
                                                                     ?>
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-6">
+                                                        <div class="col-sm-6 col-md-6">
                                                             <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">State</label>
-                                                                <select name="stc_cust_sup_state" class="form-control" required>
-                                                                    <?php 
-                                                                        include_once("../MCU/db.php");
-                                                                        $cityqry=mysqli_query($con, "
-                                                                            SELECT * FROM `stc_state` ORDER BY `stc_state_name` ASC
-                                                                        ");
-                                                                        foreach($cityqry as $cityrow){
-                                                                            echo '<option value="'.$cityrow['stc_state_id'].'">'.$cityrow['stc_state_name'].'</option>';
-                                                                        }
-                                                                    ?>
+                                                                <label for="exampleEmail" class="">Item Name</label>
+                                                                <input type="text" class="mb-2 form-control" id="stc-pro-tra-item-name" placeholder="Enter Item Name" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">Service</label>
+                                                                <select name="stc_alot_pro_proj" id="#" class="form-control" required>
+                                                                    <option>HVAC</option>
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-6">
+                                                        <div class="col-sm-6 col-md-6">
                                                             <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">Status</label>
-                                                                <select name="stc_cust_sup_status" class="form-control" required>
-                                                                    <option value="1">Active</option>
-                                                                    <option value="0">off</option>
+                                                                <label for="exampleEmail" class="">Unit</label>
+                                                                <select name="stc_alot_pro_project" id="#" class="form-control" required>
+                                                                    <option>LOT</option>
+                                                                    <option>NOS</option>
+                                                                    <option>RMT</option>
                                                                 </select>
-                                                                <input type="hidden" name="stc_cust_supervisor_action">
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">Drawing Quantity</label>
+                                                                <input type="number" class="mb-2 form-control" id="stc-pro-tra-drawing-quantity" placeholder="Enter Drawing Quantity" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-6 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">Buyer / Maker</label>
+                                                                <input type="text" class="mb-2 form-control" id="stc-pro-tra-buyer-maker" placeholder="Enter Buyer/Maker Name" required>
                                                             </div>
                                                         </div>
                                                     </div>                                                    
@@ -246,67 +220,6 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                     ?>
                                                                 </tbody>                                                                   
                                                             </table>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane tabs-animation fade" id="alot-budget" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-10">
-                                        <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Alot Budget</h5>
-                                                <form class="stc-project-alot-cust">
-                                                    <div class="row">
-                                                        <div class="col-md-12">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">Select Project</label>
-                                                                <select name="stc_alot_pro_project" id="#" class="form-control" required>
-                                                                    <?php 
-                                                                        $proseleqry=mysqli_query($con, "
-                                                                            SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
-                                                                            FROM `stc_cust_project` 
-                                                                            INNER JOIN `stc_agent_requested_customer` 
-                                                                            ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
-                                                                            WHERE `stc_agent_requested_customer_agent_id`='".$_SESSION['stc_agent_id']."'
-                                                                        ");
-                                                                        foreach($proseleqry as $proselrow){
-                                                                            echo '<option value="'.$proselrow['stc_cust_project_id'].'">'.$proselrow['stc_cust_project_title'].'</option>';
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">Select Supervisor</label>
-                                                                <select name="stc_alot_pro_supervisor" id="exampleSelect" class="form-control" required>
-                                                                    <?php 
-                                                                        $proseleqry=mysqli_query($con, "
-                                                                            SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` 
-                                                                            FROM `stc_cust_pro_supervisor` 
-                                                                            WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'
-                                                                            ORDER BY `stc_cust_pro_supervisor_fullname` ASC
-                                                                        ");
-                                                                        if(mysqli_num_rows($proseleqry)>0){
-                                                                            foreach($proseleqry as $proselrow){
-                                                                                echo '<option value="'.$proselrow['stc_cust_pro_supervisor_id'].'">'.$proselrow['stc_cust_pro_supervisor_fullname'].'</option>';
-                                                                            }
-                                                                        }else{
-                                                                            echo '<option value="NA">No Supervisor Found!!!</option>';
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-12">
-                                                            <div class="position-relative form-group">
-                                                                <input type="hidden" name="stc_alot_project_action">
-                                                                <button class="mt-1 btn btn-warning">Add</button>
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </form>
