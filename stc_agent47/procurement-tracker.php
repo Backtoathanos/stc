@@ -69,7 +69,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Create Procurment Tracker</h5>
+                                            <div class="card-body"><h5 class="card-title">Create Procurement Tracker</h5>
                                                 <form class="create-procurment-tracker">
                                                     <div class="row">
                                                         <div class="col-sm-12 col-md-12">
@@ -92,7 +92,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6 col-md-6">
+                                                        <div class="col-sm-12 col-md-6">
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Project Name</label>
                                                                 <select name="stc_alot_pro_project" id="#" class="form-control" required>
@@ -112,13 +112,13 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6 col-md-6">
+                                                        <div class="col-sm-12 col-md-6">
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Item Name</label>
                                                                 <input type="text" class="mb-2 form-control" id="stc-pro-tra-item-name" placeholder="Enter Item Name" required>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6 col-md-6">
+                                                        <div class="col-sm-12 col-md-4">
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Service</label>
                                                                 <select name="stc_alot_pro_proj" id="#" class="form-control" required>
@@ -126,7 +126,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6 col-md-6">
+                                                        <div class="col-sm-12 col-md-4">
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Unit</label>
                                                                 <select name="stc_alot_pro_project" id="#" class="form-control" required>
@@ -136,16 +136,81 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6 col-md-6">
+                                                        <div class="col-sm-12 col-md-4">
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Drawing Quantity</label>
-                                                                <input type="number" class="mb-2 form-control" id="stc-pro-tra-drawing-quantity" placeholder="Enter Drawing Quantity" required>
+                                                                <input type="number" class="mb-2 form-control" name="stc_pro_tra_drawing_quantity" placeholder="Enter Drawing Quantity" required>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-6 col-md-6">
+                                                        <div class="col-sm-12 col-md-6">
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Buyer / Maker</label>
-                                                                <input type="text" class="mb-2 form-control" id="stc-pro-tra-buyer-maker" placeholder="Enter Buyer/Maker Name" required>
+                                                                <input type="text" class="mb-2 form-control" id="stc-pro-tra-buyer-maker" placeholder="Enter Buyer / Maker Name" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">PO No. / WO No.</label>
+                                                                <input type="text" class="mb-2 form-control" id="stc-pro-tra-wo-no-po-no" placeholder="Enter PO No. / WO No." required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">PO Date</label>
+                                                                <input type="date" class="mb-2 form-control" id="stc-pro-tra-po-date" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">PO Basic Value</label>
+                                                                <input type="number" class="mb-2 form-control" id="stc-pro-tra-po-basic-value" placeholder="Please enter amount" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">GST %</label>
+                                                                <select name="stc_alot_pro_project" id="#" class="form-control" required>
+                                                                    <option>5%</option>
+                                                                    <option>12%</option>
+                                                                    <option>18%</option>
+                                                                    <option>28%</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">PO Amount</label>
+                                                                <input type="number" class="mb-2 form-control" id="stc-pro-tra-po-amount" placeholder="Please enter amount" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">TDS Approval</label>
+                                                                <input type="date" class="mb-2 form-control" id="stc-pro-tra-tds-approval" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">Mfg Clearance Client</label>
+                                                                <input type="date" class="mb-2 form-control" id="stc-pro-tra-mfg-clearance-approval" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">Mfg Lead Time</label>
+                                                                <input type="number" class="mb-2 form-control" id="stc-pro-tra-mfg-lead-time" placeholder="Enter mfg lead time" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">OEM / Dealer Location</label>
+                                                                <input type="text" class="mb-2 form-control" id="stc-pro-tra-oem-dealer-location" placeholder="City n ame" required>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleEmail" class="">Transit Time</label>
+                                                                <input type="number" class="mb-2 form-control" id="stc-pro-tra-transit-time" placeholder="Enter transit time" required>
                                                             </div>
                                                         </div>
                                                     </div>                                                    
