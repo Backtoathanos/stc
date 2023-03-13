@@ -730,6 +730,112 @@ class pirates_project extends tesseract{
 		}
 		return $blackpearl;
 	}
+
+	// save procurment 
+	public function stc_save_procurement_create($pro_id, $item_name, $service, $unit, $quantity){
+		$blackpearl='';
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_procurement_tracker`(
+			    `stc_cust_procurement_tracker_date`,
+			    `stc_cust_procurement_tracker_project_id`,
+			    `stc_cust_procurement_tracker_item_title`,
+			    `stc_cust_procurement_tracker_service`,
+			    `stc_cust_procurement_tracker_unit`,
+			    `stc_cust_procurement_tracker_qty`,
+			    `stc_cust_procurement_tracker_created_by`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $pro_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_name)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $service)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $unit)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $quantity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
+			)
+		");
+		if($blackpearl_qry){
+			$blackpearl="yes";
+		}else{
+			$blackpearl="no";
+		}
+		return $blackpearl;
+	}
+
+	// call procurment tracker function 
+	public function stc_save_procurement_call($begdate, $enddate){
+		$blackpearl='';
+		$blackpearl_query="
+			SELECT
+			    `stc_cust_procurement_tracker_id`,
+			    `stc_cust_procurement_tracker_date`,
+			    `stc_cust_project_title`,
+			    `stc_cust_procurement_tracker_item_title`,
+			    `stc_cust_procurement_tracker_service`,
+			    `stc_cust_procurement_tracker_unit`,
+			    `stc_cust_procurement_tracker_qty`,
+			    `stc_agents_name`
+			FROM
+			    `stc_cust_procurement_tracker`
+			LEFT JOIN 
+			    `stc_cust_project`
+			ON 
+				`stc_cust_procurement_tracker_project_id`=`stc_cust_project_id`
+			LEFT JOIN 
+			    `stc_agents`
+			ON 
+				`stc_cust_procurement_tracker_created_by`=`stc_agents_id`
+			WHERE
+				`stc_cust_procurement_tracker_created_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."' AND 
+			    (
+				    DATE(`stc_cust_procurement_tracker_date`) BETWEEN 
+				    	'".mysqli_real_escape_string($this->stc_dbs, date('Y-m-d', strtotime($begdate)))."' 
+				    AND '".mysqli_real_escape_string($this->stc_dbs, date('Y-m-d', strtotime($enddate)))."' 
+				)
+			ORDER BY `stc_cust_procurement_tracker_id` DESC
+		";
+		$blackpearl_result=mysqli_query($this->stc_dbs, $blackpearl_query);
+
+		if(mysqli_num_rows($blackpearl_result)>0){
+			foreach($blackpearl_result as $blackpearl_row){
+				$blackpearl.="
+					<tr>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_id']." <br> ".date('d-m-Y', strtotime($blackpearl_row['stc_cust_procurement_tracker_date']))."</td>
+						<td>".$blackpearl_row['stc_cust_project_title']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_item_title']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_service']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_unit']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_qty']."</td>
+						<td>
+							<a href='#' style='color: #97b7ff; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-addmod'><i class='fa fa-plus'></i></a>
+							<a href='#' style='color: red; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-deletemod'><i class='fa fa-trash'></i></a>
+						</td>
+					</tr>
+				";
+			}
+		}else{
+			$blackpearl.="
+				<tr>
+					<td colspan='7' class='text-center'> No data found!!</td>
+				</tr>
+			";
+		}
+		return $blackpearl;
+	}
+
+	// delete procurment
+	public function stc_save_procurement_delete($proc_id){
+		$blackpearl="";
+		$blackpearl_query=mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_cust_procurement_tracker` WHERE `stc_cust_procurement_tracker_id` = '".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+		");
+		if($blackpearl_query){
+			$blackpearl="yes";
+		}else{
+			$blackpearl="no";
+		}
+		return $blackpearl;
+	}
 }
 
 class pirates_supervisor extends tesseract{
@@ -2540,6 +2646,50 @@ if(isset($_POST['stc_req_edit_item_update'])){
 	$req_item_name=$_POST['req_item_name'];
 	$odin_req=new pirates_supervisor();
 	$odin_req_out=$odin_req->stc_change_req_item_update($req_item_id, $req_item_name);
+	echo $odin_req_out;
+}
+
+/*---------------------------------------------Procurement tracker Objects section-------------------------------------------------*/
+// add procurmenet
+if(isset($_POST['stc-pro-tra-procurement-hit'])){
+	$pro_id=$_POST['stc-pro-tra-pro-id'];
+	$item_name=$_POST['stc-pro-tra-item-name'];
+	$service=$_POST['stc-pro-tra-service'];
+	$unit=$_POST['stc-pro-tra-unit'];
+	$quantity=$_POST['stc-pro-tra-quantity'];
+	$out="";
+	if(empty($item_name) || ($service=="NA") || ($pro_id=="NA") || empty($quantity)){
+		$out="empty";
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$out="logout";
+	}else{
+		$odin_req=new pirates_project();
+		$odin_req_out=$odin_req->stc_save_procurement_create($pro_id, $item_name, $service, $unit, $quantity);
+		$out=$odin_req_out;
+	}
+	echo $out;
+}
+
+// call procurment tracker
+if(isset($_POST['get_procurment_tracker'])){
+	$begdate=@$_POST['begdate'];
+	$enddate=@$_POST['enddate'];
+
+	if($begdate==""){
+		$date=date("Y-m-d");
+		$begdate=date("Y-m-d", strtotime("-1 month", strtotime($date)));
+		$enddate=date("Y-m-d");
+	}
+	$odin_req=new pirates_project();
+	$odin_req_out=$odin_req->stc_save_procurement_call($begdate, $enddate);
+	echo $odin_req_out;
+}
+
+// delete procurment
+if(isset($_POST['delete_procurment_tracker'])){
+	$proc_id=$_POST['delete_pro_id'];
+	$odin_req=new pirates_project();
+	$odin_req_out=$odin_req->stc_save_procurement_delete($proc_id);
 	echo $odin_req_out;
 }
 ?>

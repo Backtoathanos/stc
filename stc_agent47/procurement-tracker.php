@@ -28,6 +28,9 @@ if(isset($_SESSION["stc_agent_id"])){
         .close-tag-beg{
             display: none;
         }
+        .fade:not(.show) {
+          opacity: 10;
+        }
     </style>
 </head>
 <body>
@@ -74,29 +77,10 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <div class="row">
                                                         <div class="col-sm-12 col-md-12">
                                                             <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">Customer name</label>
-                                                                <select name="stc_cust_sup_cust" class="form-control" required>
+                                                                <label for="exampleEmail" class="">Project Name</label>
+                                                                <select name="stc-pro-tra-pro-id" class="form-control" required>
                                                                     <?php 
                                                                         include_once("../MCU/db.php");
-                                                                        $cityqry=mysqli_query($con, "
-                                                                            SELECT DISTINCT `stc_customer_id`, `stc_customer_name` FROM `stc_customer`
-                                                                            INNER JOIN `stc_agent_requested_customer` 
-                                                                            ON `stc_agent_requested_customer_cust_id`=`stc_customer_id` 
-                                                                            ORDER BY `stc_customer_name` ASC
-
-                                                                        ");
-                                                                        foreach($cityqry as $custrow){
-                                                                            echo '<option value="'.$custrow['stc_customer_id'].'">'.$custrow['stc_customer_name'].'</option>';
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Project Name</label>
-                                                                <select name="stc_alot_pro_project" id="#" class="form-control" required>
-                                                                    <?php 
                                                                         $proseleqry=mysqli_query($con, "
                                                                             SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
                                                                             FROM `stc_cust_project` 
@@ -112,16 +96,16 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                 </select>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-12 col-md-6">
+                                                        <div class="col-sm-12 col-md-12">
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Item Name</label>
-                                                                <input type="text" class="mb-2 form-control" id="stc-pro-tra-item-name" placeholder="Enter Item Name" required>
+                                                                <textarea class="mb-2 form-control" name="stc-pro-tra-item-name" placeholder="Enter Item Name" required></textarea>
                                                             </div>
                                                         </div>
                                                         <div class="col-sm-12 col-md-4">
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Service</label>
-                                                                <select name="stc_alot_pro_proj" id="#" class="form-control" required>
+                                                                <select name="stc-pro-tra-service" class="form-control" required>
                                                                     <option>HVAC</option>
                                                                 </select>
                                                             </div>
@@ -129,7 +113,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                         <div class="col-sm-12 col-md-4">
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Unit</label>
-                                                                <select name="stc_alot_pro_project" id="#" class="form-control" required>
+                                                                <select name="stc-pro-tra-unit" class="form-control" required>
                                                                     <option>LOT</option>
                                                                     <option>NOS</option>
                                                                     <option>RMT</option>
@@ -139,81 +123,11 @@ if(isset($_SESSION["stc_agent_id"])){
                                                         <div class="col-sm-12 col-md-4">
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Drawing Quantity</label>
-                                                                <input type="number" class="mb-2 form-control" name="stc_pro_tra_drawing_quantity" placeholder="Enter Drawing Quantity" required>
+                                                                <input type="number" class="mb-2 form-control" name="stc-pro-tra-quantity" placeholder="Enter Drawing Quantity" required>
                                                             </div>
                                                         </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Buyer / Maker</label>
-                                                                <input type="text" class="mb-2 form-control" id="stc-pro-tra-buyer-maker" placeholder="Enter Buyer / Maker Name" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">PO No. / WO No.</label>
-                                                                <input type="text" class="mb-2 form-control" id="stc-pro-tra-wo-no-po-no" placeholder="Enter PO No. / WO No." required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">PO Date</label>
-                                                                <input type="date" class="mb-2 form-control" id="stc-pro-tra-po-date" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">PO Basic Value</label>
-                                                                <input type="number" class="mb-2 form-control" id="stc-pro-tra-po-basic-value" placeholder="Please enter amount" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">GST %</label>
-                                                                <select name="stc_alot_pro_project" id="#" class="form-control" required>
-                                                                    <option>5%</option>
-                                                                    <option>12%</option>
-                                                                    <option>18%</option>
-                                                                    <option>28%</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">PO Amount</label>
-                                                                <input type="number" class="mb-2 form-control" id="stc-pro-tra-po-amount" placeholder="Please enter amount" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">TDS Approval</label>
-                                                                <input type="date" class="mb-2 form-control" id="stc-pro-tra-tds-approval" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Mfg Clearance Client</label>
-                                                                <input type="date" class="mb-2 form-control" id="stc-pro-tra-mfg-clearance-approval" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Mfg Lead Time</label>
-                                                                <input type="number" class="mb-2 form-control" id="stc-pro-tra-mfg-lead-time" placeholder="Enter mfg lead time" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">OEM / Dealer Location</label>
-                                                                <input type="text" class="mb-2 form-control" id="stc-pro-tra-oem-dealer-location" placeholder="City n ame" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Transit Time</label>
-                                                                <input type="number" class="mb-2 form-control" id="stc-pro-tra-transit-time" placeholder="Enter transit time" required>
-                                                            </div>
-                                                        </div>
-                                                    </div>                                                    
+                                                    </div>
+                                                    <input type="hidden" name="stc-pro-tra-procurement-hit">
                                                     <button class="mt-1 btn btn-primary">Add</button>
                                                 </form>
                                             </div>
@@ -229,60 +143,18 @@ if(isset($_SESSION["stc_agent_id"])){
                                                 <form class="#">
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            <table class="table table-responsive">
+                                                            <table class="table table-stripped">
                                                                 <thead>
-                                                                    <th>Supervisor Id</br>Name</th>
-                                                                    <th>Address</th>
-                                                                    <th>Contact &</br>Whatsapp Number</th>
-                                                                    <th>Email</th>
-                                                                    <th>Sitename</th>
+                                                                    <th class="text-center">Procurment Tracker Id</br>Procurment Tracker Date</th>
+                                                                    <th class="text-center">Project Name</th>
+                                                                    <th class="text-center">Item Name</th>
+                                                                    <th class="text-center">Service</th>
+                                                                    <th class="text-center">Unit</th>
+                                                                    <th class="text-center">Quantity</th>
+                                                                    <th class="text-center">Action</th>
                                                                 </thead>
-                                                                <tbody>
-                                                                    <?php
-                                                                        $showsubsupqry=mysqli_query($con, "
-                                                                            SELECT `stc_cust_pro_supervisor_id`,
-                                                                                `stc_cust_pro_supervisor_fullname`,
-                                                                                `stc_cust_pro_supervisor_address`,
-                                                                                `stc_cust_pro_supervisor_contact`,
-                                                                                `stc_cust_pro_supervisor_whatsapp`,
-                                                                                `stc_cust_pro_supervisor_email`
-                                                                            FROM `stc_cust_pro_supervisor`
-                                                                            INNER JOIN `stc_agents` 
-                                                                            ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` 
-                                                                            WHERE `stc_agents_id`='".$_SESSION["stc_agent_id"]."'
-                                                                        ");
-                                                                        foreach($showsubsupqry as $supsubrow){
-                                                                            $sitename='';
-                                                                            $sitenameqry=mysqli_query($con, "
-                                                                                SELECT `stc_cust_project_title` FROM `stc_cust_pro_attend_supervise`
-                                                                                INNER JOIN `stc_cust_pro_supervisor` 
-                                                                                ON `stc_cust_pro_attend_supervise_super_id`=`stc_cust_pro_supervisor_id` 
-                                                                                INNER JOIN `stc_cust_project` 
-                                                                                ON `stc_cust_pro_attend_supervise_pro_id`=`stc_cust_project_id`
-                                                                                WHERE `stc_cust_pro_attend_supervise_super_id`='".$supsubrow['stc_cust_pro_supervisor_id']."'
-                                                                            ");
-                                                                            foreach($sitenameqry as $sitenamerow){
-                                                                                $sitename.=$sitenamerow['stc_cust_project_title'].'<br>';
-                                                                            }
-                                                                            echo "
-                                                                                <tr>
-                                                                                    <td>
-                                                                                        STC/S/A/".substr("0000{$supsubrow['stc_cust_pro_supervisor_id']}", -5)."</br>
-                                                                                        ".$supsubrow['stc_cust_pro_supervisor_fullname']."
-                                                                                    </td>
-                                                                                    <td>".$supsubrow['stc_cust_pro_supervisor_address']."</td>
-                                                                                    <td>
-                                                                                        +91-".$supsubrow['stc_cust_pro_supervisor_contact']."</br>
-                                                                                        <a href='http://wa.me/7209581823'>
-                                                                                        +91-".$supsubrow['stc_cust_pro_supervisor_whatsapp']."
-                                                                                        </a>
-                                                                                    </td>
-                                                                                    <td>".$supsubrow['stc_cust_pro_supervisor_email']."</td>
-                                                                                    <td>".$sitename."</td>
-                                                                                </tr>
-                                                                            ";
-                                                                        }
-                                                                    ?>
+                                                                <tbody class="procurment-tracker-data-field">
+
                                                                 </tbody>                                                                   
                                                             </table>
                                                         </div>
@@ -302,6 +174,7 @@ if(isset($_SESSION["stc_agent_id"])){
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <!-- <script src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function(){
             $('body').delegate('.search-icon', 'click', function(e){
@@ -322,7 +195,10 @@ if(isset($_SESSION["stc_agent_id"])){
     </script>
     <script>
         $(document).ready(function(e){
-            $('.create-supervisor-form').on('submit', function(e){
+
+            var begdate="";
+            var enddate="";
+            $('.create-procurment-tracker').on('submit', function(e){
                 e.preventDefault();
                 $.ajax({
                     url         : "nemesis/stc_project.php",
@@ -330,53 +206,70 @@ if(isset($_SESSION["stc_agent_id"])){
                     data        : new FormData(this),
                     contentType : false,
                     processData : false,
-                    dataType    : "JSON",
-                    success     : function(argument) {
-                        // console.log(argument);
+                    // dataType    : "JSON",
+                    success     : function(response) {
+                        // console.log(response);
+                        var argument=response.trim();
                         if (argument == "yes") {
-                          alert("Supervisor created!!!");
-                          $(".create-supervisor-form")[0].reset();
+                          alert("Procurement Tracker Created!!!");
+                          $(".create-procurment-tracker")[0].reset();
+                          procurement_tracker_call(begdate, enddate);
                         } else if (argument == "no") {
-                          alert("Please check & try again!!!");
+                          alert("Hmmm!!! Something went wrong, Procurment Tracker not created!!!");
                         } else if (argument == "logout") {
-                          // alert("Please check & try again!!!&#9786;");
                           window.location.reload();
-                        } else if (argument == "not") {
-                          alert("This Supervisor is already in our records!!!");
-                        } else {
+                        } else if(argument=="empty"){
                           alert("Do not empty any field!!!");
                         }
                     }
                 });
             });
 
-            $('.stc-project-alot-cust').on('submit', function(e){
-                e.preventDefault();
+            procurement_tracker_call(begdate, enddate);
+            function procurement_tracker_call(begdate, enddate){
                 $.ajax({
-                    url         : "nemesis/stc_project.php",
-                    method      : "POST",
-                    data        : new FormData(this),
-                    contentType : false,
-                    processData : false,
-                    dataType    : "JSON",
-                    success     : function(argument) {
-                        // console.log(argument);
-                        if (argument == "yes") {
-                          alert("Project alotted!!!");
-                          $(".stc-project-alot-cust")[0].reset();
-                        } else if (argument == "no") {
-                          alert("Please check & try again!!!");
-                        } else if (argument == "logout") {
-                          // alert("Please check & try again!!!&#9786;");
-                          window.location.reload();
-                        } else if (argument == "not") {
-                          alert("This Supervisor is already alotted on that project!!!");
-                        } else {
-                          alert("Do not empty any field!!!");
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        get_procurment_tracker:1,
+                        begdate:begdate,
+                        enddate:enddate
+                    },
+                    success : function(response){
+                        // console.log(response);
+                        $('.procurment-tracker-data-field').html(response);
+                    }
+                });
+            }
+
+            $('body').delegate('.stc-tra-addmod', 'click', function(e){
+                e.preventDefault();
+                $('.bd-procurementdetails-modal-lg').modal('show');
+            });
+
+            $('body').delegate('.stc-tra-deletemod', 'click', function(e){
+                e.preventDefault();
+                var delete_pro_id=$(this).attr('id');
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        delete_procurment_tracker:1,
+                        delete_pro_id:delete_pro_id
+                    },
+                    success : function(response){
+                        // console.log(response);
+                        var obj_response=response.trim();
+                        if(obj_response=="yes"){
+                            alert("Record deleted successfully!!!");
+                            procurement_tracker_call(begdate, enddate);
+                        }else if(obj_response=="no"){
+                            alert("Something went wrong. Record not deleted");
                         }
                     }
                 });
             });
+
         });
 
         $(document).ready(function(){
@@ -466,3 +359,102 @@ if(isset($_SESSION["stc_agent_id"])){
     </script>
 </body>
 </html>
+
+<div class="modal fade bd-procurementdetails-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Project Details Show</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Buyer / Maker</label>
+                                            <input type="text" class="mb-2 form-control" id="stc-pro-tra-buyer-maker" placeholder="Enter Buyer / Maker Name" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">PO No. / WO No.</label>
+                                            <input type="text" class="mb-2 form-control" id="stc-pro-tra-wo-no-po-no" placeholder="Enter PO No. / WO No." required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">PO Date</label>
+                                            <input type="date" class="mb-2 form-control" id="stc-pro-tra-po-date" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">PO Basic Value</label>
+                                            <input type="number" class="mb-2 form-control" id="stc-pro-tra-po-basic-value" placeholder="Please enter amount" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">GST %</label>
+                                            <select name="stc_alot_pro_project" id="#" class="form-control" required>
+                                                <option>5%</option>
+                                                <option>12%</option>
+                                                <option>18%</option>
+                                                <option>28%</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">PO Amount</label>
+                                            <input type="number" class="mb-2 form-control" id="stc-pro-tra-po-amount" placeholder="Please enter amount" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">TDS Approval</label>
+                                            <input type="date" class="mb-2 form-control" id="stc-pro-tra-tds-approval" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Mfg Clearance Client</label>
+                                            <input type="date" class="mb-2 form-control" id="stc-pro-tra-mfg-clearance-approval" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Mfg Lead Time</label>
+                                            <input type="number" class="mb-2 form-control" id="stc-pro-tra-mfg-lead-time" placeholder="Enter mfg lead time" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">OEM / Dealer Location</label>
+                                            <input type="text" class="mb-2 form-control" id="stc-pro-tra-oem-dealer-location" placeholder="City n ame" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Transit Time</label>
+                                            <input type="number" class="mb-2 form-control" id="stc-pro-tra-transit-time" placeholder="Enter transit time" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
