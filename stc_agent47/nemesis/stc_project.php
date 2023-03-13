@@ -412,9 +412,8 @@ class pirates_project extends tesseract{
 		foreach($blackpearl_checkahuexistance as $fetch_row){
 			$ahu_id=$fetch_row['stc_cahud_id'];
 		}
-		// if($ahu_type=="New"){
-			$date=date("Y-m-d H:i:s");
-			$blackpearl_set = mysqli_query($this->stc_dbs, "
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_set = mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_customer_ahu_details`(
 					`stc_cahud_date`,
 					`stc_cahud_dept`,
@@ -468,104 +467,8 @@ class pirates_project extends tesseract{
 					'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_ahu_cfm)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
 				)
-			");
-			$blackpearl=((mysqli_num_rows($blackpearl_set)>0) ? 'Yes' : 'No');
-		// }else{
-		// 	if(mysqli_num_rows($blackpearl_checkahuexistance)==0){
-		// 		$date=date("Y-m-d H:i:s");
-		// 		$blackpearl_set = mysqli_query($this->stc_dbs, "
-		// 			INSERT INTO `stc_customer_ahu_details`(
-		// 				`stc_cahud_date`,
-		// 				`stc_cahud_dept`,
-		// 				`stc_cahud_sub_location`,
-		// 				`stc_cahud_location`,
-		// 				`stc_cahud_ahuno`,
-		// 				`stc_cahud_design_temp`,
-		// 				`stc_cahud_airfilter_size`,
-		// 				`stc_cahud_airfilter_qty`,
-		// 				`stc_cahud_vbelt_size`,
-		// 				`stc_cahud_vbelt_qty`,
-		// 				`stc_cahud_pulleysize_blower`,
-		// 				`stc_cahud_pulleysize_motor`,
-		// 				`stc_cahud_blowerbearingsize_de`,
-		// 				`stc_cahud_blowerbearingsize_nde`,
-		// 				`stc_cahud_blowerbearingsize_housing`,
-		// 				`stc_cahud_motorbearingsize_de`,
-		// 				`stc_cahud_motorbearingsize_nde`,
-		// 				`stc_cahud_motorcap_hp`,
-		// 				`stc_cahud_motor_kw`,
-		// 				`stc_cahud_motor_amps`,
-		// 				`stc_cahud_motor_rpm`,
-		// 				`stc_cahud_motorwt`,
-		// 				`stc_cahud_frame_size`,
-		// 				`stc_cahud_cfm`,
-		// 				`stc_cahud_createdby`
-		// 			)VALUES(
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $cust_dept_id)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_location_name)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_sub_location_name)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_ahu_no)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_desgn_temp)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_air_size)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_air_qty)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_v_belt_size)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_v_belt_qty)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_blower_pulley_size)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_pulley_size)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_de)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_nde)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_housing)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_bearing_de)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_bearing_nde)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_hp)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_kw)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_amps)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_rpm)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_weight)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_ahu_frame_size)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_ahu_cfm)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
-		// 			)
-		// 		");
-		// 		$blackpearl=((mysqli_num_rows($blackpearl_set)>0) ? 'Yes' : 'No');
-		// 	}else{
-		// 		$blackpearl_set = mysqli_query($this->stc_dbs, "
-		// 			UPDATE
-		// 			    `stc_customer_ahu_details`
-		// 			SET
-		// 				`stc_cahud_sub_location`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_location_name)."',
-		// 				`stc_cahud_location`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_sub_location_name)."',
-		// 				`stc_cahud_ahuno`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_ahu_no)."',
-		// 				`stc_cahud_design_temp`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_desgn_temp)."',
-		// 				`stc_cahud_airfilter_size`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_air_size)."',
-		// 				`stc_cahud_airfilter_qty`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_air_qty)."',
-		// 				`stc_cahud_vbelt_size`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_v_belt_size)."',
-		// 				`stc_cahud_vbelt_qty`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_v_belt_qty)."',
-		// 				`stc_cahud_pulleysize_blower`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_blower_pulley_size)."',
-		// 				`stc_cahud_pulleysize_motor`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_pulley_size)."',
-		// 				`stc_cahud_blowerbearingsize_de`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_de)."',
-		// 				`stc_cahud_blowerbearingsize_nde`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_nde)."',
-		// 				`stc_cahud_blowerbearingsize_housing`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_housing)."',
-		// 				`stc_cahud_motorbearingsize_de`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_bearing_de)."',
-		// 				`stc_cahud_motorbearingsize_nde`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_bearing_nde)."',
-		// 				`stc_cahud_motorcap_hp`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_hp)."',
-		// 				`stc_cahud_motor_kw`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_kw)."',
-		// 				`stc_cahud_motor_amps`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_amps)."',
-		// 				`stc_cahud_motor_rpm`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_rpm)."',
-		// 				`stc_cahud_motorwt`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_weight)."',
-		// 				`stc_cahud_frame_size`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_ahu_frame_size)."',
-		// 				`stc_cahud_cfm`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_ahu_cfm)."'
-		// 			WHERE 
-		// 				`stc_cahud_dept`='".mysqli_real_escape_string($this->stc_dbs, $cust_dept_id)."'
-		// 			AND 
-		// 				`stc_cahud_id`='".mysqli_real_escape_string($this->stc_dbs, $ahu_id)."'					
-		// 		");
-		// 		$blackpearl = $blackpearl_set ? 'Yes' : 'No';
-		// 	}
-		// }
-
-		// $blackpearl=((mysqli_num_rows($blackpearl_pd_qry)>0) ? mysqli_fetch_assoc($blackpearl_pd_qry) : 'NA');
+		");
+		$blackpearl=((mysqli_num_rows($blackpearl_set)>0) ? 'Yes' : 'No');
 		return $blackpearl;
 
 	}
@@ -774,6 +677,20 @@ class pirates_project extends tesseract{
 			    `stc_cust_procurement_tracker_service`,
 			    `stc_cust_procurement_tracker_unit`,
 			    `stc_cust_procurement_tracker_qty`,
+			    `stc_cust_procurement_tracker_buyer`,
+			    `stc_cust_procurement_tracker_po_no`,
+			    `stc_cust_procurement_tracker_po_date`,
+			    `stc_cust_procurement_tracker_basicamt`,
+			    `stc_cust_procurement_tracker_gst`,
+			    `stc_cust_procurement_tracker_approval_date`,
+			    `stc_cust_procurement_tracker_mfg_clearancedate`,
+			    `stc_cust_procurement_tracker_mfg_leadtime`,
+			    `stc_cust_procurement_tracker_location`,
+			    `stc_cust_procurement_tracker_transittime`,
+			    `stc_cust_procurement_tracker_deleverytimeplan`,
+			    `stc_cust_procurement_tracker_delivered_actual`,
+			    `stc_cust_procurement_tracker_transport_charge`,
+			    `stc_cust_procurement_tracker_remartks`,
 			    `stc_agents_name`
 			FROM
 			    `stc_cust_procurement_tracker`
@@ -798,6 +715,59 @@ class pirates_project extends tesseract{
 
 		if(mysqli_num_rows($blackpearl_result)>0){
 			foreach($blackpearl_result as $blackpearl_row){
+				$basicamt=$blackpearl_row['stc_cust_procurement_tracker_qty'] * $blackpearl_row['stc_cust_procurement_tracker_basicamt'];
+				$total=$basicamt + ($basicamt * $blackpearl_row['stc_cust_procurement_tracker_gst']/100);
+				$loc_id=$blackpearl_row['stc_cust_procurement_tracker_location'];
+				$cityquery=mysqli_query($this->stc_dbs, "
+					SELECT `stc_city_name` FROM `stc_city` WHERE `stc_city_id`=$loc_id
+				");
+				$cityname='';
+				foreach($cityquery as $cityrow){
+					$cityname=$cityrow['stc_city_name'];
+				}
+
+				$pro_id=$blackpearl_row['stc_cust_procurement_tracker_id'];
+				$paymentquery=mysqli_query($this->stc_dbs, "
+					SELECT
+					    `stc_cust_procurement_tracker_payments_id`,
+					    `stc_cust_procurement_tracker_payments_tracid`,
+					    `stc_cust_procurement_tracker_payments_date`,
+					    `stc_cust_procurement_tracker_payments_amount`,
+					    `stc_cust_procurement_tracker_payments_type`,
+					    `stc_cust_procurement_tracker_payments_created_by`
+					FROM
+					    `stc_cust_procurement_tracker_payments`
+					WHERE
+					    `stc_cust_procurement_tracker_payments_tracid`=$pro_id
+				");
+				$advanceamt='';
+				$advancedate='';
+				$dispatchamt='';
+				$dispatchdate='';
+				$pdcamt='';
+				$pdcdate='';
+				foreach($paymentquery as $paymentrow){
+					if($paymentrow['stc_cust_procurement_tracker_payments_type']=="advance"){
+						$advanceamt.=$paymentrow['stc_cust_procurement_tracker_payments_amount'].'<br>';
+						$advancedate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_date'])).'<br>';
+					}elseif($paymentrow['stc_cust_procurement_tracker_payments_type']=="dispatch"){
+						$dispatchamt.=$paymentrow['stc_cust_procurement_tracker_payments_amount'].'<br>';
+						$dispatchdate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_date'])).'<br>';
+					}else{
+						$pdcamt.=$paymentrow['stc_cust_procurement_tracker_payments_amount'].'<br>';
+						$pdcdate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_date'])).'<br>';
+					}
+				}
+
+				$paymentcol="
+					<td>".$advanceamt."</td>
+					<td>".$advancedate."</td>
+					<td>".$dispatchamt."</td>
+					<td>".$dispatchdate."</td>
+					<td>".$pdcamt."</td>
+					<td>".$pdcdate."</td>
+				";
+
 				$blackpearl.="
 					<tr>
 						<td>".$blackpearl_row['stc_cust_procurement_tracker_id']." <br> ".date('d-m-Y', strtotime($blackpearl_row['stc_cust_procurement_tracker_date']))."</td>
@@ -805,9 +775,26 @@ class pirates_project extends tesseract{
 						<td>".$blackpearl_row['stc_cust_procurement_tracker_item_title']."</td>
 						<td>".$blackpearl_row['stc_cust_procurement_tracker_service']."</td>
 						<td>".$blackpearl_row['stc_cust_procurement_tracker_unit']."</td>
-						<td class='text-center'>".number_format($blackpearl_row['stc_cust_procurement_tracker_qty'], 2)."</td>
+						<td class='text-right'>".number_format($blackpearl_row['stc_cust_procurement_tracker_qty'], 2)."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_buyer']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_po_no']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_po_date']."</td>
+						<td class='text-right'>".number_format($basicamt, 2)."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_gst']."%</td>
+						<td class='text-right'>".number_format($total, 2)."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_approval_date']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_mfg_clearancedate']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_mfg_leadtime']."</td>
+						<td>".$cityname."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_transittime']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_deleverytimeplan']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_delivered_actual']."</td>
+						".$paymentcol."
+						<td class='text-right'>".number_format($blackpearl_row['stc_cust_procurement_tracker_transport_charge'], 2)."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_remartks']."</td>
 						<td>
 							<a href='#' style='color: #97b7ff; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-addmod'><i class='fa fa-plus'></i></a>
+							<a href='#' style='color: grey; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-paymod'><i class='fa fa-credit-card'></i></a>
 							<a href='#' style='color: red; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-deletemod'><i class='fa fa-trash'></i></a>
 						</td>
 					</tr>
@@ -830,6 +817,48 @@ class pirates_project extends tesseract{
 			DELETE FROM `stc_cust_procurement_tracker` WHERE `stc_cust_procurement_tracker_id` = '".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
 		");
 		if($blackpearl_query){
+			$blackpearl="yes";
+		}else{
+			$blackpearl="no";
+		}
+		return $blackpearl;
+	}
+
+	// call perticular procurement tracker
+	public function stc_procurement_tracker_perticular_call($proc_id){
+		$blackpearl="";
+		$blackpearl_query=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_cust_procurement_tracker` WHERE `stc_cust_procurement_tracker_id`='".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+		");
+		$blackpearl=mysqli_fetch_assoc($blackpearl_query);
+		return $blackpearl;
+	}
+
+	// update perticular procurement tracker
+	public function stc_procurement_tracker_update($proc_id, $buyer, $po_no_id, $po_no_date, $amount, $gst, $approval, $mfgclear, $leadtime, $dealer_loca, $transittime, $plan, $actual, $transport_charge, $remarks){
+		$blackpearl="";
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			UPDATE
+			    `stc_cust_procurement_tracker`
+			SET
+			    `stc_cust_procurement_tracker_buyer` = '".mysqli_real_escape_string($this->stc_dbs, $buyer)."',
+			    `stc_cust_procurement_tracker_po_no` = '".mysqli_real_escape_string($this->stc_dbs, $po_no_id)."',
+			    `stc_cust_procurement_tracker_po_date` = '".mysqli_real_escape_string($this->stc_dbs, $po_no_date)."',
+			    `stc_cust_procurement_tracker_basicamt` = '".mysqli_real_escape_string($this->stc_dbs, $amount)."',
+			    `stc_cust_procurement_tracker_gst` = '".mysqli_real_escape_string($this->stc_dbs, $gst)."',
+			    `stc_cust_procurement_tracker_approval_date` = '".mysqli_real_escape_string($this->stc_dbs, $approval)."',
+			    `stc_cust_procurement_tracker_mfg_clearancedate` = '".mysqli_real_escape_string($this->stc_dbs, $mfgclear)."',
+			    `stc_cust_procurement_tracker_mfg_leadtime` = '".mysqli_real_escape_string($this->stc_dbs, $leadtime)."',
+			    `stc_cust_procurement_tracker_location` = '".mysqli_real_escape_string($this->stc_dbs, $dealer_loca)."',
+			    `stc_cust_procurement_tracker_transittime` = '".mysqli_real_escape_string($this->stc_dbs, $transittime)."',
+			    `stc_cust_procurement_tracker_deleverytimeplan` = '".mysqli_real_escape_string($this->stc_dbs, $plan)."',
+			    `stc_cust_procurement_tracker_delivered_actual` = '".mysqli_real_escape_string($this->stc_dbs, $actual)."',
+			    `stc_cust_procurement_tracker_transport_charge` = '".mysqli_real_escape_string($this->stc_dbs, $transport_charge)."',
+			    `stc_cust_procurement_tracker_remartks` = '".mysqli_real_escape_string($this->stc_dbs, $remarks)."'
+			WHERE
+			    `stc_cust_procurement_tracker_id` = '".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+		");
+		if($blackpearl_qry){
 			$blackpearl="yes";
 		}else{
 			$blackpearl="no";
@@ -2693,11 +2722,34 @@ if(isset($_POST['delete_procurment_tracker'])){
 	echo $odin_req_out;
 }
 
+// call perticular procurement
+if(isset($_POST['get_procurment_tracker_perticular'])){
+	$proc_id=$_POST['add_pro_id'];
+	$odin_req=new pirates_project();
+	$odin_req_out=$odin_req->stc_procurement_tracker_perticular_call($proc_id);
+	echo json_encode($odin_req_out);
+}
+
 // update procurement
 if(isset($_POST['update_procurment_tracker'])){
-	$proc_id=$_POST['update_pro_id'];
+	$proc_id=$_POST['pro_id'];
+	$buyer=$_POST['buyer'];
+	$po_no_id=$_POST['po_no_id'];
+	$po_no_date=$_POST['po_no_date'];
+	$amount=$_POST['amount'];
+	$gst=$_POST['gst'];
+	$approval=$_POST['approval'];
+	$mfgclear=$_POST['mfgclear'];
+	$leadtime=$_POST['leadtime'];
+	$dealer_loca=$_POST['dealer_loca'];
+	$transittime=$_POST['transittime'];
+	$plan=$_POST['plan'];
+	$actual=$_POST['actual'];
+	$transport_charge=$_POST['transport_charge'];
+	$remarks=$_POST['remarks'];
+
 	$odin_req=new pirates_project();
-	$odin_req_out=$odin_req->Stc_procurement_tracker_update($proc_id);
+	$odin_req_out=$odin_req->stc_procurement_tracker_update($proc_id, $buyer, $po_no_id, $po_no_date, $amount, $gst, $approval, $mfgclear, $leadtime, $dealer_loca, $transittime, $plan, $actual, $transport_charge, $remarks);
 	echo $odin_req_out;
 }
 

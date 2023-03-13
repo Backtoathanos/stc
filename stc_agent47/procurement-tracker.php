@@ -143,14 +143,35 @@ if(isset($_SESSION["stc_agent_id"])){
                                                 <form class="#">
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            <table class="table table-stripped">
+                                                            <table class="table table-stripped table-bordered table-hover">
                                                                 <thead>
                                                                     <th class="text-center">Procurment Tracker Id</br>Procurment Tracker Date</th>
                                                                     <th class="text-center">Project Name</th>
                                                                     <th class="text-center">Item Name</th>
                                                                     <th class="text-center">Service</th>
-                                                                    <th class="text-center">Unit</th>
-                                                                    <th class="text-center">Quantity</th>
+                                                                    <th class="text-center">Uom</th>
+                                                                    <th class="text-center">Drawing Quantity</th>
+                                                                    <th class="text-center">Buyer / Maker</th>
+                                                                    <th class="text-center">PO/WO NO</th>
+                                                                    <th class="text-center">PO DATE</th>
+                                                                    <th class="text-center"> PO BASIC VALUE</th>
+                                                                    <th class="text-center"> GST </th>
+                                                                    <th class="text-center"> PO AMOUNT </th>
+                                                                    <th class="text-center">TDS APPROVAL</th>
+                                                                    <th class="text-center">Mfg Clearance (Client)</th>
+                                                                    <th class="text-center">Mfg lead time</th>
+                                                                    <th class="text-center">OEM / DELEAR location</th>
+                                                                    <th class="text-center">Transit time</th>
+                                                                    <th class="text-center">PLAN</th>
+                                                                    <th class="text-center">Actual/ Forecasted</th>
+                                                                    <th class="text-center"> ADVANCE PAYMENT </th>
+                                                                    <th class="text-center">DATE</th>
+                                                                    <th class="text-center"> BEFORE DISPTACH </th>
+                                                                    <th class="text-center">DATE</th>
+                                                                    <th class="text-center">PDC</th>
+                                                                    <th class="text-center">DURATION IN DAYS</th>
+                                                                    <th class="text-center">TRANSPORATION CHARGE</th>
+                                                                    <th class="text-center">Remarks</th>
                                                                     <th class="text-center">Action</th>
                                                                 </thead>
                                                                 <tbody class="procurment-tracker-data-field">
@@ -248,6 +269,9 @@ if(isset($_SESSION["stc_agent_id"])){
             $('body').delegate('.stc-tra-addmod', 'click', function(e){
                 e.preventDefault();
                 var add_pro_id=$(this).attr('id');
+                $('#stc-hidden-procurement-tracker-id').val(add_pro_id);
+                stc_perticular_procurment_tracker_call(add_pro_id);
+                procurement_tracker_call(begdate, enddate);
                 $('.bd-procurementdetails-modal-lg').modal('show');
             });
 
@@ -275,7 +299,96 @@ if(isset($_SESSION["stc_agent_id"])){
                 });
             });
 
+            // call perticular data
+            function stc_perticular_procurment_tracker_call(add_pro_id){
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        get_procurment_tracker_perticular:1,
+                        add_pro_id:add_pro_id
+                    },
+                    dataType : "JSON",
+                    success : function(response){
+                        // console.log(response);
+                        $('#stc-pro-tra-buyer-maker').val(response['stc_cust_procurement_tracker_buyer']);
+                        $('#stc-pro-tra-wo-no-po-no').val(response['stc_cust_procurement_tracker_po_no']);
+                        $('#stc-pro-tra-po-date').val(response['stc_cust_procurement_tracker_po_date']);
+                        $('#stc-pro-tra-po-basic-value').val(response['stc_cust_procurement_tracker_basicamt']);
+                        $('#stc-pro-tra-gst').val(response['stc_cust_procurement_tracker_gst']);
+                        $('#stc-pro-tra-tds-approval').val(response['stc_cust_procurement_tracker_approval_date']);
+                        $('#stc-pro-tra-mfg-clearance-approval').val(response['stc_cust_procurement_tracker_mfg_clearancedate']);
+                        $('#stc-pro-tra-mfg-lead-time').val(response['stc_cust_procurement_tracker_mfg_leadtime']);
+                        $('#stc-pro-tra-oem-dealer-location').val(response['stc_cust_procurement_tracker_location']);
+                        $('#stc-pro-tra-transit-time').val(response['stc_cust_procurement_tracker_transittime']);
+                        $('#stc-pro-tra-plan').val(response['stc_cust_procurement_tracker_deleverytimeplan']);
+                        $('#stc-pro-tra-actual-forecasted').val(response['stc_cust_procurement_tracker_delivered_actual']);
+                        $('#stc-pro-tra-transportaion-charge').val(response['stc_cust_procurement_tracker_transport_charge']);
+                        $('#stc-pro-tra-remarks').val(response['stc_cust_procurement_tracker_remartks']);
+                    }
+                });
+            }
 
+            // update on change
+            $('body').delegate('.stc-pro-tra-update-field', 'focusout', function(e){
+                e.preventDefault();
+                stc_perticular_procurment_tracker_update();
+                $('.record-popup').remove();
+                $(this).after("<span class='record-popup'>Record saved.</span>");
+            });
+
+            // update perticular data
+            function stc_perticular_procurment_tracker_update(){
+                var pro_id=$('#stc-hidden-procurement-tracker-id').val();
+
+                var buyer=$('#stc-pro-tra-buyer-maker').val();
+                var po_no_id=$('#stc-pro-tra-wo-no-po-no').val();
+                var po_no_date=$('#stc-pro-tra-po-date').val();
+                var amount=$('#stc-pro-tra-po-basic-value').val();
+                var gst=$('#stc-pro-tra-gst').val();
+                var approval=$('#stc-pro-tra-tds-approval').val();
+                var mfgclear=$('#stc-pro-tra-mfg-clearance-approval').val();
+                var leadtime=$('#stc-pro-tra-mfg-lead-time').val();
+                var dealer_loca=$('#stc-pro-tra-oem-dealer-location').val();
+                var transittime=$('#stc-pro-tra-transit-time').val();
+                var plan=$('#stc-pro-tra-plan').val();
+                var actual=$('#stc-pro-tra-actual-forecasted').val();
+                var remarks=$('#stc-pro-tra-remarks').val();
+                var transport_charge=$('#stc-pro-tra-transportaion-charge').val();
+
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        update_procurment_tracker:1,
+                        pro_id:pro_id,
+                        buyer:buyer,
+                        po_no_id:po_no_id,
+                        po_no_date:po_no_date,
+                        amount:amount,
+                        gst:gst,
+                        approval:approval,
+                        mfgclear:mfgclear,
+                        leadtime:leadtime,
+                        dealer_loca:dealer_loca,
+                        transittime:transittime,
+                        plan:plan,
+                        actual:actual,
+                        transport_charge:transport_charge,
+                        remarks:remarks
+                    },
+                    success : function(response){
+                        // console.log(response);
+                        response=response.trim();
+                        if(response=="no"){
+                            alert("Hmmm something went wrong, Record not saved");
+                        }else{
+                            var pro_id = $('#stc-hidden-procurement-tracker-id').val();
+                            stc_perticular_procurment_tracker_call(pro_id);   
+                        }
+                    }
+                });
+            }
 
         });
 
@@ -299,76 +412,114 @@ if(isset($_SESSION["stc_agent_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <div class="row">
-                                    <input type="hidden" class="stc-hidden-procurement-tracker-id">
+                                    <input type="hidden" id="stc-hidden-procurement-tracker-id">
                                     <div class="col-sm-12 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Buyer / Maker</label>
-                                            <input type="text" class="mb-2 form-control" id="stc-pro-tra-buyer-maker" placeholder="Enter Buyer / Maker Name" required>
+                                            <input type="text" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-buyer-maker" placeholder="Enter Buyer / Maker Name" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">PO No. / WO No.</label>
-                                            <input type="text" class="mb-2 form-control" id="stc-pro-tra-wo-no-po-no" placeholder="Enter PO No. / WO No." required>
+                                            <input type="text" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-wo-no-po-no" placeholder="Enter PO No. / WO No." required>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">PO Date</label>
-                                            <input type="date" class="mb-2 form-control" id="stc-pro-tra-po-date" required>
+                                            <input type="date" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-po-date" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">PO Basic Value</label>
-                                            <input type="number" class="mb-2 form-control" id="stc-pro-tra-po-basic-value" placeholder="Please enter amount" required>
+                                            <input type="number" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-po-basic-value" placeholder="Please enter amount" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">GST %</label>
-                                            <select name="stc_alot_pro_project" id="#" class="form-control" required>
-                                                <option>5%</option>
-                                                <option>12%</option>
-                                                <option>18%</option>
-                                                <option>28%</option>
+                                            <select id="stc-pro-tra-gst" id="#" class="form-control stc-pro-tra-update-field" required>
+                                                <option value="5">5%</option>
+                                                <option value="12">12%</option>
+                                                <option value="18">18%</option>
+                                                <option value="28">28%</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
                                         <div class="position-relative form-group">
-                                            <label for="exampleEmail" class="">PO Amount</label>
-                                            <input type="number" class="mb-2 form-control" id="stc-pro-tra-po-amount" placeholder="Please enter amount" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div class="position-relative form-group">
-                                            <label for="exampleEmail" class="">TDS Approval</label>
-                                            <input type="date" class="mb-2 form-control" id="stc-pro-tra-tds-approval" required>
+                                            <label for="exampleEmail" class="">TDS Approval Date</label>
+                                            <input type="date" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-tds-approval" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Mfg Clearance Client</label>
-                                            <input type="date" class="mb-2 form-control" id="stc-pro-tra-mfg-clearance-approval" required>
+                                            <input type="date" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-mfg-clearance-approval" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Mfg Lead Time</label>
-                                            <input type="number" class="mb-2 form-control" id="stc-pro-tra-mfg-lead-time" placeholder="Enter mfg lead time" required>
+                                            <input type="number" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-mfg-lead-time" placeholder="Enter mfg lead time" required>
                                         </div>
                                     </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div class="position-relative form-group">
+
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="position-relative form-group stc-pro-tra-update-field">
                                             <label for="exampleEmail" class="">OEM / Dealer Location</label>
-                                            <input type="text" class="mb-2 form-control" id="stc-pro-tra-oem-dealer-location" placeholder="City n ame" required>
+                                            <select id="stc-pro-tra-oem-dealer-location" id="stc-pro-tra-location" class="form-control stc-pro-tra-update-field" required>
+                                                <?php
+                                                    $procityqry=mysqli_query($con, "
+                                                        SELECT DISTINCT `stc_city_id`, `stc_city_name` 
+                                                        FROM `stc_city` 
+                                                        ORDER BY `stc_city_name` ASC
+                                                    ");
+                                                    foreach($procityqry as $procityrow){
+                                                        echo '<option value="'.$procityrow['stc_city_id'].'">'.$procityrow['stc_city_name'].'</option>';
+                                                    }
+
+                                                ?>
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="col-sm-12 col-md-6">
+                                    <div class="col-sm-12 col-md-4">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Transit Time</label>
-                                            <input type="number" class="mb-2 form-control" id="stc-pro-tra-transit-time" placeholder="Enter transit time" required>
+                                            <input type="number" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-transit-time" placeholder="Enter transit time" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Transportation Charge</label>
+                                            <input type="number" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-transportaion-charge" placeholder="Enter Transportation Charge" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-12">
+                                                    <label for="exampleEmail" class="text-center">DELIVERY TIME AS PER CLERANCE / ADV PAYMENT / PO </label>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div class="position-relative form-group">
+                                                    <label for="exampleEmail" class="">PLAN</label>
+                                                    <input type="date" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-plan" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div class="position-relative form-group">
+                                                    <label for="exampleEmail" class="">Actual/ Forecasted</label>
+                                                    <input type="date" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-actual-forecasted" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Remarks</label>
+                                            <textarea class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-remarks" placeholder="Enter Remarks" required></textarea>
                                         </div>
                                     </div>
                                 </div>
