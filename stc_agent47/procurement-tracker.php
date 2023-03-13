@@ -198,6 +198,7 @@ if(isset($_SESSION["stc_agent_id"])){
 
             var begdate="";
             var enddate="";
+            // for create procurement  tracker
             $('.create-procurment-tracker').on('submit', function(e){
                 e.preventDefault();
                 $.ajax({
@@ -225,6 +226,7 @@ if(isset($_SESSION["stc_agent_id"])){
                 });
             });
 
+            // for procuremrnt tracker
             procurement_tracker_call(begdate, enddate);
             function procurement_tracker_call(begdate, enddate){
                 $.ajax({
@@ -242,11 +244,14 @@ if(isset($_SESSION["stc_agent_id"])){
                 });
             }
 
+            // for update procurement tracker
             $('body').delegate('.stc-tra-addmod', 'click', function(e){
                 e.preventDefault();
+                var add_pro_id=$(this).attr('id');
                 $('.bd-procurementdetails-modal-lg').modal('show');
             });
 
+            // for delete procurement tracker 
             $('body').delegate('.stc-tra-deletemod', 'click', function(e){
                 e.preventDefault();
                 var delete_pro_id=$(this).attr('id');
@@ -270,92 +275,11 @@ if(isset($_SESSION["stc_agent_id"])){
                 });
             });
 
+
+
         });
 
-        $(document).ready(function(){
-            $('body').delegate('.ag-show-grid', 'click', function(e){
-                var odid=$(this).attr("id");
-                $('#togdiv'+odid).toggle(400);
-                $.ajax({
-                    url : "nemesis/stc_project.php",
-                    method : "POST",
-                    data : {
-                        get_orders_pert:1,
-                        odid:odid
-                    },
-                    success : function(orders){
-                        // console.log(orders);
-                        $('#togdiv'+odid).html(orders);
-                    }
-                });
-                // alert(odid);
-            });
-
-            $('body').delegate('.setforwardaction', 'click', function(e){
-                var odid=$(this).attr("id");
-                var validate_value=$('#setforwardactionvalue'+odid).val();
-                // $('#togdiv'+odid).toggle(400);
-                $.ajax({
-                    url : "nemesis/stc_project.php",
-                    method : "POST",
-                    data : {
-                        set_for_validate:1,
-                        odid:odid,
-                        validate_value:validate_value
-                    },
-                    dataType: "JSON",
-                    success : function(action){
-                        // console.log(orders);
-                        // $('#togdiv'+odid).html(orders);
-                        alert(action['action']);
-                        $('#togdiv'+odid).html(action['reaction']);
-
-                    }
-                });
-                // alert(odid+validate_value);
-            });
-
-            $('body').delegate('.placerequisition', 'click', function(e){
-                var odid=$(this).attr("id");
-                $.ajax({
-                    url : "nemesis/stc_project.php",
-                    method : "POST",
-                    data : {
-                        place_requisition:1,
-                        odid:odid
-                    },
-                    success : function(orders){
-                        // console.log(orders);
-                        // $('#togdiv'+odid).html(orders);
-                        if(orders == "reload"){
-                            alert("Session expired. Reloading....");
-                            window.location.reload();
-                        }else if(orders == "no"){
-                            alert("Cant placed your requisition. Please check remains quantity & enable item first!!!");
-                        }else{
-                            alert(orders);
-                            $('#togdiv'+odid).toggle(400);
-                        }                        
-                    }
-                });
-            });
-
-            $('body').delegate('.settoclean', 'click', function(e){
-                var odid=$(this).attr("id");
-                $.ajax({
-                    url : "nemesis/stc_project.php",
-                    method : "POST",
-                    data : {
-                        clean_requisition:1,
-                        odid:odid
-                    },
-                    success : function(orders){
-                            alert(orders);
-                            $('#togdiv'+odid).toggle(400);
-                    }
-                });
-            });
-        });
+        
     </script>
 </body>
 </html>
@@ -375,6 +299,7 @@ if(isset($_SESSION["stc_agent_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <div class="row">
+                                    <input type="hidden" class="stc-hidden-procurement-tracker-id">
                                     <div class="col-sm-12 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Buyer / Maker</label>

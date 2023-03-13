@@ -805,7 +805,7 @@ class pirates_project extends tesseract{
 						<td>".$blackpearl_row['stc_cust_procurement_tracker_item_title']."</td>
 						<td>".$blackpearl_row['stc_cust_procurement_tracker_service']."</td>
 						<td>".$blackpearl_row['stc_cust_procurement_tracker_unit']."</td>
-						<td>".$blackpearl_row['stc_cust_procurement_tracker_qty']."</td>
+						<td class='text-center'>".number_format($blackpearl_row['stc_cust_procurement_tracker_qty'], 2)."</td>
 						<td>
 							<a href='#' style='color: #97b7ff; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-addmod'><i class='fa fa-plus'></i></a>
 							<a href='#' style='color: red; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-deletemod'><i class='fa fa-trash'></i></a>
@@ -2692,4 +2692,13 @@ if(isset($_POST['delete_procurment_tracker'])){
 	$odin_req_out=$odin_req->stc_save_procurement_delete($proc_id);
 	echo $odin_req_out;
 }
+
+// update procurement
+if(isset($_POST['update_procurment_tracker'])){
+	$proc_id=$_POST['update_pro_id'];
+	$odin_req=new pirates_project();
+	$odin_req_out=$odin_req->Stc_procurement_tracker_update($proc_id);
+	echo $odin_req_out;
+}
+
 ?>
