@@ -73,15 +73,15 @@
                         <?php 
                             if($_SESSION['stc_agent_role']==3){
                                 echo '
+                                ';
+                            }
+                        ?>
                         <li>
                             <a href="stc-std.php">
                                 <i class="metismenu-icon"></i>
                                 Status Down List
                             </a>
                         </li>
-                                ';
-                            }
-                        ?>
                         <?php 
                             if($_SESSION['stc_agent_role']==2){
                                 echo '

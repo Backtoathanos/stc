@@ -390,6 +390,49 @@ if(isset($_SESSION["stc_agent_id"])){
                 });
             }
 
+            // payment modal show
+            $('body').delegate('.stc-tra-paymod', 'click', function(e){
+                e.preventDefault();
+                var proc_id=$(this).attr("id");
+                $('#stc-hidden-procurement-tracker-payment-id').val(proc_id);
+                $('.bd-procurementpayment-modal-lg').modal('show');
+            });
+
+            // save procurement tracker payment
+            $('body').delegate('.stc-pro-tra-pay-save', 'click', function(e){
+                e.preventDefault();
+                var proc_id = $('#stc-hidden-procurement-tracker-payment-id').val();
+                var pay_date = $('.stc-pro-tra-pay-payment-date').val();
+                var pay_type = $('.stc-pro-tra-pay-payment-type').val();
+                var pay_amount = $('.stc-pro-tra-pay-amount').val();
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        save_procurment_tracker_payment:1,
+                        proc_id:proc_id,
+                        pay_date:pay_date,
+                        pay_type:pay_type,
+                        pay_amount:pay_amount
+                    },
+                    success : function(response){
+                        // console.log(response);
+                        var obj_response=response.trim();
+                        if(obj_response=="yes"){
+                            alert("Record saved successfully!!!");
+                            procurement_tracker_call(begdate, enddate);
+                            $('.bd-procurementpayment-modal-lg').modal('hide');
+                            $('.bd-procurementpayment-modal-lg input').val('');
+                        }else if(obj_response=="empty"){
+                            alert("Do not let any field empty.");
+                        }else if(obj_response=="reload"){
+                            window.location.reload();
+                        }else if(obj_response=="no"){
+                            alert("Something went wrong. Record not saved");
+                        }
+                    }
+                });
+            });
         });
 
         
@@ -401,7 +444,7 @@ if(isset($_SESSION["stc_agent_id"])){
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Project Details Show</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Procurement Tracker</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -466,7 +509,6 @@ if(isset($_SESSION["stc_agent_id"])){
                                             <input type="number" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-mfg-lead-time" placeholder="Enter mfg lead time" required>
                                         </div>
                                     </div>
-
                                     <div class="col-sm-12 col-md-4">
                                         <div class="position-relative form-group stc-pro-tra-update-field">
                                             <label for="exampleEmail" class="">OEM / Dealer Location</label>
@@ -520,6 +562,61 @@ if(isset($_SESSION["stc_agent_id"])){
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Remarks</label>
                                             <textarea class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-remarks" placeholder="Enter Remarks" required></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-procurementpayment-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Procurement Tracker Payment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <input type="hidden" id="stc-hidden-procurement-tracker-payment-id">
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Payment Date</label>
+                                            <input type="date" class="mb-2 form-control stc-pro-tra-pay-payment-date" id="stc-pro-tra-buyer-maker" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Payment Type</label>
+                                            <select id="stc-pro-tra-gst" id="#" class="form-control stc-pro-tra-pay-payment-type" required>
+                                                <option value="advance">Advance</option>
+                                                <option value="dispatch">After Dispatch</option>
+                                                <option value="pdc">PDC</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Payment Amount</label>
+                                            <input type="number" class="mb-2 form-control stc-pro-tra-pay-amount" placeholder="Enter Payment Amount" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="position-relative form-group">
+                                            <a href="#" class="mb-2 btn btn-primary form-control stc-pro-tra-pay-save">Save</a>
                                         </div>
                                     </div>
                                 </div>

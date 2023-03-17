@@ -865,6 +865,32 @@ class pirates_project extends tesseract{
 		}
 		return $blackpearl;
 	}
+
+	// save payment
+	public function stc_procurement_tracker_payment_save($proc_id ,$pay_date ,$pay_type ,$pay_amount){
+		$blackpearl='';
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_procurement_tracker_payments`(
+				`stc_cust_procurement_tracker_payments_tracid`,
+				`stc_cust_procurement_tracker_payments_date`,
+				`stc_cust_procurement_tracker_payments_amount`,
+				`stc_cust_procurement_tracker_payments_type`,
+				`stc_cust_procurement_tracker_payments_created_by`
+			)VALUES(
+				'".mysqli_real_escape_string($this->stc_dbs, $proc_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, date('Y-m-d', strtotime($pay_date)))."',
+				'".mysqli_real_escape_string($this->stc_dbs, $pay_amount)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $pay_type)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
+			)
+		");
+		if($blackpearl_qry){
+			$blackpearl = "yes";
+		}else{
+			$blackpearl = "no";
+		}
+		return $blackpearl;
+	}
 }
 
 class pirates_supervisor extends tesseract{
@@ -1662,6 +1688,10 @@ class pirates_supervisor extends tesseract{
 				)
 			";
 		}
+		$showbystatus="AND `stc_agents_id`=".$_SESSION['stc_agent_id'];
+		if($_SESSION['stc_agent_role']==3){
+			$showbystatus='';
+		}
 		$optimusprimeqry=mysqli_query($this->stc_dbs, "
 			SELECT DISTINCT
 			    `stc_status_down_list_id`,
@@ -1697,8 +1727,10 @@ class pirates_supervisor extends tesseract{
 			ON `stc_status_down_list_equipment_number`=a.`stc_cpumpd_id` 
 			LEFT JOIN `stc_customer_pump_details` b 
 			ON `stc_status_down_list_equipment_type`=b.`stc_cpumpd_id` 
+			LEFT JOIN `stc_agents` 
+			ON `stc_status_down_list_created_by`=`stc_agents_id` 
 			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
-			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field."
+			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field." ".$search_field."
 			ORDER BY DATE(`stc_status_down_list_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimeqry)>0){
@@ -1743,16 +1775,22 @@ class pirates_supervisor extends tesseract{
 				}
 
 				$actionsec='';
-				if($row['stc_status_down_list_status']==3){
-					$actionsec='
-						<a href="#" class="stc-set-to-complete" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
-					';
-				}elseif($row['stc_status_down_list_status']==4){
-					$actionsec='
-						<a href="#" class="stc-set-to-close" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
-					';
+				if($_SESSION['stc_agent_role']==3){
+					if($row['stc_status_down_list_status']==4){
+						$actionsec='
+							<a href="#" class="stc-set-to-close" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
+						';
+					}else{
+						$actionsec='#';
+					}
 				}else{
-					$actionsec='#';
+					if($row['stc_status_down_list_status']==3){
+						$actionsec='
+							<a href="#" class="stc-set-to-complete" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
+						';
+					}else{
+						$actionsec='#';
+					}
 				}
 
 				$eq_type='';
@@ -2751,6 +2789,25 @@ if(isset($_POST['update_procurment_tracker'])){
 	$odin_req=new pirates_project();
 	$odin_req_out=$odin_req->stc_procurement_tracker_update($proc_id, $buyer, $po_no_id, $po_no_date, $amount, $gst, $approval, $mfgclear, $leadtime, $dealer_loca, $transittime, $plan, $actual, $transport_charge, $remarks);
 	echo $odin_req_out;
+}
+
+if(isset($_POST['save_procurment_tracker_payment'])){
+	$proc_id=$_POST['proc_id'];
+	$pay_date=$_POST['pay_date'];
+	$pay_type=$_POST['pay_type'];
+	$pay_amount=$_POST['pay_amount'];
+	$out='';
+
+	if(empty($pay_amount) || empty($pay_date)){
+		$out='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new pirates_project();
+		$odin_req_out=$odin_req->stc_procurement_tracker_payment_save($proc_id ,$pay_date ,$pay_type ,$pay_amount);
+		$out=$odin_req_out;
+	}
+	echo $out;
 }
 
 ?>
