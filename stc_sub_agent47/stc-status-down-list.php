@@ -88,7 +88,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Location :</h5><br>
-                                            <select class="btn btn-success form-control load_site_name_consump" id="stc-agent-sup-std-location"><option>Plese select location first!!!</option>
+                                            <input type="hidden" id="stc-agent-sup-std-hidden-location-id">
+                                            <select class="btn btn-success form-control load_site_name_consump text-left" id="stc-agent-sup-std-location"><option>Plese select location first!!!</option>
                                             </select> 
                                         </div>
                                     </div>
@@ -97,7 +98,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Department :</h5><br>
-                                            <select class="btn btn-success form-control stc-agent-sup-std-sub-location" id="stc-agent-sup-std-sub-location"><option>Please select location first!!!</option>
+                                            <select class="btn btn-success form-control stc-agent-sup-std-sub-location text-left" id="stc-agent-sup-std-sub-location"><option>Please select location first!!!</option>
                                             </select> 
                                             <!-- <input type="text" class="form-control stc-agent-sup-std-sub-location" placeholder="Enter Location"/> -->
                                         </div>
@@ -107,7 +108,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Area :</h5><br>
-                                            <select class="btn btn-success form-control stc-agent-sup-std-area" id="stc-agent-sup-std-area"><option>Please select department first!!!</option>
+                                            <select class="btn btn-success form-control stc-agent-sup-std-area text-left" id="stc-agent-sup-std-area"><option>Please select department first!!!</option>
                                             </select> 
                                             <!-- <input type="text" class="form-control stc-agent-sup-std-area" placeholder="Enter Area"/> -->
                                         </div>
@@ -117,7 +118,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Equipment Type :</h5><br>
-                                            <select class="btn btn-success form-control load_equipment_type_consump" id="stc-agent-sup-std-equipment-type"><option>Please select area first!!!</option>
+                                            <select class="btn btn-success form-control load_equipment_type_consump text-left" id="stc-agent-sup-std-equipment-type"><option>Please select area first!!!</option>
                                             </select> 
                                             <!-- <input type="text" class="form-control stc-agent-sup-std-equipment-type" placeholder="Enter Equipment Details"/> -->
                                         </div>
@@ -127,7 +128,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Equipment Number :</h5><br>
-                                            <select class="btn btn-success form-control load_equipment_number_consump" id="stc-agent-sup-std-equipment-number" disabled><option>Please select equipment no first!!!</option>
+                                            <select class="btn btn-success form-control load_equipment_number_consump text-left" id="stc-agent-sup-std-equipment-number" disabled><option>Please select equipment no first!!!</option>
                                             </select> 
                                             <!-- <input type="text" class="form-control stc-agent-sup-std-equipment-number" placeholder="Enter Equipment Number"/> -->
                                         </div>
@@ -137,7 +138,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Equipment Status :</h5><br>
-                                            <select class="btn btn-success form-control" id="stc-agent-sup-std-equipment-status"><option>Down</option><option>Running</option>
+                                            <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-equipment-status"><option>Down</option><option>Running</option>
                                             </select> 
                                         </div>
                                     </div>
@@ -146,7 +147,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Job Planning :</h5><br>
-                                            <select class="btn btn-success form-control" id="stc-agent-sup-std-job-plannning"><option>Preventive Maintanance</option><option>Breakdown Maintanance</option>
+                                            <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-plannning"><option>Preventive Maintanance</option><option>Breakdown Maintanance</option>
                                             </select> 
                                         </div>
                                     </div>
@@ -155,7 +156,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Job Type :</h5><br>
-                                            <select class="btn btn-success form-control" id="stc-agent-sup-std-job-type">
+                                            <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-type">
                                                 <option value="NA">Please select job type</option>
                                                 <option>ELECTRICAL</option>
                                                 <option>MECHANICAL</option>
@@ -173,7 +174,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Job Varieties :</h5><br>
-                                            <select class="btn btn-success form-control" id="stc-agent-sup-std-job-varities">
+                                            <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-varities">
                                                 <option value="NA">Please select job type first</option>
                                             </select> 
                                         </div>
@@ -183,7 +184,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Created By :</h5><br>
-                                            <select class="btn btn-success form-control" id="stc-agent-sup-std-created-by-select">
+                                            <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-created-by-select">
                                                 <option>CLIENT</option>
                                                 <option>ELECTRICIAN</option>
                                                 <option>INCHARGE</option>
@@ -375,6 +376,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.load_site_name_consump', 'change', function(e){
                 e.preventDefault();
                 var loca_id = $(this).val();
+                $('#stc-agent-sup-std-hidden-location-id').val(loca_id);
                 $.ajax({
                     url     : "nemesis/stc_std.php",
                     method  : "POST",
@@ -389,11 +391,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
              // call sub location department type on select location
             $('body').delegate('#stc-agent-sup-std-sub-location', 'change', function(e){
                 e.preventDefault();
-                var loca_id = $(this).val();
+                var loca_sub_name = $(this).val();
+                var loca_id = $('#stc-agent-sup-std-hidden-location-id').val();
                 $.ajax({
                     url     : "nemesis/stc_std.php",
                     method  : "POST",
-                    data    : {call_area:1,loca_id:loca_id},
+                    data    : {call_area:1,loca_sub_name:loca_sub_name, loca_id:loca_id},
                     success : function(response){
                         // console.log(response);
                         $('.stc-agent-sup-std-area').html(response);

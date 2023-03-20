@@ -48,9 +48,9 @@ class transformers extends tesseract{
 	}
 
 	// call area
-	public function stc_call_area($loca_id){
+	public function stc_call_area($loca_id, $loca_sub_name){
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
-			SELECT DISTINCT `stc_cpumpd_area` FROM `stc_customer_pump_details` WHERE `stc_cpumpd_sub_location`='".mysqli_real_escape_string($this->stc_dbs, $loca_id)."' ORDER BY `stc_cpumpd_area` ASC
+			SELECT DISTINCT `stc_cpumpd_area` FROM `stc_customer_pump_details` WHERE `stc_cpumpd_sub_location`='".mysqli_real_escape_string($this->stc_dbs, $loca_sub_name)."' AND `stc_cpumpd_location`='".mysqli_real_escape_string($this->stc_dbs, $loca_id)."' ORDER BY `stc_cpumpd_area` ASC
 		");
 		$optimusprime='<option value="NA" selected>Select Area</option>';
 		$do_action=mysqli_num_rows($optimusprimequery);
@@ -460,8 +460,9 @@ if(isset($_POST['call_department'])){
 // call area
 if(isset($_POST['call_area'])){
 	$loca_id=$_POST['loca_id'];
+	$loca_sub_name=$_POST['loca_sub_name'];
 	$metabots=new transformers();
-	$opmetabots=$metabots->stc_call_area($loca_id);
+	$opmetabots=$metabots->stc_call_area($loca_id, $loca_sub_name);
 	echo $opmetabots;
 }
 
