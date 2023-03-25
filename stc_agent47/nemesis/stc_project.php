@@ -1776,7 +1776,7 @@ class pirates_supervisor extends tesseract{
 
 				$actionsec='';
 				if($_SESSION['stc_agent_role']==3){
-					if($row['stc_status_down_list_status']==4){
+					if(($row['stc_status_down_list_status']==4) || ($row['stc_status_down_list_status']==3)){
 						$actionsec='
 							<a href="#" class="stc-set-to-close" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
 						';
