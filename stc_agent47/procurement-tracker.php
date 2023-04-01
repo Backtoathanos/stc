@@ -139,18 +139,71 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Show Supervisor</h5>
+                                            <div class="card-body"><h5 class="card-title">Show PROCUREMENT TRACKER</h5>
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        <h5>Location/Site Name :</h5><br>
+                                                        <div class="card mb-3 widget-content">
+                                                            <select class="form-control stc-proc-location-search">
+                                                                <?php 
+                                                                    include_once("../MCU/db.php");
+                                                                    echo '<option value="0" selected>Please select Sitename!!!</option>';
+                                                                    $stcagentspendreportssup=mysqli_query($con, "
+                                                                        SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
+                                                                        FROM `stc_cust_project`
+                                                                        INNER JOIN `stc_cust_procurement_tracker`
+                                                                        ON `stc_cust_project_id`=`stc_cust_procurement_tracker_project_id`
+                                                                        WHERE `stc_cust_procurement_tracker_created_by`='".$_SESSION['stc_agent_id']."'
+                                                                        ORDER BY `stc_cust_project_title` ASC
+                                                                    ");
+
+                                                                    
+                                                                    if(!empty(mysqli_num_rows($stcagentspendreportssup))){
+                                                                        foreach($stcagentspendreportssup as $pendrepcheckrow){
+                                                                            echo '<option align="left" value="'.$pendrepcheckrow['stc_cust_project_id'].'">'.$pendrepcheckrow['stc_cust_project_title'].'</option>';
+                                                                        }
+                                                                    }else{
+                                                                        echo '<option value="0">No Site found!!!</option>';
+                                                                    }
+                                                                ?>
+                                                            </select> 
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <h5>Buyer/ Maker :</h5><br>
+                                                        <div class="card mb-3 widget-content">
+                                                            <input type="text" class="form-control stc-proc-buyer-maker-search" placeholder="Search By Buy/ Maker">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <h5>Item Name :</h5><br>
+                                                        <div class="card mb-3 widget-content">
+                                                            <input type="text" class="form-control stc-proc-item-name-search" placeholder="Search By Item Name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="card mb-3 widget-content">
+                                                            <button class="form-control btn btn-success stc-proc-search-btn">Find</button>
+                                                        </div>
+                                                    </div>
+                                                </div>                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="main-card mb-3 card" style="width: 1000px;">
+                                            <div class="card-body">
                                                 <form class="#">
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <table class="table table-stripped table-bordered table-hover">
                                                                 <thead>
-                                                                    <th class="text-center">Procurment Tracker Id</br>Procurment Tracker Date</th>
-                                                                    <th class="text-center">Project Name</th>
+                                                                    <th class="text-center">Item Code</th>
                                                                     <th class="text-center">Item Name</th>
                                                                     <th class="text-center">Service</th>
                                                                     <th class="text-center">Uom</th>
                                                                     <th class="text-center">Drawing Quantity</th>
+                                                                    <th class="text-center">PO Quantity</th>
                                                                     <th class="text-center">Buyer / Maker</th>
                                                                     <th class="text-center">PO/WO NO</th>
                                                                     <th class="text-center">PO DATE</th>
@@ -171,6 +224,11 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                     <th class="text-center">PDC</th>
                                                                     <th class="text-center">DURATION IN DAYS</th>
                                                                     <th class="text-center">TRANSPORATION CHARGE</th>
+                                                                    <th class="text-center">Recieved Quantity</th>
+                                                                    <th class="text-center">Store In</th>
+                                                                    <th class="text-center">Dispatch Quantity</th>
+                                                                    <th class="text-center">Dispatch Challan No</th>
+                                                                    <th class="text-center">Balance Quantity</th>
                                                                     <th class="text-center">Remarks</th>
                                                                     <th class="text-center">Action</th>
                                                                 </thead>
@@ -247,16 +305,24 @@ if(isset($_SESSION["stc_agent_id"])){
                 });
             });
 
+            $('body').delegate('.stc-proc-search-btn', 'click', function(e){
+                e.preventDefault();
+                var by_location = $('.stc-proc-location-search').val();
+                var by_maker = $('.stc-proc-buyer-maker-search').val();
+                var by_item = $('.stc-proc-item-name-search').val();
+                procurement_tracker_call(by_location, by_maker, by_item);
+            });
             // for procuremrnt tracker
-            procurement_tracker_call(begdate, enddate);
-            function procurement_tracker_call(begdate, enddate){
+            // procurement_tracker_call(by_location, by_maker, by_item);
+            function procurement_tracker_call(by_location, by_maker, by_item){
                 $.ajax({
                     url : "nemesis/stc_project.php",
                     method : "POST",
                     data : {
                         get_procurment_tracker:1,
-                        begdate:begdate,
-                        enddate:enddate
+                        by_location:by_location,
+                        by_maker:by_maker,
+                        by_item:by_item
                     },
                     success : function(response){
                         // console.log(response);
@@ -311,6 +377,7 @@ if(isset($_SESSION["stc_agent_id"])){
                     dataType : "JSON",
                     success : function(response){
                         // console.log(response);
+                        $('#stc-pro-tra-po-qnty').val(response['stc_cust_procurement_tracker_po_qnty']);
                         $('#stc-pro-tra-buyer-maker').val(response['stc_cust_procurement_tracker_buyer']);
                         $('#stc-pro-tra-wo-no-po-no').val(response['stc_cust_procurement_tracker_po_no']);
                         $('#stc-pro-tra-po-date').val(response['stc_cust_procurement_tracker_po_date']);
@@ -341,6 +408,7 @@ if(isset($_SESSION["stc_agent_id"])){
             function stc_perticular_procurment_tracker_update(){
                 var pro_id=$('#stc-hidden-procurement-tracker-id').val();
 
+                var po_qnty=$('#stc-pro-tra-po-qnty').val();
                 var buyer=$('#stc-pro-tra-buyer-maker').val();
                 var po_no_id=$('#stc-pro-tra-wo-no-po-no').val();
                 var po_no_date=$('#stc-pro-tra-po-date').val();
@@ -362,6 +430,7 @@ if(isset($_SESSION["stc_agent_id"])){
                     data : {
                         update_procurment_tracker:1,
                         pro_id:pro_id,
+                        po_qnty:po_qnty,
                         buyer:buyer,
                         po_no_id:po_no_id,
                         po_no_date:po_no_date,
@@ -458,6 +527,12 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <input type="hidden" id="stc-hidden-procurement-tracker-id">
                                     <div class="col-sm-12 col-md-6">
                                         <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">PO Quantity.</label>
+                                            <input type="number" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-po-qnty" placeholder="Enter PO Quantity" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Buyer / Maker</label>
                                             <input type="text" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-buyer-maker" placeholder="Enter Buyer / Maker Name" required>
                                         </div>
@@ -503,13 +578,13 @@ if(isset($_SESSION["stc_agent_id"])){
                                             <input type="date" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-mfg-clearance-approval" required>
                                         </div>
                                     </div>
-                                    <div class="col-sm-12 col-md-6">
+                                    <div class="col-sm-12 col-md-3">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Mfg Lead Time</label>
                                             <input type="number" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-mfg-lead-time" placeholder="Enter mfg lead time" required>
                                         </div>
                                     </div>
-                                    <div class="col-sm-12 col-md-4">
+                                    <div class="col-sm-12 col-md-3">
                                         <div class="position-relative form-group stc-pro-tra-update-field">
                                             <label for="exampleEmail" class="">OEM / Dealer Location</label>
                                             <select id="stc-pro-tra-oem-dealer-location" id="stc-pro-tra-location" class="form-control stc-pro-tra-update-field" required>
@@ -527,13 +602,13 @@ if(isset($_SESSION["stc_agent_id"])){
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-sm-12 col-md-4">
+                                    <div class="col-sm-12 col-md-3">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Transit Time</label>
                                             <input type="number" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-transit-time" placeholder="Enter transit time" required>
                                         </div>
                                     </div>
-                                    <div class="col-sm-12 col-md-4">
+                                    <div class="col-sm-12 col-md-3">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Transportation Charge</label>
                                             <input type="number" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-transportaion-charge" placeholder="Enter Transportation Charge" required>
@@ -611,6 +686,96 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <div class="col-sm-12 col-md-4">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Payment Amount</label>
+                                            <input type="number" class="mb-2 form-control stc-pro-tra-pay-amount" placeholder="Enter Payment Amount" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="position-relative form-group">
+                                            <a href="#" class="mb-2 btn btn-primary form-control stc-pro-tra-pay-save">Save</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-procurementreceiving-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Procurement Tracker Receiving</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <input type="hidden" id="stc-hidden-procurement-tracker-receiving-id">
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Receiving Quantity</label>
+                                            <input type="number" class="mb-2 form-control stc-pro-tra-pay-amount" placeholder="Enter Payment Amount" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Stored In</label>
+                                            <input type="text" class="mb-2 form-control stc-pro-tra-pay-amount" placeholder="Enter Payment Amount" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="position-relative form-group">
+                                            <a href="#" class="mb-2 btn btn-primary form-control stc-pro-tra-pay-save">Save</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-procurementdispatch-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Procurement Tracker Dispatch</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <input type="hidden" id="stc-hidden-procurement-tracker-dispatch-id">
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Challan No</label>
+                                            <input type="text" class="mb-2 form-control stc-pro-tra-pay-amount" placeholder="Enter Payment Amount" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Dispatch Quantity</label>
                                             <input type="number" class="mb-2 form-control stc-pro-tra-pay-amount" placeholder="Enter Payment Amount" required>
                                         </div>
                                     </div>
