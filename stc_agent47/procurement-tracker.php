@@ -275,8 +275,9 @@ if(isset($_SESSION["stc_agent_id"])){
     <script>
         $(document).ready(function(e){
 
-            var begdate="";
-            var enddate="";
+            var by_location = "";
+            var by_maker = "";
+            var by_item = "";
             // for create procurement  tracker
             $('.create-procurment-tracker').on('submit', function(e){
                 e.preventDefault();
@@ -307,9 +308,9 @@ if(isset($_SESSION["stc_agent_id"])){
 
             $('body').delegate('.stc-proc-search-btn', 'click', function(e){
                 e.preventDefault();
-                var by_location = $('.stc-proc-location-search').val();
-                var by_maker = $('.stc-proc-buyer-maker-search').val();
-                var by_item = $('.stc-proc-item-name-search').val();
+                by_location = $('.stc-proc-location-search').val();
+                by_maker = $('.stc-proc-buyer-maker-search').val();
+                by_item = $('.stc-proc-item-name-search').val();
                 procurement_tracker_call(by_location, by_maker, by_item);
             });
             // for procuremrnt tracker
@@ -337,7 +338,7 @@ if(isset($_SESSION["stc_agent_id"])){
                 var add_pro_id=$(this).attr('id');
                 $('#stc-hidden-procurement-tracker-id').val(add_pro_id);
                 stc_perticular_procurment_tracker_call(add_pro_id);
-                procurement_tracker_call(begdate, enddate);
+                procurement_tracker_call(by_location, by_maker, by_item);
                 $('.bd-procurementdetails-modal-lg').modal('show');
             });
 
@@ -357,7 +358,7 @@ if(isset($_SESSION["stc_agent_id"])){
                         var obj_response=response.trim();
                         if(obj_response=="yes"){
                             alert("Record deleted successfully!!!");
-                            procurement_tracker_call(begdate, enddate);
+                            procurement_tracker_call(by_location, by_maker, by_item);
                         }else if(obj_response=="no"){
                             alert("Something went wrong. Record not deleted");
                         }
@@ -489,9 +490,93 @@ if(isset($_SESSION["stc_agent_id"])){
                         var obj_response=response.trim();
                         if(obj_response=="yes"){
                             alert("Record saved successfully!!!");
-                            procurement_tracker_call(begdate, enddate);
+                            procurement_tracker_call(by_location, by_maker, by_item);
                             $('.bd-procurementpayment-modal-lg').modal('hide');
                             $('.bd-procurementpayment-modal-lg input').val('');
+                        }else if(obj_response=="empty"){
+                            alert("Do not let any field empty.");
+                        }else if(obj_response=="reload"){
+                            window.location.reload();
+                        }else if(obj_response=="no"){
+                            alert("Something went wrong. Record not saved");
+                        }
+                    }
+                });
+            });
+
+            // recieving modal show
+            $('body').delegate('.stc-tra-recievemod', 'click', function(e){
+                e.preventDefault();
+                var proc_id=$(this).attr("id");
+                $('#stc-hidden-procurement-tracker-receiving-id').val(proc_id);
+                $('.bd-procurementreceiving-modal-lg').modal('show');
+            });
+
+            // receiving save
+            $('body').delegate('.stc-pro-tra-receiving-save', 'click', function(e){
+                e.preventDefault();
+                var proc_id = $('#stc-hidden-procurement-tracker-receiving-id').val();
+                var rec_quantity = $('.stc-pro-tra-receiving-quantity').val();
+                var rec_storein = $('.stc-pro-tra-receiving-storein').val();
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        save_procurment_tracker_receiving:1,
+                        proc_id:proc_id,
+                        rec_quantity:rec_quantity,
+                        rec_storein:rec_storein
+                    },
+                    success : function(response){
+                        // console.log(response);
+                        var obj_response=response.trim();
+                        if(obj_response=="yes"){
+                            alert("Record saved successfully!!!");
+                            procurement_tracker_call(by_location, by_maker, by_item);
+                            $('.bd-procurementreceiving-modal-lg').modal('hide');
+                            $('.bd-procurementreceiving-modal-lg input').val('');
+                        }else if(obj_response=="empty"){
+                            alert("Do not let any field empty.");
+                        }else if(obj_response=="reload"){
+                            window.location.reload();
+                        }else if(obj_response=="no"){
+                            alert("Something went wrong. Record not saved");
+                        }
+                    }
+                });
+            });
+
+            // dispatch modal show
+            $('body').delegate('.stc-tra-dispatchmod', 'click', function(e){
+                e.preventDefault();
+                var proc_id=$(this).attr("id");
+                $('#stc-hidden-procurement-tracker-dispatch-id').val(proc_id);
+                $('.bd-procurementdispatch-modal-lg').modal('show');
+            });
+
+            // save dispatch
+            $('body').delegate('.stc-pro-tra-dispatch-save', 'click', function(e){
+                e.preventDefault();
+                var proc_id = $('#stc-hidden-procurement-tracker-dispatch-id').val();
+                var dec_quantity = $('.stc-pro-tra-dispatch-quantity').val();
+                var des_challanno = $('.stc-pro-tra-dispatch-challanno').val();
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        save_procurment_tracker_dispatch:1,
+                        proc_id:proc_id,
+                        dec_quantity:dec_quantity,
+                        des_challanno:des_challanno
+                    },
+                    success : function(response){
+                        console.log(response);
+                        var obj_response=response.trim();
+                        if(obj_response=="yes"){
+                            alert("Record saved successfully!!!");
+                            procurement_tracker_call(by_location, by_maker, by_item);
+                            $('.bd-procurementdispatch-modal-lg').modal('hide');
+                            $('.bd-procurementdispatch-modal-lg input').val('');
                         }else if(obj_response=="empty"){
                             alert("Do not let any field empty.");
                         }else if(obj_response=="reload"){
@@ -725,18 +810,18 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <div class="col-sm-12 col-md-4">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Receiving Quantity</label>
-                                            <input type="number" class="mb-2 form-control stc-pro-tra-pay-amount" placeholder="Enter Payment Amount" required>
+                                            <input type="number" class="mb-2 form-control stc-pro-tra-receiving-quantity" placeholder="Enter Receiving Quantity" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-4">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Stored In</label>
-                                            <input type="text" class="mb-2 form-control stc-pro-tra-pay-amount" placeholder="Enter Payment Amount" required>
+                                            <input type="text" class="mb-2 form-control stc-pro-tra-receiving-storein" placeholder="Enter Receiving Store" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-12">
                                         <div class="position-relative form-group">
-                                            <a href="#" class="mb-2 btn btn-primary form-control stc-pro-tra-pay-save">Save</a>
+                                            <a href="#" class="mb-2 btn btn-primary form-control stc-pro-tra-receiving-save">Save</a>
                                         </div>
                                     </div>
                                 </div>
@@ -770,18 +855,18 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <div class="col-sm-12 col-md-4">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Challan No</label>
-                                            <input type="text" class="mb-2 form-control stc-pro-tra-pay-amount" placeholder="Enter Payment Amount" required>
+                                            <input type="text" class="mb-2 form-control stc-pro-tra-dispatch-challanno" placeholder="Enter Dispatch Challan No" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-4">
                                         <div class="position-relative form-group">
                                             <label for="exampleEmail" class="">Dispatch Quantity</label>
-                                            <input type="number" class="mb-2 form-control stc-pro-tra-pay-amount" placeholder="Enter Payment Amount" required>
+                                            <input type="number" class="mb-2 form-control stc-pro-tra-dispatch-quantity" placeholder="Enter Dispatch Quantity" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-12">
                                         <div class="position-relative form-group">
-                                            <a href="#" class="mb-2 btn btn-primary form-control stc-pro-tra-pay-save">Save</a>
+                                            <a href="#" class="mb-2 btn btn-primary form-control stc-pro-tra-dispatch-save">Save</a>
                                         </div>
                                     </div>
                                 </div>

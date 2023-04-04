@@ -665,7 +665,7 @@ class pirates_project extends tesseract{
 		return $blackpearl;
 	}
 
-	// call procurment tracker function 
+	// call procurment tracker 
 	public function stc_save_procurement_call($by_location, $by_maker, $by_item){
 		$blackpearl='';
 		$additional_search='';
@@ -792,9 +792,9 @@ class pirates_project extends tesseract{
 				foreach($dispatchqry as $dispatchrow){
 					$challan_no.=$dispatchrow['stc_cust_procurement_tracker_dispatch_challan_no'].'<br>';
 					$quantity_show.=number_format($dispatchrow['stc_cust_procurement_tracker_dispatch_qty'], 2).'<br>';
-					$quantity_count+=$quantity_count['stc_cust_procurement_tracker_dispatch_qty'];
+					$quantity_count+=$dispatchrow['stc_cust_procurement_tracker_dispatch_qty'];
 				}
-				$balanceqty=$blackpearl_row['stc_cust_procurement_tracker_po_qnty'] - $quantity_count;
+				$balanceqty=$blackpearl_row['stc_cust_procurement_tracker_recieved_qnty'] - $quantity_count;
 				$blackpearl.="
 					<tr>
 						<td>".$blackpearl_row['stc_cust_procurement_tracker_id']."0</td>
@@ -852,6 +852,11 @@ class pirates_project extends tesseract{
 		");
 		if($blackpearl_query){
 			$blackpearl="yes";
+			$blackpearl_query=mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_procurement_tracker_dispatch` WHERE `stc_cust_procurement_tracker_dispatch_itemid` = '".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+			");$blackpearl_query=mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_procurement_tracker_payments` WHERE `stc_cust_procurement_tracker_payments_tracid` = '".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+			");
 		}else{
 			$blackpearl="no";
 		}
@@ -916,6 +921,53 @@ class pirates_project extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, date('Y-m-d', strtotime($pay_date)))."',
 				'".mysqli_real_escape_string($this->stc_dbs, $pay_amount)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $pay_type)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
+			)
+		");
+		if($blackpearl_qry){
+			$blackpearl = "yes";
+		}else{
+			$blackpearl = "no";
+		}
+		return $blackpearl;
+	}
+
+	// save receiving
+	public function stc_procurement_tracker_receiving_save($proc_id ,$rec_quantity ,$rec_storein){
+		$blackpearl='';
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			UPDATE 
+				`stc_cust_procurement_tracker` 
+			SET 
+				`stc_cust_procurement_tracker_recieved_qnty`='".mysqli_real_escape_string($this->stc_dbs, $rec_quantity)."',
+				`stc_cust_procurement_tracker_storedin`='".mysqli_real_escape_string($this->stc_dbs, $rec_storein)."' 
+			WHERE 
+				`stc_cust_procurement_tracker_id`='".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+		");
+		if($blackpearl_qry){
+			$blackpearl = "yes";
+		}else{
+			$blackpearl = "no";
+		}
+		return $blackpearl;
+	}
+
+	// save dispatch
+	public function stc_procurement_tracker_despatch_save($proc_id ,$dec_quantity ,$des_challanno){
+		$blackpearl='';
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_procurement_tracker_dispatch`(
+			    `stc_cust_procurement_tracker_dispatch_date`,
+			    `stc_cust_procurement_tracker_dispatch_itemid`,
+			    `stc_cust_procurement_tracker_dispatch_challan_no`,
+			    `stc_cust_procurement_tracker_dispatch_qty`,
+			    `stc_cust_procurement_tracker_dispatch_createdby`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $proc_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $des_challanno)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $dec_quantity)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
 			)
 		");
@@ -2838,6 +2890,44 @@ if(isset($_POST['save_procurment_tracker_payment'])){
 	}else{
 		$odin_req=new pirates_project();
 		$odin_req_out=$odin_req->stc_procurement_tracker_payment_save($proc_id ,$pay_date ,$pay_type ,$pay_amount);
+		$out=$odin_req_out;
+	}
+	echo $out;
+}
+
+// save procurment tracker receiving
+if(isset($_POST['save_procurment_tracker_receiving'])){
+	$proc_id=$_POST['proc_id'];
+	$rec_quantity=$_POST['rec_quantity'];
+	$rec_storein=$_POST['rec_storein'];
+	$out='';
+
+	if(empty($rec_quantity) || empty($rec_storein)){
+		$out='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new pirates_project();
+		$odin_req_out=$odin_req->stc_procurement_tracker_receiving_save($proc_id ,$rec_quantity ,$rec_storein);
+		$out=$odin_req_out;
+	}
+	echo $out;
+}
+
+// save procurment tracker dispatch
+if(isset($_POST['save_procurment_tracker_dispatch'])){
+	$proc_id=$_POST['proc_id'];
+	$dec_quantity=$_POST['dec_quantity'];
+	$des_challanno=$_POST['des_challanno'];
+	$out='';
+
+	if(empty($dec_quantity) || empty($des_challanno)){
+		$out='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new pirates_project();
+		$odin_req_out=$odin_req->stc_procurement_tracker_despatch_save($proc_id ,$dec_quantity ,$des_challanno);
 		$out=$odin_req_out;
 	}
 	echo $out;
