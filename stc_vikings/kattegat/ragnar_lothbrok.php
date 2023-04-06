@@ -241,7 +241,8 @@ class sceptor extends tesseract{
     	$day = 1;
     	$combinedtodate=$day.'-'.$month.'-'.$year;
     	$newDate = date('Y-m-d', strtotime($date)); 
-    	$effectiveDate = date('Y-m-d', strtotime($combinedtodate));
+		$effectiveDate = date('m', strtotime("-1 months", strtotime($combinedtodate)));
+		$year = date('Y', strtotime("-1 months", strtotime($combinedtodate)));
 		$purchaseresult=mysqli_query($this->stc_dbs, "
 			SELECT
 			    `stc_daily_purchase_items_qty`,
@@ -253,6 +254,10 @@ class sceptor extends tesseract{
 			    `stc_daily_purchase`
 			ON
 			    `stc_daily_purchase_id`=`stc_daily_purchase_items_order_id`
+			WHERE
+			    MONTH(`stc_daily_purchase_refr_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_daily_purchase_refr_date`)='$year'
 			ORDER BY
 			    DATE(`stc_daily_purchase_refr_date`)
 			DESC
@@ -278,6 +283,10 @@ class sceptor extends tesseract{
 			    `stc_daily_sale`
 			ON
 			    `stc_daily_sale_id`=`stc_daily_sale_items_order_id`
+			WHERE
+			    MONTH(`stc_daily_sale_refr_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_daily_sale_refr_date`)='$year'
 			ORDER BY
 			    DATE(`stc_daily_sale_refr_date`)
 			DESC
@@ -316,6 +325,10 @@ class sceptor extends tesseract{
 			    `stc_expenses`
 			WHERE
 				`stc_expenses_company`=2
+			AND 
+			    MONTH(`stc_expenses_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_expenses_date`)='$year'
 			ORDER BY
 			    DATE(`stc_expenses_date`)
 			DESC
@@ -341,7 +354,9 @@ class sceptor extends tesseract{
     	$day = 1;
     	$combinedtodate=$day.'-'.$month.'-'.$year;
     	$newDate = date('Y-m-d', strtotime($date)); 
-    	$effectiveDate = date('Y-m-d', strtotime($combinedtodate));
+    	// $effectiveDate = date('Y-m-d', strtotime($combinedtodate));
+		$effectiveDate = date('m', strtotime("-1 months", strtotime($combinedtodate)));
+		$year = date('Y', strtotime("-1 months", strtotime($combinedtodate)));
 		$purchaseresult=mysqli_query($this->stc_dbs, "
 			SELECT
 			    `stc_trading_purchase_items_qty`,
@@ -353,6 +368,10 @@ class sceptor extends tesseract{
 			    `stc_trading_purchase`
 			ON
 			    `stc_trading_purchase_items_purchase_id`=`stc_trading_purchase_id`
+			WHERE 
+			    MONTH(`stc_trading_purchase_refrence_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_trading_purchase_refrence_date`)='$year'
 			ORDER BY
 			    DATE(`stc_trading_purchase_refrence_date`)
 			DESC
@@ -378,6 +397,10 @@ class sceptor extends tesseract{
 			    `stc_trading_sale`
 			ON
 			    `stc_trading_sale_items_sale_id`=`stc_trading_sale_id`
+			WHERE 
+			    MONTH(`stc_trading_sale_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_trading_sale_date`)='$year'
 			ORDER BY
 			    DATE(`stc_trading_sale_date`)
 			DESC
@@ -416,6 +439,10 @@ class sceptor extends tesseract{
 			    `stc_expenses`
 			WHERE
 				`stc_expenses_company`=1
+			AND 				
+			    MONTH(`stc_expenses_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_expenses_date`)='$year'
 			ORDER BY
 			    DATE(`stc_expenses_date`)
 			DESC
@@ -440,7 +467,8 @@ class sceptor extends tesseract{
     	$day = 1;
     	$combinedtodate=$day.'-'.$month.'-'.$year;
     	$newDate = date('Y-m-d', strtotime($date)); 
-    	$effectiveDate = date('Y-m-d', strtotime($combinedtodate));
+		$effectiveDate = date('m', strtotime("-1 months", strtotime($combinedtodate)));
+		$year = date('Y', strtotime("-1 months", strtotime($combinedtodate)));
 		$purchaseresult=mysqli_query($this->stc_dbs, "
 			SELECT
 			    `stc_groceries_purchase_items_qty`,
@@ -452,6 +480,10 @@ class sceptor extends tesseract{
 			    `stc_groceries_purchase`
 			ON
 			    `stc_groceries_purchase_items_purchase_id`=`stc_groceries_purchase_id`
+			WHERE
+			    MONTH(`stc_groceries_purchase_refrence_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_groceries_purchase_refrence_date`)='$year'
 			ORDER BY
 			    DATE(`stc_groceries_purchase_refrence_date`)
 			DESC
@@ -477,6 +509,10 @@ class sceptor extends tesseract{
 			    `stc_groceries_sale`
 			ON
 			    `stc_groceries_sale_items_sale_id`=`stc_groceries_sale_id`
+			WHERE
+			    MONTH(`stc_groceries_sale_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_groceries_sale_date`)='$year'
 			ORDER BY
 			    DATE(`stc_groceries_sale_date`)
 			DESC
@@ -514,7 +550,11 @@ class sceptor extends tesseract{
 			FROM
 			    `stc_expenses`
 			WHERE
-				`stc_expenses_company`=3
+				`stc_expenses_company`=3 
+			AND 
+			    MONTH(`stc_expenses_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_expenses_date`)='$year'
 			ORDER BY
 			    DATE(`stc_expenses_date`)
 			DESC

@@ -205,6 +205,8 @@ class transformers extends tesseract{
 						<th class="text-center">EQUIPMENT TYPE</th>
 						<th class="text-center">EQUIPMENT NO</th>
 						<th class="text-center">EQUIPMENT STATUS</th>
+						<th class="text-center">JOB PLANNING</th>
+						<th class="text-center">JOB TYPE</th>
 						<th class="text-center">MATERIAL DESCRIPTION</th>
 						<th class="text-center">TARGET DATE</th>
 						<th class="text-center">STATUS</th>
@@ -227,6 +229,7 @@ class transformers extends tesseract{
 				`stc_status_down_list_equipment_status`,
 				`stc_status_down_list_reason`,
 				`stc_status_down_list_material_desc`,
+				`stc_status_down_list_jobtype`,
 				`stc_status_down_list_from_date`,
 				`stc_status_down_list_rect_date`,
 				`stc_status_down_list_remarks`,
@@ -252,7 +255,7 @@ class transformers extends tesseract{
 				$status='';
 
 				if($row['stc_status_down_list_status']==1){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">PENDING</span></b>';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">PLANNING</span></b>';
 				}elseif($row['stc_status_down_list_status']==2){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-IN-PROGRESS</span></b>';
 				}elseif($row['stc_status_down_list_status']==3){
@@ -339,6 +342,21 @@ class transformers extends tesseract{
 					$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
 				}
 
+				$job_type='';
+				$job_varities='';
+				$stc_call_jobtypeqry=mysqli_query($this->stc_dbs, "
+					SELECT
+					    `stc_status_down_list_job_type_title`,
+					    `stc_status_down_list_job_type_sub_title`
+					FROM
+					    `stc_status_down_list_job_type`
+					WHERE
+					    `stc_status_down_list_job_type_id`='".$row['stc_status_down_list_varities_id']."'
+				");
+				foreach($stc_call_jobtypeqry as $stc_call_jobtyperow){
+					$job_type=$stc_call_jobtyperow['stc_status_down_list_job_type_title'];
+					$job_varities=$stc_call_jobtyperow['stc_status_down_list_job_type_sub_title'];
+				}
 				$optimusprime.='
 					<tr>
 						<td>'.$row['stc_cust_project_title'].'</td>
@@ -347,6 +365,8 @@ class transformers extends tesseract{
 						<td>'.$eq_type.'</td>
 						<td class="text-center">'.$eq_number.'</td>
 						'.$eqstatus.'
+						<td class="text-center">'.$job_type.'</td>
+						<td class="text-center">'.$job_varities.'</td>
 						<td>'.$row['stc_status_down_list_material_desc'].'</td>
 						<td>'.$tar_date.'</td>
 						<td>'.$status.'</td>

@@ -59,13 +59,13 @@
                 </li>
                 <li>
                     <a href="stc-status-down-list.php" class="mm-active">
-                        <i class="metismenu-icon pe-7s-triangle"></i>
+                        <i class="metismenu-icon pe-7s-switch"></i>
                         Status Down List
                     </a>
                 </li>
                 <li>
                     <a href="stc-safety.php" class="mm-active">
-                        <i class="metismenu-icon pe-7s-triangle"></i>
+                        <i class="metismenu-icon pe-7s-id"></i>
                         Safety
                     </a>
                 </li>

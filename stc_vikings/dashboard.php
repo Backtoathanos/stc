@@ -174,13 +174,46 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <div class="card mb-3 widget-content bg-midnight-bloom">
                                                 <div class="widget-content-wrapper text-white">
                                                     <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Electronics Purchase Summary</div>
+                                                        <div class="widget-heading">STC Electronics Summary</div>
                                                         <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
                                                             <span class="toelecpurchase">
                                                                 <div class="loader"></div>
                                                             </span>
                                                         </div>
+                                                        <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            <i class="fa fa-rupee-sign"></i>
+                                                            <span class="toelecsale">
+                                                                <div class="loader"></div>
+                                                            </span>
+                                                        </div>
+                                                        <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            <i class="fa fa-rupee-sign"></i>
+                                                            <span class="toelecexpenses">
+                                                                <div class="loader"></div>
+                                                            </span>
+                                                        </div>
+                                                        <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            <i class="fa fa-rupee-sign"></i>
+                                                            <span class="toeleccpaid">
+                                                                <div class="loader"></div>
+                                                            </span>
+                                                        </div>
+                                                        <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            <i class="fa fa-rupee-sign"></i>
+                                                            <span class="toelecsdues">
+                                                                <div class="loader"></div>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-xl-6">
+                                            <div class="card mb-3 widget-content bg-midnight-bloom">
+                                                <div class="widget-content-wrapper text-white">
+                                                    <div class="widget-content-left">
+                                                        <div class="widget-heading">STC Electronics Summary</div>
                                                         <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
                                                             <span class="toelecmpaid">
@@ -198,41 +231,40 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-xl-6">
-                                            <div class="card mb-3 widget-content bg-midnight-bloom">
+                                            <div class="card mb-3 widget-content bg-mixed-hopes">
                                                 <div class="widget-content-wrapper text-white">
                                                     <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Electronics Sale Summary</div>
-                                                        <div class="widget-subheading"> Total Sold &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <div class="widget-heading">STC Trading Summary</div>
+                                                        <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
-                                                            <span class="toelecsale">
+                                                            <span class="totrapurchase">
                                                                 <div class="loader"></div>
                                                             </span>
                                                         </div>
-                                                        <div class="widget-subheading">Customer Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
-                                                            <span class="toeleccpaid">
+                                                            <span class="totrasale">
                                                                 <div class="loader"></div>
                                                             </span>
                                                         </div>
-                                                        <div class="widget-subheading">Sale Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
-                                                            <span class="toelecsdues">
+                                                            <span class="totraexpenses">
                                                                 <div class="loader"></div>
                                                             </span>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-xl-12">
-                                            <div class="card mb-3 widget-content bg-midnight-bloom">
-                                                <div class="widget-content-wrapper text-white">
-                                                    <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Electronics Expenses</div>
-                                                        <i class="fa fa-rupee-sign"></i>
-                                                        <span class="toelecexpenses">
-                                                            <div class="loader"></div>
-                                                        </span>
+                                                        <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            <i class="fa fa-rupee-sign"></i>
+                                                            <span class="totracpaid">
+                                                                <div class="loader"></div>
+                                                            </span>
+                                                        </div>
+                                                        <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            <i class="fa fa-rupee-sign"></i>
+                                                            <span class="totrasdues">
+                                                                <div class="loader"></div>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -241,13 +273,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <div class="card mb-3 widget-content bg-mixed-hopes">
                                                 <div class="widget-content-wrapper text-white">
                                                     <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Trading Purchase Summary</div>
-                                                        <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totrapurchase">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
+                                                        <div class="widget-heading">STC Trading Summary</div>
                                                         <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
                                                             <span class="totrampaid">
@@ -265,41 +291,40 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             </div>
                                         </div>
                                         <div class="col-md-6 col-xl-6">
-                                            <div class="card mb-3 widget-content bg-mixed-hopes">
+                                            <div class="card mb-3 widget-content bg-midnight-bloom">
                                                 <div class="widget-content-wrapper text-white">
                                                     <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Trading Sale Summary</div>
-                                                        <div class="widget-subheading"> Total Sold &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <div class="widget-heading">STC Groceries Summary</div>
+                                                        <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totrasale">
+                                                            <span class="togrospurchase">
                                                                 <div class="loader"></div>
                                                             </span>
                                                         </div>
-                                                        <div class="widget-subheading">Customer Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totracpaid">
+                                                            <span class="togrossale">
                                                                 <div class="loader"></div>
                                                             </span>
                                                         </div>
-                                                        <div class="widget-subheading">Sale Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                        <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totrasdues">
+                                                            <span class="togrosexpenses">
                                                                 <div class="loader"></div>
                                                             </span>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12 col-xl-12">
-                                            <div class="card mb-3 widget-content bg-mixed-hopes">
-                                                <div class="widget-content-wrapper text-white">
-                                                    <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Trading Expenses</div>
-                                                        <i class="fa fa-rupee-sign"></i>
-                                                        <span class="totraexpenses">
-                                                            <div class="loader"></div>
-                                                        </span>
+                                                        <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            <i class="fa fa-rupee-sign"></i>
+                                                            <span class="togroscpaid">
+                                                                <div class="loader"></div>
+                                                            </span>
+                                                        </div>
+                                                        <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                            <i class="fa fa-rupee-sign"></i>
+                                                            <span class="togrossdues">
+                                                                <div class="loader"></div>
+                                                            </span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -308,13 +333,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <div class="card mb-3 widget-content bg-midnight-bloom">
                                                 <div class="widget-content-wrapper text-white">
                                                     <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Groceries Purchase Summary</div>
-                                                        <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togrospurchase">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
+                                                        <div class="widget-heading">STC Groceries Summary</div>
                                                         <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
                                                             <span class="togrosmpaid">
@@ -327,46 +346,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                                 <div class="loader"></div>
                                                             </span>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-xl-6">
-                                            <div class="card mb-3 widget-content bg-midnight-bloom">
-                                                <div class="widget-content-wrapper text-white">
-                                                    <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Groceries Sale Summary</div>
-                                                        <div class="widget-subheading"> Total Sold &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togrossale">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading">Customer Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togroscpaid">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading">Sale Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togrossdues">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12 col-xl-12">
-                                            <div class="card mb-3 widget-content bg-midnight-bloom">
-                                                <div class="widget-content-wrapper text-white">
-                                                    <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Groceries Expenses</div>
-                                                        <i class="fa fa-rupee-sign"></i>
-                                                        <span class="togrosexpenses">
-                                                            <div class="loader"></div>
-                                                        </span>
                                                     </div>
                                                 </div>
                                             </div>

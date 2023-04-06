@@ -79,6 +79,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                             <div class="position-relative form-group">
                                                                 <label for="exampleEmail" class="">Project Name</label>
                                                                 <select name="stc-pro-tra-pro-id" class="form-control" required>
+                                                                    <option value="NA" selected>Please Select Sitename!!!</option>
                                                                     <?php 
                                                                         include_once("../MCU/db.php");
                                                                         $proseleqry=mysqli_query($con, "

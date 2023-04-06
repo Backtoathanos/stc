@@ -1828,13 +1828,14 @@ class pirates_supervisor extends tesseract{
 				$tar_date=(date('Y', strtotime($row['stc_status_down_list_target_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_target_date'])) : 'NA';
 
 				$status='';
-
+				$updatejobdetails='';
 				if($row['stc_status_down_list_status']==1){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">PENDING</span></b>';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">PLANNING</span></b>';
 				}elseif($row['stc_status_down_list_status']==2){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-IN-PROGRESS</span></b>';
 				}elseif($row['stc_status_down_list_status']==3){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-DONE</span></b>';
+					$updatejobdetails='<a href="#" class="stc-cust-std-update btn btn-primary" message="'.$row['stc_status_down_list_jobdone_details'].'" id="'.$row['stc_status_down_list_id'].'">Update me</a></td>';
 				}elseif($row['stc_status_down_list_status']==4){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-COMPLETE</span></b>';
 				}else{
@@ -1962,7 +1963,7 @@ class pirates_supervisor extends tesseract{
 						<td>'.$dperiod.' Days</td>
 						<td>'.$status.'</td>
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
-						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
+						<td>'.$row['stc_status_down_list_jobdone_details'].'<br>'.$updatejobdetails.'
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
 						<td class="text-center">'.$actionsec.'</td>
 					</tr>
@@ -1980,6 +1981,26 @@ class pirates_supervisor extends tesseract{
 				</tbody>
 			</table>
 		';
+		return $optimusprime;
+	}
+
+	// change job done details
+	public function stc_sdl_jobdescription_update($sld_id, $jobdonedetails){
+		$optimusprime='';
+		$date=date("Y-m-d H:i:s");
+		$optimusprime_qry=mysqli_query($this->stc_dbs, "
+			UPDATE 
+				`stc_status_down_list` 
+			SET 
+				`stc_status_down_list_jobdone_details`='".mysqli_real_escape_string($this->stc_dbs, $jobdonedetails)."' 
+			WHERE 
+				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
+		");
+		if($optimusprime_qry){
+			$optimusprime='Job Description Updated!!!';
+		}else{
+			$optimusprime='Hmmm!!! Somethig went wrong on updating job descriptions.';
+		}
 		return $optimusprime;
 	}
 
@@ -2137,6 +2158,8 @@ if(isset($_POST['stc_cust_project_action'])){
 		empty($pro_status)
 	){
 		$outcome='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$outcome='reload';
 	}else{
 		$objcrproj=new pirates_project();
 		$opobjcrproj=$objcrproj->stc_create_project(
@@ -2775,6 +2798,15 @@ if(isset($_POST['stc_down_list_hit'])){
 	$metabots=new pirates_supervisor();
 	$opmetabots=$metabots->stc_call_status_down_list($location_id, $search, $status);
 	echo $opmetabots;
+}
+
+// changee job done details
+if(isset($_POST['stc_job_description_change_hit'])){
+	$sld_id=$_POST['sdl_id'];
+	$jobdonedetails=$_POST['jobdonedetails'];
+	$sdl_status=new pirates_supervisor();
+	$out_sdl_status=$sdl_status->stc_sdl_jobdescription_update($sld_id, $jobdonedetails);
+	echo $out_sdl_status;
 }
 
 // changee status

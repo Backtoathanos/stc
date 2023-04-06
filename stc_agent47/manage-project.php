@@ -937,14 +937,19 @@ if(isset($_SESSION["stc_agent_id"])){
                     success     : function(argument) {
                         // console.log(argument);
                         if (argument == "yes") {
-                          alert("Project created!!!");
-                          $(".create-project-form")[0].reset();
+                            alert("Project created successfully!!!");
+                            $(".create-project-form")[0].reset();
+                            window.location.reload();
                         } else if (argument == "no") {
-                          alert("Please check & try again!!!&#9786");
+                            alert("Please check & try again!!!&#9786");
+                        } else if (argument == "reload") {
+                            alert("Do not let any field empty!!!");
+                        } else if (argument == "reload") {
+                            window.location.reload();
                         } else if (argument == "not") {
-                          alert("This project is already in our records!!!");
+                            alert("This project is already in our records!!!");
                         } else {
-                          alert("Do not empty any field!!!");
+                            alert("Do not empty any field!!!");
                         }
                     }
                 });
