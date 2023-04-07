@@ -301,18 +301,55 @@ class sceptor extends tesseract{
 		}
 		$electronics_array['elecsale']=number_format($sale_total, 2);
 		
-		$mpayresult=mysqli_query($this->stc_dbs, "SELECT `stc_daily_purchase_payments_amount` FROM `stc_daily_purchase_payments`");
 		$totalmpaid=0;
-		foreach($mpayresult as $mpayresultrow){
-			$totalmpaid+=$mpayresultrow['stc_daily_purchase_payments_amount'];
+		$mpaypurchaseqry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_daily_purchase_id` 
+			FROM 
+				`stc_daily_purchase` 
+			WHERE 
+				MONTH(`stc_daily_purchase_refr_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_daily_purchase_refr_date`)='$year'
+		");
+		foreach($mpaypurchaseqry as $mpaypurchaserow){			
+			$mpayresult=mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_daily_purchase_payments_amount` 
+				FROM 
+					`stc_daily_purchase_payments` 
+				WHERE 
+					`stc_daily_purchase_payments_order_no`='".$mpaypurchaserow['stc_daily_purchase_id']."'");
+			foreach($mpayresult as $mpayresultrow){
+				$totalmpaid+=$mpayresultrow['stc_daily_purchase_payments_amount'];
+			}
 		}
 		$electronics_array['elecmpaid']=number_format($totalmpaid, 2);
 
-		$cpayresult=mysqli_query($this->stc_dbs, "SELECT `stc_daily_sale_payments_amount` FROM `stc_daily_sale_payments`");
 		$totalcpaid=0;
-		foreach($cpayresult as $cpayresultrow){
-			$totalcpaid+=$cpayresultrow['stc_daily_sale_payments_amount'];
+		$mpaysaleqry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_daily_sale_id` 
+			FROM 
+				`stc_daily_sale` 
+			WHERE 
+				MONTH(`stc_daily_sale_refr_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_daily_sale_refr_date`)='$year'
+		");
+		foreach($mpaysaleqry as $mpaysalerow){			
+			$cpayresult=mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_daily_sale_payments_amount` 
+				FROM 
+					`stc_daily_sale_payments` 
+				WHERE 
+					`stc_daily_sale_payments_order_no`='".$mpaysalerow['stc_daily_sale_payments_order_no']."'");
+			foreach($cpayresult as $cpayresultrow){
+				$totalcpaid+=$cpayresultrow['stc_daily_sale_payments_amount'];
+			}
 		}
+
 		$electronics_array['eleccpaid']=number_format($totalcpaid, 2);
 
 		$totalpdues= $purcahse_total - $totalmpaid;
@@ -415,18 +452,56 @@ class sceptor extends tesseract{
 		}
 		$trading_array['trasale']=number_format($sale_total, 2);
 		
-		$mpayresult=mysqli_query($this->stc_dbs, "SELECT `stc_trading_purchase_payment_value` FROM `stc_trading_purchase_payment`");
 		$totalmpaid=0;
-		foreach($mpayresult as $mpayresultrow){
-			$totalmpaid+=$mpayresultrow['stc_trading_purchase_payment_value'];
+		$mpaypurchaseqry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_trading_purchase_id` 
+			FROM 
+				`stc_trading_purchase` 
+			WHERE 
+				MONTH(`stc_trading_purchase_refrence_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_trading_purchase_refrence_date`)='$year'
+		");
+		foreach($mpaypurchaseqry as $mpaypurchaserow){			
+			$cpayresult=mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_trading_purchase_payment_value` 
+				FROM 
+					`stc_trading_purchase_payment` 
+				WHERE 
+					`stc_trading_purchase_payment_purchase_id`='".$mpaypurchaserow['stc_trading_purchase_id']."'");
+			foreach($cpayresult as $cpayresultrow){
+				$totalcpaid+=$cpayresultrow['stc_trading_purchase_payment_value'];
+			}
 		}
+		
 		$trading_array['trampaid']=number_format($totalmpaid, 2);
 
-		$cpayresult=mysqli_query($this->stc_dbs, "SELECT `stc_trading_sale_payment_value`FROM `stc_trading_sale_payment`");
 		$totalcpaid=0;
-		foreach($cpayresult as $cpayresultrow){
-			$totalcpaid+=$cpayresultrow['stc_trading_sale_payment_value'];
+		$mpaysaleqry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_trading_sale_id` 
+			FROM 
+				`stc_trading_sale` 
+			WHERE 
+				MONTH(`stc_trading_sale_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_trading_sale_date`)='$year'
+		");
+		foreach($mpaysaleqry as $mpaysalerow){			
+			$cpayresult=mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_trading_sale_payment_value` 
+				FROM 
+					`stc_trading_sale_payment` 
+				WHERE 
+					`stc_trading_sale_payment_sale_id`='".$mpaysalerow['stc_trading_sale_id']."'");
+			foreach($cpayresult as $cpayresultrow){
+				$totalcpaid+=$cpayresultrow['stc_trading_sale_payment_value'];
+			}
 		}
+		
 		$trading_array['tracpaid']=number_format($totalcpaid, 2);
 
 		$totalpdues= $purcahse_total - $totalmpaid;
@@ -527,18 +602,56 @@ class sceptor extends tesseract{
 		}
 		$groceries_array['grossale']=number_format($sale_total, 2);
 		
-		$mpayresult=mysqli_query($this->stc_dbs, "SELECT `stc_groceries_purchase_payment_value` FROM `stc_groceries_purchase_payment`");
 		$totalmpaid=0;
-		foreach($mpayresult as $mpayresultrow){
-			$totalmpaid+=$mpayresultrow['stc_groceries_purchase_payment_value'];
+		$mpaypurchaseqry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_groceries_purchase_id` 
+			FROM 
+				`stc_groceries_purchase` 
+			WHERE 
+				MONTH(`stc_groceries_purchase_refrence_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_groceries_purchase_refrence_date`)='$year'
+		");
+		foreach($mpaypurchaseqry as $mpaypurchaserow){			
+			$mpayresult=mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_groceries_purchase_payment_value` 
+				FROM 
+					`stc_groceries_purchase_payment` 
+				WHERE 
+					`stc_groceries_purchase_payment_purchase_id`='".$mpaypurchaserow['stc_groceries_purchase_id']."'");
+			foreach($mpayresult as $mpayresultrow){
+				$totalmpaid+=$mpayresultrow['stc_groceries_purchase_payment_value'];
+			}
 		}
+
 		$groceries_array['grosmpaid']=number_format($totalmpaid, 2);
 
-		$cpayresult=mysqli_query($this->stc_dbs, "SELECT `stc_groceries_sale_payment_value`FROM `stc_groceries_sale_payment`");
 		$totalcpaid=0;
-		foreach($cpayresult as $cpayresultrow){
-			$totalcpaid+=$cpayresultrow['stc_groceries_sale_payment_value'];
+		$mpaysaleqry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_groceries_sale_id` 
+			FROM 
+				`stc_groceries_sale` 
+			WHERE 
+				MONTH(`stc_groceries_sale_date`)='$effectiveDate'
+			AND 
+			    YEAR(`stc_groceries_sale_date`)='$year'
+		");
+		foreach($mpaysaleqry as $mpaysalerow){			
+			$cpayresult=mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_groceries_sale_payment_value` 
+				FROM 
+					`stc_groceries_sale_payment` 
+				WHERE 
+					`stc_groceries_sale_payment_sale_id`='".$mpaysalerow['stc_groceries_sale_id']."'");
+			foreach($cpayresult as $cpayresultrow){
+				$totalcpaid+=$cpayresultrow['stc_groceries_sale_payment_value'];
+			}
 		}
+		
 		$groceries_array['groscpaid']=number_format($totalcpaid, 2);
 
 		$totalpdues= $purcahse_total - $totalmpaid;
