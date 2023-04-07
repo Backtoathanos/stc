@@ -689,6 +689,7 @@ class pirates_project extends tesseract{
 			    `stc_cust_procurement_tracker_unit`,
 			    `stc_cust_procurement_tracker_qty`,
 			    `stc_cust_procurement_tracker_po_qnty`,
+			    `stc_cust_procurement_tracker_material_readiness_status`,
 			    `stc_cust_procurement_tracker_recieved_qnty`,
 			    `stc_cust_procurement_tracker_storedin`,
 			    `stc_cust_procurement_tracker_buyer`,
@@ -736,12 +737,18 @@ class pirates_project extends tesseract{
 					$cityname=$cityrow['stc_city_name'];
 				}
 
+				$material_readyness_status="No";
+				if($blackpearl_row['stc_cust_procurement_tracker_material_readiness_status']==1){
+					$material_readyness_status="Yes";
+				}
+
 				$pro_id=$blackpearl_row['stc_cust_procurement_tracker_id'];
 				$paymentquery=mysqli_query($this->stc_dbs, "
 					SELECT
 					    `stc_cust_procurement_tracker_payments_id`,
 					    `stc_cust_procurement_tracker_payments_tracid`,
 					    `stc_cust_procurement_tracker_payments_date`,
+					    `stc_cust_procurement_tracker_payments_actual_date`,
 					    `stc_cust_procurement_tracker_payments_amount`,
 					    `stc_cust_procurement_tracker_payments_type`,
 					    `stc_cust_procurement_tracker_payments_created_by`
@@ -752,17 +759,33 @@ class pirates_project extends tesseract{
 				");
 				$advanceamt='';
 				$advancedate='';
+				$advanceactdate='';
+				$advancecolorchange='';
 				$dispatchamt='';
 				$dispatchdate='';
+				$dispatchactdate='';
+				$dispatchcolorchange='';
 				$pdcamt='';
 				$pdcdate='';
 				foreach($paymentquery as $paymentrow){
 					if($paymentrow['stc_cust_procurement_tracker_payments_type']=="advance"){
 						$advanceamt.=$paymentrow['stc_cust_procurement_tracker_payments_amount'].'<br>';
 						$advancedate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_date'])).'<br>';
+						if($paymentrow['stc_cust_procurement_tracker_payments_actual_date']==''){
+							$advancecolorchange="red";
+							$advanceactdate.='<a href="#" class="btn btn-success form-control acutal-payment-dateset" id="'.$paymentrow['stc_cust_procurement_tracker_payments_id'].'">Paid?</a>';
+						}else{
+							$advanceactdate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_actual_date'])).'<br>';
+						}
 					}elseif($paymentrow['stc_cust_procurement_tracker_payments_type']=="dispatch"){
 						$dispatchamt.=$paymentrow['stc_cust_procurement_tracker_payments_amount'].'<br>';
 						$dispatchdate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_date'])).'<br>';
+						if($paymentrow['stc_cust_procurement_tracker_payments_actual_date']==''){
+							$dispatchcolorchange="red";
+							$dispatchactdate.='<a href="#" class="btn btn-success form-control acutal-payment-dateset" id="'.$paymentrow['stc_cust_procurement_tracker_payments_id'].'">Paid?</a>';
+						}else{
+							$dispatchactdate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_actual_date'])).'<br>';
+						}
 					}else{
 						$pdcamt.=$paymentrow['stc_cust_procurement_tracker_payments_amount'].'<br>';
 						$pdcdate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_date'])).'<br>';
@@ -770,10 +793,13 @@ class pirates_project extends tesseract{
 				}
 
 				$paymentcol="
-					<td>".$advanceamt."</td>
-					<td>".$advancedate."</td>
-					<td>".$dispatchamt."</td>
-					<td>".$dispatchdate."</td>
+					<td style='background-color:".$advancecolorchange."'>".$advanceamt."</td>
+					<td style='background-color:".$advancecolorchange."'>".$advancedate."</td>
+					<td style='background-color:".$advancecolorchange."'>".$advanceactdate."</td>
+					<td>".$material_readyness_status."</td>
+					<td style='background-color:".$dispatchcolorchange."'>".$dispatchamt."</td>
+					<td style='background-color:".$dispatchcolorchange."'>".$dispatchdate."</td>
+					<td style='background-color:".$dispatchcolorchange."'>".$dispatchactdate."</td>
 					<td>".$pdcamt."</td>
 					<td>".$pdcdate."</td>
 				";
@@ -795,6 +821,7 @@ class pirates_project extends tesseract{
 					$quantity_count+=$dispatchrow['stc_cust_procurement_tracker_dispatch_qty'];
 				}
 				$balanceqty=$blackpearl_row['stc_cust_procurement_tracker_recieved_qnty'] - $quantity_count;
+
 				$blackpearl.="
 					<tr>
 						<td>".$blackpearl_row['stc_cust_procurement_tracker_id']."0</td>
@@ -874,7 +901,7 @@ class pirates_project extends tesseract{
 	}
 
 	// update perticular procurement tracker
-	public function stc_procurement_tracker_update($proc_id, $po_qnty, $buyer, $po_no_id, $po_no_date, $amount, $gst, $approval, $mfgclear, $leadtime, $dealer_loca, $transittime, $plan, $actual, $transport_charge, $remarks){
+	public function stc_procurement_tracker_update($proc_id, $po_qnty, $buyer, $po_no_id, $po_no_date, $amount, $gst, $approval, $mfgclear, $leadtime, $dealer_loca, $transittime, $plan, $actual, $transport_charge, $mreadiness, $remarks){
 		$blackpearl="";
 		$blackpearl_qry=mysqli_query($this->stc_dbs, "
 			UPDATE
@@ -894,6 +921,7 @@ class pirates_project extends tesseract{
 			    `stc_cust_procurement_tracker_deleverytimeplan` = '".mysqli_real_escape_string($this->stc_dbs, $plan)."',
 			    `stc_cust_procurement_tracker_delivered_actual` = '".mysqli_real_escape_string($this->stc_dbs, $actual)."',
 			    `stc_cust_procurement_tracker_transport_charge` = '".mysqli_real_escape_string($this->stc_dbs, $transport_charge)."',
+			    `stc_cust_procurement_tracker_material_readiness_status` = '".mysqli_real_escape_string($this->stc_dbs, $mreadiness)."',
 			    `stc_cust_procurement_tracker_remartks` = '".mysqli_real_escape_string($this->stc_dbs, $remarks)."'
 			WHERE
 			    `stc_cust_procurement_tracker_id` = '".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
@@ -970,6 +998,21 @@ class pirates_project extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $dec_quantity)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
 			)
+		");
+		if($blackpearl_qry){
+			$blackpearl = "yes";
+		}else{
+			$blackpearl = "no";
+		}
+		return $blackpearl;
+	}
+
+	// update procurement tracker payment date
+	public function stc_procurement_tracker_payment_update($pay_id){
+		$blackpearl='';
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_cust_procurement_tracker_payments` SET `stc_cust_procurement_tracker_payments_actual_date`='".mysqli_real_escape_string($this->stc_dbs, $date)."' WHERE `stc_cust_procurement_tracker_payments_id`='".mysqli_real_escape_string($this->stc_dbs, $pay_id)."'
 		");
 		if($blackpearl_qry){
 			$blackpearl = "yes";
@@ -2900,10 +2943,11 @@ if(isset($_POST['update_procurment_tracker'])){
 	$plan=$_POST['plan'];
 	$actual=$_POST['actual'];
 	$transport_charge=$_POST['transport_charge'];
+	$mreadiness=$_POST['mreadiness'];
 	$remarks=$_POST['remarks'];
 
 	$odin_req=new pirates_project();
-	$odin_req_out=$odin_req->stc_procurement_tracker_update($proc_id, $po_qnty, $buyer, $po_no_id, $po_no_date, $amount, $gst, $approval, $mfgclear, $leadtime, $dealer_loca, $transittime, $plan, $actual, $transport_charge, $remarks);
+	$odin_req_out=$odin_req->stc_procurement_tracker_update($proc_id, $po_qnty, $buyer, $po_no_id, $po_no_date, $amount, $gst, $approval, $mfgclear, $leadtime, $dealer_loca, $transittime, $plan, $actual, $transport_charge, $mreadiness, $remarks);
 	echo $odin_req_out;
 }
 
@@ -2960,6 +3004,20 @@ if(isset($_POST['save_procurment_tracker_dispatch'])){
 	}else{
 		$odin_req=new pirates_project();
 		$odin_req_out=$odin_req->stc_procurement_tracker_despatch_save($proc_id ,$dec_quantity ,$des_challanno);
+		$out=$odin_req_out;
+	}
+	echo $out;
+}
+
+// save procurment tracker payment date
+if(isset($_POST['save_procurment_tracker_payment_update'])){
+	$pay_id=$_POST['pay_id'];
+	$out='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new pirates_project();
+		$odin_req_out=$odin_req->stc_procurement_tracker_payment_update($pay_id);
 		$out=$odin_req_out;
 	}
 	echo $out;

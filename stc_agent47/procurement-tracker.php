@@ -202,26 +202,29 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                     <th class="text-center">Item Code</th>
                                                                     <th class="text-center">Item Name</th>
                                                                     <th class="text-center">Service</th>
-                                                                    <th class="text-center">Uom</th>
+                                                                    <th class="text-center">UoM</th>
                                                                     <th class="text-center">Drawing Quantity</th>
                                                                     <th class="text-center">PO Quantity</th>
                                                                     <th class="text-center">Buyer / Maker</th>
                                                                     <th class="text-center">PO/WO NO</th>
                                                                     <th class="text-center">PO DATE</th>
-                                                                    <th class="text-center"> PO BASIC VALUE</th>
-                                                                    <th class="text-center"> GST </th>
-                                                                    <th class="text-center"> PO AMOUNT </th>
+                                                                    <th class="text-center">PO BASIC VALUE</th>
+                                                                    <th class="text-center">GST </th>
+                                                                    <th class="text-center">PO AMOUNT </th>
                                                                     <th class="text-center">TDS APPROVAL</th>
-                                                                    <th class="text-center">Mfg Clearance (Client)</th>
-                                                                    <th class="text-center">Mfg lead time</th>
+                                                                    <th class="text-center">MFG CLEARANCE (CLIENT)</th>
+                                                                    <th class="text-center">MFG LEAD TIME</th>
                                                                     <th class="text-center">OEM / DELEAR location</th>
-                                                                    <th class="text-center">Transit time</th>
+                                                                    <th class="text-center">TRANSIT TIME</th>
                                                                     <th class="text-center">PLAN</th>
-                                                                    <th class="text-center">Actual/ Forecasted</th>
-                                                                    <th class="text-center"> ADVANCE PAYMENT </th>
-                                                                    <th class="text-center">DATE</th>
-                                                                    <th class="text-center"> BEFORE DISPTACH </th>
-                                                                    <th class="text-center">DATE</th>
+                                                                    <th class="text-center">ACTUAL/ FORECASTED</th>
+                                                                    <th class="text-center">ADVANCE PAYMENT AMOUNT </th>
+                                                                    <th class="text-center">ADVANCE PAYMENT EXPECTED DATE</th>
+                                                                    <th class="text-center">ADVANCE PAYMENT ACTUAL DATE</th>
+                                                                    <th class="text-center">MATERIAL READINESS STATUS</th>
+                                                                    <th class="text-center">BEFORE DISPTACH AMOUNT</th>
+                                                                    <th class="text-center">BEFORE DISPTACH AMOUNT EXPECTED DATE</th>
+                                                                    <th class="text-center">BEFORE DISPTACH AMOUNT ACTUAL DATE</th>
                                                                     <th class="text-center">PDC</th>
                                                                     <th class="text-center">DURATION IN DAYS</th>
                                                                     <th class="text-center">TRANSPORATION CHARGE</th>
@@ -393,7 +396,9 @@ if(isset($_SESSION["stc_agent_id"])){
                         $('#stc-pro-tra-plan').val(response['stc_cust_procurement_tracker_deleverytimeplan']);
                         $('#stc-pro-tra-actual-forecasted').val(response['stc_cust_procurement_tracker_delivered_actual']);
                         $('#stc-pro-tra-transportaion-charge').val(response['stc_cust_procurement_tracker_transport_charge']);
+                        $('#stc-pro-tra-mreadiness-status').val(response['stc_cust_procurement_tracker_material_readiness_status']);
                         $('#stc-pro-tra-remarks').val(response['stc_cust_procurement_tracker_remartks']);
+
                     }
                 });
             }
@@ -423,6 +428,7 @@ if(isset($_SESSION["stc_agent_id"])){
                 var transittime=$('#stc-pro-tra-transit-time').val();
                 var plan=$('#stc-pro-tra-plan').val();
                 var actual=$('#stc-pro-tra-actual-forecasted').val();
+                var mreadiness=$('#stc-pro-tra-mreadiness-status').val();
                 var remarks=$('#stc-pro-tra-remarks').val();
                 var transport_charge=$('#stc-pro-tra-transportaion-charge').val();
 
@@ -446,6 +452,7 @@ if(isset($_SESSION["stc_agent_id"])){
                         plan:plan,
                         actual:actual,
                         transport_charge:transport_charge,
+                        mreadiness:mreadiness,
                         remarks:remarks
                     },
                     success : function(response){
@@ -571,7 +578,7 @@ if(isset($_SESSION["stc_agent_id"])){
                         des_challanno:des_challanno
                     },
                     success : function(response){
-                        console.log(response);
+                        // console.log(response);
                         var obj_response=response.trim();
                         if(obj_response=="yes"){
                             alert("Record saved successfully!!!");
@@ -584,6 +591,32 @@ if(isset($_SESSION["stc_agent_id"])){
                             window.location.reload();
                         }else if(obj_response=="no"){
                             alert("Something went wrong. Record not saved");
+                        }
+                    }
+                });
+            });
+
+            // save dispatch
+            $('body').delegate('.acutal-payment-dateset', 'click', function(e){
+                e.preventDefault();
+                var pay_id = $(this).attr("id");
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        save_procurment_tracker_payment_update:1,
+                        pay_id:pay_id
+                    },
+                    success : function(response){
+                        console.log(response);
+                        var obj_response=response.trim();
+                        if(obj_response=="yes"){
+                            alert("Record updated successfully!!!");
+                            procurement_tracker_call(by_location, by_maker, by_item);
+                        }else if(obj_response=="reload"){
+                            window.location.reload();
+                        }else if(obj_response=="no"){
+                            alert("Something went wrong. Record not updated");
                         }
                     }
                 });
@@ -717,6 +750,16 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <input type="date" class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-actual-forecasted" required>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="position-relative form-group">
+                                            <label for="exampleEmail" class="">Material Ready?</label>
+                                            <select class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-mreadiness-status">
+                                                <option value="0">No</option>
+                                                <option value="1">Yes</option>
+                                            </select>
+                                            <textarea class="mb-2 form-control stc-pro-tra-update-field" id="stc-pro-tra-remarks" placeholder="Enter Remarks" required></textarea>
                                         </div>
                                     </div>
                                     <div class="col-sm-12 col-md-12">
