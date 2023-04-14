@@ -120,6 +120,25 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
                                             <div class="card-body"><h5 class="card-title">Tool Box Meeting</h5>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="position-relative form-group">
+                                                            <label for="exampleEmail" class="">By Month</label>
+                                                            <input type="month" class="form-control safety-filter-by-month">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <div class="position-relative form-group">
+                                                            <label for="exampleEmail" class="">By Supervisor Name</label>
+                                                            <input type="text" class="form-control safety-filter-by-supervisorname" placeholder="Enter Supervisor Name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="position-relative form-group">
+                                                            <button type="text" class="form-control btn btn-primary safety-filter-by-search">Search</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -279,13 +298,18 @@ if(isset($_SESSION["stc_agent_id"])){
     </script>
     <script>
         $(document).ready(function(e){
-            // call tbm
-            call_tbm();
-            function call_tbm(){
+            $('body').delegate('.safety-filter-by-search', 'click', function() {
+                var month = $('.safety-filter-by-month').val();
+                var supervise_name=$('.safety-filter-by-supervisorname').val();
+                // call tbm
+                call_tbm(month, supervise_name);
+            });
+            
+            function call_tbm(month, supervise_name){
                 $.ajax({
                     url         : "nemesis/stc_project.php",
                     method      : "POST",
-                    data        : {stc_safety_calltbm:1},
+                    data        : {stc_safety_calltbm:1, month:month, supervise_name:supervise_name},
                     success     : function(response_tbm){
                         // console.log(response_tbm);
                         $('.stc-safety-tbm-res-table').html(response_tbm);
@@ -584,7 +608,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                     </div>                                    
                                     <div class="col-md-7 col-sm-12 col-xl-7">
                                         <div class="position-relative form-group">
-                                            <input type="checkbox" class="checklistcb" value="Hardhat"> Hardhat
+                                            <input type="checkbox" class="checklistcb" value="Hardhat"> Helmet
                                             <input type="checkbox" class="checklistcb" value="Nose Mask"> Nose Mask
                                             <input type="checkbox" class="checklistcb" value="Safety Goggle"> Safety Goggle
                                             <input type="checkbox" class="checklistcb" value="Hand Gloves"> Hand Gloves
@@ -604,7 +628,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                 <tr>
                                                     <th class="text-center">Sl no.</th>
                                                     <th class="text-center">Employee’s Name</th>
-                                                    <th class="text-center">Hardhat</th>
+                                                    <th class="text-center">Helmet</th>
                                                     <th class="text-center">Safety Goggle</th>
                                                     <th class="text-center">Nose Mask</th>
                                                     <th class="text-center">Hand Gloves</th>

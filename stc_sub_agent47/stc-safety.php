@@ -694,6 +694,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         if(response=="success"){
                             alert("Record added.");
                             call_tbm_fields();
+                            $('.stc-tbm-no').val('');
+                            $('#stc-tbtm-ppe-checklistempname').val('');
+                            $('.checklistcb').prop('checked', false);
                         }else{
                             alert("Something went wrong, please check and try again.");
                         }
@@ -903,7 +906,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     </div>                                    
                                     <div class="col-md-7 col-sm-12 col-xl-7">
                                         <div class="position-relative form-group">
-                                            <input type="checkbox" class="checklistcb" value="Hardhat"> Hardhat
+                                            <input type="checkbox" class="checklistcb" value="Hardhat"> Helmet
                                             <input type="checkbox" class="checklistcb" value="Nose Mask"> Nose Mask
                                             <input type="checkbox" class="checklistcb" value="Safety Goggle"> Safety Goggle
                                             <input type="checkbox" class="checklistcb" value="Hand Gloves"> Hand Gloves
@@ -923,7 +926,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 <tr>
                                                     <th class="text-center">Sl no.</th>
                                                     <th class="text-center">Employee’s Name</th>
-                                                    <th class="text-center">Hardhat</th>
+                                                    <th class="text-center">Helmet</th>
                                                     <th class="text-center">Safety Goggle</th>
                                                     <th class="text-center">Nose Mask</th>
                                                     <th class="text-center">Hand Gloves</th>

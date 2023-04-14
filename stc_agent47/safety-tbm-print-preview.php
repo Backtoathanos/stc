@@ -355,7 +355,7 @@ if(isset($_GET['tbm_no'])){
                       <tr>
                           <th class="text-center">Sl no.</th>
                           <th class="text-center">Employee’s Name</th>
-                          <th class="text-center">Hardhat</th>
+                          <th class="text-center">Helmet</th>
                           <th class="text-center">Safety Goggle</th>
                           <th class="text-center">Nose Mask</th>
                           <th class="text-center">Hand Gloves</th>
@@ -433,7 +433,7 @@ if(isset($_GET['tbm_no'])){
                 <?php 
                   $checksafetyqry=mysqli_query($con, "SELECT * FROM `stc_safetytbm_img` WHERE `stc_safetytbm_img_tbmid`='".$get_stc_safety['stc_safetytbm_id']."' AND `stc_safetytbm_img_location`<>'' LIMIT 0,1");
                   foreach($checksafetyqry as $checksafetyrow4){
-                    echo '<img style="width:10cm;" src="../stc_sub_agent47/safety_img/'.$checksafetyrow4['stc_safetytbm_img_location'].'">';
+                    echo '<img style="position:relative; top:10px; width:10cm;height:350px" src="../stc_sub_agent47/safety_img/'.$checksafetyrow4['stc_safetytbm_img_location'].'">';
                   }
                 ?>
               </div>
