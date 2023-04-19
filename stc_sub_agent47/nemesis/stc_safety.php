@@ -330,6 +330,156 @@ class witcher_supervisor extends tesseract{
 
 }
 
+class witcher_vhl extends tesseract{
+	// calll created vhl no
+	public function stc_hit_vhl_call_no(){
+		$optimusprime='';
+		$date=date("Y-m-d");
+		$optimusprimechecquery=mysqli_query($this->stc_dbs, "
+			SELECT `stc_safetyvehicle_date` FROM `stc_safetyvehicle` WHERE `stc_safetyvehicle_date`='".$date."' AND `stc_safetyvehicle_createdby`='".$_SESSION['stc_agent_sub_id']."' ORDER BY `stc_safetyvehicle_id` DESC LIMIT 0,1
+		");
+		$previousentrydate='';
+		foreach($optimusprimechecquery as $optimusprimechecrow){
+			$previousentrydate=$optimusprimechecrow['stc_safetyvehicle_date'];
+		}
+		if(abs($previousentrydate==$date)){
+			$optimusprime='same';
+		}else{
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_safetyvehicle`(
+					`stc_safetyvehicle_date`, 
+					`stc_safetyvehicle_createdby`
+				) VALUES (
+					'".$date."',
+					'".$_SESSION['stc_agent_sub_id']."'
+				)
+			");
+			if($optimusprimequery){
+				$optimusprimequery=mysqli_query($this->stc_dbs, "
+					SELECT `stc_safetyvehicle_id` FROM `stc_safetyvehicle` WHERE `stc_safetyvehicle_createdby`='".$_SESSION['stc_agent_sub_id']."' ORDER BY `stc_safetyvehicle_id` DESC LIMIT 0,1
+				");
+				foreach($optimusprimequery as $optimusprimerow){
+					$optimusprime=$optimusprimerow['stc_safetyvehicle_id'];
+				}
+			}else{
+				$optimusprime="not success";
+			}
+		}
+		return $optimusprime;
+	}
+
+	// call vhl
+	public function stc_call_vhl(){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetyvehicle` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetyvehicle_createdby`
+			WHERE `stc_safetyvehicle_createdby`='".$_SESSION['stc_agent_sub_id']."' 
+			ORDER BY DATE(`stc_safetyvehicle_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="#" class="form-control btn btn-secondary stc-safetyvhl-edit" id="'.$optimusprimerow['stc_safetyvehicle_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetyvhl-delete" id="'.$optimusprimerow['stc_safetyvehicle_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyvehicle_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyvehicle_desc'].'</td>
+						<td>'.$optimusprimerow['stc_safetyvehicle_reg_no'].'</td>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyvehicle_dateofinspection'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyvehicle_driversname'].'</td>
+						<td>'.$action_show.'
+						</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// delete vhl
+	public function stc_delete_vhl($vhl_id){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_safetyvehicle` WHERE `stc_safetyvehicle_id`='".mysqli_real_escape_string($this->stc_dbs, $vhl_id)."'
+		");
+		if($optimusprimequery){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
+
+	// call tbm with feilds
+	public function stc_call_vhl_fields($stc_vhl_no){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetyvehicle` WHERE `stc_safetyvehicle_id`='".$stc_vhl_no."' ORDER BY `stc_safetyvehicle_id` DESC
+		");
+		foreach($optimusprimequery as $optimusprimerow){
+			$optimusprime=$optimusprimerow;
+		}
+		return $optimusprime;
+	}
+
+	// call vhl
+	public function stc_update_vhl($stc_vhl_no, $stc_description, $stc_reg_name, $stc_dateofinspection, $stc_driversname, $stc_undertaking_vehic, $stc_signature, $stc_faultsreported, $stc_ol, $stc_bfl, $stc_wl, $stc_ws, $stc_as, $stc_sb, $stc_pb, $stc_fb, $stc_pb1, $stc_cgs, $stc_mc, $stc_dl, $stc_stg, $stc_lc, $stc_dashp, $stc_horn, $stc_alarm, $stc_hyds, $stc_spart, $stc_towbar, $stc_equip, $stc_fk){		
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			UPDATE
+			    `stc_safetyvehicle`
+			SET
+			    `stc_safetyvehicle_desc`= '".mysqli_real_escape_string($this->stc_dbs, $stc_description)."',
+			    `stc_safetyvehicle_reg_no`= '".mysqli_real_escape_string($this->stc_dbs, $stc_reg_name)."',
+			    `stc_safetyvehicle_dateofinspection`= '".mysqli_real_escape_string($this->stc_dbs, $stc_dateofinspection)."',
+			    `stc_safetyvehicle_driversname`= '".mysqli_real_escape_string($this->stc_dbs, $stc_driversname)."',
+			    `stc_safetyvehicle_personundertaking`= '".mysqli_real_escape_string($this->stc_dbs, $stc_undertaking_vehic)."',
+			    `stc_safetyvehicle_signature`= '".mysqli_real_escape_string($this->stc_dbs, $stc_signature)."',
+			    `stc_safetyvehicle_faultsreported`= '".mysqli_real_escape_string($this->stc_dbs, $stc_faultsreported)."',
+			    `stc_safetyvehicle_oil_level`= '".mysqli_real_escape_string($this->stc_dbs, $stc_ol)."',
+			    `stc_safetyvehicle_brakefluidlevel`= '".mysqli_real_escape_string($this->stc_dbs, $stc_bfl)."',
+				`stc_safetyvehicle_waterlevel`= '".mysqli_real_escape_string($this->stc_dbs, $stc_wl)."',
+				`stc_safetyvehicle_windscreen`= '".mysqli_real_escape_string($this->stc_dbs, $stc_ws)."',
+				`stc_safetyvehicle_adjustseat`= '".mysqli_real_escape_string($this->stc_dbs, $stc_as)."',
+				`stc_safetyvehicle_seatbelts`= '".mysqli_real_escape_string($this->stc_dbs, $stc_sb)."',
+				`stc_safetyvehicle_parking_brake`= '".mysqli_real_escape_string($this->stc_dbs, $stc_pb)."',
+				`stc_safetyvehicle_footbrake`= '".mysqli_real_escape_string($this->stc_dbs, $stc_fb)."',
+				`stc_safetyvehicle_passengerbrake`= '".mysqli_real_escape_string($this->stc_dbs, $stc_pb1)."',
+				`stc_safetyvehicle_clutchgearshift`= '".mysqli_real_escape_string($this->stc_dbs, $stc_cgs)."',
+				`stc_safetyvehicle_mirrorsclean`= '".mysqli_real_escape_string($this->stc_dbs, $stc_mc)."',
+				`stc_safetyvehicle_doorlock`= '".mysqli_real_escape_string($this->stc_dbs, $stc_dl)."',
+				`stc_safetyvehicle_steering`= '".mysqli_real_escape_string($this->stc_dbs, $stc_stg)."',
+				`stc_safetyvehicle_lightsclearance`= '".mysqli_real_escape_string($this->stc_dbs, $stc_lc)."',
+				`stc_safetyvehicle_dashcontrolpanel`= '".mysqli_real_escape_string($this->stc_dbs, $stc_dashp)."',
+				`stc_safetyvehicle_horn`= '".mysqli_real_escape_string($this->stc_dbs, $stc_horn)."',
+				`stc_safetyvehicle_alarm`= '".mysqli_real_escape_string($this->stc_dbs, $stc_alarm)."',
+				`stc_safetyvehicle_hydraulicsystem`= '".mysqli_real_escape_string($this->stc_dbs, $stc_hyds)."',
+				`stc_safetyvehicle_sparetyre`= '".mysqli_real_escape_string($this->stc_dbs, $stc_spart)."',
+				`stc_safetyvehicle_towbar`= '".mysqli_real_escape_string($this->stc_dbs, $stc_towbar)."',
+				`stc_safetyvehicle_equipment`= '".mysqli_real_escape_string($this->stc_dbs, $stc_equip)."',
+				`stc_safetyvehicle_firstaidkit`= '".mysqli_real_escape_string($this->stc_dbs, $stc_fk)."'
+			WHERE
+			    `stc_safetyvehicle_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_vhl_no)."'
+		");
+		if($optimusprimequery){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
+}
 /*-----------------------------------------------------------------------------------*/
 /*-------------------------------------For Safety------------------------------------*/
 /*-----------------------------------------------------------------------------------*/
@@ -428,6 +578,76 @@ if(isset($_POST['stc_safety_savetbmppechecklist'])){
 	$stc_filter=$_POST['stc_filter'];
 	$objsearchreq=new witcher_supervisor();
 	$opobjsearchreq=$objsearchreq->stc_save_tbm_ppe_checklist($stc_tbm_no, $stc_emp_name, $stc_filter);
+	echo $opobjsearchreq;
+}
+
+/*-------------------------------------For vhl vehicle checklist------------------------------------*/
+// add id to tbm
+if(isset($_POST['stc_safety_addvhl'])){
+	$objsearchreq=new witcher_vhl();
+	$opobjsearchreq=$objsearchreq->stc_hit_vhl_call_no();
+	echo $opobjsearchreq;
+}
+
+// call tbm 
+if(isset($_POST['stc_safety_callvhl'])){
+	$objsearchreq=new witcher_vhl();
+	$opobjsearchreq=$objsearchreq->stc_call_vhl();
+	echo $opobjsearchreq;
+}
+
+// delete vhl
+if(isset($_POST['stc_safety_deletevhl'])){
+	$vhl_id=$_POST['vhl_id'];
+	$objsearchreq=new witcher_vhl();
+	$opobjsearchreq=$objsearchreq->stc_delete_vhl($vhl_id);
+	echo $opobjsearchreq;
+}
+
+// call fields for vhl
+if(isset($_POST['stc_safety_callvhlfields'])){
+	$stc_vhl_no=$_POST['stc_vhl_no'];
+	$objsearchreq=new witcher_vhl();
+	$opobjsearchreq=$objsearchreq->stc_call_vhl_fields($stc_vhl_no);
+	echo json_encode($opobjsearchreq);
+	// echo $opobjsearchreq;
+}
+
+// update save for tbm
+if(isset($_POST['stc_safety_updatevhl'])){
+	$stc_vhl_no=$_POST['stc_vhl_no'];
+	$stc_description=$_POST['stc_description'];
+	$stc_reg_name=$_POST['stc_reg_name'];
+	$stc_dateofinspection=$_POST['stc_dateofinspection'];
+	$stc_driversname=$_POST['stc_driversname'];
+	$stc_undertaking_vehic=$_POST['stc_undertaking_vehic'];
+	$stc_signature=$_POST['stc_signature'];
+	$stc_faultsreported=$_POST['stc_faultsreported'];
+	$stc_ol=$_POST['stc_ol'];
+	$stc_bfl=$_POST['stc_bfl'];
+	$stc_wl=$_POST['stc_wl'];
+	$stc_ws=$_POST['stc_ws'];
+	$stc_as=$_POST['stc_as'];
+	$stc_sb=$_POST['stc_sb'];
+	$stc_pb=$_POST['stc_pb'];
+	$stc_fb=$_POST['stc_fb'];
+	$stc_pb1=$_POST['stc_pb1'];
+	$stc_cgs=$_POST['stc_cgs'];
+	$stc_mc=$_POST['stc_mc'];
+	$stc_dl=$_POST['stc_dl'];
+	$stc_stg=$_POST['stc_stg'];
+	$stc_lc=$_POST['stc_lc'];
+	$stc_dashp=$_POST['stc_dashp'];
+	$stc_horn=$_POST['stc_horn'];
+	$stc_alarm=$_POST['stc_alarm'];
+	$stc_hyds=$_POST['stc_hyds'];
+	$stc_spart=$_POST['stc_spart'];
+	$stc_towbar=$_POST['stc_towbar'];
+	$stc_equip=$_POST['stc_equip'];
+	$stc_fk=$_POST['stc_fk'];
+
+	$objsearchreq=new witcher_vhl();
+	$opobjsearchreq=$objsearchreq->stc_update_vhl($stc_vhl_no, $stc_description, $stc_reg_name, $stc_dateofinspection, $stc_driversname, $stc_undertaking_vehic, $stc_signature, $stc_faultsreported, $stc_ol, $stc_bfl, $stc_wl, $stc_ws, $stc_as, $stc_sb, $stc_pb, $stc_fb, $stc_pb1, $stc_cgs, $stc_mc, $stc_dl, $stc_stg, $stc_lc, $stc_dashp, $stc_horn, $stc_alarm, $stc_hyds, $stc_spart, $stc_towbar, $stc_equip, $stc_fk);
 	echo $opobjsearchreq;
 }
 ?>

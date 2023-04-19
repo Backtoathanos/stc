@@ -221,8 +221,31 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">VHL Vehicle Checklist comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body"><h5 class="card-title">VHL Vehicle Checklist</h5>
+                                                <a href="#" class="form-control btn btn-success add-vhl-vehicle-checklist-modal">Add VHL Vehicle Checklist</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Date.</th>
+                                                            <th class="text-center">Vehicle Description</th>
+                                                            <th class="text-center">Vehicle Registration No.</th>
+                                                            <th width="20%" class="text-center">Date of Inspection.</th>
+                                                            <th class="text-center">Drivers Name.</th>
+                                                            <th width="10%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-vhl-res-table">
+                                                        <tr>
+                                                            <td>Loading...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -716,6 +739,214 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
         });
     </script>
+    <script>
+        $(document).ready(function(){            
+            // call vhl
+            call_vhl();
+            function call_vhl(){
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callvhl:1},
+                    success     : function(response_tbm){
+                        $('.stc-safety-vhl-res-table').html(response_tbm);
+                    }
+                });
+            }
+
+            // delete vhl            
+            $('body').delegate('.stc-safetyvhl-delete', 'click', function(e){
+                e.preventDefault();
+                var vhl_id=$(this).attr("id");
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_deletevhl:1,vhl_id:vhl_id},
+                    success     : function(response_tbm){
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+                            alert("Record Removed!!!");
+                            call_vhl();
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            });
+
+            function call_vhl_fields(){
+                var stc_vhl_no=$('.stc-vhl-no').val();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callvhlfields:1,stc_vhl_no:stc_vhl_no},
+                    dataType    : "JSON",
+                    success     : function(response_vhl){
+                        // console.log(response_vhl);
+                        $('#stc-vhl-vehicle-description').val(response_vhl.stc_safetyvehicle_desc);
+                        $('#stc-vhl-reg-name').val(response_vhl.stc_safetyvehicle_reg_no);
+                        $('#stc-vhl-dateofinspection').val(response_vhl.stc_safetyvehicle_dateofinspection);
+                        $('#stc-vhl-driversname').val(response_vhl.stc_safetyvehicle_driversname);
+                        $('#stc-vhl-person-undertaking-vehinspection').val(response_vhl.stc_safetyvehicle_personundertaking);
+                        $('#stc-vhl-signature').val(response_vhl.stc_safetyvehicle_signature);
+                        $('#stc-vhl-vehiclefaults-reported').val(response_vhl.stc_safetyvehicle_faultsreported);
+                        $('#stc-vhl-ol').val(response_vhl.stc_safetyvehicle_oil_level);
+                        $('#stc-vhl-bfl').val(response_vhl.stc_safetyvehicle_brakefluidlevel);
+                        $('#stc-vhl-wl').val(response_vhl.stc_safetyvehicle_waterlevel);
+                        $('#stc-vhl-ws').val(response_vhl.stc_safetyvehicle_windscreen);
+                        $('#stc-vhl-as').val(response_vhl.stc_safetyvehicle_adjustseat);
+                        $('#stc-vhl-sb').val(response_vhl.stc_safetyvehicle_seatbelts);
+                        $('#stc-vhl-pb').val(response_vhl.stc_safetyvehicle_parking_brake);
+                        $('#stc-vhl-fb').val(response_vhl.stc_safetyvehicle_footbrake);
+                        $('#stc-vhl-pb1').val(response_vhl.stc_safetyvehicle_passengerbrake);
+                        $('#stc-vhl-cgs').val(response_vhl.stc_safetyvehicle_clutchgearshift);
+                        $('#stc-vhl-mc').val(response_vhl.stc_safetyvehicle_mirrorsclean);
+                        $('#stc-vhl-dl').val(response_vhl.stc_safetyvehicle_doorlock);
+                        $('#stc-vhl-stg').val(response_vhl.stc_safetyvehicle_steering);
+                        $('#stc-vhl-lc').val(response_vhl.stc_safetyvehicle_lightsclearance);
+                        $('#stc-vhl-dashp').val(response_vhl.stc_safetyvehicle_dashcontrolpanel);
+                        $('#stc-vhl-horn').val(response_vhl.stc_safetyvehicle_horn);
+                        $('#stc-vhl-alarm').val(response_vhl.stc_safetyvehicle_alarm);
+                        $('#stc-vhl-hyds').val(response_vhl.stc_safetyvehicle_hydraulicsystem);
+                        $('#stc-vhl-spart').val(response_vhl.stc_safetyvehicle_sparetyre);
+                        $('#stc-vhl-towbar').val(response_vhl.stc_safetyvehicle_towbar);
+                        $('#stc-vhl-equip').val(response_vhl.stc_safetyvehicle_equipment);
+                        $('#stc-vhl-fk').val(response_vhl.stc_safetyvehicle_firstaidkit);
+                    }
+                });
+            }
+
+            // save data
+            $('body').delegate('.add-vhl-vehicle-checklist-modal', 'click', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_addvhl:1},
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="same"){
+                            alert("Can not add new tool box meeting at same day, you can only edit & delete on same day.");
+                        }else{
+                            call_vhl();
+                            $('.bd-vhl-vehicle-checklist-modal-lg').modal('show');
+                            $('.stc-vhl-no').val(response);
+                            $("input[type=text]").val('');
+                            $("select").val(0);
+                            $("textarea").val('');
+                            call_vhl_fields();
+                        }
+                    }
+                });
+            });
+
+            // save vhl
+            function save_vhl(){
+                var stc_vhl_no=$('.stc-vhl-no').val();
+                var stc_description=$('#stc-vhl-vehicle-description').val();
+                var stc_reg_name=$('#stc-vhl-reg-name').val();
+                var stc_dateofinspection=$('#stc-vhl-dateofinspection').val();
+                var stc_driversname=$('#stc-vhl-driversname').val();
+                var stc_ol=$('#stc-vhl-ol').val();
+                var stc_bfl=$('#stc-vhl-bfl').val();
+                var stc_wl=$('#stc-vhl-wl').val();
+                var stc_ws=$('#stc-vhl-ws').val();
+                var stc_as=$('#stc-vhl-as').val();
+                var stc_sb=$('#stc-vhl-sb').val();
+                var stc_pb=$('#stc-vhl-pb').val();
+                var stc_fb=$('#stc-vhl-fb').val();
+                var stc_pb1=$('#stc-vhl-pb1').val();
+                var stc_cgs=$('#stc-vhl-cgs').val();
+                var stc_mc=$('#stc-vhl-mc').val();
+                var stc_dl=$('#stc-vhl-dl').val();
+                var stc_stg=$('#stc-vhl-stg').val();
+                var stc_lc=$('#stc-vhl-lc').val();
+                var stc_dashp=$('#stc-vhl-dashp').val();
+                var stc_horn=$('#stc-vhl-horn').val();
+                var stc_alarm=$('#stc-vhl-alarm').val();
+                var stc_hyds=$('#stc-vhl-hyds').val();
+                var stc_spart=$('#stc-vhl-spart').val();
+                var stc_towbar=$('#stc-vhl-towbar').val();
+                var stc_equip=$('#stc-vhl-equip').val();
+                var stc_fk=$('#stc-vhl-fk').val();
+                var stc_undertaking_vehic =$('#stc-vhl-person-undertaking-vehinspection').val();
+                var stc_signature =$('#stc-vhl-signature').val();
+                var stc_faultsreported =$('#stc-vhl-vehiclefaults-reported').val();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {
+                        stc_safety_updatevhl:1,
+                        stc_vhl_no:stc_vhl_no,
+                        stc_description:stc_description,
+                        stc_reg_name:stc_reg_name,
+                        stc_dateofinspection:stc_dateofinspection,
+                        stc_driversname:stc_driversname,
+                        stc_undertaking_vehic:stc_undertaking_vehic,
+                        stc_signature:stc_signature,
+                        stc_faultsreported:stc_faultsreported,
+                        stc_ol:stc_ol,
+                        stc_bfl:stc_bfl,
+                        stc_wl:stc_wl,
+                        stc_ws:stc_ws,
+                        stc_as:stc_as,
+                        stc_sb:stc_sb,
+                        stc_pb:stc_pb,
+                        stc_fb:stc_fb,
+                        stc_pb1:stc_pb1,
+                        stc_cgs:stc_cgs,
+                        stc_mc:stc_mc,
+                        stc_dl:stc_dl,
+                        stc_stg:stc_stg,
+                        stc_lc:stc_lc,
+                        stc_dashp:stc_dashp,
+                        stc_horn:stc_horn,
+                        stc_alarm:stc_alarm,
+                        stc_hyds:stc_hyds,
+                        stc_spart:stc_spart,
+                        stc_towbar:stc_towbar,
+                        stc_equip:stc_equip,
+                        stc_fk:stc_fk
+                    },
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            }
+
+            // update
+            $('body').delegate('.stc-safetyvhl-edit', 'click', function(e){
+                e.preventDefault();
+                var vhl_id=$(this).attr("id");
+                $('.stc-vhl-no').val(vhl_id);
+                $('.bd-vhl-vehicle-checklist-modal-lg').modal('show');
+                call_vhl()
+                call_vhl_fields();
+            });
+
+            // update vhl
+            $('body').delegate('.stc-vhl-fields', 'focusout', function(e){
+                e.preventDefault();
+                save_vhl();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            // update vhl list
+            $('body').delegate('.stc-vhl-drop-fields', 'change', function(){
+                save_vhl();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+        });
+    </script>
 </body>
 </html>
 <div class="modal fade bd-tbt-box-meeting-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -975,6 +1206,315 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <h5 class="card-title">GP/P No. *</h5>
                                         <div class="position-relative form-group">
                                             <input type="text" class="form-control" id="stc-tbtm-gatepassno" placeholder="Enter GP/P No.">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-vhl-vehicle-checklist-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">VHL Vehicle Checklist</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title" align="center">VEHICLE INSPECTION</h5>
+                                        <label>* fields are automatic saved when you switch</label>
+                                        <input type="hidden" class="stc-vhl-no">
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">Vehicle description</h5>
+                                        <div class="position-relative form-group">
+                                            <textarea class="form-control stc-vhl-fields" id="stc-vhl-vehicle-description" placeholder="Enter Vehicle description"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Vehicle Registration number</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-vhl-fields" id="stc-vhl-reg-name" placeholder="Enter Vehicle Registration number">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Date of inspection</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control stc-vhl-fields" id="stc-vhl-dateofinspection">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Driver’s name</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-vhl-fields" id="stc-vhl-driversname" placeholder="Enter Driver's Name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <p>If you dont have a data then move to next field *</p>
+                                        <div class="position-relative form-group">
+                                            <table class="table table-hover table-bordered ">
+                                                <thead>
+                                                    <tr>
+                                                        <td class="card-title">What should I check before operating the vehicle</td>
+                                                        <td class="card-title">Yes / No</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Oil level</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-ol">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Brake fluid level</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-bfl">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Water level</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-wl">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Windscreen washer level</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-ws">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Adjust seat and controls</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-as">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Seat belts – check for operation (all)</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-sb">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Parking brake – hold against slight acceleration</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-pb">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Foot brake – holds, stops vehicle smoothly</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-fb">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Passenger brake for Driving lessons</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-pb1">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Clutch and gearshift – shifts smoothly without jumping or jerking</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-cgs">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Mirrors clean and adjusted</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-mc">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Doors and door locks operate correctly</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-dl">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Steering – moves smoothly</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-stg">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Lights – clearance, headlights, tail, license plate, brake, indicator turn signals & alarm.</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-lc">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Dash control panel – all lights and gauges are operational</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-dashp">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Horn</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-horn">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Vehicle reverse alarm</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-alarm">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Hydraulic systems – no evidence of leaks and systems operate smoothly</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-hyds">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Check spare tyre</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-spart">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Check tow bar (where fitted) </td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-towbar">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Emergency equipment</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-equip">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>First aid kit</td>
+                                                        <td>
+                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-fk">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5 col-sm-12 col-xl-5">
+                                        <h5 class="card-title">Name of Person undertaking vehicle inspection.</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-vhl-fields" id="stc-vhl-person-undertaking-vehinspection" placeholder="Enter Name of Person undertaking vehicle inspection.">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Signature</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-vhl-fields" id="stc-vhl-signature" placeholder="Enter Signature">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Vehicle faults to be reported immediately</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-vhl-fields" id="stc-vhl-vehiclefaults-reported" placeholder="Enter Vehicle faults to be reported immediately">
                                         </div>
                                     </div>
                                 </div>
