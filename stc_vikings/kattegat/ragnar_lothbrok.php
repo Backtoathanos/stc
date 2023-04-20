@@ -233,16 +233,15 @@ class sceptor extends tesseract{
 	}
 
 	// call sale purcashe
-	public function stc_electronics(){
+	public function stc_electronics($month){
 		$electronics_array=array();
 		$date = date("d-m-Y");
     	$year = date("Y");
-    	$month = date("m");
+    	// $month = date("m");
     	$day = 1;
     	$combinedtodate=$day.'-'.$month.'-'.$year;
     	$newDate = date('Y-m-d', strtotime($date)); 
-		$effectiveDate = date('m', strtotime("-1 months", strtotime($combinedtodate)));
-		$year = date('Y', strtotime("-1 months", strtotime($combinedtodate)));
+		$effectiveDate = $month;
 		$purchaseresult=mysqli_query($this->stc_dbs, "
 			SELECT
 			    `stc_daily_purchase_items_qty`,
@@ -383,17 +382,16 @@ class sceptor extends tesseract{
 		return $electronics_array;
 	}
 
-	public function stc_trading(){
+	public function stc_trading($month){
 		$trading_array=array();
 		$date = date("d-m-Y");
     	$year = date("Y");
-    	$month = date("m");
+    	// $month = date("m");
     	$day = 1;
     	$combinedtodate=$day.'-'.$month.'-'.$year;
     	$newDate = date('Y-m-d', strtotime($date)); 
     	// $effectiveDate = date('Y-m-d', strtotime($combinedtodate));
-		$effectiveDate = date('m', strtotime("-1 months", strtotime($combinedtodate)));
-		$year = date('Y', strtotime("-1 months", strtotime($combinedtodate)));
+		$effectiveDate = $month;
 		$purchaseresult=mysqli_query($this->stc_dbs, "
 			SELECT
 			    `stc_trading_purchase_items_qty`,
@@ -534,16 +532,15 @@ class sceptor extends tesseract{
 		return $trading_array;
 	}
 
-	public function stc_groceries(){
+	public function stc_groceries($month){
 		$groceries_array=array();
 		$date = date("d-m-Y");
     	$year = date("Y");
-    	$month = date("m");
+    	// $month = date("m");
     	$day = 1;
     	$combinedtodate=$day.'-'.$month.'-'.$year;
     	$newDate = date('Y-m-d', strtotime($date)); 
-		$effectiveDate = date('m', strtotime("-1 months", strtotime($combinedtodate)));
-		$year = date('Y', strtotime("-1 months", strtotime($combinedtodate)));
+		$effectiveDate = $month;
 		$purchaseresult=mysqli_query($this->stc_dbs, "
 			SELECT
 			    `stc_groceries_purchase_items_qty`,
@@ -691,6 +688,7 @@ class sceptor extends tesseract{
 #<------------------------------------------------------------------------------->
 
 if(isset($_POST["dashboard"])){	
+	$month=$_POST['month'];
 	$objtitems=new sceptor();
 	$objinventory=new sceptor();
 	$objtmerchant=new sceptor();
@@ -711,9 +709,9 @@ if(isset($_POST["dashboard"])){
 	$opobjtsoled=$objtsoled->stc_soled();
 	$opobjmerdue=$objmerpaid->stc_merchant_paid();
 	$opobjcustdue=$objcustpaid->stc_customer_paid();
-	$opobjstcelec=$objstcelecpaid->stc_electronics();
-	$opobjstctra=$objstctrapaid->stc_trading();
-	$opobjstcgro=$objstcgropaid->stc_groceries();
+	$opobjstcelec=$objstcelecpaid->stc_electronics($month);
+	$opobjstctra=$objstctrapaid->stc_trading($month);
+	$opobjstcgro=$objstcgropaid->stc_groceries($month);
 
 	$cursedyouout=array($opobjtitems, $opobjinventory, $opobjtmerchant, $opobjtcustomer, $opobjtpurchased, $opobjtsoled, $opobjmerdue, $opobjcustdue, $opobjstcelec, $opobjstctra, $opobjstcgro);
 

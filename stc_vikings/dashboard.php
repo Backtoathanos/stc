@@ -174,7 +174,24 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <div class="card mb-3 widget-content bg-midnight-bloom">
                                                 <div class="widget-content-wrapper text-white">
                                                     <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Electronics Summary</div>
+                                                        <div class="widget-heading">STC Electronics Summary
+                                                            <span>
+                                                                <select class="form-control stc-dash-month">
+                                                                    <option value="1">January</option>
+                                                                    <option value="2">February</option>
+                                                                    <option value="3">March</option>
+                                                                    <option value="4">April</option>
+                                                                    <option value="5">May</option>
+                                                                    <option value="6">June</option>
+                                                                    <option value="7">July</option>
+                                                                    <option value="8">August</option>
+                                                                    <option value="9">September</option>
+                                                                    <option value="10">October</option>
+                                                                    <option value="11">November</option>
+                                                                    <option value="12">December</option>
+                                                                </select>
+                                                            </span>
+                                                        </div>
                                                         <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>
                                                             <span class="toelecpurchase">
@@ -396,15 +413,21 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         $(document).ready(function(){
             var d = new Date($.now());
             
-            stc_dashboard_reload();
-            function stc_dashboard_reload(){
+            var month=$('.stc-dash-month').val();
+            $('body').delegate('.stc-dash-month', 'change', function() {
+                month=$(this).val();
+                stc_dashboard_reload(month);
+            });
+
+            stc_dashboard_reload(month);
+            function stc_dashboard_reload(month){
                 $.ajax({
                     url         : "kattegat/ragnar_lothbrok.php",
                     method      : "post",
-                    data        : {dashboard:1},
+                    data        : {dashboard:1, month:month},
                     dataType    : 'JSON',
                     success     : function(data){
-                        console.log(data);
+                        // console.log(data);
                         $('.toproducts').html(data[0]);
                         $('.toinventory').html(data[1]);
                         $('.tomerchants').html(data[2]);
