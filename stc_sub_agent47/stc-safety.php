@@ -166,8 +166,29 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Personal protective equipment checklist comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body"><h5 class="card-title">Personal protective equipment checklist</h5>
+                                                <a href="#" class="form-control btn btn-success add-ppec-modal">Add Personal protective equipment checklist</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Date.</th>
+                                                            <th class="text-center">Site Name</th>
+                                                            <th class="text-center">Supervisor Name</th>
+                                                            <th width="10%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-ppec-res-table">
+                                                        <tr>
+                                                            <td>Loading...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -177,8 +198,29 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Personal protective equipment mapping comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body"><h5 class="card-title">PERSONAL PROTECTIVE EQUIPMENT MAPPING</h5>
+                                                <a href="#" class="form-control btn btn-success add-ppem-modal">Add PERSONAL PROTECTIVE EQUIPMENT MAPPING</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Date.</th>
+                                                            <th class="text-center">Site Name</th>
+                                                            <th class="text-center">Supervisor Name</th>
+                                                            <th width="10%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-ppem-res-table">
+                                                        <tr>
+                                                            <td>Loading...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -188,12 +230,33 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Tools & Tackles Hand ToolList comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body"><h5 class="card-title">Tools & Tackles Hand ToolList</h5>
+                                                <a href="#" class="form-control btn btn-success add-toolist-modal">Add Tools & Tackles Hand ToolList</a>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Date.</th>
+                                                            <th class="text-center">Site Name</th>
+                                                            <th class="text-center">Supervisor Name</th>
+                                                            <th width="10%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-toollist-res-table">
+                                                        <tr>
+                                                            <td>Loading...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>                                
                             </div>
                             <div class="tab-pane tabs-animation fade" id="safetytab_4" role="tabpanel">
                                 <div class="row">
@@ -255,8 +318,31 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">AUD 08 Hot Work comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body"><h5 class="card-title">Hot Work</h5>
+                                                <a href="#" class="form-control btn btn-success add-hotwork-modal">Add Hot Work</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Date.</th>
+                                                            <th class="text-center">WO No.</th>
+                                                            <th class="text-center">Sitename.</th>
+                                                            <th width="10%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-hotwork-res-table">
+                                                        <tr>
+                                                            <td>Loading...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -266,8 +352,32 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Near Miss Reporting comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body"><h5 class="card-title">Near Miss Reporting</h5>
+                                                <a href="#" class="form-control btn btn-success add-near-miss-reporting-modal">Add Near Miss Reporting</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Date.</th>
+                                                            <th class="text-center">Time.</th>
+                                                            <th class="text-center">Place.</th>
+                                                            <th class="text-center">Image.</th>
+                                                            <th width="10%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-nearmissreporting-res-table">
+                                                        <tr>
+                                                            <td>Loading...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -632,7 +742,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         stc_supervisor_name:supervisor_name
                     },
                     success     : function(response_tbm){
-                        console.log(response_tbm);
+                        // console.log(response_tbm);
                         var response=response_tbm.trim();
                         if(response=="success"){
                             alert("Record added.");
@@ -702,29 +812,32 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var stc_tbm_no=$('.stc-tbm-no').val();
                 var emp_name=$('#stc-tbtm-ppe-checklistempname').val();
                 var filter = get_filter('checklistcb');
-                 $.ajax({
-                    url         : "nemesis/stc_safety.php",
-                    method      : "POST",
-                    data        : {
-                        stc_safety_savetbmppechecklist:1,
-                        stc_tbm_no:stc_tbm_no,
-                        stc_emp_name:emp_name,
-                        stc_filter:filter
-                    },
-                    success     : function(response_tbm){
-                        // console.log(response_tbm);
-                        var response=response_tbm.trim();
-                        if(response=="success"){
-                            alert("Record added.");
-                            call_tbm_fields();
-                            $('.stc-tbm-no').val('');
-                            $('#stc-tbtm-ppe-checklistempname').val('');
-                            $('.checklistcb').prop('checked', false);
-                        }else{
-                            alert("Something went wrong, please check and try again.");
+                if(emp_name!=''){
+                     $.ajax({
+                        url         : "nemesis/stc_safety.php",
+                        method      : "POST",
+                        data        : {
+                            stc_safety_savetbmppechecklist:1,
+                            stc_tbm_no:stc_tbm_no,
+                            stc_emp_name:emp_name,
+                            stc_filter:filter
+                        },
+                        success     : function(response_tbm){
+                            // console.log(response_tbm);
+                            var response=response_tbm.trim();
+                            if(response=="success"){
+                                alert("Record added.");
+                                call_tbm_fields();
+                                $('#stc-tbtm-ppe-checklistempname').val('');
+                                $('.checklistcb').prop('checked', false);
+                            }else{
+                                alert("Something went wrong, please check and try again.");
+                            }
                         }
-                    }
-                });
+                    });
+                }else{
+                    alert("Please enter employees name!!!");
+                }
                 // console.log(filter);
             });
 
@@ -812,6 +925,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-vhl-towbar').val(response_vhl.stc_safetyvehicle_towbar);
                         $('#stc-vhl-equip').val(response_vhl.stc_safetyvehicle_equipment);
                         $('#stc-vhl-fk').val(response_vhl.stc_safetyvehicle_firstaidkit);
+                        $('#stc-vhl-other-remarks').val(response_vhl.stc_safetyvehicle_otherremakrs);
                     }
                 });
             }
@@ -832,9 +946,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             call_vhl();
                             $('.bd-vhl-vehicle-checklist-modal-lg').modal('show');
                             $('.stc-vhl-no').val(response);
-                            $("input[type=text]").val('');
-                            $("select").val(0);
-                            $("textarea").val('');
+                            $(".bd-vhl-vehicle-checklist-modal-lg input[type=text]").val('');
+                            $(".bd-vhl-vehicle-checklist-modal-lg select").val(0);
+                            $(".bd-vhl-vehicle-checklist-modal-lg textarea").val('');
                             call_vhl_fields();
                         }
                     }
@@ -870,6 +984,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var stc_towbar=$('#stc-vhl-towbar').val();
                 var stc_equip=$('#stc-vhl-equip').val();
                 var stc_fk=$('#stc-vhl-fk').val();
+                var stc_other=$('#stc-vhl-other-remarks').val();
                 var stc_undertaking_vehic =$('#stc-vhl-person-undertaking-vehinspection').val();
                 var stc_signature =$('#stc-vhl-signature').val();
                 var stc_faultsreported =$('#stc-vhl-vehiclefaults-reported').val();
@@ -883,6 +998,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         stc_reg_name:stc_reg_name,
                         stc_dateofinspection:stc_dateofinspection,
                         stc_driversname:stc_driversname,
+                        stc_other:stc_other,
                         stc_undertaking_vehic:stc_undertaking_vehic,
                         stc_signature:stc_signature,
                         stc_faultsreported:stc_faultsreported,
@@ -935,6 +1051,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.stc-vhl-fields', 'focusout', function(e){
                 e.preventDefault();
                 save_vhl();
+                call_vhl()
                 $('.saved-popup').remove();
                 $(this).after('<p class="saved-popup text-success">Record Saved</p>');
             });
@@ -942,9 +1059,1042 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             // update vhl list
             $('body').delegate('.stc-vhl-drop-fields', 'change', function(){
                 save_vhl();
+                call_vhl()
                 $('.saved-popup').remove();
                 $(this).after('<p class="saved-popup text-success">Record Saved</p>');
             });
+        });
+    </script>
+    <script>
+        $(document).ready(function(){  
+            // call ppem
+            call_ppem();
+            function call_ppem(){
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callppem:1},
+                    success     : function(response_tbm){
+                        $('.stc-safety-ppem-res-table').html(response_tbm);
+                    }
+                });
+            }
+
+            // delete ppem            
+            $('body').delegate('.stc-safetyppem-delete', 'click', function(e){
+                e.preventDefault();
+                var ppem_id=$(this).attr("id");
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_deleteppem:1,ppem_id:ppem_id},
+                    success     : function(response_tbm){
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+                            alert("Record Removed!!!");
+                            call_ppem();
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            });
+
+            function call_ppem_fields(){
+                var stc_ppem_no=$('.stc-ppem-no').val();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callppemfields:1,stc_ppem_no:stc_ppem_no},
+                    dataType    : "JSON",
+                    success     : function(response_vhl){
+                        // console.log(response_vhl);
+                        $('#stc-ppem-date').val(response_vhl.stc_safetyppem_date);
+                        $('#stc-ppem-site-name').val(response_vhl.stc_safetyppem_site_name);
+                        $('#stc-ppem-supervisorname').val(response_vhl.stc_safetyppem_supervisor_name);
+                    }
+                });
+            }
+
+            // save data
+            $('body').delegate('.add-ppem-modal', 'click', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_addppem:1},
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="same"){
+                            alert("Can not add new ppem at same day, you can only edit & delete on same day.");
+                        }else if(response=="reload"){
+                            window.location.reload();
+                        }else{
+                            call_ppem();
+                            $('.bd-ppem-modal-lg').modal('show');
+                            $('.stc-ppem-no').val(response);
+                            $(".bd-ppem-modal-lg input[type=text]").val('');
+                            $(".bd-ppem-modal-lg select").val(0);
+                            $(".bd-ppem-modal-lg textarea").val('');
+                            // call_ppem_fields();
+                        }
+                    }
+                });
+            });
+            
+            // save ppem
+            function save_ppem(){
+                var stc_ppem_no=$('.stc-ppem-no').val();
+                var stc_date=$('#stc-ppem-date').val();
+                var stc_sitename=$('#stc-ppem-site-name').val();
+                var stc_supervisorname=$('#stc-ppem-supervisorname').val();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {
+                        stc_safety_updateppem:1,
+                        stc_ppem_no:stc_ppem_no,
+                        stc_date:stc_date,
+                        stc_sitename:stc_sitename,
+                        stc_supervisorname:stc_supervisorname
+                    },
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            }
+
+            // update
+            $('body').delegate('.stc-safetyppem-edit', 'click', function(e){
+                e.preventDefault();
+                var ppem_id=$(this).attr("id");
+                $('.stc-ppem-no').val(ppem_id);
+                $('.bd-ppem-modal-lg').modal('show');
+                call_ppem();
+                call_ppem_fields();
+            });
+
+            // update ppem list
+            $('body').delegate('.stc-ppem-fields', 'focusout', function(){
+                save_ppem();
+                call_ppem();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            // checklist save
+            $('body').delegate('.stc-ppem-ppe-add', 'click', function(e){
+                e.preventDefault();
+                var stc_ppem_no=$('.stc-ppem-no').val();
+                var sitentry=$('#stc-ppem-ppe-siteentry').val();
+                var filter = get_filter('checklistppecb');
+                if(sitentry!=''){
+                     $.ajax({
+                        url         : "nemesis/stc_safety.php",
+                        method      : "POST",
+                        data        : {
+                            stc_safety_saveppemppe:1,
+                            stc_ppem_no:stc_ppem_no,
+                            stc_sitentry:sitentry,
+                            stc_filter:filter
+                        },
+                        success     : function(response_tbm){
+                            // console.log(response_tbm);
+                            var response=response_tbm.trim();
+                            if(response=="success"){
+                                alert("Record added.");
+                                call_ppem_fields();
+                                $('#stc-ppem-ppe-siteentry').val('');
+                                $('.checklistppecb').prop('checked', false);
+                            }else{
+                                alert("Something went wrong, please check and try again.");
+                            }
+                        }
+                    });
+                }else{
+                    alert("Please enter employees name!!!");
+                }
+                // console.log(filter);
+            });
+
+            // filter tbm checkbox
+            function get_filter(class_name){
+                var filter = [];
+                $('.' + class_name + ':checked').each(function(){
+                   filter.push($(this).val()); 
+                });
+                return filter;
+            }
+        });
+    </script>
+    <script>
+        $(document).ready(function(){  
+            // call nearmiss
+            call_nearmiss();
+            function call_nearmiss(){
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callnearmiss:1},
+                    success     : function(response_tbm){
+                        $('.stc-safety-nearmissreporting-res-table').html(response_tbm);
+                    }
+                });
+            }
+
+            // delete nearmiss            
+            $('body').delegate('.stc-safetynearmiss-delete', 'click', function(e){
+                e.preventDefault();
+                var nearmiss_id=$(this).attr("id");
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_deletenearmiss:1,nearmiss_id:nearmiss_id},
+                    success     : function(response_tbm){
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+                            alert("Record Removed!!!");
+                            call_nearmiss();
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            });
+
+            function call_nearmiss_fields(){
+                var stc_nearmiss_no=$('.stc-nearmiss-no').val();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callnearmissfields:1,stc_nearmiss_no:stc_nearmiss_no},
+                    dataType    : "JSON",
+                    success     : function(response_vhl){
+                        // console.log(response_vhl);
+                        $('#stc-nearmiss-orgunitoccur').val(response_vhl.stc_safetynearmiss_orgunitoccur);
+                        $('#stc-nearmiss-incident-date').val(response_vhl.stc_safetynearmiss_incidenet_date);
+                        $('#stc-nearmiss-incident-time').val(response_vhl.stc_safetynearmiss_time);
+                        $('#stc-nearmiss-incident-location').val(response_vhl.stc_safetynearmiss_location);
+                        $('#stc-nearmiss-incidentdesc').val(response_vhl.stc_safetynearmiss_incidenetdesc);
+                        $('#stc-nearmiss-primarycause').val(response_vhl.stc_safetynearmiss_primarycause);
+                        $('#stc-nearmiss-nameofemployee').val(response_vhl.stc_safetynearmiss_empname);
+                        $('#stc-nearmiss-gpno').val(response_vhl.stc_safetynearmiss_gpno);
+                        $('#stc-nearmiss-vendor').val(response_vhl.stc_safetynearmiss_vendor);
+                        $('#stc-nearmiss-actiontaken').val(response_vhl.stc_safetynearmiss_actiontaken);
+                        $('#stc-nearmiss-currdate').val(response_vhl.stc_safetynearmiss_currdate);
+                        $('#stc-nearmiss-namesignature').val(response_vhl.stc_safetynearmiss_namesign);
+                    }
+                });
+            }
+
+            // save data
+            $('body').delegate('.add-near-miss-reporting-modal', 'click', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_addnearmiss:1},
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="same"){
+                            alert("Can not add new near miss at same day, you can only edit & delete on same day.");
+                        }else if(response=="reload"){
+                            window.location.reload();
+                        }else{
+                            call_nearmiss();
+                            $('.bd-nearmissreporting-modal-lg').modal('show');
+                            $('.stc-ppem-no').val(response);
+                            $(".bd-nearmissreporting-modal-lg input[type=text]").val('');
+                            $(".bd-nearmissreporting-modal-lg select").val(0);
+                            $(".bd-nearmissreporting-modal-lg textarea").val('');
+                            // call_ppem_fields();
+                        }
+                    }
+                });
+            });
+
+            // save nearmiss
+            function save_nearmiss(){
+                var stc_nearmiss_no=$('.stc-nearmiss-no').val();
+                var stc_orgunitoccur=$('#stc-nearmiss-orgunitoccur').val();
+                var stc_incidentdate=$('#stc-nearmiss-incident-date').val();
+                var stc_incidenttime=$('#stc-nearmiss-incident-time').val();
+                var stc_incidentlocation=$('#stc-nearmiss-incident-location').val();
+                var stc_placeofincident=$('.stc-nearmiss-incident-place:checked').val();
+                var stc_possibleconsq=$('.stc-nearmiss-possible-cons:checked').val();
+                var stc_incidenetdesc=$('#stc-nearmiss-incidentdesc').val();
+                var stc_primarycause=$('#stc-nearmiss-primarycause').val();
+                var stc_empname=$('#stc-nearmiss-nameofemployee').val();
+                var stc_gpno=$('#stc-nearmiss-gpno').val();
+                var stc_vendor=$('#stc-nearmiss-vendor').val();
+                var stc_actiontaken=$('#stc-nearmiss-actiontaken').val();
+                var stc_currdate=$('#stc-nearmiss-currdate').val();
+                var stc_namesign=$('#stc-nearmiss-namesignature').val();
+
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {
+                        stc_safety_updatenearmiss:1,
+                        stc_nearmiss_no:stc_nearmiss_no,
+                        stc_orgunitoccur:stc_orgunitoccur,
+                        stc_incidentdate:stc_incidentdate,
+                        stc_incidenttime:stc_incidenttime,
+                        stc_incidentlocation:stc_incidentlocation,
+                        stc_placeofincident:stc_placeofincident,
+                        stc_possibleconsq:stc_possibleconsq,
+                        stc_incidenetdesc:stc_incidenetdesc,
+                        stc_primarycause:stc_primarycause,
+                        stc_empname:stc_empname,
+                        stc_gpno:stc_gpno,
+                        stc_vendor:stc_vendor,
+                        stc_actiontaken:stc_actiontaken,
+                        stc_currdate:stc_currdate,
+                        stc_namesign:stc_namesign
+                    },
+                    success     : function(response_tbm){
+                        console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            }
+
+            // update
+            $('body').delegate('.stc-safetynearmiss-edit', 'click', function(e){
+                e.preventDefault();
+                var nearmiss_id=$(this).attr("id");
+                $('.stc-nearmiss-no').val(nearmiss_id);
+                $('.bd-nearmissreporting-modal-lg').modal('show');
+                call_nearmiss();
+                call_nearmiss_fields();
+            });
+
+            // update nearmiss list
+            $('body').delegate('.stc-nearmiss-fields', 'focusout', function(){
+                save_nearmiss();
+                call_nearmiss();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            // update nearmiss list
+            $('body').delegate('.stc-nearmiss-fields-checked', 'click', function(){
+                save_nearmiss();
+                call_nearmiss();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            // image upload
+            $(document).on('submit', '#safety-nearmissimage-upload-form', function() {
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "post",
+                    data        : new FormData(this),
+                    contentType : false,
+                    cache       : false,
+                    processData : false,
+                    success     : function(data){
+                        // console.log(data);
+                        data=data.trim();
+                        if(data=="success"){
+                            alert("Image added!!");
+                            call_nearmiss();
+                            $('#safety-image-upload-form')[0].reset();
+                        }
+                    }
+                });
+                return false;
+            });            
+        });
+    </script>
+    <script>
+        $(document).ready(function(){    
+            // call hot work
+            call_hotwork();
+            function call_hotwork(){
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callhotwork:1},
+                    success     : function(response_tbm){
+                        $('.stc-safety-hotwork-res-table').html(response_tbm);
+                    }
+                });
+            }       
+
+            // delete ppem            
+            $('body').delegate('.stc-safetyhotwork-delete', 'click', function(e){
+                e.preventDefault();
+                var hotwork_id=$(this).attr("id");
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_deletehotwork:1,hotwork_id:hotwork_id},
+                    success     : function(response_tbm){
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+                            alert("Record Removed!!!");
+                            call_hotwork();
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            });  
+
+            // save data
+            $('body').delegate('.add-hotwork-modal', 'click', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_addhotwork:1},
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="same"){
+                            alert("Can not add new hot work at same day, you can only edit & delete on same day.");
+                        }else if(response=="reload"){
+                            window.location.reload();
+                        }else{
+                            call_hotwork();
+                            $('.bd-hotwork-modal-lg').modal('show');
+                            $('.stc-hotwork-no').val(response);
+                            $(".bd-hotwork-modal-lg input[type=text]").val('');
+                            $(".bd-hotwork-modal-lg select").val(0);
+                            $(".bd-hotwork-modal-lg textarea").val('');
+                            // call_ppem_fields();
+                        }
+                    }
+                });
+            });
+
+            function call_hotwork_fields(){
+                var stc_hotwork_no=$('.stc-hotwork-no').val();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callhotworkfields:1,stc_hotwork_no:stc_hotwork_no},
+                    dataType    : "JSON",
+                    success     : function(response_vhl){
+                        // console.log(response_vhl);
+                        $('#stc-nearmiss-orgunitoccur').val(response_vhl.stc_safetynearmiss_orgunitoccur);
+                        $('#stc-hotwork-wono').val(response_vhl.stc_safetyhotwork_wono);
+                        $('#stc-hotwork-sitename').val(response_vhl.stc_safetyhotwork_jobssitename);
+                        $('#stc-hotwork-starting-date').val(response_vhl.stc_safetyhotwork_startingdate);
+                        $('#stc-hotwork-make').val(response_vhl.stc_safetyhotwork_make);
+                        $('#stc-hotwork-slno').val(response_vhl.stc_safetyhotwork_slno);
+                        $('#stc-hotwork-capaei').val(response_vhl.stc_safetyhotwork_capaei);
+                        $('#stc-hotwork-oosigwc').val(response_vhl.stc_safetyhotwork_oosigwc);
+                        $('#stc-hotwork-vacawp').val(response_vhl.stc_safetyhotwork_vacawp);
+                        $('#stc-hotwork-rwp').val(response_vhl.stc_safetyhotwork_rwp);
+                        $('#stc-hotwork-tspt').val(response_vhl.stc_safetyhotwork_tspt);
+                        $('#stc-hotwork-cfmtec').val(response_vhl.stc_safetyhotwork_cfmtec);
+                        $('#stc-hotwork-geagde').val(response_vhl.stc_safetyhotwork_geagde);
+                        $('#stc-hotwork-cfmteh').val(response_vhl.stc_safetyhotwork_cfmteh);
+                        $('#stc-hotwork-eh').val(response_vhl.stc_safetyhotwork_eh);
+                        $('#stc-hotwork-wmccanlc').val(response_vhl.stc_safetyhotwork_wmccanlc);
+                        $('#stc-hotwork-wfr').val(response_vhl.stc_safetyhotwork_wfr);
+                        $('#stc-hotwork-cfeaftws').val(response_vhl.stc_safetyhotwork_cfeaftws);
+                        $('#stc-hotwork-scle').val(response_vhl.stc_safetyhotwork_scle);
+                        $('#stc-hotwork-ctte').val(response_vhl.stc_safetyhotwork_ctte);
+                        $('#stc-hotwork-wcopraipcwad').val(response_vhl.stc_safetyhotwork_wcopraipcwad);
+                        $('#stc-hotwork-cltp').val(response_vhl.stc_safetyhotwork_cltp);
+                        $('#stc-hotwork-wianep').val(response_vhl.stc_safetyhotwork_wianep);
+                        $('#stc-hotwork-socuaptvs').val(response_vhl.stc_safetyhotwork_socuaptvs);
+                        $('#stc-hotwork-recoslaecpfbutcw').val(response_vhl.stc_safetyhotwork_recoslaecpfbutcw);
+                        $('#stc-hotwork-aowbcbh').val(response_vhl.stc_safetyhotwork_aowbcbh);
+                        $('#stc-hotwork-acwoseow').val(response_vhl.stc_safetyhotwork_acwoseow);
+                        $('#stc-hotwork-acpptpth').val(response_vhl.stc_safetyhotwork_acpptpth);
+                    }
+                });
+            }
+
+            // save hotwork
+            function save_hotwork(){
+                var stc_hotwork_no=$('.stc-hotwork-no').val();
+                var stc_wono= $('#stc-hotwork-wono').val();
+                var stc_sitename= $('#stc-hotwork-sitename').val();
+                var stc_starting= $('#stc-hotwork-starting-date').val();
+                var stc_make= $('#stc-hotwork-make').val();
+                var stc_slno= $('#stc-hotwork-slno').val();
+                var stc_capaei= $('#stc-hotwork-capaei').val();
+                var stc_oosigwc= $('#stc-hotwork-oosigwc').val();
+                var stc_vacawp= $('#stc-hotwork-vacawp').val();
+                var stc_rwp= $('#stc-hotwork-rwp').val();
+                var stc_tspt= $('#stc-hotwork-tspt').val();
+                var stc_cfmtec= $('#stc-hotwork-cfmtec').val();
+                var stc_geagde= $('#stc-hotwork-geagde').val();
+                var stc_cfmteh= $('#stc-hotwork-cfmteh').val();
+                var stc_eh= $('#stc-hotwork-eh').val();
+                var stc_wmccanlc= $('#stc-hotwork-wmccanlc').val();
+                var stc_wfr= $('#stc-hotwork-wfr').val();
+                var stc_cfeaftws= $('#stc-hotwork-cfeaftws').val();
+                var stc_scle= $('#stc-hotwork-scle').val();
+                var stc_ctte= $('#stc-hotwork-ctte').val();
+                var stc_wcopraipcwad= $('#stc-hotwork-wcopraipcwad').val();
+                var stc_cltp= $('#stc-hotwork-cltp').val();
+                var stc_wianep= $('#stc-hotwork-wianep').val();
+                var stc_socuaptvs= $('#stc-hotwork-socuaptvs').val();
+                var stc_recoslaecpfbutcw= $('#stc-hotwork-recoslaecpfbutcw').val();
+                var stc_aowbcbh= $('#stc-hotwork-aowbcbh').val();
+                var stc_acwoseow= $('#stc-hotwork-acwoseow').val();
+                var stc_acpptpth= $('#stc-hotwork-acpptpth').val();
+
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {
+                        stc_safety_updatehotwork:1,
+                        stc_hotwork_no:stc_hotwork_no,
+                        stc_wono:stc_wono,
+                        stc_sitename:stc_sitename,
+                        stc_starting:stc_starting,
+                        stc_make:stc_make,
+                        stc_slno:stc_slno,
+                        stc_capaei:stc_capaei,
+                        stc_oosigwc:stc_oosigwc,
+                        stc_vacawp:stc_vacawp,
+                        stc_rwp:stc_rwp,
+                        stc_tspt:stc_tspt,
+                        stc_cfmtec:stc_cfmtec,
+                        stc_geagde:stc_geagde,
+                        stc_cfmteh:stc_cfmteh,
+                        stc_eh:stc_eh,
+                        stc_wmccanlc:stc_wmccanlc,
+                        stc_wfr:stc_wfr,
+                        stc_cfeaftws:stc_cfeaftws,
+                        stc_scle:stc_scle,
+                        stc_ctte:stc_ctte,
+                        stc_wcopraipcwad:stc_wcopraipcwad,
+                        stc_cltp:stc_cltp,
+                        stc_wianep:stc_wianep,
+                        stc_socuaptvs:stc_socuaptvs,
+                        stc_recoslaecpfbutcw:stc_recoslaecpfbutcw,
+                        stc_aowbcbh:stc_aowbcbh,
+                        stc_acwoseow:stc_acwoseow,
+                        stc_acpptpth:stc_acpptpth
+                    },
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            }
+
+            // update
+            $('body').delegate('.stc-safetyhotwork-edit', 'click', function(e){
+                e.preventDefault();
+                var hotwork_id=$(this).attr("id");
+                $('.stc-hotwork-no').val(hotwork_id);
+                $('.bd-hotwork-modal-lg').modal('show');
+                call_hotwork();
+                call_hotwork_fields();
+            });
+
+            // update hotwork list
+            $('body').delegate('.stc-hotwork-fields', 'focusout', function(){
+                save_hotwork();
+                call_hotwork();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            $('body').delegate('.stc-hotwork-drop-fields', 'change', function(){
+                save_hotwork();
+                call_hotwork();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function(){    
+            // call ppec
+            call_ppec();
+            function call_ppec(){
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callppec:1},
+                    success     : function(response_tbm){
+                        $('.stc-safety-ppec-res-table').html(response_tbm);
+                    }
+                });
+            }       
+
+            // delete ppec            
+            $('body').delegate('.stc-safetyppec-delete', 'click', function(e){
+                e.preventDefault();
+                var ppec_id=$(this).attr("id");
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_deleteppec:1,ppec_id:ppec_id},
+                    success     : function(response_tbm){
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+                            alert("Record Removed!!!");
+                            call_ppec();
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            });  
+
+            function call_ppec_fields(){
+                var stc_ppec_no=$('.stc-ppec-no').val();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callppecfields:1,stc_ppec_no:stc_ppec_no},
+                    dataType    : "JSON",
+                    success     : function(response_vhl){
+                        // console.log(response_vhl);
+                        $('#stc-ppec-wono').val(response_vhl.ppec.stc_safetyppec_wono);
+                        $('#stc-ppec-sitename').val(response_vhl.ppec.stc_safetyppec_sitename);
+                        $('#stc-ppec-check').val(response_vhl.ppec.stc_safetyppec_check);
+                        $('#stc-ppec-sitesup').val(response_vhl.ppec.stc_safetyppec_sitesupervisor);
+                        $('#stc-ppec-safetysup').val(response_vhl.ppec.stc_safetyppec_safetysupervisor);
+
+                        var ppecppes=response_vhl.ppecppess;
+                            
+                        
+                        var ppecppes_entry_out='<tr><td colspan="22" class="text-center">Empty record</td></td>';
+                        if(ppecppes.length>0){
+                            ppecppes_entry_out='';
+                            var sl=0;
+                            for(var i=0; i<ppecppes.length; i++){
+                                sl++;
+                                var helmet='X';
+                                var shoes='X';
+                                var hvjacket='X';
+                                var safetygoggles='X';
+                                var frjacket='X';
+                                var earplug='X';
+                                var cottongloves='X';
+                                var nosemask='X';
+                                var faceshieldcovid19='X';
+                                var apron='X';
+                                var faceshield='X';
+                                var cuttinggoogles='X';
+                                var leathergloves='X';
+                                var legguard='X';
+                                var handsleeve='X';
+                                var safetyharness='X';
+                                var rubbergloves='X';
+                                var lubricationgloves='X';
+                                var earmuff='X';
+                                var singuard='X';
+                                if(ppecppes[i].stc_safetyppec_ppes_helmet==1){
+                                    hardhat='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_helmet==1){
+                                    helmet='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_shoes==1){
+                                    shoes='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_hvjacket==1){
+                                    hvjacket='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_safetygoggles==1){
+                                    safetygoggles='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_frjacket==1){
+                                    frjacket='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_earplug==1){
+                                    earplug='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_cottongloves==1){
+                                    cottongloves='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_nosemask==1){
+                                    nosemask='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_faceshieldcovid19==1){
+                                    faceshieldcovid19='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_apron==1){
+                                    apron='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_faceshield==1){
+                                    faceshield='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_cuttinggoogles==1){
+                                    cuttinggoogles='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_leathergloves==1){
+                                    leathergloves='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_legguard==1){
+                                    legguard='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_handsleeve==1){
+                                    handsleeve='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_safetyharness==1){
+                                    safetyharness='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_rubbergloves==1){
+                                    rubbergloves='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_lubricationgloves==1){
+                                    lubricationgloves='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_earmuff==1){
+                                    earmuff='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                if(ppecppes[i].stc_safetyppec_ppes_singuard==1){
+                                    singuard='<i class="fa fa-check" aria-hidden="true"></i>';
+                                }
+                                ppecppes_entry_out+='<tr><td>' + sl + '</td><td>' + ppecppes[i].stc_safetyppec_ppes_workmen + '</td><td>' + helmet + '</td><td>' + shoes + '</td><td>' + hvjacket + '</td><td>' + safetygoggles + '</td><td>' + frjacket + '</td><td>' + earplug + '</td><td>' + cottongloves + '</td><td>' + nosemask + '</td><td>' + faceshieldcovid19 + '</td><td>' + apron + '</td><td>' + faceshield + '</td><td>' + cuttinggoogles + '</td><td>' + leathergloves + '</td><td>' + legguard + '</td><td>' + handsleeve + '</td><td>' + safetyharness + '</td><td>' + rubbergloves + '</td><td>' + lubricationgloves + '</td><td>' + earmuff + '</td><td>' + singuard + '</td></tr>';
+                            }
+                        }
+                        $('.stc-ppec-ppes-res').html(ppecppes_entry_out);
+                    }
+                });
+            }
+
+            // save data
+            $('body').delegate('.add-ppec-modal', 'click', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_addppec:1},
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="same"){
+                            alert("Can not add new ppec at same day, you can only edit & delete on same day.");
+                        }else if(response=="reload"){
+                            window.location.reload();
+                        }else{
+                            call_ppec();
+                            $('.bd-ppec-modal-lg').modal('show');
+                            $('.stc-ppec-no').val(response);
+                            $(".bd-ppec-modal-lg input[type=text]").val('');
+                            $(".bd-ppec-modal-lg select").val(0);
+                            $(".bd-ppec-modal-lg textarea").val('');
+                            // call_ppem_fields();
+                        }
+                    }
+                });
+            });
+            
+            // save ppec
+            function save_ppec(){
+                var stc_ppec_no=$('.stc-ppec-no').val();
+                var stc_ppec_wono=$('#stc-ppec-wono').val();
+                var stc_ppec_sitename=$('#stc-ppec-sitename').val();
+                var stc_ppec_check=$('#stc-ppec-check').val();
+                var stc_ppec_sitesup=$('#stc-ppec-sitesup').val();
+                var stc_ppec_safsup=$('#stc-ppec-safetysup').val();
+
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {
+                        stc_safety_updateppec:1,
+                        stc_ppec_no:stc_ppec_no,
+                        stc_ppec_wono:stc_ppec_wono,
+                        stc_ppec_sitename:stc_ppec_sitename,
+                        stc_ppec_check:stc_ppec_check,
+                        stc_ppec_sitesup:stc_ppec_sitesup,
+                        stc_ppec_safsup:stc_ppec_safsup
+                    },
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            }
+
+            // update
+            $('body').delegate('.stc-safetyppec-edit', 'click', function(e){
+                e.preventDefault();
+                var ppec_id=$(this).attr("id");
+                $('.stc-ppec-no').val(ppec_id);
+                $('.bd-ppec-modal-lg').modal('show');
+                call_ppec();
+                call_ppec_fields();
+            });
+
+            // update ppec list
+            $('body').delegate('.stc-ppec-fields', 'focusout', function(){
+                save_ppec();
+                call_ppec();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            $('body').delegate('.stc-ppec-drop-fields', 'change', function(){
+                save_ppec();
+                call_ppec();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            // checklist save
+            $('body').delegate('.stc-ppec-ppe-add', 'click', function(e){
+                e.preventDefault();
+                var stc_ppec_no=$('.stc-ppec-no').val();
+                var workmen=$('#stc-ppec-ppe-workmen').val();
+                var filter = get_filter('checklistppecb2');
+                if(workmen!=''){
+                     $.ajax({
+                        url         : "nemesis/stc_safety.php",
+                        method      : "POST",
+                        data        : {
+                            stc_safety_saveppecppe:1,
+                            stc_ppec_no:stc_ppec_no,
+                            stc_workmen:workmen,
+                            stc_filter:filter
+                        },
+                        success     : function(response_tbm){
+                            // console.log(response_tbm);
+                            var response=response_tbm.trim();
+                            if(response=="success"){
+                                alert("Record added.");
+                                call_ppec_fields();
+                                $('#stc-ppec-ppe-workmen').val('');
+                                $('.checklistppecb2').prop('checked', false);
+                            }else{
+                                alert("Something went wrong, please check and try again.");
+                            }
+                        }
+                    });
+                }else{
+                    alert("Please enter name of workmen!!!");
+                }
+                // console.log(filter);
+            });
+
+            // filter tbm checkbox
+            function get_filter(class_name){
+                var filter = [];
+                $('.' + class_name + ':checked').each(function(){
+                   filter.push($(this).val()); 
+                });
+                return filter;
+            }
+
+        });
+    </script>
+    <script>
+        $(document).ready(function(){  
+            // call toollist
+            call_toollist();
+            function call_toollist(){
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_calltoollist:1},
+                    success     : function(response_tbm){
+                        $('.stc-safety-toollist-res-table').html(response_tbm);
+                    }
+                });
+            }
+
+            // save data
+            $('body').delegate('.add-toolist-modal', 'click', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_addtoollist:1},
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="same"){
+                            alert("Can not add new ppec at same day, you can only edit & delete on same day.");
+                        }else if(response=="reload"){
+                            window.location.reload();
+                        }else{
+                            call_toollist();
+                            $('.bd-ppec-modal-lg').modal('show');
+                            $('.stc-ppec-no').val(response);
+                            $(".bd-toollist-modal-lg input[type=text]").val('');
+                            $(".bd-toollist-modal-lg select").val(0);
+                            $(".bd-toollist-modal-lg textarea").val('');
+                            // call_toollist_fields();
+                        }
+                    }
+                });
+            });
+
+            // delete toollist            
+            $('body').delegate('.stc-safetytoollist-delete', 'click', function(e){
+                e.preventDefault();
+                var toollist_id=$(this).attr("id");
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_deletetoollist:1,toollist_id:toollist_id},
+                    success     : function(response_tbm){
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+                            alert("Record Removed!!!");
+                            call_toollist();
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            });  
+
+            function call_toollist_fields(){
+                var stc_toollist_no=$('.stc-toollist-no').val();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_calltoollistfields:1,stc_toollist_no:stc_toollist_no},
+                    dataType    : "JSON",
+                    success     : function(response_vhl){
+                        // console.log(response_vhl);
+                        $('#stc-toollist-date').val(response_vhl.toollist.stc_safetytoolslist_date);
+                        $('#stc-toollist-wono').val(response_vhl.toollist.stc_safetytoolslist_wono);
+                        $('#stc-toollist-sitename').val(response_vhl.toollist.stc_safetytoolslist_sitename);
+                        $('#stc-toollist-suptech').val(response_vhl.toollist.stc_safetytoolslist_supervisor);
+
+                        var toollistlist=response_vhl.toollistlist;
+                            
+                        
+                        var toollistlist_entry_out='<tr><td colspan="22" class="text-center">Empty record</td></td>';
+                        if(toollistlist.length>0){
+                            toollistlist_entry_out='';
+                            var sl=0;
+                            for(var i=0; i<toollistlist.length; i++){
+                                sl++;
+                                toollistlist_entry_out+='<tr><td>' + sl + '</td><td>' + toollistlist[i].stc_safetytoolslistitem_tooldesc + '</td><td class="text-right">' + toollistlist[i].stc_safetytoolslistitem_qty + '</td><td class="text-right">' + toollistlist[i].stc_safetytoolslistitem_inuse + '</td><td class="text-right">' + toollistlist[i].stc_safetytoolslistitem_repair + '</td><td class="text-right">' + toollistlist[i].stc_safetytoolslistitem_damage + '</td></tr>';
+                            }
+                        }
+                        $('.stc-toollist-list-res-table').html(toollistlist_entry_out);
+                    }
+                });
+            }
+
+            // save toollist
+            function save_toollist(){
+                var stc_toollist_no=$('.stc-toollist-no').val();
+                var stc_toollistdate=$('#stc-toollist-date').val();
+                var stc_toollistwono=$('#stc-toollist-wono').val();
+                var stc_toollistsitename=$('#stc-toollist-sitename').val();
+                var stc_toollistsuptech=$('#stc-toollist-suptech').val();
+
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {
+                        stc_safety_updatetoollist:1,
+                        stc_toollist_no:stc_toollist_no,
+                        stc_toollistdate:stc_toollistdate,
+                        stc_toollistwono:stc_toollistwono,
+                        stc_toollistsitename:stc_toollistsitename,
+                        stc_toollistsuptech:stc_toollistsuptech
+                    },
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            }
+
+            // update
+            $('body').delegate('.stc-safetytoollist-edit', 'click', function(e){
+                e.preventDefault();
+                var toollist_id=$(this).attr("id");
+                $('.stc-toollist-no').val(toollist_id);
+                $('.bd-toollist-modal-lg').modal('show');
+                call_toollist();
+                call_toollist_fields();
+            });
+
+            // update ppec list
+            $('body').delegate('.stc-toollist-fields', 'focusout', function(){
+                save_toollist();
+                call_toollist();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+
+            // checklist save
+            $('body').delegate('#stc-toollist-tooladdbtn', 'click', function(e){
+                e.preventDefault();
+                var stc_toollist_no=$('.stc-toollist-no').val();
+                var toolddesc=$('#stc-toollist-tooldesc').val();
+                var toolqty=$('#stc-toollist-toolquantity').val();
+                var toolinuse=$('#stc-toollist-toolinuse').val();
+                var toolinrepair=$('#stc-toollist-toolinrepair').val();
+                var tooldamaged=$('#stc-toollist-tooldamaged').val();
+                if(toolddesc!=''){
+                     $.ajax({
+                        url         : "nemesis/stc_safety.php",
+                        method      : "POST",
+                        data        : {
+                            stc_safety_savetoolliste:1,
+                            stc_toollist_no:stc_toollist_no,
+                            stc_toolddesc:toolddesc,
+                            stc_toolqty:toolqty,
+                            stc_toolinuse:toolinuse,
+                            stc_toolinrepair:toolinrepair,
+                            stc_tooldamaged:tooldamaged
+                        },
+                        success     : function(response_tbm){
+                            // console.log(response_tbm);
+                            var response=response_tbm.trim();
+                            if(response=="success"){
+                                alert("Record added.");
+                                call_toollist_fields();
+                                $('#stc-toollist-tooldesc').val('');
+                                $('#stc-toollist-toolquantity').val('');
+                                $('#stc-toollist-toolinuse').val('');
+                                $('#stc-toollist-toolinrepair').val('');
+                                $('#stc-toollist-tooldamaged').val('');
+                            }else{
+                                alert("Something went wrong, please check and try again.");
+                            }
+                        }
+                    });
+                }else{
+                    alert("Please enter name of workmen!!!");
+                }
+                // console.log(filter);
+            });
+
         });
     </script>
 </body>
@@ -1278,7 +2428,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Oil level</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-ol">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-ol">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1288,7 +2438,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Brake fluid level</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-bfl">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-bfl">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1298,7 +2448,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Water level</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-wl">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-wl">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1308,7 +2458,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Windscreen washer level</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-ws">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-ws">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1318,7 +2468,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Adjust seat and controls</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-as">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-as">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1328,7 +2478,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Seat belts – check for operation (all)</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-sb">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-sb">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1338,7 +2488,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Parking brake – hold against slight acceleration</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-pb">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-pb">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1348,7 +2498,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Foot brake – holds, stops vehicle smoothly</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-fb">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-fb">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1358,7 +2508,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Passenger brake for Driving lessons</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-pb1">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-pb1">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1368,7 +2518,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Clutch and gearshift – shifts smoothly without jumping or jerking</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-cgs">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-cgs">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1378,7 +2528,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Mirrors clean and adjusted</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-mc">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-mc">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1388,7 +2538,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Doors and door locks operate correctly</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-dl">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-dl">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1398,7 +2548,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Steering – moves smoothly</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-stg">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-stg">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1408,7 +2558,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Lights – clearance, headlights, tail, license plate, brake, indicator turn signals & alarm.</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-lc">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-lc">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1418,7 +2568,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Dash control panel – all lights and gauges are operational</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-dashp">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-dashp">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1428,7 +2578,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Horn</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-horn">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-horn">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1438,7 +2588,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Vehicle reverse alarm</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-alarm">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-alarm">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1448,7 +2598,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Hydraulic systems – no evidence of leaks and systems operate smoothly</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-hyds">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-hyds">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1458,7 +2608,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Check spare tyre</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-spart">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-spart">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1468,7 +2618,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Check tow bar (where fitted) </td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-towbar">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-towbar">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1478,7 +2628,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>Emergency equipment</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-equip">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-equip">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1488,7 +2638,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr>
                                                         <td>First aid kit</td>
                                                         <td>
-                                                            <select class="form-select stc-vhl-drop-fields" id="stc-vhl-fk">
+                                                            <select class="form-control stc-vhl-drop-fields" id="stc-vhl-fk">
                                                                 <option value="0">Please select</option>
                                                                 <option value="1">Yes</option>
                                                                 <option value="2">No</option>
@@ -1497,6 +2647,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">Others</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-vhl-fields" id="stc-vhl-other-remarks" placeholder="Enter other vehicle inspection.">
                                         </div>
                                     </div>
                                     <div class="col-md-5 col-sm-12 col-xl-5">
@@ -1515,6 +2671,760 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <h5 class="card-title">Vehicle faults to be reported immediately</h5>
                                         <div class="position-relative form-group">
                                             <input type="text" class="form-control stc-vhl-fields" id="stc-vhl-vehiclefaults-reported" placeholder="Enter Vehicle faults to be reported immediately">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-ppem-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">PPEM</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title" align="center">PERSONAL PROTECTIVE EQUIPMENT MAPPING</h5>
+                                        <label>* fields are automatic saved when you switch</label>
+                                        <input type="hidden" class="stc-ppem-no">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Date</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control stc-ppem-fields" id="stc-ppem-date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Site Name</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-ppem-fields" id="stc-ppem-site-name" placeholder="Enter Site Name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Supervisor name</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-ppem-fields" id="stc-ppem-supervisorname" placeholder="Enter Supervisor Name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Site Entry</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control" id="stc-ppem-ppe-siteentry" placeholder="Enter Site Entry">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Site Entry</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="checkbox" class="checklistppecb" value="Helmet"> Helmet
+                                            <input type="checkbox" class="checklistppecb" value="Shoe"> Shoe
+                                            <input type="checkbox" class="checklistppecb" value="HV jacket"> H V jacket
+                                            <input type="checkbox" class="checklistppecb" value="safety googles"> safety googles
+                                            <input type="checkbox" class="checklistppecb" value="F R Jacket"> F R Jacket
+                                            <input type="checkbox" class="checklistppecb" value="Ear plug"> Ear Plug <br>
+                                            <input type="checkbox" class="checklistppecb" value="Cotten gloves"> Cotten gloves
+                                            <input type="checkbox" class="checklistppecb" value="Mask"> Mask
+                                            <input type="checkbox" class="checklistppecb" value="Face Shield 1"> Face Shield 1
+                                            <input type="checkbox" class="checklistppecb" value="Apron"> Apron
+                                            <input type="checkbox" class="checklistppecb" value="Face Shield"> Face Shield
+                                            <input type="checkbox" class="checklistppecb" value="Cutting Gooles"> Cutting Googles
+                                            <input type="checkbox" class="checklistppecb" value="Leather Gloves"> Leather Gloves
+                                            <input type="checkbox" class="checklistppecb" value="Leg Guard"> Leg Guard
+                                            <input type="checkbox" class="checklistppecb" value="Hand Sleeve"> Hand Sleeve
+                                            <input type="checkbox" class="checklistppecb" value="Safety Harness"> Safety Harness
+                                            <input type="checkbox" class="checklistppecb" value="Rubber Gloves"> Rubber Gloves
+                                            <input type="checkbox" class="checklistppecb" value="Lubrication Gloves"> Lubrication Gloves
+                                            <input type="checkbox" class="checklistppecb" value="Ear Muff"> Ear puff
+                                            <input type="checkbox" class="checklistppecb" value="Sin Guard"> Sin Guard
+                                        </div>
+                                    </div>                                    
+                                    <div class="col-md-2 col-sm-12 col-xl-2">
+                                        <a href="#" class="form-control stc-ppem-ppe-add btn btn-success">Add</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-nearmissreporting-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Near Miss Reporting</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title" align="center">Near Miss Reporting</h5>
+                                        <label>* fields are automatic saved when you switch</label>
+                                        <input type="hidden" class="stc-nearmiss-no">
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">Organization unit of occurrence</h5>
+                                        <div class="position-relative form-group">                                            
+                                            <textarea class="form-control stc-nearmiss-fields" id="stc-nearmiss-orgunitoccur" placeholder="Enter Organization unit of occurrence"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Incident date</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control stc-nearmiss-fields" id="stc-nearmiss-incident-date" placeholder="Enter Incident date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Incident time</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="time" class="form-control stc-nearmiss-fields" id="stc-nearmiss-incident-time">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Incident Location</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-nearmiss-fields" id="stc-nearmiss-incident-location" placeholder="Enter Incident Location">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Place of incident (Please tick):</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="radio" class="stc-nearmiss-fields-checked stc-nearmiss-incident-place" name="stc-nearmiss-incident-place" value="Main Road"> Main Road <br>
+                                            <input type="radio" class="stc-nearmiss-fields-checked stc-nearmiss-incident-place" name="stc-nearmiss-incident-place" value="Other Road"> Other Road <br>
+                                            <input type="radio" class="stc-nearmiss-fields-checked stc-nearmiss-incident-place" name="stc-nearmiss-incident-place" value="Mines"> Mines <br>
+                                            <input type="radio" class="stc-nearmiss-fields-checked stc-nearmiss-incident-place" name="stc-nearmiss-incident-place" value="Work Place"> Work Place <br>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Possible consequence (Please tick):</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="radio" class="stc-nearmiss-fields-checked stc-nearmiss-possible-cons" name="stc-nearmiss-possible-cons" value="Derailment"> Derailment <br>
+                                            <input type="radio" class="stc-nearmiss-fields-checked stc-nearmiss-possible-cons" name="stc-nearmiss-possible-cons" value="Equipment property damage"> Equipment property damage <br>
+                                            <input type="radio" class="stc-nearmiss-fields-checked stc-nearmiss-possible-cons" name="stc-nearmiss-possible-cons" value="First Aid"> First Aid <br>
+                                            <input type="radio" class="stc-nearmiss-fields-checked stc-nearmiss-possible-cons" name="stc-nearmiss-possible-cons" value="Fatality"> Fatality <br>
+                                            <input type="radio" class="stc-nearmiss-fields-checked stc-nearmiss-possible-cons" name="stc-nearmiss-possible-cons" value="Foreign body"> Foreign body <br>
+                                            <input type="radio" class="stc-nearmiss-fields-checked stc-nearmiss-possible-cons" name="stc-nearmiss-possible-cons" value="fire"> fire <br>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Brief Incident description</h5>
+                                        <div class="position-relative form-group">                                            
+                                            <textarea class="form-control stc-nearmiss-fields" id="stc-nearmiss-incidentdesc" placeholder="Enter Brief Incident description"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Primary cause</h5>
+                                        <div class="position-relative form-group">                                            
+                                            <textarea class="form-control stc-nearmiss-fields" id="stc-nearmiss-primarycause" placeholder="Enter Primary cause"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Name of the employee/ contact partner:</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-nearmiss-fields" id="stc-nearmiss-nameofemployee" placeholder="Enter Name of the employee/ contact partner">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">P No./ G P No.</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-nearmiss-fields" id="stc-nearmiss-gpno" placeholder="Enter P No./ G P No.">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Department / Vendor:</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-nearmiss-fields" id="stc-nearmiss-vendor" placeholder="Enter Department / Vendor">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">Action Taken</h5>
+                                        <div class="position-relative form-group">                                            
+                                            <textarea class="form-control stc-nearmiss-fields" id="stc-nearmiss-actiontaken" placeholder="Enter Action Taken"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Date</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control stc-nearmiss-fields" id="stc-nearmiss-currdate">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Name & Signature</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-nearmiss-fields" id="stc-nearmiss-namesignature" placeholder="Enter Name & Signature">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-hotwork-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Hot Work</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title" align="center">Hot Work</h5>
+                                        <label>* fields are automatic saved when you switch</label>
+                                        <input type="hidden" class="stc-hotwork-no">
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">Work Order No</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-hotwork-fields" id="stc-hotwork-wono" placeholder="Enter Work Order No">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Job Sitename</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-hotwork-fields" id="stc-hotwork-sitename" placeholder="Enter Job sitename">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Starting date</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control stc-hotwork-fields" id="stc-hotwork-starting-date" placeholder="Enter Starting date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Electric welding machine Make</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-hotwork-fields" id="stc-hotwork-make" placeholder="Enter Electric welding machine Make">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Electric welding machine Sl No</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-hotwork-fields" id="stc-hotwork-slno" placeholder="Enter Electric welding machine Sl No">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <p>If you dont have a data then move to next field *</p>
+                                        <div class="position-relative form-group">
+                                            <table class="table table-hover table-bordered ">
+                                                <thead>
+                                                    <tr>
+                                                        <td class="card-title">Equipments</td>
+                                                        <td class="card-title">Yes / No</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>CONNECTIONS ARE PROPER AND EFFECTIVELY INSULATED</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-capaei">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>ON /OFF SWITCH IN GOOD WORKING CONDITION?</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-oosigwc">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>VOLTMETER/AMMETER CONNECTED & WORKING PROPERLY?</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-vacawp">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>REGULATOR WORKING PROPERLY</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-rwp">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>THREE / SINGLE PHASE TRANSFORMER</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-tspt">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>CABLE    (FROM MACHINE TO EARTH CLAMP</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-cfmtec">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>GOOD EARTHING AND GROUNDING. (DOUBLE EARTHING</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-geagde">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>CABLE (FROM MACHINE TO ELECTRODE HOLDER)</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-cfmteh">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>ELECTRODE HOLDER</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-eh">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>WELDING MACHIN COMPLETELY COVERD AND NO LOOSE CONNECTIONS</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-wmccanlc">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>WHEELS FREELY ROTATING</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-wfr">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>COMPATIBLE FIRE EXTINGUSHER AVAILABLE FOR THE WELDING SET</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-cfeaftws">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>SUPPLY CABLE’S LENGTH EXCEEDING 5M</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-scle">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>CONNECTION TAKEN THROUGH ELCB’s?</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-ctte">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>WELDING CABLE OF PROPER RATING AND IN PROPER CONDITION WITHOUT ANY DAMAGES?</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-wcopraipcwad">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>CONNECTING LUGS TIGHTENED PROPERLY?</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-cltp">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>WELL INSULATED AND NO EXPOSED PARTS?</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-wianep">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>SIZE OF CABLE USED ARE PROPORTIONAL TO VOLTAGE SUPPLY</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-socuaptvs">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>RETURN EARTH CABLE OF SUFFICIENT LENGTH? ARE ELECTRICAL CONDUCTORS PROHIBITED FROM BEING USED TO COMPLETE WOR</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-recoslaecpfbutcw">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>ANY OVERLOADING, WHERE BY CABLES BECOME HOT?</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-aowbcbh">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>ANY CONTACT WITH OIL / SHARP EDGES OR WATER?</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-acwoseow">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>ANY CABLES PROPERLY PLACED TO PREVENT TRIPPING HAZARDS?</td>
+                                                        <td>
+                                                            <select class="form-control stc-hotwork-drop-fields" id="stc-hotwork-acpptpth">
+                                                                <option value="0">Please select</option>
+                                                                <option value="1">Yes</option>
+                                                                <option value="2">No</option>
+                                                            </select>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-ppec-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">PPEC</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title" align="center">PPEC</h5>
+                                        <label>* fields are automatic saved when you switch</label>
+                                        <input type="hidden" class="stc-ppec-no">
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Work Order No</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-ppec-fields" id="stc-ppec-wono" placeholder="Enter Work Order No">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Job Sitename</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-ppec-fields" id="stc-ppec-sitename" placeholder="Enter Job sitename">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Check</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control stc-ppec-drop-fields" id="stc-ppec-check">
+                                                <option value="">Please select</option>
+                                                <option value="OK">OK</option>
+                                                <option value="NOT OK">NOT OK</option>
+                                                <option value="NOT APPLICABLE">NOT APPLICABLE</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Site Supervisor</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-ppec-fields" id="stc-ppec-sitesup" placeholder="Enter Site Supervisor">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Safety Supervisor/ Officer</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-ppec-fields" id="stc-ppec-safetysup" placeholder="Enter Safety Supervisor/ Officer">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Name of Workmen</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control" id="stc-ppec-ppe-workmen" placeholder="Enter Name of Workmen">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Site Entry</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="checkbox" class="checklistppecb2" value="Helmet"> Helmet
+                                            <input type="checkbox" class="checklistppecb2" value="Shoe"> Shoe
+                                            <input type="checkbox" class="checklistppecb2" value="HV jacket"> H V jacket
+                                            <input type="checkbox" class="checklistppecb2" value="safety googles"> safety googles
+                                            <input type="checkbox" class="checklistppecb2" value="F R Jacket"> F R Jacket
+                                            <input type="checkbox" class="checklistppecb2" value="Ear plug"> Ear Plug <br>
+                                            <input type="checkbox" class="checklistppecb2" value="Cotten gloves"> Cotten gloves
+                                            <input type="checkbox" class="checklistppecb2" value="Mask"> Mask
+                                            <input type="checkbox" class="checklistppecb2" value="Face Shield 1"> Face Shield 1
+                                            <input type="checkbox" class="checklistppecb2" value="Apron"> Apron
+                                            <input type="checkbox" class="checklistppecb2" value="Face Shield"> Face Shield
+                                            <input type="checkbox" class="checklistppecb2" value="Cutting Gooles"> Cutting Googles
+                                            <input type="checkbox" class="checklistppecb2" value="Leather Gloves"> Leather Gloves
+                                            <input type="checkbox" class="checklistppecb2" value="Leg Guard"> Leg Guard
+                                            <input type="checkbox" class="checklistppecb2" value="Hand Sleeve"> Hand Sleeve
+                                            <input type="checkbox" class="checklistppecb2" value="Safety Harness"> Safety Harness
+                                            <input type="checkbox" class="checklistppecb2" value="Rubber Gloves"> Rubber Gloves
+                                            <input type="checkbox" class="checklistppecb2" value="Lubrication Gloves"> Lubrication Gloves
+                                            <input type="checkbox" class="checklistppecb2" value="Ear Muff"> Ear puff
+                                            <input type="checkbox" class="checklistppecb2" value="Sin Guard"> Sin Guard
+                                        </div>
+                                    </div>                                    
+                                    <div class="col-md-2 col-sm-12 col-xl-2">
+                                        <a href="#" class="form-control stc-ppec-ppe-add btn btn-success">Add</a>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <div class="position-relative form-group">
+                                            <table class="table table-hover table-bordered table-responsive">
+                                                <thead>
+                                                    <tr>
+                                                        <td class="card-title">Name of Workmen</td>
+                                                        <td class="card-title">YasfNo</td>
+                                                        <td class="card-title">Helmet</td>
+                                                        <td class="card-title">Shoe</td>
+                                                        <td class="card-title">H V jacket</td>
+                                                        <td class="card-title">safety googles</td>
+                                                        <td class="card-title">F R Jacket</td>
+                                                        <td class="card-title">Ear Plug</td>
+                                                        <td class="card-title">Cotten gloves</td>
+                                                        <td class="card-title">Mask</td>
+                                                        <td class="card-title">Face Shield 1</td>
+                                                        <td class="card-title">Apron</td>
+                                                        <td class="card-title">Face Shield</td>
+                                                        <td class="card-title">Cutting Googles</td>
+                                                        <td class="card-title">Leather Gloves</td>
+                                                        <td class="card-title">Leg Guard</td>
+                                                        <td class="card-title">Hand Sleeve</td>
+                                                        <td class="card-title">Safety Harness</td>
+                                                        <td class="card-title">Rubber Gloves</td>
+                                                        <td class="card-title">Lubrication Gloves</td>
+                                                        <td class="card-title">Ear puff</td>
+                                                        <td class="card-title">Sin Guard</td>
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="stc-ppec-ppes-res"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-toollist-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">TOOLS & TACKLES HAND TOOLLIST</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title" align="center">TOOLS & TACKLES HAND TOOLLIST</h5>
+                                        <label>* fields are automatic saved when you switch</label>
+                                        <input type="hidden" class="stc-toollist-no">
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Date</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control stc-toollist-fields" id="stc-toollist-date" placeholder="Enter Date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Work Order No</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-toollist-fields" id="stc-toollist-wono" placeholder="Enter Work Permit No">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Job Sitename</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-toollist-fields" id="stc-toollist-sitename" placeholder="Enter Job sitename">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">SUPERVISOR & TECHNICIAN</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-toollist-fields" id="stc-toollist-suptech" placeholder="Enter SUPERVISOR & TECHNICIAN">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h3 class="card-title text-center">Hand Tool List Items</h3>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Tool Description</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control" id="stc-toollist-tooldesc" placeholder="Enter tool description">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Quantity</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="number" class="form-control" id="stc-toollist-toolquantity" placeholder="Enter quantity">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">In use</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="number" class="form-control" id="stc-toollist-toolinuse" placeholder="Enter in use">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Repair</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="number" class="form-control" id="stc-toollist-toolinrepair" placeholder="Enter Repair">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Damaged</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="number" class="form-control" id="stc-toollist-tooldamaged" placeholder="Enter Damaged">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Add</h5>
+                                        <div class="position-relative form-group">
+                                            <a href="javascript:void(0)" class="form-control btn btn-success" id="stc-toollist-tooladdbtn">Add</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <div class="position-relative form-group">
+                                            <table class="table table-hover table-bordered table-responsive">
+                                                <thead>
+                                                    <tr>
+                                                        <td class="card-title">Item No</td>
+                                                        <td class="card-title">Tool Description</td>
+                                                        <td class="card-title">Quantity</td>
+                                                        <td class="card-title">In use</td>
+                                                        <td class="card-title">Repair</td>
+                                                        <td class="card-title">Damaged</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="stc-toollist-list-res-table">
+
+                                                </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
