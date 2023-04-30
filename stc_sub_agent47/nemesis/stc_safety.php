@@ -935,6 +935,7 @@ class witcher_hotwork extends tesseract{
 		}
 		return $optimusprime;
 	}
+	
 	// call hotwork
 	public function stc_call_hotwork(){
 		$optimusprime='';

@@ -1043,7 +1043,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var vhl_id=$(this).attr("id");
                 $('.stc-vhl-no').val(vhl_id);
                 $('.bd-vhl-vehicle-checklist-modal-lg').modal('show');
-                call_vhl()
+                call_vhl();
                 call_vhl_fields();
             });
 
@@ -1051,7 +1051,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.stc-vhl-fields', 'focusout', function(e){
                 e.preventDefault();
                 save_vhl();
-                call_vhl()
+                call_vhl();
                 $('.saved-popup').remove();
                 $(this).after('<p class="saved-popup text-success">Record Saved</p>');
             });
@@ -1059,7 +1059,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             // update vhl list
             $('body').delegate('.stc-vhl-drop-fields', 'change', function(){
                 save_vhl();
-                call_vhl()
+                call_vhl();
                 $('.saved-popup').remove();
                 $(this).after('<p class="saved-popup text-success">Record Saved</p>');
             });

@@ -2112,14 +2112,6 @@ class pirates_supervisor extends tesseract{
 		if($supervise_name==''){
 			$supervise_rec='';
 		}
-		$qry="SELECT * FROM `stc_safetytbm` 
-			LEFT JOIN `stc_cust_pro_supervisor`
-			ON `stc_cust_pro_supervisor_id`=`stc_safetytbm_created_by`
-			WHERE ".$supervise_rec." (
-				MONTH(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
-				YEAR(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
-			)
-			ORDER BY DATE(`stc_safetytbm_date`) DESC";
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			SELECT * FROM `stc_safetytbm` 
 			LEFT JOIN `stc_cust_pro_supervisor`
@@ -2184,6 +2176,320 @@ class pirates_supervisor extends tesseract{
 		}
 		return $optimusprime;
 	}
+
+	// call ppec
+	public function stc_call_ppec($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetyppec` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetyppec_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetyppec_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetyppec_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			)
+			ORDER BY DATE(`stc_safetyppec_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetyppec_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetyppec-edit" id="'.$optimusprimerow['stc_safetyppec_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetyppec-delete" id="'.$optimusprimerow['stc_safetyppec_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyppec_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyppec_wono'].'</td>
+						<td>'.$optimusprimerow['stc_safetyppec_sitename'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// call ppem
+	public function stc_call_ppem($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetyppem` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetyppem_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetyppem_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetyppem_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`stc_safetyppem_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetyppem_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetyppem-edit" id="'.$optimusprimerow['stc_safetyppem_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetyppem-delete" id="'.$optimusprimerow['stc_safetyppem_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyppem_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyppem_site_name'].'</td>
+						<td>'.$optimusprimerow['stc_safetyppem_supervisor_name'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// call toollist
+	public function stc_call_toolllist($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetytoolslist` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetytoolslist_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetytoolslist_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetytoolslist_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`stc_safetytoolslist_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetytoolslist_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetytoollist-edit" id="'.$optimusprimerow['stc_safetytoolslist_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetytoollist-delete" id="'.$optimusprimerow['stc_safetytoolslist_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetytoolslist_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetytoolslist_wono'].'</td>
+						<td>'.$optimusprimerow['stc_safetytoolslist_sitename'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// call vhl
+	public function stc_call_vhl($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetyvehicle` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetyvehicle_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetyvehicle_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetyvehicle_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`stc_safetyvehicle_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetyvehicle_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetyvhl-edit" id="'.$optimusprimerow['stc_safetyvehicle_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetyvhl-delete" id="'.$optimusprimerow['stc_safetyvehicle_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyvehicle_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyvehicle_desc'].'</td>
+						<td>'.$optimusprimerow['stc_safetyvehicle_reg_no'].'</td>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyvehicle_dateofinspection'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyvehicle_driversname'].'</td>
+						<td>'.$action_show.'
+						</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// call hotwork
+	public function stc_call_hotwork($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetyhotwork` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetyhotwork_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetyhotwork_startingdate`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetyhotwork_startingdate`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`stc_safetyhotwork_startingdate`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetyhotwork_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetyhotwork-edit" id="'.$optimusprimerow['stc_safetyhotwork_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetyhotwork-delete" id="'.$optimusprimerow['stc_safetyhotwork_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyhotwork_startingdate'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyhotwork_wono'].'</td>
+						<td>'.$optimusprimerow['stc_safetyhotwork_jobssitename'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// call nearmiss
+	public function stc_call_nearmiss($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetynearmiss` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetynearmiss_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetynearmiss_currdate`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetynearmiss_currdate`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`stc_safetynearmiss_currdate`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$optimusprimeimgqry=mysqli_query($this->stc_dbs, "
+					SELECT `stc_safetynearmiss_img_location` FROM `stc_safetynearmiss_img` WHERE `stc_safetynearmiss_img_nearmissid`='".$optimusprimerow['stc_safetynearmiss_id']."'
+				");
+				$img_path='';
+				$imgcounter=0;
+				$safety_image='';
+				foreach($optimusprimeimgqry as $optimusprimeimgrow){
+					$imgcounter++;
+					$img_path=$optimusprimeimgrow['stc_safetynearmiss_img_location'];
+
+					$safety_image.='
+							<img src="../stc_sub_agent47/safety_img/'.$img_path.'" style="width: 190px;position: relative;padding: 0;margin: 0;">
+					';
+				}
+				if($imgcounter<=2){
+					$safety_image.="
+						<form action='#' id='safety-nearmissimage-upload-form' >
+							<input type='file' name='stc-safety-nearmissimage-path'>
+							<input type='hidden' name='stc-safety-nearmiss-id' value='".$optimusprimerow['stc_safetynearmiss_id']."'>
+							<input type='submit' value='Upload' class='btn btn-success'>
+						</form>";
+				}
+				$action_show='
+					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetynearmiss_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetynearmiss-edit" id="'.$optimusprimerow['stc_safetynearmiss_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetynearmiss-delete" id="'.$optimusprimerow['stc_safetynearmiss_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetynearmiss_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetynearmiss_time'].'</td>
+						<td>'.$optimusprimerow['stc_safetynearmiss_location'].'</td>
+						<td>'.$safety_image.'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
 }
 
 /*---------------------------------------------Project Objects section-------------------------------------------------*/
@@ -2193,6 +2499,60 @@ if(isset($_POST['stc_safety_calltbm'])){
 	$supervise_name	= 	$_POST['supervise_name'];
 	$objsearchreq=new pirates_supervisor();
 	$opobjsearchreq=$objsearchreq->stc_call_tbm($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call ppec  safety
+if(isset($_POST['stc_safety_callppec'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_ppec($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call ppem  safety
+if(isset($_POST['stc_safety_callppem'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_ppem($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call toollist  safety
+if(isset($_POST['stc_safety_calltoollist'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_toolllist($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call vhl  safety
+if(isset($_POST['stc_safety_callvhl'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_vhl($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call hotwork  safety
+if(isset($_POST['stc_safety_callhotwork'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_hotwork($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call nearmiss  safety
+if(isset($_POST['stc_safety_callnearmiss'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_nearmiss($month, $supervise_name);
 	echo $opobjsearchreq;
 }
 
