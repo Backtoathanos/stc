@@ -1133,7 +1133,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                 if(ppecppes[i].stc_safetyppec_ppes_singuard==1){
                                     singuard='<i class="fa fa-check" aria-hidden="true"></i>';
                                 }
-                                ppecppes_entry_out+='<tr><td>' + sl + '</td><td>' + ppecppes[i].stc_safetyppec_ppes_workmen + '</td><td>' + helmet + '</td><td>' + shoes + '</td><td>' + hvjacket + '</td><td>' + safetygoggles + '</td><td>' + frjacket + '</td><td>' + earplug + '</td><td>' + cottongloves + '</td><td>' + nosemask + '</td><td>' + faceshieldcovid19 + '</td><td>' + apron + '</td><td>' + faceshield + '</td><td>' + cuttinggoogles + '</td><td>' + leathergloves + '</td><td>' + legguard + '</td><td>' + handsleeve + '</td><td>' + safetyharness + '</td><td>' + rubbergloves + '</td><td>' + lubricationgloves + '</td><td>' + earmuff + '</td><td>' + singuard + '</td></tr>';
+                                ppecppes_entry_out+='<tr><td>' + ppecppes[i].stc_safetyppec_ppes_workmen + '</td><td>' + helmet + '</td><td>' + shoes + '</td><td>' + hvjacket + '</td><td>' + safetygoggles + '</td><td>' + frjacket + '</td><td>' + earplug + '</td><td>' + cottongloves + '</td><td>' + nosemask + '</td><td>' + faceshieldcovid19 + '</td><td>' + apron + '</td><td>' + faceshield + '</td><td>' + cuttinggoogles + '</td><td>' + leathergloves + '</td><td>' + legguard + '</td><td>' + handsleeve + '</td><td>' + safetyharness + '</td><td>' + rubbergloves + '</td><td>' + lubricationgloves + '</td><td>' + earmuff + '</td><td>' + singuard + '</td></tr>';
                             }
                         }
                         $('.stc-ppec-ppes-res').html(ppecppes_entry_out);

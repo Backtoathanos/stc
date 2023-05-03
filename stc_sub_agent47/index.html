@@ -72,6 +72,7 @@
                     processData : false,
                     success     : function(argument) {
                         // console.log(argument);
+                        argument=argument.trim();
                         if(argument=="success"){
                             window.location.href="dashboard.php";
                         }else{
