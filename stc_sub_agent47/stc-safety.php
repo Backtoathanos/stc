@@ -3351,7 +3351,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-12 col-xl-6">
-                                        <h5 class="card-title">Work Order No</h5>
+                                        <h5 class="card-title">Work Permit No</h5>
                                         <div class="position-relative form-group">
                                             <input type="text" class="form-control stc-toollist-fields" id="stc-toollist-wono" placeholder="Enter Work Permit No">
                                         </div>

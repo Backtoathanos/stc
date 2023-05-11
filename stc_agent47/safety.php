@@ -3294,7 +3294,6 @@ if(isset($_SESSION["stc_agent_id"])){
                                                 <thead>
                                                     <tr>
                                                         <td class="card-title">Name of Workmen</td>
-                                                        <td class="card-title">YasfNo</td>
                                                         <td class="card-title">Helmet</td>
                                                         <td class="card-title">Shoe</td>
                                                         <td class="card-title">H V jacket</td>

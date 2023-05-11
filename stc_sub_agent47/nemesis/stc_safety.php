@@ -274,11 +274,11 @@ class witcher_supervisor extends tesseract{
 				$insertqry .='`stc_safetytbm_checklist_hardhat`,';
 				$insertval .='1,';
 			}
-			if($values == "Nose Mask"){
+			if($values == "Safety Goggle"){
 				$insertqry .='`stc_safetytbm_checklist_SafetyGoggle`,';
 				$insertval .='1,';
 			}
-			if($values == "Safety Goggle"){
+			if($values == "Nose Mask"){
 				$insertqry .='`stc_safetytbm_checklist_NoseMask`,';
 				$insertval .='1,';
 			}
@@ -1098,7 +1098,7 @@ class witcher_ppec extends tesseract{
 		if(mysqli_num_rows($optimusprimequery)>0){
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetyppec_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="../stc_agent47/stc-ppec-print-preview.php?ppec_no='.$optimusprimerow['stc_safetyppec_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyppec-edit" id="'.$optimusprimerow['stc_safetyppec_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyppec-delete" id="'.$optimusprimerow['stc_safetyppec_id'].'">Delete</a>
 				';
