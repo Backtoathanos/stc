@@ -128,7 +128,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <input type="hidden" name="stc-pro-tra-procurement-hit">
+                                                    <input type="hidden" name="stc-pro-tra-procurement-hit">  
                                                     <button class="mt-1 btn btn-primary">Add</button>
                                                 </form>
                                             </div>
