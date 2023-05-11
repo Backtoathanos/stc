@@ -17,7 +17,7 @@ if($_SESSION['stc_school_user_for']==2){
     <link rel="icon" type="image/png" href="../assets/img/stc_logo_title.png">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>
-      STC School || Canteen
+      STC School || School Management
     </title>
     <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
     <!--     Fonts and icons     -->
@@ -401,7 +401,7 @@ if($_SESSION['stc_school_user_for']==2){
                 <p>Dashboard</p>
               </a>
             </li>
-            <li class="nav-item active">
+            <li class="nav-item ">
               <a class="nav-link" href="./canteen.php">
                 <i class="material-icons">content_paste</i>
                 <p>Canteen</p>
@@ -413,7 +413,7 @@ if($_SESSION['stc_school_user_for']==2){
                 <p>Fee Collection</p>
               </a>
             </li>
-            <li class="nav-item">
+            <li class="nav-item active">
               <a class="nav-link" href="./school-management.php">
                 <i class="material-icons">feed</i>
                 <p>School Management</p>

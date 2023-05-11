@@ -53,6 +53,12 @@ if(empty(@$_SESSION['stc_school_user_id'])){
               <p>Fee Collection</p>
             </a>
           </li>
+          <li class="nav-item">
+              <a class="nav-link" href="./school-management.php">
+                <i class="material-icons">feed</i>
+                <p>School Management</p>
+              </a>
+          </li>
         </ul>
       </div>
     </div>

@@ -415,6 +415,12 @@ if($_SESSION['stc_school_user_for']==1){
                 <p>Fee Collection</p>
               </a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./school-management.php">
+                <i class="material-icons">feed</i>
+                <p>School Management</p>
+              </a>
+            </li>
           </ul>
         </div>
       </div>
