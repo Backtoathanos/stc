@@ -946,14 +946,14 @@ if($_SESSION['stc_school_user_for']==2){
                                   <div class="mb-3">
                                     <h5
                                       for="name"
-                                      >Occupation
+                                      >Parent / Guardian Occupation
                                     </h5>
                                     <input
                                       name="stcschoolmanagementstudentparentguardianoccupation"
                                       type="text"
                                       class="form-control validate stcschoolmanagementstudentparentguardianoccupation"
                                       value=""
-                                      placeholder="Enter Occupation"
+                                      placeholder="Occupation"
                                     />
                                   </div>
                                 </div>
