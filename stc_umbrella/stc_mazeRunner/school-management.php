@@ -455,8 +455,8 @@ if($_SESSION['stc_school_user_for']==2){
                             </a>
                           </li>
                           <li class="nav-item">
-                            <a class="nav-link " href="#stc-create-class" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Create Class
+                            <a class="nav-link " href="#stc-create-classroom" data-toggle="tab">
+                              <i class="material-icons">add_circle</i> Create Class Room
                               <div class="ripple-container"></div>
                             </a>
                           </li>
@@ -960,6 +960,156 @@ if($_SESSION['stc_school_user_for']==2){
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                   <div class="mb-3">
                                     <button type="button" name="search" class="form-control btn btn-success" id="stcschoolstudentsave">Save</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Field Create Subject -->
+
+                      <div class="tab-pane " id="stc-create-subject">
+                        <div class="row">
+                          <div class="col-12">
+                            <h2 class="tm-block-title d-inline-block">Create Subject</h2>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
+                            <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
+                              <div class="row">
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Subject ID
+                                    </h5>
+                                    <input
+                                      name="stcschoolmanagementsubjectid"
+                                      type="text"
+                                      class="form-control validate stcschoolmanagementsubjectid"
+                                      value=""
+                                      placeholder="Enter Subject ID"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Subject Title
+                                    </h5>
+                                    <input
+                                      name="stcschoolmanagementsubjecttitle"
+                                      type="text"
+                                      class="form-control validate stcschoolmanagementsubjecttitle"
+                                      value=""
+                                      placeholder="Enter Subject Title"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Syllubus Details
+                                    </h5>
+                                    <textarea 
+                                      name="stcschoolmanagementsubjectdetails"
+                                      class="form-control validate stcschoolmanagementsubjectdetails"
+                                      value=""
+                                      placeholder="Enter Complete Syllubus Details"
+                                      ></textarea>
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolsubjectsave">Save</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Field Class Room -->
+
+                      <div class="tab-pane " id="stc-create-classroom">
+                        <div class="row">
+                          <div class="col-12">
+                            <h2 class="tm-block-title d-inline-block">Create Class Room</h2>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
+                            <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
+                              <div class="row">
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Class Room ID
+                                    </h5>
+                                    <input
+                                      name="stcschoolmanagementclassroomid"
+                                      type="text"
+                                      class="form-control validate stcschoolmanagementclassroomid"
+                                      value=""
+                                      placeholder="Enter Class Room ID"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Class Room Title
+                                    </h5>
+                                    <input
+                                      name="stcschoolmanagementclassroomtitle"
+                                      type="text"
+                                      class="form-control validate stcschoolmanagementclassroomtitle"
+                                      value=""
+                                      placeholder="Enter Class Room Title"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Location
+                                    </h5>
+                                    <input
+                                      name="stcschoolmanagementclassroomlocation"
+                                      type="text"
+                                      class="form-control validate stcschoolmanagementclassroomlocation"
+                                      value=""
+                                      placeholder="Enter Class Room Location"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Capacity
+                                    </h5>
+                                    <input
+                                      name="stcschoolmanagementclassroomcapacity"
+                                      type="text"
+                                      class="form-control validate stcschoolmanagementclassroomcapacity"
+                                      value=""
+                                      placeholder="Enter Class Room Capacity"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolclassroomsave">Save</button>
                                   </div>
                                 </div>
                               </div>
