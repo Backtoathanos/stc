@@ -857,7 +857,7 @@ if($_SESSION['stc_school_user_for']==2){
                                     />
                                   </div>
                                 </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                <div class="col-sm-12 col-md-12 col-lg-12">
                                   <div class="mb-3">
                                     <h5
                                       for="name"
@@ -890,7 +890,7 @@ if($_SESSION['stc_school_user_for']==2){
                                   <div class="mb-3">
                                     <h5
                                       for="name"
-                                      >Joining Date
+                                      >Admission Date
                                     </h5>
                                     <input
                                       name="stcschoolmanagementstudentjoiningdate"
@@ -939,21 +939,6 @@ if($_SESSION['stc_school_user_for']==2){
                                       class="form-control validate stcschoolmanagementstudentparentguardianfullname"
                                       value=""
                                       placeholder="Enter Parent / Guardian Full Name"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Parent / Guardian Occupation
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementstudentparentguardianoccupation"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementstudentparentguardianoccupation"
-                                      value=""
-                                      placeholder="Occupation"
                                     />
                                   </div>
                                 </div>
@@ -1470,45 +1455,6 @@ if($_SESSION['stc_school_user_for']==2){
             }
           });
         }
-
-        // search canteen
-        $(document).on('click', '#canteensearch', function(e){
-          e.preventDefault();
-          var search=$('.stcfilterbyattr').val();
-          $.ajax({  
-            url       : "../vanaheim/canteen-raised.php",
-            method    : "POST",  
-            data      : {
-              stc_search_canteen : 1,
-              search:search
-            },
-            // dataType: `JSON`,
-            success   : function(response_canteen){
-             // console.log(data);
-             $('.stc-view-silent-canteen-row-fetch').html(response_canteen);
-            }
-          });
-        });
-
-        // show inside
-        $('body').delegate('.stc-school-showdeep-req', 'click', function(e){
-          e.preventDefault();
-          var req_date=$(this).attr("id");
-          $.ajax({  
-            url       : "../vanaheim/canteen-raised.php",
-            method    : "POST",  
-            data      : {
-              stc_call_by_date : 1,
-              req_date:req_date
-            },
-            // dataType: `JSON`,
-            success   : function(response_canteen){
-             // console.log(data);
-             $('.stc-school-showdeep-res').modal("show");
-             $('.stc-show-canteen-nested-show').html(response_canteen);
-            }
-          });
-        });
       });
     </script>
   </body>
