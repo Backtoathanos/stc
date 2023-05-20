@@ -460,6 +460,12 @@ if($_SESSION['stc_school_user_for']==2){
                               <div class="ripple-container"></div>
                             </a>
                           </li>
+                          <li class="nav-item">
+                            <a class="nav-link " href="#stc-create-shedule" data-toggle="tab">
+                              <i class="material-icons">add_circle</i> Schedule Routine
+                              <div class="ripple-container"></div>
+                            </a>
+                          </li>
                         </ul>
                       </div>
                     </div>
@@ -944,6 +950,20 @@ if($_SESSION['stc_school_user_for']==2){
                                 </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                   <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Remarks
+                                    </h5>
+                                    <textarea 
+                                      name="stcschoolmanagementstudentremarks"
+                                      class="form-control validate stcschoolmanagementstudentremarks"
+                                      value=""
+                                      placeholder="Remarks"
+                                      ></textarea>
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
                                     <button type="button" name="search" class="form-control btn btn-success" id="stcschoolstudentsave">Save</button>
                                   </div>
                                 </div>
@@ -1102,6 +1122,119 @@ if($_SESSION['stc_school_user_for']==2){
                           </div>
                         </div>
                       </div>
+
+                      
+
+                      <!-- Field Schedule Routine -->
+                      <div class="tab-pane " id="stc-create-shedule">
+                        <div class="row">
+                          <div class="col-12">
+                            <h2 class="tm-block-title d-inline-block">Create Schedule Routine</h2>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
+                            <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
+                              <div class="row">
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Subject
+                                    </h5>
+                                    <select
+                                      name="stcschoolschedulesubject"
+                                      type="text"
+                                      class="form-control validate stcschoolschedulesubject"
+                                      >
+                                      <option value="Monday">Monday</option>
+                                      <option value="Tuesday">Tuesday</option>
+                                      <option value="Wednesday">Wednesday</option>
+                                      <option value="Thursday">Thursday</option>
+                                      <option value="Friday">Friday</option>
+                                      <option value="Saturday">Saturday</option>
+                                      
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Class
+                                    </h5>
+                                    <select
+                                      name="stcschoolscheduleclass"
+                                      type="text"
+                                      class="form-control validate stcschoolscheduleclass"
+                                      >
+                                      <option value="Monday">Monday</option>
+                                      <option value="Tuesday">Tuesday</option>
+                                      <option value="Wednesday">Wednesday</option>
+                                      <option value="Thursday">Thursday</option>
+                                      <option value="Friday">Friday</option>
+                                      <option value="Saturday">Saturday</option>
+                                      
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Day
+                                    </h5>
+                                    <select
+                                      name="stcschoolscheduleday"
+                                      type="text"
+                                      class="form-control validate stcschoolscheduleday"
+                                      >
+                                      <option value="Monday">Monday</option>
+                                      <option value="Tuesday">Tuesday</option>
+                                      <option value="Wednesday">Wednesday</option>
+                                      <option value="Thursday">Thursday</option>
+                                      <option value="Friday">Friday</option>
+                                      <option value="Saturday">Saturday</option>
+                                      
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Start Time
+                                    </h5>
+                                    <input
+                                      name="stcschoolschedulestarttime"
+                                      type="time"
+                                      class="form-control validate stcschoolschedulestarttime"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >End Time
+                                    </h5>
+                                    <input
+                                      name="stcschoolscheduleendtime"
+                                      type="time"
+                                      class="form-control validate stcschoolscheduleendtime"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolschedulesave">Save</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1156,45 +1289,6 @@ if($_SESSION['stc_school_user_for']==2){
   <!-- Material Dashboard DEMO methods, don't include it in your project! -->
   <script src="../assets/demo/demo.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-  <script type="text/javascript">
-    var ctx = document.getElementById("chartjs_bar").getContext('2d');
-              var myChart = new Chart(ctx, {
-                  type: 'bar',
-                  data: {
-                      labels:<?php echo json_encode($agent_name); ?>,
-                      datasets: [{
-                          backgroundColor: [
-                             "#00FFFF",
-                              "#ff407b",
-                              "#25d5f2",
-                              "#ffc750",
-                              "#2ec551",
-                              "#7040fa",
-                              "#ff004e",
-                              "#FF00FF",
-                              "#FFA500",
-                              "#A52A2A",
-                              "#008000"
-                          ],
-                          data:<?php echo json_encode($sales); ?>,
-                      }]
-                  },
-                  options: {
-                         legend: {
-                      display: true,
-                      position: 'bottom',
-  
-                      labels: {
-                          fontColor: '#71748d',
-                          fontFamily: 'Circular Std Book',
-                          fontSize: 14,
-                      }
-                  },
-  
-  
-              }
-              });
-  </script>
   <script>
     $(document).ready(function() {
       $().ready(function() {
@@ -1405,56 +1499,210 @@ if($_SESSION['stc_school_user_for']==2){
     <!-- canteen section -->
     <script>
       $(document).ready(function(){
-        // save canteen to db
-        $(document).on('click', '#stcschoolcanteenserjit', function(e){
+
+        // save teacher to db
+        $(document).on('click', '#stcschoolteachersave', function(e){
           e.preventDefault();
-          var stcschoolcanteenserdate       = $('.stcschoolcanteenserdate').val();
-          var stcschoolcanteensertype       = $('.stcschoolcanteensertype').val();
-          var stcschoolcanteensertime       = $('.stcschoolcanteensertime').val();
-          var stcschoolcanteenserqty        = $('.stcschoolcanteenserqty').val();
-          var stcschoolcanteenserremarks    = $('.stcschoolcanteenserremarks').val();
+          var stcschoolmanagementteacherid              = $('.stcschoolmanagementteacherid').val();
+          var stcschoolmanagementteacherfirstname       = $('.stcschoolmanagementteacherfirstname').val();
+          var stcschoolmanagementteacherlastname        = $('.stcschoolmanagementteacherlastname').val();
+          var stcschoolmanagementteacherdateofbirth     = $('.stcschoolmanagementteacherdateofbirth').val();
+          var stcschoolmanagementteachergender          = $('.stcschoolmanagementteachergender:checked').val();
+          var stcschoolmanagementteacherbloodgroup      = $('.stcschoolmanagementteacherbloodgroup').val();
+          var stcschoolmanagementteacheremail           = $('.stcschoolmanagementteacheremail').val();
+          var stcschoolmanagementteachernumber          = $('.stcschoolmanagementteachernumber').val();
+          var stcschoolmanagementteacheraddress         = $('.stcschoolmanagementteacheraddress').val();
+          var stcschoolmanagementteacherskills          = $('.stcschoolmanagementteacherskills').val();
+          var stcschoolmanagementteacherreligion        = $('.stcschoolmanagementteacherreligion').val();
+          var stcschoolmanagementteacherjoiningdate     = $('.stcschoolmanagementteacherjoiningdate').val();
+          var stcschoolmanagementteacherremarks         = $('.stcschoolmanagementteacherremarks').val();
           $.ajax({  
-            url       : "../vanaheim/canteen-raised.php",
+            url       : "../vanaheim/school-management.php",
             method    : "POST",  
             data      : {
-              stcschoolcanteenserdate:stcschoolcanteenserdate,
-              stcschoolcanteensertype:stcschoolcanteensertype,
-              stcschoolcanteensertime:stcschoolcanteensertime,
-              stcschoolcanteenserqty:stcschoolcanteenserqty,
-              stcschoolcanteenserremarks:stcschoolcanteenserremarks,
-              save_canteen_action : 1
+              stcschoolmanagementteacherid:stcschoolmanagementteacherid,
+              stcschoolmanagementteacherfirstname:stcschoolmanagementteacherfirstname,
+              stcschoolmanagementteacherlastname:stcschoolmanagementteacherlastname,
+              stcschoolmanagementteacherdateofbirth:stcschoolmanagementteacherdateofbirth,
+              stcschoolmanagementteachergender:stcschoolmanagementteachergender,
+              stcschoolmanagementteacherbloodgroup:stcschoolmanagementteacherbloodgroup,
+              stcschoolmanagementteacheremail:stcschoolmanagementteacheremail,
+              stcschoolmanagementteachernumber:stcschoolmanagementteachernumber,
+              stcschoolmanagementteacheraddress:stcschoolmanagementteacheraddress,
+              stcschoolmanagementteacherskills:stcschoolmanagementteacherskills,
+              stcschoolmanagementteacherreligion:stcschoolmanagementteacherreligion,
+              stcschoolmanagementteacherjoiningdate:stcschoolmanagementteacherjoiningdate,
+              stcschoolmanagementteacherremarks:stcschoolmanagementteacherremarks,
+              save_teacheradd_action : 1
             },
             // dataType: `JSON`,
             success   : function(data){
              // console.log(data);
              var response=data.trim();
-             if(response=="Record saved successfully."){
-              alert(data);
+             if(response=="success"){
+              alert("Record saved successfully.");
               window.location.reload();
-             }else{
-              $(this).show();
-              alert(data);
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check contact and email and try again.");
+             }
+            }
+          });
+        });
+
+
+        // save teacher to db
+        $(document).on('click', '#stcschoolstudentsave', function(e){
+          e.preventDefault();
+          var stcschoolmanagementstudentid              = $('.stcschoolmanagementstudentid').val();
+          var stcschoolmanagementstudentfirstname       = $('.stcschoolmanagementstudentfirstname').val();
+          var stcschoolmanagementstudentlastname        = $('.stcschoolmanagementstudentlastname').val();
+          var stcschoolmanagementstudentdateofbirth     = $('.stcschoolmanagementstudentdateofbirth').val();
+          var stcschoolmanagementstudentgender          = $('.stcschoolmanagementstudentgender:checked').val();
+          var stcschoolmanagementstudentbloodgroup      = $('.stcschoolmanagementstudentbloodgroup').val();
+          var stcschoolmanagementstudentemail           = $('.stcschoolmanagementstudentemail').val();
+          var stcschoolmanagementstudentnumber          = $('.stcschoolmanagementstudentnumber').val();
+          var stcschoolmanagementStudentaddress         = $('.stcschoolmanagementStudentaddress').val();
+          var stcschoolmanagementstudentreligion          = $('.stcschoolmanagementstudentreligion').val();
+          var stcschoolmanagementstudentjoiningdate        = $('.stcschoolmanagementstudentjoiningdate').val();
+          var stcschoolmanagementstudentclassroom     = $('.stcschoolmanagementstudentclassroom').val();
+          var stcschoolmanagementstudentparentguardianfullname         = $('.stcschoolmanagementstudentparentguardianfullname').val();
+          var stcschoolmanagementstudentremarks         = $('.stcschoolmanagementstudentremarks').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stcschoolmanagementstudentid:stcschoolmanagementstudentid,
+              stcschoolmanagementstudentfirstname:stcschoolmanagementstudentfirstname,
+              stcschoolmanagementstudentlastname:stcschoolmanagementstudentlastname,
+              stcschoolmanagementstudentdateofbirth:stcschoolmanagementstudentdateofbirth,
+              stcschoolmanagementstudentgender:stcschoolmanagementstudentgender,
+              stcschoolmanagementstudentbloodgroup:stcschoolmanagementstudentbloodgroup,
+              stcschoolmanagementstudentemail:stcschoolmanagementstudentemail,
+              stcschoolmanagementstudentnumber:stcschoolmanagementstudentnumber,
+              stcschoolmanagementStudentaddress:stcschoolmanagementStudentaddress,
+              stcschoolmanagementstudentreligion:stcschoolmanagementstudentreligion,
+              stcschoolmanagementstudentjoiningdate:stcschoolmanagementstudentjoiningdate,
+              stcschoolmanagementstudentclassroom:stcschoolmanagementstudentclassroom,
+              stcschoolmanagementstudentparentguardianfullname:stcschoolmanagementstudentparentguardianfullname,
+              stcschoolmanagementstudentremarks:stcschoolmanagementstudentremarks,
+              save_studentadd_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              alert("Record saved successfully.");
+              window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check contact and email other, details and try again.");
+             }
+            }
+          });
+        });
+
+
+        // save subject to db
+        $(document).on('click', '#stcschoolsubjectsave', function(e){
+          e.preventDefault();
+          var stcschoolmanagementsubjectid        = $('.stcschoolmanagementsubjectid').val();
+          var stcschoolmanagementsubjecttitle     = $('.stcschoolmanagementsubjecttitle').val();
+          var stcschoolmanagementsubjectdetails   = $('.stcschoolmanagementsubjectdetails').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stcschoolmanagementsubjectid:stcschoolmanagementsubjectid,
+              stcschoolmanagementsubjecttitle:stcschoolmanagementsubjecttitle,
+              stcschoolmanagementsubjectdetails:stcschoolmanagementsubjectdetails,
+              save_subjectadd_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              alert("Record saved successfully.");
+              window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check and try again.");
+             }
+            }
+          });
+        });
+
+
+        // save class to db
+        $(document).on('click', '#stcschoolclassroomsave', function(e){
+          e.preventDefault();
+          var stcschoolmanagementclassroomid        = $('.stcschoolmanagementclassroomid').val();
+          var stcschoolmanagementclassroomtitle     = $('.stcschoolmanagementclassroomtitle').val();
+          var stcschoolmanagementclassroomlocation   = $('.stcschoolmanagementclassroomlocation').val();
+          var stcschoolmanagementclassroomcapacity   = $('.stcschoolmanagementclassroomcapacity').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stcschoolmanagementclassroomid:stcschoolmanagementclassroomid,
+              stcschoolmanagementclassroomtitle:stcschoolmanagementclassroomtitle,
+              stcschoolmanagementclassroomlocation:stcschoolmanagementclassroomlocation,
+              stcschoolmanagementclassroomcapacity:stcschoolmanagementclassroomcapacity,
+              save_classadd_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              alert("Record saved successfully.");
+              window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check and try again.");
              }
             }
           });
         });
 
         // call canteen
-        stc_call_canteen();
-        function stc_call_canteen(){
-          $.ajax({  
-            url       : "../vanaheim/canteen-raised.php",
-            method    : "POST",  
-            data      : {
-              stc_call_canteen : 1
-            },
-            // dataType: `JSON`,
-            success   : function(response_canteen){
-             // console.log(data);
-             $('.stc-view-silent-canteen-row-fetch').html(response_canteen);
-            }
-          });
-        }
+        // stc_call_canteen();
+        // function stc_call_canteen(){
+        //   $.ajax({  
+        //     url       : "../vanaheim/canteen-raised.php",
+        //     method    : "POST",  
+        //     data      : {
+        //       stc_call_canteen : 1
+        //     },
+        //     // dataType: `JSON`,
+        //     success   : function(response_canteen){
+        //      // console.log(data);
+        //      $('.stc-view-silent-canteen-row-fetch').html(response_canteen);
+        //     }
+        //   });
+        // }
       });
     </script>
   </body>
