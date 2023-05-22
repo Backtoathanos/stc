@@ -232,6 +232,88 @@ class Yggdrasil extends tesseract{
 	}
 	
 
+	public function stc_save_school_schedule($stcschoolscheduleteacher, $stcschoolschedulesubject, $stcschoolscheduleclass, $stcschoolscheduleday, $stcschoolschedulestarttime, $stcschoolscheduleendtime){
+		$odin='';
+		$date=date("Y-m-d H:i:s");
+		$check_qry=mysqli_query($this->stc_dbs, "SELECT `stc_school_teacher_schedule_id` FROM `stc_school_teacher_schedule` WHERE `stc_school_teacher_schedule_teacherid`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleteacher)."' AND `stc_school_teacher_schedule_day`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleday)."' AND `stc_school_teacher_schedule_begtime`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolschedulestarttime)."' AND `stc_school_teacher_schedule_endtime`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleendtime)."'
+		");
+		if(mysqli_num_rows($check_qry)>0){
+			$odin = "duplicate";
+		}else{
+			$set_loki=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_school_teacher_schedule`(
+					`stc_school_teacher_schedule_teacherid`,
+					`stc_school_teacher_schedule_classid`,
+					`stc_school_teacher_schedule_subjectid`,
+					`stc_school_teacher_schedule_day`,
+					`stc_school_teacher_schedule_begtime`,
+					`stc_school_teacher_schedule_endtime`,
+					`stc_school_teacher_schedule_status`,
+					`stc_school_teacher_schedule_createdate`,
+					`stc_school_teacher_schedule_createdby`
+				)VALUES(
+					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleteacher)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleclass)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolschedulesubject)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleday)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolschedulestarttime)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleendtime)."',
+					'0',
+					'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+					'".$_SESSION['stc_school_user_id']."'
+				)
+			");
+			if($set_loki){
+				$odin = "success";
+			}else{
+				$odin = "wrong";
+			}
+		}
+		return $odin;
+	}
+
+	public function stc_call_school_student($schedule_id){
+		$odin='';
+		$odin_stuqry=mysqli_query($this->stc_dbs, "
+			SELECT
+			    `stc_school_student_id`,
+			    `stc_school_student_studid`,
+			    `stc_school_student_firstname`,
+			    `stc_school_student_lastname`
+			FROM
+			    `stc_school_student`
+			LEFT JOIN
+			    `stc_school_teacher_schedule`
+			ON
+			    `stc_school_student_classroomid`=`stc_school_teacher_schedule_classid`
+			WHERE
+			    `stc_school_teacher_schedule_id`='".mysqli_real_escape_string($this->stc_dbs, $schedule_id)."'
+		");
+		if(mysqli_num_rows($odin_stuqry)>0){
+			foreach($odin_stuqry as $odin_sturow){
+				$odin.='
+					<tr>
+						<td>'.$odin_sturow['stc_school_student_studid'].'</td>
+						<td>'.$odin_sturow['stc_school_student_firstname'].' '.$odin_sturow['stc_school_student_lastname'].'</td>
+						<td>
+							<input type="radio" name="stu-attendancecombo" class="stc-school-stu-attendance-but" id="'.$odin_sturow['stc_school_student_id'].'" checked> Present
+						</td>
+						<td>
+							<input type="radio" name="stu-attendancecombo" class="stc-school-stu-attendance-but" id="'.$odin_sturow['stc_school_student_id'].'"> Absent
+						</td>
+					</tr>
+				';
+			}
+		}else{
+			$odin='
+				<tr>
+					<td colspan="5">No data found!!!</td>
+				</tr>
+			';
+		}
+		return $odin;
+	}
+
 }
 
 #<------------------------------------------------------------------------------------------>
@@ -332,4 +414,32 @@ if(isset($_POST['save_classadd_action'])){
 	echo $out;
 }
 
+// save schedule
+if(isset($_POST['save_schduleadd_action'])){
+	$stcschoolscheduleteacher =$_POST['stcschoolscheduleteacher'];
+	$stcschoolschedulesubject =$_POST['stcschoolschedulesubject'];
+	$stcschoolscheduleclass =$_POST['stcschoolscheduleclass'];
+	$stcschoolscheduleday = $_POST['stcschoolscheduleday'];
+	$stcschoolschedulestarttime =$_POST['stcschoolschedulestarttime'];
+	$stcschoolscheduleendtime = $_POST['stcschoolscheduleendtime'];
+
+	$valkyrie=new Yggdrasil();
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out="reload";
+	}else if($stcschoolscheduleteacher=="NA" || $stcschoolschedulesubject=="NA" || $stcschoolscheduleclass=="NA"){
+		$out="empty";
+	}else{		
+		$lokiheck=$valkyrie->stc_save_school_schedule($stcschoolscheduleteacher, $stcschoolschedulesubject, $stcschoolscheduleclass, $stcschoolscheduleday, $stcschoolschedulestarttime, $stcschoolscheduleendtime);
+		$out=$lokiheck;
+	}
+	echo $out;
+}
+
+// call student for attendance
+if(isset($_POST['stc_call_student'])){
+	$schedule_id=$_POST['schedule_id'];
+	$valkyrie=new Yggdrasil();
+	$lokiheck=$valkyrie->stc_call_school_student($schedule_id);
+	echo $lokiheck;
+}
 ?>

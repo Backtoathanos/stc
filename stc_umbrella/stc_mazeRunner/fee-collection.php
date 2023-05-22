@@ -421,6 +421,12 @@ if($_SESSION['stc_school_user_for']==1){
                 <p>School Management</p>
               </a>
             </li>
+            <li class="nav-item active">
+              <a class="nav-link" href="./school-attendance.php">
+                <i class="material-icons">feed</i>
+                <p>School Attendance</p>
+              </a>
+            </li>
           </ul>
         </div>
       </div>

@@ -415,8 +415,14 @@ if($_SESSION['stc_school_user_for']==2){
             </li>
             <li class="nav-item active">
               <a class="nav-link" href="./school-management.php">
-                <i class="material-icons">feed</i>
+                <i class="material-icons">school</i>
                 <p>School Management</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./school-attendance.php">
+                <i class="material-icons">schedule</i>
+                <p>School Attendance</p>
               </a>
             </li>
           </ul>
@@ -462,7 +468,7 @@ if($_SESSION['stc_school_user_for']==2){
                           </li>
                           <li class="nav-item">
                             <a class="nav-link " href="#stc-create-shedule" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Schedule Routine
+                              <i class="material-icons">add_circle</i> Create Schedule
                               <div class="ripple-container"></div>
                             </a>
                           </li>
@@ -698,7 +704,7 @@ if($_SESSION['stc_school_user_for']==2){
                                 </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                   <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolteachersave">Save</button>
+                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolteachersave">Add Teacher</button>
                                   </div>
                                 </div>
                               </div>
@@ -915,21 +921,20 @@ if($_SESSION['stc_school_user_for']==2){
                                         class="form-control stcschoolmanagementstudentclassroom" 
                                         name="stcschoolmanagementstudentclassroom" 
                                         >
-                                        <option value="0">--Select--</option> 
-                                        <option value="a_positive">1</option>
-                                        <option value="a_negative">2</option>
-                                        <option value="b_positive">3</option>
-                                        <option value="b_negative">4</option>
-                                        <option value="o_positive">5</option>
-                                        <option value="o_negative">6</option>
-                                        <option value="ab_positive">7</option>
-                                        <option value="ab_negative">9</option>
-                                        <option value="ab_negative">10</option>
-                                        <option value="ab_negative">11</option>
-                                        <option value="ab_negative">12</option>
-                                        <option value="ab_negative">13</option>
-                                        <option value="ab_negative">14</option>
-                                        <option value="ab_negative">15</option>
+                                        <option value="0">--Select--</option>
+                                        <?php
+                                          include_once("../../MCU/db.php");
+
+                                          $class_sql=mysqli_query($con, "
+                                              select * from stc_school_class where stc_school_class_status=1
+                                          ");
+                                          foreach($class_sql as $classrow){
+                                            echo '<option value="'.$classrow['stc_school_class_id'].'">'.$classrow['stc_school_class_title'].'</option>';
+
+                                        ?> 
+                                        <?php 
+                                          }                                          
+                                        ?>
                                     </select>
                                   </div>
                                 </div>
@@ -964,7 +969,7 @@ if($_SESSION['stc_school_user_for']==2){
                                 </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                   <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolstudentsave">Save</button>
+                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolstudentsave">Add Student</button>
                                   </div>
                                 </div>
                               </div>
@@ -1031,7 +1036,7 @@ if($_SESSION['stc_school_user_for']==2){
                                 </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                   <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolsubjectsave">Save</button>
+                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolsubjectsave">Add Subject</button>
                                   </div>
                                 </div>
                               </div>
@@ -1114,7 +1119,7 @@ if($_SESSION['stc_school_user_for']==2){
                                 </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                   <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolclassroomsave">Save</button>
+                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolclassroomsave">Add Class Room</button>
                                   </div>
                                 </div>
                               </div>
@@ -1129,7 +1134,7 @@ if($_SESSION['stc_school_user_for']==2){
                       <div class="tab-pane " id="stc-create-shedule">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Create Schedule Routine</h2>
+                            <h2 class="tm-block-title d-inline-block">Create Schedule</h2>
                           </div>
                         </div>
                         <div class="row">
@@ -1140,19 +1145,50 @@ if($_SESSION['stc_school_user_for']==2){
                                   <div class="mb-3">
                                     <h5
                                       for="name"
+                                      >Teacher
+                                    </h5>
+                                    <select
+                                      name="stcschoolscheduleteacher"
+                                      type="text"
+                                      class="form-control validate stcschoolscheduleteacher"
+                                      ><option value="NA">Select</option>
+                                      <?php
+                                        $teacher_sql=mysqli_query($con, "
+                                            select * from stc_school_teacher where stc_school_teacher_status=1
+                                        ");
+                                        foreach($teacher_sql as $teacherrow){
+                                          echo '<option value="'.$teacherrow['stc_school_teacher_id'].'">'.$teacherrow['stc_school_teacher_firstname'].' - '.$teacherrow['stc_school_teacher_teachid'].'</option>';
+
+                                      ?> 
+                                      <?php 
+                                        }                                          
+                                      ?>
+                                      
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
                                       >Subject
                                     </h5>
                                     <select
                                       name="stcschoolschedulesubject"
                                       type="text"
                                       class="form-control validate stcschoolschedulesubject"
-                                      >
-                                      <option value="Monday">Monday</option>
-                                      <option value="Tuesday">Tuesday</option>
-                                      <option value="Wednesday">Wednesday</option>
-                                      <option value="Thursday">Thursday</option>
-                                      <option value="Friday">Friday</option>
-                                      <option value="Saturday">Saturday</option>
+                                      ><option value="NA">Select</option>
+                                      <?php
+                                        $subject_sql=mysqli_query($con, "
+                                            select * from stc_school_subject where stc_school_subject_status=1
+                                        ");
+                                        foreach($subject_sql as $subjectrow){
+                                          echo '<option value="'.$subjectrow['stc_school_subject_id'].'">'.$subjectrow['stc_school_subject_title'].' - '.$subjectrow['stc_school_subject_subid'].'</option>';
+
+                                      ?> 
+                                      <?php 
+                                        }                                          
+                                      ?>
                                       
                                     </select>
                                   </div>
@@ -1167,14 +1203,22 @@ if($_SESSION['stc_school_user_for']==2){
                                       name="stcschoolscheduleclass"
                                       type="text"
                                       class="form-control validate stcschoolscheduleclass"
-                                      >
-                                      <option value="Monday">Monday</option>
-                                      <option value="Tuesday">Tuesday</option>
-                                      <option value="Wednesday">Wednesday</option>
-                                      <option value="Thursday">Thursday</option>
-                                      <option value="Friday">Friday</option>
-                                      <option value="Saturday">Saturday</option>
-                                      
+                                      ><option value="NA">Select</option>
+                                      <?php
+                                        $sclass_sql=mysqli_query($con, "
+                                            select * from stc_school_class where stc_school_class_status=1
+                                        ");
+                                        foreach($sclass_sql as $sclassrow){
+                                          echo '<option value="'.$sclassrow['stc_school_class_id'].'">'.$sclassrow['stc_school_class_title'].' - '.$sclassrow['stc_school_class_classid'].'</option>';
+
+                                      ?> 
+                                      <?php 
+                                        }      
+
+                                        // $date=date();
+                                        date_default_timezone_set('Asia/Kolkata');
+                                        $time=date('H:i:s');                                    
+                                      ?>                                      
                                     </select>
                                   </div>
                                 </div>
@@ -1189,6 +1233,7 @@ if($_SESSION['stc_school_user_for']==2){
                                       type="text"
                                       class="form-control validate stcschoolscheduleday"
                                       >
+                                      ><option value="NA">Select</option>
                                       <option value="Monday">Monday</option>
                                       <option value="Tuesday">Tuesday</option>
                                       <option value="Wednesday">Wednesday</option>
@@ -1209,6 +1254,7 @@ if($_SESSION['stc_school_user_for']==2){
                                       name="stcschoolschedulestarttime"
                                       type="time"
                                       class="form-control validate stcschoolschedulestarttime"
+                                      value="<?php echo $time;?>"
                                     />
                                   </div>
                                 </div>
@@ -1222,12 +1268,13 @@ if($_SESSION['stc_school_user_for']==2){
                                       name="stcschoolscheduleendtime"
                                       type="time"
                                       class="form-control validate stcschoolscheduleendtime"
+                                      value="<?php echo $time;?>"
                                     />
                                   </div>
                                 </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                   <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolschedulesave">Save</button>
+                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolschedulesave">Add Schedule</button>
                                   </div>
                                 </div>
                               </div>
@@ -1245,228 +1292,228 @@ if($_SESSION['stc_school_user_for']==2){
       </div>
     </div>
     
-  <!--   Core JS Files   -->
-  <script src="../assets/js/core/jquery.min.js"></script>
-  <script src="../assets/js/core/popper.min.js"></script>
-  <script src="../assets/js/core/bootstrap-material-design.min.js"></script>
-  <script src="../assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
-  <!-- Plugin for the momentJs  -->
-  <script src="../assets/js/plugins/moment.min.js"></script>
-  <!--  Plugin for Sweet Alert -->
-  <script src="../assets/js/plugins/sweetalert2.js"></script>
-  <!-- Forms Validations Plugin -->
-  <script src="../assets/js/plugins/jquery.validate.min.js"></script>
-  <!-- Plugin for the Wizard, full documentation here: https://github.com/VinceG/twitter-bootstrap-wizard -->
-  <script src="../assets/js/plugins/jquery.bootstrap-wizard.js"></script>
-  <!--  Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
-  <script src="../assets/js/plugins/bootstrap-selectpicker.js"></script>
-  <!--  Plugin for the DateTimePicker, full documentation here: https://eonasdan.github.io/bootstrap-datetimepicker/ -->
-  <script src="../assets/js/plugins/bootstrap-datetimepicker.min.js"></script>
-  <!--  DataTables.net Plugin, full documentation here: https://datatables.net/  -->
-  <script src="../assets/js/plugins/jquery.dataTables.min.js"></script>
-  <!--  Plugin for Tags, full documentation here: https://github.com/bootstrap-tagsinput/bootstrap-tagsinputs  -->
-  <script src="../assets/js/plugins/bootstrap-tagsinput.js"></script>
-  <!-- Plugin for Fileupload, full documentation here: http://www.jasny.net/bootstrap/javascript/#fileinput -->
-  <script src="../assets/js/plugins/jasny-bootstrap.min.js"></script>
-  <!--  Full Calendar Plugin, full documentation here: https://github.com/fullcalendar/fullcalendar    -->
-  <script src="../assets/js/plugins/fullcalendar.min.js"></script>
-  <!-- Vector Map plugin, full documentation here: http://jvectormap.com/documentation/ -->
-  <script src="../assets/js/plugins/jquery-jvectormap.js"></script>
-  <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
-  <script src="../assets/js/plugins/nouislider.min.js"></script>
-  <!-- Include a polyfill for ES6 Promises (optional) for IE11, UC Browser and Android browser support SweetAlert -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.js"></script>
-  <!-- Library for adding dinamically elements -->
-  <script src="../assets/js/plugins/arrive.min.js"></script>
-  <!--  Google Maps Plugin    -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
-  <!-- Chartist JS -->
-  <script src="../assets/js/plugins/chartist.min.js"></script>
-  <!--  Notifications Plugin    -->
-  <script src="../assets/js/plugins/bootstrap-notify.js"></script>
-  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
-  <script src="../assets/js/material-dashboard.js?v=2.1.2" type="text/javascript"></script>
-  <!-- Material Dashboard DEMO methods, don't include it in your project! -->
-  <script src="../assets/demo/demo.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-  <script>
-    $(document).ready(function() {
-      $().ready(function() {
-        $sidebar = $('.sidebar');
+    <!--   Core JS Files   -->
+    <script src="../assets/js/core/jquery.min.js"></script>
+    <script src="../assets/js/core/popper.min.js"></script>
+    <script src="../assets/js/core/bootstrap-material-design.min.js"></script>
+    <script src="../assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
+    <!-- Plugin for the momentJs  -->
+    <script src="../assets/js/plugins/moment.min.js"></script>
+    <!--  Plugin for Sweet Alert -->
+    <script src="../assets/js/plugins/sweetalert2.js"></script>
+    <!-- Forms Validations Plugin -->
+    <script src="../assets/js/plugins/jquery.validate.min.js"></script>
+    <!-- Plugin for the Wizard, full documentation here: https://github.com/VinceG/twitter-bootstrap-wizard -->
+    <script src="../assets/js/plugins/jquery.bootstrap-wizard.js"></script>
+    <!--  Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
+    <script src="../assets/js/plugins/bootstrap-selectpicker.js"></script>
+    <!--  Plugin for the DateTimePicker, full documentation here: https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+    <script src="../assets/js/plugins/bootstrap-datetimepicker.min.js"></script>
+    <!--  DataTables.net Plugin, full documentation here: https://datatables.net/  -->
+    <script src="../assets/js/plugins/jquery.dataTables.min.js"></script>
+    <!--  Plugin for Tags, full documentation here: https://github.com/bootstrap-tagsinput/bootstrap-tagsinputs  -->
+    <script src="../assets/js/plugins/bootstrap-tagsinput.js"></script>
+    <!-- Plugin for Fileupload, full documentation here: http://www.jasny.net/bootstrap/javascript/#fileinput -->
+    <script src="../assets/js/plugins/jasny-bootstrap.min.js"></script>
+    <!--  Full Calendar Plugin, full documentation here: https://github.com/fullcalendar/fullcalendar    -->
+    <script src="../assets/js/plugins/fullcalendar.min.js"></script>
+    <!-- Vector Map plugin, full documentation here: http://jvectormap.com/documentation/ -->
+    <script src="../assets/js/plugins/jquery-jvectormap.js"></script>
+    <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
+    <script src="../assets/js/plugins/nouislider.min.js"></script>
+    <!-- Include a polyfill for ES6 Promises (optional) for IE11, UC Browser and Android browser support SweetAlert -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.js"></script>
+    <!-- Library for adding dinamically elements -->
+    <script src="../assets/js/plugins/arrive.min.js"></script>
+    <!--  Google Maps Plugin    -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
+    <!-- Chartist JS -->
+    <script src="../assets/js/plugins/chartist.min.js"></script>
+    <!--  Notifications Plugin    -->
+    <script src="../assets/js/plugins/bootstrap-notify.js"></script>
+    <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="../assets/js/material-dashboard.js?v=2.1.2" type="text/javascript"></script>
+    <!-- Material Dashboard DEMO methods, don't include it in your project! -->
+    <script src="../assets/demo/demo.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $().ready(function() {
+          $sidebar = $('.sidebar');
 
-        $sidebar_img_container = $sidebar.find('.sidebar-background');
+          $sidebar_img_container = $sidebar.find('.sidebar-background');
 
-        $full_page = $('.full-page');
+          $full_page = $('.full-page');
 
-        $sidebar_responsive = $('body > .navbar-collapse');
+          $sidebar_responsive = $('body > .navbar-collapse');
 
-        window_width = $(window).width();
+          window_width = $(window).width();
 
-        fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
+          fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
 
-        if (window_width > 767 && fixed_plugin_open == 'Dashboard') {
-          if ($('.fixed-plugin .dropdown').hasClass('show-dropdown')) {
-            $('.fixed-plugin .dropdown').addClass('open');
-          }
-
-        }
-
-        $('.fixed-plugin a').click(function(event) {
-          // Alex if we click on switch, stop propagation of the event, so the dropdown will not be hide, otherwise we set the  section active
-          if ($(this).hasClass('switch-trigger')) {
-            if (event.stopPropagation) {
-              event.stopPropagation();
-            } else if (window.event) {
-              window.event.cancelBubble = true;
+          if (window_width > 767 && fixed_plugin_open == 'Dashboard') {
+            if ($('.fixed-plugin .dropdown').hasClass('show-dropdown')) {
+              $('.fixed-plugin .dropdown').addClass('open');
             }
-          }
-        });
 
-        $('.fixed-plugin .active-color span').click(function() {
-          $full_page_background = $('.full-page-background');
-
-          $(this).siblings().removeClass('active');
-          $(this).addClass('active');
-
-          var new_color = $(this).data('color');
-
-          if ($sidebar.length != 0) {
-            $sidebar.attr('data-color', new_color);
           }
 
-          if ($full_page.length != 0) {
-            $full_page.attr('filter-color', new_color);
-          }
+          $('.fixed-plugin a').click(function(event) {
+            // Alex if we click on switch, stop propagation of the event, so the dropdown will not be hide, otherwise we set the  section active
+            if ($(this).hasClass('switch-trigger')) {
+              if (event.stopPropagation) {
+                event.stopPropagation();
+              } else if (window.event) {
+                window.event.cancelBubble = true;
+              }
+            }
+          });
 
-          if ($sidebar_responsive.length != 0) {
-            $sidebar_responsive.attr('data-color', new_color);
-          }
-        });
+          $('.fixed-plugin .active-color span').click(function() {
+            $full_page_background = $('.full-page-background');
 
-        $('.fixed-plugin .background-color .badge').click(function() {
-          $(this).siblings().removeClass('active');
-          $(this).addClass('active');
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
 
-          var new_color = $(this).data('background-color');
+            var new_color = $(this).data('color');
 
-          if ($sidebar.length != 0) {
-            $sidebar.attr('data-background-color', new_color);
-          }
-        });
+            if ($sidebar.length != 0) {
+              $sidebar.attr('data-color', new_color);
+            }
 
-        $('.fixed-plugin .img-holder').click(function() {
-          $full_page_background = $('.full-page-background');
+            if ($full_page.length != 0) {
+              $full_page.attr('filter-color', new_color);
+            }
 
-          $(this).parent('li').siblings().removeClass('active');
-          $(this).parent('li').addClass('active');
+            if ($sidebar_responsive.length != 0) {
+              $sidebar_responsive.attr('data-color', new_color);
+            }
+          });
+
+          $('.fixed-plugin .background-color .badge').click(function() {
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
+
+            var new_color = $(this).data('background-color');
+
+            if ($sidebar.length != 0) {
+              $sidebar.attr('data-background-color', new_color);
+            }
+          });
+
+          $('.fixed-plugin .img-holder').click(function() {
+            $full_page_background = $('.full-page-background');
+
+            $(this).parent('li').siblings().removeClass('active');
+            $(this).parent('li').addClass('active');
 
 
-          var new_image = $(this).find("img").attr('src');
+            var new_image = $(this).find("img").attr('src');
 
-          if ($sidebar_img_container.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
-            $sidebar_img_container.fadeOut('fast', function() {
+            if ($sidebar_img_container.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
+              $sidebar_img_container.fadeOut('fast', function() {
+                $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
+                $sidebar_img_container.fadeIn('fast');
+              });
+            }
+
+            if ($full_page_background.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
+              var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
+
+              $full_page_background.fadeOut('fast', function() {
+                $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
+                $full_page_background.fadeIn('fast');
+              });
+            }
+
+            if ($('.switch-sidebar-image input:checked').length == 0) {
+              var new_image = $('.fixed-plugin li.active .img-holder').find("img").attr('src');
+              var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
+
               $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
-              $sidebar_img_container.fadeIn('fast');
-            });
-          }
-
-          if ($full_page_background.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
-            var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
-
-            $full_page_background.fadeOut('fast', function() {
               $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
-              $full_page_background.fadeIn('fast');
-            });
-          }
-
-          if ($('.switch-sidebar-image input:checked').length == 0) {
-            var new_image = $('.fixed-plugin li.active .img-holder').find("img").attr('src');
-            var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
-
-            $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
-            $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
-          }
-
-          if ($sidebar_responsive.length != 0) {
-            $sidebar_responsive.css('background-image', 'url("' + new_image + '")');
-          }
-        });
-
-        $('.switch-sidebar-image input').change(function() {
-          $full_page_background = $('.full-page-background');
-
-          $input = $(this);
-
-          if ($input.is(':checked')) {
-            if ($sidebar_img_container.length != 0) {
-              $sidebar_img_container.fadeIn('fast');
-              $sidebar.attr('data-image', '#');
             }
 
-            if ($full_page_background.length != 0) {
-              $full_page_background.fadeIn('fast');
-              $full_page.attr('data-image', '#');
+            if ($sidebar_responsive.length != 0) {
+              $sidebar_responsive.css('background-image', 'url("' + new_image + '")');
+            }
+          });
+
+          $('.switch-sidebar-image input').change(function() {
+            $full_page_background = $('.full-page-background');
+
+            $input = $(this);
+
+            if ($input.is(':checked')) {
+              if ($sidebar_img_container.length != 0) {
+                $sidebar_img_container.fadeIn('fast');
+                $sidebar.attr('data-image', '#');
+              }
+
+              if ($full_page_background.length != 0) {
+                $full_page_background.fadeIn('fast');
+                $full_page.attr('data-image', '#');
+              }
+
+              background_image = true;
+            } else {
+              if ($sidebar_img_container.length != 0) {
+                $sidebar.removeAttr('data-image');
+                $sidebar_img_container.fadeOut('fast');
+              }
+
+              if ($full_page_background.length != 0) {
+                $full_page.removeAttr('data-image', '#');
+                $full_page_background.fadeOut('fast');
+              }
+
+              background_image = false;
+            }
+          });
+
+          $('.switch-sidebar-mini input').change(function() {
+            $body = $('body');
+
+            $input = $(this);
+
+            if (md.misc.sidebar_mini_active == true) {
+              $('body').removeClass('sidebar-mini');
+              md.misc.sidebar_mini_active = false;
+
+              $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar();
+
+            } else {
+
+              $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar('destroy');
+
+              setTimeout(function() {
+                $('body').addClass('sidebar-mini');
+
+                md.misc.sidebar_mini_active = true;
+              }, 300);
             }
 
-            background_image = true;
-          } else {
-            if ($sidebar_img_container.length != 0) {
-              $sidebar.removeAttr('data-image');
-              $sidebar_img_container.fadeOut('fast');
-            }
+            // we simulate the window Resize so the charts will get updated in realtime.
+            var simulateWindowResize = setInterval(function() {
+              window.dispatchEvent(new Event('resize'));
+            }, 180);
 
-            if ($full_page_background.length != 0) {
-              $full_page.removeAttr('data-image', '#');
-              $full_page_background.fadeOut('fast');
-            }
-
-            background_image = false;
-          }
-        });
-
-        $('.switch-sidebar-mini input').change(function() {
-          $body = $('body');
-
-          $input = $(this);
-
-          if (md.misc.sidebar_mini_active == true) {
-            $('body').removeClass('sidebar-mini');
-            md.misc.sidebar_mini_active = false;
-
-            $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar();
-
-          } else {
-
-            $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar('destroy');
-
+            // we stop the simulation of Window Resize after the animations are completed
             setTimeout(function() {
-              $('body').addClass('sidebar-mini');
+              clearInterval(simulateWindowResize);
+            }, 1000);
 
-              md.misc.sidebar_mini_active = true;
-            }, 300);
-          }
-
-          // we simulate the window Resize so the charts will get updated in realtime.
-          var simulateWindowResize = setInterval(function() {
-            window.dispatchEvent(new Event('resize'));
-          }, 180);
-
-          // we stop the simulation of Window Resize after the animations are completed
-          setTimeout(function() {
-            clearInterval(simulateWindowResize);
-          }, 1000);
-
+          });
         });
       });
-    });
-  </script>
-  <script>
-    $(document).ready(function() {
-      // Javascript method's body can be found in assets/js/demos.js
-      md.initDashboardPageCharts();
+    </script>
+    <script>
+      $(document).ready(function() {
+        // Javascript method's body can be found in assets/js/demos.js
+        md.initDashboardPageCharts();
 
-    });
-  </script>
+      });
+    </script>
     <script>
       $(document).ready(function(){
         $('.close-icon').on('click', function(e){
@@ -1666,6 +1713,53 @@ if($_SESSION['stc_school_user_for']==2){
               stcschoolmanagementclassroomlocation:stcschoolmanagementclassroomlocation,
               stcschoolmanagementclassroomcapacity:stcschoolmanagementclassroomcapacity,
               save_classadd_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              alert("Record saved successfully.");
+              window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check and try again.");
+             }
+            }
+          });
+        });
+
+          
+          
+          
+          
+          
+          
+
+        $(document).on('click', '#stcschoolschedulesave', function(e){
+          e.preventDefault();
+          var stcschoolscheduleteacher      = $('.stcschoolscheduleteacher').val();
+          var stcschoolschedulesubject      = $('.stcschoolschedulesubject').val();
+          var stcschoolscheduleclass        = $('.stcschoolscheduleclass').val();
+          var stcschoolscheduleday          = $('.stcschoolscheduleday').val();
+          var stcschoolschedulestarttime    = $('.stcschoolschedulestarttime').val();
+          var stcschoolscheduleendtime      = $('.stcschoolscheduleendtime').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stcschoolscheduleteacher:stcschoolscheduleteacher,
+              stcschoolschedulesubject:stcschoolschedulesubject,
+              stcschoolscheduleclass:stcschoolscheduleclass,
+              stcschoolscheduleday:stcschoolscheduleday,
+              stcschoolschedulestarttime:stcschoolschedulestarttime,
+              stcschoolscheduleendtime:stcschoolscheduleendtime,
+              save_schduleadd_action : 1
             },
             // dataType: `JSON`,
             success   : function(data){
