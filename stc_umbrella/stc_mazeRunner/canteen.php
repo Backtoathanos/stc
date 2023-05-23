@@ -388,46 +388,7 @@ if($_SESSION['stc_school_user_for']==2){
 
   <body class="">
     <div class="wrapper ">
-      <div class="sidebar" data-color="purple" data-background-color="white" data-image="../assets/img/sidebar-1.jpg">
-        <div class="logo"><a href="#" class="simple-text logo-normal">
-            STC School
-          </a>
-        </div>
-        <div class="sidebar-wrapper">
-          <ul class="nav">
-            <li class="nav-item ">
-              <a class="nav-link" href="./dashboard.php">
-                <i class="material-icons">dashboard</i>
-                <p>Dashboard</p>
-              </a>
-            </li>
-            <li class="nav-item active">
-              <a class="nav-link" href="./canteen.php">
-                <i class="material-icons">content_paste</i>
-                <p>Canteen</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="./fee-collection.php">
-                <i class="material-icons">feed</i>
-                <p>Fee Collection</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="./school-management.php">
-                <i class="material-icons">feed</i>
-                <p>School Management</p>
-              </a>
-            </li>
-            <li class="nav-item active">
-              <a class="nav-link" href="./school-attendance.php">
-                <i class="material-icons">feed</i>
-                <p>School Attendance</p>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <?php include_once("bar/sidebar.php");?>
       <div class="main-panel">
         <!-- Navbar -->
         <?php include_once("bar/navbar.php");?>
@@ -889,6 +850,16 @@ if($_SESSION['stc_school_user_for']==2){
       // Javascript method's body can be found in assets/js/demos.js
       md.initDashboardPageCharts();
 
+    });
+  </script>
+  <script>
+    $(document).ready(function() {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const value = urlParams.get('canteen');
+      if(value=="yes"){
+        $('.canteen').addClass('active');
+      }
     });
   </script>
     <script>

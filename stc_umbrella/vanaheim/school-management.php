@@ -296,10 +296,10 @@ class Yggdrasil extends tesseract{
 						<td>'.$odin_sturow['stc_school_student_studid'].'</td>
 						<td>'.$odin_sturow['stc_school_student_firstname'].' '.$odin_sturow['stc_school_student_lastname'].'</td>
 						<td>
-							<input type="radio" name="stu-attendancecombo" class="stc-school-stu-attendance-but" id="'.$odin_sturow['stc_school_student_id'].'" checked> Present
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-school-stu-attendance-but" id="'.$odin_sturow['stc_school_student_id'].'" checked> Present
 						</td>
 						<td>
-							<input type="radio" name="stu-attendancecombo" class="stc-school-stu-attendance-but" id="'.$odin_sturow['stc_school_student_id'].'"> Absent
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-school-stu-attendance-but" id="'.$odin_sturow['stc_school_student_id'].'"> Absent
 						</td>
 					</tr>
 				';

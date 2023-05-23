@@ -388,46 +388,7 @@ if($_SESSION['stc_school_user_for']==2){
 
   <body class="">
     <div class="wrapper ">
-      <div class="sidebar" data-color="purple" data-background-color="white" data-image="../assets/img/sidebar-1.jpg">
-        <div class="logo"><a href="#" class="simple-text logo-normal">
-            STC School
-          </a>
-        </div>
-        <div class="sidebar-wrapper">
-          <ul class="nav">
-            <li class="nav-item ">
-              <a class="nav-link" href="./dashboard.php">
-                <i class="material-icons">dashboard</i>
-                <p>Dashboard</p>
-              </a>
-            </li>
-            <li class="nav-item ">
-              <a class="nav-link" href="./canteen.php">
-                <i class="material-icons">content_paste</i>
-                <p>Canteen</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="./fee-collection.php">
-                <i class="material-icons">feed</i>
-                <p>Fee Collection</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="./school-management.php">
-                <i class="material-icons">school</i>
-                <p>School Management</p>
-              </a>
-            </li>
-            <li class="nav-item active">
-              <a class="nav-link" href="./school-attendance.php">
-                <i class="material-icons">schedule</i>
-                <p>School Attendance</p>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <?php include_once("bar/sidebar.php");?>
       <div class="main-panel">
         <!-- Navbar -->
         <?php include_once("bar/navbar.php");?>
@@ -522,24 +483,39 @@ if($_SESSION['stc_school_user_for']==2){
                                               }
                                               // if(($day==$schedule_row['stc_school_teacher_schedule_day'])){
                                                 $rev_counter--;
-
-                                                $schedule_data.='
-                                                  <td class="text-center">
-                                                    <a href="javascript:void(0);" class="stc-school-show-student" id="'.$schedule_row['stc_school_teacher_schedule_id'].'">
-                                                    <b>
-                                                      '.date('h:i a', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                                      '.date('h:i a', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'<br>
-                                                      '.$schedule_row['stc_school_subject_title'].'
-                                                    </b>
-                                                  </td>
-                                                ';
+                                                if($schedule_row['stc_school_subject_title']=="NA"){
+                                                    
+                                                    $schedule_data.='
+                                                        <td class="text-center">
+                                                            <b>
+                                                              '.$schedule_row['stc_school_subject_title'].'
+                                                            </b>
+                                                        
+                                                        </td>
+                                                    ';
+                                                        
+                                                }else{
+                                              
+                
+                                                    $schedule_data.='
+                                                      <td class="text-center">
+                                                        <a href="javascript:void(0);" class="stc-school-show-student" id="'.$schedule_row['stc_school_teacher_schedule_id'].'">
+                                                            <b>
+                                                              '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
+                                                              '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'<br>
+                                                              '.$schedule_row['stc_school_subject_title'].'
+                                                            </b>
+                                                        </a>
+                                                      </td>
+                                                    ';
+                                                }
                                               // }else{
 
                                               // }
                                             }
                                             $hash_rec='';
                                             for($i = 0; $i<$rev_counter; $i++){
-                                              $hash_rec.='<td class="text-center"><b>#</b></td>';
+                                              $hash_rec.='<td class="text-center"><b>NA</b></td>';
                                             }
                                             $data.='
                                                   <tr>
@@ -792,6 +768,16 @@ if($_SESSION['stc_school_user_for']==2){
 
       });
     </script>
+    <script>
+    $(document).ready(function() {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const value = urlParams.get('school-attendance');
+      if(value=="yes"){
+        $('.school-attendance').addClass('active');
+      }
+    });
+  </script>
     <script>
       $(document).ready(function(){
         $('.close-icon').on('click', function(e){
