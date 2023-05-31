@@ -28,10 +28,10 @@
                 <p>School Management</p>
             </a>
           </li>
-          <li class="nav-item school-attendance">
-            <a class="nav-link" href="./school-attendance.php?school-attendance=yes">
+          <li class="nav-item daily-schedule">
+            <a class="nav-link" href="./daily-schedule.php?daily-schedule=yes">
                 <i class="material-icons">schedule</i>
-                <p>School Attendance</p>
+                <p>Schedule</p>
             </a>
           </li>
         </ul>

@@ -1476,15 +1476,15 @@ if($_SESSION['stc_school_user_for']==2){
       });
     </script>
     <script>
-    $(document).ready(function() {
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
-      const value = urlParams.get('school-management');
-      if(value=="yes"){
-        $('.school-management').addClass('active');
-      }
-    });
-  </script>
+      $(document).ready(function() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const value = urlParams.get('school-management');
+        if(value=="yes"){
+          $('.school-management').addClass('active');
+        }
+      });
+    </script>
     <script>
       $(document).ready(function(){
         $('.close-icon').on('click', function(e){
@@ -1574,7 +1574,7 @@ if($_SESSION['stc_school_user_for']==2){
         });
 
 
-        // save teacher to db
+        // save student to db
         $(document).on('click', '#stcschoolstudentsave', function(e){
           e.preventDefault();
           var stcschoolmanagementstudentid              = $('.stcschoolmanagementstudentid').val();
@@ -1617,7 +1617,7 @@ if($_SESSION['stc_school_user_for']==2){
              var response=data.trim();
              if(response=="success"){
               alert("Record saved successfully.");
-              window.location.reload();
+              // window.location.reload();
              }else if(response=="reload"){
               window.location.reload();
              }else if(response=="empty"){
@@ -1705,12 +1705,6 @@ if($_SESSION['stc_school_user_for']==2){
           });
         });
 
-          
-          
-          
-          
-          
-          
 
         $(document).on('click', '#stcschoolschedulesave', function(e){
           e.preventDefault();
@@ -1738,7 +1732,7 @@ if($_SESSION['stc_school_user_for']==2){
              var response=data.trim();
              if(response=="success"){
               alert("Record saved successfully.");
-              window.location.reload();
+              // window.location.reload();
              }else if(response=="reload"){
               window.location.reload();
              }else if(response=="empty"){
@@ -1751,23 +1745,6 @@ if($_SESSION['stc_school_user_for']==2){
             }
           });
         });
-
-        // call canteen
-        // stc_call_canteen();
-        // function stc_call_canteen(){
-        //   $.ajax({  
-        //     url       : "../vanaheim/canteen-raised.php",
-        //     method    : "POST",  
-        //     data      : {
-        //       stc_call_canteen : 1
-        //     },
-        //     // dataType: `JSON`,
-        //     success   : function(response_canteen){
-        //      // console.log(data);
-        //      $('.stc-view-silent-canteen-row-fetch').html(response_canteen);
-        //     }
-        //   });
-        // }
       });
     </script>
   </body>
