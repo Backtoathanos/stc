@@ -603,4 +603,23 @@ if(isset($_POST['stc_call_lecture_end'])){
 	}
 	echo $out;
 }
+
+// call student for attendance
+if(isset($_POST['stc_student_save'])){
+	$stc_stid=$_POST['stc_stid'];
+	$stc_sthwperc=$_POST['stc_sthwperc'];
+	$stc_stcatt=$_POST['stc_stcatt'];
+	$attendance='Present';
+	if($stc_stcatt == 0){
+		$attendance='Absent';
+	}
+	$out=array('Id' => $stc_stid, 'HW Percentage' => $stc_sthwperc , 'Attendance' => $attendance);
+	// if(empty($_SESSION['stc_school_user_id'])){
+	// 	$out="reload";
+	// }else{
+	// 	$valkyrie=new Yggdrasil();
+	// 	$out=$valkyrie->stc_call_school_lecturer_end();
+	// }
+	print_r($out);
+}
 ?>

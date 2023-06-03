@@ -940,6 +940,35 @@ if($_SESSION['stc_school_user_for']==2){
             }
           });
         });
+
+        $(document).on('click', '.stc-school-student-att-save', function(e){
+          e.preventDefault();
+          var stc_stid = $(this).attr('id');
+          var stc_sthwperc = $('.stc-school-stu-attendance-hw'+stc_stid).val();
+          var stc_stcatt = $('.stc-school-stu-attendance-but'+stc_stid + ':checked').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_student_save : 1,
+              stc_stid : stc_stid,
+              stc_sthwperc : stc_sthwperc,
+              stc_stcatt : stc_stcatt
+            },
+            // dataType: `JSON`,
+            success   : function(response_student){
+             console.log(response_student);
+              // var response=response_student.trim();
+              // if(response=="reload"){
+              //   window.location.reload();
+              // }else{
+              //   $('.stc-school-showstudent-res').modal('hide');
+              //   window.location.reload();
+              // }
+            }
+          });
+        });
+
         // $(document).on('click', '.modal-closebtn', function(e){
         //   e.preventDefault();
         //   $('.stc-school-showstudent-res').modal('hide');
