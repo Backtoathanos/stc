@@ -316,6 +316,8 @@ class Yggdrasil extends tesseract{
 			SELECT
 			    `stc_school_student_id`,
 			    `stc_school_student_studid`,
+			    `stc_school_class_id`,
+			    `stc_school_subject_id`,
 			    `stc_school_student_firstname`,
 			    `stc_school_student_lastname`,
 			    `stc_school_class_title`,
@@ -339,6 +341,20 @@ class Yggdrasil extends tesseract{
 		");
 		if(mysqli_num_rows($odin_stuqry)>0){
 			foreach($odin_stuqry as $odin_sturow){
+				$check_rec=mysqli_query($this->stc_dbs, "
+					SELECT `stc_school_student_attendance_id` FROM`stc_school_student_attendance` 
+					WHERE `stc_school_student_attendance_status`='3' 
+					AND `stc_school_student_attendance_stuid`='".$odin_sturow['stc_school_student_id']."'
+					AND `stc_school_student_attendance_classid`='".$odin_sturow['stc_school_class_id']."'
+					AND `stc_school_student_attendance_subid`='".$odin_sturow['stc_school_subject_id']."'
+					AND `stc_school_student_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
+				");
+				$updatebtn='#';
+				if(mysqli_num_rows($check_rec)==0){	
+					$updatebtn='
+							<a href="#" class="btn btn-success stc-school-student-att-save" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'">Update</a> 
+						';
+				}
 				$odin.='
 					<tr>
 						<td class="text-center"><b>'.$odin_sturow['stc_school_student_studid'].'</b></td>
@@ -356,9 +372,7 @@ class Yggdrasil extends tesseract{
 						<td>
 							<input type="number" class="stc-school-stu-attendance-hw'.$odin_sturow['stc_school_student_id'].' form-control" min="0" max="100" id="'.$odin_sturow['stc_school_student_id'].'" placeholder="Type here.."> 
 						</td>
-						<td>
-							<a href="#" class="btn btn-success stc-school-student-att-save" id="'.$odin_sturow['stc_school_student_id'].'">Update</a> 
-						</td>
+						<td>'.$updatebtn.'</td>
 					</tr>
 				';
 			}
@@ -378,6 +392,8 @@ class Yggdrasil extends tesseract{
 			SELECT
 			    `stc_school_student_id`,
 			    `stc_school_student_studid`,
+			    `stc_school_class_id`,
+			    `stc_school_subject_id`,
 			    `stc_school_student_firstname`,
 			    `stc_school_student_lastname`,
 			    `stc_school_class_title`,
@@ -401,6 +417,20 @@ class Yggdrasil extends tesseract{
 		");
 		if(mysqli_num_rows($odin_stuqry)>0){
 			foreach($odin_stuqry as $odin_sturow){
+				$check_rec=mysqli_query($this->stc_dbs, "
+					SELECT `stc_school_student_attendance_id` FROM`stc_school_student_attendance` 
+					WHERE `stc_school_student_attendance_status`='3' 
+					AND `stc_school_student_attendance_stuid`='".$odin_sturow['stc_school_student_id']."'
+					AND `stc_school_student_attendance_classid`='".$odin_sturow['stc_school_class_id']."'
+					AND `stc_school_student_attendance_subid`='".$odin_sturow['stc_school_subject_id']."'
+					AND `stc_school_student_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
+				");
+				$updatebtn='#';
+				if(mysqli_num_rows($check_rec)==0){	
+					$updatebtn='
+							<a href="#" class="btn btn-success stc-school-student-att-save" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'">Update</a> 
+						';
+				}
 				$odin.='
 					<tr>
 						<td class="text-center"><b>'.$odin_sturow['stc_school_student_studid'].'</b></td>
@@ -418,9 +448,7 @@ class Yggdrasil extends tesseract{
 						<td>
 							<input type="number" class="stc-school-stu-attendance-hw'.$odin_sturow['stc_school_student_id'].' form-control" min="0" max="100" id="'.$odin_sturow['stc_school_student_id'].'" placeholder="Type here.."> 
 						</td>
-						<td>
-							<a href="#" class="btn btn-success stc-school-student-att-save" id="'.$odin_sturow['stc_school_student_id'].'">Update</a> 
-						</td>
+						<td>'.$updatebtn.'</td>
 					</tr>
 				';
 			}
@@ -443,7 +471,57 @@ class Yggdrasil extends tesseract{
 			WHERE `stc_school_teacher_attendance_status`='1' 
 			AND `stc_school_teacher_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
 		");
+		$odin_teacherattuqry=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_school_student_attendance` 
+			SET `stc_school_student_attendance_status`='1' 
+			WHERE `stc_school_student_attendance_status`='3' 
+			AND `stc_school_student_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
+		");
 		if($odin_teacherattuqry){
+			$odin="success";
+		}else{
+			$odin="failed";
+		}
+		return $odin;
+	}
+
+	public function stc_call_school_student_save($stc_stid, $stc_stsubid, $stc_stclassid, $stc_sthwperc, $stc_stcatt){		
+		$odin='';
+		$date=date("Y-m-d H:i:s");
+		$endtime=date("H:i:s");
+		$odin_studentuqry=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_school_student_attendance` 
+			SET `stc_school_student_attendance_hw`= '".mysqli_real_escape_string($this->stc_dbs, $stc_sthwperc)."', `stc_school_student_attendance_status`='1' 
+			WHERE `stc_school_student_attendance_status`='2' 
+			AND `stc_school_student_attendance_stuid`='".mysqli_real_escape_string($this->stc_dbs, $stc_stid)."'
+			AND `stc_school_student_attendance_classid`='".mysqli_real_escape_string($this->stc_dbs, $stc_stclassid)."'
+			AND `stc_school_student_attendance_subid`='".mysqli_real_escape_string($this->stc_dbs, $stc_stsubid)."'
+			AND `stc_school_student_attendance_attendance`='1'
+		");
+		$odin_studentaqry=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_school_student_attendance`(
+				`stc_school_student_attendance_date`,
+				`stc_school_student_attendance_stuid`,
+				`stc_school_student_attendance_classid`,
+				`stc_school_student_attendance_subid`,
+				`stc_school_student_attendance_attendance`,
+				`stc_school_student_attendance_hw`,
+				`stc_school_student_attendance_status`,
+				`stc_school_student_attendance_createdate`,
+				`stc_school_student_attendance_createdby`
+			)VALUES(
+				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_stid)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_stclassid)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_stsubid)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_stcatt)."',
+				'0',
+				'3',
+				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+				'".$_SESSION['stc_school_user_id']."'
+			)
+		");
+		if($odin_studentaqry){
 			$odin="success";
 		}else{
 			$odin="failed";
@@ -581,7 +659,7 @@ if(isset($_POST['stc_call_student'])){
 	echo $lokiheck;
 }
 
-// call student for attendance
+// call student for attendance default
 if(isset($_POST['stc_call_student_default'])){
 	$schedule_id=$_POST['schedule_id'];
 	$class_id=$_POST['class_id'];
@@ -590,8 +668,7 @@ if(isset($_POST['stc_call_student_default'])){
 	echo $lokiheck;
 }
 
-
-// call student for attendance
+// end lecturer from teacher
 if(isset($_POST['stc_call_lecture_end'])){
 	$class_id=$_POST['class_id'];
 	$out='';
@@ -604,22 +681,20 @@ if(isset($_POST['stc_call_lecture_end'])){
 	echo $out;
 }
 
-// call student for attendance
+// save student attendance
 if(isset($_POST['stc_student_save'])){
 	$stc_stid=$_POST['stc_stid'];
+	$stc_stsubid=$_POST['stc_stsubid'];
+	$stc_stclassid=$_POST['stc_stclassid'];
 	$stc_sthwperc=$_POST['stc_sthwperc'];
 	$stc_stcatt=$_POST['stc_stcatt'];
-	$attendance='Present';
-	if($stc_stcatt == 0){
-		$attendance='Absent';
+	$out='';
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out="reload";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_call_school_student_save($stc_stid, $stc_stsubid, $stc_stclassid, $stc_sthwperc, $stc_stcatt);
 	}
-	$out=array('Id' => $stc_stid, 'HW Percentage' => $stc_sthwperc , 'Attendance' => $attendance);
-	// if(empty($_SESSION['stc_school_user_id'])){
-	// 	$out="reload";
-	// }else{
-	// 	$valkyrie=new Yggdrasil();
-	// 	$out=$valkyrie->stc_call_school_lecturer_end();
-	// }
-	print_r($out);
+	echo $out;
 }
 ?>

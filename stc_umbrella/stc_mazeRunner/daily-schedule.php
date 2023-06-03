@@ -444,7 +444,7 @@ if($_SESSION['stc_school_user_for']==2){
                                         <?php 
                                           include_once("../../MCU/db.php");
                                           date_default_timezone_set('Asia/Kolkata');
-                                          $day_array=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+                                          $day_array=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
                                           $data='';
 
                                           $check_attendanceforsc=mysqli_query($con, "
@@ -943,7 +943,10 @@ if($_SESSION['stc_school_user_for']==2){
 
         $(document).on('click', '.stc-school-student-att-save', function(e){
           e.preventDefault();
+          $(this).hide(500);
           var stc_stid = $(this).attr('id');
+          var stc_stclassid = $(this).attr('classid');
+          var stc_stsubid = $(this).attr('subid');
           var stc_sthwperc = $('.stc-school-stu-attendance-hw'+stc_stid).val();
           var stc_stcatt = $('.stc-school-stu-attendance-but'+stc_stid + ':checked').val();
           $.ajax({  
@@ -952,19 +955,23 @@ if($_SESSION['stc_school_user_for']==2){
             data      : {
               stc_student_save : 1,
               stc_stid : stc_stid,
+              stc_stsubid : stc_stsubid,
+              stc_stclassid : stc_stclassid,
               stc_sthwperc : stc_sthwperc,
               stc_stcatt : stc_stcatt
             },
             // dataType: `JSON`,
             success   : function(response_student){
-             console.log(response_student);
-              // var response=response_student.trim();
-              // if(response=="reload"){
-              //   window.location.reload();
-              // }else{
-              //   $('.stc-school-showstudent-res').modal('hide');
-              //   window.location.reload();
-              // }
+             // console.log(response_student);
+              var response=response_student.trim();
+              if(response=="reload"){
+                window.location.reload();
+              }else if(response=="success"){
+                alert("Student record updated!!!");
+              }else{
+                alert("Something went wrong!!! Please check & try again.");
+                $('.stc-school-student-att-save').show(500);
+              }
             }
           });
         });
