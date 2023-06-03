@@ -17,7 +17,7 @@ if($_SESSION['stc_school_user_for']==2){
     <link rel="icon" type="image/png" href="../assets/img/stc_logo_title.png">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>
-      STC School || School Attendance
+      STC School || School Schedule
     </title>
     <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
     <!--     Fonts and icons     -->
@@ -1030,6 +1030,21 @@ if($_SESSION['stc_school_user_for']==2){
             <div class="mb-3">
               <span class="bmd-form-group">
                 <button class="btn btn-success form-control">Save</button>
+              </span>
+            </div>
+          </div>
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <div class="mb-3">
+              <h5 for="syllabus">Questions</h5>
+              <span class="bmd-form-group">
+                <input type="text" class="form-control" id="Questions" placeholder="Type Here..">
+              </span>
+            </div>
+          </div>
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <div class="mb-3">
+              <span class="bmd-form-group">
+                <button class="btn btn-success form-control">Add</button>
               </span>
             </div>
           </div>
