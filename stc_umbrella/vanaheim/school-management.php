@@ -471,6 +471,12 @@ class Yggdrasil extends tesseract{
 			WHERE `stc_school_teacher_attendance_status`='1' 
 			AND `stc_school_teacher_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
 		");
+		$odin_lectureuqry=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_school_lecture` 
+			SET `stc_school_lecture_status`='2' 
+			WHERE `stc_school_lecture_status`='3' 
+			AND `stc_school_lecture_createdby`='".$_SESSION['stc_school_user_id']."'
+		");
 		$odin_teacherattuqry=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_school_student_attendance` 
 			SET `stc_school_student_attendance_status`='1' 
@@ -525,6 +531,124 @@ class Yggdrasil extends tesseract{
 			$odin="success";
 		}else{
 			$odin="failed";
+		}
+		return $odin;
+	}
+
+	public function stc_call_school_lecturedetails_save($schedule_id, $classtype, $chapter, $lession, $Syllabus, $remarks){
+		$odin='';
+		$date=date("Y-m-d H:i:s");
+		$odin_schedulegqry=mysqli_query($this->stc_dbs, "
+			SELECT
+			    `stc_school_teacher_schedule_classid`,
+			    `stc_school_teacher_schedule_subjectid`
+			FROM
+			    `stc_school_teacher_schedule`
+			WHERE
+			    `stc_school_teacher_schedule_id`='".mysqli_real_escape_string($this->stc_dbs, $schedule_id)."'
+		");
+		$classid=0;
+		$subid=0;
+		foreach($odin_schedulegqry as $odin_schedulegrow){
+			$classid=$odin_schedulegrow['stc_school_teacher_schedule_classid'];
+			$subid=$odin_schedulegrow['stc_school_teacher_schedule_subjectid'];
+		}
+		$odin_lectureiqry=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_school_lecture`(
+				`stc_school_lecture_scheduleid`,
+				`stc_school_lecture_classid`,
+				`stc_school_lecture_subid`,
+				`stc_school_lecture_classtype`,
+				`stc_school_lecture_chapter`,
+				`stc_school_lecture_lesson`,
+				`stc_school_lecture_syllabus`,
+				`stc_school_lecture_remarks`,
+				`stc_school_lecture_status`,
+				`stc_school_lecture_createdate`,
+				`stc_school_lecture_createdby`
+			)VALUES(
+				'".mysqli_real_escape_string($this->stc_dbs, $schedule_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $classid)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $subid)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $classtype)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $chapter)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $lession)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $Syllabus)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
+				'2',
+				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+				'".$_SESSION['stc_school_user_id']."'
+			)
+		");
+		if($odin_lectureiqry){
+			$odin='success';
+		}else{
+			$odin='failed';
+		}
+		return $odin;
+	}
+
+	public function stc_call_school_lecturedetailsquestion_save($schedule_id, $questions){
+		$odin='';
+		$date=date("Y-m-d H:i:s");
+		$odin_schedulegqry=mysqli_query($this->stc_dbs, "
+			SELECT
+			    `stc_school_teacher_schedule_classid`,
+			    `stc_school_teacher_schedule_subjectid`
+			FROM
+			    `stc_school_teacher_schedule`
+			WHERE
+			    `stc_school_teacher_schedule_id`='".mysqli_real_escape_string($this->stc_dbs, $schedule_id)."'
+		");
+		$classid=0;
+		$subid=0;
+		foreach($odin_schedulegqry as $odin_schedulegrow){
+			$classid=$odin_schedulegrow['stc_school_teacher_schedule_classid'];
+			$subid=$odin_schedulegrow['stc_school_teacher_schedule_subjectid'];
+		}
+		$odin_lecturegqry=mysqli_query($this->stc_dbs, "
+			SELECT
+			    `stc_school_lecture_id`
+			FROM
+			    `stc_school_lecture`
+			WHERE
+			    `stc_school_lecture_status`='2'
+			AND 
+				`stc_school_lecture_classid`='".$classid."'
+			AND 
+				`stc_school_lecture_subid`='".$subid."'
+			AND 
+				`stc_school_lecture_createdby`='".$_SESSION['stc_school_user_id']."'
+		");
+		$lecture_id=0;
+		foreach($odin_lecturegqry as $odin_lecturegrow){
+			$lecture_id=$odin_lecturegrow['stc_school_lecture_id'];
+		}
+		$odin_lectureiqry=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_school_lecture_question`(
+				`stc_school_lecture_question_lectureid`,
+				`stc_school_lecture_question_scheduleid`,
+				`stc_school_lecture_question_classid`,
+				`stc_school_lecture_question_subid`,
+				`stc_school_lecture_question_question`,
+				`stc_school_lecture_question_status`,
+				`stc_school_lecture_question_createdate`,
+				`stc_school_lecture_question_createdby`
+			)VALUES(
+				'".mysqli_real_escape_string($this->stc_dbs, $lecture_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $schedule_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $classid)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $subid)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $questions)."',
+				'1',
+				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+				'".$_SESSION['stc_school_user_id']."'
+			)
+		");
+		if($odin_lectureiqry){
+			$odin='success';
+		}else{
+			$odin='failed';
 		}
 		return $odin;
 	}
@@ -694,6 +818,42 @@ if(isset($_POST['stc_student_save'])){
 	}else{
 		$valkyrie=new Yggdrasil();
 		$out=$valkyrie->stc_call_school_student_save($stc_stid, $stc_stsubid, $stc_stclassid, $stc_sthwperc, $stc_stcatt);
+	}
+	echo $out;
+}
+
+// save lecture details
+if(isset($_POST['stc_lecturedet_save'])){
+	$schedule_id=$_POST['schedule_id'];
+	$classtype=$_POST['classtype'];
+	$chapter=$_POST['chapter'];
+	$lession=$_POST['lession'];
+	$Syllabus=$_POST['Syllabus'];
+	$remarks=$_POST['remarks'];
+	$out='';
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out="reload";
+	}elseif(($classtype=='NA') || (empty($chapter)) || (empty($lession)) || (empty($Syllabus))){
+		$out="empty";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_call_school_lecturedetails_save($schedule_id, $classtype, $chapter, $lession, $Syllabus, $remarks);
+	}
+	echo $out;
+}
+
+// save lecture details
+if(isset($_POST['stc_lecturedetquestion_save'])){
+	$schedule_id=$_POST['schedule_id'];
+	$questions=$_POST['questions'];
+	$out='';
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out="reload";
+	}elseif(empty($questions)){
+		$out="empty";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_call_school_lecturedetailsquestion_save($schedule_id, $questions);
 	}
 	echo $out;
 }

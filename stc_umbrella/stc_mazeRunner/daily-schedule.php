@@ -976,6 +976,72 @@ if($_SESSION['stc_school_user_for']==2){
           });
         });
 
+        $(document).on('click', '.save-lecture', function(e){
+          e.preventDefault();
+          var schedule_id=$('.stc-school-hidden-schedule-id').val();
+          var classtype=$('#classtype').val();
+          var chapter=$('#chapter').val();
+          var lession=$('#lession').val();
+          var Syllabus=$('#Syllabus').val();
+          var remarks=$('#remarks').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_lecturedet_save : 1,
+              schedule_id : schedule_id,
+              classtype : classtype,
+              chapter : chapter,
+              lession : lession,
+              Syllabus : Syllabus,
+              remarks : remarks
+            },
+            // dataType: `JSON`,
+            success   : function(response_student){
+             // console.log(response_student);
+              var response=response_student.trim();
+              if(response=="reload"){
+                window.location.reload();
+              }else if(response=="success"){
+                alert("Record updated!!!");
+              }else if(response=="empty"){
+                alert("Please fill all fields, if you dont have any then write NA.");
+              }else{
+                alert("Something went wrong!!! Please check & try again.");
+              }
+            }
+          });
+        });
+
+        $(document).on('click', '.add-question', function(e){
+          e.preventDefault();
+          var schedule_id=$('.stc-school-hidden-schedule-id').val();
+          var questions=$('#Questions').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_lecturedetquestion_save : 1,
+              schedule_id : schedule_id,
+              questions : questions
+            },
+            // dataType: `JSON`,
+            success   : function(response_student){
+             // console.log(response_student);
+              var response=response_student.trim();
+              if(response=="reload"){
+                window.location.reload();
+              }else if(response=="success"){
+                alert("Record updated!!!");
+              }else if(response=="empty"){
+                alert("Please fill all fields, if you dont have any then write NA.");
+              }else{
+                alert("Something went wrong!!! Please check & try again.");
+              }
+            }
+          });
+        });
+
         // $(document).on('click', '.modal-closebtn', function(e){
         //   e.preventDefault();
         //   $('.stc-school-showstudent-res').modal('hide');
@@ -1058,14 +1124,14 @@ if($_SESSION['stc_school_user_for']==2){
             <div class="mb-3">
               <h5 for="syllabus">Remarks</h5>
               <span class="bmd-form-group">
-                <textarea class="form-control" id="Syllabus" placeholder="Type Here.."></textarea>
+                <textarea class="form-control" id="remarks" placeholder="Type Here.."></textarea>
               </span>
             </div>
           </div>        
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
             <div class="mb-3">
               <span class="bmd-form-group">
-                <button class="btn btn-success form-control">Save</button>
+                <button class="btn btn-success form-control save-lecture">Save</button>
               </span>
             </div>
           </div>
@@ -1080,7 +1146,7 @@ if($_SESSION['stc_school_user_for']==2){
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
             <div class="mb-3">
               <span class="bmd-form-group">
-                <button class="btn btn-success form-control">Add</button>
+                <button class="btn btn-success form-control add-question">Add</button>
               </span>
             </div>
           </div>
