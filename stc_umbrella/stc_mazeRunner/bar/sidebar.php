@@ -10,30 +10,44 @@
               <p>Dashboard</p>
             </a>
           </li>
+          <?php
+          if($_SESSION['stc_school_user_for']!=4){
+            echo '
           <li class="nav-item canteen">
             <a class="nav-link" href="./canteen.php?canteen=yes">
               <i class="material-icons">content_paste</i>
               <p>Canteen</p>
             </a>
-          </li>
+          </li>';
+          }
+          if($_SESSION['stc_school_user_for']==3){
+            echo '
           <li class="nav-item fee-collection">
             <a class="nav-link" href="./fee-collection.php?fee-collection=yes">
               <i class="material-icons">feed</i>
               <p>Fee Collection</p>
             </a>
-          </li>
+          </li>';
+          }
+          if($_SESSION['stc_school_user_for']==3){
+            echo '
           <li class="nav-item school-management">
             <a class="nav-link" href="./school-management.php?school-management=yes">
                 <i class="material-icons">school</i>
                 <p>School Management</p>
             </a>
-          </li>
+          </li>';
+          }
+          if($_SESSION['stc_school_user_for']==4){
+            echo '
           <li class="nav-item daily-schedule">
             <a class="nav-link" href="./daily-schedule.php?daily-schedule=yes">
                 <i class="material-icons">schedule</i>
                 <p>Schedule</p>
             </a>
-          </li>
+          </li>';
+          }
+          ?>
         </ul>
       </div>
     </div>

@@ -114,6 +114,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     <span>School Fee</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-11" data-toggle="tab" href="#tab-content-11">
+                                    <span>School Attendance</span>
+                                </a>
+                            </li>
                             ';
                                 }
                             ?>
@@ -1032,6 +1037,70 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <div class="tab-pane tabs-animation fade" id="tab-content-11" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="description" align="center"
+                                              >School Attendance
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">                                  
+                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <input type="month" class="form-control stc-school-month" value="<?php echo date('Y-m') ?>">
+                                        </div>
+                                    </div>                                   
+                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <a href="#" class="form-control btn btn-primary stc-school-att-find">Find</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success " ><div class="stc-show-school-attendance" style="width: 900px;overflow-x: auto; white-space: nowrap;">
+                                            <table class="table table-bordered table-responsive">
+                                                <thead>
+                                                   <tr>
+                                                        <th class="text-center">DATE</th>
+                                                        <th class="text-center">LOCATION</th>
+                                                        <th class="text-center">DEPTARTMENT</th>
+                                                        <th class="text-center">AREA</th>
+                                                        <th class="text-center">EQUIPMENT TYPE</th>
+                                                        <th class="text-center">EQUIPMENT NO</th>
+                                                        <th class="text-center">EQUIPMENT STATUS</th>
+                                                        <th class="text-center">JOB TYPE</th>
+                                                        <th class="text-center">CREATED BY</th>
+                                                        <th class="text-center">CREATER NAME & MOBILE NO</th>
+                                                        <th class="text-center">RESPONSIBLE PERSON NAME & MOBILE NO</th>
+                                                        <th class="text-center">REASON</th>
+                                                        <th class="text-center">MATERIALS REQ</th>
+                                                        <th class="text-center">MANPOWER REQ</th>
+                                                        <th class="text-center">WORK COMPLETION TARGET PERIOD</th>
+                                                        <th class="text-center">ACTUAL WORK COMPLETION PERIOD</th>
+                                                        <th class="text-center">USED MATERIAL</th>
+                                                        <th class="text-center">STOCK MATERIAL</th>
+                                                        <th class="text-center">DOWN PERIOD</th>
+                                                        <th class="text-center">WORK STATUS</th>
+                                                        <th class="text-center">PENDING REASON</th>
+                                                        <th class="text-center">JOB DONE DETAILS</th>
+                                                        <th class="text-center">REMARKS</th>
+                                                   </tr>
+                                                </thead>
+                                                <tbody>
+                                                  <tr>
+                                                    <td colspan="15">
+                                                        <h3>Please wait.....</h3>
+                                                    </td>
+                                                  </tr>
+                                                </tbody>
+                                            </table></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>  
                 </div>
@@ -1606,6 +1675,24 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 e.preventDefault();
                 $("#stc-school-name-table").table2excel({
                     filename: "stc-fee-reports.xls"
+                });
+            });
+
+            // call attendance
+            $('body').delegate('.stc-school-att-find', 'click', function(e){
+                e.preventDefault();
+                var stc_school_month = $('.stc-school-month').val();
+                $.ajax({
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "post",
+                    data    : {
+                        stc_find_school_attendance:1,
+                        stc_school_month:stc_school_month
+                    },
+                    success : function(response_sandp){
+                        // console.log(response_sandp);
+                        $('.stc-show-school-attendance').html(response_sandp);
+                    }
                 });
             });
         });

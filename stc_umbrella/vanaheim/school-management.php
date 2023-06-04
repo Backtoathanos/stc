@@ -80,7 +80,7 @@ class Yggdrasil extends tesseract{
 						'1',
 						'".mysqli_real_escape_string($this->stc_dbs, $aboutyou)."',
 						'".mysqli_real_escape_string($this->stc_dbs, $password)."',
-						'1',
+						'4',
 						'1'
 					)
 				");

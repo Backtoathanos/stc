@@ -5,7 +5,7 @@ session_start();
 if(empty(@$_SESSION['stc_school_user_id'])){
     header('location:../index.html');
 }
-if($_SESSION['stc_school_user_for']==2){
+if($_SESSION['stc_school_user_for']==3){
     header('location:forbidden.html');
 }
 ?>
