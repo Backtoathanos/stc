@@ -1060,7 +1060,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-xl-12 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success " ><div class="stc-show-school-attendance" style="width: 900px;overflow-x: auto; white-space: nowrap;">
+                                        <div class="card-border mb-3 card card-body border-success " ><div class="stc-show-school-attendance" style="width: auto;overflow-x: auto; white-space: nowrap;">
                                             <table class="table table-bordered table-responsive">
                                                 <thead>
                                                    <tr>

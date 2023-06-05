@@ -3208,8 +3208,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
       if(mysqli_num_rows($ivar_sqlquery)>0){
          $slno=0;
          $total_time=0;
-         $attended_date='';
          foreach($ivar_sqlquery as $ivar_sqlrow){
+            $attended_date='';
             $slno++;
             $fullname = $ivar_sqlrow['stc_school_teacher_firstname'].' '.$ivar_sqlrow['stc_school_teacher_lastname'];
             for($i=1;$i<=$day_count;$i++){

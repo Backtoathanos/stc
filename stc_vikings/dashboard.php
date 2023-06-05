@@ -170,27 +170,32 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                             <div class="col-md-12 col-xl-12">
                                 <div class="card-border mb-3 card card-body border-success" style="font-size: 15px;">
                                     <div class="row">
+                                        <div class="col-md-12 col-xl-12">
+                                            <div class="card mb-3 widget-content bg-midnight-bloom" style="background-image: linear-gradient(-20deg, #d4eeff 0%, #fdb8b5 100%) !important;">
+                                                <div class="widget-heading">Month : </div>
+                                                <div class="widget-subheading">
+                                                    <select class="form-control stc-dash-month">
+                                                        <option value="1">January</option>
+                                                        <option value="2">February</option>
+                                                        <option value="3">March</option>
+                                                        <option value="4">April</option>
+                                                        <option value="5">May</option>
+                                                        <option value="6">June</option>
+                                                        <option value="7">July</option>
+                                                        <option value="8">August</option>
+                                                        <option value="9">September</option>
+                                                        <option value="10">October</option>
+                                                        <option value="11">November</option>
+                                                        <option value="12">December</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="col-md-6 col-xl-6">
                                             <div class="card mb-3 widget-content bg-midnight-bloom">
                                                 <div class="widget-content-wrapper text-white">
                                                     <div class="widget-content-left">
                                                         <div class="widget-heading">STC Electronics Summary
-                                                            <span>
-                                                                <select class="form-control stc-dash-month">
-                                                                    <option value="1">January</option>
-                                                                    <option value="2">February</option>
-                                                                    <option value="3">March</option>
-                                                                    <option value="4">April</option>
-                                                                    <option value="5">May</option>
-                                                                    <option value="6">June</option>
-                                                                    <option value="7">July</option>
-                                                                    <option value="8">August</option>
-                                                                    <option value="9">September</option>
-                                                                    <option value="10">October</option>
-                                                                    <option value="11">November</option>
-                                                                    <option value="12">December</option>
-                                                                </select>
-                                                            </span>
                                                         </div>
                                                         <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                             <i class="fa fa-rupee-sign"></i>

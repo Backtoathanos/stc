@@ -84,6 +84,16 @@ class Yggdrasil extends tesseract{
 						'1'
 					)
 				");
+				$get_teachid=mysqli_query($this->stc_dbs, "
+					SELECT `stc_school_user_id` FROM `stc_school` WHERE `stc_school_user_contact`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteachernumber)."'
+				");
+				$userid=0;
+				foreach($get_teachid as $get_teachrow){
+					$userid=$get_teachrow['userid'];
+				}
+				$update_teach=mysqli_query($this->stc_dbs, "
+					UPDATE `stc_school_teacher` SET `stc_school_teacher_userid`='".mysqli_real_escape_string($this->stc_dbs, $userid)."' WHERE `stc_school_teacher_contact`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteachernumber)."'
+				");
 				$odin = "success";
 			}else{
 				$odin = "wrong";
