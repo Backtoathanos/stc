@@ -492,6 +492,8 @@ if($_SESSION['stc_school_user_for']==2){
                                             foreach($schedule_sql as $schedule_row){                                                
                                               $rev_counter--;
                                               
+                                              $missed_class = '<span style="bfont-size: 110px; color: red; position: absolute; margin: 25px 5px 5px 0px;">X</span>';
+                                              $completed_class = '<span style="font-size: 110px;color: green;position: absolute;margin: 28px 5px 5px -20px;">✔</span>';
                                               $day=date("l");
                                               if($att_counter>0){
                                                 if($schedule_id==$schedule_row['stc_school_teacher_schedule_id']){
