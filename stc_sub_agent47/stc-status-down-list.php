@@ -156,7 +156,31 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Job Type :</h5><br>
-                                            <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-type">
+                                            <label for="ELECTRICAL">
+                                                <input type="checkbox" id="ELECTRICAL" class="stc-agent-sup-std-job-type" value="'ELECTRICAL'"> ELECTRICAL
+                                            </label>
+                                            <label for="MECHANICAL">
+                                            <input type="checkbox" id="MECHANICAL" class="stc-agent-sup-std-job-type" value="'MECHANICAL'"> MECHANICAL
+                                            </label>
+                                            <label for="REFRIGERATION">
+                                            <input type="checkbox" id="REFRIGERATION" class="stc-agent-sup-std-job-type" value="'REFRIGERATION'"> REFRIGERATION
+                                            </label>
+                                            <label for="CLEANING">
+                                            <input type="checkbox" id="CLEANING" class="stc-agent-sup-std-job-type" value="'CLEANING'"> CLEANING
+                                            </label>
+                                            <label for="NOISY">
+                                            <input type="checkbox" id="NOISY" class="stc-agent-sup-std-job-type" value="'NOISY'"> NOISY
+                                            </label>
+                                            <label for="WATER DROPPING">
+                                            <input type="checkbox" id="WATER DROPPING" class="stc-agent-sup-std-job-type" value="'WATER DROPPING'"> WATER DROPPING
+                                            </label>
+                                            <label for="LUBRICATION">
+                                            <input type="checkbox" id="LUBRICATION" class="stc-agent-sup-std-job-type" value="'LUBRICATION'"> LUBRICATION
+                                            </label>
+                                            <label for="CHECKING/MAINTENANCE">
+                                            <input type="checkbox" id="CHECKING/MAINTENANCE" class="stc-agent-sup-std-job-type" value="'CHECKING/MAINTENANCE'"> CHECKING/MAINTENANCE
+                                            </label>
+                                            <!-- <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-type">
                                                 <option value="NA">Please select job type</option>
                                                 <option>ELECTRICAL</option>
                                                 <option>MECHANICAL</option>
@@ -166,7 +190,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 <option>WATER DROPPING</option>
                                                 <option>LUBRICATION</option>
                                                 <option>CHECKING/MAINTENANCE</option>
-                                            </select> 
+                                            </select>  -->
                                         </div>
                                     </div>
                                 </div>
@@ -439,9 +463,13 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             });
 
             // call equipment type on select location
-            $('body').delegate('#stc-agent-sup-std-job-type', 'change', function(e){
+            $('body').delegate('.stc-agent-sup-std-job-type', 'change', function(e){
                 e.preventDefault();
-                var job_type = $(this).val();
+                // var job_type = $(this).val();
+                var job_type = [];
+                $('.stc-agent-sup-std-job-type:checked').each(function(){
+                   job_type.push($(this).val()); 
+                });
                 $.ajax({
                     url     : "nemesis/stc_std.php",
                     method  : "POST",
@@ -583,6 +611,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.stc-cust-ag-jobdonedetails-save', 'click', function(e){
                 e.preventDefault();
                 var jobdonedetails=$(".stc-cust-ag-jobdonedetails").val();
+                var work_permit_no=$(".stc-agent-sup-std-upermit-no").val();
                 if(jobdonedetails==""){
                     alert("Please provide job done details.");
                 }else{
@@ -593,6 +622,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             stc_status_change_hit:1,
                             status_id:status_id,
                             jobdonedetails:jobdonedetails,
+                            work_permit_no:work_permit_no,
                             sdl_id:sdl_id
                         },
                         success     : function(response_sdl){
@@ -653,6 +683,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title" align="center">Permit No :</h5>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <input type="text" class="form-control stc-agent-sup-std-upermit-no" placeholder="Enter Permit No">
+                                    </div><br>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title" align="center">Job Done Details</h5>
                                     </div>

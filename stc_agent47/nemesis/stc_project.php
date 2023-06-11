@@ -1772,14 +1772,14 @@ class pirates_supervisor extends tesseract{
 					<tr>
 						<th class="text-center">DATE</th>
 						<th class="text-center">LOCATION</th>
-						<th class="text-center">DEPTARTMENT</th>
+						<th class="text-center">DEPARTMENT</th>
 						<th class="text-center">AREA</th>
 						<th class="text-center">EQUIPMENT TYPE</th>
 						<th class="text-center">EQUIPMENT NO</th>
 						<th class="text-center">EQUIPMENT STATUS</th>
 						<th class="text-center">JOB PLANNING</th>
 						<th class="text-center">JOB TYPE</th>
-						<th class="text-center">VARITIES OF JOB</th>
+						<th class="text-center">VARIETIES OF JOB</th>
 						<th class="text-center">CREATED BY</th>
 						<th class="text-center">PERMIT NO</th>
 						<th class="text-center">CREATER NAME & MOBILE NO</th>

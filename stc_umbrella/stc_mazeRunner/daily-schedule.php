@@ -947,7 +947,6 @@ if($_SESSION['stc_school_user_for']==2){
 
         $(document).on('click', '.stc-attend-check', function(e){
           var stvalue=$(this).val();
-          console.log(stvalue);
           if(stvalue==0){
             $('.stc-school-student-att-save').hide();
           }else{

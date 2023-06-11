@@ -112,9 +112,10 @@ class transformers extends tesseract{
 	}
 
 	// call job variites
-	public function stc_call_job_varities($job_type){		
+	public function stc_call_job_varities($job_type){	
+		$job_type=implode(',', $job_type);
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
-			SELECT `stc_status_down_list_job_type_id`,`stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_title`='".mysqli_real_escape_string($this->stc_dbs, $job_type)."' ORDER BY `stc_status_down_list_job_type_sub_title` ASC
+			SELECT `stc_status_down_list_job_type_id`,`stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_title` IN (".$job_type.") ORDER BY `stc_status_down_list_job_type_sub_title` ASC
 		");
 		$optimusprime='<option value="NA" selected>Select Job Varieties</option>';
 		$do_action=mysqli_num_rows($optimusprimequery);
@@ -199,8 +200,10 @@ class transformers extends tesseract{
 			<table class="table table-bordered table-responsive">
 				<thead>
 					<tr>
+						<th class="text-center">DATE</th>
 						<th class="text-center">LOCATION</th>
 						<th class="text-center">AREA</th>
+						<th class="text-center">DEPARTMENT</th>
 						<th class="text-center">JOB TYPE</th>
 						<th class="text-center">EQUIPMENT TYPE</th>
 						<th class="text-center">EQUIPMENT NO</th>
@@ -223,6 +226,7 @@ class transformers extends tesseract{
 				`stc_status_down_list_date`,
 				`stc_cust_project_title`,
 				`stc_status_down_list_area`,
+				`stc_status_down_list_sub_location`,
 				`stc_status_down_list_jobtype`,
 				`stc_status_down_list_created_by_select`,
                 `stc_status_down_list_creator_details`,
@@ -236,6 +240,7 @@ class transformers extends tesseract{
 				`stc_status_down_list_responsive_person`,
 				`stc_status_down_list_target_date`,
 				`stc_status_down_list_jobpending_details`,
+				`stc_status_down_list_varities_id`,
 				`stc_status_down_list_equipment_type`,
 				`stc_status_down_list_equipment_number`,
 				`stc_status_down_list_status`
@@ -359,8 +364,10 @@ class transformers extends tesseract{
 				}
 				$optimusprime.='
 					<tr>
+						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
 						<td>'.$row['stc_cust_project_title'].'</td>
 						<td>'.$row['stc_status_down_list_area'].'</td>
+						<td>'.$row['stc_status_down_list_sub_location'].'</td>
 						<td>'.$row['stc_status_down_list_jobtype'].'</td>
 						<td>'.$eq_type.'</td>
 						<td class="text-center">'.$eq_number.'</td>
@@ -392,7 +399,7 @@ class transformers extends tesseract{
 	}
 
 	// change status
-	public function stc_sdl_status_update($status, $sld_id, $jobdonedetails){
+	public function stc_sdl_status_update($status, $sld_id, $jobdonedetails, $work_permit_no){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$optimusprime_qry=mysqli_query($this->stc_dbs, "
@@ -400,7 +407,8 @@ class transformers extends tesseract{
 				`stc_status_down_list` 
 			SET 
 				`stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."',
-				`stc_status_down_list_jobdone_details`='".mysqli_real_escape_string($this->stc_dbs, $jobdonedetails)."' 
+				`stc_status_down_list_jobdone_details`='".mysqli_real_escape_string($this->stc_dbs, $jobdonedetails)."',
+				`stc_status_down_list_permit_no`='".mysqli_real_escape_string($this->stc_dbs, $work_permit_no)."'  
 			WHERE 
 				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
 		");
@@ -560,8 +568,9 @@ if(isset($_POST['stc_status_change_hit'])){
 	$sld_id=$_POST['sdl_id'];
 	$status=$_POST['status_id'];
 	$jobdonedetails=$_POST['jobdonedetails'];
+	$work_permit_no=$_POST['work_permit_no'];
 	$sdl_status=new transformers();
-	$out_sdl_status=$sdl_status->stc_sdl_status_update($status, $sld_id, $jobdonedetails);
+	$out_sdl_status=$sdl_status->stc_sdl_status_update($status, $sld_id, $jobdonedetails, $work_permit_no);
 	echo $out_sdl_status;
 }
 
