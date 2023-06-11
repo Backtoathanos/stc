@@ -893,8 +893,9 @@ if($_SESSION['stc_school_user_for']==2){
             success   : function(response_student){
              // console.log(data);
               $('.stc-school-hidden-schedule-id').val(schedule_id);
-             $('.stc-show-student-nested-show').html(response_student);
-             $('.stc-school-showstudent-res').modal('show');
+              $('.stc-show-student-nested-show').html(response_student);
+              $('.stc-school-showstudent-res').modal('show');
+              call_syllabus_det();
             }
           });
         });
@@ -917,6 +918,7 @@ if($_SESSION['stc_school_user_for']==2){
               $('.stc-school-hidden-schedule-id').val(schedule_id);
              $('.stc-show-student-nested-show').html(response_student);
              $('.stc-school-showstudent-res').modal('show');
+              call_syllabus_det();
             }
           });
         });
@@ -943,6 +945,15 @@ if($_SESSION['stc_school_user_for']==2){
           });
         });
 
+        $(document).on('click', '.stc-attend-check', function(e){
+          var stvalue=$(this).val();
+          console.log(stvalue);
+          if(stvalue==0){
+            $('.stc-school-student-att-save').hide();
+          }else{
+            $('.stc-school-student-att-save').show();
+          }
+        });
         $(document).on('click', '.stc-school-student-att-save', function(e){
           e.preventDefault();
           $(this).hide(500);
@@ -1001,10 +1012,16 @@ if($_SESSION['stc_school_user_for']==2){
             // dataType: `JSON`,
             success   : function(response_student){
              // console.log(response_student);
+              call_syllabus_det();
               var response=response_student.trim();
               if(response=="reload"){
                 window.location.reload();
               }else if(response=="success"){
+                $('#classtype').val('NA');
+                $('#chapter').val('');
+                $('#lession').val('');
+                $('#Syllabus').val('');
+                $('#remarks').val('');
                 alert("Record updated!!!");
               }else if(response=="empty"){
                 alert("Please fill all fields, if you dont have any then write NA.");
@@ -1034,7 +1051,9 @@ if($_SESSION['stc_school_user_for']==2){
               if(response=="reload"){
                 window.location.reload();
               }else if(response=="success"){
+                call_syllabus_quest();
                 alert("Record updated!!!");
+                $('#Questions').val('');
               }else if(response=="empty"){
                 alert("Please fill all fields, if you dont have any then write NA.");
               }else{
@@ -1042,6 +1061,43 @@ if($_SESSION['stc_school_user_for']==2){
               }
             }
           });
+        });
+
+        function call_syllabus_det(){
+          var schedule_id=$('.stc-school-hidden-schedule-id').val();
+          $.ajax({
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_syllabusdet_call : 1,
+              schedule_id:schedule_id
+            },
+            // dataType: `JSON`,
+            success   : function(response_student){
+              $('.stc-show-student-syllabusdet-show').html(response_student);
+              call_syllabus_quest();
+            }
+          })
+        }
+
+        function call_syllabus_quest(){
+          var question_id=$('.stc-syllabus-out:checked').attr("id");
+          $.ajax({
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_syllabusquest_call : 1,
+              question_id:question_id
+            },
+            // dataType: `JSON`,
+            success   : function(response_student){
+              $('.stc-show-student-syllabusquest-show').html(response_student);
+            }
+          })
+        }
+
+        $(document).on('click', '.stc-syllabus-out', function(){
+          call_syllabus_quest();
         });
 
         // $(document).on('click', '.modal-closebtn', function(e){
@@ -1084,7 +1140,7 @@ if($_SESSION['stc_school_user_for']==2){
                 </tbody>
               </table>
             </div>
-          </div>
+          </div>     
           <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
             <div class="mb-3">
               <h5 for="classtype">Class Type</h5>
@@ -1100,6 +1156,14 @@ if($_SESSION['stc_school_user_for']==2){
           </div>          
           <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
             <div class="mb-3">
+              <h5 for="syllabus">Syllabus</h5>
+              <span class="bmd-form-group">
+                <input type="text" class="form-control" id="Syllabus" placeholder="Type Here..">
+              </span>
+            </div>
+          </div>        
+          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+            <div class="mb-3">
               <h5 for="chapter">Chapter</h5>
               <span class="bmd-form-group">
                 <input type="text" class="form-control" id="chapter" placeholder="Type Here..">
@@ -1113,15 +1177,7 @@ if($_SESSION['stc_school_user_for']==2){
                 <input type="text" class="form-control" id="lession" placeholder="Type Here..">
               </span>
             </div>
-          </div>         
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="syllabus">Syllabus</h5>
-              <span class="bmd-form-group">
-                <input type="text" class="form-control" id="Syllabus" placeholder="Type Here..">
-              </span>
-            </div>
-          </div>          
+          </div>      
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
             <div class="mb-3">
               <h5 for="syllabus">Remarks</h5>
@@ -1139,6 +1195,25 @@ if($_SESSION['stc_school_user_for']==2){
           </div>
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
             <div class="mb-3">
+              <table class="table table-hover table-bordered table-responsive">
+                <thead>
+                  <tr>
+                    <th class="text-center">Select</th>
+                    <th class="text-center">Date</th>
+                    <th class="text-center">Class Type</th>
+                    <th class="text-center">Syllabus</th>
+                    <th class="text-center">Chapter</th>
+                    <th class="text-center">Lession</th>
+                  </tr>
+                </thead>
+                <tbody class="stc-show-student-syllabusdet-show">
+                  
+                </tbody>
+              </table>
+            </div>
+          </div>         
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <div class="mb-3">
               <h5 for="syllabus">Questions</h5>
               <span class="bmd-form-group">
                 <input type="text" class="form-control" id="Questions" placeholder="Type Here..">
@@ -1150,6 +1225,21 @@ if($_SESSION['stc_school_user_for']==2){
               <span class="bmd-form-group">
                 <button class="btn btn-success form-control add-question">Add</button>
               </span>
+            </div>
+          </div>
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <div class="mb-3">
+              <table class="table table-hover table-bordered table-responsive">
+                <thead>
+                  <tr>
+                    <th class="text-center">Sl No</th>
+                    <th class="text-center">Questions</th>
+                  </tr>
+                </thead>
+                <tbody class="stc-show-student-syllabusquest-show">
+                  
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

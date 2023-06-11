@@ -372,11 +372,11 @@ class Yggdrasil extends tesseract{
 						<td class="text-center"><b>'.$odin_sturow['stc_school_class_title'].'</b></td>
 						<td class="text-center"><b>'.$odin_sturow['stc_school_subject_title'].'</b></td>
 						<td>
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" value="1" checked> 
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" value="1" checked> 
 							<label for="p'.$odin_sturow['stc_school_student_id'].'">Present</label>
 						</td>
 						<td>
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" value="0"> 
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" value="0"> 
 							<label for="a'.$odin_sturow['stc_school_student_id'].'">Absent</label>
 						</td>
 						<td>
@@ -448,11 +448,11 @@ class Yggdrasil extends tesseract{
 						<td class="text-center"><b>'.$odin_sturow['stc_school_class_title'].'</b></td>
 						<td class="text-center"><b>'.$odin_sturow['stc_school_subject_title'].'</b></td>
 						<td>
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" value="1" checked> 
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" value="1" checked> 
 							<label for="p'.$odin_sturow['stc_school_student_id'].'">Present</label>
 						</td>
 						<td>
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" value="0"> 
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" value="0"> 
 							<label for="a'.$odin_sturow['stc_school_student_id'].'">Absent</label>
 						</td>
 						<td>
@@ -663,6 +663,79 @@ class Yggdrasil extends tesseract{
 		return $odin;
 	}
 
+	public function stc_call_syllabus_det($schedule_id){
+		$odin='';
+		$odinqry=mysqli_query($this->stc_dbs, "
+			SELECT
+			    `stc_school_lecture_id`,
+			    `stc_school_lecture_createdate`,
+			    `stc_school_lecture_classtype`,
+			    `stc_school_lecture_chapter`,
+			    `stc_school_lecture_lesson`,
+			    `stc_school_lecture_syllabus`
+			FROM
+			    `stc_school_lecture`
+			WHERE
+			    `stc_school_lecture_scheduleid`='".mysqli_real_escape_string($this->stc_dbs, $schedule_id)."'
+			ORDER BY 
+				DATE(`stc_school_lecture_createdate`) 
+			DESC LIMIT 0,5
+		");
+		if(mysqli_num_rows($odinqry)>0){
+			$checked='checked';
+			foreach($odinqry as $odinrow){
+				$odin.='
+					<tr>
+						<td for="'.$odinrow['stc_school_lecture_id'].'">
+							<input type="radio" name="syllabus_det" '.$checked.' class="stc-syllabus-out" value="'.$odinrow['stc_school_lecture_id'].'" id="'.$odinrow['stc_school_lecture_id'].'">
+						</td>
+						<td class="text-center">'.date('d-m-Y', strtotime($odinrow['stc_school_lecture_createdate'])).'</td>
+						<td class="text-center">'.$odinrow['stc_school_lecture_classtype'].'</td>
+						<td class="text-center">'.$odinrow['stc_school_lecture_chapter'].'</td>
+						<td class="text-center">'.$odinrow['stc_school_lecture_lesson'].'</td>
+						<td class="text-center">'.$odinrow['stc_school_lecture_syllabus'].'</td>
+					</tr>
+				';
+				$checked='';
+			}
+		}else{
+			$odin.='
+				<tr><td colspan="4">No records found.</td></tr>
+			';
+		}
+		return $odin;
+	}
+
+	public function stc_call_syllabus_quest($question_id){
+		$odin='';
+		$odinqry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_school_lecture_question_question`
+			FROM
+				`stc_school_lecture_question`
+			WHERE
+				`stc_school_lecture_question_lectureid`='".mysqli_real_escape_string($this->stc_dbs, $question_id)."'
+			ORDER BY `stc_school_lecture_question_question` ASC
+		");
+		if(mysqli_num_rows($odinqry)>0){
+			$sl=0;
+			foreach($odinqry as $odinrow){
+				$sl++;
+				$odin.='
+					<tr>
+						<td class="text-center">'.$sl.'</td>
+						<td>'.$odinrow['stc_school_lecture_question_question'].'</td>
+					</tr>
+				';
+			}
+		}else{
+			$odin.='
+				<tr><td colspan="4">No records found.</td></tr>
+			';
+		}
+		return $odin;
+	}
+
 }
 
 #<------------------------------------------------------------------------------------------>
@@ -864,6 +937,32 @@ if(isset($_POST['stc_lecturedetquestion_save'])){
 	}else{
 		$valkyrie=new Yggdrasil();
 		$out=$valkyrie->stc_call_school_lecturedetailsquestion_save($schedule_id, $questions);
+	}
+	echo $out;
+}
+
+// call syllabus details
+if(isset($_POST['stc_syllabusdet_call'])){
+	$schedule_id=$_POST['schedule_id'];
+	$out='';
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out="reload";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_call_syllabus_det($schedule_id);
+	}
+	echo $out;
+}
+
+// call syllabus questions
+if(isset($_POST['stc_syllabusquest_call'])){
+	$question_id=$_POST['question_id'];
+	$out='';
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out="reload";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_call_syllabus_quest($question_id);
 	}
 	echo $out;
 }
