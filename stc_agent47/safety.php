@@ -124,7 +124,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <div class="col-md-4">
                                                         <div class="position-relative form-group">
                                                             <label for="exampleEmail" class="">By Month</label>
-                                                            <input type="month" class="form-control safety-filter-by-month">
+                                                            <input type="month" class="form-control safety-filter-by-month" value="<?php echo date("Y-m");?>">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-8">
@@ -178,7 +178,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <div class="col-md-4">
                                                         <div class="position-relative form-group">
                                                             <label for="exampleEmail" class="">By Month</label>
-                                                            <input type="month" class="form-control safety-ppec-filter-by-month">
+                                                            <input type="month" class="form-control safety-ppec-filter-by-month" value="<?php echo date("Y-m");?>">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-8">
@@ -230,7 +230,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <div class="col-md-4">
                                                         <div class="position-relative form-group">
                                                             <label for="exampleEmail" class="">By Month</label>
-                                                            <input type="month" class="form-control safety-ppem-filter-by-month">
+                                                            <input type="month" class="form-control safety-ppem-filter-by-month" value="<?php echo date("Y-m");?>">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-8">
@@ -282,7 +282,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <div class="col-md-4">
                                                         <div class="position-relative form-group">
                                                             <label for="exampleEmail" class="">By Month</label>
-                                                            <input type="month" class="form-control safety-toollist-filter-by-month">
+                                                            <input type="month" class="form-control safety-toollist-filter-by-month" value="<?php echo date("Y-m");?>">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-8">
@@ -356,7 +356,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <div class="col-md-4">
                                                         <div class="position-relative form-group">
                                                             <label for="exampleEmail" class="">By Month</label>
-                                                            <input type="month" class="form-control safety-vhl-filter-by-month">
+                                                            <input type="month" class="form-control safety-vhl-filter-by-month" value="<?php echo date("Y-m");?>">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-8">
@@ -410,7 +410,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <div class="col-md-4">
                                                         <div class="position-relative form-group">
                                                             <label for="exampleEmail" class="">By Month</label>
-                                                            <input type="month" class="form-control safety-hotwork-filter-by-month">
+                                                            <input type="month" class="form-control safety-hotwork-filter-by-month" value="<?php echo date("Y-m");?>">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-8">
@@ -457,21 +457,12 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Near Miss Reporting comes here</h5>
-                                                blah blah blah...
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="main-card mb-3 card">
                                             <div class="card-body"><h5 class="card-title">Near Miss Reporting</h5>
                                                 <div class="row">
                                                     <div class="col-md-4">
                                                         <div class="position-relative form-group">
                                                             <label for="exampleEmail" class="">By Month</label>
-                                                            <input type="month" class="form-control safety-nearmiss-filter-by-month">
+                                                            <input type="month" class="form-control safety-nearmiss-filter-by-month" value="<?php echo date("Y-m");?>">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-8">
