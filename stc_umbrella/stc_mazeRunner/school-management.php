@@ -449,6 +449,15 @@ if($_SESSION['stc_school_user_for']==4){
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
                             <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
                               <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <a
+                                      href="javascript:void(0)"
+                                      class="form-control btn btn-success stc-school-show-teach-btn"
+                                      value=""
+                                    >Show Teacher</a>
+                                  </div>
+                                </div>
                                 <div class="col-sm-12 col-md-6 col-lg-6">
                                   <div class="mb-3">
                                     <h5
@@ -1087,9 +1096,7 @@ if($_SESSION['stc_school_user_for']==4){
                             </div>
                           </div>
                         </div>
-                      </div>
-
-                      
+                      </div>                     
 
                       <!-- Field Schedule Routine -->
                       <div class="tab-pane " id="stc-create-shedule">
@@ -1745,12 +1752,43 @@ if($_SESSION['stc_school_user_for']==4){
             }
           });
         });
+
+        // show data sections 
+
+        $(document).on('click', '.stc-school-show-teach-btn', function(e){
+          e.preventDefault();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_load_teacher_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              $('.stc-school-showteacher-res').modal('show');
+              alert("Record saved successfully.");
+              // window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check and try again.");
+             }
+            }
+          });
+        });
       });
     </script>
   </body>
   </html>
 
-<div class="modal fade bd-example-modal-xl stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal fade bd-example-modal-xl stc-school-showteacher-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -1767,6 +1805,41 @@ if($_SESSION['stc_school_user_for']==4){
                   <th class="text-center">Time</th>
                   <th class="text-center">Student</th>
                   <th class="text-center">Teacher</th>
+                  <th class="text-center">Staff</th>
+                  <th class="text-center">Guest</th>
+                </tr>
+              </thead>
+              <tbody class="stc-show-canteen-nested-show">
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade bd-example-modal-xl stc-school-showstud-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">School Student</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <h5>School Canteen</h5>
+            <table class="table table-hover table-bordered">
+              <thead>
+                <tr>
+                  <th class="text-center">Student Id</th>
+                  <th class="text-center">Student Name</th>
+                  <th class="text-center">Class</th>
                   <th class="text-center">Staff</th>
                   <th class="text-center">Guest</th>
                 </tr>
