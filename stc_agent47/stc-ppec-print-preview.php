@@ -39,11 +39,11 @@ if(isset($_GET['ppec_no'])){
     <!-- https://fontawesome.com/ -->
     <!-- <link rel="stylesheet" href="stark_tower/jquery-ui-datepicker/jquery-ui.min.css" type="text/css" /> -->
     <!-- http://api.jqueryui.com/datepicker/ -->
-    <link rel="stylesheet" href="../stc_symbiote/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://stcassociate.com/stc_symbiote/css/bootstrap.min.css" />
     <!-- https://getbootstrap.com/ -->
-    <link rel="stylesheet" href="../stc_symbiote/css/templatemo-style.css">
+    <link rel="stylesheet" href="https://stcassociate.com/stc_symbiote/css/templatemo-style.css">
 
-    <link rel="stylesheet" href="../stc_symbiote/css/awsomeminho.css">
+    <link rel="stylesheet" href="https://stcassociate.com/stc_symbiote/css/awsomeminho.css">
 
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/infinite.css">
@@ -390,7 +390,7 @@ if(isset($_GET['ppec_no'])){
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-    <?php include "../stc_symbiote/footer.php";?>
+    <?php include "https://stcassociate.com/stc_symbiote/footer.php";?>
     <script>
       $(document).ready(function(){
         $('#printInvoice').click(function(){

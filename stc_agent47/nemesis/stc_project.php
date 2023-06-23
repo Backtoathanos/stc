@@ -2133,7 +2133,7 @@ class pirates_supervisor extends tesseract{
 				}
 
 				$safety_image='
-						<img src="safety_img/'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
+						<img src="https://stcassociate.com/stc_sub_agent47/safety_img/'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
 				';
 				if($img_path==""){
 					$safety_image="
@@ -2151,7 +2151,7 @@ class pirates_supervisor extends tesseract{
 						<a href="safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetytbm_id'].'" class="form-control btn btn-danger">Print</a>
 					';
 					$safety_image='
-							<img src="../stc_sub_agent47/safety_img/'.$img_path.'" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">
+							<img src="https://stcassociate.com/stc_sub_agent47/safety_img/'.$img_path.'" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">
 					';
 				}
 
