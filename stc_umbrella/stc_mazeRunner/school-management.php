@@ -695,6 +695,15 @@ if($_SESSION['stc_school_user_for']==4){
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
                             <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
                               <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <a
+                                      href="javascript:void(0)"
+                                      class="form-control btn btn-success stc-school-show-stud-btn"
+                                      value=""
+                                    >Show Student</a>
+                                  </div>
+                                </div>
                                 <div class="col-sm-12 col-md-6 col-lg-6">
                                   <div class="mb-3">
                                     <h5
@@ -960,6 +969,15 @@ if($_SESSION['stc_school_user_for']==4){
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
                             <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
                               <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <a
+                                      href="javascript:void(0)"
+                                      class="form-control btn btn-success stc-school-show-subject-btn"
+                                      value=""
+                                    >Show Subject</a>
+                                  </div>
+                                </div>
                                 <div class="col-sm-12 col-md-6 col-lg-6">
                                   <div class="mb-3">
                                     <h5
@@ -1027,6 +1045,15 @@ if($_SESSION['stc_school_user_for']==4){
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
                             <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
                               <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <a
+                                      href="javascript:void(0)"
+                                      class="form-control btn btn-success stc-school-show-classroom-btn"
+                                      value=""
+                                    >Show Classroom</a>
+                                  </div>
+                                </div>
                                 <div class="col-sm-12 col-md-6 col-lg-6">
                                   <div class="mb-3">
                                     <h5
@@ -1099,6 +1126,7 @@ if($_SESSION['stc_school_user_for']==4){
                       </div>                     
 
                       <!-- Field Schedule Routine -->
+
                       <div class="tab-pane " id="stc-create-shedule">
                         <div class="row">
                           <div class="col-12">
@@ -1109,6 +1137,15 @@ if($_SESSION['stc_school_user_for']==4){
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
                             <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
                               <div class="row">
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <a
+                                      href="javascript:void(0)"
+                                      class="form-control btn btn-success stc-school-show-schedule-btn"
+                                      value=""
+                                    >Show Schedule</a>
+                                  </div>
+                                </div>
                                 <div class="col-sm-12 col-md-6 col-lg-6">
                                   <div class="mb-3">
                                     <h5
