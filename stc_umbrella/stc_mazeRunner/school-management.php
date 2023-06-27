@@ -1849,7 +1849,95 @@ if($_SESSION['stc_school_user_for']==4){
              }
             }
           });
-        });
+        }); 
+
+        $(document).on('click', '.stc-school-show-sub-btn', function(e){
+          e.preventDefault();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_load_subject_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              $('.stc-school-showsubject-res').modal('show');
+              alert("Record saved successfully.");
+              // window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check and try again.");
+             }
+            }
+          });
+        }); 
+
+        $(document).on('click', '.stc-school-show-classroom-btn', function(e){
+          e.preventDefault();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_load_classroom_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              $('.stc-school-showclassroom-res').modal('show');
+              alert("Record saved successfully.");
+              // window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check and try again.");
+             }
+            }
+          });
+        }); 
+
+        $(document).on('click', '.stc-school-show-schedule-btn', function(e){
+          e.preventDefault();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_load_schedule_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              $('.stc-school-showschedule-res').modal('show');
+              alert("Record saved successfully.");
+              // window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check and try again.");
+             }
+            }
+          });
+        }); 
+         
       });
     </script>
   </body>
