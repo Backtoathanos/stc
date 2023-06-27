@@ -1820,6 +1820,36 @@ if($_SESSION['stc_school_user_for']==4){
             }
           });
         });
+
+
+        $(document).on('click', '.stc-school-show-stud-btn', function(e){
+          e.preventDefault();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_load_teacher_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              $('.stc-school-showstuddent-res').modal('show');
+              alert("Record saved successfully.");
+              // window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check and try again.");
+             }
+            }
+          });
+        });
       });
     </script>
   </body>
@@ -1829,21 +1859,28 @@ if($_SESSION['stc_school_user_for']==4){
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">School Canteen</h4>
+        <h4 class="modal-title">School Teacher</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Canteen</h5>
+            <h5>School Teacher</h5>
             <table class="table table-hover table-bordered">
               <thead>
                 <tr>
-                  <th class="text-center">Time</th>
-                  <th class="text-center">Student</th>
-                  <th class="text-center">Teacher</th>
-                  <th class="text-center">Staff</th>
-                  <th class="text-center">Guest</th>
+                  <th class="text-center">Sl No</th>
+                  <th class="text-center">Teacher Name</th>
+                  <th class="text-center">Teacher DOB</th>
+                  <th class="text-center">Gender</th>
+                  <th class="text-center">Blood Group</th>
+                  <th class="text-center">Email</th>
+                  <th class="text-center">Contact</th>
+                  <th class="text-center">Address</th>
+                  <th class="text-center">Skills</th>
+                  <th class="text-center">Religion</th>
+                  <th class="text-center">Join Date</th>
+                  <th class="text-center">Remarks</th>
                 </tr>
               </thead>
               <tbody class="stc-show-canteen-nested-show">
@@ -1870,15 +1907,126 @@ if($_SESSION['stc_school_user_for']==4){
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Canteen</h5>
+            <h5>School Student</h5>
             <table class="table table-hover table-bordered">
               <thead>
                 <tr>
                   <th class="text-center">Student Id</th>
                   <th class="text-center">Student Name</th>
+                  <th class="text-center">Stuednt DOB</th>
+                  <th class="text-center">Gender</th>
+                  <th class="text-center">Blood Group</th>
+                  <th class="text-center">Email</th>
+                  <th class="text-center">Contact</th>
+                  <th class="text-center">Address</th>
+                  <th class="text-center">Religion</th>
+                  <th class="text-center">Admission Date</th>
+                  <th class="text-center">Classroom</th>
+                  <th class="text-center">Parent/Guardian Name</th>
+                  <th class="text-center">Remarks</th>
+                </tr>
+              </thead>
+              <tbody class="stc-show-canteen-nested-show">
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade bd-example-modal-xl stc-school-showsub-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">School Subject</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <h5>School Subject</h5>
+            <table class="table table-hover table-bordered">
+              <thead>
+                <tr>
+                  <th class="text-center">Subject Id</th>
+                  <th class="text-center">Subject Title</th>
+                  <th class="text-center">Syllabus Details</th>
+                  </tr>
+              </thead>
+              <tbody class="stc-show-canteen-nested-show">
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade bd-example-modal-xl stc-school-showclassroom-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">School Clasroom</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <h5>School Classroom</h5>
+            <table class="table table-hover table-bordered">
+              <thead>
+                <tr>
+                  <th class="text-center">Classroom ID</th>
+                  <th class="text-center">Classroom Title</th>
+                  <th class="text-center">Loaction</th>
+                  <th class="text-center">Capacity</th>
+                </tr>
+              </thead>
+              <tbody class="stc-show-canteen-nested-show">
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade bd-example-modal-xl stc-school-showschedule-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">School Schedule</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <h5>School Schedule</h5>
+            <table class="table table-hover table-bordered">
+              <thead>
+                <tr>
+                  <th class="text-center">Teacher</th>
+                  <th class="text-center">Subject</th>
                   <th class="text-center">Class</th>
-                  <th class="text-center">Staff</th>
-                  <th class="text-center">Guest</th>
+                  <th class="text-center">Day</th>
+                  <th class="text-center">Start Time</th>
+                  <th class="text-center">End Time</th>
                 </tr>
               </thead>
               <tbody class="stc-show-canteen-nested-show">
