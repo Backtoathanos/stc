@@ -948,9 +948,9 @@ if($_SESSION['stc_school_user_for']==2){
         $(document).on('click', '.stc-attend-check', function(e){
           var stvalue=$(this).val();
           if(stvalue==0){
-            $('.stc-school-student-att-save').hide();
+            $(this).parent().parent().find('.stc-school-student-att-save').hide();
           }else{
-            $('.stc-school-student-att-save').show();
+            $(this).parent().parent().find('.stc-school-student-att-save').show();
           }
         });
         $(document).on('click', '.stc-school-student-att-save', function(e){
@@ -1081,18 +1081,20 @@ if($_SESSION['stc_school_user_for']==2){
 
         function call_syllabus_quest(){
           var question_id=$('.stc-syllabus-out:checked').attr("id");
-          $.ajax({
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_syllabusquest_call : 1,
-              question_id:question_id
-            },
-            // dataType: `JSON`,
-            success   : function(response_student){
-              $('.stc-show-student-syllabusquest-show').html(response_student);
-            }
-          })
+          if(question_id>0){
+            $.ajax({
+              url       : "../vanaheim/school-management.php",
+              method    : "POST",  
+              data      : {
+                stc_syllabusquest_call : 1,
+                question_id:question_id
+              },
+              // dataType: `JSON`,
+              success   : function(response_student){
+                $('.stc-show-student-syllabusquest-show').html(response_student);
+              }
+            });
+          }
         }
 
         $(document).on('click', '.stc-syllabus-out', function(){
@@ -1118,127 +1120,174 @@ if($_SESSION['stc_school_user_for']==2){
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <input type="hidden" class="stc-school-hidden-schedule-id">
-            <!-- <h5>School Attendance</h5> -->
-            <div class="mb-3">
-              <table class="table table-hover table-bordered table-responsive">
-                <thead>
-                  <tr>
-                    <th class="text-center">Student ID</th>
-                    <th class="text-center">Student Name</th>
-                    <th class="text-center">Class</th>
-                    <th class="text-center">Subject</th>
-                    <th class="text-center" colspan="2">Attendance</th>
-                    <th class="text-center">HW Done %</th>
-                    <th class="text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody class="stc-show-student-nested-show">
-                  
-                </tbody>
-              </table>
-            </div>
-          </div>     
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="classtype">Class Type</h5>
-              <span class="bmd-form-group">
-                <select name="stcschoolmanagementteacherid" id="classtype" type="text" class="form-control validate classtype" >
-                  <option value="NA">Select</option>
-                  <option value="Syllabus">Syllabus Class</option>
-                  <option value="Revised">Revised Class</option>
-                  <option value="Doubt">Doubt Class</option>
-                </select>
-              </span>
-            </div>
-          </div>          
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="syllabus">Syllabus</h5>
-              <span class="bmd-form-group">
-                <input type="text" class="form-control" id="Syllabus" placeholder="Type Here..">
-              </span>
-            </div>
-          </div>        
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="chapter">Chapter</h5>
-              <span class="bmd-form-group">
-                <input type="text" class="form-control" id="chapter" placeholder="Type Here..">
-              </span>
-            </div>
-          </div>          
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="lession">Lession</h5>
-              <span class="bmd-form-group">
-                <input type="text" class="form-control" id="lession" placeholder="Type Here..">
-              </span>
-            </div>
-          </div>      
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="syllabus">Remarks</h5>
-              <span class="bmd-form-group">
-                <textarea class="form-control" id="remarks" placeholder="Type Here.."></textarea>
-              </span>
-            </div>
-          </div>        
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <span class="bmd-form-group">
-                <button class="btn btn-success form-control save-lecture">Save</button>
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <table class="table table-hover table-bordered table-responsive">
-                <thead>
-                  <tr>
-                    <th class="text-center">Select</th>
-                    <th class="text-center">Date</th>
-                    <th class="text-center">Class Type</th>
-                    <th class="text-center">Syllabus</th>
-                    <th class="text-center">Chapter</th>
-                    <th class="text-center">Lession</th>
-                  </tr>
-                </thead>
-                <tbody class="stc-show-student-syllabusdet-show">
-                  
-                </tbody>
-              </table>
-            </div>
-          </div>         
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="syllabus">Questions</h5>
-              <span class="bmd-form-group">
-                <input type="text" class="form-control" id="Questions" placeholder="Type Here..">
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <span class="bmd-form-group">
-                <button class="btn btn-success form-control add-question">Add</button>
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <table class="table table-hover table-bordered table-responsive">
-                <thead>
-                  <tr>
-                    <th class="text-center">Sl No</th>
-                    <th class="text-center">Questions</th>
-                  </tr>
-                </thead>
-                <tbody class="stc-show-student-syllabusquest-show">
-                  
-                </tbody>
-              </table>
+          <div class="col-lg-12 col-md-12">
+            <div class="card">
+              <div class="card-header card-header-tabs card-header-primary">
+                <div class="nav-tabs-navigation">
+                  <div class="nav-tabs-wrapper">
+                    <span class="nav-tabs-title">Tasks:</span>
+                    <ul class="nav nav-tabs" data-tabs="tabs">
+                      <li class="nav-item">
+                        <a class="nav-link active" href="#stc-show-attendance" data-toggle="tab">
+                          <i class="material-icons">add_circle</i> Attendance
+                          <div class="ripple-container"></div>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="#stc-show-lecture" data-toggle="tab">
+                          <i class="material-icons">add_circle</i> Lecture
+                          <div class="ripple-container"></div>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="tab-content">
+                  <div class="tab-pane active" id="stc-show-attendance">
+                    <div class="row">
+                      <div class="col-12">
+                        <h2 class="tm-block-title d-inline-block">Attendance</h2>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                        <input type="hidden" class="stc-school-hidden-schedule-id">
+                        <!-- <h5>School Attendance</h5> -->
+                        <div class="mb-3">
+                          <table class="table table-hover table-bordered table-responsive">
+                            <thead>
+                              <tr>
+                                <th class="text-center">Student ID</th>
+                                <th class="text-center">Student Name</th>
+                                <th class="text-center">Class</th>
+                                <th class="text-center">Subject</th>
+                                <th class="text-center" colspan="2">Attendance</th>
+                                <th class="text-center">HW Done %</th>
+                                <th class="text-center">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody class="stc-show-student-nested-show">
+                              
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>   
+                    </div>
+                  </div>
+                  <div class="tab-pane" id="stc-show-lecture">
+                    <div class="row">
+                      <div class="col-12">
+                        <h2 class="tm-block-title d-inline-block">Lecture</h2>
+                      </div>
+                    </div>
+                    <div class="row"> 
+                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <h5 for="classtype">Class Type</h5>
+                          <span class="bmd-form-group">
+                            <select name="stcschoolmanagementteacherid" id="classtype" type="text" class="form-control validate classtype" >
+                              <option value="NA">Select</option>
+                              <option value="Syllabus">Syllabus Class</option>
+                              <option value="Revised">Revised Class</option>
+                              <option value="Doubt">Doubt Class</option>
+                            </select>
+                          </span>
+                        </div>
+                      </div>          
+                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <h5 for="syllabus">Syllabus</h5>
+                          <span class="bmd-form-group">
+                            <input type="text" class="form-control" id="Syllabus" placeholder="Type Here..">
+                          </span>
+                        </div>
+                      </div>        
+                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <h5 for="chapter">Chapter</h5>
+                          <span class="bmd-form-group">
+                            <input type="text" class="form-control" id="chapter" placeholder="Type Here..">
+                          </span>
+                        </div>
+                      </div>          
+                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <h5 for="lession">Lession</h5>
+                          <span class="bmd-form-group">
+                            <input type="text" class="form-control" id="lession" placeholder="Type Here..">
+                          </span>
+                        </div>
+                      </div>      
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <h5 for="syllabus">Remarks</h5>
+                          <span class="bmd-form-group">
+                            <textarea class="form-control" id="remarks" placeholder="Type Here.."></textarea>
+                          </span>
+                        </div>
+                      </div>        
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <span class="bmd-form-group">
+                            <button class="btn btn-success form-control save-lecture">Save</button>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <table class="table table-hover table-bordered table-responsive">
+                            <thead>
+                              <tr>
+                                <th class="text-center">Select</th>
+                                <th class="text-center">Date</th>
+                                <th class="text-center">Class Type</th>
+                                <th class="text-center">Syllabus</th>
+                                <th class="text-center">Chapter</th>
+                                <th class="text-center">Lession</th>
+                              </tr>
+                            </thead>
+                            <tbody class="stc-show-student-syllabusdet-show">
+                              
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>         
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <h5 for="syllabus">Questions</h5>
+                          <span class="bmd-form-group">
+                            <input type="text" class="form-control" id="Questions" placeholder="Type Here..">
+                          </span>
+                        </div>
+                      </div>
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <span class="bmd-form-group">
+                            <button class="btn btn-success form-control add-question">Add</button>
+                          </span>
+                        </div>
+                      </div>
+                      <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <table class="table table-hover table-bordered table-responsive">
+                            <thead>
+                              <tr>
+                                <th class="text-center">Sl No</th>
+                                <th class="text-center">Questions</th>
+                              </tr>
+                            </thead>
+                            <tbody class="stc-show-student-syllabusquest-show">
+                              
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
