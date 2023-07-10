@@ -1892,7 +1892,7 @@ if($_SESSION['stc_school_user_for']==4){
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
             <h5>School Teacher</h5>            
-            <diV style="width: auto;overflow-x: auto; white-space: nowrap;">
+            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
               <table class="table table-hover table-bordered">
                 <thead>
                   <tr>
@@ -1914,7 +1914,7 @@ if($_SESSION['stc_school_user_for']==4){
                   
                 </tbody>
               </table>
-            </diV>
+            </div>
           </div>
         </div>
       </div>
@@ -1933,7 +1933,7 @@ if($_SESSION['stc_school_user_for']==4){
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
             <h5>School Student</h5>
-            <diV style="width: auto;overflow-x: auto; white-space: nowrap;">
+            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
               <table class="table table-hover table-bordered">
                 <thead>
                   <tr>
@@ -1956,7 +1956,7 @@ if($_SESSION['stc_school_user_for']==4){
                   
                 </tbody>
               </table>
-            </diV>
+            </div>
           </div>
         </div>
       </div>
@@ -1975,7 +1975,7 @@ if($_SESSION['stc_school_user_for']==4){
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
             <h5>School Subject</h5>            
-            <diV style="width: auto;overflow-x: auto; white-space: nowrap;">
+            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
               <table class="table table-hover table-bordered">
                 <thead>
                   <tr>
@@ -1990,7 +1990,7 @@ if($_SESSION['stc_school_user_for']==4){
                   
                 </tbody>
               </table>
-            </diV>
+            </div>
           </div>
         </div>
       </div>
@@ -2008,23 +2008,25 @@ if($_SESSION['stc_school_user_for']==4){
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Classroom</h5>
-            <table class="table table-hover table-bordered">
-              <thead>
-                <tr>
-                  <th class="text-center">Classroom ID</th>
-                  <th class="text-center">Classroom Title</th>
-                  <th class="text-center">Loaction</th>
-                  <th class="text-center">Capacity</th>
-                  <th class="text-center">Created Date</th>
-                  <th class="text-center">Created by</th>
-                  <th class="text-center">Action</th>
-                </tr>
-              </thead>
-              <tbody class="stc-classroom-rec-show">
-                
-              </tbody>
-            </table>
+            <h5>School Classroom</h5>                          
+            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
+              <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th class="text-center">Classroom ID</th>
+                    <th class="text-center">Classroom Title</th>
+                    <th class="text-center">Loaction</th>
+                    <th class="text-center">Capacity</th>
+                    <th class="text-center">Created Date</th>
+                    <th class="text-center">Created by</th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="stc-classroom-rec-show">
+                  
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -2042,22 +2044,24 @@ if($_SESSION['stc_school_user_for']==4){
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Schedule</h5>
-            <table class="table table-hover table-bordered">
-              <thead>
-                <tr>
-                  <th class="text-center">Teacher</th>
-                  <th class="text-center">Subject</th>
-                  <th class="text-center">Class</th>
-                  <th class="text-center">Day</th>
-                  <th class="text-center">Start Time</th>
-                  <th class="text-center">End Time</th>
-                </tr>
-              </thead>
-              <tbody class="stc-schedule-rec-show">
-                
-              </tbody>
-            </table>
+            <h5>School Schedule</h5>                        
+            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
+              <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th class="text-center">Teacher</th>
+                    <th class="text-center">Subject</th>
+                    <th class="text-center">Class</th>
+                    <th class="text-center">Day</th>
+                    <th class="text-center">Start Time</th>
+                    <th class="text-center">End Time</th>
+                  </tr>
+                </thead>
+                <tbody class="stc-schedule-rec-show">
+                  
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
