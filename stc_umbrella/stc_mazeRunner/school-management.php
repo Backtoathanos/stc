@@ -1811,6 +1811,18 @@ if($_SESSION['stc_school_user_for']==4){
               var student=response.response_student;
               $('.stc-student-rec-show').html(student);
 
+
+              var subject=response.response_subject;
+              $('.stc-subject-rec-show').html(subject);
+
+
+              var classroom=response.response_class;
+              $('.stc-classroom-rec-show').html(classroom);
+
+
+              var schedule=response.response_scedule;
+              $('.stc-schedule-rec-show').html(schedule);
+
               
              }else if(response.status="reload"){
               window.location.reload();
@@ -1951,7 +1963,7 @@ if($_SESSION['stc_school_user_for']==4){
                   <th class="text-center">Syllabus Details</th>
                   </tr>
               </thead>
-              <tbody class="stc-show-canteen-nested-show">
+              <tbody class="stc-subject-rec-show">
                 
               </tbody>
             </table>
@@ -1982,7 +1994,7 @@ if($_SESSION['stc_school_user_for']==4){
                   <th class="text-center">Capacity</th>
                 </tr>
               </thead>
-              <tbody class="stc-show-canteen-nested-show">
+              <tbody class="stc-classroom-rec-show">
                 
               </tbody>
             </table>
@@ -2015,7 +2027,7 @@ if($_SESSION['stc_school_user_for']==4){
                   <th class="text-center">End Time</th>
                 </tr>
               </thead>
-              <tbody class="stc-show-canteen-nested-show">
+              <tbody class="stc-schedule-rec-show">
                 
               </tbody>
             </table>
