@@ -1302,6 +1302,7 @@ if($_SESSION['stc_school_user_for']==4){
     <script src="../assets/js/core/popper.min.js"></script>
     <script src="../assets/js/core/bootstrap-material-design.min.js"></script>
     <script src="../assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <!-- Plugin for the momentJs  -->
     <script src="../assets/js/plugins/moment.min.js"></script>
     <!--  Plugin for Sweet Alert -->
@@ -1791,151 +1792,56 @@ if($_SESSION['stc_school_user_for']==4){
         });
 
         // show data sections 
+        call_records();
+        function call_records(){          
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_load_record_action : 1
+            },
+            dataType: `JSON`,
+            success   : function(response){
+             // console.log(response);
+             if(response.status=="success"){
+              var teacher=response.response_teacher;
+              $('.stc-teacher-rec-show').html(teacher);
+
+
+              var student=response.response_student;
+              $('.stc-student-rec-show').html(student);
+
+              
+             }else if(response.status="reload"){
+              window.location.reload();
+             }
+            }
+          });
+        }
 
         $(document).on('click', '.stc-school-show-teach-btn', function(e){
           e.preventDefault();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_load_teacher_action : 1
-            },
-            // dataType: `JSON`,
-            success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="success"){
-              $('.stc-school-showteacher-res').modal('show');
-              alert("Record saved successfully.");
-              // window.location.reload();
-             }else if(response=="reload"){
-              window.location.reload();
-             }else if(response=="empty"){
-              alert("Do not let any field empty.");
-             }else if(response=="wrong"){
-              alert("Something went wrong record not saved! Please try again.");
-             }else if(response=="duplicate"){
-              alert("Duplicate details found! Please check and try again.");
-             }
-            }
-          });
+          $('.stc-school-showteacher-res').modal('show');
         });
-
 
         $(document).on('click', '.stc-school-show-stud-btn', function(e){
           e.preventDefault();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_load_teacher_action : 1
-            },
-            // dataType: `JSON`,
-            success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="success"){
-              $('.stc-school-showstuddent-res').modal('show');
-              alert("Record saved successfully.");
-              // window.location.reload();
-             }else if(response=="reload"){
-              window.location.reload();
-             }else if(response=="empty"){
-              alert("Do not let any field empty.");
-             }else if(response=="wrong"){
-              alert("Something went wrong record not saved! Please try again.");
-             }else if(response=="duplicate"){
-              alert("Duplicate details found! Please check and try again.");
-             }
-            }
-          });
+          $('.stc-school-showstud-res').modal('show');
         }); 
 
         $(document).on('click', '.stc-school-show-sub-btn', function(e){
           e.preventDefault();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_load_subject_action : 1
-            },
-            // dataType: `JSON`,
-            success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="success"){
-              $('.stc-school-showsubject-res').modal('show');
-              alert("Record saved successfully.");
-              // window.location.reload();
-             }else if(response=="reload"){
-              window.location.reload();
-             }else if(response=="empty"){
-              alert("Do not let any field empty.");
-             }else if(response=="wrong"){
-              alert("Something went wrong record not saved! Please try again.");
-             }else if(response=="duplicate"){
-              alert("Duplicate details found! Please check and try again.");
-             }
-            }
-          });
+          $('.stc-school-showsubject-res').modal('show');
         }); 
 
         $(document).on('click', '.stc-school-show-classroom-btn', function(e){
           e.preventDefault();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_load_classroom_action : 1
-            },
-            // dataType: `JSON`,
-            success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="success"){
-              $('.stc-school-showclassroom-res').modal('show');
-              alert("Record saved successfully.");
-              // window.location.reload();
-             }else if(response=="reload"){
-              window.location.reload();
-             }else if(response=="empty"){
-              alert("Do not let any field empty.");
-             }else if(response=="wrong"){
-              alert("Something went wrong record not saved! Please try again.");
-             }else if(response=="duplicate"){
-              alert("Duplicate details found! Please check and try again.");
-             }
-            }
-          });
+          $('.stc-school-showclassroom-res').modal('show');
         }); 
 
         $(document).on('click', '.stc-school-show-schedule-btn', function(e){
           e.preventDefault();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_load_schedule_action : 1
-            },
-            // dataType: `JSON`,
-            success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="success"){
-              $('.stc-school-showschedule-res').modal('show');
-              alert("Record saved successfully.");
-              // window.location.reload();
-             }else if(response=="reload"){
-              window.location.reload();
-             }else if(response=="empty"){
-              alert("Do not let any field empty.");
-             }else if(response=="wrong"){
-              alert("Something went wrong record not saved! Please try again.");
-             }else if(response=="duplicate"){
-              alert("Duplicate details found! Please check and try again.");
-             }
-            }
-          });
+          $('.stc-school-showschedule-res').modal('show');
         }); 
          
       });
@@ -1953,33 +1859,32 @@ if($_SESSION['stc_school_user_for']==4){
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Teacher</h5>
-            <table class="table table-hover table-bordered">
-              <thead>
-                <tr>
-                  <th class="text-center">Sl No</th>
-                  <th class="text-center">Teacher Name</th>
-                  <th class="text-center">Teacher DOB</th>
-                  <th class="text-center">Gender</th>
-                  <th class="text-center">Blood Group</th>
-                  <th class="text-center">Email</th>
-                  <th class="text-center">Contact</th>
-                  <th class="text-center">Address</th>
-                  <th class="text-center">Skills</th>
-                  <th class="text-center">Religion</th>
-                  <th class="text-center">Join Date</th>
-                  <th class="text-center">Remarks</th>
-                </tr>
-              </thead>
-              <tbody class="stc-show-canteen-nested-show">
-                
-              </tbody>
-            </table>
+            <h5>School Teacher</h5>            
+            <diV style="width: auto;overflow-x: auto; white-space: nowrap;">
+              <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th class="text-center">Sl No</th>
+                    <th class="text-center">Teacher Name</th>
+                    <th class="text-center">Teacher DOB</th>
+                    <th class="text-center">Gender</th>
+                    <th class="text-center">Blood Group</th>
+                    <th class="text-center">Email</th>
+                    <th class="text-center">Contact</th>
+                    <th class="text-center">Address</th>
+                    <th class="text-center">Skills</th>
+                    <th class="text-center">Religion</th>
+                    <th class="text-center">Join Date</th>
+                    <th class="text-center">Remarks</th>
+                  </tr>
+                </thead>
+                <tbody class="stc-teacher-rec-show">
+                  
+                </tbody>
+              </table>
+            </diV>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -1996,28 +1901,30 @@ if($_SESSION['stc_school_user_for']==4){
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
             <h5>School Student</h5>
-            <table class="table table-hover table-bordered">
-              <thead>
-                <tr>
-                  <th class="text-center">Student Id</th>
-                  <th class="text-center">Student Name</th>
-                  <th class="text-center">Stuednt DOB</th>
-                  <th class="text-center">Gender</th>
-                  <th class="text-center">Blood Group</th>
-                  <th class="text-center">Email</th>
-                  <th class="text-center">Contact</th>
-                  <th class="text-center">Address</th>
-                  <th class="text-center">Religion</th>
-                  <th class="text-center">Admission Date</th>
-                  <th class="text-center">Classroom</th>
-                  <th class="text-center">Parent/Guardian Name</th>
-                  <th class="text-center">Remarks</th>
-                </tr>
-              </thead>
-              <tbody class="stc-show-canteen-nested-show">
-                
-              </tbody>
-            </table>
+            <diV style="width: auto;overflow-x: auto; white-space: nowrap;">
+              <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th class="text-center">Student Id</th>
+                    <th class="text-center">Student Name</th>
+                    <th class="text-center">Stuednt DOB</th>
+                    <th class="text-center">Gender</th>
+                    <th class="text-center">Blood Group</th>
+                    <th class="text-center">Email</th>
+                    <th class="text-center">Contact</th>
+                    <th class="text-center">Address</th>
+                    <th class="text-center">Religion</th>
+                    <th class="text-center">Admission Date</th>
+                    <th class="text-center">Classroom</th>
+                    <th class="text-center">Parent/Guardian Name</th>
+                    <th class="text-center">Remarks</th>
+                  </tr>
+                </thead>
+                <tbody class="stc-show-canteen-nested-show">
+                  
+                </tbody>
+              </table>
+            </diV>
           </div>
         </div>
       </div>

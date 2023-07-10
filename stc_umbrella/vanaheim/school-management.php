@@ -736,6 +736,122 @@ class Yggdrasil extends tesseract{
 		return $odin;
 	}
 
+	public function stc_call_records(){
+		$odinteacherqry=mysqli_query($this->stc_dbs, "
+			SELECT
+			    `stc_school_teacher_userid`,
+			    `stc_school_teacher_teachid`,
+			    `stc_school_teacher_firstname`,
+			    `stc_school_teacher_lastname`,
+			    `stc_school_teacher_dob`,
+			    `stc_school_teacher_gender`,
+			    `stc_school_teacher_bloodgroup`,
+			    `stc_school_teacher_email`,
+			    `stc_school_teacher_contact`,
+			    `stc_school_teacher_address`,
+			    `stc_school_teacher_skills`,
+			    `stc_school_teacher_religion`,
+			    `stc_school_teacher_joindate`,
+			    `stc_school_teacher_remarks`,
+			    `stc_school_teacher_status`,
+			    `stc_school_teacher_createdate`,
+			    `stc_school_user_fullName`
+			FROM
+			    `stc_school_teacher`
+			LEFT JOIN
+			    `stc_school`
+			ON
+			    `stc_school_user_id`=`stc_school_teacher_createdby`
+			ORDER BY `stc_school_teacher_firstname` ASC
+		");
+		$teacher_records='';
+		if(mysqli_num_rows($odinteacherqry)>0){
+			$slno=0;
+			foreach($odinteacherqry as $row){
+				$slno++;
+				$teacher_records.='
+					<tr>
+						<td class="text-center">'.$slno.'</td>
+						<td>'.$row['stc_school_teacher_firstname'].' '.$row['stc_school_teacher_lastname'].'</td>
+						<td>'.date('d-m-Y', strtotime($row['stc_school_teacher_dob'])).'</td>
+						<td>'.$row['stc_school_teacher_gender'].'</td>
+						<td>'.$row['stc_school_teacher_bloodgroup'].'</td>
+						<td>'.$row['stc_school_teacher_email'].'</td>
+						<td>'.$row['stc_school_teacher_contact'].'</td>
+						<td>'.$row['stc_school_teacher_address'].'</td>
+						<td>'.$row['stc_school_teacher_skills'].'</td>
+						<td>'.$row['stc_school_teacher_religion'].'</td>
+						<td>'.date('d-m-Y', strtotime($row['stc_school_teacher_joindate'])).'</td>
+						<td>'.$row['stc_school_teacher_remarks'].'</td>
+					</tr>
+				';
+			}
+		}
+
+		$odinteacherqry=mysqli_query($this->stc_dbs, "
+			SELECT
+			    `stc_school_student_id`,
+			    `stc_school_student_studid`,
+			    `stc_school_student_firstname`,
+			    `stc_school_student_lastname`,
+			    `stc_school_student_dob`,
+			    `stc_school_student_gender`,
+			    `stc_school_student_bloodgroup`,
+			    `stc_school_student_email`,
+			    `stc_school_student_contact`,
+			    `stc_school_student_address`,
+			    `stc_school_student_religion`,
+			    `stc_school_student_admissionno`,
+			    `stc_school_student_admissiondate`,
+			    `stc_school_student_classroomid`,
+			    `stc_school_class_title`,
+			    `stc_school_student_admissionclass`,
+			    `stc_school_student_guardianname`,
+			    `stc_school_student_remarks`,
+			    `stc_school_student_status`,
+			    `stc_school_student_createdate`,
+			    `stc_school_user_fullName`
+			FROM
+			    `stc_school_student`
+			LEFT JOIN
+			    `stc_school`
+			ON
+			    `stc_school_user_id`=`stc_school_student_createdby`
+			LEFT JOIN
+			    `stc_school_class`
+			ON
+			    `stc_school_class_id`=`stc_school_student_classroomid`
+			ORDER BY `stc_school_student_firstname` ASC
+		");
+		$teacher_records='';
+		if(mysqli_num_rows($odinteacherqry)>0){
+			$slno=0;
+			foreach($odinteacherqry as $row){
+				$slno++;
+				$teacher_records.='
+					<tr>
+						<td class="text-center">'.$slno.'</td>
+						<td>'.$row['stc_school_student_firstname'].' '.$row['stc_school_student_lastname'].'</td>
+						<td>'.date('d-m-Y', strtotime($row['stc_school_student_dob'])).'</td>
+						<td>'.$row['stc_school_student_gender'].'</td>
+						<td>'.$row['stc_school_student_bloodgroup'].'</td>
+						<td>'.$row['stc_school_student_email'].'</td>
+						<td>'.$row['stc_school_student_contact'].'</td>
+						<td>'.$row['stc_school_student_address'].'</td>
+						<td>'.$row['stc_school_student_religion'].'</td>
+						<td>'.date('d-m-Y', strtotime($row['stc_school_student_admissiondate'])).'</td>
+						<td>'.$row['stc_school_teacher_remarks'].'</td>
+						<td>'.$row['stc_school_student_guardianname'].'</td>
+						<td>'.$row['stc_school_student_remarks'].'</td>
+					</tr>
+				';
+			}
+		}
+		$odin['status']="success";
+		$odin['response_teacher']=$teacher_records;
+		return $odin;
+	}
+
 }
 
 #<------------------------------------------------------------------------------------------>
@@ -965,5 +1081,17 @@ if(isset($_POST['stc_syllabusquest_call'])){
 		$out=$valkyrie->stc_call_syllabus_quest($question_id);
 	}
 	echo $out;
+}
+
+// call records
+if(isset($_POST['stc_load_record_action'])){
+	$out='';
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out['reload']="reload";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_call_records();
+	}
+	echo json_encode($out);
 }
 ?>
