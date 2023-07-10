@@ -1820,7 +1820,7 @@ if($_SESSION['stc_school_user_for']==4){
               $('.stc-classroom-rec-show').html(classroom);
 
 
-              var schedule=response.response_scedule;
+              var schedule=response.response_schedule;
               $('.stc-schedule-rec-show').html(schedule);
 
               

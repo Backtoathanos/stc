@@ -929,12 +929,136 @@ class Yggdrasil extends tesseract{
 			}
 		}
 
+		$schedule_records='';
+    	$day_array=array('Monday');
+    	$init_time=8;
+    	$end_time=10;
+    	$rep_qry="";
+    	foreach($day_array as $row){
+    		$data='';
+    		$init_time=$end_time++;
+    		$end_time++;
+    		$rep_qry.=" - 
+    			SELECT
+				    `stc_school_class_title`,
+				    `stc_school_subject_title`,
+				    `stc_school_teacher_firstname`,
+				    `stc_school_teacher_lastname`,
+    				`stc_school_teacher_schedule_day`
+				FROM
+				    `stc_school_teacher_schedule`
+				LEFT JOIN 
+					`stc_school_class` 
+				ON 
+					`stc_school_class_id`=`stc_school_teacher_schedule_subjectid` 
+				LEFT JOIN 
+					`stc_school_subject` 
+				ON 
+					`stc_school_subject_id`=`stc_school_teacher_schedule_classid` 
+				LEFT JOIN 
+					`stc_school_teacher` 
+				ON 
+					`stc_school_teacher_id`=`stc_school_teacher_schedule_teacherid`
+				WHERE
+				    `stc_school_teacher_schedule_day`='".$row."'
+				AND
+					hour(`stc_school_teacher_schedule_begtime`)>".$init_time."
+				AND 
+					hour(`stc_school_teacher_schedule_begtime`)<".$end_time."
+				ORDER BY 
+					`stc_school_subject_title` ASC					
+    		";
+
+    		$odinscheduleqry=mysqli_query($this->stc_dbs, "
+    			SELECT
+				    `stc_school_class_title`,
+				    `stc_school_subject_title`,
+				    `stc_school_teacher_firstname`,
+				    `stc_school_teacher_lastname`,
+    				`stc_school_teacher_schedule_day`
+				FROM
+				    `stc_school_teacher_schedule`
+				LEFT JOIN 
+					`stc_school_class` 
+				ON 
+					`stc_school_class_id`=`stc_school_teacher_schedule_subjectid` 
+				LEFT JOIN 
+					`stc_school_subject` 
+				ON 
+					`stc_school_subject_id`=`stc_school_teacher_schedule_classid` 
+				LEFT JOIN 
+					`stc_school_teacher` 
+				ON 
+					`stc_school_teacher_id`=`stc_school_teacher_schedule_teacherid`
+				WHERE
+				    `stc_school_teacher_schedule_day`='".$row."'
+				AND
+					hour(`stc_school_teacher_schedule_begtime`)>".$init_time."
+				AND 
+					hour(`stc_school_teacher_schedule_begtime`)<".$end_time."
+				ORDER BY 
+					`stc_school_subject_title` ASC
+    		");
+
+
+    		$odinscheduleqry=mysqli_query($this->stc_dbs, "
+    			SELECT
+				    `stc_school_class_title`,
+				    `stc_school_subject_title`,
+				    `stc_school_teacher_firstname`,
+				    `stc_school_teacher_lastname`,
+    				`stc_school_teacher_schedule_day`
+				FROM
+				    `stc_school_teacher_schedule`
+				LEFT JOIN 
+					`stc_school_class` 
+				ON 
+					`stc_school_class_id`=`stc_school_teacher_schedule_subjectid` 
+				LEFT JOIN 
+					`stc_school_subject` 
+				ON 
+					`stc_school_subject_id`=`stc_school_teacher_schedule_classid` 
+				LEFT JOIN 
+					`stc_school_teacher` 
+				ON 
+					`stc_school_teacher_id`=`stc_school_teacher_schedule_teacherid`
+				WHERE
+				    `stc_school_teacher_schedule_day`='".$row."'
+				AND (
+					(
+							hour(`stc_school_teacher_schedule_begtime`)>".$init_time."
+						AND 
+							hour(`stc_school_teacher_schedule_begtime`)<".$end_time."
+					) OR (
+							hour(`stc_school_teacher_schedule_begtime`)>".$init_time."
+						AND 
+							hour(`stc_school_teacher_schedule_begtime`)<".$end_time."
+					) 
+				)
+				ORDER BY 
+					`stc_school_subject_title` ASC
+					
+    		");
+    		foreach($odinscheduleqry as $odinschedulerow){
+    			$data.='
+    				<td>'.$odinschedulerow['stc_school_teacher_schedule_day'].' '.$odinschedulerow['stc_school_class_title'].'<br>'.$odinschedulerow['stc_school_subject_title'].'<br>'.$odinschedulerow['stc_school_teacher_firstname'].' '.$odinschedulerow['stc_school_teacher_lastname'].'</td>
+    			';
+    		}
+    		$schedule_records.='
+					<tr>
+						<td class="text-center">'.$row.'</td>
+						'.$data.'
+					</tr>
+			';
+    	}
 		
 		$odin['status']="success";
 		$odin['response_teacher']=$teacher_records;
 		$odin['response_student']=$student_records;
 		$odin['response_subject']=$subject_records;
 		$odin['response_class']=$class_records;
+		$odin['response_schedule']=$schedule_records;
+		$odin['rep_qry']=$rep_qry;
 		return $odin;
 	}
 
