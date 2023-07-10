@@ -1559,7 +1559,7 @@ if($_SESSION['stc_school_user_for']==4){
         });
       });
     </script>
-    <!-- canteen section -->
+    <!-- data show section -->
     <script>
       $(document).ready(function(){
 
@@ -1750,7 +1750,7 @@ if($_SESSION['stc_school_user_for']==4){
           });
         });
 
-
+        // save shedule to db
         $(document).on('click', '#stcschoolschedulesave', function(e){
           e.preventDefault();
           var stcschoolscheduleteacher      = $('.stcschoolscheduleteacher').val();
@@ -1829,9 +1829,9 @@ if($_SESSION['stc_school_user_for']==4){
           $('.stc-school-showstud-res').modal('show');
         }); 
 
-        $(document).on('click', '.stc-school-show-sub-btn', function(e){
+        $(document).on('click', '.stc-school-show-subject-btn', function(e){
           e.preventDefault();
-          $('.stc-school-showsubject-res').modal('show');
+          $('.stc-school-showsub-res').modal('show');
         }); 
 
         $(document).on('click', '.stc-school-show-classroom-btn', function(e){
@@ -1851,7 +1851,7 @@ if($_SESSION['stc_school_user_for']==4){
 
 <div class="modal fade bd-example-modal-xl stc-school-showteacher-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content" style="top: 75px;">
       <div class="modal-header">
         <h4 class="modal-title">School Teacher</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -1892,7 +1892,7 @@ if($_SESSION['stc_school_user_for']==4){
 
 <div class="modal fade bd-example-modal-xl stc-school-showstud-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content" style="top: 75px;">
       <div class="modal-header">
         <h4 class="modal-title">School Student</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -1920,7 +1920,7 @@ if($_SESSION['stc_school_user_for']==4){
                     <th class="text-center">Remarks</th>
                   </tr>
                 </thead>
-                <tbody class="stc-show-canteen-nested-show">
+                <tbody class="stc-student-rec-show">
                   
                 </tbody>
               </table>
@@ -1928,16 +1928,13 @@ if($_SESSION['stc_school_user_for']==4){
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
     </div>
   </div>
 </div>
 
 <div class="modal fade bd-example-modal-xl stc-school-showsub-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content" style="top: 75px;">
       <div class="modal-header">
         <h4 class="modal-title">School Subject</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -1961,16 +1958,13 @@ if($_SESSION['stc_school_user_for']==4){
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
     </div>
   </div>
 </div>
 
 <div class="modal fade bd-example-modal-xl stc-school-showclassroom-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content" style="top: 75px;">
       <div class="modal-header">
         <h4 class="modal-title">School Clasroom</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -1995,16 +1989,13 @@ if($_SESSION['stc_school_user_for']==4){
           </div>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
     </div>
   </div>
 </div>
 
 <div class="modal fade bd-example-modal-xl stc-school-showschedule-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content" style="top: 75px;">
       <div class="modal-header">
         <h4 class="modal-title">School Schedule</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -2030,9 +2021,6 @@ if($_SESSION['stc_school_user_for']==4){
             </table>
           </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>

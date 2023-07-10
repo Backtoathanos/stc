@@ -788,7 +788,7 @@ class Yggdrasil extends tesseract{
 			}
 		}
 
-		$odinteacherqry=mysqli_query($this->stc_dbs, "
+		$odinstudentqry=mysqli_query($this->stc_dbs, "
 			SELECT
 			    `stc_school_student_id`,
 			    `stc_school_student_studid`,
@@ -823,12 +823,12 @@ class Yggdrasil extends tesseract{
 			    `stc_school_class_id`=`stc_school_student_classroomid`
 			ORDER BY `stc_school_student_firstname` ASC
 		");
-		$teacher_records='';
-		if(mysqli_num_rows($odinteacherqry)>0){
+		$student_records='';
+		if(mysqli_num_rows($odinstudentqry)>0){
 			$slno=0;
-			foreach($odinteacherqry as $row){
+			foreach($odinstudentqry as $row){
 				$slno++;
-				$teacher_records.='
+				$student_records.='
 					<tr>
 						<td class="text-center">'.$slno.'</td>
 						<td>'.$row['stc_school_student_firstname'].' '.$row['stc_school_student_lastname'].'</td>
@@ -840,15 +840,50 @@ class Yggdrasil extends tesseract{
 						<td>'.$row['stc_school_student_address'].'</td>
 						<td>'.$row['stc_school_student_religion'].'</td>
 						<td>'.date('d-m-Y', strtotime($row['stc_school_student_admissiondate'])).'</td>
-						<td>'.$row['stc_school_teacher_remarks'].'</td>
+						<td>'.$row['stc_school_class_title'].'</td>
 						<td>'.$row['stc_school_student_guardianname'].'</td>
 						<td>'.$row['stc_school_student_remarks'].'</td>
 					</tr>
 				';
 			}
 		}
+
+		$odinsubjectqry=mysqli_query($this->stc_dbs, "
+			SELECT
+			    `stc_school_subject_title`,
+			    `stc_school_subject_subid`,
+			    `stc_school_subject_syllabusdetails`,
+			    `stc_school_subject_status`,
+			    `stc_school_subject_createdate`,
+			    `stc_school_user_fullName`
+			FROM
+			    `stc_school_subject`
+			LEFT JOIN
+			    `stc_school`
+			ON
+			    `stc_school_user_id`=`stc_school_subject_createdby`
+			ORDER BY `stc_school_subject_title` ASC
+		");
+		$subject_records='';
+		if(mysqli_num_rows($odinsubjectqry)>0){
+			$slno=0;
+			foreach($odinsubjectqry as $row){
+				$slno++;
+				$subject_records.='
+					<tr>
+						<td>'.$row['stc_school_subject_id'].'</td>
+						<td>'.$row['stc_school_subject_title'].'</td>
+						<td>'.$row['stc_school_subject_syllabusdetails'].'</td>
+						<td>'.date('d-m-Y', strtotime($row['stc_school_subject_createdate'])).'</td>
+						<td>'.$row['stc_school_user_fullName'].'</td>
+					</tr>
+				';
+			}
+		}
 		$odin['status']="success";
 		$odin['response_teacher']=$teacher_records;
+		$odin['response_student']=$student_records;
+		$odin['response_subject']=$subject_records;
 		return $odin;
 	}
 
@@ -1085,7 +1120,7 @@ if(isset($_POST['stc_syllabusquest_call'])){
 
 // call records
 if(isset($_POST['stc_load_record_action'])){
-	$out='';
+	$out=array();
 	if(empty($_SESSION['stc_school_user_id'])){
 		$out['reload']="reload";
 	}else{
