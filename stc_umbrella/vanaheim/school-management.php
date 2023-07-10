@@ -909,11 +909,21 @@ class Yggdrasil extends tesseract{
 				$class_records.='
 					<tr>
 						<td class="text-center">'.$row['stc_school_class_id'].'</td>
-						<td>'.$row['stc_school_class_title'].'</td>
-						<td>'.$row['stc_school_class_location'].'</td>
-						<td>'.$row['stc_school_class_capacity'].'</td>
+						<td>'.$row['stc_school_class_title'].'
+							<input type="text" class="stc-class-title-upd" value="'.$row['stc_school_class_title'].'" style="display:none">
+						</td>
+						<td>'.$row['stc_school_class_location'].'
+							<input type="text" class="stc-class-location-upd" value="'.$row['stc_school_class_location'].'" style="display:none">
+						</td>
+						<td>'.$row['stc_school_class_capacity'].'
+							<input type="text" class="stc-class-capacity-upd" value="'.$row['stc_school_class_location'].'" style="display:none">
+						</td>
 						<td>'.date('d-m-Y', strtotime($row['stc_school_class_createdate'])).'</td>
 						<td>'.$row['stc_school_user_fullName'].'</td>
+						<td>
+							<a href="javascript:void(0)" class=" btn btn-default stc-class-upd-btn-show">Update</a>
+							<a href="javascript:void(0)" class=" btn btn-primary stc-class-upd-btn-save" style="display:none">Save</a>
+						</td>
 					</tr>
 				';
 			}

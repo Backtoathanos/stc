@@ -1855,6 +1855,26 @@ if($_SESSION['stc_school_user_for']==4){
           e.preventDefault();
           $('.stc-school-showschedule-res').modal('show');
         }); 
+
+
+        $(document).on('click', '.stc-class-upd-btn-show', function(e){
+          e.preventDefault();
+          $(this).hide();
+          $(this).parent().parent().find('.stc-class-upd-btn-save').show();
+          $(this).parent().parent().find('.stc-class-title-upd').show();
+          $(this).parent().parent().find('.stc-class-location-upd').show();
+          $(this).parent().parent().find('.stc-class-capacity-upd').show();
+        }); 
+
+        $(document).on('click', '.stc-class-upd-btn-save', function(e){
+          e.preventDefault();
+          $(this).hide();
+          $(this).parent().parent().find('.stc-class-title-upd').hide();
+          $(this).parent().parent().find('.stc-class-location-upd').hide();
+          $(this).parent().parent().find('.stc-class-capacity-upd').hide();
+          $(this).parent().parent().find('.stc-class-upd-btn-show').show();
+        }); 
+        
          
       });
     </script>
@@ -1954,21 +1974,23 @@ if($_SESSION['stc_school_user_for']==4){
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Subject</h5>
-            <table class="table table-hover table-bordered">
-              <thead>
-                <tr>
-                  <th class="text-center">Subject Id</th>
-                  <th class="text-center">Subject Title</th>
-                  <th class="text-center">Syllabus Details</th>
-                  <th class="text-center">Created Date</th>
-                  <th class="text-center">Created by</th>
-                  </tr>
-              </thead>
-              <tbody class="stc-subject-rec-show">
-                
-              </tbody>
-            </table>
+            <h5>School Subject</h5>            
+            <diV style="width: auto;overflow-x: auto; white-space: nowrap;">
+              <table class="table table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th class="text-center">Subject Id</th>
+                    <th class="text-center">Subject Title</th>
+                    <th class="text-center">Syllabus Details</th>
+                    <th class="text-center">Created Date</th>
+                    <th class="text-center">Created by</th>
+                    </tr>
+                </thead>
+                <tbody class="stc-subject-rec-show">
+                  
+                </tbody>
+              </table>
+            </diV>
           </div>
         </div>
       </div>
@@ -1996,6 +2018,7 @@ if($_SESSION['stc_school_user_for']==4){
                   <th class="text-center">Capacity</th>
                   <th class="text-center">Created Date</th>
                   <th class="text-center">Created by</th>
+                  <th class="text-center">Action</th>
                 </tr>
               </thead>
               <tbody class="stc-classroom-rec-show">
