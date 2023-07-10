@@ -850,6 +850,7 @@ class Yggdrasil extends tesseract{
 
 		$odinsubjectqry=mysqli_query($this->stc_dbs, "
 			SELECT
+				`stc_school_subject_id`,
 			    `stc_school_subject_title`,
 			    `stc_school_subject_subid`,
 			    `stc_school_subject_syllabusdetails`,
@@ -880,10 +881,48 @@ class Yggdrasil extends tesseract{
 				';
 			}
 		}
+
+		$odinclassqry=mysqli_query($this->stc_dbs, "
+			SELECT
+			    `stc_school_class_id`,
+			    `stc_school_class_title`,
+			    `stc_school_class_classid`,
+			    `stc_school_class_location`,
+			    `stc_school_class_capacity`,
+			    `stc_school_class_status`,
+			    `stc_school_class_createdate`,
+			    `stc_school_user_fullName`
+			FROM
+			    `stc_school_class`
+			LEFT JOIN
+			    `stc_school`
+			ON
+			    `stc_school_user_id`=`stc_school_class_createdby`
+			ORDER BY `stc_school_class_title` ASC
+		");
+		$class_records='';
+		if(mysqli_num_rows($odinclassqry)>0){
+			$slno=0;
+			foreach($odinclassqry as $row){
+				$slno++;
+				$class_records.='
+					<tr>
+						<td>'.$row['stc_school_class_id'].'</td>
+						<td>'.$row['stc_school_class_title'].'</td>
+						<td>'.$row['stc_school_class_location'].'</td>
+						<td>'.date('d-m-Y', strtotime($row['stc_school_class_createdate'])).'</td>
+						<td>'.$row['stc_school_user_fullName'].'</td>
+					</tr>
+				';
+			}
+		}
+
+		
 		$odin['status']="success";
 		$odin['response_teacher']=$teacher_records;
 		$odin['response_student']=$student_records;
 		$odin['response_subject']=$subject_records;
+		$odin['response_class']=$class_records;
 		return $odin;
 	}
 
