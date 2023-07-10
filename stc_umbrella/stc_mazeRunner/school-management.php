@@ -2049,12 +2049,14 @@ if($_SESSION['stc_school_user_for']==4){
               <table class="table table-hover table-bordered">
                 <thead>
                   <tr>
-                    <th class="text-center">Teacher</th>
-                    <th class="text-center">Subject</th>
-                    <th class="text-center">Class</th>
-                    <th class="text-center">Day</th>
-                    <th class="text-center">Start Time</th>
-                    <th class="text-center">End Time</th>
+                    <td class="text-center"><b>Day</b></td>
+                    <td class="text-center"><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></td>
+                    <td class="text-center"><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></td>
+                    <td class="text-center"><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></td>
+                    <td class="text-center"><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
+                    <td class="text-center"><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
+                    <td class="text-center"><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
+                    <td class="text-center"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
                   </tr>
                 </thead>
                 <tbody class="stc-schedule-rec-show">
