@@ -1961,6 +1961,8 @@ if($_SESSION['stc_school_user_for']==4){
                   <th class="text-center">Subject Id</th>
                   <th class="text-center">Subject Title</th>
                   <th class="text-center">Syllabus Details</th>
+                  <th class="text-center">Created Date</th>
+                  <th class="text-center">Created by</th>
                   </tr>
               </thead>
               <tbody class="stc-subject-rec-show">
@@ -1992,6 +1994,8 @@ if($_SESSION['stc_school_user_for']==4){
                   <th class="text-center">Classroom Title</th>
                   <th class="text-center">Loaction</th>
                   <th class="text-center">Capacity</th>
+                  <th class="text-center">Created Date</th>
+                  <th class="text-center">Created by</th>
                 </tr>
               </thead>
               <tbody class="stc-classroom-rec-show">

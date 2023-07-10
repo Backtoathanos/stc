@@ -843,6 +843,7 @@ class Yggdrasil extends tesseract{
 						<td>'.$row['stc_school_class_title'].'</td>
 						<td>'.$row['stc_school_student_guardianname'].'</td>
 						<td>'.$row['stc_school_student_remarks'].'</td>
+						<td>'.$row['stc_school_student_remarks'].'</td>
 					</tr>
 				';
 			}
@@ -872,7 +873,7 @@ class Yggdrasil extends tesseract{
 				$slno++;
 				$subject_records.='
 					<tr>
-						<td>'.$row['stc_school_subject_id'].'</td>
+						<td class="text-center">'.$row['stc_school_subject_id'].'</td>
 						<td>'.$row['stc_school_subject_title'].'</td>
 						<td>'.$row['stc_school_subject_syllabusdetails'].'</td>
 						<td>'.date('d-m-Y', strtotime($row['stc_school_subject_createdate'])).'</td>
@@ -907,9 +908,10 @@ class Yggdrasil extends tesseract{
 				$slno++;
 				$class_records.='
 					<tr>
-						<td>'.$row['stc_school_class_id'].'</td>
+						<td class="text-center">'.$row['stc_school_class_id'].'</td>
 						<td>'.$row['stc_school_class_title'].'</td>
 						<td>'.$row['stc_school_class_location'].'</td>
+						<td>'.$row['stc_school_class_capacity'].'</td>
 						<td>'.date('d-m-Y', strtotime($row['stc_school_class_createdate'])).'</td>
 						<td>'.$row['stc_school_user_fullName'].'</td>
 					</tr>
