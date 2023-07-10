@@ -916,7 +916,7 @@ class Yggdrasil extends tesseract{
 							<input type="text" class="stc-class-location-upd" value="'.$row['stc_school_class_location'].'" style="display:none">
 						</td>
 						<td>'.$row['stc_school_class_capacity'].'
-							<input type="text" class="stc-class-capacity-upd" value="'.$row['stc_school_class_capacity'].'" style="display:none">
+							<input type="text" class="stc-class-capacity-upd" value="'.$row['stc_school_class_location'].'" style="display:none">
 						</td>
 						<td>'.date('d-m-Y', strtotime($row['stc_school_class_createdate'])).'</td>
 						<td>'.$row['stc_school_user_fullName'].'</td>
