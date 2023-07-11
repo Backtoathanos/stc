@@ -969,7 +969,7 @@ class Yggdrasil extends tesseract{
 					`stc_school_subject_title` ASC					
     		";
 
-    		$odinscheduleqry=mysqli_query($this->stc_dbs, "
+    		$odinscheduleqrycounter=mysqli_query($this->stc_dbs, "
     			SELECT
 				    `stc_school_class_title`,
 				    `stc_school_subject_title`,
@@ -1000,6 +1000,9 @@ class Yggdrasil extends tesseract{
 					`stc_school_subject_title` ASC
     		");
 
+    		foreach($odinscheduleqrycounter as $odinscheduleqrycounterrow){
+    			
+    		}
 
     		$odinscheduleqry=mysqli_query($this->stc_dbs, "
     			SELECT

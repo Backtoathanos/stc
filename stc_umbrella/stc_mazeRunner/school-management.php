@@ -1249,7 +1249,22 @@ if($_SESSION['stc_school_user_for']==4){
                                     </select>
                                   </div>
                                 </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                <div class="col-sm-12 col-md-4 col-lg-4">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Period
+                                    </h5>
+                                    <select
+                                      name="stcschoolscheduleperiod"
+                                      class="form-control validate stcschoolscheduleperiod" 
+                                    ><option>Select</option>
+                                    <option>1<sup>st</sup></option> 
+                                    <option>2<sup>nd</sup></option>                                      
+                                    </select>
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-4 col-lg-4">
                                   <div class="mb-3">
                                     <h5
                                       for="name"
@@ -1263,7 +1278,7 @@ if($_SESSION['stc_school_user_for']==4){
                                     />
                                   </div>
                                 </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                <div class="col-sm-12 col-md-4 col-lg-4">
                                   <div class="mb-3">
                                     <h5
                                       for="name"
