@@ -2059,7 +2059,16 @@ if($_SESSION['stc_school_user_for']==4){
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Schedule</h5>                        
+            <h5>School Schedule</h5> 
+            <select class="form-control btn btn-info">
+              <option>Select</option>
+              <option>Monday</option>
+              <option>Tuesday</option>
+              <option>Wednesday</option>
+              <option>Thursday</option>
+              <option>Friday</option>
+              <option>Saturday</option>
+            </select>                       
             <div style="width: auto;overflow-x: auto; white-space: nowrap;">
               <table class="table table-hover table-bordered">
                 <thead>
