@@ -1260,7 +1260,12 @@ if($_SESSION['stc_school_user_for']==4){
                                       class="form-control validate stcschoolscheduleperiod" 
                                     ><option>Select</option>
                                     <option>1<sup>st</sup></option> 
-                                    <option>2<sup>nd</sup></option>                                      
+                                    <option>2<sup>nd</sup></option>
+                                    <option>3<sup>rd</sup></option>
+                                    <option>4<sup>th</sup></option>                                      
+                                    <option>5<sup>th</sup></option>
+                                    <option>6<sup>th</sup></option>
+                                    <option>7<sup>th</sup></option>
                                     </select>
                                   </div>
                                 </div>
