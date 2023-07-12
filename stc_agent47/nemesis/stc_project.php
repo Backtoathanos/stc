@@ -1878,9 +1878,9 @@ class pirates_supervisor extends tesseract{
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-IN-PROGRESS</span></b>';
 				}elseif($row['stc_status_down_list_status']==3){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-DONE</span></b>';
-					$updatejobdetails='<a href="#" class="stc-cust-std-update btn btn-primary" message="'.$row['stc_status_down_list_jobdone_details'].'" id="'.$row['stc_status_down_list_id'].'">Update me</a></td>';
 				}elseif($row['stc_status_down_list_status']==4){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-COMPLETE</span></b>';
+					$updatejobdetails='<a href="#" class="stc-cust-std-update btn btn-primary" message="'.$row['stc_status_down_list_jobdone_details'].'" id="'.$row['stc_status_down_list_id'].'">Update me</a></td>';
 				}else{
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">CLOSED</span></b>';
 				}
@@ -2249,7 +2249,7 @@ class pirates_supervisor extends tesseract{
 		if(mysqli_num_rows($optimusprimequery)>0){
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetyppem_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="../stc_agent47/stc-ppem-print-preview.php?ppem_no='.$optimusprimerow['stc_safetyppem_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyppem-edit" id="'.$optimusprimerow['stc_safetyppem_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyppem-delete" id="'.$optimusprimerow['stc_safetyppem_id'].'">Delete</a>
 				';
