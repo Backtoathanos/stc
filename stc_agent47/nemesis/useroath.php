@@ -62,7 +62,7 @@ if(isset($_POST['agent_signin'])){
 if(isset($_POST['stc_ag_account_update'])){
 	$out="";
 	if(empty($_SESSION['stc_agent_id'])){
-	  	$out = "Both Fields are required";
+	  	$out = "empty";
 	}else{
 		$stc_ac_id=$_POST['stc_ac_id'];
 		$stc_ac_pass=$_POST['stc_ac_pass'];
