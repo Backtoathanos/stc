@@ -20,7 +20,7 @@
             </a>
           </li>';
           }
-          if($_SESSION['stc_school_user_for']!==4){
+          if($_SESSION['stc_school_user_for']!=4){
             echo '
           <li class="nav-item fee-collection">
             <a class="nav-link" href="./fee-collection.php?fee-collection=yes">
