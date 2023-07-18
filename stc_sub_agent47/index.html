@@ -23,7 +23,7 @@
 
                     <div class="signin-form">
                         <h2 class="form-title">STC Associate</h2>
-                        <h2 class="form-title">Sign In</h2>
+                        <h2 class="form-title">Supervisor Sign In</h2>
                         <form method="POST" class="register-form" id="login-form">
                             <div class="form-group">
                                 <label for="your_name"><i class="zmdi zmdi-account material-icons-name"></i></label>
@@ -72,7 +72,8 @@
                     processData : false,
                     success     : function(argument) {
                         // console.log(argument);
-                        if(argument="success"){
+                        argument=argument.trim();
+                        if(argument=="success"){
                             window.location.href="dashboard.php";
                         }else{
                             alert('Please check username or password!!!')

@@ -6,7 +6,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
     header('location:../index.html');
 }
 
-if($_SESSION['stc_school_user_for']==1){
+if($_SESSION['stc_school_user_for']>3){
     header('location:forbidden.html');
 }
 ?>
@@ -390,34 +390,7 @@ if($_SESSION['stc_school_user_for']==1){
 
   <body class="">
     <div class="wrapper ">
-      <div class="sidebar" data-color="purple" data-background-color="white" data-image="../assets/img/sidebar-1.jpg">
-        <div class="logo"><a href="#" class="simple-text logo-normal">
-            STC School
-          </a>
-        </div>
-        <div class="sidebar-wrapper">
-          <ul class="nav">
-            <li class="nav-item ">
-              <a class="nav-link" href="./dashboard.php">
-                <i class="material-icons">dashboard</i>
-                <p>Dashboard</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="./canteen.php">
-                <i class="material-icons">content_paste</i>
-                <p>Canteen</p>
-              </a>
-            </li>
-            <li class="nav-item active">
-              <a class="nav-link" href="./fee-collection.php">
-                <i class="material-icons">feed</i>
-                <p>Fee Collection</p>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
+      <?php include_once("bar/sidebar.php");?>
       <div class="main-panel">
         <!-- Navbar -->
         <?php include_once("bar/navbar.php");?>
@@ -866,6 +839,16 @@ if($_SESSION['stc_school_user_for']==1){
   <!-- Material Dashboard DEMO methods, don't include it in your project! -->
   <script src="../assets/demo/demo.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const value = urlParams.get('fee-collection');
+      if(value=="yes"){
+        $('.fee-collection').addClass('active');
+      }
+    });
+  </script>
   <script>
       $(document).ready(function(){
         $('.close-icon').on('click', function(e){

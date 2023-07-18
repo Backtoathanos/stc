@@ -3143,6 +3143,129 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
       }
       return $odin;
    }
+
+   // call attendance
+   public function stc_school_call_attendance($stc_school_month){
+      $cmonth=date('F', strtotime($stc_school_month));
+      $month=date('m', strtotime($stc_school_month));
+      $year=date('Y', strtotime($stc_school_month));
+      $date_array=array(
+         'January' => 31,
+         'February' => 28,
+         'March' => 31,
+         'April' => 30,
+         'May' => 31,
+         'June' => 30,
+         'July' => 31,
+         'August' => 31,
+         'September' => 30,
+         'October' => 31,
+         'November' => 30,
+         'December' => 31
+      );
+      $att_date='';
+      $day_count=0;
+      foreach($date_array as $key => $date_row){
+         if($cmonth==$key){
+            if ($year % 400 == 0)
+               $day_count=29;
+            else
+               $day_count=$date_row;
+         }
+      }
+      for($i=1;$i<=$day_count;$i++){
+         $att_date.='<th class="text-center">'.$i.'</th>';
+      }
+
+      $ivar='
+         <table class="table table-bordered">
+            <thead>
+               <tr>
+                  <th class="text-center">Sl No</th>
+                  <th class="text-center">Teacher Name</th>
+                  '.$att_date.'
+                  <th class="text-center">Total</th>
+               </tr>
+            </thead>
+            <tbody>
+      ';
+      $ivar_sqlquery=mysqli_query($this->stc_dbs, "
+         SELECT DISTINCT
+            `stc_school_teacher_userid`,
+            `stc_school_teacher_firstname`,
+            `stc_school_teacher_lastname`
+         FROM
+            `stc_school_teacher_attendance`
+         LEFT JOIN
+            `stc_school_teacher`
+         ON
+            `stc_school_teacher_userid`=`stc_school_teacher_attendance_createdby`
+         WHERE
+             MONTH(`stc_school_teacher_attendance_createdate`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."'
+         AND 
+            YEAR(`stc_school_teacher_attendance_createdate`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+      ");
+      if(mysqli_num_rows($ivar_sqlquery)>0){
+         $slno=0;
+         $total_time=0;
+         foreach($ivar_sqlquery as $ivar_sqlrow){
+            $attended_date='';
+            $slno++;
+            $fullname = $ivar_sqlrow['stc_school_teacher_firstname'].' '.$ivar_sqlrow['stc_school_teacher_lastname'];
+            for($i=1;$i<=$day_count;$i++){
+               $ivar_getattqry=mysqli_query($this->stc_dbs, "
+                  SELECT
+                      `stc_school_teacher_attendance_begtime`,
+                      `stc_school_teacher_attendance_endtime`
+                  FROM
+                      `stc_school_teacher_attendance`
+                  WHERE
+                      DAY(`stc_school_teacher_attendance_createdate`) = '".$i."'
+                  AND
+                      MONTH(`stc_school_teacher_attendance_createdate`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."'
+                  AND
+                      YEAR(`stc_school_teacher_attendance_createdate`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+                  AND
+                      `stc_school_teacher_attendance_createdby` = '".$ivar_sqlrow['stc_school_teacher_userid']."'
+               ");
+               $day_time=0;
+               foreach($ivar_getattqry as $ivar_getattrow){
+                  $time1 = date('H:i:s', strtotime($ivar_getattrow['stc_school_teacher_attendance_begtime']));
+                  $time2 = date('H:i:s', strtotime($ivar_getattrow['stc_school_teacher_attendance_endtime']));
+                  $array1 = explode(':', $time1);
+                  $array2 = explode(':', $time2);
+
+                  $minutes1 = ($array1[0] * 60 + $array1[1]);
+                  $minutes2 = ($array2[0] * 60 + $array2[1]);
+
+                  $day_time += abs($minutes1 - $minutes2);
+                  $total_time+=$day_time;
+               }
+               $attended_date.='<td class="text-center">'.round($day_time/60, 2).' <sup>hr</sup></td>';
+            }
+            $attended_date.='<td class="text-center">'.round($total_time/60, 2).' hrs</td>';
+            $ivar.='
+               <tr>
+                  <td class="text-center">'.$slno.'</td>
+                  <td>'.$fullname.'</td>
+                  '.$attended_date.'
+               </tr>
+            ';
+         }
+      }else{
+         $ivar.='
+            <tr>
+               <td class="text-center" colspan="20">No record found.</td>
+            </tr>
+         ';
+      }
+
+      $ivar.='
+            </tbody>
+         </table>
+      ';
+      return $ivar;
+   }
 }
 #<--------------------------------------------------------------------------------------------------------->
 #<--------------------------------------Object sections of reports class----------------------------------->
@@ -3366,6 +3489,17 @@ if(isset($_POST['stc_find_school_fee_reports'])){
    $bjorneschoolfee=new ragnarReportsViewSchoolFeeReports();
 
    $out=$bjorneschoolfee->stc_school_call_fee($bjornebegdate, $bjorneenddate, $bjorneschool);
+   echo $out;
+}
+
+// call school fee
+if(isset($_POST['stc_find_school_attendance'])){
+   $out='';
+   $stc_school_month=$_POST['stc_school_month'];
+
+   $bjorneschoolfee=new ragnarReportsViewSchoolFeeReports();
+
+   $out=$bjorneschoolfee->stc_school_call_attendance($stc_school_month);
    echo $out;
 }
 ?>

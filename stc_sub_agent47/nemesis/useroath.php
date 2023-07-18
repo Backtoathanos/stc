@@ -32,6 +32,24 @@ class prime extends tesseract{
 		}
 		return $op;
 	}
+
+	public function stc_update_password($stc_ac_id, $stc_ac_pass, $stc_ac_repass){
+		$op='';
+		$updatebumblebee=mysqli_query($this->stc_dbs, "
+			UPDATE
+			    `stc_cust_pro_supervisor`
+			SET
+			    `stc_cust_pro_supervisor_password` = '".mysqli_real_escape_string($this->stc_dbs, $stc_ac_pass)."'
+			WHERE
+				`stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_ac_id)."'
+		");
+		if($updatebumblebee){
+			$op="success";
+		}else{
+			$op="error";
+		}
+		return $op;
+	}
 }
 
 if(isset($_POST['agent_signin'])){
@@ -46,4 +64,18 @@ if(isset($_POST['agent_signin'])){
 	}
 }
 
+if(isset($_POST['stc_ag_account_update'])){
+	$out="";
+	if(empty($_SESSION['stc_agent_sub_id'])){
+	  	$out = "empty";
+	}else{
+		$stc_ac_id=$_POST['stc_ac_id'];
+		$stc_ac_pass=$_POST['stc_ac_pass'];
+		$stc_ac_repass=$_POST['stc_ac_repass'];
+		$objlogin=new prime();
+		$out=$objlogin->stc_update_password($stc_ac_id, $stc_ac_pass, $stc_ac_repass);
+	}
+
+	echo $out;
+}
 ?>

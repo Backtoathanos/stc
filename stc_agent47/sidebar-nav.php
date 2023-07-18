@@ -70,18 +70,12 @@
                                 Order Management
                             </a>
                         </li>
-                        <?php 
-                            if($_SESSION['stc_agent_role']==3){
-                                echo '
                         <li>
                             <a href="stc-std.php">
                                 <i class="metismenu-icon"></i>
                                 Status Down List
                             </a>
                         </li>
-                                ';
-                            }
-                        ?>
                         <?php 
                             if($_SESSION['stc_agent_role']==2){
                                 echo '
@@ -99,8 +93,14 @@
                 </li>
                 <li>
                     <a href="safety.php" class="mm-active">
-                        <i class="metismenu-icon pe-7s-note2"></i>
+                        <i class="metismenu-icon pe-7s-id"></i>
                         Safety
+                    </a>
+                </li>
+                <li>
+                    <a href="procurement-tracker.php" class="mm-active">
+                        <i class="metismenu-icon pe-7s-pin"></i>
+                        Procurement Tracker
                     </a>
                 </li>
                 <li>

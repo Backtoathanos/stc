@@ -431,8 +431,6 @@ if($_SESSION['stc_school_user_for']==4){
         -webkit-transform: rotate(-45deg);
                 transform: rotate(-45deg);
       }
-
-
     </style>
   </head>
 
@@ -1866,6 +1864,7 @@ if($_SESSION['stc_school_user_for']==4){
         });
 
         // show data sections 
+        call_records();
         function call_records(){          
           $.ajax({  
             url       : "../vanaheim/school-management.php",
@@ -1891,7 +1890,6 @@ if($_SESSION['stc_school_user_for']==4){
 
               var classroom=response.response_class;
               $('.stc-classroom-rec-show').html(classroom);
-
               
              }else if(response.status="reload"){
               window.location.reload();

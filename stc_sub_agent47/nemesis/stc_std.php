@@ -48,9 +48,9 @@ class transformers extends tesseract{
 	}
 
 	// call area
-	public function stc_call_area($loca_id){
+	public function stc_call_area($loca_id, $loca_sub_name){
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
-			SELECT DISTINCT `stc_cpumpd_area` FROM `stc_customer_pump_details` WHERE `stc_cpumpd_sub_location`='".mysqli_real_escape_string($this->stc_dbs, $loca_id)."' ORDER BY `stc_cpumpd_area` ASC
+			SELECT DISTINCT `stc_cpumpd_area` FROM `stc_customer_pump_details` WHERE `stc_cpumpd_sub_location`='".mysqli_real_escape_string($this->stc_dbs, $loca_sub_name)."' AND `stc_cpumpd_location`='".mysqli_real_escape_string($this->stc_dbs, $loca_id)."' ORDER BY `stc_cpumpd_area` ASC
 		");
 		$optimusprime='<option value="NA" selected>Select Area</option>';
 		$do_action=mysqli_num_rows($optimusprimequery);
@@ -112,9 +112,10 @@ class transformers extends tesseract{
 	}
 
 	// call job variites
-	public function stc_call_job_varities($job_type){		
+	public function stc_call_job_varities($job_type){	
+		$job_type=implode(',', $job_type);
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
-			SELECT `stc_status_down_list_job_type_id`,`stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_title`='".mysqli_real_escape_string($this->stc_dbs, $job_type)."' ORDER BY `stc_status_down_list_job_type_sub_title` ASC
+			SELECT `stc_status_down_list_job_type_id`,`stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_title` IN (".$job_type.") ORDER BY `stc_status_down_list_job_type_sub_title` ASC
 		");
 		$optimusprime='<option value="NA" selected>Select Job Varieties</option>';
 		$do_action=mysqli_num_rows($optimusprimequery);
@@ -199,12 +200,16 @@ class transformers extends tesseract{
 			<table class="table table-bordered table-responsive">
 				<thead>
 					<tr>
+						<th class="text-center">DATE</th>
 						<th class="text-center">LOCATION</th>
 						<th class="text-center">AREA</th>
+						<th class="text-center">DEPARTMENT</th>
 						<th class="text-center">JOB TYPE</th>
 						<th class="text-center">EQUIPMENT TYPE</th>
 						<th class="text-center">EQUIPMENT NO</th>
 						<th class="text-center">EQUIPMENT STATUS</th>
+						<th class="text-center">JOB PLANNING</th>
+						<th class="text-center">JOB TYPE</th>
 						<th class="text-center">MATERIAL DESCRIPTION</th>
 						<th class="text-center">TARGET DATE</th>
 						<th class="text-center">STATUS</th>
@@ -221,18 +226,21 @@ class transformers extends tesseract{
 				`stc_status_down_list_date`,
 				`stc_cust_project_title`,
 				`stc_status_down_list_area`,
+				`stc_status_down_list_sub_location`,
 				`stc_status_down_list_jobtype`,
 				`stc_status_down_list_created_by_select`,
                 `stc_status_down_list_creator_details`,
 				`stc_status_down_list_equipment_status`,
 				`stc_status_down_list_reason`,
 				`stc_status_down_list_material_desc`,
+				`stc_status_down_list_jobtype`,
 				`stc_status_down_list_from_date`,
 				`stc_status_down_list_rect_date`,
 				`stc_status_down_list_remarks`,
 				`stc_status_down_list_responsive_person`,
 				`stc_status_down_list_target_date`,
 				`stc_status_down_list_jobpending_details`,
+				`stc_status_down_list_varities_id`,
 				`stc_status_down_list_equipment_type`,
 				`stc_status_down_list_equipment_number`,
 				`stc_status_down_list_status`
@@ -252,7 +260,7 @@ class transformers extends tesseract{
 				$status='';
 
 				if($row['stc_status_down_list_status']==1){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">PENDING</span></b>';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">PLANNING</span></b>';
 				}elseif($row['stc_status_down_list_status']==2){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-IN-PROGRESS</span></b>';
 				}elseif($row['stc_status_down_list_status']==3){
@@ -339,14 +347,33 @@ class transformers extends tesseract{
 					$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
 				}
 
+				$job_type='';
+				$job_varities='';
+				$stc_call_jobtypeqry=mysqli_query($this->stc_dbs, "
+					SELECT
+					    `stc_status_down_list_job_type_title`,
+					    `stc_status_down_list_job_type_sub_title`
+					FROM
+					    `stc_status_down_list_job_type`
+					WHERE
+					    `stc_status_down_list_job_type_id`='".$row['stc_status_down_list_varities_id']."'
+				");
+				foreach($stc_call_jobtypeqry as $stc_call_jobtyperow){
+					$job_type=$stc_call_jobtyperow['stc_status_down_list_job_type_title'];
+					$job_varities=$stc_call_jobtyperow['stc_status_down_list_job_type_sub_title'];
+				}
 				$optimusprime.='
 					<tr>
+						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
 						<td>'.$row['stc_cust_project_title'].'</td>
 						<td>'.$row['stc_status_down_list_area'].'</td>
+						<td>'.$row['stc_status_down_list_sub_location'].'</td>
 						<td>'.$row['stc_status_down_list_jobtype'].'</td>
 						<td>'.$eq_type.'</td>
 						<td class="text-center">'.$eq_number.'</td>
 						'.$eqstatus.'
+						<td class="text-center">'.$job_type.'</td>
+						<td class="text-center">'.$job_varities.'</td>
 						<td>'.$row['stc_status_down_list_material_desc'].'</td>
 						<td>'.$tar_date.'</td>
 						<td>'.$status.'</td>
@@ -372,7 +399,7 @@ class transformers extends tesseract{
 	}
 
 	// change status
-	public function stc_sdl_status_update($status, $sld_id, $jobdonedetails){
+	public function stc_sdl_status_update($status, $sld_id, $jobdonedetails, $work_permit_no){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$optimusprime_qry=mysqli_query($this->stc_dbs, "
@@ -380,7 +407,8 @@ class transformers extends tesseract{
 				`stc_status_down_list` 
 			SET 
 				`stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."',
-				`stc_status_down_list_jobdone_details`='".mysqli_real_escape_string($this->stc_dbs, $jobdonedetails)."' 
+				`stc_status_down_list_jobdone_details`='".mysqli_real_escape_string($this->stc_dbs, $jobdonedetails)."',
+				`stc_status_down_list_permit_no`='".mysqli_real_escape_string($this->stc_dbs, $work_permit_no)."'  
 			WHERE 
 				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
 		");
@@ -460,8 +488,9 @@ if(isset($_POST['call_department'])){
 // call area
 if(isset($_POST['call_area'])){
 	$loca_id=$_POST['loca_id'];
+	$loca_sub_name=$_POST['loca_sub_name'];
 	$metabots=new transformers();
-	$opmetabots=$metabots->stc_call_area($loca_id);
+	$opmetabots=$metabots->stc_call_area($loca_id, $loca_sub_name);
 	echo $opmetabots;
 }
 
@@ -539,8 +568,9 @@ if(isset($_POST['stc_status_change_hit'])){
 	$sld_id=$_POST['sdl_id'];
 	$status=$_POST['status_id'];
 	$jobdonedetails=$_POST['jobdonedetails'];
+	$work_permit_no=$_POST['work_permit_no'];
 	$sdl_status=new transformers();
-	$out_sdl_status=$sdl_status->stc_sdl_status_update($status, $sld_id, $jobdonedetails);
+	$out_sdl_status=$sdl_status->stc_sdl_status_update($status, $sld_id, $jobdonedetails, $work_permit_no);
 	echo $out_sdl_status;
 }
 

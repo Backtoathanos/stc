@@ -412,9 +412,8 @@ class pirates_project extends tesseract{
 		foreach($blackpearl_checkahuexistance as $fetch_row){
 			$ahu_id=$fetch_row['stc_cahud_id'];
 		}
-		// if($ahu_type=="New"){
-			$date=date("Y-m-d H:i:s");
-			$blackpearl_set = mysqli_query($this->stc_dbs, "
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_set = mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_customer_ahu_details`(
 					`stc_cahud_date`,
 					`stc_cahud_dept`,
@@ -468,104 +467,8 @@ class pirates_project extends tesseract{
 					'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_ahu_cfm)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
 				)
-			");
-			$blackpearl=((mysqli_num_rows($blackpearl_set)>0) ? 'Yes' : 'No');
-		// }else{
-		// 	if(mysqli_num_rows($blackpearl_checkahuexistance)==0){
-		// 		$date=date("Y-m-d H:i:s");
-		// 		$blackpearl_set = mysqli_query($this->stc_dbs, "
-		// 			INSERT INTO `stc_customer_ahu_details`(
-		// 				`stc_cahud_date`,
-		// 				`stc_cahud_dept`,
-		// 				`stc_cahud_sub_location`,
-		// 				`stc_cahud_location`,
-		// 				`stc_cahud_ahuno`,
-		// 				`stc_cahud_design_temp`,
-		// 				`stc_cahud_airfilter_size`,
-		// 				`stc_cahud_airfilter_qty`,
-		// 				`stc_cahud_vbelt_size`,
-		// 				`stc_cahud_vbelt_qty`,
-		// 				`stc_cahud_pulleysize_blower`,
-		// 				`stc_cahud_pulleysize_motor`,
-		// 				`stc_cahud_blowerbearingsize_de`,
-		// 				`stc_cahud_blowerbearingsize_nde`,
-		// 				`stc_cahud_blowerbearingsize_housing`,
-		// 				`stc_cahud_motorbearingsize_de`,
-		// 				`stc_cahud_motorbearingsize_nde`,
-		// 				`stc_cahud_motorcap_hp`,
-		// 				`stc_cahud_motor_kw`,
-		// 				`stc_cahud_motor_amps`,
-		// 				`stc_cahud_motor_rpm`,
-		// 				`stc_cahud_motorwt`,
-		// 				`stc_cahud_frame_size`,
-		// 				`stc_cahud_cfm`,
-		// 				`stc_cahud_createdby`
-		// 			)VALUES(
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $cust_dept_id)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_location_name)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_sub_location_name)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_ahu_no)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_desgn_temp)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_air_size)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_air_qty)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_v_belt_size)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_v_belt_qty)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cust_blower_pulley_size)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_pulley_size)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_de)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_nde)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_housing)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_bearing_de)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_bearing_nde)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_hp)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_kw)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_amps)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_rpm)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_weight)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_ahu_frame_size)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $stc_cus_ahu_cfm)."',
-		// 				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
-		// 			)
-		// 		");
-		// 		$blackpearl=((mysqli_num_rows($blackpearl_set)>0) ? 'Yes' : 'No');
-		// 	}else{
-		// 		$blackpearl_set = mysqli_query($this->stc_dbs, "
-		// 			UPDATE
-		// 			    `stc_customer_ahu_details`
-		// 			SET
-		// 				`stc_cahud_sub_location`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_location_name)."',
-		// 				`stc_cahud_location`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_sub_location_name)."',
-		// 				`stc_cahud_ahuno`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_ahu_no)."',
-		// 				`stc_cahud_design_temp`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_desgn_temp)."',
-		// 				`stc_cahud_airfilter_size`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_air_size)."',
-		// 				`stc_cahud_airfilter_qty`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_air_qty)."',
-		// 				`stc_cahud_vbelt_size`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_v_belt_size)."',
-		// 				`stc_cahud_vbelt_qty`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_v_belt_qty)."',
-		// 				`stc_cahud_pulleysize_blower`='".mysqli_real_escape_string($this->stc_dbs, $stc_cust_blower_pulley_size)."',
-		// 				`stc_cahud_pulleysize_motor`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_pulley_size)."',
-		// 				`stc_cahud_blowerbearingsize_de`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_de)."',
-		// 				`stc_cahud_blowerbearingsize_nde`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_nde)."',
-		// 				`stc_cahud_blowerbearingsize_housing`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_blower_bearing_housing)."',
-		// 				`stc_cahud_motorbearingsize_de`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_bearing_de)."',
-		// 				`stc_cahud_motorbearingsize_nde`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_bearing_nde)."',
-		// 				`stc_cahud_motorcap_hp`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_hp)."',
-		// 				`stc_cahud_motor_kw`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_kw)."',
-		// 				`stc_cahud_motor_amps`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_amps)."',
-		// 				`stc_cahud_motor_rpm`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_capacity_rpm)."',
-		// 				`stc_cahud_motorwt`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_motor_weight)."',
-		// 				`stc_cahud_frame_size`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_ahu_frame_size)."',
-		// 				`stc_cahud_cfm`='".mysqli_real_escape_string($this->stc_dbs, $stc_cus_ahu_cfm)."'
-		// 			WHERE 
-		// 				`stc_cahud_dept`='".mysqli_real_escape_string($this->stc_dbs, $cust_dept_id)."'
-		// 			AND 
-		// 				`stc_cahud_id`='".mysqli_real_escape_string($this->stc_dbs, $ahu_id)."'					
-		// 		");
-		// 		$blackpearl = $blackpearl_set ? 'Yes' : 'No';
-		// 	}
-		// }
-
-		// $blackpearl=((mysqli_num_rows($blackpearl_pd_qry)>0) ? mysqli_fetch_assoc($blackpearl_pd_qry) : 'NA');
+		");
+		$blackpearl=((mysqli_num_rows($blackpearl_set)>0) ? 'Yes' : 'No');
 		return $blackpearl;
 
 	}
@@ -727,6 +630,394 @@ class pirates_project extends tesseract{
 			$blackpearl="Job type updated!!!";
 		}else{
 			$blackpearl="Hmmm!!! Something went wrong, Job type not updated!!!";
+		}
+		return $blackpearl;
+	}
+
+	// save procurment 
+	public function stc_save_procurement_create($pro_id, $item_name, $service, $unit, $quantity){
+		$blackpearl='';
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_procurement_tracker`(
+			    `stc_cust_procurement_tracker_date`,
+			    `stc_cust_procurement_tracker_project_id`,
+			    `stc_cust_procurement_tracker_item_title`,
+			    `stc_cust_procurement_tracker_service`,
+			    `stc_cust_procurement_tracker_unit`,
+			    `stc_cust_procurement_tracker_qty`,
+			    `stc_cust_procurement_tracker_created_by`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $pro_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_name)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $service)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $unit)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $quantity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
+			)
+		");
+		if($blackpearl_qry){
+			$blackpearl="yes";
+		}else{
+			$blackpearl="no";
+		}
+		return $blackpearl;
+	}
+
+	// call procurment tracker 
+	public function stc_save_procurement_call($by_location, $by_maker, $by_item){
+		$blackpearl='';
+		$additional_search='';
+		if($by_location>0){
+			$additional_search.=' AND `stc_cust_procurement_tracker_project_id`="'.mysqli_real_escape_string($this->stc_dbs, $by_location).'"';
+		}
+		if($by_maker!=''){
+			$additional_search.=' AND `stc_cust_procurement_tracker_buyer` REGEXP "'.mysqli_real_escape_string($this->stc_dbs, $by_maker).'"';
+		}
+		if($by_item!=''){
+			$additional_search.=' AND `stc_cust_procurement_tracker_item_title` REGEXP "'.mysqli_real_escape_string($this->stc_dbs, $by_item).'"';
+		}
+		// $additional_search=$searchbylocation.$searchbymaker.$searchbyitem;
+		$blackpearl_query="
+			SELECT
+			    `stc_cust_procurement_tracker_id`,
+			    `stc_cust_procurement_tracker_date`,
+			    `stc_cust_project_title`,
+			    `stc_cust_procurement_tracker_item_title`,
+			    `stc_cust_procurement_tracker_service`,
+			    `stc_cust_procurement_tracker_unit`,
+			    `stc_cust_procurement_tracker_qty`,
+			    `stc_cust_procurement_tracker_po_qnty`,
+			    `stc_cust_procurement_tracker_material_readiness_status`,
+			    `stc_cust_procurement_tracker_recieved_qnty`,
+			    `stc_cust_procurement_tracker_storedin`,
+			    `stc_cust_procurement_tracker_buyer`,
+			    `stc_cust_procurement_tracker_po_no`,
+			    `stc_cust_procurement_tracker_po_date`,
+			    `stc_cust_procurement_tracker_basicamt`,
+			    `stc_cust_procurement_tracker_gst`,
+			    `stc_cust_procurement_tracker_approval_date`,
+			    `stc_cust_procurement_tracker_mfg_clearancedate`,
+			    `stc_cust_procurement_tracker_mfg_leadtime`,
+			    `stc_cust_procurement_tracker_location`,
+			    `stc_cust_procurement_tracker_transittime`,
+			    `stc_cust_procurement_tracker_deleverytimeplan`,
+			    `stc_cust_procurement_tracker_delivered_actual`,
+			    `stc_cust_procurement_tracker_transport_charge`,
+			    `stc_cust_procurement_tracker_remartks`,
+			    `stc_agents_name`
+			FROM
+			    `stc_cust_procurement_tracker`
+			LEFT JOIN 
+			    `stc_cust_project`
+			ON 
+				`stc_cust_procurement_tracker_project_id`=`stc_cust_project_id`
+			LEFT JOIN 
+			    `stc_agents`
+			ON 
+				`stc_cust_procurement_tracker_created_by`=`stc_agents_id`
+			WHERE
+				`stc_cust_procurement_tracker_created_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
+				".$additional_search."
+			ORDER BY `stc_cust_procurement_tracker_id` DESC
+		";
+		$blackpearl_result=mysqli_query($this->stc_dbs, $blackpearl_query);
+
+		if(mysqli_num_rows($blackpearl_result)>0){
+			foreach($blackpearl_result as $blackpearl_row){
+				$basicamt=$blackpearl_row['stc_cust_procurement_tracker_po_qnty'] * $blackpearl_row['stc_cust_procurement_tracker_basicamt'];
+				$total=$basicamt + ($basicamt * $blackpearl_row['stc_cust_procurement_tracker_gst']/100);
+				$loc_id=$blackpearl_row['stc_cust_procurement_tracker_location'];
+				$cityquery=mysqli_query($this->stc_dbs, "
+					SELECT `stc_city_name` FROM `stc_city` WHERE `stc_city_id`=$loc_id
+				");
+				$cityname='';
+				foreach($cityquery as $cityrow){
+					$cityname=$cityrow['stc_city_name'];
+				}
+
+				$material_readyness_status="No";
+				if($blackpearl_row['stc_cust_procurement_tracker_material_readiness_status']==1){
+					$material_readyness_status="Yes";
+				}
+
+				$pro_id=$blackpearl_row['stc_cust_procurement_tracker_id'];
+				$paymentquery=mysqli_query($this->stc_dbs, "
+					SELECT
+					    `stc_cust_procurement_tracker_payments_id`,
+					    `stc_cust_procurement_tracker_payments_tracid`,
+					    `stc_cust_procurement_tracker_payments_date`,
+					    `stc_cust_procurement_tracker_payments_actual_date`,
+					    `stc_cust_procurement_tracker_payments_amount`,
+					    `stc_cust_procurement_tracker_payments_type`,
+					    `stc_cust_procurement_tracker_payments_created_by`
+					FROM
+					    `stc_cust_procurement_tracker_payments`
+					WHERE
+					    `stc_cust_procurement_tracker_payments_tracid`=$pro_id
+				");
+				$advanceamt='';
+				$advancedate='';
+				$advanceactdate='';
+				$advancecolorchange='';
+				$dispatchamt='';
+				$dispatchdate='';
+				$dispatchactdate='';
+				$dispatchcolorchange='';
+				$pdcamt='';
+				$pdcdate='';
+				foreach($paymentquery as $paymentrow){
+					if($paymentrow['stc_cust_procurement_tracker_payments_type']=="advance"){
+						$advanceamt.=$paymentrow['stc_cust_procurement_tracker_payments_amount'].'<br>';
+						$advancedate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_date'])).'<br>';
+						if($paymentrow['stc_cust_procurement_tracker_payments_actual_date']==''){
+							$advancecolorchange="red";
+							$advanceactdate.='<a href="#" class="btn btn-success form-control acutal-payment-dateset" id="'.$paymentrow['stc_cust_procurement_tracker_payments_id'].'">Paid?</a>';
+						}else{
+							$advanceactdate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_actual_date'])).'<br>';
+						}
+					}elseif($paymentrow['stc_cust_procurement_tracker_payments_type']=="dispatch"){
+						$dispatchamt.=$paymentrow['stc_cust_procurement_tracker_payments_amount'].'<br>';
+						$dispatchdate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_date'])).'<br>';
+						if($paymentrow['stc_cust_procurement_tracker_payments_actual_date']==''){
+							$dispatchcolorchange="red";
+							$dispatchactdate.='<a href="#" class="btn btn-success form-control acutal-payment-dateset" id="'.$paymentrow['stc_cust_procurement_tracker_payments_id'].'">Paid?</a>';
+						}else{
+							$dispatchactdate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_actual_date'])).'<br>';
+						}
+					}else{
+						$pdcamt.=$paymentrow['stc_cust_procurement_tracker_payments_amount'].'<br>';
+						$pdcdate.=date('d-m-Y', strtotime($paymentrow['stc_cust_procurement_tracker_payments_date'])).'<br>';
+					}
+				}
+
+				$paymentcol="
+					<td style='background-color:".$advancecolorchange."'>".$advanceamt."</td>
+					<td style='background-color:".$advancecolorchange."'>".$advancedate."</td>
+					<td style='background-color:".$advancecolorchange."'>".$advanceactdate."</td>
+					<td>".$material_readyness_status."</td>
+					<td style='background-color:".$dispatchcolorchange."'>".$dispatchamt."</td>
+					<td style='background-color:".$dispatchcolorchange."'>".$dispatchdate."</td>
+					<td style='background-color:".$dispatchcolorchange."'>".$dispatchactdate."</td>
+					<td>".$pdcamt."</td>
+					<td>".$pdcdate."</td>
+				";
+				$dispatchqry=mysqli_query($this->stc_dbs, "
+					SELECT
+					    `stc_cust_procurement_tracker_dispatch_challan_no`,
+					    `stc_cust_procurement_tracker_dispatch_qty`
+					FROM
+					    `stc_cust_procurement_tracker_dispatch`
+					WHERE
+					    `stc_cust_procurement_tracker_dispatch_itemid`='".$blackpearl_row['stc_cust_procurement_tracker_id']."'
+				");
+				$challan_no='';
+				$quantity_show='';
+				$quantity_count=0;
+				foreach($dispatchqry as $dispatchrow){
+					$challan_no.=$dispatchrow['stc_cust_procurement_tracker_dispatch_challan_no'].'<br>';
+					$quantity_show.=number_format($dispatchrow['stc_cust_procurement_tracker_dispatch_qty'], 2).'<br>';
+					$quantity_count+=$dispatchrow['stc_cust_procurement_tracker_dispatch_qty'];
+				}
+				$balanceqty=$blackpearl_row['stc_cust_procurement_tracker_recieved_qnty'] - $quantity_count;
+
+				$blackpearl.="
+					<tr>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_id']."0</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_item_title']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_service']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_unit']."</td>
+						<td class='text-right'>".number_format($blackpearl_row['stc_cust_procurement_tracker_qty'], 2)."</td>
+						<td class='text-right'>".number_format($blackpearl_row['stc_cust_procurement_tracker_po_qnty'], 2)."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_buyer']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_po_no']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_po_date']."</td>
+						<td class='text-right'>".number_format($basicamt, 2)."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_gst']."%</td>
+						<td class='text-right'>".number_format($total, 2)."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_approval_date']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_mfg_clearancedate']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_mfg_leadtime']."</td>
+						<td>".$cityname."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_transittime']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_deleverytimeplan']."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_delivered_actual']."</td>
+						".$paymentcol."
+						<td class='text-right'>".number_format($blackpearl_row['stc_cust_procurement_tracker_transport_charge'], 2)."</td>
+						<td class='text-right'>".number_format($blackpearl_row['stc_cust_procurement_tracker_recieved_qnty'], 2)."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_storedin']."</td>
+						<td>".$challan_no."</td>
+						<td class='text-right'>".$quantity_show."</td>
+						<td class='text-right'>".number_format($balanceqty, 2)."</td>
+						<td>".$blackpearl_row['stc_cust_procurement_tracker_remartks']."</td>
+						<td>
+							<a href='#' style='color: #97b7ff; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-addmod'><i class='fa fa-plus'></i></a>
+							<a href='#' style='color: grey; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-paymod'><i class='fa fa-credit-card'></i></a>
+							<a href='#' style='color: #97b7ff; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-recievemod'><i class='fa fa-clipboard'></i></a>
+							<a href='#' style='color: #5f11a7; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-dispatchmod'><i class='fa fa-truck'></i></a>
+							<a href='#' style='color: red; font-size: 25px; padding: 5px; margin: 5px; background: #ffffba; border-radius: 45%;' id='".$blackpearl_row['stc_cust_procurement_tracker_id']."' class='stc-tra-deletemod'><i class='fa fa-trash'></i></a>
+						</td>
+					</tr>
+				";
+			}
+		}else{
+			$blackpearl.="
+				<tr>
+					<td colspan='7' class='text-center'> No data found!!</td>
+				</tr>
+			";
+		}
+		return $blackpearl;
+	}
+
+	// delete procurment
+	public function stc_save_procurement_delete($proc_id){
+		$blackpearl="";
+		$blackpearl_query=mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_cust_procurement_tracker` WHERE `stc_cust_procurement_tracker_id` = '".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+		");
+		if($blackpearl_query){
+			$blackpearl="yes";
+			$blackpearl_query=mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_procurement_tracker_dispatch` WHERE `stc_cust_procurement_tracker_dispatch_itemid` = '".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+			");$blackpearl_query=mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_procurement_tracker_payments` WHERE `stc_cust_procurement_tracker_payments_tracid` = '".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+			");
+		}else{
+			$blackpearl="no";
+		}
+		return $blackpearl;
+	}
+
+	// call perticular procurement tracker
+	public function stc_procurement_tracker_perticular_call($proc_id){
+		$blackpearl="";
+		$blackpearl_query=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_cust_procurement_tracker` WHERE `stc_cust_procurement_tracker_id`='".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+		");
+		$blackpearl=mysqli_fetch_assoc($blackpearl_query);
+		return $blackpearl;
+	}
+
+	// update perticular procurement tracker
+	public function stc_procurement_tracker_update($proc_id, $po_qnty, $buyer, $po_no_id, $po_no_date, $amount, $gst, $approval, $mfgclear, $leadtime, $dealer_loca, $transittime, $plan, $actual, $transport_charge, $mreadiness, $remarks){
+		$blackpearl="";
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			UPDATE
+			    `stc_cust_procurement_tracker`
+			SET
+			    `stc_cust_procurement_tracker_po_qnty` = '".mysqli_real_escape_string($this->stc_dbs, $po_qnty)."',
+			    `stc_cust_procurement_tracker_buyer` = '".mysqli_real_escape_string($this->stc_dbs, $buyer)."',
+			    `stc_cust_procurement_tracker_po_no` = '".mysqli_real_escape_string($this->stc_dbs, $po_no_id)."',
+			    `stc_cust_procurement_tracker_po_date` = '".mysqli_real_escape_string($this->stc_dbs, $po_no_date)."',
+			    `stc_cust_procurement_tracker_basicamt` = '".mysqli_real_escape_string($this->stc_dbs, $amount)."',
+			    `stc_cust_procurement_tracker_gst` = '".mysqli_real_escape_string($this->stc_dbs, $gst)."',
+			    `stc_cust_procurement_tracker_approval_date` = '".mysqli_real_escape_string($this->stc_dbs, $approval)."',
+			    `stc_cust_procurement_tracker_mfg_clearancedate` = '".mysqli_real_escape_string($this->stc_dbs, $mfgclear)."',
+			    `stc_cust_procurement_tracker_mfg_leadtime` = '".mysqli_real_escape_string($this->stc_dbs, $leadtime)."',
+			    `stc_cust_procurement_tracker_location` = '".mysqli_real_escape_string($this->stc_dbs, $dealer_loca)."',
+			    `stc_cust_procurement_tracker_transittime` = '".mysqli_real_escape_string($this->stc_dbs, $transittime)."',
+			    `stc_cust_procurement_tracker_deleverytimeplan` = '".mysqli_real_escape_string($this->stc_dbs, $plan)."',
+			    `stc_cust_procurement_tracker_delivered_actual` = '".mysqli_real_escape_string($this->stc_dbs, $actual)."',
+			    `stc_cust_procurement_tracker_transport_charge` = '".mysqli_real_escape_string($this->stc_dbs, $transport_charge)."',
+			    `stc_cust_procurement_tracker_material_readiness_status` = '".mysqli_real_escape_string($this->stc_dbs, $mreadiness)."',
+			    `stc_cust_procurement_tracker_remartks` = '".mysqli_real_escape_string($this->stc_dbs, $remarks)."'
+			WHERE
+			    `stc_cust_procurement_tracker_id` = '".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+		");
+		if($blackpearl_qry){
+			$blackpearl="yes";
+		}else{
+			$blackpearl="no";
+		}
+		return $blackpearl;
+	}
+
+	// save payment
+	public function stc_procurement_tracker_payment_save($proc_id ,$pay_date ,$pay_type ,$pay_amount){
+		$blackpearl='';
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_procurement_tracker_payments`(
+				`stc_cust_procurement_tracker_payments_tracid`,
+				`stc_cust_procurement_tracker_payments_date`,
+				`stc_cust_procurement_tracker_payments_amount`,
+				`stc_cust_procurement_tracker_payments_type`,
+				`stc_cust_procurement_tracker_payments_created_by`
+			)VALUES(
+				'".mysqli_real_escape_string($this->stc_dbs, $proc_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, date('Y-m-d', strtotime($pay_date)))."',
+				'".mysqli_real_escape_string($this->stc_dbs, $pay_amount)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $pay_type)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
+			)
+		");
+		if($blackpearl_qry){
+			$blackpearl = "yes";
+		}else{
+			$blackpearl = "no";
+		}
+		return $blackpearl;
+	}
+
+	// save receiving
+	public function stc_procurement_tracker_receiving_save($proc_id ,$rec_quantity ,$rec_storein){
+		$blackpearl='';
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			UPDATE 
+				`stc_cust_procurement_tracker` 
+			SET 
+				`stc_cust_procurement_tracker_recieved_qnty`='".mysqli_real_escape_string($this->stc_dbs, $rec_quantity)."',
+				`stc_cust_procurement_tracker_storedin`='".mysqli_real_escape_string($this->stc_dbs, $rec_storein)."' 
+			WHERE 
+				`stc_cust_procurement_tracker_id`='".mysqli_real_escape_string($this->stc_dbs, $proc_id)."'
+		");
+		if($blackpearl_qry){
+			$blackpearl = "yes";
+		}else{
+			$blackpearl = "no";
+		}
+		return $blackpearl;
+	}
+
+	// save dispatch
+	public function stc_procurement_tracker_despatch_save($proc_id ,$dec_quantity ,$des_challanno){
+		$blackpearl='';
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_procurement_tracker_dispatch`(
+			    `stc_cust_procurement_tracker_dispatch_date`,
+			    `stc_cust_procurement_tracker_dispatch_itemid`,
+			    `stc_cust_procurement_tracker_dispatch_challan_no`,
+			    `stc_cust_procurement_tracker_dispatch_qty`,
+			    `stc_cust_procurement_tracker_dispatch_createdby`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $proc_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $des_challanno)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $dec_quantity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
+			)
+		");
+		if($blackpearl_qry){
+			$blackpearl = "yes";
+		}else{
+			$blackpearl = "no";
+		}
+		return $blackpearl;
+	}
+
+	// update procurement tracker payment date
+	public function stc_procurement_tracker_payment_update($pay_id){
+		$blackpearl='';
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_cust_procurement_tracker_payments` SET `stc_cust_procurement_tracker_payments_actual_date`='".mysqli_real_escape_string($this->stc_dbs, $date)."' WHERE `stc_cust_procurement_tracker_payments_id`='".mysqli_real_escape_string($this->stc_dbs, $pay_id)."'
+		");
+		if($blackpearl_qry){
+			$blackpearl = "yes";
+		}else{
+			$blackpearl = "no";
 		}
 		return $blackpearl;
 	}
@@ -1481,14 +1772,14 @@ class pirates_supervisor extends tesseract{
 					<tr>
 						<th class="text-center">DATE</th>
 						<th class="text-center">LOCATION</th>
-						<th class="text-center">DEPTARTMENT</th>
+						<th class="text-center">DEPARTMENT</th>
 						<th class="text-center">AREA</th>
 						<th class="text-center">EQUIPMENT TYPE</th>
 						<th class="text-center">EQUIPMENT NO</th>
 						<th class="text-center">EQUIPMENT STATUS</th>
 						<th class="text-center">JOB PLANNING</th>
 						<th class="text-center">JOB TYPE</th>
-						<th class="text-center">VARITIES OF JOB</th>
+						<th class="text-center">VARIETIES OF JOB</th>
 						<th class="text-center">CREATED BY</th>
 						<th class="text-center">PERMIT NO</th>
 						<th class="text-center">CREATER NAME & MOBILE NO</th>
@@ -1527,6 +1818,10 @@ class pirates_supervisor extends tesseract{
 				)
 			";
 		}
+		$showbystatus="AND `stc_agents_id`=".$_SESSION['stc_agent_id'];
+		if($_SESSION['stc_agent_role']==3){
+			$showbystatus='';
+		}
 		$optimusprimeqry=mysqli_query($this->stc_dbs, "
 			SELECT DISTINCT
 			    `stc_status_down_list_id`,
@@ -1562,8 +1857,10 @@ class pirates_supervisor extends tesseract{
 			ON `stc_status_down_list_equipment_number`=a.`stc_cpumpd_id` 
 			LEFT JOIN `stc_customer_pump_details` b 
 			ON `stc_status_down_list_equipment_type`=b.`stc_cpumpd_id` 
+			LEFT JOIN `stc_agents` 
+			ON `stc_status_down_list_created_by`=`stc_agents_id` 
 			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
-			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field."
+			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field." ".$search_field."
 			ORDER BY DATE(`stc_status_down_list_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimeqry)>0){
@@ -1574,15 +1871,16 @@ class pirates_supervisor extends tesseract{
 				$tar_date=(date('Y', strtotime($row['stc_status_down_list_target_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_target_date'])) : 'NA';
 
 				$status='';
-
+				$updatejobdetails='';
 				if($row['stc_status_down_list_status']==1){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">PENDING</span></b>';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">PLANNING</span></b>';
 				}elseif($row['stc_status_down_list_status']==2){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-IN-PROGRESS</span></b>';
 				}elseif($row['stc_status_down_list_status']==3){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-DONE</span></b>';
 				}elseif($row['stc_status_down_list_status']==4){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-COMPLETE</span></b>';
+					$updatejobdetails='<a href="#" class="stc-cust-std-update btn btn-primary" message="'.$row['stc_status_down_list_jobdone_details'].'" id="'.$row['stc_status_down_list_id'].'">Update me</a></td>';
 				}else{
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">CLOSED</span></b>';
 				}
@@ -1608,16 +1906,22 @@ class pirates_supervisor extends tesseract{
 				}
 
 				$actionsec='';
-				if($row['stc_status_down_list_status']==3){
-					$actionsec='
-						<a href="#" class="stc-set-to-complete" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
-					';
-				}elseif($row['stc_status_down_list_status']==4){
-					$actionsec='
-						<a href="#" class="stc-set-to-close" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
-					';
+				if($_SESSION['stc_agent_role']==3){
+					if(($row['stc_status_down_list_status']==4) || ($row['stc_status_down_list_status']==3)){
+						$actionsec='
+							<a href="#" class="stc-set-to-close" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
+						';
+					}else{
+						$actionsec='#';
+					}
 				}else{
-					$actionsec='#';
+					if($row['stc_status_down_list_status']==3){
+						$actionsec='
+							<a href="#" class="stc-set-to-complete" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
+						';
+					}else{
+						$actionsec='#';
+					}
 				}
 
 				$eq_type='';
@@ -1702,7 +2006,7 @@ class pirates_supervisor extends tesseract{
 						<td>'.$dperiod.' Days</td>
 						<td>'.$status.'</td>
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
-						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
+						<td>'.$row['stc_status_down_list_jobdone_details'].'<br>'.$updatejobdetails.'
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
 						<td class="text-center">'.$actionsec.'</td>
 					</tr>
@@ -1720,6 +2024,26 @@ class pirates_supervisor extends tesseract{
 				</tbody>
 			</table>
 		';
+		return $optimusprime;
+	}
+
+	// change job done details
+	public function stc_sdl_jobdescription_update($sld_id, $jobdonedetails){
+		$optimusprime='';
+		$date=date("Y-m-d H:i:s");
+		$optimusprime_qry=mysqli_query($this->stc_dbs, "
+			UPDATE 
+				`stc_status_down_list` 
+			SET 
+				`stc_status_down_list_jobdone_details`='".mysqli_real_escape_string($this->stc_dbs, $jobdonedetails)."' 
+			WHERE 
+				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
+		");
+		if($optimusprime_qry){
+			$optimusprime='Job Description Updated!!!';
+		}else{
+			$optimusprime='Hmmm!!! Somethig went wrong on updating job descriptions.';
+		}
 		return $optimusprime;
 	}
 
@@ -1778,12 +2102,24 @@ class pirates_supervisor extends tesseract{
 	}
 
 	// safety
-	public function stc_call_tbm(){
+	public function stc_call_tbm($month, $supervise_name){
 		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			SELECT * FROM `stc_safetytbm` 
 			LEFT JOIN `stc_cust_pro_supervisor`
 			ON `stc_cust_pro_supervisor_id`=`stc_safetytbm_created_by`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			)
 			ORDER BY DATE(`stc_safetytbm_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimequery)>0){
@@ -1797,7 +2133,7 @@ class pirates_supervisor extends tesseract{
 				}
 
 				$safety_image='
-						<img src="safety_img/'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
+						<img src="https://stcassociate.com/stc_sub_agent47/safety_img/'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
 				';
 				if($img_path==""){
 					$safety_image="
@@ -1815,7 +2151,7 @@ class pirates_supervisor extends tesseract{
 						<a href="safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetytbm_id'].'" class="form-control btn btn-danger">Print</a>
 					';
 					$safety_image='
-							<img src="../stc_sub_agent47/safety_img/'.$img_path.'" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">
+							<img src="https://stcassociate.com/stc_sub_agent47/safety_img/'.$img_path.'" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">
 					';
 				}
 
@@ -1840,13 +2176,383 @@ class pirates_supervisor extends tesseract{
 		}
 		return $optimusprime;
 	}
+
+	// call ppec
+	public function stc_call_ppec($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetyppec` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetyppec_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetyppec_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetyppec_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			)
+			ORDER BY DATE(`stc_safetyppec_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="../stc_agent47/stc-ppec-print-preview.php?ppec_no='.$optimusprimerow['stc_safetyppec_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetyppec-edit" id="'.$optimusprimerow['stc_safetyppec_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetyppec-delete" id="'.$optimusprimerow['stc_safetyppec_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyppec_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyppec_wono'].'</td>
+						<td>'.$optimusprimerow['stc_safetyppec_sitename'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// call ppem
+	public function stc_call_ppem($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetyppem` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetyppem_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetyppem_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetyppem_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`stc_safetyppem_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="../stc_agent47/stc-ppem-print-preview.php?ppem_no='.$optimusprimerow['stc_safetyppem_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetyppem-edit" id="'.$optimusprimerow['stc_safetyppem_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetyppem-delete" id="'.$optimusprimerow['stc_safetyppem_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyppem_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyppem_site_name'].'</td>
+						<td>'.$optimusprimerow['stc_safetyppem_supervisor_name'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// call toollist
+	public function stc_call_toolllist($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetytoolslist` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetytoolslist_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetytoolslist_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetytoolslist_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`stc_safetytoolslist_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetytoolslist_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetytoollist-edit" id="'.$optimusprimerow['stc_safetytoolslist_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetytoollist-delete" id="'.$optimusprimerow['stc_safetytoolslist_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetytoolslist_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetytoolslist_wono'].'</td>
+						<td>'.$optimusprimerow['stc_safetytoolslist_sitename'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// call vhl
+	public function stc_call_vhl($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetyvehicle` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetyvehicle_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetyvehicle_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetyvehicle_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`stc_safetyvehicle_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetyvehicle_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetyvhl-edit" id="'.$optimusprimerow['stc_safetyvehicle_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetyvhl-delete" id="'.$optimusprimerow['stc_safetyvehicle_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyvehicle_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyvehicle_desc'].'</td>
+						<td>'.$optimusprimerow['stc_safetyvehicle_reg_no'].'</td>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyvehicle_dateofinspection'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyvehicle_driversname'].'</td>
+						<td>'.$action_show.'
+						</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// call hotwork
+	public function stc_call_hotwork($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetyhotwork` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetyhotwork_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetyhotwork_startingdate`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetyhotwork_startingdate`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`stc_safetyhotwork_startingdate`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetyhotwork_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetyhotwork-edit" id="'.$optimusprimerow['stc_safetyhotwork_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetyhotwork-delete" id="'.$optimusprimerow['stc_safetyhotwork_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyhotwork_startingdate'])).'</td>
+						<td>'.$optimusprimerow['stc_safetyhotwork_wono'].'</td>
+						<td>'.$optimusprimerow['stc_safetyhotwork_jobssitename'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// call nearmiss
+	public function stc_call_nearmiss($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safetynearmiss` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetynearmiss_createdby`
+			WHERE ".$supervise_rec." (
+				MONTH(`stc_safetynearmiss_currdate`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetynearmiss_currdate`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`stc_safetynearmiss_currdate`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$optimusprimeimgqry=mysqli_query($this->stc_dbs, "
+					SELECT `stc_safetynearmiss_img_location` FROM `stc_safetynearmiss_img` WHERE `stc_safetynearmiss_img_nearmissid`='".$optimusprimerow['stc_safetynearmiss_id']."'
+				");
+				$img_path='';
+				$imgcounter=0;
+				$safety_image='';
+				foreach($optimusprimeimgqry as $optimusprimeimgrow){
+					$imgcounter++;
+					$img_path=$optimusprimeimgrow['stc_safetynearmiss_img_location'];
+
+					$safety_image.='
+							<img src="../stc_sub_agent47/safety_img/'.$img_path.'" style="width: 190px;position: relative;padding: 0;margin: 0;">
+					';
+				}
+				if($imgcounter<=2){
+					$safety_image.="
+						<form action='#' id='safety-nearmissimage-upload-form' >
+							<input type='file' name='stc-safety-nearmissimage-path'>
+							<input type='hidden' name='stc-safety-nearmiss-id' value='".$optimusprimerow['stc_safetynearmiss_id']."'>
+							<input type='submit' value='Upload' class='btn btn-success'>
+						</form>";
+				}
+				$action_show='
+					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetynearmiss_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetynearmiss-edit" id="'.$optimusprimerow['stc_safetynearmiss_id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetynearmiss-delete" id="'.$optimusprimerow['stc_safetynearmiss_id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetynearmiss_date'])).'</td>
+						<td>'.$optimusprimerow['stc_safetynearmiss_time'].'</td>
+						<td>'.$optimusprimerow['stc_safetynearmiss_location'].'</td>
+						<td>'.$safety_image.'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
 }
 
 /*---------------------------------------------Project Objects section-------------------------------------------------*/
 // call tbm  safety
 if(isset($_POST['stc_safety_calltbm'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
 	$objsearchreq=new pirates_supervisor();
-	$opobjsearchreq=$objsearchreq->stc_call_tbm();
+	$opobjsearchreq=$objsearchreq->stc_call_tbm($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call ppec  safety
+if(isset($_POST['stc_safety_callppec'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_ppec($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call ppem  safety
+if(isset($_POST['stc_safety_callppem'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_ppem($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call toollist  safety
+if(isset($_POST['stc_safety_calltoollist'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_toolllist($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call vhl  safety
+if(isset($_POST['stc_safety_callvhl'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_vhl($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call hotwork  safety
+if(isset($_POST['stc_safety_callhotwork'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_hotwork($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call nearmiss  safety
+if(isset($_POST['stc_safety_callnearmiss'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_nearmiss($month, $supervise_name);
 	echo $opobjsearchreq;
 }
 
@@ -1877,6 +2583,8 @@ if(isset($_POST['stc_cust_project_action'])){
 		empty($pro_status)
 	){
 		$outcome='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$outcome='reload';
 	}else{
 		$objcrproj=new pirates_project();
 		$opobjcrproj=$objcrproj->stc_create_project(
@@ -2517,6 +3225,15 @@ if(isset($_POST['stc_down_list_hit'])){
 	echo $opmetabots;
 }
 
+// changee job done details
+if(isset($_POST['stc_job_description_change_hit'])){
+	$sld_id=$_POST['sdl_id'];
+	$jobdonedetails=$_POST['jobdonedetails'];
+	$sdl_status=new pirates_supervisor();
+	$out_sdl_status=$sdl_status->stc_sdl_jobdescription_update($sld_id, $jobdonedetails);
+	echo $out_sdl_status;
+}
+
 // changee status
 if(isset($_POST['stc_status_change_hit'])){
 	$sld_id=$_POST['sdl_id'];
@@ -2542,4 +3259,150 @@ if(isset($_POST['stc_req_edit_item_update'])){
 	$odin_req_out=$odin_req->stc_change_req_item_update($req_item_id, $req_item_name);
 	echo $odin_req_out;
 }
+
+/*---------------------------------------------Procurement tracker Objects section-------------------------------------------------*/
+// add procurmenet
+if(isset($_POST['stc-pro-tra-procurement-hit'])){
+	$pro_id=$_POST['stc-pro-tra-pro-id'];
+	$item_name=$_POST['stc-pro-tra-item-name'];
+	$service=$_POST['stc-pro-tra-service'];
+	$unit=$_POST['stc-pro-tra-unit'];
+	$quantity=$_POST['stc-pro-tra-quantity'];
+	$out="";
+	if(empty($item_name) || ($service=="NA") || ($pro_id=="NA") || empty($quantity)){
+		$out="empty";
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$out="logout";
+	}else{
+		$odin_req=new pirates_project();
+		$odin_req_out=$odin_req->stc_save_procurement_create($pro_id, $item_name, $service, $unit, $quantity);
+		$out=$odin_req_out;
+	}
+	echo $out;
+}
+
+// call procurment tracker
+if(isset($_POST['get_procurment_tracker'])){
+	$by_location=$_POST['by_location'];
+	$by_maker=$_POST['by_maker'];
+	$by_item=$_POST['by_item'];
+
+	$odin_req=new pirates_project();
+	$odin_req_out=$odin_req->stc_save_procurement_call($by_location, $by_maker, $by_item);
+	echo $odin_req_out;
+}
+
+// delete procurment
+if(isset($_POST['delete_procurment_tracker'])){
+	$proc_id=$_POST['delete_pro_id'];
+	$odin_req=new pirates_project();
+	$odin_req_out=$odin_req->stc_save_procurement_delete($proc_id);
+	echo $odin_req_out;
+}
+
+// call perticular procurement
+if(isset($_POST['get_procurment_tracker_perticular'])){
+	$proc_id=$_POST['add_pro_id'];
+	$odin_req=new pirates_project();
+	$odin_req_out=$odin_req->stc_procurement_tracker_perticular_call($proc_id);
+	echo json_encode($odin_req_out);
+}
+
+// update procurement
+if(isset($_POST['update_procurment_tracker'])){
+	$proc_id=$_POST['pro_id'];
+	$po_qnty=$_POST['po_qnty'];
+	$buyer=$_POST['buyer'];
+	$po_no_id=$_POST['po_no_id'];
+	$po_no_date=$_POST['po_no_date'];
+	$amount=$_POST['amount'];
+	$gst=$_POST['gst'];
+	$approval=$_POST['approval'];
+	$mfgclear=$_POST['mfgclear'];
+	$leadtime=$_POST['leadtime'];
+	$dealer_loca=$_POST['dealer_loca'];
+	$transittime=$_POST['transittime'];
+	$plan=$_POST['plan'];
+	$actual=$_POST['actual'];
+	$transport_charge=$_POST['transport_charge'];
+	$mreadiness=$_POST['mreadiness'];
+	$remarks=$_POST['remarks'];
+
+	$odin_req=new pirates_project();
+	$odin_req_out=$odin_req->stc_procurement_tracker_update($proc_id, $po_qnty, $buyer, $po_no_id, $po_no_date, $amount, $gst, $approval, $mfgclear, $leadtime, $dealer_loca, $transittime, $plan, $actual, $transport_charge, $mreadiness, $remarks);
+	echo $odin_req_out;
+}
+
+// save procurment tracker payment
+if(isset($_POST['save_procurment_tracker_payment'])){
+	$proc_id=$_POST['proc_id'];
+	$pay_date=$_POST['pay_date'];
+	$pay_type=$_POST['pay_type'];
+	$pay_amount=$_POST['pay_amount'];
+	$out='';
+
+	if(empty($pay_amount) || empty($pay_date)){
+		$out='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new pirates_project();
+		$odin_req_out=$odin_req->stc_procurement_tracker_payment_save($proc_id ,$pay_date ,$pay_type ,$pay_amount);
+		$out=$odin_req_out;
+	}
+	echo $out;
+}
+
+// save procurment tracker receiving
+if(isset($_POST['save_procurment_tracker_receiving'])){
+	$proc_id=$_POST['proc_id'];
+	$rec_quantity=$_POST['rec_quantity'];
+	$rec_storein=$_POST['rec_storein'];
+	$out='';
+
+	if(empty($rec_quantity) || empty($rec_storein)){
+		$out='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new pirates_project();
+		$odin_req_out=$odin_req->stc_procurement_tracker_receiving_save($proc_id ,$rec_quantity ,$rec_storein);
+		$out=$odin_req_out;
+	}
+	echo $out;
+}
+
+// save procurment tracker dispatch
+if(isset($_POST['save_procurment_tracker_dispatch'])){
+	$proc_id=$_POST['proc_id'];
+	$dec_quantity=$_POST['dec_quantity'];
+	$des_challanno=$_POST['des_challanno'];
+	$out='';
+
+	if(empty($dec_quantity) || empty($des_challanno)){
+		$out='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new pirates_project();
+		$odin_req_out=$odin_req->stc_procurement_tracker_despatch_save($proc_id ,$dec_quantity ,$des_challanno);
+		$out=$odin_req_out;
+	}
+	echo $out;
+}
+
+// save procurment tracker payment date
+if(isset($_POST['save_procurment_tracker_payment_update'])){
+	$pay_id=$_POST['pay_id'];
+	$out='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new pirates_project();
+		$odin_req_out=$odin_req->stc_procurement_tracker_payment_update($pay_id);
+		$out=$odin_req_out;
+	}
+	echo $out;
+}
+
 ?>
