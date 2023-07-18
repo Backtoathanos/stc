@@ -1007,7 +1007,7 @@ class Yggdrasil extends tesseract{
 			    				</a>
 							</td>
 						';
-						$tracker--;
+						break;
 	    			}else{
 	    				$tracker++;
 	    			}
