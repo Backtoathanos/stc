@@ -941,10 +941,6 @@ class Yggdrasil extends tesseract{
 
 	public function stc_call_schedule($day){
 		$schedule_records='';
-    	$init_time=8;
-    	$end_time=10;
-    	$rep_qry="";
-
     	$odinclassqry=mysqli_query($this->stc_dbs, "
     		SELECT
 			    `stc_school_class_id`,
@@ -965,6 +961,7 @@ class Yggdrasil extends tesseract{
 
 	    	$odinscheduleqrycounter=mysqli_query($this->stc_dbs, "
 	    		SELECT
+				    `stc_school_teacher_schedule_id`,
 				    `stc_school_class_title`,
 				    `stc_school_subject_title`,
 				    `stc_school_teacher_firstname`,
@@ -973,7 +970,8 @@ class Yggdrasil extends tesseract{
 				    hour(`stc_school_teacher_schedule_endtime`) as endtime,
 				    `stc_school_teacher_schedule_begtime`,
 				    `stc_school_teacher_schedule_endtime`,
-	    			`stc_school_teacher_schedule_day`
+	    			`stc_school_teacher_schedule_day`,
+	    			`stc_school_teacher_schedule_period`
 				FROM
 				    `stc_school_teacher_schedule`
 				LEFT JOIN 
@@ -992,108 +990,59 @@ class Yggdrasil extends tesseract{
 				    `stc_school_teacher_schedule_day`='".$day."'
                 AND
                 	`stc_school_teacher_schedule_classid`='".$class_id."'
+                ORDER BY `stc_school_teacher_schedule_period` ASC
 	    	");
-
-	    	$lecounter=0;
-	    	$emptyfcounter=7;
-	    	foreach($odinscheduleqrycounter as $odinscheduleqrycounterrow){
-	    		$lecounter++;
-		    	if(($odinscheduleqrycounterrow['begtime']>8 && $odinscheduleqrycounterrow['endtime']<10)){
-		    		$emptyfcounter--;
-		    		$data.='
-		    			<td>
-		    				'.$odinscheduleqrycounterrow['stc_school_class_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].' 
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'].'<br>
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_begtime'])).' - 
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_endtime'])).'
-		    			</td>
-		    		';
-		    	}elseif(($odinscheduleqrycounterrow['begtime']>9 && $odinscheduleqrycounterrow['endtime']<11)){
-		    		$emptyfcounter--;
-		    		$data.='
-		    			<td>
-		    				'.$odinscheduleqrycounterrow['stc_school_class_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].' 
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'].'<br>
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_begtime'])).' - 
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_endtime'])).'
-		    			</td>
-		    		';
-		    	}elseif(($odinscheduleqrycounterrow['begtime']>10 && $odinscheduleqrycounterrow['endtime']<12)){
-		    		$emptyfcounter--;
-		    		$data.='
-		    			<td>
-		    				'.$odinscheduleqrycounterrow['stc_school_class_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].' 
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'].'<br>
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_begtime'])).' - 
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_endtime'])).'
-		    			</td>
-		    		';
-		    	}elseif(($odinscheduleqrycounterrow['begtime']>11 && $odinscheduleqrycounterrow['endtime']<13)){
-		    		$emptyfcounter--;
-		    		$data.='
-		    			<td>
-		    				'.$odinscheduleqrycounterrow['stc_school_class_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].' 
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'].'<br>
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_begtime'])).' - 
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_endtime'])).'
-		    			</td>
-		    		';
-		    	}elseif(($odinscheduleqrycounterrow['begtime']>12 && $odinscheduleqrycounterrow['endtime']<14)){
-		    		$emptyfcounter--;
-		    		$data.='
-		    			<td>
-		    				'.$odinscheduleqrycounterrow['stc_school_class_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].' 
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'].'<br>
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_begtime'])).' - 
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_endtime'])).'
-		    			</td>
-		    		';
-		    	}elseif(($odinscheduleqrycounterrow['begtime']>13 && $odinscheduleqrycounterrow['endtime']<15)){
-		    		$emptyfcounter--;
-		    		$data.='
-		    			<td>
-		    				'.$odinscheduleqrycounterrow['stc_school_class_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].' 
-		    				'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'].'<br>
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_begtime'])).' - 
-                            '.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_endtime'])).'
-		    			</td>
-		    		';
-		    	}else{
-		    		$emptyfcounter--;
-		    		$data.='
-		    			<td>NA</td>
-		    		';
-		    	}
-	    	}
-	    	if($emptyfcounter>0){
-	    		for($i=0;$i<$emptyfcounter;$i++){
-		    		$data.='
-		    			<td>NA</td>
-		    		';
+	    	$routinecounter=0;
+	    	for($i=0;$i<7;$i++){
+	    		$routinecounter++;
+	    		$tracker=0;
+	    		foreach($odinscheduleqrycounter as $odinscheduleqrycounterrow){
+	    			if($routinecounter==$odinscheduleqrycounterrow['stc_school_teacher_schedule_period']){
+	    				$data.='
+							<td class="text-center schedule-box" style="background: linear-gradient(37deg, #d4fffd , #1de4ff)">
+								<div class="remove icon"></div>
+								<a href="javascript:void(0)" class="stc-remove-schedule-btn" id="'.$odinscheduleqrycounterrow['stc_school_teacher_schedule_id'].'">
+									'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
+									'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].' 
+									'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'].'<br>
+				    				'.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_begtime'])).' - 
+				    				'.date('h:i', strtotime($odinscheduleqrycounterrow['stc_school_teacher_schedule_endtime'])).'
+			    				</a>
+							</td>
+						';
+						$tracker--;
+	    			}else{
+	    				$tracker++;
+	    			}
+	    		}
+	    		if($tracker>0){
+	    			$data.='<td style="text-align: center;font-size: 40px;font-weight: bold;background: linear-gradient(45deg, #f31414, #c5f72c);">NA</td>';
 	    		}
 	    	}
 	    	$schedule_records.='
 					<tr>
-						<td class="text-center">'.$row['stc_school_class_title'].'</td>
+						<td class="text-center"><b>'.$row['stc_school_class_title'].'</b></td>
 						'.$data.'
 					</tr>
 			';
 		}
 		$odin['status']="success";
 		$odin['response_schedule']=$schedule_records;
-		$odin['rep_qry']=$rep_qry;
+		return $odin;
+	}
+	
+	public function stc_remove_schedule($sched_id){
+    	$odinclassqry=mysqli_query($this->stc_dbs, "
+    		DELETE FROM `stc_school_teacher_schedule` WHERE `stc_school_teacher_schedule_id`='".mysqli_real_escape_string($this->stc_dbs, $sched_id)."'
+    	");
+    	$status="failed";
+    	$message="Schedule not removed.";
+    	if($odinclassqry){
+	    	$status="success";
+	    	$message="Schedule removed.";
+    	}
+		$odin['status']=$status;
+		$odin['message']=$message;
 		return $odin;
 	}
 
@@ -1353,4 +1302,18 @@ if(isset($_POST['stc_load_schedule_action'])){
 	}
 	echo json_encode($out);
 }
+
+// call schedule
+if(isset($_POST['stc_remove_schedule_action'])){
+	$sched_id=$_POST['sched_id'];
+	$out=array();
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out['reload']="reload";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_remove_schedule($sched_id);
+	}
+	echo json_encode($out);
+}
+
 ?>

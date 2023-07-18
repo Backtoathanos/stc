@@ -383,6 +383,56 @@ if($_SESSION['stc_school_user_for']==4){
       .stc_print_page i{
         color: black;
       }
+
+      .schedule-box a{
+        color: #7e6060;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: bold;
+      }
+      table:hover .schedule-box {
+        background: linear-gradient(37deg, #eecda3, #ef629f);
+      }
+      .schedule-box:hover a{
+        font-size: 17px;
+        color: black;
+      }
+
+      .schedule-box a:hover .remove.icon{
+        display: block;
+      }
+
+      .remove.icon {
+        color: red;
+        position: absolute;
+        margin-left: 3px;
+        margin-top: 10px;
+        background-color: #000;
+      }
+
+      .remove.icon:before {
+        content: '';
+        position: absolute;
+        width: 15px;
+        height: 2px;
+        background-color: #000;
+        background-color: currentColor;
+        -webkit-transform: rotate(45deg);
+                transform: rotate(45deg);
+      }
+
+      .remove.icon:after {
+        content: '';
+        position: absolute;
+        width: 15px;
+        height: 2px;
+        background-color: #000;
+        background-color: currentColor;
+        -webkit-transform: rotate(-45deg);
+                transform: rotate(-45deg);
+      }
+
+
     </style>
   </head>
 
@@ -1260,7 +1310,14 @@ if($_SESSION['stc_school_user_for']==4){
                                       class="form-control validate stcschoolscheduleperiod" 
                                     ><option>Select</option>
                                     <option>1<span style="vertical-align: top;font-size: 11px;">st</span></option> 
-                                    <option>2<span style="vertical-align: top;font-size: 11px;">nd</span></option>                                      
+                                    <option>2<span style="vertical-align: top;font-size: 11px;">nd</span></option>
+                                    <option><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></option>
+                                    <option><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></option>
+                                    <option><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></option>
+                                    <option><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+                                    <option><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+                                    <option><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+                                    <option><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
                                     </select>
                                   </div>
                                 </div>
@@ -1843,31 +1900,70 @@ if($_SESSION['stc_school_user_for']==4){
           });
         }
 
-        
+        load_schedule();
+        function load_schedule(){
+          var day=$('.stc-schedule-week').val();
+          if(day!="Select"){
+            $.ajax({  
+              url       : "../vanaheim/school-management.php",
+              method    : "POST",  
+              data      : {
+                stc_load_schedule_action : 1,
+                day:day
+              },
+              dataType: `JSON`,
+              success   : function(response){
+               // console.log(response);
+               if(response.status=="success"){
+
+                var schedule=response.response_schedule;
+                $('.stc-schedule-rec-show').html(schedule);
+                $('.remove.icon').hide();
+
+                
+               }else if(response.status="reload"){
+                window.location.reload();
+               }
+              }
+            });
+          }
+        }
+
         $(document).on('change', '.stc-schedule-week', function(e){
           e.preventDefault();
-          var day=$(this).val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_load_schedule_action : 1,
-              day:day
-            },
-            dataType: `JSON`,
-            success   : function(response){
-             // console.log(response);
-             if(response.status=="success"){
+          load_schedule();
+        });
 
-              var schedule=response.response_schedule;
-              $('.stc-schedule-rec-show').html(schedule);
+        $(document).on('hover', '.schedule-box', function(e){
+          e.preventDefault();
+          $('.remove.icon').show();
+        });
 
-              
-             }else if(response.status="reload"){
-              window.location.reload();
-             }
-            }
-          });
+        $(document).on('click', '.stc-remove-schedule-btn', function(e){
+          e.preventDefault();
+          var sched_id=$(this).attr("id");
+          if (confirm("Are you sure you want to remove this schedule.") == true) {
+            $.ajax({  
+              url       : "../vanaheim/school-management.php",
+              method    : "POST",  
+              data      : {
+                stc_remove_schedule_action : 1,
+                sched_id:sched_id
+              },
+              dataType: `JSON`,
+              success   : function(response){
+               // console.log(response);
+               if(response.status=="success"){
+                alert(response.message);
+                load_schedule();
+               }else if(response.status="failed"){
+                alert(response.message);
+               }else if(response.status="reload"){
+                window.location.reload();
+               }
+              }
+            });
+          }
         });
 
         $(document).on('click', '.stc-school-show-teach-btn', function(e){
@@ -2079,7 +2175,7 @@ if($_SESSION['stc_school_user_for']==4){
 
 <div class="modal fade bd-example-modal-xl stc-school-showschedule-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content" style="top: 75px;">
+    <div class="modal-content" style="top: 75px;left: -200px;width: 1200px;">
       <div class="modal-header">
         <h4 class="modal-title">School Schedule</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -2090,12 +2186,17 @@ if($_SESSION['stc_school_user_for']==4){
             <h5>School Schedule</h5> 
             <select class="form-control btn btn-info stc-schedule-week">
               <option>Select</option>
-              <option>Monday</option>
-              <option>Tuesday</option>
-              <option>Wednesday</option>
-              <option>Thursday</option>
-              <option>Friday</option>
-              <option>Saturday</option>
+              <?php
+              $day_arr=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+              $day=date("l");
+                foreach($day_arr as $day_arr_row){
+                  if($day==$day_arr_row){
+                    echo '<option selected>'.$day_arr_row.'</option>';
+                  }else{
+                    echo '<option>'.$day_arr_row.'</option>';
+                  }
+                }
+              ?>
             </select>                       
             <div style="width: auto;overflow-x: auto; white-space: nowrap;">
               <table class="table table-hover table-bordered">
