@@ -246,21 +246,18 @@ class Yggdrasil extends tesseract{
 	public function stc_save_school_schedule($stcschoolscheduleteacher, $stcschoolschedulesubject, $stcschoolscheduleclass, $stcschoolscheduleday, $stcschoolschedulestarttime, $stcschoolscheduleendtime, $stcschoolscheduleperiod){
 		$odin='';
 		$date=date("Y-m-d H:i:s");
-		$check_qry=mysqli_query($this->stc_dbs, "SELECT `stc_school_teacher_schedule_id` FROM `stc_school_teacher_schedule` WHERE `stc_school_teacher_schedule_teacherid`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleteacher)."' AND `stc_school_teacher_schedule_day`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleday)."' AND `stc_school_teacher_schedule_begtime`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolschedulestarttime)."' AND `stc_school_teacher_schedule_endtime`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleendtime)."'
+		$check_qry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_school_teacher_schedule_id` 
+			FROM `stc_school_teacher_schedule` 
+			WHERE 
+				`stc_school_teacher_schedule_classid`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleclass)."' AND 
+				`stc_school_teacher_schedule_day`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleday)."' AND 
+				`stc_school_teacher_schedule_period`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleperiod)."'
 		");
 		if(mysqli_num_rows($check_qry)>0){
 			$odin = "duplicate";
 		}else{
-			// $getteacheruid=mysqli_query($this->stc_dbs, "
-			// 	SELECT `stc_school_user_id` FROM `stc_school`
-			// 	LEFT JOIN `stc_school_teacher`
-			// 	ON `stc_school_teacher_userid`=`stc_school_user_id`
-			// 	WHERE `stc_school_teacher_id`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleteacher)."'
-			// ");
-			// $stcschoolscheduleuser='';
-			// foreach($getteacheruid as $getteacheruidrow){
-			// 	$stcschoolscheduleuser=$getteacheruidrow['stc_school_user_id'];
-			// }
 			$set_loki=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_school_teacher_schedule`(
 					`stc_school_teacher_schedule_teacherid`,
