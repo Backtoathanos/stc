@@ -1307,15 +1307,13 @@ if($_SESSION['stc_school_user_for']==4){
                                       name="stcschoolscheduleperiod"
                                       class="form-control validate stcschoolscheduleperiod" 
                                     ><option>Select</option>
-                                    <option>1<span style="vertical-align: top;font-size: 11px;">st</span></option> 
-                                    <option>2<span style="vertical-align: top;font-size: 11px;">nd</span></option>
-                                    <option><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></option>
-                                    <option><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></option>
-                                    <option><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></option>
-                                    <option><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
-                                    <option><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
-                                    <option><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
-                                    <option><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+                                    <option value="1"><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></option>
+                                    <option value="2"><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></option>
+                                    <option value="3"><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></option>
+                                    <option value="4"><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+                                    <option value="5"><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+                                    <option value="6"><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+                                    <option value="7"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
                                     </select>
                                   </div>
                                 </div>
