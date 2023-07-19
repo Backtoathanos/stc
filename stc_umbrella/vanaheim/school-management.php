@@ -1002,7 +1002,6 @@ class Yggdrasil extends tesseract{
 							<td class="text-center schedule-box" style="background: linear-gradient(37deg, #d4fffd , #1de4ff)">
 								<div class="remove icon"></div>
 								<a href="javascript:void(0)" class="stc-remove-schedule-btn" id="'.$odinscheduleqrycounterrow['stc_school_teacher_schedule_id'].'">
-									'.$odinscheduleqrycounterrow['stc_school_teacher_schedule_period'].'<br>
 									'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
 									'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].' 
 									'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'].'<br>
