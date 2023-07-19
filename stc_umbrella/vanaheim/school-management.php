@@ -877,6 +877,9 @@ class Yggdrasil extends tesseract{
 						<td>'.$row['stc_school_subject_syllabusdetails'].'</td>
 						<td>'.date('d-m-Y', strtotime($row['stc_school_subject_createdate'])).'</td>
 						<td>'.$row['stc_school_user_fullName'].'</td>
+						<td>
+							<a href="javascript:void(0)" class=" btn btn-primary stc-add-lesson" id="'.$row['stc_school_subject_id'].'">Add Lesson</a>
+						</td>
 					</tr>
 				';
 			}

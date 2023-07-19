@@ -1992,6 +1992,13 @@ if($_SESSION['stc_school_user_for']==4){
           load_schedule();
         }); 
 
+        $(document).on('click', '.stc-add-lesson', function(e){
+          e.preventDefault();
+          $('.stc-school-showsub-res').modal('hide');
+          $('.stc-school-addlesson-res').modal('show');
+          var sub_id=$(this).attr("id");
+          $('.stc-sub-id-hidden').val(sub_id);
+        }); 
 
         $(document).on('click', '.stc-class-upd-btn-show', function(e){
           e.preventDefault();
@@ -2120,6 +2127,7 @@ if($_SESSION['stc_school_user_for']==4){
                     <th class="text-center">Syllabus Details</th>
                     <th class="text-center">Created Date</th>
                     <th class="text-center">Created by</th>
+                    <th class="text-center">Add Lesson</th>
                     </tr>
                 </thead>
                 <tbody class="stc-subject-rec-show">
@@ -2213,6 +2221,29 @@ if($_SESSION['stc_school_user_for']==4){
                   
                 </tbody>
               </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade bd-example-modal-xl stc-school-addlesson-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="top: 75px;">
+      <div class="modal-header">
+        <h4 class="modal-title">School Clasroom</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <input type="hidden" class="stc-sub-id-hidden">
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <h5>School Classroom</h5>                          
+            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
+
             </div>
           </div>
         </div>
