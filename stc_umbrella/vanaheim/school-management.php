@@ -952,6 +952,7 @@ class Yggdrasil extends tesseract{
 			    `stc_school_class`
 			ORDER BY `stc_school_class_title` ASC
     	");
+    	$checker="";
     	foreach($odinclassqry as $row){
     		$data='';
     		$class_id=$row['stc_school_class_id'];
@@ -990,15 +991,18 @@ class Yggdrasil extends tesseract{
                 ORDER BY `stc_school_teacher_schedule_period` ASC
 	    	");
 	    	$routinecounter=0;
+	    	$boxcounter=0;
 	    	for($i=0;$i<7;$i++){
 	    		$routinecounter++;
-	    		$tracker=0;
+	    		$tracker=1;
 	    		foreach($odinscheduleqrycounter as $odinscheduleqrycounterrow){
 	    			if($routinecounter==$odinscheduleqrycounterrow['stc_school_teacher_schedule_period']){
+	    				$boxcounter++;
 	    				$data.='
 							<td class="text-center schedule-box" style="background: linear-gradient(37deg, #d4fffd , #1de4ff)">
 								<div class="remove icon"></div>
 								<a href="javascript:void(0)" class="stc-remove-schedule-btn" id="'.$odinscheduleqrycounterrow['stc_school_teacher_schedule_id'].'">
+									'.$odinscheduleqrycounterrow['stc_school_teacher_schedule_period'].'<br>
 									'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
 									'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].' 
 									'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'].'<br>
@@ -1007,13 +1011,17 @@ class Yggdrasil extends tesseract{
 			    				</a>
 							</td>
 						';
+						$tracker=1;
 						break;
 	    			}else{
-	    				$tracker++;
+	    				$tracker=0;
 	    			}
 	    		}
-	    		if($tracker>0){
-	    			$data.='<td style="text-align: center;font-size: 40px;font-weight: bold;background: linear-gradient(45deg, #f31414, #c5f72c);">NA</td>';
+	    		if($tracker==0){
+	    			if($boxcounter<7){
+	    				$data.='<td style="text-align: center;font-size: 40px;font-weight: bold;background: linear-gradient(45deg, #f31414, #c5f72c);">NA</td>';
+	    				$boxcounter++;
+	    			}
 	    		}
 	    	}
 	    	$schedule_records.='
@@ -1022,6 +1030,7 @@ class Yggdrasil extends tesseract{
 						'.$data.'
 					</tr>
 			';
+			$checker.='<br>';
 		}
 		$odin['status']="success";
 		$odin['response_schedule']=$schedule_records;

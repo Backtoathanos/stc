@@ -1855,7 +1855,7 @@ if($_SESSION['stc_school_user_for']==4){
              }else if(response=="wrong"){
               alert("Something went wrong record not saved! Please try again.");
              }else if(response=="duplicate"){
-              alert("Duplicate details found! Please check and try again.");
+              alert("Busy schedule, Please check availability first.");
              }
             }
           });
@@ -1989,6 +1989,7 @@ if($_SESSION['stc_school_user_for']==4){
         $(document).on('click', '.stc-school-show-schedule-btn', function(e){
           e.preventDefault();
           $('.stc-school-showschedule-res').modal('show');
+          load_schedule();
         }); 
 
 
