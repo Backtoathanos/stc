@@ -1102,6 +1102,16 @@ if($_SESSION['stc_school_user_for']==2){
           call_syllabus_quest();
         });
 
+        $('.modal-adjustment').css('top', '200px');
+        $(document).on('click', '.resp-1', function(){
+          $('.modal-adjustment').css('top', '200px');
+        });
+
+
+        $(document).on('click', '.resp-2', function(){
+          $('.modal-adjustment').css('top', '350px');
+        });
+        
         // $(document).on('click', '.modal-closebtn', function(e){
         //   e.preventDefault();
         //   $('.stc-school-showstudent-res').modal('hide');
@@ -1114,7 +1124,7 @@ if($_SESSION['stc_school_user_for']==2){
 
 <div class="modal fade bd-example-modal-xl stc-school-showstudent-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content modal-adjustment">
       <div class="modal-header">
         <h4 class="modal-title">Student Attendance</h4>
         <button type="button" class="btn btn-danger stc-school-exit-period">Exit</button>
@@ -1128,13 +1138,13 @@ if($_SESSION['stc_school_user_for']==2){
                   <div class="nav-tabs-wrapper">
                     <span class="nav-tabs-title">Tasks:</span>
                     <ul class="nav nav-tabs" data-tabs="tabs">
-                      <li class="nav-item">
+                      <li class="nav-item resp-1">
                         <a class="nav-link active" href="#stc-show-attendance" data-toggle="tab">
                           <i class="material-icons">add_circle</i> Attendance
                           <div class="ripple-container"></div>
                         </a>
                       </li>
-                      <li class="nav-item">
+                      <li class="nav-item resp-2">
                         <a class="nav-link" href="#stc-show-lecture" data-toggle="tab">
                           <i class="material-icons">add_circle</i> Lecture
                           <div class="ripple-container"></div>
