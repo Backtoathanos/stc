@@ -877,9 +877,6 @@ class Yggdrasil extends tesseract{
 						<td>'.$row['stc_school_subject_syllabusdetails'].'</td>
 						<td>'.date('d-m-Y', strtotime($row['stc_school_subject_createdate'])).'</td>
 						<td>'.$row['stc_school_user_fullName'].'</td>
-						<td>
-							<a href="javascript:void(0)" class=" btn btn-primary stc-add-syllabus" id="'.$row['stc_school_subject_id'].'">Add Syllabus</a>
-						</td>
 					</tr>
 				';
 			}
@@ -1048,66 +1045,6 @@ class Yggdrasil extends tesseract{
     	if($odinclassqry){
 	    	$status="success";
 	    	$message="Schedule removed.";
-    	}
-		$odin['status']=$status;
-		$odin['message']=$message;
-		return $odin;
-	}
-
-	public function stc_syllabus_save($stc_sub_id, $stc_class, $stc_title, $stc_unit, $stc_chapter, $stc_lession, $stc_completion, $stc_classcomplete, $stc_classhrs){
-    	$odinsyllabusqry=mysqli_query($this->stc_dbs, "
-    		SELECT
-				`stc_school_syllabus_class_id`,
-				`stc_school_syllabus_subid`,
-				`stc_school_syllabus_title`,
-				`stc_school_syllabus_unit`,
-				`stc_school_syllabus_chapter`,
-				`stc_school_syllabus_lession`
-			FROM
-				`stc_school_syllabus`
-			WHERE
-				`stc_school_syllabus_class_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_class)."' AND
-				`stc_school_syllabus_subid` = '".mysqli_real_escape_string($this->stc_dbs, $stc_sub_id)."' AND
-				`stc_school_syllabus_title` = '".mysqli_real_escape_string($this->stc_dbs, $stc_title)."' AND
-				`stc_school_syllabus_unit` = '".mysqli_real_escape_string($this->stc_dbs, $stc_unit)."' AND
-				`stc_school_syllabus_chapter` = '".mysqli_real_escape_string($this->stc_dbs, $stc_chapter)."' AND
-				`stc_school_syllabus_lession` = '".mysqli_real_escape_string($this->stc_dbs, $stc_lession)."'
-    	");
-    	$status="failed";
-    	$message="Syllabus not added.";
-    	$date = date('Y-m-d H:i:s');
-    	if(mysqli_num_rows($odinsyllabusqry)==0){
-    		$odinsyllabusinsqry=mysqli_query($this->stc_dbs, "
-    			INSERT INTO `stc_school_syllabus`(
-					`stc_school_syllabus_class_id`,
-					`stc_school_syllabus_subid`,
-					`stc_school_syllabus_title`,
-					`stc_school_syllabus_unit`,
-					`stc_school_syllabus_chapter`,
-					`stc_school_syllabus_lession`,
-					`stc_school_syllabus_completedate`,
-					`stc_school_syllabus_classduration`,
-					`stc_school_syllabus_timeduration`,
-					`stc_school_syllabus_createdby`,
-					`stc_school_syllabus_createdate`
-				)VALUES(
-					'".mysqli_real_escape_string($this->stc_dbs, $stc_class)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $stc_sub_id)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $stc_title)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $stc_unit)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $stc_chapter)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $stc_lession)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $stc_completion)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $stc_classcomplete)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $stc_classhrs)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_school_user_id'])."',
-					'".mysqli_real_escape_string($this->stc_dbs, $date)."'
-				)
-    		");
-			if($odinsyllabusinsqry){
-				$status="success";
-    			$message="Syllabus added.";
-			}
     	}
 		$odin['status']=$status;
 		$odin['message']=$message;
@@ -1384,24 +1321,4 @@ if(isset($_POST['stc_remove_schedule_action'])){
 	echo json_encode($out);
 }
 
-if(isset($_POST['stc_save_syllabus_action'])){
-	$stc_sub_id=$_POST['stc_sub_id'];
-	$stc_class=$_POST['stc_class'];
-	$stc_title=$_POST['stc_title'];
-	$stc_unit=$_POST['stc_unit'];
-	$stc_chapter=$_POST['stc_chapter'];
-	$stc_lession=$_POST['stc_lession'];
-	$stc_completion=$_POST['stc_completion'];
-	$stc_classcomplete=$_POST['stc_classcomplete'];
-	$stc_classhrs=$_POST['stc_classhrs'];
-
-	$out=array();
-	if(empty($_SESSION['stc_school_user_id'])){
-		$out['reload']="reload";
-	}else{
-		$valkyrie=new Yggdrasil();		
-		$out=$valkyrie->stc_syllabus_save($stc_sub_id, $stc_class, $stc_title, $stc_unit, $stc_chapter, $stc_lession, $stc_completion, $stc_classcomplete, $stc_classhrs);
-	}
-	echo json_encode($out);
-}
 ?>

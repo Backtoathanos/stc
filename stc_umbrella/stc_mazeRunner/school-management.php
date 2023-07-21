@@ -732,6 +732,7 @@ if($_SESSION['stc_school_user_for']==4){
                       </div>
 
                       <!-- Create Student -->
+
                       <div class="tab-pane " id="stc-create-student">
                         <div class="row">
                           <div class="col-12">
@@ -1005,6 +1006,7 @@ if($_SESSION['stc_school_user_for']==4){
                       </div>
 
                       <!-- Field Create Subject -->
+
                       <div class="tab-pane " id="stc-create-subject">
                         <div class="row">
                           <div class="col-12">
@@ -1080,6 +1082,7 @@ if($_SESSION['stc_school_user_for']==4){
                       </div>
 
                       <!-- Field Class Room -->
+
                       <div class="tab-pane " id="stc-create-classroom">
                         <div class="row">
                           <div class="col-12">
@@ -1171,6 +1174,7 @@ if($_SESSION['stc_school_user_for']==4){
                       </div>                     
 
                       <!-- Field Schedule Routine -->
+
                       <div class="tab-pane " id="stc-create-shedule">
                         <div class="row">
                           <div class="col-12">
@@ -1976,84 +1980,6 @@ if($_SESSION['stc_school_user_for']==4){
           $('.stc-school-showsub-res').modal('show');
         }); 
 
-        $(document).on('click', '.stc-add-syllabus-save', function(e){
-          e.preventDefault();
-          var stc_sub_id = $('.stc-sub-id-hidden').val();
-          var stc_class = $('.stc-add-syllabus-class').val();
-          var stc_title = $('.stc-add-syllabus-title').val();
-          var stc_unit = $('.stc-add-syllabus-unit').val();
-          var stc_chapter = $('.stc-add-syllabus-chapter').val();
-          var stc_lession = $('.stc-add-syllabus-lession').val();
-          var stc_completion = $('.stc-add-syllabus-completion-date').val();
-          var stc_classcomplete = $('.stc-add-syllabus-classcomplete').val();
-          var stc_classhrs = $('.stc-add-syllabus-classhrs').val();
-          var validate = 1;
-
-          if(stc_title==""){
-            $('.stc-add-syllabus-title').after("<p class='text-danger alert-paragraph'>Enter Title</p>");
-            validate=0;
-          }else{
-            validate=1;
-            $('.stc-add-syllabus-title').parent().find('.alert-paragraph').remove();
-          }
-
-          if(stc_unit==""){
-            $('.stc-add-syllabus-unit').after("<p class='text-danger alert-paragraph'>Select Unit</p>");
-            validate=0;
-          }else{
-            validate=1;
-            $('.stc-add-syllabus-unit').parent().find('.alert-paragraph').remove();
-          }
-
-          if(stc_chapter==""){
-            $('.stc-add-syllabus-chapter').after("<p class='text-danger alert-paragraph'>Select Unit</p>");
-            validate=0;
-          }else{
-            validate=1;
-            $('.stc-add-syllabus-chapter').parent().find('.alert-paragraph').remove();
-          }
-
-          if(stc_lession==""){
-            $('.stc-add-syllabus-lession').after("<p class='text-danger alert-paragraph'>Select Unit</p>");
-            validate=0;
-          }else{
-            validate=1;
-            $('.stc-add-syllabus-lession').parent().find('.alert-paragraph').remove();
-          }
-
-          if(validate==1){
-            $.ajax({  
-              url       : "../vanaheim/school-management.php",
-              method    : "POST",  
-              data      : {
-                stc_save_syllabus_action : 1,
-                stc_sub_id : stc_sub_id,
-                stc_class : stc_class,
-                stc_title : stc_title,
-                stc_unit : stc_unit,
-                stc_chapter : stc_chapter,
-                stc_lession : stc_lession,
-                stc_completion : stc_completion,
-                stc_classcomplete : stc_classcomplete,
-                stc_classhrs : stc_classhrs
-              },
-              dataType: `JSON`,
-              success   : function(response){
-               // console.log(response);
-               if(response.status=="success"){
-
-                alert(response.status);
-
-                
-               }else if(response.status="failed"){
-                alert(response.status);
-               }else if(response.status="reload"){
-                window.location.reload();
-               }
-              }
-            });
-          }
-        }); 
         $(document).on('click', '.stc-school-show-classroom-btn', function(e){
           e.preventDefault();
           call_records();
@@ -2066,14 +1992,6 @@ if($_SESSION['stc_school_user_for']==4){
           load_schedule();
         }); 
 
-        $(document).on('click', '.stc-add-syllabus', function(e){
-          e.preventDefault();
-          $('body').removeAttr('class');
-          $('.stc-school-showsub-res').modal('hide');
-          $('.stc-school-addsyllabus-res').modal('show');
-          var sub_id=$(this).attr("id");
-          $('.stc-sub-id-hidden').val(sub_id);
-        }); 
 
         $(document).on('click', '.stc-class-upd-btn-show', function(e){
           e.preventDefault();
@@ -2184,7 +2102,7 @@ if($_SESSION['stc_school_user_for']==4){
 
 <div class="modal fade bd-example-modal-xl stc-school-showsub-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content" style="position:absolute; top: 10%;">
+    <div class="modal-content" style="top: 75px;">
       <div class="modal-header">
         <h4 class="modal-title">School Subject</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -2202,7 +2120,6 @@ if($_SESSION['stc_school_user_for']==4){
                     <th class="text-center">Syllabus Details</th>
                     <th class="text-center">Created Date</th>
                     <th class="text-center">Created by</th>
-                    <th class="text-center">Add Lesson</th>
                     </tr>
                 </thead>
                 <tbody class="stc-subject-rec-show">
@@ -2297,85 +2214,6 @@ if($_SESSION['stc_school_user_for']==4){
                 </tbody>
               </table>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-<div class="modal fade bd-example-modal-xl stc-school-addsyllabus-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md">
-    <div class="modal-content" style="position:absolute; top: 10%;">
-      <div class="modal-header">
-        <h4 class="modal-title">Add Syllabus</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <input type="hidden" class="stc-sub-id-hidden">
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>Class</h5>
-            <select class="form-control stc-add-syllabus-class">
-              <option>Select</option>
-              <?php
-                include_once("../../MCU/db.php");
-
-                $class_sql=mysqli_query($con, "
-                    select * from stc_school_class where stc_school_class_status=1
-                ");
-                foreach($class_sql as $classrow){
-                  echo '<option value="'.$classrow['stc_school_class_id'].'">'.$classrow['stc_school_class_title'].'</option>';
-
-              ?> 
-              <?php 
-                }                                          
-              ?>
-            </select><br>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>Title</h5>
-            <input type="text" class="form-control stc-add-syllabus-title" placeholder="Type Here"><br>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>Unit</h5>
-            <select class="form-control stc-add-syllabus-unit">
-              <option>Select</option>
-              <option value="1">Unit - 1</option>
-              <option value="2">Unit - 2</option>
-              <option value="3">Unit - 3</option>
-              <option value="4">Unit - 4</option>
-              <option value="5">Unit - 5</option>
-              <option value="6">Unit - 6</option>
-              <option value="7">Unit - 7</option>
-              <option value="8">Unit - 8</option>
-              <option value="9">Unit - 9</option>
-              <option value="10">Unit - 10</option>
-            </select><br>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>Chapter</h5>
-            <input type="text" class="form-control stc-add-syllabus-chapter" placeholder="Type Here"><br>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>Lesson</h5>
-            <input type="text" class="form-control stc-add-syllabus-lession" placeholder="Type Here"><br>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>Completion Date</h5>
-            <input type="date" class="form-control stc-add-syllabus-completion-date" value="<?php echo date('Y-m-d');?>"><br>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>Class Duration</h5>
-            <input type="number" class="form-control stc-add-syllabus-classcomplete" placeholder="Type Here"><br>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>Time Duration in (Hrs)</h5>
-            <input type="number" class="form-control stc-add-syllabus-classhrs" placeholder="Type Here"><br>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <a href="javascript:void(0)" class="btn btn-success stc-add-syllabus-save">Save</a>
           </div>
         </div>
       </div>

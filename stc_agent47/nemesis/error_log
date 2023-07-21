@@ -7120,3 +7120,18 @@ Stack trace:
 [25-Feb-2023 09:47:22 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 75
 [25-Feb-2023 09:47:27 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 75
 [27-Feb-2023 15:10:06 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 75
+[17-Jul-2023 09:28:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[17-Jul-2023 09:28:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 211
+[17-Jul-2023 16:25:52 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 75
+[18-Jul-2023 09:18:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[18-Jul-2023 09:18:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 211
+[19-Jul-2023 09:19:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[19-Jul-2023 09:19:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 211
+[20-Jul-2023 09:14:09 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[20-Jul-2023 09:14:09 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 211
+[20-Jul-2023 12:08:52 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 205
+[21-Jul-2023 09:12:20 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[21-Jul-2023 09:12:20 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 211
+[21-Jul-2023 10:39:32 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 515
+[21-Jul-2023 16:49:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[21-Jul-2023 16:49:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 211
