@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/c2484kn1eg0y/public_html/repositories/stc
+    - export DEPLOYPATH=/home/c2484kn1eg0y/repositories/stc
     - /bin/cp -R * $DEPLOYPATH
