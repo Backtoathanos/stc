@@ -1935,6 +1935,13 @@ if($_SESSION['stc_school_user_for']==4){
           $('.remove.icon').show();
         });
 
+        $(document).on('click', '.hover-box', function(e){
+          e.preventDefault();
+          var box_name = $(this).attr('id');
+          $('.schedule-box').css({ 'color': 'white', 'background': 'linear-gradient(37deg, #d4fffd , #1de4ff)', 'font-size': '20px' });
+          $('.box-rep-'+box_name).css({ 'color': 'white', 'background': 'linear-gradient(37deg, rgb(24 129 124), rgb(158 243 255)) black', 'font-size': '20px' });
+        });
+        
         $(document).on('click', '.stc-remove-schedule-btn', function(e){
           e.preventDefault();
           var sched_id=$(this).attr("id");

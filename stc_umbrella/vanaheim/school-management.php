@@ -952,7 +952,8 @@ class Yggdrasil extends tesseract{
 			    `stc_school_class`
 			ORDER BY `stc_school_class_title` ASC
     	");
-    	$checker="";
+    	$teacher_name=array();
+    	$schedule_id=array();
     	foreach($odinclassqry as $row){
     		$data='';
     		$class_id=$row['stc_school_class_id'];
@@ -998,8 +999,9 @@ class Yggdrasil extends tesseract{
 	    		foreach($odinscheduleqrycounter as $odinscheduleqrycounterrow){
 	    			if($routinecounter==$odinscheduleqrycounterrow['stc_school_teacher_schedule_period']){
 	    				$boxcounter++;
+	    				array_push($teacher_name,$odinscheduleqrycounterrow['stc_school_teacher_firstname']);
 	    				$data.='
-							<td class="text-center schedule-box" style="background: linear-gradient(37deg, #d4fffd , #1de4ff)">
+							<td class="text-center schedule-box box-rep-'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].'" style="background: linear-gradient(37deg, #d4fffd , #1de4ff)">
 								<div class="remove icon"></div>
 								<a href="javascript:void(0)" class="stc-remove-schedule-btn" id="'.$odinscheduleqrycounterrow['stc_school_teacher_schedule_id'].'">
 									'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
@@ -1029,8 +1031,24 @@ class Yggdrasil extends tesseract{
 						'.$data.'
 					</tr>
 			';
-			$checker.='<br>';
+
 		}
+
+		$teacher_name=array_unique($teacher_name);
+		$schedule_records.='
+				<tr>
+					<td class="text-center"><b>Teacher : </b></td>
+					<td class="text-center" colspan="4">
+		';
+		for($j=0;$j<count($teacher_name);$j++){
+			$schedule_records.='
+				<b><a href="javascript:void(0)" class="hover-box" style="display: block;padding: 5px;background: #ae9fff;font-size: 20px;font-weight: bold;" id="'.$teacher_name[$j].'">'.$teacher_name[$j].'</a></b><br>
+			';
+		}
+		$schedule_records.='
+					</td>
+				</tr>
+		';
 		$odin['status']="success";
 		$odin['response_schedule']=$schedule_records;
 		return $odin;
@@ -1050,7 +1068,6 @@ class Yggdrasil extends tesseract{
 		$odin['message']=$message;
 		return $odin;
 	}
-
 }
 
 #<------------------------------------------------------------------------------------------>
