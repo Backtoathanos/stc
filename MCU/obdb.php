@@ -1,7 +1,7 @@
 <?php
 date_default_timezone_set('Asia/Kolkata');
 // databaseconnectiviy
-define('DB_SERVER','a2plcpnl0682');
+define('DB_SERVER','localhost');
 define('DB_USER','nausher');
 define('DB_PASS' ,'ZX5#*,PPq$5;');
 define('DB_NAME', 'stc_associate_go');

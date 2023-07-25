@@ -1,6 +1,6 @@
 <?php
 date_default_timezone_set('Asia/Kolkata');
-$server="a2plcpnl0682";
+$server="localhost";
 $user="nausher";
 $password="ZX5#*,PPq$5;";
 $db="stc_associate_go";
