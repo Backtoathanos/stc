@@ -1002,7 +1002,7 @@ class Yggdrasil extends tesseract{
 	    				$teacher_title = $odinscheduleqrycounterrow['stc_school_teacher_firstname'].'-'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'];
 	    				array_push($teacher_name, $teacher_title);
 	    				$data.='
-							<td title="Click to remove schedule" class="text-center schedule-box box-rep-'.$teacher_title.'">
+							<td title="Click here to remove schedule" class="text-center schedule-box box-rep-'.$teacher_title.'">
 								<div class="remove icon"></div>
 								<a href="javascript:void(0)" class="stc-remove-schedule-btn" id="'.$odinscheduleqrycounterrow['stc_school_teacher_schedule_id'].'">
 									'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
