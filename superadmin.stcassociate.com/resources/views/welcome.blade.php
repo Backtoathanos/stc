@@ -81,7 +81,7 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    STC ASSociates Super Admin
+                    STC Associates Super Admin
                 </div>
             </div>
         </div>
