@@ -999,9 +999,10 @@ class Yggdrasil extends tesseract{
 	    		foreach($odinscheduleqrycounter as $odinscheduleqrycounterrow){
 	    			if($routinecounter==$odinscheduleqrycounterrow['stc_school_teacher_schedule_period']){
 	    				$boxcounter++;
-	    				array_push($teacher_name,$odinscheduleqrycounterrow['stc_school_teacher_firstname']);
+	    				$teacher_title = $odinscheduleqrycounterrow['stc_school_teacher_firstname'].'-'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'];
+	    				array_push($teacher_name, $teacher_title);
 	    				$data.='
-							<td class="text-center schedule-box box-rep-'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].'" style="background: linear-gradient(37deg, #d4fffd , #1de4ff)">
+							<td title="Click to remove schedule" class="text-center schedule-box box-rep-'.$teacher_title.'">
 								<div class="remove icon"></div>
 								<a href="javascript:void(0)" class="stc-remove-schedule-btn" id="'.$odinscheduleqrycounterrow['stc_school_teacher_schedule_id'].'">
 									'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
@@ -1020,7 +1021,7 @@ class Yggdrasil extends tesseract{
 	    		}
 	    		if($tracker==0){
 	    			if($boxcounter<7){
-	    				$data.='<td style="text-align: center;font-size: 40px;font-weight: bold;background: linear-gradient(45deg, #f31414, #c5f72c);">NA</td>';
+	    				$data.='<td class="schedule-show-na">NA</td>';
 	    				$boxcounter++;
 	    			}
 	    		}
@@ -1035,14 +1036,18 @@ class Yggdrasil extends tesseract{
 		}
 
 		$teacher_name=array_unique($teacher_name);
+		$display_teach=array();
+		foreach($teacher_name as $teacher_namerow){
+			$display_teach[]=$teacher_namerow;
+		}
 		$schedule_records.='
 				<tr>
 					<td class="text-center"><b>Teacher : </b></td>
 					<td class="text-center" colspan="4">
 		';
-		for($j=0;$j<count($teacher_name);$j++){
+		for($j=0;$j<count($display_teach);$j++){
 			$schedule_records.='
-				<b><a href="javascript:void(0)" class="hover-box" style="display: block;padding: 5px;background: #ae9fff;font-size: 20px;font-weight: bold;" id="'.$teacher_name[$j].'">'.$teacher_name[$j].'</a></b><br>
+				<b><a href="javascript:void(0)" class="hover-box" title="Click here to hover all schedule from '.str_replace("-"," ",$display_teach[$j]).'" id="'.$display_teach[$j].'">'.ucwords(str_replace("-"," ",$display_teach[$j])).'</a></b>
 			';
 		}
 		$schedule_records.='

@@ -384,15 +384,27 @@ if($_SESSION['stc_school_user_for']==4){
         color: black;
       }
 
+      .remove.icon{
+        display: none;
+      }
+
+      .schedule-box{
+        background: linear-gradient(37deg, #d4fffd , #1de4ff)
+      }
       .schedule-box a{
         color: #7e6060;
         text-decoration: none;
         font-size: 15px;
         font-weight: bold;
       }
-      table:hover .schedule-box {
+      .schedule-box:hover  {
         background: linear-gradient(37deg, #eecda3, #ef629f);
       }
+
+      .schedule-box:hover .remove.icon{
+        display: block;
+      }
+
       .schedule-box:hover a{
         font-size: 17px;
         color: black;
@@ -402,11 +414,17 @@ if($_SESSION['stc_school_user_for']==4){
         display: block;
       }
 
+      .schedule-show-na{
+        text-align: center;
+        font-size: 40px;
+        font-weight: bold;
+        background: linear-gradient(45deg, #f31414, #c5f72c);
+      }
       .remove.icon {
         color: red;
         position: absolute;
         margin-left: 3px;
-        margin-top: 10px;
+        margin-top: 38px;
         background-color: #000;
       }
 
@@ -430,6 +448,20 @@ if($_SESSION['stc_school_user_for']==4){
         background-color: currentColor;
         -webkit-transform: rotate(-45deg);
                 transform: rotate(-45deg);
+      }
+
+      .hover-box{
+        display: block;padding: 5px;
+        background: linear-gradient(45deg, #00c9b0, #e9ad02);
+        font-size: 20px;
+        font-weight: bold;
+        color: #4affdf;
+      }
+
+      .hover-box:hover{
+        background: linear-gradient(45deg, #ff6565, #df7bff);
+        text-decoration: underline;
+        color: black;
       }
     </style>
   </head>
@@ -1914,7 +1946,7 @@ if($_SESSION['stc_school_user_for']==4){
 
                 var schedule=response.response_schedule;
                 $('.stc-schedule-rec-show').html(schedule);
-                $('.remove.icon').hide();
+                // $('.remove.icon').hide();
 
                 
                }else if(response.status="reload"){
