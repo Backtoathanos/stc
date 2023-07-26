@@ -1000,6 +1000,8 @@ class Yggdrasil extends tesseract{
 	    			if($routinecounter==$odinscheduleqrycounterrow['stc_school_teacher_schedule_period']){
 	    				$boxcounter++;
 	    				$teacher_title = $odinscheduleqrycounterrow['stc_school_teacher_firstname'].'-'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'];
+	    				$teacher_title=str_replace(" ","",$teacher_title);
+	    				$teacher_title=str_replace("","",$teacher_title);
 	    				array_push($teacher_name, $teacher_title);
 	    				$data.='
 							<td title="Click here to remove schedule" class="text-center schedule-box box-rep-'.$teacher_title.'">
