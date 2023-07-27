@@ -41,11 +41,11 @@ if(isset($_GET['vcid'])){
     <!-- https://fontawesome.com/ -->
     <!-- <link rel="stylesheet" href="stark_tower/jquery-ui-datepicker/jquery-ui.min.css" type="text/css" /> -->
     <!-- http://api.jqueryui.com/datepicker/ -->
-    <link rel="stylesheet" href="../stc_symbiote/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://stcassociate.com/stc_symbiote/css/bootstrap.min.css" />
     <!-- https://getbootstrap.com/ -->
-    <link rel="stylesheet" href="../stc_symbiote/css/templatemo-style.css">
+    <link rel="stylesheet" href="https://stcassociate.com/stc_symbiote/css/templatemo-style.css">
 
-    <link rel="stylesheet" href="../stc_symbiote/css/awsomeminho.css">
+    <link rel="stylesheet" href="https://stcassociate.com/stc_symbiote/css/awsomeminho.css">
 
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link rel="stylesheet" href="https://s3-us-west-2.amazonaws.com/s.cdpn.io/3/infinite.css">
@@ -356,7 +356,7 @@ if(isset($_GET['vcid'])){
       <div class="row header">
         <!-- Create order -->
         <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4">
-          <div style="height: 70px;"><img style="height: 70px;" src="../stc_symbiote/img/stc-header.png"></div>
+          <div style="height: 70px;"><img style="height: 70px;" src="https://stcassociate.com/stc_symbiote/img/stc-header.png"></div>
           <p>
             Rajmahal Apartment, D/304 3rd Floor, Block No 1, Pardih, Jamshedpur, Jharkhand 832110
           </p>
@@ -370,7 +370,7 @@ if(isset($_GET['vcid'])){
         </div>
         <div class="col-xl-2 col-lg-2 col-md-4 col-sm-2">
             <a target="_blank" id="logo_print_pre" href="#">
-              <img src="../stc_symbiote/img/stc_logo.png">
+              <img src="https://stcassociate.com/stc_symbiote/img/stc_logo.png">
             </a>
         </div>
       </div>
@@ -553,7 +553,7 @@ if(isset($_GET['vcid'])){
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-    <?php include "../stc_symbiote/footer.php";?>
+    <?php include "https://stcassociate.com/stc_symbiote/footer.php";?>
     <script>
       $(document).ready(function(){
          $('#printInvoice').click(function(){

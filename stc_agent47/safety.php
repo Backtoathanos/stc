@@ -570,7 +570,7 @@ if(isset($_SESSION["stc_agent_id"])){
             function call_tbm_fields(){
                 var stc_tbm_no=$('.stc-tbm-no').val();
                 $.ajax({
-                    url         : "../stc_sub_agent47/nemesis/stc_safety.php",
+                    url         : "https://stcassociate.com/stc_sub_agent47/nemesis/stc_safety.php",
                     method      : "POST",
                     data        : {stc_safety_calltbmfields:1,stc_tbm_no:stc_tbm_no},
                     dataType    : "JSON",
