@@ -7137,3 +7137,5 @@ Stack trace:
 [21-Jul-2023 16:49:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 211
 [27-Jul-2023 09:14:09 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_product.php on line 211
 [27-Jul-2023 09:14:09 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_agcart.php on line 103
+[27-Jul-2023 16:06:01 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 515
+[27-Jul-2023 16:06:07 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 515
