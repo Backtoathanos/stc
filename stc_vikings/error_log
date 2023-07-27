@@ -15234,3 +15234,5 @@
 [27-Jul-2023 12:12:06 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
 [27-Jul-2023 12:12:06 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
 [27-Jul-2023 12:12:06 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[27-Jul-2023 16:01:52 Asia/Kolkata] PHP Notice:  Undefined index: invono in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview-additional.php on line 59
+[27-Jul-2023 16:01:54 Asia/Kolkata] PHP Notice:  Undefined index: invono in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview-additional.php on line 59
