@@ -472,6 +472,7 @@ if($_SESSION['stc_school_user_for']==2){
                                                 `stc_school_subject_title`,
                                                 `stc_school_teacher_schedule_day`,
                                                 `stc_school_teacher_schedule_classid`,
+                                                `stc_school_teacher_schedule_subjectid`,
                                                 `stc_school_teacher_schedule_begtime`,
                                                 `stc_school_teacher_schedule_endtime` 
                                               FROM 
@@ -499,7 +500,7 @@ if($_SESSION['stc_school_user_for']==2){
                                                 if($schedule_id==$schedule_row['stc_school_teacher_schedule_id']){
                                                   $schedule_data.='
                                                     <td class="text-center">
-                                                      <a href="javascript:void(0);" class="stc-school-show-student-default" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'">
+                                                      <a href="javascript:void(0);" class="stc-school-show-student-default" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'" sub-id="'.$schedule_row['stc_school_teacher_schedule_subjectid'].'">
                                                           <b>
                                                             Class - '.$schedule_row['stc_school_class_title'].'<br>
                                                             '.$schedule_row['stc_school_subject_title'].'<br>
@@ -553,7 +554,7 @@ if($_SESSION['stc_school_user_for']==2){
                                                     if(($cur_time>$beg_time) && ($end_time>$cur_time)){
                                                       $schedule_data.='
                                                         <td class="text-center" style="background: #8cff32;font-weight: bold;">
-                                                          <a href="javascript:void(0);" class="stc-school-show-student" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'">
+                                                          <a href="javascript:void(0);" class="stc-school-show-student" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'" sub-id="'.$schedule_row['stc_school_teacher_schedule_subjectid'].'">
                                                               <b>
                                                                 Class - '.$schedule_row['stc_school_class_title'].'<br>
                                                                 '.$schedule_row['stc_school_subject_title'].'<br>
@@ -882,6 +883,7 @@ if($_SESSION['stc_school_user_for']==2){
           e.preventDefault();
           var schedule_id=$(this).attr('id');
           var class_id=$(this).attr('class-id');
+          var sub_id=$(this).attr('sub-id');
           $.ajax({  
             url       : "../vanaheim/school-management.php",
             method    : "POST",  
@@ -895,6 +897,8 @@ if($_SESSION['stc_school_user_for']==2){
              // console.log(data);
               $('.stc-school-hidden-schedule-id').val(schedule_id);
               $('.stc-show-student-nested-show').html(response_student);
+              $('.stc-school-hidden-scclass-id').val(class_id);
+              $('.stc-school-hidden-scsub-id').val(sub_id);
               $('.stc-school-showstudent-res').modal('show');
               call_syllabus_det();
             }
@@ -905,6 +909,7 @@ if($_SESSION['stc_school_user_for']==2){
           e.preventDefault();
           var schedule_id=$(this).attr('id');
           var class_id=$(this).attr('class-id');
+          var sub_id=$(this).attr('sub-id');
           $.ajax({  
             url       : "../vanaheim/school-management.php",
             method    : "POST",  
@@ -917,8 +922,10 @@ if($_SESSION['stc_school_user_for']==2){
             success   : function(response_student){
              // console.log(data);
               $('.stc-school-hidden-schedule-id').val(schedule_id);
-             $('.stc-show-student-nested-show').html(response_student);
-             $('.stc-school-showstudent-res').modal('show');
+              $('.stc-show-student-nested-show').html(response_student);
+              $('.stc-school-hidden-scclass-id').val(class_id);
+              $('.stc-school-hidden-scsub-id').val(sub_id);
+              $('.stc-school-showstudent-res').modal('show');
               call_syllabus_det();
             }
           });
@@ -954,6 +961,7 @@ if($_SESSION['stc_school_user_for']==2){
             $(this).parent().parent().find('.stc-school-student-att-save').show();
           }
         });
+        
         $(document).on('click', '.stc-school-student-att-save', function(e){
           e.preventDefault();
           $(this).hide(500);
@@ -996,6 +1004,7 @@ if($_SESSION['stc_school_user_for']==2){
           var chapter=$('#chapter').val();
           var lession=$('#lession').val();
           var Syllabus=$('#Syllabus').val();
+          var Unit=$('#unit-should-be').val();
           var remarks=$('#remarks').val();
           $.ajax({  
             url       : "../vanaheim/school-management.php",
@@ -1007,6 +1016,7 @@ if($_SESSION['stc_school_user_for']==2){
               chapter : chapter,
               lession : lession,
               Syllabus : Syllabus,
+              Unit : Unit,
               remarks : remarks
             },
             // dataType: `JSON`,
@@ -1063,22 +1073,72 @@ if($_SESSION['stc_school_user_for']==2){
           });
         });
 
+        var sy_syllabus = new Array();
         function call_syllabus_det(){
           var schedule_id=$('.stc-school-hidden-schedule-id').val();
+          var class_id=$('.stc-school-hidden-scclass-id').val();
+          var sub_id=$('.stc-school-hidden-scsub-id').val();
           $.ajax({
             url       : "../vanaheim/school-management.php",
             method    : "POST",  
             data      : {
               stc_syllabusdet_call : 1,
-              schedule_id:schedule_id
+              schedule_id:schedule_id,
+              class_id:class_id,
+              sub_id:sub_id
             },
-            // dataType: `JSON`,
+            dataType: `JSON`,
             success   : function(response_student){
-              $('.stc-show-student-syllabusdet-show').html(response_student);
+              $('.stc-show-student-syllabusdet-show').html(response_student.lecture_details);
+              var syl_result= response_student.syllabus_details;
+              sy_syllabus.push(syl_result);
+              var syllabus_output='<option value="NA">Select</option>';
+              for(var i=0; i<sy_syllabus[0].length;i++){
+                syllabus_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_title + '</option>';
+              }
+              $('#Syllabus').html(syllabus_output);
               call_syllabus_quest();
             }
-          })
+          });
         }
+
+        $(document).on('change', '#Syllabus', function(){
+          var syll_id = $(this).val();
+          var chapter_output = '<option value="NA">Select</option>';
+          for(var i=0; i<sy_syllabus[0].length;i++){
+            chapter_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_chapter + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_chapter + '</option>';
+          }
+          $('#chapter').html(chapter_output);
+        });
+
+        $(document).on('change', '#chapter', function(){
+          var syll_id = $(this).val();
+          var lession_output = '<option value="NA">Select</option>';
+          for(var i=0; i<sy_syllabus[0].length;i++){
+            lession_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_lession + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_lession + '</option>';
+          }
+          $('#lession').html(lession_output);
+        });
+
+        $(document).on('change', '#lession', function(){
+          var syll_id = $(this).val();
+          var unit_output = '<option value="NA">Select</option>';
+          for(var i=0; i<sy_syllabus[0].length;i++){
+            unit_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_unit + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_unit + '</option>';
+          }
+          $('#unit-should-be').html(unit_output);
+        });
+
+        $(document).on('change', '#unit-should-be', function(){
+          var syll_id = $(this).val();
+          var cdate_output = '';
+          for(var i=0; i<sy_syllabus[0].length;i++){
+            if(syll_id==sy_syllabus[0][i].stc_school_syllabus_id){
+              cdate_output=sy_syllabus[0][i].stc_school_syllabus_completedate;
+            }
+          }
+          $('#complete-date').val(cdate_output);
+        });
 
         function call_syllabus_quest(){
           var question_id=$('.stc-syllabus-out:checked').attr("id");
@@ -1165,6 +1225,8 @@ if($_SESSION['stc_school_user_for']==2){
                     <div class="row">
                       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
                         <input type="hidden" class="stc-school-hidden-schedule-id">
+                        <input type="hidden" class="stc-school-hidden-scclass-id">
+                        <input type="hidden" class="stc-school-hidden-scsub-id">
                         <!-- <h5>School Attendance</h5> -->
                         <div class="mb-3">
                           <table class="table table-hover table-bordered table-responsive">
@@ -1211,7 +1273,9 @@ if($_SESSION['stc_school_user_for']==2){
                         <div class="mb-3">
                           <h5 for="syllabus">Syllabus</h5>
                           <span class="bmd-form-group">
-                            <input type="text" class="form-control" id="Syllabus" placeholder="Type Here..">
+                            <select name="stcschoolmanagementteacherid" id="Syllabus" type="text" class="form-control validate Syllabus" >
+                              <option value="NA">Select</option>
+                            </select>
                           </span>
                         </div>
                       </div>        
@@ -1219,7 +1283,9 @@ if($_SESSION['stc_school_user_for']==2){
                         <div class="mb-3">
                           <h5 for="chapter">Chapter</h5>
                           <span class="bmd-form-group">
-                            <input type="text" class="form-control" id="chapter" placeholder="Type Here..">
+                            <select name="stcschoolmanagementteacherid" id="chapter" type="text" class="form-control validate chapter" >
+                              <option value="NA">Select</option>
+                            </select>
                           </span>
                         </div>
                       </div>          
@@ -1227,10 +1293,30 @@ if($_SESSION['stc_school_user_for']==2){
                         <div class="mb-3">
                           <h5 for="lession">Lession</h5>
                           <span class="bmd-form-group">
-                            <input type="text" class="form-control" id="lession" placeholder="Type Here..">
+                            <select name="stcschoolmanagementteacherid" id="lession" type="text" class="form-control validate lession" >
+                              <option value="NA">Select</option>
+                            </select>
                           </span>
                         </div>
-                      </div>      
+                      </div>         
+                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <h5 for="lession">Unit</h5>
+                          <span class="bmd-form-group">
+                            <select name="stcschoolmanagementteacherid" id="unit-should-be" type="text" class="form-control validate unit-should-be" >
+                              <option value="NA">Select</option>
+                            </select>
+                          </span>
+                        </div>
+                      </div>           
+                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+                        <div class="mb-3">
+                          <h5 for="lession">Complete date</h5>
+                          <span class="bmd-form-group">
+                            <input type="text" class="form-control" id="complete-date" placeholder="Type Here.." disabled>
+                          </span>
+                        </div>
+                      </div>
                       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
                         <div class="mb-3">
                           <h5 for="syllabus">Remarks</h5>
