@@ -3876,3 +3876,8 @@ Stack trace:
 [27-Jul-2023 11:31:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_j_type in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 534
 [27-Jul-2023 11:32:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_j_type in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 534
 [27-Jul-2023 11:33:15 Asia/Kolkata] PHP Notice:  Undefined index: work_permit_no in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 571
+[31-Jul-2023 17:08:58 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 511
+[31-Jul-2023 17:12:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_j_type in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 534
+[31-Jul-2023 17:13:14 Asia/Kolkata] PHP Notice:  Undefined index: work_permit_no in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 571
+[31-Jul-2023 17:56:52 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 511
+[31-Jul-2023 18:02:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_j_type in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 534
