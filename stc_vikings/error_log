@@ -15236,3 +15236,7 @@
 [27-Jul-2023 12:12:06 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
 [27-Jul-2023 16:01:52 Asia/Kolkata] PHP Notice:  Undefined index: invono in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview-additional.php on line 59
 [27-Jul-2023 16:01:54 Asia/Kolkata] PHP Notice:  Undefined index: invono in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview-additional.php on line 59
+[31-Jul-2023 18:04:08 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[31-Jul-2023 18:04:08 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[31-Jul-2023 12:34:11 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[31-Jul-2023 12:34:11 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167

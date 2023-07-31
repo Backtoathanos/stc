@@ -24,3 +24,4 @@
 [27-Jul-2023 11:43:55 Asia/Kolkata] PHP Notice:  Undefined index: stc_direct_challan_sess in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2876
 [27-Jul-2023 11:43:55 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2876
 [27-Jul-2023 12:02:39 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[31-Jul-2023 18:04:20 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
