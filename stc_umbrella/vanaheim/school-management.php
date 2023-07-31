@@ -544,7 +544,7 @@ class Yggdrasil extends tesseract{
 		return $odin;
 	}
 
-	public function stc_call_school_lecturedetails_save($schedule_id, $classtype, $chapter, $lession, $Syllabus, $remarks){
+	public function stc_call_school_lecturedetails_save($schedule_id, $classtype, $chapter, $lession, $Syllabus, $Unit, $remarks){
 		$odin='';
 		$date=date("Y-m-d H:i:s");
 		$odin_schedulegqry=mysqli_query($this->stc_dbs, "
@@ -571,6 +571,7 @@ class Yggdrasil extends tesseract{
 				`stc_school_lecture_chapter`,
 				`stc_school_lecture_lesson`,
 				`stc_school_lecture_syllabus`,
+				`stc_school_lecture_unit`,
 				`stc_school_lecture_remarks`,
 				`stc_school_lecture_status`,
 				`stc_school_lecture_createdate`,
@@ -583,6 +584,7 @@ class Yggdrasil extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $chapter)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $lession)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $Syllabus)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $Unit)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
 				'2',
 				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
@@ -662,11 +664,13 @@ class Yggdrasil extends tesseract{
 		return $odin;
 	}
 
-	public function stc_call_syllabus_det($schedule_id){
-		$odin='';
+	public function stc_call_syllabus_det($schedule_id, $class_id, $sub_id){
+		$lecture_details='';
+		$syllabus_details='';
 		$odinqry=mysqli_query($this->stc_dbs, "
 			SELECT
 			    `stc_school_lecture_id`,
+			    `stc_school_lecture_subid`,
 			    `stc_school_lecture_createdate`,
 			    `stc_school_lecture_classtype`,
 			    `stc_school_lecture_chapter`,
@@ -683,7 +687,7 @@ class Yggdrasil extends tesseract{
 		if(mysqli_num_rows($odinqry)>0){
 			$checked='checked';
 			foreach($odinqry as $odinrow){
-				$odin.='
+				$lecture_details.='
 					<tr>
 						<td for="'.$odinrow['stc_school_lecture_id'].'">
 							<input type="radio" name="syllabus_det" '.$checked.' class="stc-syllabus-out" value="'.$odinrow['stc_school_lecture_id'].'" id="'.$odinrow['stc_school_lecture_id'].'">
@@ -698,10 +702,34 @@ class Yggdrasil extends tesseract{
 				$checked='';
 			}
 		}else{
-			$odin.='
+			$lecture_details.='
 				<tr><td colspan="4">No records found.</td></tr>
 			';
 		}
+
+		$odinqry=mysqli_query($this->stc_dbs, "
+			SELECT
+			    `stc_school_syllabus_id`,
+			    `stc_school_syllabus_title`,
+			    `stc_school_syllabus_chapter`,
+			    `stc_school_syllabus_lession`,
+			    `stc_school_syllabus_unit`,
+			    Date_FORMAT(`stc_school_syllabus_completedate`, '%d %M %Y') as stc_school_syllabus_completedate
+			FROM
+			    `stc_school_syllabus`
+			WHERE
+			    `stc_school_syllabus_class_id`='".mysqli_real_escape_string($this->stc_dbs, $class_id)."'
+			AND 
+			    `stc_school_syllabus_subid`='".mysqli_real_escape_string($this->stc_dbs, $sub_id)."'
+		");
+		$syllabus_details=array();
+		foreach($odinqry as $odinqryrow){
+			$syllabus_details[]=$odinqryrow;
+		}
+		$odin=array(
+			'lecture_details' => $lecture_details,
+			'syllabus_details' => $syllabus_details
+		);
 		return $odin;
 	}
 
@@ -1252,6 +1280,7 @@ if(isset($_POST['stc_lecturedet_save'])){
 	$chapter=$_POST['chapter'];
 	$lession=$_POST['lession'];
 	$Syllabus=$_POST['Syllabus'];
+	$Unit=$_POST['Unit'];
 	$remarks=$_POST['remarks'];
 	$out='';
 	if(empty($_SESSION['stc_school_user_id'])){
@@ -1260,7 +1289,7 @@ if(isset($_POST['stc_lecturedet_save'])){
 		$out="empty";
 	}else{
 		$valkyrie=new Yggdrasil();
-		$out=$valkyrie->stc_call_school_lecturedetails_save($schedule_id, $classtype, $chapter, $lession, $Syllabus, $remarks);
+		$out=$valkyrie->stc_call_school_lecturedetails_save($schedule_id, $classtype, $chapter, $lession, $Syllabus, $Unit, $remarks);
 	}
 	echo $out;
 }
@@ -1284,14 +1313,16 @@ if(isset($_POST['stc_lecturedetquestion_save'])){
 // call syllabus details
 if(isset($_POST['stc_syllabusdet_call'])){
 	$schedule_id=$_POST['schedule_id'];
+	$class_id=$_POST['class_id'];
+	$sub_id=$_POST['sub_id'];
 	$out='';
 	if(empty($_SESSION['stc_school_user_id'])){
 		$out="reload";
 	}else{
 		$valkyrie=new Yggdrasil();
-		$out=$valkyrie->stc_call_syllabus_det($schedule_id);
+		$out=$valkyrie->stc_call_syllabus_det($schedule_id, $class_id, $sub_id);
 	}
-	echo $out;
+	echo json_encode($out);
 }
 
 // call syllabus questions
