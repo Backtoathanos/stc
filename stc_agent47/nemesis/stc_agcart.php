@@ -100,7 +100,7 @@ class transformers extends tesseract{
 			SELECT `stc_customer_id`,`stc_customer_name` FROM `stc_customer`
 			INNER JOIN `stc_agent_requested_customer`
 			ON `stc_customer_id`=`stc_agent_requested_customer_cust_id`
-			WHERE `stc_agent_requested_customer_agent_id`='".$_SESSION['stc_agent_id']."'
+			WHERE `stc_agent_requested_customer_agent_id`='".@$_SESSION['stc_agent_id']."'
 		");
 		$optimusprime='<option value="NA" selected>Select Customer</option>';
 		$do_action=mysqli_num_rows($optimusprimequery);

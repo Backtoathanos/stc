@@ -208,7 +208,7 @@ class prime extends tesseract{
 			SELECT * FROM `stc_agent_order` 
 			INNER JOIN `stc_customer`
 			ON `stc_agent_order_cust_id`=`stc_customer_id`
-			WHERE `stc_agent_order_agent_id`='".$_SESSION['stc_agent_id']."'
+			WHERE `stc_agent_order_agent_id`='".@$_SESSION['stc_agent_id']."'
 			ORDER BY `stc_agent_order_id` DESC
 		");
 		$countopquery=mysqli_num_rows($optimusprimequery);

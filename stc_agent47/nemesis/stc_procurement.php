@@ -72,7 +72,6 @@ class procurement extends tesseract{
 						$recoprqty+=$recoprrow['stc_cust_super_requisition_list_items_rec_recqty'];
 					}
 
-					$reminder=number_format($firstrow['stc_cust_super_requisition_list_items_approved_qty'], 2) - number_format($recqty, 2);
 					$transformers.='
 						<tr>
 							<td>'.$sl.'</td>
@@ -202,7 +201,7 @@ class procurement extends tesseract{
 			) VALUES (
 				'".$cust_order_refr."', 
 				'".$date."', 
-				'".$_SESSION['stc_agent_id']."',
+				'".@$_SESSION['stc_agent_id']."',
 				'1'
 			)
 		");
