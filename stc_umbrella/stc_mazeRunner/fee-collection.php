@@ -550,6 +550,34 @@ if($_SESSION['stc_school_user_for']>3){
                                     />
                                   </div>
                                 </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Day Boarding Collection
+                                    </h5>
+                                    <input
+                                      name="stcschooldayboarding"
+                                      type="number"
+                                      class="form-control validate stcschooldayboarding"
+                                      placeholder="Enter Day Boarding Collection"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Neat Collection
+                                    </h5>
+                                    <input
+                                      name="stcschoolneatcoll"
+                                      type="number"
+                                      class="form-control validate stcschoolneatcoll"
+                                      placeholder="Enter Neat Collection"
+                                    />
+                                  </div>
+                                </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                   <div class="mb-3">
                                     <h5
@@ -890,6 +918,8 @@ if($_SESSION['stc_school_user_for']>3){
           var stcschoolbooks                =  $('.stcschoolbooks').val();
           var stcschooltransporation        =  $('.stcschooltransporation').val();
           var stcschooldonation             =  $('.stcschooldonation').val();
+          var stcschooldayboarding          =  $('.stcschooldayboarding').val();
+          var stcschoolneatcoll             =  $('.stcschoolneatcoll').val();
           var stcschoolothercharges         =  $('.stcschoolothercharges').val();
           var stcschoolcashback             =  $('.stcschoolcashback').val();
           var stcschooldssalary             =  $('.stcschooldssalary').val();
@@ -910,6 +940,8 @@ if($_SESSION['stc_school_user_for']>3){
               stcschoolbooks:stcschoolbooks,
               stcschooltransporation:stcschooltransporation,
               stcschooldonation:stcschooldonation,
+              stcschooldayboarding:stcschooldayboarding,
+              stcschoolneatcoll:stcschoolneatcoll,
               stcschoolothercharges:stcschoolothercharges,
               stcschoolcashback:stcschoolcashback,
               stcschooldssalary:stcschooldssalary,

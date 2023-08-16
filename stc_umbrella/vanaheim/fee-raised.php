@@ -7,7 +7,7 @@ include "../../MCU/obdb.php";
 /*------------------------------------------------------------------------------------------------*/
 class Yggdrasil extends tesseract{
 	// stc call request
-	public function stc_save_school_fee($stcwhichschool, $stcschoolmonthlyfee, $stcschooladmissionfee, $stcschoolbooks, $stcschooltransporation, $stcschooldonation, $stcschooldssalary, $stcschooltsalary, $stcschoolvfuel, $stcschoolvmaint, $stcschoolelectricity, $stcschoolcanteen, $stcschoolothercharges, $stcschoolcashback, $stcschoolexpenses, $stcschoolremarks){
+	public function stc_save_school_fee($stcwhichschool, $stcschoolmonthlyfee, $stcschooladmissionfee, $stcschoolbooks, $stcschooltransporation, $stcschooldonation, $stcschooldayboarding, $stcschoolneatcoll, $stcschooldssalary, $stcschooltsalary, $stcschoolvfuel, $stcschoolvmaint, $stcschoolelectricity, $stcschoolcanteen, $stcschoolothercharges, $stcschoolcashback, $stcschoolexpenses, $stcschoolremarks){
 		$odin='';
 		$date=date("Y-m-d");
 		$set_loki=mysqli_query($this->stc_dbs, "
@@ -19,6 +19,8 @@ class Yggdrasil extends tesseract{
 				`stc_school_fee_book_charge`,
 				`stc_school_fee_transportation`,
 				`stc_school_fee_donation`,
+				`stc_school_fee_dayboarding`,
+				`stc_school_fee_neat`,
 				`stc_school_fee_dstaffsal`,
 				`stc_school_fee_teacherssal`,
 				`stc_school_fee_vehiclefuel`,
@@ -38,6 +40,8 @@ class Yggdrasil extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolbooks)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschooltransporation)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschooldonation)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stcschooldayboarding)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolneatcoll)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschooldssalary)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschooltsalary)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolvfuel)."',
@@ -519,6 +523,8 @@ if(isset($_POST['save_school_fee_action'])){
 	$stcschoolbooks 			= $_POST['stcschoolbooks'];
 	$stcschooltransporation 	= $_POST['stcschooltransporation'];
 	$stcschooldonation 			= $_POST['stcschooldonation'];
+	$stcschooldayboarding 		= $_POST['stcschooldayboarding'];
+	$stcschoolneatcoll 			= $_POST['stcschoolneatcoll'];
 	$stcschooldssalary 			= $_POST['stcschooldssalary'];
 	$stcschooltsalary 			= $_POST['stcschooltsalary'];
 	$stcschoolvfuel 			= $_POST['stcschoolvfuel'];
@@ -534,7 +540,7 @@ if(isset($_POST['save_school_fee_action'])){
 	if(empty($_SESSION['stc_school_user_id'])){
 		header("Location:../index.html");
 	}else{
-		$lokiheck=$valkyrie->stc_save_school_fee($stcwhichschool, $stcschoolmonthlyfee, $stcschooladmissionfee, $stcschoolbooks, $stcschooltransporation, $stcschooldonation, $stcschooldssalary, $stcschooltsalary, $stcschoolvfuel, $stcschoolvmaint, $stcschoolelectricity, $stcschoolcanteen, $stcschoolothercharges, $stcschoolcashback, $stcschoolexpenses, $stcschoolremarks);
+		$lokiheck=$valkyrie->stc_save_school_fee($stcwhichschool, $stcschoolmonthlyfee, $stcschooladmissionfee, $stcschoolbooks, $stcschooltransporation, $stcschooldonation, $stcschooldayboarding, $stcschoolneatcoll, $stcschooldssalary, $stcschooltsalary, $stcschoolvfuel, $stcschoolvmaint, $stcschoolelectricity, $stcschoolcanteen, $stcschoolothercharges, $stcschoolcashback, $stcschoolexpenses, $stcschoolremarks);
 		$out=$lokiheck;
 	}
 	echo $out;
