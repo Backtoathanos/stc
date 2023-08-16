@@ -2877,6 +2877,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
          $maxbook=0;
          $maxtransport=0;
          $maxdonation=0;
+         $maxdayboarding=0;
+         $maxneat=0;
          $maxother=0;
          $maxcashback=0;
          $maxdsal=0;
@@ -2894,6 +2896,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
             $book=0;
             $transport=0;
             $donation=0;
+            $dayboarding=0;
+            $neat=0;
             $others=0;
             $cashback=0;
             $dsal=0;
@@ -2914,6 +2918,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                    `stc_school_fee_book_charge`,
                    `stc_school_fee_transportation`,
                    `stc_school_fee_donation`,
+                   `stc_school_fee_dayboarding`,
+                   `stc_school_fee_neat`,
                    `stc_school_fee_others`,
                    `stc_school_fee_cashback`,
                    `stc_school_fee_dstaffsal`,
@@ -2945,6 +2951,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                $book=$odin_getstudentrow['stc_school_fee_book_charge'];
                $transport=$odin_getstudentrow['stc_school_fee_transportation'];
                $donation=$odin_getstudentrow['stc_school_fee_donation'];
+               $dayboarding=$odin_getstudentrow['stc_school_fee_dayboarding'];
+               $neat=$odin_getstudentrow['stc_school_fee_neat'];
                $dsal=$odin_getstudentrow['stc_school_fee_dstaffsal'];
                $ssal=$odin_getstudentrow['stc_school_fee_teacherssal'];
                $vfuel=$odin_getstudentrow['stc_school_fee_vehiclefuel'];
@@ -2958,12 +2966,14 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                $user=$odin_getstudentrow['stc_school_user_fullName'];
             }
 
-            $total= $monthfee + $admmfee + $book + $transport + $donation + $others + $cashback;
+            $total= $monthfee + $admmfee + $book + $transport + $donation + $dayboarding + $neat + $others + $cashback;
             $maxmonthfee+=$monthfee;
             $maxadmfee+=$admmfee;
             $maxbook+=$book;
             $maxtransport+=$transport;
             $maxdonation+=$donation;
+            $maxdayboarding+=$dayboarding;
+            $maxneat+=$neat;
             $maxother+=$others;
             $maxcashback+=$cashback;
             $maxdsal+=$dsal;
@@ -2982,6 +2992,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                   <td title="Books" class="text-right">'.number_format($book, 2).'</td>
                   <td title="Transportation" class="text-right">'.number_format($transport, 2).'</td>
                   <td title="Donation" class="text-right">'.number_format($donation, 2).'</td>
+                  <td title="Donation" class="text-right">'.number_format($dayboarding, 2).'</td>
+                  <td title="Donation" class="text-right">'.number_format($neat, 2).'</td>
                   <td title="Others" class="text-right">'.number_format($others, 2).'</td>
                   <td title="Cashback" class="text-right">'.number_format($cashback, 2).'</td>
                   <td title="D Staff Salary" class="text-right">'.number_format($dsal, 2).'</td>
@@ -3024,6 +3036,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                <td class="text-right">'.number_format($maxbook, 2).'</td>
                <td class="text-right">'.number_format($maxtransport, 2).'</td>
                <td class="text-right">'.number_format($maxdonation, 2).'</td>
+               <td class="text-right">'.number_format($maxdayboarding, 2).'</td>
+               <td class="text-right">'.number_format($maxneat, 2).'</td>
                <td class="text-right">'.number_format($maxother, 2).'</td>
                <td class="text-right">'.number_format($maxcashback, 2).'</td>
                <td class="text-right">'.number_format($maxdsal, 2).'</td>
@@ -3095,6 +3109,21 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                <td class="text-right" colspan="10"></td>
             </tr>
          ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Day Boarding Amount :</td>
+               <td class="text-right">'.number_format($maxdayboarding, 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+         $odin.='
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Neat Amount :</td>
+               <td class="text-right">'.number_format($maxneat, 2).'</td>
+               <td class="text-right" colspan="10"></td>
+            </tr>
+         ';
+
          $odin.='
             <tr style="font-size: 20px;font-weight: bold;">
                <td class="text-right" colspan="2">Total Other Charges Amount :</td>
