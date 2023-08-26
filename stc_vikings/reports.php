@@ -825,7 +825,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                     <th class="text-center"><b>Transportation</b></th>
                                                     <th class="text-center"><b>Donation</b></th>
                                                     <th class="text-center"><b>Day Boarding</b></th>
-                                                    <th class="text-center"><b>Neat</b></th>
+                                                    <th class="text-center"><b>NEET</b></th>
                                                     <th class="text-center"><b>Others</b></th>
                                                     <th class="text-center"><b>Cashback</b></th>
                                                     <th class="text-center"><b>D Staff Salary</b></th>

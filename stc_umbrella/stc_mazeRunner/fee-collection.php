@@ -568,13 +568,13 @@ if($_SESSION['stc_school_user_for']>3){
                                   <div class="mb-3">
                                     <h5
                                       for="name"
-                                      >Neat Collection
+                                      >NEET Collection
                                     </h5>
                                     <input
                                       name="stcschoolneatcoll"
                                       type="number"
                                       class="form-control validate stcschoolneatcoll"
-                                      placeholder="Enter Neat Collection"
+                                      placeholder="Enter NEET Collection"
                                     />
                                   </div>
                                 </div>

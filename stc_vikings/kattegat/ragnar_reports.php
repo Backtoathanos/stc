@@ -3118,7 +3118,7 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
          ';
          $odin.='
             <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Neat Amount :</td>
+               <td class="text-right" colspan="2">Total NEET Amount :</td>
                <td class="text-right">'.number_format($maxneat, 2).'</td>
                <td class="text-right" colspan="10"></td>
             </tr>
