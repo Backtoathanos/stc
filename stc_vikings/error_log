@@ -2337,3 +2337,5 @@
 [07-Sep-2023 09:30:04 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
 [07-Sep-2023 10:02:14 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
 [07-Sep-2023 10:02:14 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Sep-2023 15:41:04 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Sep-2023 15:41:04 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
