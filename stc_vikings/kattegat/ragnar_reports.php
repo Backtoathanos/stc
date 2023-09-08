@@ -472,30 +472,22 @@ class ragnarReportsViewRequiReports extends tesseract{
          <table class="table table-bordered table-responsive" id="stc-show-std-details-table">
             <thead>
                <tr>
+                  <th class="text-center">SL NO</th>
                   <th class="text-center">DATE</th>
                   <th class="text-center">LOCATION</th>
-                  <th class="text-center">DEPTARTMENT</th>
-                  <th class="text-center">AREA</th>
-                  <th class="text-center">EQUIPMENT TYPE</th>
-                  <th class="text-center">EQUIPMENT NO</th>
-                  <th class="text-center">EQUIPMENT STATUS</th>
-                  <th class="text-center">JOB TYPE</th>
-                  <th class="text-center">PERMIT NO</th>
-                  <th class="text-center">CREATED BY</th>
-                  <th class="text-center">CREATER NAME & MOBILE NO</th>
-                  <th class="text-center">RESPONSIBLE PERSON NAME & MOBILE NO</th>
-                  <th class="text-center">REASON</th>
-                  <th class="text-center">MATERIALS REQ</th>
-                  <th class="text-center">MANPOWER REQ</th>
-                  <th class="text-center">WORK COMPLETION TARGET PERIOD</th>
-                  <th class="text-center">ACTUAL WORK COMPLETION PERIOD</th>
-                  <th class="text-center">USED MATERIAL</th>
-                  <th class="text-center">STOCK MATERIAL</th>
-                  <th class="text-center">DOWN PERIOD</th>
-                  <th class="text-center">WORK STATUS</th>
-                  <th class="text-center" style="width:10%">PENDING REASON</th>
-                  <th class="text-center" style="width:10%">JOB DONE DETAILS</th>
-                  <th class="text-center" style="width:10%">REMARKS</th>
+                  <th class="text-center">EQUIPMENT DETAILS</th>
+                  <th class="text-center">QTY</th>
+                  <th class="text-center">CAPACITY</th>
+                  <th class="text-center">REASON ATTRIBUTE TO GLOBAL OR VOLTAS</th>
+                  <th class="text-center">DOWN REASON</th>
+                  <th class="text-center">TARGET DATE</th>
+                  <th class="text-center">PENDING REASON</th>
+                  <th class="text-center">REQUIREMENT OF MATERIAL</th>
+                  <th class="text-center">REMARKS</th>
+                  <th class="text-center">COMPLETION DATE</th>
+                  <th class="text-center">STATUS</th>
+                  <th class="text-center">STATUS 2</th>
+                  <th class="text-center">DELAY(DAYS)</th>
                </tr>
             </thead>
             <tbody>
@@ -629,30 +621,22 @@ class ragnarReportsViewRequiReports extends tesseract{
             
             $ivar.='
                <tr>
+                  <td>'.$row['stc_status_down_list_id'].'</td>
                   <td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
                   <td>'.$row['stc_cust_project_title'].'</td>
-                  <td>'.$row['stc_status_down_list_sub_location'].'</td>
-                  <td>'.$row['stc_status_down_list_area'].'</td>
                   <td>'.$eq_type.'</td>
                   <td>'.$eq_number.'</td>
-                  '.$eqstatus.'
-                  <td>'.$row['stc_status_down_list_jobtype'].'</td>
-                  <td>'.$row['stc_status_down_list_permit_no'].'</td>
-                  <td>'.$row['stc_status_down_list_created_by_select'].'</td>
-                  <td>'.$row['stc_status_down_list_creator_details'].'</td>
-                  <td>'.$row['stc_status_down_list_responsive_person'].'</td>
-                  <td>'.$row['stc_status_down_list_reason'].'</td>
-                  <td>'.$row['stc_status_down_list_material_desc'].'</td>
-                  <td>'.$row['stc_status_down_list_manpower_req'].'</td>
+                  <td>Capacity</td>
+                  <td>Voltas</td>
+                  <td style="width:10%">'.$row['stc_status_down_list_reason'].'</td>
                   <td>'.$tar_date.'</td>
-                  <td>'.$rec_date.'</td>
-                  <td>NA</td>
-                  <td>NA</td>
-                  <td>'.$dperiod.' Days</td>
-                  <td>'.$status.'</td>
                   <td style="width:10%">'.$row['stc_status_down_list_jobpending_details'].'</td>
-                  <td style="width:10%">'.$row['stc_status_down_list_jobdone_details'].'</td>
+                  <td>'.$row['stc_status_down_list_material_desc'].'</td>
                   <td style="width:10%">'.$row['stc_status_down_list_remarks'].'</td>
+                  <td>'.$rec_date.'</td>
+                  '.$eqstatus.'
+                  <td>'.$status.'</td>
+                  <td>'.$dperiod.' Days</td>
                </tr>
             ';
          }
@@ -3324,6 +3308,7 @@ if(isset($_POST['Stc_std_details'])){
    $outbjornecustomer=$bjornecustomer->stc_call_std();
    echo $outbjornecustomer;
 }
+
 // call customer
 if(isset($_POST['Stc_customer_reporsts_call_customer'])){
    $bjornecustomer=new ragnarReportsViewRequiReports();

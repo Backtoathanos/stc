@@ -363,14 +363,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">                                   
-                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success">
-                                            <button class="mb-2 mr-2 btn btn-success btn-block stc-std-hit">
-                                                <i class="metismenu-icon pe-7s-search"></i> Status Down List
-                                            </button>
-                                        </div>
-                                    </div>
+                                <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
@@ -1002,29 +995,22 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <table class="table table-bordered table-responsive">
                                                 <thead>
                                                    <tr>
+                                                        <th class="text-center">SL NO</th>
                                                         <th class="text-center">DATE</th>
                                                         <th class="text-center">LOCATION</th>
-                                                        <th class="text-center">DEPTARTMENT</th>
-                                                        <th class="text-center">AREA</th>
-                                                        <th class="text-center">EQUIPMENT TYPE</th>
-                                                        <th class="text-center">EQUIPMENT NO</th>
-                                                        <th class="text-center">EQUIPMENT STATUS</th>
-                                                        <th class="text-center">JOB TYPE</th>
-                                                        <th class="text-center">CREATED BY</th>
-                                                        <th class="text-center">CREATER NAME & MOBILE NO</th>
-                                                        <th class="text-center">RESPONSIBLE PERSON NAME & MOBILE NO</th>
-                                                        <th class="text-center">REASON</th>
-                                                        <th class="text-center">MATERIALS REQ</th>
-                                                        <th class="text-center">MANPOWER REQ</th>
-                                                        <th class="text-center">WORK COMPLETION TARGET PERIOD</th>
-                                                        <th class="text-center">ACTUAL WORK COMPLETION PERIOD</th>
-                                                        <th class="text-center">USED MATERIAL</th>
-                                                        <th class="text-center">STOCK MATERIAL</th>
-                                                        <th class="text-center">DOWN PERIOD</th>
-                                                        <th class="text-center">WORK STATUS</th>
+                                                        <th class="text-center">EQUIPMENT DETAILS</th>
+                                                        <th class="text-center">QTY</th>
+                                                        <th class="text-center">CAPACITY</th>
+                                                        <th class="text-center">REASON ATTRIBUTE TO GLOBAL OR VOLTAS</th>
+                                                        <th class="text-center">DOWN REASON</th>
+                                                        <th class="text-center">TARGET DATE</th>
                                                         <th class="text-center">PENDING REASON</th>
-                                                        <th class="text-center">JOB DONE DETAILS</th>
+                                                        <th class="text-center">REQUIREMENT OF MATERIAL</th>
                                                         <th class="text-center">REMARKS</th>
+                                                        <th class="text-center">COMPLETION DATE</th>
+                                                        <th class="text-center">STATUS</th>
+                                                        <th class="text-center">STATUS 2</th>
+                                                        <th class="text-center">DELAY(DAYS)</th>
                                                    </tr>
                                                 </thead>
                                                 <tbody>
@@ -1065,36 +1051,46 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success " ><div class="stc-show-school-attendance" style="width: auto;overflow-x: auto; white-space: nowrap;">
                                             <table class="table table-bordered table-responsive">
                                                 <thead>
-                                                   <tr>
-                                                        <th class="text-center">DATE</th>
-                                                        <th class="text-center">LOCATION</th>
-                                                        <th class="text-center">DEPTARTMENT</th>
-                                                        <th class="text-center">AREA</th>
-                                                        <th class="text-center">EQUIPMENT TYPE</th>
-                                                        <th class="text-center">EQUIPMENT NO</th>
-                                                        <th class="text-center">EQUIPMENT STATUS</th>
-                                                        <th class="text-center">JOB TYPE</th>
-                                                        <th class="text-center">CREATED BY</th>
-                                                        <th class="text-center">CREATER NAME & MOBILE NO</th>
-                                                        <th class="text-center">RESPONSIBLE PERSON NAME & MOBILE NO</th>
-                                                        <th class="text-center">REASON</th>
-                                                        <th class="text-center">MATERIALS REQ</th>
-                                                        <th class="text-center">MANPOWER REQ</th>
-                                                        <th class="text-center">WORK COMPLETION TARGET PERIOD</th>
-                                                        <th class="text-center">ACTUAL WORK COMPLETION PERIOD</th>
-                                                        <th class="text-center">USED MATERIAL</th>
-                                                        <th class="text-center">STOCK MATERIAL</th>
-                                                        <th class="text-center">DOWN PERIOD</th>
-                                                        <th class="text-center">WORK STATUS</th>
-                                                        <th class="text-center">PENDING REASON</th>
-                                                        <th class="text-center">JOB DONE DETAILS</th>
-                                                        <th class="text-center">REMARKS</th>
-                                                   </tr>
+                                                    <tr>
+                                                        <th class="text-center">Sl No</th>
+                                                        <th class="text-center">Teacher Name</th>
+                                                        <th class="text-center">1</th>
+                                                        <th class="text-center">2</th>
+                                                        <th class="text-center">3</th>
+                                                        <th class="text-center">4</th>
+                                                        <th class="text-center">5</th>
+                                                        <th class="text-center">6</th>
+                                                        <th class="text-center">7</th>
+                                                        <th class="text-center">8</th>
+                                                        <th class="text-center">9</th>
+                                                        <th class="text-center">10</th>
+                                                        <th class="text-center">11</th>
+                                                        <th class="text-center">12</th>
+                                                        <th class="text-center">13</th>
+                                                        <th class="text-center">14</th>
+                                                        <th class="text-center">15</th>
+                                                        <th class="text-center">16</th>
+                                                        <th class="text-center">17</th>
+                                                        <th class="text-center">18</th>
+                                                        <th class="text-center">19</th>
+                                                        <th class="text-center">20</th>
+                                                        <th class="text-center">21</th>
+                                                        <th class="text-center">22</th>
+                                                        <th class="text-center">23</th>
+                                                        <th class="text-center">24</th>
+                                                        <th class="text-center">25</th>
+                                                        <th class="text-center">26</th>
+                                                        <th class="text-center">27</th>
+                                                        <th class="text-center">28</th>
+                                                        <th class="text-center">29</th>
+                                                        <th class="text-center">30</th>
+                                                        <th class="text-center">Total</th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
                                                   <tr>
                                                     <td colspan="15">
-                                                        <h3>Please wait.....</h3>
+                                                        <h3>Search here.....</h3>
                                                     </td>
                                                   </tr>
                                                 </tbody>
