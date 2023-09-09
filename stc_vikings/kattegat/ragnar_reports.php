@@ -521,9 +521,9 @@ class ragnarReportsViewRequiReports extends tesseract{
                <tr>
                   <td class="text-center">'.$sitename.'</td>
                   <td class="text-center">TOTAL JOB DONE:-</td>
-                  <td class="text-center" style="background-color: #a9d08e;">'.$pendingjon.'</td>
+                  <td class="text-center" style="background-color: #a9d08e;">'.$jobdone.'</td>
                   <td class="text-center">PENDING JOB:-</td>
-                  <td class="text-center" style="background-color: #ffc000;">'.$jobdone.'</td>
+                  <td class="text-center" style="background-color: #ffc000;">'.$pendingjon.'</td>
                </tr>
             </table>
          ';
