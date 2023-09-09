@@ -467,7 +467,7 @@ class ragnarReportsViewMerchantLedger extends tesseract{
 
 class ragnarReportsViewRequiReports extends tesseract{
    // call std
-   public function stc_call_std($projectid){
+   public function stc_call_std($projectid, $status){
       $ivar='';
       $ivarqry=mysqli_query($this->stc_dbs, "
          SELECT 
@@ -501,14 +501,29 @@ class ragnarReportsViewRequiReports extends tesseract{
          FROM `stc_status_down_list` 
          INNER JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
-         WHERE `stc_status_down_list_status`<>5 AND `stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $projectid)."'
+         WHERE `stc_status_down_list_status`<>5 
+         AND `stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $projectid)."' 
+         AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."'
+         ORDER BY DATE(`stc_status_down_list_date`) DESC
+      ");
+
+
+      $ivarpreqry=mysqli_query($this->stc_dbs, "
+         SELECT 
+             `stc_cust_project_title`,
+             `stc_status_down_list_status`
+         FROM `stc_status_down_list` 
+         INNER JOIN `stc_cust_project` 
+         ON `stc_cust_project_id`=`stc_status_down_list_location` 
+         WHERE `stc_status_down_list_status`<>5 
+         AND `stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $projectid)."' 
          ORDER BY DATE(`stc_status_down_list_date`) DESC
       ");
       $sitename="";
       $jobdone=0;
       $pendingjon=0;
-      if(mysqli_num_rows($ivarqry)>0){
-         foreach($ivarqry as $prerow){
+      if(mysqli_num_rows($ivarpreqry)>0){
+         foreach($ivarpreqry as $prerow){
             $sitename=$prerow['stc_cust_project_title'];
             if($prerow['stc_status_down_list_status']==1){
                $pendingjon++;
@@ -527,7 +542,9 @@ class ragnarReportsViewRequiReports extends tesseract{
                </tr>
             </table>
          ';
+      }
 
+      if(mysqli_num_rows($ivarqry)>0){
          $ivar.='
             <table class="table table-bordered table-responsive" id="stc-show-std-details-table">
                <thead>
@@ -559,17 +576,21 @@ class ragnarReportsViewRequiReports extends tesseract{
             $tar_date=(date('Y', strtotime($row['stc_status_down_list_target_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_target_date'])) : 'NA';
 
             $status='';
-
+            $status2color="";
             if($row['stc_status_down_list_status']==1){
                $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">PENDING</span></b>';
+               $status2color="#e91919";
                $pendingjon++;
             }elseif($row['stc_status_down_list_status']==2){
                $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-IN-PROGRESS</span></b>';
+               $status2color="#bbbe38";
             }elseif($row['stc_status_down_list_status']==3){
                $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-DONE</span></b>';
+               $status2color="#38be7a";
                $jobdone++;
             }elseif($row['stc_status_down_list_status']==4){
                $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-COMPLETE</span></b>';
+               $status2color="#38be7a";
             }else{
                $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">CLOSE</span></b>';
             }
@@ -663,7 +684,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td style="width:10%">'.$row['stc_status_down_list_remarks'].'</td>
                   <td>'.$rec_date.'</td>
                   '.$eqstatus.'
-                  <td>'.$status.'</td>
+                  <td style="background-color:'.$status2color.'">'.$status.'</td>
                   <td>'.$dperiod.' Days</td>
                </tr>
             ';
@@ -3333,8 +3354,9 @@ if(isset($_POST['Stc_call_reports_on_merchants'])){
 // call std details
 if(isset($_POST['Stc_std_details'])){
    $projectid=$_POST['projectid'];
+   $status=$_POST['status'];
    $bjornecustomer=new ragnarReportsViewRequiReports();
-   $outbjornecustomer=$bjornecustomer->stc_call_std($projectid);
+   $outbjornecustomer=$bjornecustomer->stc_call_std($projectid, $status);
    echo $outbjornecustomer;
 }
 
