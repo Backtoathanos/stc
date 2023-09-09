@@ -180,14 +180,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="col-md-6 col-xl-6"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
-                                            <h5>Creator Name & Mobile NO :</h5><br>
-                                            <input type="text" class="form-control stc-agent-sup-std-creator-details" placeholder="Enter Creator Name & Mobile NO">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-6"> 
-                                    <div class="main-card mb-3 card">
-                                        <div class="card-body">
                                             <h5>Job Type :</h5><br>
                                             <label for="ELECTRICAL">
                                                 <input type="checkbox" style="position: relative;top: 2px;" id="ELECTRICAL" class="stc-agent-sup-std-job-type" value="'ELECTRICAL'"> ELECTRICAL
@@ -305,7 +297,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Work Completion Target Date :</h5><br>
-                                            <input type="date" class="form-control" id="stc-agent-sup-std-target-date" required>
+                                            <input type="date" class="form-control" id="stc-agent-sup-std-target-date" <?php echo date("Y-m-d");?> required>
                                         </div>
                                     </div>
                                 </div>

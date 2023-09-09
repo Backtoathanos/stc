@@ -115,7 +115,7 @@ class transformers extends tesseract{
 	public function stc_call_job_varities($job_type){	
 		$job_type=implode(',', $job_type);
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
-			SELECT `stc_status_down_list_job_type_id`,`stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_title` IN (".$job_type.") ORDER BY `stc_status_down_list_job_type_sub_title` ASC
+			SELECT DISTINCT `stc_status_down_list_job_type_id`,`stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_title` IN (".$job_type.") ORDER BY `stc_status_down_list_job_type_sub_title` ASC
 		");
 		$optimusprime='<option value="NA" selected>Select Job Varieties</option>';
 		$do_action=mysqli_num_rows($optimusprimequery);
@@ -148,10 +148,10 @@ class transformers extends tesseract{
 			    `stc_status_down_list_equipment_type`,
 			    `stc_status_down_list_equipment_number`,
 			    `stc_status_down_list_equipment_status`,
-			    `stc_status_down_list_jobtype`,
 			    `stc_status_down_list_qty`,
 			    `stc_status_down_list_capacity`,
 			    `stc_status_down_list_reasonattribute`,
+			    `stc_status_down_list_jobtype`,
 			    `stc_status_down_list_varities_id`,
 			    `stc_status_down_list_created_by_select`,
 			    `stc_status_down_list_permit_no`,
@@ -173,10 +173,10 @@ class transformers extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_eq_type)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_eq_number)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_eq_status)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_qty)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_capacity)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_reasonattribute)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_varities)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_created_by_se)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $permit_no)."',

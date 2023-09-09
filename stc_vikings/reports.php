@@ -968,7 +968,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                                 <div class="row">                                  
-                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                    <div class="col-md-10 col-xl-10 col-sm-12"> 
                                         <div class="card-border mb-3 card card-body border-success">
                                             <select class="btn btn-success form-control load_site_name_consump" id="stc-agent-sup-std-location-find">
                                                 <?php 
@@ -994,6 +994,16 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                     }
                                                 ?>
                                             </select> 
+                                        </div>
+                                    </div>                     
+                                    <div class="col-md-2 col-xl-2 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <select class="form-control stc-std-load-status">
+                                                <option value="1">DOWN</option>
+                                                <option value="2">WORK-IN-PROGRESS</option>
+                                                <option value="3">WORK-DONE</option>
+                                                <option value="4">WORK-COMPLETE</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-2 col-xl-2 col-sm-12 hidden-requisition-excel-section"> 
@@ -1346,13 +1356,33 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             // function stc_call_std(){
             $('body').delegate('.load_site_name_consump', 'change', function(e){
                 var projectid = $(".load_site_name_consump").val();
+                var status = $(".stc-std-load-status").val();
                 $('.stc-show-std-details').html("Please wait...");
                 $.ajax({
                 url     : "kattegat/ragnar_reports.php",
                 method  : "POST",
                 data    : {
                   Stc_std_details:1,
-                  projectid:projectid
+                  projectid:projectid,
+                  status:status
+                },
+                success : function(data){
+                    // console.log(data);
+                    $('.stc-show-std-details').html(data);
+                }
+              });
+            });
+            $('body').delegate('.stc-std-load-status', 'change', function(e){
+                var projectid = $(".load_site_name_consump").val();
+                var status = $(".stc-std-load-status").val();
+                $('.stc-show-std-details').html("Please wait...");
+                $.ajax({
+                url     : "kattegat/ragnar_reports.php",
+                method  : "POST",
+                data    : {
+                  Stc_std_details:1,
+                  projectid:projectid,
+                  status:status
                 },
                 success : function(data){
                     // console.log(data);
