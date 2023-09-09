@@ -132,7 +132,7 @@ class transformers extends tesseract{
 	}
 
 	// save std
-	public function stc_std_save($stc_location, $stc_dept, $stc_area, $stc_eq_type, $stc_eq_number, $stc_eq_status, $stc_j_plannning, $stc_j_type, $stc_j_varities, $stc_created_by_se, $permit_no, $stc_creator_details, $stc_r_person, $stc_reason, $stc_material_desc, $stc_manpower_req, $stc_target_date, $stc_tools_req, $stc_remarks){
+	public function stc_std_save($stc_location, $stc_dept, $stc_area, $stc_eq_type, $stc_eq_number, $stc_eq_status, $stc_j_plannning, $stc_qty, $stc_capacity, $stc_reasonattribute, $stc_j_type, $stc_j_varities, $stc_created_by_se, $permit_no, $stc_creator_details, $stc_r_person, $stc_reason, $stc_material_desc, $stc_manpower_req, $stc_target_date, $stc_tools_req, $stc_remarks){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$tools_req='';
@@ -149,6 +149,9 @@ class transformers extends tesseract{
 			    `stc_status_down_list_equipment_number`,
 			    `stc_status_down_list_equipment_status`,
 			    `stc_status_down_list_jobtype`,
+			    `stc_status_down_list_qty`,
+			    `stc_status_down_list_capacity`,
+			    `stc_status_down_list_reasonattribute`,
 			    `stc_status_down_list_varities_id`,
 			    `stc_status_down_list_created_by_select`,
 			    `stc_status_down_list_permit_no`,
@@ -171,6 +174,9 @@ class transformers extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_eq_number)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_eq_status)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_qty)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_capacity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_reasonattribute)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_varities)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_created_by_se)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $permit_no)."',
@@ -531,6 +537,9 @@ if(isset($_POST['stc_std_hit'])){
 	$stc_eq_number=$_POST['stc_eq_number'];
 	$stc_eq_status=$_POST['stc_eq_status'];
 	$stc_j_plannning=$_POST['stc_j_plannning'];
+	$stc_qty=$_POST['stc_qty'];
+	$stc_capacity=$_POST['stc_capacity'];
+	$stc_reasonattribute=$_POST['stc_reasonattribute'];
 	$stc_j_type=$_POST['stc_j_type'];
 	$stc_j_varities=$_POST['stc_j_varities'];
 	$stc_created_by_se=$_POST['stc_created_by_se'];
@@ -550,7 +559,7 @@ if(isset($_POST['stc_std_hit'])){
 	}elseif(empty($_SESSION['stc_agent_sub_id'])){
 		$opmetabots="Please login!!!";
 	}else{
-		$opmetabots=$metabots->stc_std_save($stc_location, $stc_dept, $stc_area, $stc_eq_type, $stc_eq_number, $stc_eq_status, $stc_j_plannning, $stc_j_type, $stc_j_varities, $stc_created_by_se, $permit_no, $stc_creator_details, $stc_r_person, $stc_reason, $stc_material_desc, $stc_manpower_req, $stc_target_date, $stc_tools_req, $stc_remarks);
+		$opmetabots=$metabots->stc_std_save($stc_location, $stc_dept, $stc_area, $stc_eq_type, $stc_eq_number, $stc_eq_status, $stc_j_plannning, $stc_qty, $stc_capacity, $stc_reasonattribute, $stc_j_type, $stc_j_varities, $stc_created_by_se, $permit_no, $stc_creator_details, $stc_r_person, $stc_reason, $stc_material_desc, $stc_manpower_req, $stc_target_date, $stc_tools_req, $stc_remarks);
 	}
 	echo $opmetabots;
 }

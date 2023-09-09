@@ -968,19 +968,32 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                                 <div class="row">                                  
-                                    <div class="col-md-4 col-xl-4 col-sm-12"> 
+                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
                                         <div class="card-border mb-3 card card-body border-success">
-                                            <input type="text" id="locInput" onkeyup="locFunction()" placeholder="Search By Location" class="form-control">
-                                        </div>
-                                    </div>                                   
-                                    <div class="col-md-4 col-xl-4 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success">
-                                            <input type="text" id="depInput" onkeyup="depFunction()" placeholder="Search By Department" class="form-control">
-                                        </div>
-                                    </div>                                   
-                                    <div class="col-md-4 col-xl-4 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success">
-                                            <input type="text" id="statusInput" onkeyup="statusFunction()" placeholder="Search By Status" class="form-control">
+                                            <select class="btn btn-success form-control load_site_name_consump" id="stc-agent-sup-std-location-find">
+                                                <?php 
+                                                    include_once("../MCU/db.php");
+                                                    echo '<option value="0" selected>Please select Sitename!!!</option>';
+                                                    $stcagentspendreportssup=mysqli_query($con, "
+                                                        SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
+                                                        FROM `stc_cust_project`
+                                                        INNER JOIN `stc_status_down_list`
+                                                        ON `stc_cust_project_id`=`stc_status_down_list_location`
+                                                        INNER JOIN `stc_agent_requested_customer` 
+                                                        ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
+                                                        ORDER BY `stc_cust_project_title` ASC
+                                                    ");
+
+                                                    
+                                                    if(!empty(mysqli_num_rows($stcagentspendreportssup))){
+                                                        foreach($stcagentspendreportssup as $pendrepcheckrow){
+                                                            echo '<option align="left" value="'.$pendrepcheckrow['stc_cust_project_id'].'">'.$pendrepcheckrow['stc_cust_project_title'].'</option>';
+                                                        }
+                                                    }else{
+                                                        echo '<option value="0">No Site found!!!</option>';
+                                                    }
+                                                ?>
+                                            </select> 
                                         </div>
                                     </div>
                                     <div class="col-md-2 col-xl-2 col-sm-12 hidden-requisition-excel-section"> 
@@ -1016,7 +1029,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <tbody>
                                                   <tr>
                                                     <td colspan="15">
-                                                        <h3>Please wait.....</h3>
+                                                        <h3>Search here.....</h3>
                                                     </td>
                                                   </tr>
                                                 </tbody>
@@ -1306,80 +1319,49 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         });
     </script>
     <script>
-        function locFunction() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("locInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("stc-show-std-details-table");
-            tr = table.getElementsByTagName("tr");
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }       
-            }
-        }
 
-        function depFunction() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("depInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("stc-show-std-details-table");
-            tr = table.getElementsByTagName("tr");
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[2];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }       
-            }
-        }
-
-        function statusFunction() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("statusInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("stc-show-std-details-table");
-            tr = table.getElementsByTagName("tr");
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[6];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }       
-            }
-        }
+        // function statusFunction() {
+        //     var input, filter, table, tr, td, i, txtValue;
+        //     input = document.getElementById("statusInput");
+        //     filter = input.value.toUpperCase();
+        //     table = document.getElementById("stc-show-std-details-table");
+        //     tr = table.getElementsByTagName("tr");
+        //     for (i = 0; i < tr.length; i++) {
+        //         td = tr[i].getElementsByTagName("td")[14];
+        //         if (td) {
+        //             txtValue = td.textContent || td.innerText;
+        //             if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        //                 tr[i].style.display = "";
+        //             } else {
+        //                 tr[i].style.display = "none";
+        //             }
+        //         }       
+        //     }
+        // }
 
         $(document).ready(function(){
             $('.hidden-project-excel-section').hide();
             
-            stc_call_std();
-            function stc_call_std(){
+            // stc_call_std();
+            // function stc_call_std(){
+            $('body').delegate('.load_site_name_consump', 'change', function(e){
+                var projectid = $(".load_site_name_consump").val();
+                $('.stc-show-std-details').html("Please wait...");
                 $.ajax({
                 url     : "kattegat/ragnar_reports.php",
                 method  : "POST",
                 data    : {
-                  Stc_std_details:1
+                  Stc_std_details:1,
+                  projectid:projectid
                 },
                 success : function(data){
                     // console.log(data);
                     $('.stc-show-std-details').html(data);
                 }
               });
-            }
+            });
+
+            // }
             // on change call agents
             $('body').delegate('#stc-on-call-customer-proj', 'change', function(e){
               e.preventDefault();

@@ -152,33 +152,66 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         </div>
                                     </div>
                                 </div>
+                                <div class="col-md-3 col-xl-3"> 
+                                    <div class="main-card mb-3 card">
+                                        <div class="card-body">
+                                            <h5>Quantity :</h5><br>
+                                            <input type="number" class="form-control stc-agent-sup-std-qty" placeholder="Enter Quantity">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-xl-3"> 
+                                    <div class="main-card mb-3 card">
+                                        <div class="card-body">
+                                            <h5>Capacity :</h5><br>
+                                            <input type="number" class="form-control stc-agent-sup-std-capacity" placeholder="Enter Capacity">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-6"> 
+                                    <div class="main-card mb-3 card">
+                                        <div class="card-body">
+                                            <h5>Reason Attribute to GLOBAL or VOLTAS :</h5><br>
+                                            <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-reasonattribite"><option>GLOBAL</option><option>VOLTAS</option>
+                                            </select> 
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-6"> 
+                                    <div class="main-card mb-3 card">
+                                        <div class="card-body">
+                                            <h5>Creator Name & Mobile NO :</h5><br>
+                                            <input type="text" class="form-control stc-agent-sup-std-creator-details" placeholder="Enter Creator Name & Mobile NO">
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-md-6 col-xl-6"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Job Type :</h5><br>
                                             <label for="ELECTRICAL">
-                                                <input type="checkbox" id="ELECTRICAL" class="stc-agent-sup-std-job-type" value="'ELECTRICAL'"> ELECTRICAL
+                                                <input type="checkbox" style="position: relative;top: 2px;" id="ELECTRICAL" class="stc-agent-sup-std-job-type" value="'ELECTRICAL'"> ELECTRICAL
                                             </label>
                                             <label for="MECHANICAL">
-                                            <input type="checkbox" id="MECHANICAL" class="stc-agent-sup-std-job-type" value="'MECHANICAL'"> MECHANICAL
+                                            <input type="checkbox" style="position: relative;top: 2px;" id="MECHANICAL" class="stc-agent-sup-std-job-type" value="'MECHANICAL'"> MECHANICAL
                                             </label>
                                             <label for="REFRIGERATION">
-                                            <input type="checkbox" id="REFRIGERATION" class="stc-agent-sup-std-job-type" value="'REFRIGERATION'"> REFRIGERATION
+                                            <input type="checkbox" style="position: relative;top: 2px;" id="REFRIGERATION" class="stc-agent-sup-std-job-type" value="'REFRIGERATION'"> REFRIGERATION
                                             </label>
                                             <label for="CLEANING">
-                                            <input type="checkbox" id="CLEANING" class="stc-agent-sup-std-job-type" value="'CLEANING'"> CLEANING
+                                            <input type="checkbox" style="position: relative;top: 2px;" id="CLEANING" class="stc-agent-sup-std-job-type" value="'CLEANING'"> CLEANING
                                             </label>
                                             <label for="NOISY">
-                                            <input type="checkbox" id="NOISY" class="stc-agent-sup-std-job-type" value="'NOISY'"> NOISY
+                                            <input type="checkbox" style="position: relative;top: 2px;" id="NOISY" class="stc-agent-sup-std-job-type" value="'NOISY'"> NOISY
                                             </label>
                                             <label for="WATER DROPPING">
-                                            <input type="checkbox" id="WATER DROPPING" class="stc-agent-sup-std-job-type" value="'WATER DROPPING'"> WATER DROPPING
+                                            <input type="checkbox" style="position: relative;top: 2px;" id="WATER DROPPING" class="stc-agent-sup-std-job-type" value="'WATER DROPPING'"> WATER DROPPING
                                             </label>
                                             <label for="LUBRICATION">
-                                            <input type="checkbox" id="LUBRICATION" class="stc-agent-sup-std-job-type" value="'LUBRICATION'"> LUBRICATION
+                                            <input type="checkbox" style="position: relative;top: 2px;" id="LUBRICATION" class="stc-agent-sup-std-job-type" value="'LUBRICATION'"> LUBRICATION
                                             </label>
                                             <label for="CHECKING/MAINTENANCE">
-                                            <input type="checkbox" id="CHECKING/MAINTENANCE" class="stc-agent-sup-std-job-type" value="'CHECKING/MAINTENANCE'"> CHECKING/MAINTENANCE
+                                            <input type="checkbox" style="position: relative;top: 2px;" id="CHECKING/MAINTENANCE" class="stc-agent-sup-std-job-type" value="'CHECKING/MAINTENANCE'"> CHECKING/MAINTENANCE
                                             </label>
                                             <!-- <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-type">
                                                 <option value="NA">Please select job type</option>
@@ -491,7 +524,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var eq_number = $('#stc-agent-sup-std-equipment-number').val();
                 var eq_status = $('#stc-agent-sup-std-equipment-status').val();
                 var j_plannning = $('#stc-agent-sup-std-job-plannning').val();
-                var j_type = $('#stc-agent-sup-std-job-type').val();
+                var qty=$(".stc-agent-sup-std-qty").val();
+                var capacity=$(".stc-agent-sup-std-capacity").val();
+                var reasonattribute=$("#stc-agent-sup-std-reasonattribite").val();
+                var j_type = $('.stc-agent-sup-std-job-type').val();
                 var j_varities = $('#stc-agent-sup-std-job-varities').val();
                 var created_by_se= $('#stc-agent-sup-std-created-by-select').val();
                 var permit_no = $('.stc-agent-sup-std-permit-no').val();
@@ -516,6 +552,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         stc_eq_status:eq_status,
                         stc_j_type:j_type,
                         stc_j_plannning:j_plannning,
+                        stc_qty:qty,
+                        stc_capacity:capacity,
+                        stc_reasonattribute:reasonattribute,
                         stc_j_varities:j_varities,
                         stc_created_by_se:created_by_se,
                         permit_no:permit_no,
