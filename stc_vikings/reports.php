@@ -363,14 +363,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">                                   
-                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success">
-                                            <button class="mb-2 mr-2 btn btn-success btn-block stc-std-hit">
-                                                <i class="metismenu-icon pe-7s-search"></i> Status Down List
-                                            </button>
-                                        </div>
-                                    </div>
+                                <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
@@ -975,19 +968,32 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                                 <div class="row">                                  
-                                    <div class="col-md-4 col-xl-4 col-sm-12"> 
+                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
                                         <div class="card-border mb-3 card card-body border-success">
-                                            <input type="text" id="locInput" onkeyup="locFunction()" placeholder="Search By Location" class="form-control">
-                                        </div>
-                                    </div>                                   
-                                    <div class="col-md-4 col-xl-4 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success">
-                                            <input type="text" id="depInput" onkeyup="depFunction()" placeholder="Search By Department" class="form-control">
-                                        </div>
-                                    </div>                                   
-                                    <div class="col-md-4 col-xl-4 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success">
-                                            <input type="text" id="statusInput" onkeyup="statusFunction()" placeholder="Search By Status" class="form-control">
+                                            <select class="btn btn-success form-control load_site_name_consump" id="stc-agent-sup-std-location-find">
+                                                <?php 
+                                                    include_once("../MCU/db.php");
+                                                    echo '<option value="0" selected>Please select Sitename!!!</option>';
+                                                    $stcagentspendreportssup=mysqli_query($con, "
+                                                        SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
+                                                        FROM `stc_cust_project`
+                                                        INNER JOIN `stc_status_down_list`
+                                                        ON `stc_cust_project_id`=`stc_status_down_list_location`
+                                                        INNER JOIN `stc_agent_requested_customer` 
+                                                        ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
+                                                        ORDER BY `stc_cust_project_title` ASC
+                                                    ");
+
+                                                    
+                                                    if(!empty(mysqli_num_rows($stcagentspendreportssup))){
+                                                        foreach($stcagentspendreportssup as $pendrepcheckrow){
+                                                            echo '<option align="left" value="'.$pendrepcheckrow['stc_cust_project_id'].'">'.$pendrepcheckrow['stc_cust_project_title'].'</option>';
+                                                        }
+                                                    }else{
+                                                        echo '<option value="0">No Site found!!!</option>';
+                                                    }
+                                                ?>
+                                            </select> 
                                         </div>
                                     </div>
                                     <div class="col-md-2 col-xl-2 col-sm-12 hidden-requisition-excel-section"> 
@@ -1002,35 +1008,28 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <table class="table table-bordered table-responsive">
                                                 <thead>
                                                    <tr>
+                                                        <th class="text-center">SL NO</th>
                                                         <th class="text-center">DATE</th>
                                                         <th class="text-center">LOCATION</th>
-                                                        <th class="text-center">DEPTARTMENT</th>
-                                                        <th class="text-center">AREA</th>
-                                                        <th class="text-center">EQUIPMENT TYPE</th>
-                                                        <th class="text-center">EQUIPMENT NO</th>
-                                                        <th class="text-center">EQUIPMENT STATUS</th>
-                                                        <th class="text-center">JOB TYPE</th>
-                                                        <th class="text-center">CREATED BY</th>
-                                                        <th class="text-center">CREATER NAME & MOBILE NO</th>
-                                                        <th class="text-center">RESPONSIBLE PERSON NAME & MOBILE NO</th>
-                                                        <th class="text-center">REASON</th>
-                                                        <th class="text-center">MATERIALS REQ</th>
-                                                        <th class="text-center">MANPOWER REQ</th>
-                                                        <th class="text-center">WORK COMPLETION TARGET PERIOD</th>
-                                                        <th class="text-center">ACTUAL WORK COMPLETION PERIOD</th>
-                                                        <th class="text-center">USED MATERIAL</th>
-                                                        <th class="text-center">STOCK MATERIAL</th>
-                                                        <th class="text-center">DOWN PERIOD</th>
-                                                        <th class="text-center">WORK STATUS</th>
+                                                        <th class="text-center">EQUIPMENT DETAILS</th>
+                                                        <th class="text-center">QTY</th>
+                                                        <th class="text-center">CAPACITY</th>
+                                                        <th class="text-center">REASON ATTRIBUTE TO GLOBAL OR VOLTAS</th>
+                                                        <th class="text-center">DOWN REASON</th>
+                                                        <th class="text-center">TARGET DATE</th>
                                                         <th class="text-center">PENDING REASON</th>
-                                                        <th class="text-center">JOB DONE DETAILS</th>
+                                                        <th class="text-center">REQUIREMENT OF MATERIAL</th>
                                                         <th class="text-center">REMARKS</th>
+                                                        <th class="text-center">COMPLETION DATE</th>
+                                                        <th class="text-center">STATUS</th>
+                                                        <th class="text-center">STATUS 2</th>
+                                                        <th class="text-center">DELAY(DAYS)</th>
                                                    </tr>
                                                 </thead>
                                                 <tbody>
                                                   <tr>
                                                     <td colspan="15">
-                                                        <h3>Please wait.....</h3>
+                                                        <h3>Search here.....</h3>
                                                     </td>
                                                   </tr>
                                                 </tbody>
@@ -1065,36 +1064,46 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success " ><div class="stc-show-school-attendance" style="width: auto;overflow-x: auto; white-space: nowrap;">
                                             <table class="table table-bordered table-responsive">
                                                 <thead>
-                                                   <tr>
-                                                        <th class="text-center">DATE</th>
-                                                        <th class="text-center">LOCATION</th>
-                                                        <th class="text-center">DEPTARTMENT</th>
-                                                        <th class="text-center">AREA</th>
-                                                        <th class="text-center">EQUIPMENT TYPE</th>
-                                                        <th class="text-center">EQUIPMENT NO</th>
-                                                        <th class="text-center">EQUIPMENT STATUS</th>
-                                                        <th class="text-center">JOB TYPE</th>
-                                                        <th class="text-center">CREATED BY</th>
-                                                        <th class="text-center">CREATER NAME & MOBILE NO</th>
-                                                        <th class="text-center">RESPONSIBLE PERSON NAME & MOBILE NO</th>
-                                                        <th class="text-center">REASON</th>
-                                                        <th class="text-center">MATERIALS REQ</th>
-                                                        <th class="text-center">MANPOWER REQ</th>
-                                                        <th class="text-center">WORK COMPLETION TARGET PERIOD</th>
-                                                        <th class="text-center">ACTUAL WORK COMPLETION PERIOD</th>
-                                                        <th class="text-center">USED MATERIAL</th>
-                                                        <th class="text-center">STOCK MATERIAL</th>
-                                                        <th class="text-center">DOWN PERIOD</th>
-                                                        <th class="text-center">WORK STATUS</th>
-                                                        <th class="text-center">PENDING REASON</th>
-                                                        <th class="text-center">JOB DONE DETAILS</th>
-                                                        <th class="text-center">REMARKS</th>
-                                                   </tr>
+                                                    <tr>
+                                                        <th class="text-center">Sl No</th>
+                                                        <th class="text-center">Teacher Name</th>
+                                                        <th class="text-center">1</th>
+                                                        <th class="text-center">2</th>
+                                                        <th class="text-center">3</th>
+                                                        <th class="text-center">4</th>
+                                                        <th class="text-center">5</th>
+                                                        <th class="text-center">6</th>
+                                                        <th class="text-center">7</th>
+                                                        <th class="text-center">8</th>
+                                                        <th class="text-center">9</th>
+                                                        <th class="text-center">10</th>
+                                                        <th class="text-center">11</th>
+                                                        <th class="text-center">12</th>
+                                                        <th class="text-center">13</th>
+                                                        <th class="text-center">14</th>
+                                                        <th class="text-center">15</th>
+                                                        <th class="text-center">16</th>
+                                                        <th class="text-center">17</th>
+                                                        <th class="text-center">18</th>
+                                                        <th class="text-center">19</th>
+                                                        <th class="text-center">20</th>
+                                                        <th class="text-center">21</th>
+                                                        <th class="text-center">22</th>
+                                                        <th class="text-center">23</th>
+                                                        <th class="text-center">24</th>
+                                                        <th class="text-center">25</th>
+                                                        <th class="text-center">26</th>
+                                                        <th class="text-center">27</th>
+                                                        <th class="text-center">28</th>
+                                                        <th class="text-center">29</th>
+                                                        <th class="text-center">30</th>
+                                                        <th class="text-center">Total</th>
+                                                    </tr>
                                                 </thead>
                                                 <tbody>
                                                   <tr>
                                                     <td colspan="15">
-                                                        <h3>Please wait.....</h3>
+                                                        <h3>Search here.....</h3>
                                                     </td>
                                                   </tr>
                                                 </tbody>
@@ -1310,80 +1319,49 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         });
     </script>
     <script>
-        function locFunction() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("locInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("stc-show-std-details-table");
-            tr = table.getElementsByTagName("tr");
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }       
-            }
-        }
 
-        function depFunction() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("depInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("stc-show-std-details-table");
-            tr = table.getElementsByTagName("tr");
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[2];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }       
-            }
-        }
-
-        function statusFunction() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("statusInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("stc-show-std-details-table");
-            tr = table.getElementsByTagName("tr");
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[6];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }       
-            }
-        }
+        // function statusFunction() {
+        //     var input, filter, table, tr, td, i, txtValue;
+        //     input = document.getElementById("statusInput");
+        //     filter = input.value.toUpperCase();
+        //     table = document.getElementById("stc-show-std-details-table");
+        //     tr = table.getElementsByTagName("tr");
+        //     for (i = 0; i < tr.length; i++) {
+        //         td = tr[i].getElementsByTagName("td")[14];
+        //         if (td) {
+        //             txtValue = td.textContent || td.innerText;
+        //             if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        //                 tr[i].style.display = "";
+        //             } else {
+        //                 tr[i].style.display = "none";
+        //             }
+        //         }       
+        //     }
+        // }
 
         $(document).ready(function(){
             $('.hidden-project-excel-section').hide();
             
-            stc_call_std();
-            function stc_call_std(){
+            // stc_call_std();
+            // function stc_call_std(){
+            $('body').delegate('.load_site_name_consump', 'change', function(e){
+                var projectid = $(".load_site_name_consump").val();
+                $('.stc-show-std-details').html("Please wait...");
                 $.ajax({
                 url     : "kattegat/ragnar_reports.php",
                 method  : "POST",
                 data    : {
-                  Stc_std_details:1
+                  Stc_std_details:1,
+                  projectid:projectid
                 },
                 success : function(data){
                     // console.log(data);
                     $('.stc-show-std-details').html(data);
                 }
               });
-            }
+            });
+
+            // }
             // on change call agents
             $('body').delegate('#stc-on-call-customer-proj', 'change', function(e){
               e.preventDefault();
