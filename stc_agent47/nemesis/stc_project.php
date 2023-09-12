@@ -1135,6 +1135,52 @@ class pirates_supervisor extends tesseract{
 		");
 		if(mysqli_num_rows($cptjacksparrowalotpcheck)>0){
 			$blackpearl=mysqli_fetch_assoc($cptjacksparrowalotpcheck);
+			$sitenameqry=mysqli_query($this->stc_dbs, "
+        	    SELECT DISTINCT `stc_cust_project_title` FROM `stc_cust_pro_attend_supervise`
+        	    INNER JOIN `stc_cust_pro_supervisor` 
+        	    ON `stc_cust_pro_attend_supervise_super_id`=`stc_cust_pro_supervisor_id` 
+        	    INNER JOIN `stc_cust_project` 
+        	    ON `stc_cust_pro_attend_supervise_pro_id`=`stc_cust_project_id`
+        	    WHERE `stc_cust_pro_attend_supervise_super_id`='".mysqli_real_escape_string($this->stc_dbs, $userid)."'
+        	");
+        	$sitename='';
+        	$slno=0;
+        	foreach($sitenameqry as $sitenamerow){
+        		$slno++;
+        		if($sitenamerow['stc_cust_project_title']!=""){
+        	    	$sitename.=$slno." - ".$sitenamerow['stc_cust_project_title'].'<br>';
+        		}
+        	}
+        	$blackpearl["Sitename"]=$sitename;
+		}
+		return $blackpearl;
+	}
+
+	// update single user record 
+	public function stc_update_supervisor($sup_user_id, $sup_cust, $sup_fullname, $sup_cont, $sup_whatsapp, $sup_email, $sup_address, $sup_city, $sup_state, $sup_pincode, $stc_category, $sup_status){
+		$blackpearl='';
+		$cptjacktupdateuser=mysqli_query($this->stc_dbs, "
+			UPDATE
+		    	`stc_cust_pro_supervisor`
+			SET
+			    `stc_cust_pro_supervisor_cust_id` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_cust)."',
+			    `stc_cust_pro_supervisor_fullname` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_fullname)."',
+			    `stc_cust_pro_supervisor_contact` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_cont)."',
+			    `stc_cust_pro_supervisor_whatsapp` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_whatsapp)."',
+			    `stc_cust_pro_supervisor_email` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_email)."',
+			    `stc_cust_pro_supervisor_address` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_address)."',
+			    `stc_cust_pro_supervisor_pincode` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_pincode)."',
+			    `stc_cust_pro_supervisor_cityid` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_city)."',
+			    `stc_cust_pro_supervisor_state_id` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_state)."',
+			    `stc_cust_pro_supervisor_category` 		= '".mysqli_real_escape_string($this->stc_dbs, $stc_category)."',
+			    `stc_cust_pro_supervisor_status` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_status)."'
+			WHERE
+			    `stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $sup_user_id)."'
+		");
+		if($cptjacktupdateuser){
+			$blackpearl="yes";
+		}else{
+			$blackpearl="no";
 		}
 		return $blackpearl;
 	}
@@ -3010,6 +3056,57 @@ if(isset($_POST['stc_load_single_user'])){
 	echo json_encode($outcome);
 }
 
+if(isset($_POST['stc_update_single_user'])){
+	$sup_user_id 		= 	$_POST['user_id'];
+	$sup_cust 		= 	$_POST['cust_id'];
+	$sup_fullname	=	$_POST['fullname'];
+	$sup_cont 		=	$_POST['contnumber'];
+	$sup_whatsapp 	=	$_POST['whatsapp'];
+	$sup_email 		=	$_POST['email'];
+	$sup_address	=	$_POST['address'];
+	$sup_city 		=	$_POST['city'];
+	$sup_state 		=	$_POST['state'];
+	$sup_pincode 	=	$_POST['pincode'];
+	$stc_category 	= 	$_POST['category'];
+	$sup_status		=	$_POST['status'];
+	$outcome		=	'';
+	if(
+		empty($sup_user_id) ||
+		empty($sup_cust) || 
+		empty($sup_fullname) || 
+		empty($sup_cont) ||  
+		empty($sup_whatsapp) || 
+		empty($sup_email) || 
+		empty($sup_address) || 
+		empty($sup_city) || 
+		empty($sup_state) || 
+		empty($sup_pincode) || 
+		empty($stc_category)
+	){
+		$outcome='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$outcome="logout";
+	}else{
+		$objcrproj=new pirates_supervisor();
+		$opobjcrproj=$objcrproj->stc_update_supervisor(
+			$sup_user_id,
+			$sup_cust,
+			$sup_fullname,
+			$sup_cont,
+			$sup_whatsapp,
+			$sup_email,
+			$sup_address,
+			$sup_city,
+			$sup_state,
+			$sup_pincode,
+			$stc_category,
+			$sup_status
+		);
+		$outcome = $opobjcrproj;
+	}
+	// echo $outcome;
+	echo json_encode($outcome);
+}
 
 // alot project to supervisor
 if(isset($_POST['stc_alot_project_action'])){

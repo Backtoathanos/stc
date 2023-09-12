@@ -10,6 +10,7 @@ if(isset($_SESSION["stc_agent_id"])){
 }else{ 
     header("Location:index.html"); 
 } 
+include_once("../MCU/db.php");
 ?> 
 <!doctype html>
 <html lang="en">
@@ -170,143 +171,16 @@ if(isset($_SESSION["stc_agent_id"])){
                         <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                             <li class="nav-item">
                                 <a role="tab" class="nav-link active" id="tab-1" data-toggle="tab" href="#show-supervisor">
-                                    <span>Show User<b><i class="pe-7s-look"></i></b></span>
+                                    <span><b><i class="pe-7s-look" style="position: relative;top: 2px"></i></b> Show User</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#alot-budget">
-                                    <span>Alot Project <b>O</b></span>
+                                    <span><b>O</b> Link Project </span>
                                 </a>
                             </li>
                         </ul>
                         <div class="tab-content">
-                            <!-- <div class="tab-pane tabs-animation fade show active" id="create-project" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Create User</h5>
-                                                <form class="create-supervisor-form">
-                                                    <div class="row">
-                                                        <div class="col-sm-12 col-md-12">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">Customer name</label>
-                                                                <select name="stc_cust_sup_cust" class="form-control" required>
-                                                                    <?php 
-                                                                        include_once("../MCU/db.php");
-                                                                        $cityqry=mysqli_query($con, "
-                                                                            SELECT distinct `stc_customer_id`, `stc_customer_name` FROM `stc_customer`
-                                                                            INNER JOIN `stc_agent_requested_customer` 
-                                                                            ON `stc_agent_requested_customer_cust_id`=`stc_customer_id` 
-                                                                            ORDER BY `stc_customer_name` ASC
-
-                                                                        ");
-                                                                        foreach($cityqry as $custrow){
-                                                                            echo '<option value="'.$custrow['stc_customer_id'].'">'.$custrow['stc_customer_name'].'</option>';
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">User full name</label>
-                                                                <input placeholder="Enter your User name" type="text" name="stc_cust_sup_fullname" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">User contact</label>
-                                                                <input placeholder="Enter your User contact number" type="number" name="stc_cust_sup_contnumber" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">User whatsapp</label>
-                                                                <input placeholder="Enter your User Whatsapp" type="number" name="stc_cust_sup_whatsapp" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-6 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">User email</label>
-                                                                <input placeholder="Enter your User E-mail" type="text" name="stc_cust_sup_email" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                    </div>                                                        
-                                                    <div class="position-relative form-group">
-                                                        <label for="exampleText" class="">User address</label>
-                                                        <textarea id="exampleText" class="form-control" name="stc_cust_sup_address" placeholder="Enter your User address" required></textarea>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-4">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">User pincode</label>
-                                                                <input placeholder="Enter your User pincode" type="text" name="stc_cust_sup_pincode" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">City</label>
-                                                                <select name="stc_cust_sup_city" class="form-control" required>
-                                                                    <?php 
-                                                                        $cityqry=mysqli_query($con, "
-                                                                            SELECT * FROM `stc_city` ORDER BY `stc_city_name` ASC
-                                                                        ");
-                                                                        foreach($cityqry as $cityrow){
-                                                                            echo '<option value="'.$cityrow['stc_city_id'].'">'.$cityrow['stc_city_name'].'</option>';
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">State</label>
-                                                                <select name="stc_cust_sup_state" class="form-control" required>
-                                                                    <?php 
-                                                                        include_once("../MCU/db.php");
-                                                                        $cityqry=mysqli_query($con, "
-                                                                            SELECT * FROM `stc_state` ORDER BY `stc_state_name` ASC
-                                                                        ");
-                                                                        foreach($cityqry as $cityrow){
-                                                                            echo '<option value="'.$cityrow['stc_state_id'].'">'.$cityrow['stc_state_name'].'</option>';
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>                                                                
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="usercat" class="">User Category</label>
-                                                                <select class="form-control" id="usercat" name="stc_cust_sup_category">
-                                                                    <option>Coordinator</option>
-                                                                    <option>Electrician</option>
-                                                                    <option>Operator</option>
-                                                                    <option>Helper</option>
-                                                                    <option>Safety Supervisor</option>
-                                                                    <option>Site Incharge</option>
-                                                                    <option selected>Supervisor</option>
-                                                                    <option>Technician</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">Status</label>
-                                                                <select name="stc_cust_sup_status" class="form-control" required>
-                                                                    <option value="1">Active</option>
-                                                                    <option value="0">off</option>
-                                                                </select>
-                                                                <input type="hidden" name="stc_cust_supervisor_action">
-                                                            </div>
-                                                        </div>
-                                                    </div>                                                    
-                                                    <button class="mt-1 btn btn-primary form-control">Add</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
                             <div class="tab-pane tabs-animation fade show active" id="show-supervisor" role="tabpanel">
                                 <div class="row">
                                     <div class="col-md-12">
@@ -314,10 +188,10 @@ if(isset($_SESSION["stc_agent_id"])){
                                             <div class="card-body"><h2 class="card-title">Show User</h2>
                                                 <div class="row mb-3 mt-3">
                                                     <div class="col-md-3">
-                                                        <button type="button" class="btn mr-2 mb-2 btn-primary form-control stcAdduser" data-toggle="modal" data-target=".bd-adduser-modal-lg">Add User</button>
+                                                        <button type="button" class="btn mr-2 mb-2 btn-primary form-control stcAdduser" data-toggle="modal" data-target=".bd-adduser-modal-lg"><i class="fas fa-plus-circle"></i> Add User</button>
                                                     </div>
                                                     <div class="col-md-9 d-none d-sm-block">
-                                                        <input type="text" class="form-control all_project_search" placeholder="Search User">
+                                                        <input type="text" class="form-control all_project_search" id="searchuser" onkeyup="myFunction()" placeholder="Search User">
                                                     </div>                                      
                                                 </div>
                                                 <form class="#">
@@ -386,7 +260,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                 $address=$address.'...';
                                                                             }
                                                                             echo '
-                                                                                <div class="col-md-4" style="margin-bottom:15px;">
+                                                                                <div class="col-md-3 usertarget" style="margin-bottom:15px;">
                                                                                     <div class="card profile-card-3">
                                                                                         <div class="background-block">
                                                                                             <img src="https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&h=650&w=940" alt="profile-sample1" class="background"/>
@@ -404,7 +278,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                             </h3>
                                                                                             <div class="icon-block">
                                                                                                 <a href="#" class="stc-user-edit" title="Edit" data-toggle="modal" data-target=".bd-edituser-modal-lg" id="'.$supsubrow['stc_cust_pro_supervisor_id'].'"><i class="fas fa-edit"></i></a>
-                                                                                                <a href="#" class="stc-user-view" title="View" data-toggle="modal" data-target=".bd-showuser-modal-lg"> <i class="fas fa-eye"></i></a>
+                                                                                                <a href="#" class="stc-user-view" title="View" data-toggle="modal" data-target=".bd-showuser-modal-lg" id="'.$supsubrow['stc_cust_pro_supervisor_id'].'"> <i class="fas fa-eye"></i></a>
                                                                                                 <a href="#" class="stc-user-collaborate" title="Collaborate"> <i class="fas fa-handshake-o"></i></a>
                                                                                             </div>
                                                                                         </div>
@@ -427,7 +301,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="row">
                                     <div class="col-md-10">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Alot Project</h5>
+                                            <div class="card-body"><h5 class="card-title">Link Project</h5>
                                                 <form class="stc-project-alot-cust">
                                                     <div class="row">
                                                         <div class="col-md-12">
@@ -513,6 +387,19 @@ if(isset($_SESSION["stc_agent_id"])){
         });
     </script>
     <script>
+        function myFunction() {
+          var input = document.getElementById("searchuser");
+          var filter = input.value.toLowerCase();
+          var nodes = document.getElementsByClassName('usertarget');
+
+          for (i = 0; i < nodes.length; i++) {
+            if (nodes[i].innerText.toLowerCase().includes(filter)) {
+              nodes[i].style.display = "block";
+            } else {
+              nodes[i].style.display = "none";
+            }
+          }
+        }
         $(document).ready(function(e){
             $('.create-supervisor-form').on('submit', function(e){
                 e.preventDefault();
@@ -562,16 +449,106 @@ if(isset($_SESSION["stc_agent_id"])){
                           window.location.reload();
                         }
 
-                        $("#stc_cust_sup_fullname").val(argument['stc_cust_pro_supervisor_address']);
-                        $("#stc_cust_sup_contnumber").val(argument['stc_cust_pro_supervisor_address']);
-                        $("#stc_cust_sup_whatsapp").val(argument['stc_cust_pro_supervisor_address']);
-                        $("#stc_cust_sup_email").val(argument['stc_cust_pro_supervisor_address']);
-                        $("#stc_cust_sup_fullname").val(argument['stc_cust_pro_supervisor_address']);
-                        $("#stc_cust_sup_fullname").val(argument['stc_cust_pro_supervisor_address']);
+                        $(".stc-edituser-save").attr('id', argument['stc_cust_pro_supervisor_id']);
+                        $("#stc_cust_sup_cust").val(argument['stc_cust_pro_supervisor_cust_id']);
+                        $("#stc_cust_sup_fullname").val(argument['stc_cust_pro_supervisor_fullname']);
+                        $("#stc_cust_sup_contnumber").val(argument['stc_cust_pro_supervisor_contact']);
+                        $("#stc_cust_sup_whatsapp").val(argument['stc_cust_pro_supervisor_whatsapp']);
+                        $("#stc_cust_sup_email").val(argument['stc_cust_pro_supervisor_email']);
+                        $("#stc_cust_sup_address").val(argument['stc_cust_pro_supervisor_address']);
+                        $("#stc_cust_sup_pincode").val(argument['stc_cust_pro_supervisor_pincode']);
+                        $("#stc_cust_sup_city").val(argument['stc_cust_pro_supervisor_cityid']);
+                        $("#stc_cust_sup_state").val(argument['stc_cust_pro_supervisor_state_id']);
+                        $("#stc_cust_sup_category").val(argument['stc_cust_pro_supervisor_category']);
+                        $("#stc_cust_sup_status").val(argument['stc_cust_pro_supervisor_status']);
                     }
                 });
             });
-                // $('.close-btn').click();
+
+            // update user record
+            $('.stc-edituser-save').on('click', function(){
+                var user_id = $(this).attr('id');
+                var cust_id = $("#stc_cust_sup_cust").val();
+                var fullname = $("#stc_cust_sup_fullname").val();
+                var contnumber = $("#stc_cust_sup_contnumber").val();
+                var whatsapp = $("#stc_cust_sup_whatsapp").val();
+                var email = $("#stc_cust_sup_email").val();
+                var address = $("#stc_cust_sup_address").val();
+                var pincode = $("#stc_cust_sup_pincode").val();
+                var city = $("#stc_cust_sup_city").val();
+                var state = $("#stc_cust_sup_state").val();
+                var category = $("#stc_cust_sup_category").val();
+                var status = $("#stc_cust_sup_status").val();
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_update_single_user:1,
+                        user_id:user_id,
+                        cust_id:cust_id,
+                        fullname:fullname,
+                        contnumber:contnumber,
+                        whatsapp:whatsapp,
+                        email:email,
+                        address:address,
+                        pincode:pincode,
+                        city:city,
+                        state:state,
+                        category:category,
+                        status:status
+                    },
+                    dataType    : "JSON",
+                    success     : function(argument) {                        
+                        if (argument == "yes") {
+                          alert("User updated!!!");
+                          window.location.reload();
+                        } else if (argument == "no") {
+                          alert("Please check & try again!!!");
+                        } else if (argument == "logout") {
+                          window.location.reload();
+                        } else if (argument == "empty") {
+                          alert("Do not empty any field!!!");
+                        }
+                    }
+                });
+            });
+
+            // call user
+            $('.stc-user-view').on('click', function(){
+                var user_id = $(this).attr('id');
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_load_single_user:1,
+                        user_id:user_id
+                    },
+                    dataType    : "JSON",
+                    success     : function(argument) {
+                        // console.log(argument);
+                        if (argument == "empty") {
+                          alert("No record found.");
+                        } else if (argument == "logout") {
+                          // alert("Please check & try again!!!&#9786;");
+                          window.location.reload();
+                        }
+                        $("#vstc_cust_sup_cust").val(argument['stc_cust_pro_supervisor_cust_id']);
+                        $("#vstc_cust_sup_fullname").val(argument['stc_cust_pro_supervisor_fullname']);
+                        $("#vstc_cust_sup_contnumber").val(argument['stc_cust_pro_supervisor_contact']);
+                        $("#vstc_cust_sup_whatsapp").val(argument['stc_cust_pro_supervisor_whatsapp']);
+                        $("#vstc_cust_sup_email").val(argument['stc_cust_pro_supervisor_email']);
+                        $("#vstc_cust_sup_address").val(argument['stc_cust_pro_supervisor_address']);
+                        $("#vstc_cust_sup_pincode").val(argument['stc_cust_pro_supervisor_pincode']);
+                        $("#vstc_cust_sup_city").val(argument['stc_cust_pro_supervisor_cityid']);
+                        $("#vstc_cust_sup_state").val(argument['stc_cust_pro_supervisor_state_id']);
+                        $("#vstc_cust_sup_category").val(argument['stc_cust_pro_supervisor_category']);
+                        $("#vstc_cust_sup_status").val(argument['stc_cust_pro_supervisor_status']);
+                        $("#vstc_cust_sup_sitename").html(argument['Sitename']);
+                        console.log(argument['Sitename']);
+                    }
+                });
+            });
+            
             $('.stc-project-alot-cust').on('submit', function(e){
                 e.preventDefault();
                 $.ajax({
@@ -849,7 +826,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="row">
                                     <div class="col-sm-12 col-md-12">
                                         <div class="position-relative form-group">
-                                            <label for="exampleSelect" class="">Customer name</label>
+                                            <label for="stc_cust_sup_cust" class="">Customer name</label>
                                             <select id="stc_cust_sup_cust" class="form-control" required>
                                                 <?php 
                                                     $cityqry=mysqli_query($con, "
@@ -868,43 +845,43 @@ if(isset($_SESSION["stc_agent_id"])){
                                     </div>
                                     <div class="col-sm-6 col-md-6">
                                         <div class="position-relative form-group">
-                                            <label for="exampleEmail" class="">User full name</label>
+                                            <label for="stc_cust_sup_fullname" class="">User full name</label>
                                             <input placeholder="Enter your User name" type="text" id="stc_cust_sup_fullname" class="mb-2 form-control" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-md-6">
                                         <div class="position-relative form-group">
-                                            <label for="exampleEmail" class="">User contact</label>
+                                            <label for="stc_cust_sup_contnumber" class="">User contact</label>
                                             <input placeholder="Enter your User contact number" type="number" id="stc_cust_sup_contnumber" class="mb-2 form-control" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-md-6">
                                         <div class="position-relative form-group">
-                                            <label for="exampleEmail" class="">User whatsapp</label>
+                                            <label for="stc_cust_sup_whatsapp" class="">User whatsapp</label>
                                             <input placeholder="Enter your User Whatsapp" type="number" id="stc_cust_sup_whatsapp" class="mb-2 form-control" required>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-md-6">
                                         <div class="position-relative form-group">
-                                            <label for="exampleEmail" class="">User email</label>
+                                            <label for="stc_cust_sup_email" class="">User email</label>
                                             <input placeholder="Enter your User E-mail" type="text" id="stc_cust_sup_email" class="mb-2 form-control" required>
                                         </div>
                                     </div>
                                 </div>                                                        
                                 <div class="position-relative form-group">
-                                    <label for="exampleText" class="">User address</label>
-                                    <textarea id="exampleText" class="form-control" id="stc_cust_sup_address" placeholder="Enter your User address" required></textarea>
+                                    <label for="stc_cust_sup_address" class="">User address</label>
+                                    <textarea class="form-control" id="stc_cust_sup_address" placeholder="Enter your User address" required></textarea>
                                 </div>
                                 <div class="row">
                                     <div class="col-md-4">
                                         <div class="position-relative form-group">
-                                            <label for="exampleEmail" class="">User pincode</label>
+                                            <label for="stc_cust_sup_pincode" class="">User pincode</label>
                                             <input placeholder="Enter your User pincode" type="text" id="stc_cust_sup_pincode" class="mb-2 form-control" required>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="position-relative form-group">
-                                            <label for="exampleSelect" class="">City</label>
+                                            <label for="stc_cust_sup_city" class="">City</label>
                                             <select id="stc_cust_sup_city" class="form-control" required>
                                                 <?php 
                                                     $cityqry=mysqli_query($con, "
@@ -919,7 +896,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                     </div>
                                     <div class="col-md-4">
                                         <div class="position-relative form-group">
-                                            <label for="exampleSelect" class="">State</label>
+                                            <label for="stc_cust_sup_state" class="">State</label>
                                             <select id="stc_cust_sup_state" class="form-control" required>
                                                 <?php 
                                                     $cityqry=mysqli_query($con, "
@@ -934,7 +911,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                     </div>                                                                
                                     <div class="col-md-6">
                                         <div class="position-relative form-group">
-                                            <label for="usercat" class="">User Category</label>
+                                            <label for="stc_cust_sup_category" class="">User Category</label>
                                             <select class="form-control" id="stc_cust_sup_category">
                                                 <option>Coordinator</option>
                                                 <option>Electrician</option>
@@ -949,7 +926,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                     </div>
                                     <div class="col-md-6">
                                         <div class="position-relative form-group">
-                                            <label for="exampleSelect" class="">Status</label>
+                                            <label for="stc_cust_sup_status" class="">Status</label>
                                             <select id="stc_cust_sup_status" class="form-control" required>
                                                 <option value="1">Active</option>
                                                 <option value="0">off</option>
@@ -979,7 +956,133 @@ if(isset($_SESSION["stc_agent_id"])){
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body"></div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body"><h5 class="card-title">Create User</h5>
+                                <div class="row">
+                                    <div class="col-sm-12 col-md-12">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_cust" class="">Customer name</label>
+                                            <select id="vstc_cust_sup_cust" class="form-control" disabled>
+                                                <?php 
+                                                    $cityqry=mysqli_query($con, "
+                                                        SELECT distinct `stc_customer_id`, `stc_customer_name` FROM `stc_customer`
+                                                        INNER JOIN `stc_agent_requested_customer` 
+                                                        ON `stc_agent_requested_customer_cust_id`=`stc_customer_id` 
+                                                        ORDER BY `stc_customer_name` ASC
+
+                                                    ");
+                                                    foreach($cityqry as $custrow){
+                                                        echo '<option value="'.$custrow['stc_customer_id'].'">'.$custrow['stc_customer_name'].'</option>';
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_fullname" class="">User full name</label>
+                                            <input placeholder="Enter your User name" type="text" id="vstc_cust_sup_fullname" disabled class="mb-2 form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_contnumber" class="">User contact</label>
+                                            <input placeholder="Enter your User contact number" type="number" id="vstc_cust_sup_contnumber" disabled class="mb-2 form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_whatsapp" class="">User whatsapp</label>
+                                            <input placeholder="Enter your User Whatsapp" type="number" id="vstc_cust_sup_whatsapp" disabled class="mb-2 form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6 col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_email" class="">User email</label>
+                                            <input placeholder="Enter your User E-mail" type="text" id="vstc_cust_sup_email" disabled class="mb-2 form-control" required>
+                                        </div>
+                                    </div>
+                                </div>                                                        
+                                <div class="position-relative form-group">
+                                    <label for="vstc_cust_sup_address" class="">User address</label>
+                                    <textarea class="form-control" id="vstc_cust_sup_address" disabled placeholder="Enter your User address" required></textarea>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_pincode" class="">User pincode</label>
+                                            <input placeholder="Enter your User pincode" type="text" disabled id="vstc_cust_sup_pincode" class="mb-2 form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_city" class="">City</label>
+                                            <select id="vstc_cust_sup_city" class="form-control" disabled required>
+                                                <?php 
+                                                    $cityqry=mysqli_query($con, "
+                                                        SELECT * FROM `stc_city` ORDER BY `stc_city_name` ASC
+                                                    ");
+                                                    foreach($cityqry as $cityrow){
+                                                        echo '<option value="'.$cityrow['stc_city_id'].'">'.$cityrow['stc_city_name'].'</option>';
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_state" class="">State</label>
+                                            <select id="vstc_cust_sup_state" class="form-control" disabled required>
+                                                <?php 
+                                                    $cityqry=mysqli_query($con, "
+                                                        SELECT * FROM `stc_state` ORDER BY `stc_state_name` ASC
+                                                    ");
+                                                    foreach($cityqry as $cityrow){
+                                                        echo '<option value="'.$cityrow['stc_state_id'].'">'.$cityrow['stc_state_name'].'</option>';
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>                                                                
+                                    <div class="col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_category" class="">User Category</label>
+                                            <select class="form-control" disabled id="vstc_cust_sup_category">
+                                                <option>Coordinator</option>
+                                                <option>Electrician</option>
+                                                <option>Operator</option>
+                                                <option>Helper</option>
+                                                <option>Safety Supervisor</option>
+                                                <option>Site Incharge</option>
+                                                <option selected>Supervisor</option>
+                                                <option>Technician</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_status" class="">Status</label>
+                                            <select id="vstc_cust_sup_status" disabled class="form-control" required>
+                                                <option value="1">Active</option>
+                                                <option value="0">off</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="position-relative form-group">
+                                            <label for="vstc_cust_sup_sitename" class="">Sitename</label>
+                                            <div id="vstc_cust_sup_sitename" style="background: #e9ecef; padding: 15px; border-radius: 0.25rem; border: 1px solid #ced4da;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
