@@ -50,9 +50,9 @@
                                 <div class="widget-content-left">
                                     <div class="btn-group">
                                         <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="p-0 btn">
-                                            <div class="round-circl"><h2>Y</h2></div>
+                                            <div class="round-circl" style="position: relative;top: 10px;line-height: 1.66;margin: 0;padding: 0;font-weight: bold;color: #222;font-family: Poppins;font-size: 36px;"><h2>Y</h2></div>
                                             <!-- <img width="42" class="rounded-circle" src="assets/images/avatars/1.jpg" alt=""> -->
-                                            <i class="fa fa-angle-down ml-2 opacity-8"></i>
+                                            <i class="fa fa-angle-down ml-2 opacity-8" style="position: relative;font-size: 25px;padding: 0;margin: 0;left: -4px;top: -8px"></i>
                                         </a>
                                         <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right">
                                             <h6 tabindex="-1" class="dropdown-header">STC ASSOCIATE</h6>

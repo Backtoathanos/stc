@@ -59,9 +59,9 @@
                             </a>
                         </li>
                         <li>
-                            <a href="manage-supervisor.php">
+                            <a href="manage-user.php">
                                 <i class="metismenu-icon"></i>
-                                Supervisor Management
+                                User Management
                             </a>
                         </li>
                         <li>

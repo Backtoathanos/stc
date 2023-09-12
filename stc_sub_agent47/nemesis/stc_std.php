@@ -136,8 +136,10 @@ class transformers extends tesseract{
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$tools_req='';
-		foreach($stc_tools_req as $stc_tools_row){
-			$tools_req.=$stc_tools_row.', ';
+		if(!empty($stc_tools_req)){
+			foreach($stc_tools_req as $stc_tools_row){
+				$tools_req.=$stc_tools_row.', ';
+			}
 		}
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_status_down_list`(
@@ -577,7 +579,7 @@ if(isset($_POST['stc_status_change_hit'])){
 	$sld_id=$_POST['sdl_id'];
 	$status=$_POST['status_id'];
 	$jobdonedetails=$_POST['jobdonedetails'];
-	$work_permit_no=$_POST['work_permit_no'];
+	$work_permit_no=@$_POST['work_permit_no'];
 	$sdl_status=new transformers();
 	$out_sdl_status=$sdl_status->stc_sdl_status_update($status, $sld_id, $jobdonedetails, $work_permit_no);
 	echo $out_sdl_status;

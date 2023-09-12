@@ -1036,6 +1036,7 @@ class pirates_supervisor extends tesseract{
 			$sup_state,
 			$sup_pincode,
 			$sup_password,
+			$stc_category,
 			$sup_status
 		){
 		$blackpearl='';
@@ -1058,6 +1059,7 @@ class pirates_supervisor extends tesseract{
 					`stc_cust_pro_supervisor_cityid`, 
 					`stc_cust_pro_supervisor_state_id`, 
 					`stc_cust_pro_supervisor_password`, 
+					`stc_cust_pro_supervisor_category`, 
 					`stc_cust_pro_supervisor_status`, 
 					`stc_cust_pro_supervisor_created_by`
 				) VALUES (
@@ -1071,6 +1073,7 @@ class pirates_supervisor extends tesseract{
 					'".mysqli_real_escape_string($this->stc_dbs, $sup_city)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $sup_state)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $sup_password)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stc_category)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $sup_status)."',
 					'".$_SESSION['stc_agent_id']."'
 				)
@@ -1119,6 +1122,19 @@ class pirates_supervisor extends tesseract{
 			}
 		}else{
 			$blackpearl='not';
+		}
+		return $blackpearl;
+	}
+
+	// call single user
+	public function stc_call_singleuser($userid){
+		$blackpearl=array();
+		$cptjacksparrowalotpcheck=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_cust_pro_supervisor` 
+			WHERE `stc_cust_pro_supervisor_id`='".mysqli_real_escape_string($this->stc_dbs, $userid)."'
+		");
+		if(mysqli_num_rows($cptjacksparrowalotpcheck)>0){
+			$blackpearl=mysqli_fetch_assoc($cptjacksparrowalotpcheck);
 		}
 		return $blackpearl;
 	}
@@ -2816,6 +2832,7 @@ if(isset($_POST['stc_cust_supervisor_action'])){
 	$sup_city 		=	$_POST['stc_cust_sup_city'];
 	$sup_state 		=	$_POST['stc_cust_sup_state'];
 	$sup_pincode 	=	$_POST['stc_cust_sup_pincode'];
+	$stc_category 	= 	$_POST['stc_cust_sup_category'];
 	$sup_status		=	$_POST['stc_cust_sup_status'];
 	$outcome		=	'';
 	function randomPassword() {
@@ -2942,6 +2959,7 @@ if(isset($_POST['stc_cust_supervisor_action'])){
 		empty($sup_city) || 
 		empty($sup_state) || 
 		empty($sup_pincode) || 
+		empty($stc_category) || 
 		empty($sup_status)
 	){
 		$outcome='empty';
@@ -2960,16 +2978,38 @@ if(isset($_POST['stc_cust_supervisor_action'])){
 			$sup_state,
 			$sup_pincode,
 			$sup_password,
+			$stc_category,
 			$sup_status
 		);
 		$outcome = $opobjcrproj;
 		if($outcome == "yes"){
-			mail($sup_email, "Welcome Supervisor", $maildesc, $headers);
+			mail($sup_email, "Welcome ".$sup_fullname, $maildesc, $headers);
 		}
 	}
 	// echo $outcome;
 	echo json_encode($outcome);
 }
+
+// alot project to supervisor
+if(isset($_POST['stc_load_single_user'])){
+	$userid	= 	$_POST['user_id'];
+	$outcome		=	'';
+
+	if( empty($userid) ){
+		$outcome='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$outcome="logout";
+	}else{
+		$objcrproj=new pirates_supervisor();
+		$opobjcrproj=$objcrproj->stc_call_singleuser(
+			$userid
+		);
+		$outcome = $opobjcrproj;
+	}
+	// echo $outcome;
+	echo json_encode($outcome);
+}
+
 
 // alot project to supervisor
 if(isset($_POST['stc_alot_project_action'])){
