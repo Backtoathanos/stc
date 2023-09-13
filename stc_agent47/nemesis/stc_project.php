@@ -1159,6 +1159,14 @@ class pirates_supervisor extends tesseract{
 	// update single user record 
 	public function stc_update_supervisor($sup_user_id, $sup_cust, $sup_fullname, $sup_cont, $sup_whatsapp, $sup_email, $sup_address, $sup_city, $sup_state, $sup_pincode, $stc_category, $sup_status){
 		$blackpearl='';
+		$cptjackcheckuser=mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_pro_supervisor_fullname` FROM `stc_cust_pro_supervisor` 
+			WHERE 
+				`stc_cust_pro_supervisor_fullname`='".mysqli_real_escape_string($this->stc_dbs, $sup_fullname)."' AND 
+				`stc_cust_pro_supervisor_fullname`='".mysqli_real_escape_string($this->stc_dbs, $sup_cont)."' AND 
+				`stc_cust_pro_supervisor_fullname`='".mysqli_real_escape_string($this->stc_dbs, $sup_whatsapp)."' AND
+				`stc_cust_pro_supervisor_fullname`='".mysqli_real_escape_string($this->stc_dbs, $sup_email)."' AND
+		");
 		$cptjacktupdateuser=mysqli_query($this->stc_dbs, "
 			UPDATE
 		    	`stc_cust_pro_supervisor`
