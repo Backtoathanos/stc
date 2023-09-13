@@ -190,7 +190,7 @@ include_once("../MCU/db.php");
                                                     <div class="col-md-3">
                                                         <button type="button" class="btn mr-2 mb-2 btn-primary form-control stcAdduser" data-toggle="modal" data-target=".bd-adduser-modal-lg"><i class="fas fa-plus-circle"></i> Add User</button>
                                                     </div>
-                                                    <div class="col-md-9 d-none d-sm-block">
+                                                    <div class="col-md-9">
                                                         <input type="text" class="form-control all_project_search" id="searchuser" onkeyup="myFunction()" placeholder="Search User">
                                                     </div>                                      
                                                 </div>
