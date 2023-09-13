@@ -544,7 +544,6 @@ include_once("../MCU/db.php");
                         $("#vstc_cust_sup_category").val(argument['stc_cust_pro_supervisor_category']);
                         $("#vstc_cust_sup_status").val(argument['stc_cust_pro_supervisor_status']);
                         $("#vstc_cust_sup_sitename").html(argument['Sitename']);
-                        console.log(argument['Sitename']);
                     }
                 });
             });
@@ -678,7 +677,7 @@ include_once("../MCU/db.php");
                 <div class="row">
                     <div class="col-md-12">
                         <div class="main-card mb-3 card">
-                            <div class="card-body"><h5 class="card-title">Create User</h5>
+                            <div class="card-body"><h5 class="card-title">Add User</h5>
                                 <form class="create-supervisor-form">
                                     <div class="row">
                                         <div class="col-sm-12 col-md-12">
@@ -808,7 +807,6 @@ include_once("../MCU/db.php");
     </div>
 </div>
 
-
 <div class="modal fade bd-edituser-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -822,7 +820,7 @@ include_once("../MCU/db.php");
                 <div class="row">
                     <div class="col-md-12">
                         <div class="main-card mb-3 card">
-                            <div class="card-body"><h5 class="card-title">Create User</h5>
+                            <div class="card-body"><h5 class="card-title">Edit User</h5>
                                 <div class="row">
                                     <div class="col-sm-12 col-md-12">
                                         <div class="position-relative form-group">
@@ -960,7 +958,7 @@ include_once("../MCU/db.php");
                 <div class="row">
                     <div class="col-md-12">
                         <div class="main-card mb-3 card">
-                            <div class="card-body"><h5 class="card-title">Create User</h5>
+                            <div class="card-body"><h5 class="card-title">Show User</h5>
                                 <div class="row">
                                     <div class="col-sm-12 col-md-12">
                                         <div class="position-relative form-group">
