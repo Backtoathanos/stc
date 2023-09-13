@@ -506,9 +506,11 @@ include_once("../MCU/db.php");
                           alert("Please check & try again!!!");
                         } else if (argument == "logout") {
                           window.location.reload();
+                        } else if (argument == "duplicate") {
+                          alert("Duplicate User found!!!");
                         } else if (argument == "empty") {
                           alert("Do not empty any field!!!");
-                        }
+                        } 
                     }
                 });
             });

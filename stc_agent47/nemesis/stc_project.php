@@ -1162,33 +1162,39 @@ class pirates_supervisor extends tesseract{
 		$cptjackcheckuser=mysqli_query($this->stc_dbs, "
 			SELECT `stc_cust_pro_supervisor_fullname` FROM `stc_cust_pro_supervisor` 
 			WHERE 
-				`stc_cust_pro_supervisor_fullname`='".mysqli_real_escape_string($this->stc_dbs, $sup_fullname)."' AND 
-				`stc_cust_pro_supervisor_fullname`='".mysqli_real_escape_string($this->stc_dbs, $sup_cont)."' AND 
-				`stc_cust_pro_supervisor_fullname`='".mysqli_real_escape_string($this->stc_dbs, $sup_whatsapp)."' AND
-				`stc_cust_pro_supervisor_fullname`='".mysqli_real_escape_string($this->stc_dbs, $sup_email)."' AND
+				(
+				`stc_cust_pro_supervisor_contact`='".mysqli_real_escape_string($this->stc_dbs, $sup_cont)."' OR 
+				`stc_cust_pro_supervisor_whatsapp`='".mysqli_real_escape_string($this->stc_dbs, $sup_whatsapp)."' OR
+				`stc_cust_pro_supervisor_email`='".mysqli_real_escape_string($this->stc_dbs, $sup_email)."'
+				) AND 
+				`stc_cust_pro_supervisor_id`<>'".mysqli_real_escape_string($this->stc_dbs, $sup_user_id)."'
 		");
-		$cptjacktupdateuser=mysqli_query($this->stc_dbs, "
-			UPDATE
-		    	`stc_cust_pro_supervisor`
-			SET
-			    `stc_cust_pro_supervisor_cust_id` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_cust)."',
-			    `stc_cust_pro_supervisor_fullname` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_fullname)."',
-			    `stc_cust_pro_supervisor_contact` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_cont)."',
-			    `stc_cust_pro_supervisor_whatsapp` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_whatsapp)."',
-			    `stc_cust_pro_supervisor_email` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_email)."',
-			    `stc_cust_pro_supervisor_address` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_address)."',
-			    `stc_cust_pro_supervisor_pincode` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_pincode)."',
-			    `stc_cust_pro_supervisor_cityid` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_city)."',
-			    `stc_cust_pro_supervisor_state_id` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_state)."',
-			    `stc_cust_pro_supervisor_category` 		= '".mysqli_real_escape_string($this->stc_dbs, $stc_category)."',
-			    `stc_cust_pro_supervisor_status` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_status)."'
-			WHERE
-			    `stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $sup_user_id)."'
-		");
-		if($cptjacktupdateuser){
-			$blackpearl="yes";
+		if(mysqli_num_rows($cptjackcheckuser==0)){
+			$cptjacktupdateuser=mysqli_query($this->stc_dbs, "
+				UPDATE
+			    	`stc_cust_pro_supervisor`
+				SET
+				    `stc_cust_pro_supervisor_cust_id` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_cust)."',
+				    `stc_cust_pro_supervisor_fullname` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_fullname)."',
+				    `stc_cust_pro_supervisor_contact` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_cont)."',
+				    `stc_cust_pro_supervisor_whatsapp` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_whatsapp)."',
+				    `stc_cust_pro_supervisor_email` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_email)."',
+				    `stc_cust_pro_supervisor_address` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_address)."',
+				    `stc_cust_pro_supervisor_pincode` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_pincode)."',
+				    `stc_cust_pro_supervisor_cityid` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_city)."',
+				    `stc_cust_pro_supervisor_state_id` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_state)."',
+				    `stc_cust_pro_supervisor_category` 		= '".mysqli_real_escape_string($this->stc_dbs, $stc_category)."',
+				    `stc_cust_pro_supervisor_status` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_status)."'
+				WHERE
+				    `stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $sup_user_id)."'
+			");
+			if($cptjacktupdateuser){
+				$blackpearl="yes";
+			}else{
+				$blackpearl="no";
+			}
 		}else{
-			$blackpearl="no";
+			$blackpearl="duplicate";
 		}
 		return $blackpearl;
 	}
