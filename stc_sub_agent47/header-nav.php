@@ -68,7 +68,7 @@
                                     <div class="widget-heading">
                                         <?php 
                                             // if(!empty($_COOKIE['agentsperformename'])){
-                                                echo $_SESSION['stc_agent_sub_name'];
+                                                echo @$_SESSION['stc_agent_sub_name'];
                                             // }else{
                                                 // header("location:index.php");
                                             // }

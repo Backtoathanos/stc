@@ -39,36 +39,49 @@
                         Home
                     </a>
                 </li>
-                <li>
-                    <a href="stc-product.php" class="mm-active">
-                        <i class="metismenu-icon pe-7s-box2"></i>
-                        Products
-                    </a>
-                </li>
-                <li>
-                    <a href="stc-requisition.php" class="mm-active">
-                        <i class="metismenu-icon pe-7s-note2"></i>
-                        Requisition
-                    </a>
-                </li>
-                <li>
-                    <a href="stc-consumption.php" class="mm-active">
-                        <i class="metismenu-icon pe-7s-box1"></i>
-                        Consumption
-                    </a>
-                </li>
-                <li>
-                    <a href="stc-status-down-list.php" class="mm-active">
-                        <i class="metismenu-icon pe-7s-switch"></i>
-                        Status Down List
-                    </a>
-                </li>
-                <li>
-                    <a href="stc-safety.php" class="mm-active">
-                        <i class="metismenu-icon pe-7s-id"></i>
-                        Safety
-                    </a>
-                </li>
+                <?php
+                    if($_SESSION['stc_agent_sub_category']=="supervisor"){
+                        echo '
+                            <li>
+                                <a href="stc-product.php" class="mm-active">
+                                    <i class="metismenu-icon pe-7s-box2"></i>
+                                    Products
+                                </a>
+                            </li>
+                        ';
+                    }
+
+                    if($_SESSION['stc_agent_sub_category']=="supervisor"){
+                        echo '
+                            <li>
+                                <a href="stc-requisition.php" class="mm-active">
+                                    <i class="metismenu-icon pe-7s-note2"></i>
+                                    Requisition
+                                </a>
+                            </li>
+                            <li>
+                                <a href="stc-consumption.php" class="mm-active">
+                                    <i class="metismenu-icon pe-7s-box1"></i>
+                                    Consumption
+                                </a>
+                            </li>
+                        ';
+                    }
+                    echo '
+                        <li>
+                            <a href="stc-status-down-list.php" class="mm-active">
+                                <i class="metismenu-icon pe-7s-switch"></i>
+                                Status Down List
+                            </a>
+                        </li>
+                        <li>
+                            <a href="stc-safety.php" class="mm-active">
+                                <i class="metismenu-icon pe-7s-id"></i>
+                                Safety
+                            </a>
+                        </li>
+                    ';
+                ?>
             </ul>
         </div>
     </div>

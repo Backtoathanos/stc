@@ -10,22 +10,25 @@ class prime extends tesseract{
 	// check agents existance
 	public function stc_login($user,$pass){
 		$checkbumblebee=mysqli_query($this->stc_dbs, "
-			SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` 
+			SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_category` 
 			FROM `stc_cust_pro_supervisor` 
 			WHERE (
 				`stc_cust_pro_supervisor_contact`='".$user."' OR 
 				`stc_cust_pro_supervisor_whatsapp`='".$user."' OR 
 				`stc_cust_pro_supervisor_email`='".$user."'
 			) AND `stc_cust_pro_supervisor_password`='".$pass."'
+			AND `stc_cust_pro_supervisor_status`=1
 		");
 		if(mysqli_num_rows($checkbumblebee)>0){
 			$user_details=mysqli_fetch_assoc($checkbumblebee);
 			$user_name=$user_details['stc_cust_pro_supervisor_fullname'];
 			$user_id=$user_details['stc_cust_pro_supervisor_id'];
+			$category=$user_details['stc_cust_pro_supervisor_category'];
 			// setcookie("agentsperforme", $user_id, time() +3600000);
 			// setcookie("agentsperformename", $user_name, time() + 3600000);
 			$_SESSION['stc_agent_sub_id']=$user_id;
 			$_SESSION['stc_agent_sub_name']=$user_name;
+			$_SESSION['stc_agent_sub_category']=$category;
 			$op="success";
 		}else{
 			$op="Please Check Username & Password Again.";
