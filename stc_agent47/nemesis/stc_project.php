@@ -1169,7 +1169,7 @@ class pirates_supervisor extends tesseract{
 				) AND 
 				`stc_cust_pro_supervisor_id`<>'".mysqli_real_escape_string($this->stc_dbs, $sup_user_id)."'
 		");
-		if(mysqli_num_rows($cptjackcheckuser>0)){
+		if(mysqli_num_rows($cptjackcheckuser)==0){
 			$cptjacktupdateuser=mysqli_query($this->stc_dbs, "
 				UPDATE
 			    	`stc_cust_pro_supervisor`
