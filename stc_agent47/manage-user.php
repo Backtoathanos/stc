@@ -852,19 +852,19 @@ include_once("../MCU/db.php");
                                     <div class="col-sm-6 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="stc_cust_sup_contnumber" class="">User contact</label>
-                                            <input placeholder="Enter your User contact number" type="number" id="stc_cust_sup_contnumber" class="mb-2 form-control" required>
+                                            <input placeholder="Enter your User contact number" type="number" id="stc_cust_sup_contnumber" class="mb-2 form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="stc_cust_sup_whatsapp" class="">User whatsapp</label>
-                                            <input placeholder="Enter your User Whatsapp" type="number" id="stc_cust_sup_whatsapp" class="mb-2 form-control" required>
+                                            <input placeholder="Enter your User Whatsapp" type="number" id="stc_cust_sup_whatsapp" class="mb-2 form-control" disabled>
                                         </div>
                                     </div>
                                     <div class="col-sm-6 col-md-6">
                                         <div class="position-relative form-group">
                                             <label for="stc_cust_sup_email" class="">User email</label>
-                                            <input placeholder="Enter your User E-mail" type="text" id="stc_cust_sup_email" class="mb-2 form-control" required>
+                                            <input placeholder="Enter your User E-mail" type="text" id="stc_cust_sup_email" class="mb-2 form-control" disabled>
                                         </div>
                                     </div>
                                 </div>                                                        
