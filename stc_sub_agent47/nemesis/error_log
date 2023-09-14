@@ -3262,3 +3262,42 @@
 [13-Sep-2023 10:51:29 Asia/Kolkata] PHP Notice:  Undefined index: work_permit_no in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 580
 [13-Sep-2023 10:51:38 Asia/Kolkata] PHP Notice:  Undefined index: work_permit_no in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 580
 [13-Sep-2023 10:51:44 Asia/Kolkata] PHP Notice:  Undefined index: work_permit_no in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 580
+[13-Sep-2023 13:43:07 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[13-Sep-2023 13:43:22 Asia/Kolkata] PHP Notice:  Undefined index: job_type in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 527
+[13-Sep-2023 13:43:22 Asia/Kolkata] PHP Warning:  implode(): Invalid arguments passed in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 116
+[13-Sep-2023 13:43:22 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 121
+[13-Sep-2023 13:45:13 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[13-Sep-2023 13:46:52 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[13-Sep-2023 15:33:11 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[13-Sep-2023 15:44:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_tools_req in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 555
+[13-Sep-2023 15:44:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_tools_req in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 555
+[13-Sep-2023 15:44:52 Asia/Kolkata] PHP Notice:  Undefined index: stc_tools_req in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 555
+[13-Sep-2023 15:44:54 Asia/Kolkata] PHP Notice:  Undefined index: stc_tools_req in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 555
+[13-Sep-2023 16:35:57 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[13-Sep-2023 16:40:22 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[13-Sep-2023 16:41:51 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[13-Sep-2023 17:04:19 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[13-Sep-2023 17:07:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_tools_req in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 555
+[13-Sep-2023 17:09:17 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[13-Sep-2023 17:11:45 Asia/Kolkata] PHP Notice:  Undefined index: stc_tools_req in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 555
+[13-Sep-2023 17:33:35 Asia/Kolkata] PHP Notice:  Undefined index: prod_price in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_agcart.php on line 538
+[14-Sep-2023 10:15:14 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 10:19:37 Asia/Kolkata] PHP Notice:  Undefined index: job_type in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 527
+[14-Sep-2023 10:19:37 Asia/Kolkata] PHP Warning:  implode(): Invalid arguments passed in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 116
+[14-Sep-2023 10:19:37 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 121
+[14-Sep-2023 10:22:00 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 10:25:03 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 10:27:42 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 10:30:10 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 10:34:10 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 11:11:47 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 11:13:16 Asia/Kolkata] PHP Notice:  Undefined index: job_type in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 527
+[14-Sep-2023 11:13:16 Asia/Kolkata] PHP Warning:  implode(): Invalid arguments passed in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 116
+[14-Sep-2023 11:13:16 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 121
+[14-Sep-2023 11:16:37 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 11:20:15 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 14:32:51 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 15:16:48 Asia/Kolkata] PHP Notice:  Undefined index: prod_price in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_agcart.php on line 538
+[14-Sep-2023 16:14:13 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519
+[14-Sep-2023 16:15:37 Asia/Kolkata] PHP Notice:  Undefined index: stc_tools_req in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 555
+[14-Sep-2023 16:16:02 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 519

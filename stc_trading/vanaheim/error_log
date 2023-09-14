@@ -1,0 +1,12 @@
+[13-Sep-2023 14:02:11 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1959
+[13-Sep-2023 14:02:11 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1966
+[13-Sep-2023 14:02:11 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1974
+[13-Sep-2023 14:04:01 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1959
+[13-Sep-2023 14:04:01 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1966
+[13-Sep-2023 14:04:01 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1974
+[13-Sep-2023 14:04:36 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1959
+[13-Sep-2023 14:04:36 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1966
+[13-Sep-2023 14:04:36 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1974
+[14-Sep-2023 11:47:18 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1464
+[14-Sep-2023 11:47:18 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1464
+[14-Sep-2023 11:47:18 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_trading/vanaheim/order_perform.php on line 1465

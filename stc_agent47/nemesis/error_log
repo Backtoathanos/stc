@@ -1639,3 +1639,57 @@
 [09-Sep-2023 17:09:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_role in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1822
 [09-Sep-2023 17:09:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_role in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1909
 [09-Sep-2023 17:09:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_role in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1909
+[13-Sep-2023 17:18:56 Asia/Kolkata] PHP Notice:  Undefined index: user_id in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 3068
+[14-Sep-2023 15:36:33 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:36:33 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:36:59 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:36:59 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:38:15 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:38:15 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:38:38 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:38:38 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:39:49 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:39:49 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:39:54 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:39:54 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:40:32 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:40:32 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:41:46 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:41:46 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:43:39 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:43:39 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:44:04 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:44:04 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:44:28 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:44:28 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:45:06 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:45:06 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:45:35 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:45:35 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:46:16 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:46:16 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:46:45 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:46:45 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:47:08 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:47:08 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:47:43 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:47:43 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:48:57 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:48:57 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:49:24 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:49:24 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:49:43 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:49:43 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:50:06 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:50:06 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:50:32 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:50:32 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:52:12 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 15:52:12 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 16:02:07 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 16:02:07 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 16:03:28 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 16:03:28 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 16:58:08 Asia/Kolkata] PHP Notice:  Object of class mysqli_result could not be converted to int in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 16:58:08 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1172
+[14-Sep-2023 17:17:25 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_name in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 2977
