@@ -271,7 +271,7 @@ include_once("../MCU/db.php");
                                                                                         <div class="card-content">
                                                                                             <h2>'.$supsubrow['stc_cust_pro_supervisor_fullname'].'<small>'.$supsubrow['stc_cust_pro_supervisor_category'].'</small></h2>
                                                                                             <h3 style="font-size: 0.75rem;">
-                                                                                                '.$supsubrow['stc_cust_pro_supervisor_address'].'<br>
+                                                                                                '.$address.'<br>
                                                                                                 +91-'.$supsubrow['stc_cust_pro_supervisor_contact'].'<br>
                                                                                                 +91-'.$supsubrow['stc_cust_pro_supervisor_whatsapp'].'<br>
 
