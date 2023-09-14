@@ -40,7 +40,7 @@
                     </a>
                 </li>
                 <?php
-                    if($_SESSION['stc_agent_sub_category']=="Supervisor"){
+                    if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
                         echo '
                             <li>
                                 <a href="stc-product.php" class="mm-active">
@@ -51,7 +51,7 @@
                         ';
                     }
 
-                    if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Safety Supervisor"){
+                    if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge" || $_SESSION['stc_agent_sub_category']=="Safety Supervisor"){
                         echo '
                             <li>
                                 <a href="stc-requisition.php" class="mm-active">
