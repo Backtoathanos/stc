@@ -2384,3 +2384,9 @@
 [14-Sep-2023 10:56:05 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/canteen.php on line 658
 [14-Sep-2023 10:56:17 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/canteen.php on line 643
 [14-Sep-2023 10:56:17 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/canteen.php on line 658
+[14-Sep-2023 16:55:23 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 191
+[14-Sep-2023 16:55:23 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 206
+[14-Sep-2023 17:01:09 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 191
+[14-Sep-2023 17:01:09 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 206
+[15-Sep-2023 02:29:23 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 191
+[15-Sep-2023 02:29:23 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 206
