@@ -1174,35 +1174,8 @@ class pirates_supervisor extends tesseract{
 			WHERE
 			    `stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $sup_user_id)."'
 		");
-<<<<<<< HEAD
-		if(mysqli_num_rows($cptjackcheckuser)==0){
-			$cptjacktupdateuser=mysqli_query($this->stc_dbs, "
-				UPDATE
-			    	`stc_cust_pro_supervisor`
-				SET
-				    `stc_cust_pro_supervisor_cust_id` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_cust)."',
-				    `stc_cust_pro_supervisor_fullname` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_fullname)."',
-				    `stc_cust_pro_supervisor_contact` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_cont)."',
-				    `stc_cust_pro_supervisor_whatsapp` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_whatsapp)."',
-				    `stc_cust_pro_supervisor_email` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_email)."',
-				    `stc_cust_pro_supervisor_address` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_address)."',
-				    `stc_cust_pro_supervisor_pincode` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_pincode)."',
-				    `stc_cust_pro_supervisor_cityid` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_city)."',
-				    `stc_cust_pro_supervisor_state_id` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_state)."',
-				    `stc_cust_pro_supervisor_category` 		= '".mysqli_real_escape_string($this->stc_dbs, $stc_category)."',
-				    `stc_cust_pro_supervisor_status` 		= '".mysqli_real_escape_string($this->stc_dbs, $sup_status)."'
-				WHERE
-				    `stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $sup_user_id)."'
-			");
-			if($cptjacktupdateuser){
-				$blackpearl="yes";
-			}else{
-				$blackpearl="no";
-			}
-=======
 		if($cptjacktupdateuser){
 			$blackpearl="yes";
->>>>>>> d916be5ec0f437e6ad787db52b68b5de4da522b5
 		}else{
 			$blackpearl="no";
 		}
