@@ -302,6 +302,7 @@ class transformers extends tesseract{
 				`stc_status_down_list_remarks`,
 				`stc_status_down_list_responsive_person`,
 				`stc_status_down_list_target_date`,
+				`stc_status_down_list_permit_no`,
 				`stc_status_down_list_jobpending_details`,
 				`stc_status_down_list_varities_id`,
 				`stc_status_down_list_equipment_type`,
@@ -310,7 +311,8 @@ class transformers extends tesseract{
 			FROM `stc_status_down_list` 
 			INNER JOIN `stc_cust_project` 
 			ON `stc_cust_project_id`=`stc_status_down_list_location` 
-			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' AND `stc_status_down_list_status`<>5
+			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
+			AND `stc_status_down_list_status`<>5
 			ORDER BY `stc_status_down_list_equipment_status` ASC
 		");
 		if(mysqli_num_rows($optimusprimeqry)>0){
@@ -447,7 +449,10 @@ class transformers extends tesseract{
 						<td>'.$status.'</td>
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
-						<td class="text-center">'.$actionsec.'</td>
+						<td class="text-center">
+							'.$actionsec.'
+							<input type="hidden" class="stc-std-permit-no-hidden-call" value="'.$row['stc_status_down_list_permit_no'].'" id="'.$row['stc_cust_project_title'].'">
+						</td>
 					</tr>
 				';
 			}

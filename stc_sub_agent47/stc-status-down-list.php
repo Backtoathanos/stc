@@ -411,18 +411,24 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 $('.attribute-message-show').remove();
                 $(this).after('<p class="text-success attribute-message-show">Record updated.</p>');
                 stc_update_std();
+                var location_id=$('#stc-agent-sup-std-location-find').val();
+                std_list_call(location_id);
             });
 
             $('body').delegate('.stc-std-update-on-change', 'focusout', function(e){
                 $('.attribute-message-show').remove();
                 $(this).after('<p class="text-success attribute-message-show">Record updated.</p>');
                 stc_update_std();
+                var location_id=$('#stc-agent-sup-std-location-find').val();
+                std_list_call(location_id);
             });
 
             $('body').delegate('.stc-agent-sup-std-tools-req-btn', 'click', function(e){
                 $('.attribute-message-show').remove();
                 $(this).after('<p class="text-success attribute-message-show">Record updated.</p>');
                 stc_update_std_toolsreq();
+                var location_id=$('#stc-agent-sup-std-location-find').val();
+                std_list_call(location_id);
             });
             
             // filter tbm checkbox
@@ -467,6 +473,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var jobdonedetails='';
                 if(status_id=="NA"){
                 }else if(status_id==3){
+                    var permit_no=$(this).parent().find('.stc-std-permit-no-hidden-call').val();
+                    $('.stc-agent-sup-std-upermit-no').val(permit_no);
                     $('.bd-std-jobdonedetails-modal-lg').modal('show');
                     sdl_id=$(this).attr("id");
                     status_id='3';                    
