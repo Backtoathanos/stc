@@ -132,7 +132,7 @@ class transformers extends tesseract{
 	}
 
 	// save std
-	public function stc_std_save($stc_location, $stc_dept, $stc_area, $stc_eq_type, $stc_eq_number, $stc_eq_status, $stc_j_plannning, $stc_qty, $stc_capacity, $stc_reasonattribute, $stc_j_type, $stc_j_varities, $stc_created_by_se, $permit_no, $stc_creator_details, $stc_r_person, $stc_reason, $stc_material_desc, $stc_manpower_req, $stc_target_date, $stc_tools_req, $stc_remarks){
+	public function stc_std_save($stc_location, $stc_dept, $stc_area, $stc_j_plannning){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$tools_req='';
@@ -147,24 +147,7 @@ class transformers extends tesseract{
 			    `stc_status_down_list_location`,
 			    `stc_status_down_list_sub_location`,
 			    `stc_status_down_list_area`,
-			    `stc_status_down_list_equipment_type`,
-			    `stc_status_down_list_equipment_number`,
-			    `stc_status_down_list_equipment_status`,
-			    `stc_status_down_list_qty`,
-			    `stc_status_down_list_capacity`,
-			    `stc_status_down_list_reasonattribute`,
 			    `stc_status_down_list_jobtype`,
-			    `stc_status_down_list_varities_id`,
-			    `stc_status_down_list_created_by_select`,
-			    `stc_status_down_list_permit_no`,
-			    `stc_status_down_list_creator_details`,
-			    `stc_status_down_list_responsive_person`,
-			    `stc_status_down_list_reason`,
-			    `stc_status_down_list_material_desc`,
-			    `stc_status_down_list_manpower_req`,
-			    `stc_status_down_list_target_date`,
-			    `stc_status_down_list_tools_req`,
-			    `stc_status_down_list_remarks`,
 			    `stc_status_down_list_status`,
 			    `stc_status_down_list_created_by`
 			)VALUES(
@@ -172,27 +155,99 @@ class transformers extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_dept)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_location)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_area)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_eq_type)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_eq_number)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_eq_status)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_qty)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_capacity)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_reasonattribute)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_varities)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_created_by_se)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $permit_no)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_creator_details)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_r_person)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_reason)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_material_desc)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_manpower_req)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_target_date)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $tools_req)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_remarks)."',
 				'1',
 				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
 			)
+		");
+		if($optimusprimequery){
+			$optimusprime='Status Down List saved. Thankyou!!!';
+		}else{
+			$optimusprime='Hmmm!!! Something went wrong on status down.';
+		}
+		return $optimusprime;
+	}
+
+	// update std manual
+	public function stc_std_updatem($stc_std_id, $stc_location, $stc_dept, $stc_area, $stc_j_plannning){
+		$optimusprime='';
+		$date=date("Y-m-d H:i:s");
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			UPDATE
+			    `stc_status_down_list`
+			SET
+			    `stc_status_down_list_location` = '".mysqli_real_escape_string($this->stc_dbs, $stc_dept)."',
+			    `stc_status_down_list_sub_location` = '".mysqli_real_escape_string($this->stc_dbs, $stc_location)."',
+			    `stc_status_down_list_area` = '".mysqli_real_escape_string($this->stc_dbs, $stc_area)."',
+			    `stc_status_down_list_jobtype` = '".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."'
+			    `stc_status_down_list_updated_by` = '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
+			WHERE 
+				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_std_id)."'
+		");
+		if($optimusprimequery){
+			$optimusprime='Status Down List updated. Thankyou!!!';
+		}else{
+			$optimusprime='Hmmm!!! Something went wrong on status down.';
+		}
+		return $optimusprime;
+	}
+
+	// update std auto
+	public function stc_std_update($std_id, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $remarks){
+		$optimusprime='';
+		$date=date("Y-m-d H:i:s");
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_status_down_list` 
+			SET
+				`stc_status_down_list_equipment_status`='".mysqli_real_escape_string($this->stc_dbs, $eq_status)."',
+				`stc_status_down_list_jobtype`='".mysqli_real_escape_string($this->stc_dbs, $j_plannning)."',
+				`stc_status_down_list_qty`='".mysqli_real_escape_string($this->stc_dbs, $qty)."',
+				`stc_status_down_list_capacity`='".mysqli_real_escape_string($this->stc_dbs, $capacity)."',
+				`stc_status_down_list_reasonattribute`='".mysqli_real_escape_string($this->stc_dbs, $reasonattribute)."',
+				`stc_status_down_list_created_by_select`='".mysqli_real_escape_string($this->stc_dbs, $created_by_se)."',
+				`stc_status_down_list_permit_no`='".mysqli_real_escape_string($this->stc_dbs, $permit_no)."',
+				`stc_status_down_list_responsive_person`='".mysqli_real_escape_string($this->stc_dbs, $r_person)."',
+				`stc_status_down_list_creator_details`='".mysqli_real_escape_string($this->stc_dbs, $creator_details)."',
+				`stc_status_down_list_reason`='".mysqli_real_escape_string($this->stc_dbs, $reason)."',
+				`stc_status_down_list_material_desc`='".mysqli_real_escape_string($this->stc_dbs, $material_desc)."',
+				`stc_status_down_list_manpower_req`='".mysqli_real_escape_string($this->stc_dbs, $manpower_req)."',
+				`stc_status_down_list_target_date`='".mysqli_real_escape_string($this->stc_dbs, $target_date)."',
+				`stc_status_down_list_remarks`='".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
+				`stc_status_down_list_updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
+			WHERE
+				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $std_id)."'
+		");
+		if($optimusprimequery){
+			$optimusprime='Status Down saved. Thankyou!!!';
+		}else{
+			$optimusprime='Hmmm!!! Something went wrong on status down.';
+		}
+		return $optimusprime;
+	}
+
+	// tools req
+	public function stc_std_update_toolsreq($std_id, $tools_req){
+		$optimusprime='';
+		$date=date("Y-m-d H:i:s");
+		$stctools_req='';
+		if(!empty($tools_req)){
+			$sln=0;
+			foreach($tools_req as $stc_tools_row){
+				$sln++;
+				if($sln>1){
+					$stctools_req.=', '.$stc_tools_row;
+				}else{
+					$stctools_req.=$stc_tools_row;
+				}
+			}
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_status_down_list` 
+			SET
+				`stc_status_down_list_tools_req`='".mysqli_real_escape_string($this->stc_dbs, $stctools_req)."',
+				`stc_status_down_list_updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
+			WHERE
+				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $std_id)."'
 		");
 		if($optimusprimequery){
 			$optimusprime='Status Down saved. Thankyou!!!';
@@ -247,6 +302,7 @@ class transformers extends tesseract{
 				`stc_status_down_list_remarks`,
 				`stc_status_down_list_responsive_person`,
 				`stc_status_down_list_target_date`,
+				`stc_status_down_list_permit_no`,
 				`stc_status_down_list_jobpending_details`,
 				`stc_status_down_list_varities_id`,
 				`stc_status_down_list_equipment_type`,
@@ -255,7 +311,8 @@ class transformers extends tesseract{
 			FROM `stc_status_down_list` 
 			INNER JOIN `stc_cust_project` 
 			ON `stc_cust_project_id`=`stc_status_down_list_location` 
-			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' AND `stc_status_down_list_status`<>5
+			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
+			AND `stc_status_down_list_status`<>5
 			ORDER BY `stc_status_down_list_equipment_status` ASC
 		");
 		if(mysqli_num_rows($optimusprimeqry)>0){
@@ -297,23 +354,28 @@ class transformers extends tesseract{
 				}
 
 				$actionsec='';
-				if($row['stc_status_down_list_status']==1){
-					$actionsec='
-						<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
-							<option status="NA">SELECT STATUS</option>
-							<option status="2">WORK-IN-PROGRESS</option>
-							<option status="3">WORK-DONE</option>
-						</select>
-						<a href="#" class="stc-add-to-pending btn btn-danger" style="font-size:10px;margin-top:4px;" id="'.$row['stc_status_down_list_id'].'">Add Pending Reason</a>
-					';
-				}elseif($row['stc_status_down_list_status']==2){
-					$actionsec='
-						<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
-							<option status="NA">SELECT STATUS</option>
-							<option status="1">PENDING</option>
-							<option status="3">WORK-DONE</option>
-						</select>
-					';
+				if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
+					if($row['stc_status_down_list_status']==1){
+						$actionsec='
+							<a href="javascript:void(0)" class="btn bg-success text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
+							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
+								<option status="NA">SELECT STATUS</option>
+								<option status="2">WORK-IN-PROGRESS</option>
+								<option status="3">WORK-DONE</option>
+							</select>
+							<a href="#" class="stc-add-to-pending btn btn-danger" style="font-size:10px;margin-top:4px;" id="'.$row['stc_status_down_list_id'].'">Add Pending Reason</a>
+						';
+					}elseif($row['stc_status_down_list_status']==2){
+						$actionsec='
+							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
+								<option status="NA">SELECT STATUS</option>
+								<option status="1">PENDING</option>
+								<option status="3">WORK-DONE</option>
+							</select>
+						';
+					}else{
+						$actionsec='#';
+					}
 				}else{
 					$actionsec='#';
 				}
@@ -387,7 +449,10 @@ class transformers extends tesseract{
 						<td>'.$status.'</td>
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
-						<td class="text-center">'.$actionsec.'</td>
+						<td class="text-center">
+							'.$actionsec.'
+							<input type="hidden" class="stc-std-permit-no-hidden-call" value="'.$row['stc_status_down_list_permit_no'].'" id="'.$row['stc_cust_project_title'].'">
+						</td>
 					</tr>
 				';
 			}
@@ -403,6 +468,15 @@ class transformers extends tesseract{
 				</tbody>
 			</table>
 		';
+		return $optimusprime;
+	}
+
+	public function stc_std_call_perticular($std_id){
+		$optimusprime='';
+		$optimusprimeqry=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_status_down_list` WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $std_id)."'
+		");
+		$optimusprime=mysqli_fetch_assoc($optimusprimeqry);
 		return $optimusprime;
 	}
 
@@ -529,41 +603,101 @@ if(isset($_POST['call_j_varities'])){
 	$opmetabots=$metabots->stc_call_job_varities($job_type);
 	echo $opmetabots;
 }
+
 // std save
 if(isset($_POST['stc_std_hit'])){
 	$opmetabots='';
 	$stc_location=$_POST['stc_location'];
 	$stc_dept=$_POST['stc_dept'];
 	$stc_area=$_POST['stc_area'];
-	$stc_eq_type=$_POST['stc_eq_type'];
-	$stc_eq_number=$_POST['stc_eq_number'];
-	$stc_eq_status=$_POST['stc_eq_status'];
 	$stc_j_plannning=$_POST['stc_j_plannning'];
-	$stc_qty=$_POST['stc_qty'];
-	$stc_capacity=$_POST['stc_capacity'];
-	$stc_reasonattribute=$_POST['stc_reasonattribute'];
-	$stc_j_type=$_POST['stc_j_type'];
-	$stc_j_varities=$_POST['stc_j_varities'];
-	$stc_created_by_se=$_POST['stc_created_by_se'];
-	$permit_no=$_POST['permit_no'];
-    $stc_creator_details=$_POST['stc_creator_details'];
-	$stc_r_person=$_POST['stc_r_person'];
-	$stc_reason=$_POST['stc_reason'];
-	$stc_material_desc=$_POST['stc_material_desc'];
-	$stc_manpower_req=$_POST['stc_manpower_req'];
-	$stc_target_date=$_POST['stc_target_date'];
-	$stc_tools_req=$_POST['stc_tools_req'];
-	$stc_remarks=$_POST['stc_remarks'];
 
 	$metabots=new transformers();
-	if(($stc_dept=="NA") || ($stc_eq_type=="NA") || ($stc_eq_number=="NA") || ($stc_j_type=="NA") || ($stc_j_varities=="NA") || empty($stc_location) || empty($stc_area) || empty($stc_creator_details) || empty($stc_r_person) || empty($stc_reason) || empty($stc_material_desc) || empty($stc_manpower_req) || empty($stc_target_date)){
-		$opmetabots="Please fill all the field choose date, if no data available then fill with NA.";
+	if(($stc_dept=="NA") || empty($stc_location) || empty($stc_area)){
+		$opmetabots="Please fill all the field, if no data available then fill with NA.";
 	}elseif(empty($_SESSION['stc_agent_sub_id'])){
 		$opmetabots="Please login!!!";
 	}else{
-		$opmetabots=$metabots->stc_std_save($stc_location, $stc_dept, $stc_area, $stc_eq_type, $stc_eq_number, $stc_eq_status, $stc_j_plannning, $stc_qty, $stc_capacity, $stc_reasonattribute, $stc_j_type, $stc_j_varities, $stc_created_by_se, $permit_no, $stc_creator_details, $stc_r_person, $stc_reason, $stc_material_desc, $stc_manpower_req, $stc_target_date, $stc_tools_req, $stc_remarks);
+		$opmetabots=$metabots->stc_std_save($stc_location, $stc_dept, $stc_area, $stc_j_plannning);
 	}
 	echo $opmetabots;
+}
+
+// std update manual
+if(isset($_POST['stc_std_update_mhit'])){
+	$opmetabots='';
+	$stc_std_id=$_POST['stc_std_id'];
+	$stc_location=$_POST['stc_location'];
+	$stc_dept=$_POST['stc_dept'];
+	$stc_area=$_POST['stc_area'];
+	$stc_j_plannning=$_POST['stc_j_plannning'];
+
+	$metabots=new transformers();
+	if(($stc_dept=="NA") || empty($stc_location) || empty($stc_area)){
+		$opmetabots="Please fill all the field, if no data available then fill with NA.";
+	}elseif(empty($_SESSION['stc_agent_sub_id'])){
+		$opmetabots="Please login!!!";
+	}else{
+		$opmetabots=$metabots->stc_std_updatem($stc_std_id, $stc_location, $stc_dept, $stc_area, $stc_j_plannning);
+	}
+	echo $opmetabots;
+}
+
+// stc update auto
+if(isset($_POST['stc_update_std_hit'])){
+
+	$std_id = $_POST['std_id'];
+	$eq_status = $_POST['eq_status'];
+	$j_plannning = $_POST['j_plannning'];
+	$qty = $_POST['qty'];
+	$capacity = $_POST['capacity'];
+	$reasonattribute = $_POST['reasonattribute'];
+	$created_by_se = $_POST['created_by_se'];
+	$permit_no = $_POST['permit_no'];
+	$creator_details = $_POST['creator_details'];
+	$r_person = $_POST['r_person'];
+	$reason = $_POST['reason'];
+	$material_desc = $_POST['material_desc'];
+	$manpower_req = $_POST['manpower_req'];
+	$target_date = $_POST['target_date'];
+	$remarks = $_POST['remarks'];
+
+	$metabots=new transformers();
+	if(empty($_SESSION['stc_agent_sub_id'])){
+		$opmetabots="login";
+	}else{
+		$opmetabots=$metabots->stc_std_update($std_id, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $remarks);
+	}
+	echo json_encode($opmetabots);
+
+}
+
+// tool requisition
+if(isset($_POST['stc_update_std_toolsreq_hit'])){
+	$std_id=$_POST['std_id'];
+	$tools_req=$_POST['tools_req'];
+
+	$metabots=new transformers();
+	if(empty($_SESSION['stc_agent_sub_id'])){
+		$opmetabots="login";
+	}else{
+		$opmetabots=$metabots->stc_std_update_toolsreq($std_id, $tools_req);
+	}
+	echo json_encode($opmetabots);
+}
+
+// std call
+if(isset($_POST['stc_std_perticular_call_hit'])){
+	$opmetabots='';
+	$std_id=$_POST['std_id'];
+
+	$metabots=new transformers();
+	if(empty($_SESSION['stc_agent_sub_id'])){
+		$opmetabots="Please login!!!";
+	}else{
+		$opmetabots=$metabots->stc_std_call_perticular($std_id);
+	}
+	echo json_encode($opmetabots);
 }
 
 // call std
