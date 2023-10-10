@@ -4,7 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Login</title>
+        <title>Dashboard</title>
+
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@200;600&display=swap" rel="stylesheet">
@@ -46,7 +47,6 @@
 
             .title {
                 font-size: 84px;
-                font-weight: bold;
             }
 
             .links > a {
@@ -80,48 +80,15 @@
                 </div>
             @endif
 
-            
             <div class="content">
                 <div class="title m-b-md">
-                    Login
+                    STC Associates Super Admin
                 </div>
-                <form method="POST" action="" method="POST">
-                    {{csrf_field()}}
-                    <div class="row mb-3">
-                        <div class="col-4">
-                            <label for="user-id" class="mt-2">User Id : </label>
-                        </div>
-                        <div class="col-8">
-                            <input type="text" id="user-id" class="form-control" name="userid" required placeholder="Enter user id">
-                        </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <a href="{{ url('logout') }}">Logout</a>
                     </div>
-                    <div class="row mb-3">
-                        <div class="col-4">
-                            <label for="user-password" class="mt-2">Password : </label>
-                        </div>
-                        <div class="col-8">
-                            <input type="password" id="user-password" class="form-control" name="password" required placeholder="Enter password">
-                        </div>
-                    </div>
-                    <div class="row mb-3">
-                        <div class="col-6">
-                            <label for="remember-me" class="mt-2">Remember me : </label>
-                        </div>
-                        <div class="col-6">
-                            <input type="checkbox" id="remember-me" name="remember-me" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <button class="btn btn-success loginbtn">Login</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12">
-                            <p>@include('layouts._message')</p>
-                        </div>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </body>
