@@ -328,7 +328,7 @@ class sceptor extends tesseract{
 		$totalcpaid=0;
 		$mpaysaleqry=mysqli_query($this->stc_dbs, "
 			SELECT 
-				`stc_daily_sale_id` 
+				`stc_daily_sale_id`
 			FROM 
 				`stc_daily_sale` 
 			WHERE 
@@ -343,7 +343,7 @@ class sceptor extends tesseract{
 				FROM 
 					`stc_daily_sale_payments` 
 				WHERE 
-					`stc_daily_sale_payments_order_no`='".$mpaysalerow['stc_daily_sale_payments_order_no']."'");
+					`stc_daily_sale_payments_order_no`='".$mpaysalerow['stc_daily_sale_id']."'");
 			foreach($cpayresult as $cpayresultrow){
 				$totalcpaid+=$cpayresultrow['stc_daily_sale_payments_amount'];
 			}
@@ -470,7 +470,7 @@ class sceptor extends tesseract{
 				WHERE 
 					`stc_trading_purchase_payment_purchase_id`='".$mpaypurchaserow['stc_trading_purchase_id']."'");
 			foreach($cpayresult as $cpayresultrow){
-				$totalcpaid+=$cpayresultrow['stc_trading_purchase_payment_value'];
+				$totalmpaid+=$cpayresultrow['stc_trading_purchase_payment_value'];
 			}
 		}
 		

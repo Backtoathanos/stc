@@ -1832,3 +1832,4 @@
 [15-Sep-2023 05:22:35 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL) in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1177
 [15-Sep-2023 05:24:37 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL) in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1177
 [15-Sep-2023 05:29:03 UTC] PHP Parse error:  syntax error, unexpected '<<' (T_SL) in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 1177
+[07-Oct-2023 10:37:52 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_name in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 2960

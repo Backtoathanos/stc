@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,6 +14,19 @@
 |
 */
 
-Route::get('/', function () {
+Route::get('/', [AuthController::class, 'login_admin']);
+Route::post('/', [AuthController::class, 'auth_login_admin']);
+Route::get('/logout', [AuthController::class, 'logout_admin']);
+
+
+Route::group(['middleware' => 'superadmin'], function(){
+        
+    Route::get('/dashboard', function() {
+        return view('dashboard');
+    });
+});
+
+
+Route::get('/', function() {
     return view('welcome');
 });
