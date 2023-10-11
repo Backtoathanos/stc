@@ -13,7 +13,7 @@ class AuthController extends Controller
         if(!empty(Auth::check()) && Auth::user()->status==1){
             return redirect('dashboard');
         }else{
-            return view('welcome');
+            return view('pages.welcome');
         }
     }
 
