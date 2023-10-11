@@ -467,7 +467,7 @@ class ragnarReportsViewMerchantLedger extends tesseract{
 
 class ragnarReportsViewRequiReports extends tesseract{
    // call std
-   public function stc_call_std($projectid, $status){
+   public function stc_call_std($status){
       $ivar='';
       $ivarqry=mysqli_query($this->stc_dbs, "
          SELECT 
@@ -502,7 +502,6 @@ class ragnarReportsViewRequiReports extends tesseract{
          INNER JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
          WHERE `stc_status_down_list_status`<>5 
-         AND `stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $projectid)."' 
          AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."'
          ORDER BY DATE(`stc_status_down_list_date`) DESC
       ");
@@ -516,7 +515,6 @@ class ragnarReportsViewRequiReports extends tesseract{
          INNER JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
          WHERE `stc_status_down_list_status`<>5 
-         AND `stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $projectid)."' 
          ORDER BY DATE(`stc_status_down_list_date`) DESC
       ");
       $sitename="";
@@ -524,7 +522,6 @@ class ragnarReportsViewRequiReports extends tesseract{
       $pendingjon=0;
       if(mysqli_num_rows($ivarpreqry)>0){
          foreach($ivarpreqry as $prerow){
-            $sitename=$prerow['stc_cust_project_title'];
             if($prerow['stc_status_down_list_status']==1){
                $pendingjon++;
             }elseif($prerow['stc_status_down_list_status']==3){
@@ -534,10 +531,9 @@ class ragnarReportsViewRequiReports extends tesseract{
          $ivar.='
             <table class="table table-bordered table-responsive" id="stc-show-std-detailspre-table">
                <tr>
-                  <td class="text-center">'.$sitename.'</td>
-                  <td class="text-center">TOTAL JOB DONE:-</td>
+                  <td class="text-center">TOTAL WORK-DONE:-</td>
                   <td class="text-center" style="background-color: #a9d08e;">'.$jobdone.'</td>
-                  <td class="text-center">PENDING JOB:-</td>
+                  <td class="text-center">DOWN JOB:-</td>
                   <td class="text-center" style="background-color: #ffc000;">'.$pendingjon.'</td>
                </tr>
             </table>
@@ -555,15 +551,8 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th class="text-center">EQUIPMENT DETAILS</th>
                      <th class="text-center">QTY</th>
                      <th class="text-center">CAPACITY</th>
-                     <th class="text-center">REASON ATTRIBUTE TO GLOBAL OR VOLTAS</th>
                      <th class="text-center">DOWN REASON</th>
-                     <th class="text-center">TARGET DATE</th>
-                     <th class="text-center">PENDING REASON</th>
-                     <th class="text-center">REQUIREMENT OF MATERIAL</th>
-                     <th class="text-center">REMARKS</th>
-                     <th class="text-center">COMPLETION DATE</th>
                      <th class="text-center">STATUS</th>
-                     <th class="text-center">STATUS 2</th>
                      <th class="text-center">DELAY(DAYS)</th>
                   </tr>
                </thead>
@@ -601,7 +590,7 @@ class ragnarReportsViewRequiReports extends tesseract{
 
             $dperiod='0';
 
-            if($row['stc_status_down_list_equipment_status']=="Down"){
+            if($row['stc_status_down_list_status']==1){
                $eqstatus='
                      <td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
                ';
@@ -670,22 +659,15 @@ class ragnarReportsViewRequiReports extends tesseract{
 
             $ivar.='
                <tr>
-                  <td>'.$row['stc_status_down_list_id'].'</td>
+                  <td class="text-center">'.$row['stc_status_down_list_id'].'</td>
                   <td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
                   <td>'.$row['stc_cust_project_title'].'</td>
                   <td>'.$eq_type.' '.$eq_number.'</td>
-                  <td>'.$row['stc_status_down_list_qty'].'</td>
-                  <td>'.$row['stc_status_down_list_capacity'].'</td>
-                  <td>'.$row['stc_status_down_list_reasonattribute'].'</td>
+                  <td class="text-right">'.$row['stc_status_down_list_qty'].'</td>
+                  <td class="text-right">'.$row['stc_status_down_list_capacity'].'</td>
                   <td style="width:10%">'.$row['stc_status_down_list_reason'].'</td>
-                  <td>'.$tar_date.'</td>
-                  <td style="width:10%">'.$row['stc_status_down_list_jobpending_details'].'</td>
-                  <td>'.$row['stc_status_down_list_material_desc'].'</td>
-                  <td style="width:10%">'.$row['stc_status_down_list_remarks'].'</td>
-                  <td>'.$rec_date.'</td>
-                  '.$eqstatus.'
-                  <td style="background-color:'.$status2color.'">'.$status.'</td>
-                  <td>'.$dperiod.' Days</td>
+                  <td  class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
+                  <td class="text-right">'.$dperiod.' Days</td>
                </tr>
             ';
          }
@@ -3353,10 +3335,9 @@ if(isset($_POST['Stc_call_reports_on_merchants'])){
 #<-----------------------------Object sections of requisition reports class-------------------------------->
 // call std details
 if(isset($_POST['Stc_std_details'])){
-   $projectid=$_POST['projectid'];
    $status=$_POST['status'];
    $bjornecustomer=new ragnarReportsViewRequiReports();
-   $outbjornecustomer=$bjornecustomer->stc_call_std($projectid, $status);
+   $outbjornecustomer=$bjornecustomer->stc_call_std($status);
    echo $outbjornecustomer;
 }
 
