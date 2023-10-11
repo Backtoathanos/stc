@@ -22,11 +22,15 @@ Route::get('/logout', [AuthController::class, 'logout_admin']);
 Route::group(['middleware' => 'superadmin'], function(){
         
     Route::get('/dashboard', function() {
-        return view('dashboard');
+        return view('pages.dashboard');
     });
 });
 
 
 Route::get('/', function() {
-    return view('welcome');
+    return view('pages.welcome');
+});
+
+Route::get('/image', function() {
+    return view('image');
 });

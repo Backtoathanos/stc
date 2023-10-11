@@ -967,36 +967,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">                                  
-                                    <div class="col-md-10 col-xl-10 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success">
-                                            <select class="btn btn-success form-control load_site_name_consump" id="stc-agent-sup-std-location-find">
-                                                <?php 
-                                                    include_once("../MCU/db.php");
-                                                    echo '<option value="0" selected>Please select Sitename!!!</option>';
-                                                    $stcagentspendreportssup=mysqli_query($con, "
-                                                        SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
-                                                        FROM `stc_cust_project`
-                                                        INNER JOIN `stc_status_down_list`
-                                                        ON `stc_cust_project_id`=`stc_status_down_list_location`
-                                                        INNER JOIN `stc_agent_requested_customer` 
-                                                        ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
-                                                        ORDER BY `stc_cust_project_title` ASC
-                                                    ");
-
-                                                    
-                                                    if(!empty(mysqli_num_rows($stcagentspendreportssup))){
-                                                        foreach($stcagentspendreportssup as $pendrepcheckrow){
-                                                            echo '<option align="left" value="'.$pendrepcheckrow['stc_cust_project_id'].'">'.$pendrepcheckrow['stc_cust_project_title'].'</option>';
-                                                        }
-                                                    }else{
-                                                        echo '<option value="0">No Site found!!!</option>';
-                                                    }
-                                                ?>
-                                            </select> 
-                                        </div>
-                                    </div>                     
-                                    <div class="col-md-2 col-xl-2 col-sm-12"> 
+                                <div class="row">
+                                    <div class="col-md-2 col-xl-2 col-sm-12" style="display:none;"> 
                                         <div class="card-border mb-3 card card-body border-success">
                                             <select class="form-control stc-std-load-status">
                                                 <option value="1">DOWN</option>
@@ -1006,15 +978,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-2 col-xl-2 col-sm-12 hidden-requisition-excel-section"> 
-                                        <div class="card-border mb-3 card card-body border-success">
-                                            <button class="mb-2 mr-2 btn btn-success btn-block stc-requisition-exportexcel-hit" data-type="excel">
-                                                <i class="fa fa-file-excel-o"></i> Export Excel
-                                            </button>
-                                        </div>
-                                    </div>
                                     <div class="col-md-12 col-xl-12 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success " ><div class="stc-show-std-details" style="width: 1000px;overflow-x: auto; white-space: nowrap;">
+                                        <div class="card-border mb-3 card card-body border-success " ><div class="stc-show-std-details" style="overflow-x: auto; white-space: nowrap;">
                                             <table class="table table-bordered table-responsive">
                                                 <thead>
                                                    <tr>
@@ -1024,15 +989,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                         <th class="text-center">EQUIPMENT DETAILS</th>
                                                         <th class="text-center">QTY</th>
                                                         <th class="text-center">CAPACITY</th>
-                                                        <th class="text-center">REASON ATTRIBUTE TO GLOBAL OR VOLTAS</th>
                                                         <th class="text-center">DOWN REASON</th>
-                                                        <th class="text-center">TARGET DATE</th>
-                                                        <th class="text-center">PENDING REASON</th>
-                                                        <th class="text-center">REQUIREMENT OF MATERIAL</th>
-                                                        <th class="text-center">REMARKS</th>
-                                                        <th class="text-center">COMPLETION DATE</th>
                                                         <th class="text-center">STATUS</th>
-                                                        <th class="text-center">STATUS 2</th>
                                                         <th class="text-center">DELAY(DAYS)</th>
                                                    </tr>
                                                 </thead>
@@ -1351,10 +1309,12 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
 
         $(document).ready(function(){
             $('.hidden-project-excel-section').hide();
-            
-            // stc_call_std();
-            // function stc_call_std(){
-            $('body').delegate('.load_site_name_consump', 'change', function(e){
+            var screenwidth=$(window).width();
+            var finalwidth=screenwidth - (screenwidth * 0.20);
+            var percent=finalwidth/screenwidth * 100;
+            $('.stc-show-std-details').width(finalwidth);
+            stc_call_std();
+            function stc_call_std(){
                 var projectid = $(".load_site_name_consump").val();
                 var status = $(".stc-std-load-status").val();
                 $('.stc-show-std-details').html("Please wait...");
@@ -1363,7 +1323,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 method  : "POST",
                 data    : {
                   Stc_std_details:1,
-                  projectid:projectid,
                   status:status
                 },
                 success : function(data){
@@ -1371,25 +1330,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     $('.stc-show-std-details').html(data);
                 }
               });
-            });
-            $('body').delegate('.stc-std-load-status', 'change', function(e){
-                var projectid = $(".load_site_name_consump").val();
-                var status = $(".stc-std-load-status").val();
-                $('.stc-show-std-details').html("Please wait...");
-                $.ajax({
-                url     : "kattegat/ragnar_reports.php",
-                method  : "POST",
-                data    : {
-                  Stc_std_details:1,
-                  projectid:projectid,
-                  status:status
-                },
-                success : function(data){
-                    // console.log(data);
-                    $('.stc-show-std-details').html(data);
-                }
-              });
-            });
+            }
 
             // }
             // on change call agents
