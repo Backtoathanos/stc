@@ -24,7 +24,7 @@ Route::get('/logout', [AuthController::class, 'logout_admin']);
 
 Route::group(['middleware' => 'superadmin'], function(){
 
-    Route::get('/dashboard', [DashboardController::class, 'dashboard']);
+    Route::get('/dashboard', [DashboardController::class, 'show']);
     
     Route::get('/users/admin', [AdminUsersController::class, 'show']);
 
