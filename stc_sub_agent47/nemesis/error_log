@@ -3326,3 +3326,15 @@
 [09-Oct-2023 10:52:47 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
 [10-Oct-2023 10:13:34 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
 [10-Oct-2023 10:24:03 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
+[10-Oct-2023 22:58:52 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
+[11-Oct-2023 11:09:29 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
+[11-Oct-2023 14:38:03 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
+[11-Oct-2023 14:51:56 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
+[13-Oct-2023 10:38:33 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
+[13-Oct-2023 13:29:40 Asia/Kolkata] PHP Notice:  Undefined index: job_type in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 601
+[13-Oct-2023 13:29:40 Asia/Kolkata] PHP Warning:  implode(): Invalid arguments passed in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 116
+[13-Oct-2023 13:29:40 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 121
+[13-Oct-2023 13:30:27 Asia/Kolkata] PHP Notice:  Undefined index: job_type in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 601
+[13-Oct-2023 13:30:27 Asia/Kolkata] PHP Warning:  implode(): Invalid arguments passed in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 116
+[13-Oct-2023 13:30:27 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 121
+[13-Oct-2023 15:03:54 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
