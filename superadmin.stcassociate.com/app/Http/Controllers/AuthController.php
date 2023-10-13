@@ -12,6 +12,7 @@ class AuthController extends Controller
         // dd(Hash::make(123456));
         if(!empty(Auth::check()) && Auth::user()->status==1){
             return redirect('dashboard');
+            // return view('pages.dashboard');
         }else{
             return view('pages.welcome');
         }
@@ -22,6 +23,7 @@ class AuthController extends Controller
         $remember = !empty($request->remember) ? true : false;
         if(Auth::attempt(['email'=>$request->userid, 'password'=>$request->password], $remember)){
             return redirect('dashboard');
+            // return view('pages.dashboard');
         }else{
             return redirect()->back()->with('error', "Invalid Credential!");
         }

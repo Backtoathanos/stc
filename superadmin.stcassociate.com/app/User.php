@@ -36,4 +36,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    static public function getAdmin(){
+        return User::select('users.*')
+                ->orderBy('id', 'desc')
+                ->get();
+    }
+
+    static public function getSingle($id){
+        return User::find($id);
+    }
 }
