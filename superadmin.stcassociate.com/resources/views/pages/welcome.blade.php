@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
-        @include('layouts.head')
+        @include('layouts.default_head')
         <style>
             html, body {
                 background-color: #fff;
