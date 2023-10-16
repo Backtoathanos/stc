@@ -22,7 +22,7 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Admin Users</h1>
+            <h1 class="m-0">Electronics Users</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
@@ -45,8 +45,8 @@
                 <p>@include('layouts._message')</p>
             </div>
         </div>
-        <div class="row">
-          <div class="col-lg-12 col-12"><a href="{{ url('/users/admin/create') }}" class="btn btn-block btn-primary btn-md">Create Admin User</a></div>
+        <div class="row">          
+        <div class="col-lg-12 col-12"><a href="{{ url('/users/electronicsusers/create') }}" class="btn btn-block btn-primary btn-md">Create Electronics User</a></div>
           <div class="col-lg-12 col-12">
             <div class="card">
                 <!-- /.card-header -->
@@ -57,22 +57,44 @@
                         <th class="text-center">Id</th>
                         <th class="text-center">Name</th>
                         <th class="text-center">Email</th>
+                        <th class="text-center">Contact</th>
                         <th class="text-center">Address</th>
+                        <th class="text-center">City</th>
+                        <th class="text-center">State</th>
+                        <th class="text-center">Pincode</th>
+                        <th class="text-center">About User</th>
+                        <th class="text-center">Password</th>
                         <th class="text-center">Status</th>
+                        <th class="text-center">Role</th>
                         <th class="text-center">Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                         @foreach($getRecord as $value)
                         <tr>
-                            <td class="text-center">{{$value->id}}</td>
-                            <td>{{$value->name}}</td>
-                            <td>{{$value->email}}</td>
-                            <td>{{$value->password}}</td>
-                            <td class="text-center">{{ ($value->status == 1) ? 'Active' : 'In-active'}}</td>
+                            <td class="text-center">{{$value->stc_electronics_user_id}}</td>
+                            <td>{{$value->stc_electronics_user_fullName}}</td>
+                            <td>{{$value->stc_electronics_user_email}}</td>
+                            <td>{{$value->stc_electronics_user_contact}}</td>
+                            <td>{{$value->stc_electronics_user_address}}</td>
+                            <td>{{$value->stc_city_name}}</td>
+                            <td>{{$value->stc_state_name}}</td>
+                            <td>{{$value->stc_electronics_user_pincode}}</td>
+                            <td>{{$value->stc_electronics_user_aboutyou}}</td>
+                            <td>{{$value->stc_electronics_user_password}}</td>
+                            <td class="text-center">{{ ($value->stc_electronics_user_status == 1) ? 'Active' : 'In-active'}}</td>
                             <td class="text-center">
-                                <a href="{{url('/users/admin/delete/'.$value->id)}}" class="btn btn-danger btn-sm" ><i class='fas fa-trash'></i></a>
-                                <a href="{{url('/users/admin/edit/'.$value->id)}}" class="btn btn-danger btn-sm" ><i class='fas fa-edit'></i></a>
+                              @if($value->stc_electronics_user_for == 1)
+                                User
+                              @elseif($value->stc_electronics_user_for == 2)
+                                Receptient
+                              @else 
+                                Admin
+                              @endif
+                            </td>
+                            <td class="text-center">
+                                <a href="{{url('/users/electronicsusers/delete/'.$value->stc_electronics_user_id)}}" class="btn btn-danger btn-sm" ><i class='fas fa-trash'></i></a>
+                                <a href="{{url('/users/electronicsusers/edit/'.$value->stc_electronics_user_id)}}" class="btn btn-danger btn-sm" ><i class='fas fa-edit'></i></a>
                             </td>
                         </tr>
                         @endforeach
@@ -82,8 +104,15 @@
                         <th class="text-center">Id</th>
                         <th class="text-center">Name</th>
                         <th class="text-center">Email</th>
-                        <th class="text-center">Passwords</th>
+                        <th class="text-center">Contact</th>
+                        <th class="text-center">Address</th>
+                        <th class="text-center">City</th>
+                        <th class="text-center">State</th>
+                        <th class="text-center">Pincode</th>
+                        <th class="text-center">About User</th>
+                        <th class="text-center">Password</th>
                         <th class="text-center">Status</th>
+                        <th class="text-center">Role</th>
                         <th class="text-center">Actions</th>
                       </tr>
                     </tfoot>

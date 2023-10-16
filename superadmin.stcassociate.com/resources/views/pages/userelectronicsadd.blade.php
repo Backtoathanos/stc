@@ -22,13 +22,13 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">Trading Users</h1>
+            <h1 class="m-0">Electronics Users</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
               <li class="breadcrumb-item"><a href="#">User</a></li>
-              <li class="breadcrumb-item"><a href="#">{{!empty($page_title) ? $page_title : ''}}</a></li>
+              <li class="breadcrumb-item"><a href="{{url('/users/electronicsusers')}}">{{!empty($page_title) ? $page_title : ''}}</a></li>
               <li class="breadcrumb-item active"><a href="#">Add</a></li>
             </ol>
           </div><!-- /.col -->
@@ -51,44 +51,65 @@
                 <div class="card-body">
                   <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
+                    <input type="text" class="form-control" id="name" name="name" value="{{old('name')}}" placeholder="Enter name" required>
                   </div>
                   <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter email">
+                    <input type="email" class="form-control" id="email" name="email" value="{{old('email')}}" placeholder="Enter email" required>
+                    <div style="color:red;">{{ $errors->first('email') }}</div>
                   </div>
                   <div class="form-group">
                     <label for="contact">Contact</label>
-                    <input type="text" class="form-control" id="contact" name="contact" placeholder="Enter contact">
+                    <input type="text" class="form-control" id="contact" name="contact" value="{{old('contact')}}" placeholder="Enter contact" required>
+                    <div style="color:red;">{{ $errors->first('contact') }}</div>
                   </div>
                   <div class="form-group">
                     <label for="address">Address</label>
-                    <textarea class="form-control" id="address" name="address" placeholder="Enter address"></textarea>
+                    <textarea class="form-control" id="address" name="address" placeholder="Enter address" required>{{old('address')}}</textarea>
                   </div>
                   <div class="form-group">
                     <label for="city">City</label>
                     <select class="form-control" id="city" name="city">
-                        <option>Select</option>
+                        <option value="NA">Select</option>
+                        @foreach($getRecordCity as $city)
+                          <option value="{{$city->stc_city_id}}">{{$city->stc_city_name}}</option>
+                        @endforeach
                     </select>
                   </div>
                   <div class="form-group">
                     <label for="state">State</label>
                     <select class="form-control" id="state" name="state">
-                        <option>Select</option>
+                        <option value="NA">Select</option>
+                        @foreach($getRecordState as $state)
+                          <option value="{{$state->stc_state_id}}">{{$state->stc_state_name}}</option>
+                        @endforeach
                     </select>
                   </div>
                   <div class="form-group">
                     <label for="pincode">Pincode</label>
-                    <input type="number" class="form-control" id="pincode" name="pincode" placeholder="Enter pincode">
+                    <input type="number" class="form-control" id="pincode" name="pincode" value="{{old('pincode')}}" placeholder="Enter pincode" required>
                   </div>
                   <div class="form-group">
                     <label for="passowrd">Password</label>
-                    <input type="password" class="form-control" id="passowrd" name="password" placeholder="Password">
+                    <input type="password" class="form-control" id="passowrd" name="password" value="{{old('password')}}" placeholder="Password">
+                  </div>
+                  <div class="form-group">
+                    <label for="abtuser">About user</label>
+                    <input type="text" class="form-control" id="abtuser" name="abtuser" value="{{old('abtuser')}}" placeholder="Enter about user">
+                  </div>
+                  <div class="form-group">
+                    <label for="role">Role</label>
+                    <select class="form-control" id="role" name="role">
+                        <option {{ (old('status')==1) ? 'selected' : '' }} value="1">Admin</option>
+                        <option {{ (old('status')==2) ? 'selected' : '' }} value="2">Receptionist</option>
+                        <option {{ (old('status')==3) ? 'selected' : '' }} value="3">User</option>
+                    </select>
                   </div>
                   <div class="form-group">
                     <label for="status">Status</label>
                     <select class="form-control" id="status" name="status">
-                        <option>Select</option>
+                        <option {{ (old('status')==1) ? 'selected' : '' }} value="1">Active</option>
+                        <option {{ (old('status')==0) ? 'selected' : '' }} value="0">In-active</option>
                     </select>
                   </div>
                 </div>
