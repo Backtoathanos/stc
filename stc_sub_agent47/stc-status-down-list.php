@@ -29,6 +29,13 @@ if(isset($_SESSION["stc_agent_sub_id"])){
         .fade:not(.show) {
           opacity: 10;
         }
+        
+        @media (max-width: 991.98px){
+           .tabledata-responsvie{
+                overflow-x: auto;
+                white-space: nowrap;
+           }
+        }
     </style>
 </head>
 <body>
@@ -85,7 +92,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="col-md-12 col-xl-12"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
-                                            <div class="card mb-3 widget-content stc-std-search-result">
+                                            <div class="card mb-3 widget-content stc-std-search-result tabledata-responsvie">
                                             </div>
                                         </div>
                                     </div>
@@ -226,6 +233,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.stc-agent-sup-std-save', 'click', function(e){
                 e.preventDefault();
                 var operation=$(this).attr('operation');
+                var slocation  = $('#stc-agent-sup-std-sublocation').val();
                 var location = $('.stc-agent-sup-std-sub-location option:selected').text();
                 var dept = $('#stc-agent-sup-std-location').val();
                 var area = $('.stc-agent-sup-std-area option:selected').text();
@@ -254,6 +262,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         method      : "POST",
                         data        : {
                             stc_std_hit:1,
+                            stc_slocation:slocation,
                             stc_location:location,
                             stc_dept:dept,
                             stc_area:area,
@@ -281,9 +290,13 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         data        : {
                             stc_std_update_mhit:1,
                             stc_std_id:std_id,
+                            stc_slocation:slocation,
                             stc_location:location,
                             stc_dept:dept,
                             stc_area:area,
+                            stc_eq_type:eq_type,
+                            stc_eq_number:eq_number,
+                            stc_j_varities:j_varities,
                             stc_j_plannning:j_plannning
                         },
                         success     : function(response_std){
@@ -313,6 +326,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     dataType : 'JSON',
                     success     : function(response_sdl){
                         $('#stc-agent-sup-std-hidden-std-id').val(response_sdl.stc_status_down_list_id);
+                        $('#stc-agent-sup-std-sublocation').val(response_sdl.stc_status_down_list_plocation);
+                        $('#stc-agent-sup-std-location').val(response_sdl.stc_status_down_list_location);
+                        $('#stc-agent-sup-std-sub-location').val(response_sdl.stc_status_down_list_sub_location);
+                        $('#stc-agent-sup-std-sub-location').change();
                         $('#stc-agent-sup-std-equipment-status').val(response_sdl.stc_status_down_list_equipment_status);
                         $('#stc-agent-sup-std-job-plannning').val(response_sdl.stc_status_down_list_jobtype);
                         $(".stc-agent-sup-std-qty").val(response_sdl.stc_status_down_list_qty);
@@ -328,6 +345,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-agent-sup-std-target-date').val(response_sdl.stc_status_down_list_target_date);
                         $('.stc-agent-sup-std-remarks').val(response_sdl.stc_status_down_list_remarks);
                         $('.stc-std-tools-req-item-show').html(response_sdl.stc_status_down_list_tools_req);
+                        $('#stc-agent-sup-std-area').val(response_sdl.stc_status_down_list_area);
                     }
                 });
             }
@@ -473,11 +491,11 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var jobdonedetails='';
                 if(status_id=="NA"){
                 }else if(status_id==3){
-                    var permit_no=$(this).parent().find('.stc-std-permit-no-hidden-call').val();
+                    var permit_no=$(this).parent().find('.stc-std-permit-no-hidden-call').val();  
                     $('.stc-agent-sup-std-upermit-no').val(permit_no);
                     $('.bd-std-jobdonedetails-modal-lg').modal('show');
                     sdl_id=$(this).attr("id");
-                    status_id='3';                    
+                    status_id='3';
                 }else{
                     $.ajax({
                         url         : "nemesis/stc_std.php",
@@ -587,6 +605,32 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     load_std_perticular(std_id);
                 }
             });
+            
+            $('body').delegate('.update-status-si', 'click', function(e){
+                e.preventDefault();
+                var data_id = $(this).attr('data-id');
+                var actiontype = $(this).attr('actiontype');
+                $.ajax({
+                    url         : "nemesis/stc_std.php",
+                    method      : "POST",
+                    data        : {
+                        stc_jobcomplete_update_hit:1,
+                        data_id:data_id,
+                        actiontype:actiontype
+                    },
+                    dataType : 'JSON',
+                    success     : function(response_sdl){
+                        if(response_sdl=="logout"){
+                            widnow.location.reload();
+                        }else{
+                            alert(response_sdl);
+                            var location_id=$('#stc-agent-sup-std-location-find').val();
+                            std_list_call(location_id);
+                        }
+                    }
+                });
+            });
+            
         });
     </script>
 </body>
@@ -686,12 +730,25 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <h5>Location :</h5><br>
                                 <input type="hidden" id="stc-agent-sup-std-hidden-std-id">
                                 <input type="hidden" id="stc-agent-sup-std-hidden-location-id">
+                                <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-sublocation">
+                                    <option value="NA">Select</option>
+                                    <option>TATA Steel - Jamshedpur</option>
+                                    <option>TATA Steel - KPO</option>
+                                    <option>Others</option>
+                                </select> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xl-3"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Sub Location :</h5><br>
                                 <select class="btn btn-success form-control load_site_name_consump text-left" id="stc-agent-sup-std-location"><option>Plese select location first!!!</option>
                                 </select> 
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-6"> 
+                    <div class="col-md-3 col-xl-3"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Department :</h5><br>
@@ -816,44 +873,20 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Capacity (auto save):</h5><br>
-                                <input type="number" class="form-control stc-agent-sup-std-capacity stc-std-update-on-focusout" placeholder="Enter Capacity">
+                                <input type="text" class="form-control stc-agent-sup-std-capacity stc-std-update-on-focusout" placeholder="Enter Capacity">
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
+                    <div class="col-md-4 col-xl-4 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Reason Attribute to GLOBAL or VOLTAS (auto save):</h5><br>
+                                <h5>Reason Attribute (auto save):</h5><br>
                                 <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-reasonattribite"><option>GLOBAL</option><option>VOLTAS</option>
                                 </select> 
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <h5>Created By (auto save):</h5><br>
-                                <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-created-by-select">
-                                    <option>CLIENT</option>
-                                    <option>ELECTRICIAN</option>
-                                    <option>INCHARGE</option>
-                                    <option>OPERATOR</option>
-                                    <option>OTHER</option>
-                                    <option>SUPERVISOR</option>
-                                    <option>TECHNICIAN</option>
-                                </select> 
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <h5>Creator Name & Mobile NO (auto save):</h5><br>
-                                <input type="text" class="form-control stc-agent-sup-std-creator-details stc-std-update-on-focusout" placeholder="Enter Creator Name & Mobile NO">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
+                    <div class="col-md-4 col-xl-4 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Permit No (auto save):</h5><br>
@@ -861,7 +894,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
+                    <div class="col-md-4 col-xl-4 stc-std-section-hideshow">  
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Responsible Person (auto save):</h5><br>

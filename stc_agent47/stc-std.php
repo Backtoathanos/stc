@@ -30,6 +30,11 @@ if(isset($_SESSION["stc_agent_id"])){
         .fade:not(.show) {
           opacity: 10;
         }
+
+        .tabledata-responsvie{
+                overflow-x: auto;
+                white-space: nowrap;
+           }
     </style>
 </head>
 <body>
@@ -125,7 +130,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="col-md-12 col-xl-12"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
-                                            <div class="card mb-3 widget-content stc-std-search-result" >
+                                            <div class="card mb-3 widget-content stc-std-search-result tabledata-responsvie" >
                                             </div>
                                         </div>
                                     </div>
@@ -159,6 +164,11 @@ if(isset($_SESSION["stc_agent_id"])){
     </script>
     <script>
         $(document).ready(function(){
+            var screenwidth=$(window).width();
+            var finalwidth=screenwidth - (screenwidth * 0.20);
+            var percent=finalwidth/screenwidth * 100;
+            $('.stc-std-search-result').width(finalwidth);
+
             // call status down list
             $('body').delegate('.stc-std-list-show-hit', 'click', function(e){
                 e.preventDefault();
@@ -185,7 +195,8 @@ if(isset($_SESSION["stc_agent_id"])){
             $('body').delegate('.stc-set-to-complete', 'click', function(e){
                 e.preventDefault();
                 var sdl_id=$(this).attr("id");
-                var status_id='4';
+                var status_id='5';
+                $(this).hide();
                 $.ajax({
                     url         : "nemesis/stc_project.php",
                     method      : "POST",

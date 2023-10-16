@@ -1856,6 +1856,11 @@ class pirates_supervisor extends tesseract{
 						<th class="text-center">PENDING REASON</th>
 						<th class="text-center">JOB DONE DETAILS</th>
 						<th class="text-center">REMARKS</th>
+						<th class="text-center">CREATED BY</th>
+						<th class="text-center">UPDATED BY</th>
+						<th class="text-center">UPDATED ON</th>
+						<th class="text-center">STATUS UPDATED BY</th>
+						<th class="text-center">STATUS UPDATED ON</th>
 						<th class="text-center">ACTION</th>
 					</tr>
 				</thead>
@@ -1908,7 +1913,12 @@ class pirates_supervisor extends tesseract{
 			    `stc_status_down_list_target_date`,
 			    `stc_status_down_list_tools_req`,
 			    `stc_status_down_list_status`,
-			    `stc_status_down_list_created_by`
+			    `stc_status_down_list_created_by`,
+			    `stc_cust_pro_supervisor_fullname`,
+				`stc_status_down_list_updated_by`,
+				`stc_status_down_list_updated_date`,
+				`stc_status_down_list_status_updated_by`,
+				`stc_status_down_list_status_updated_on`
 			FROM `stc_status_down_list` 
 			LEFT JOIN `stc_cust_project` 
 			ON `stc_cust_project_id`=`stc_status_down_list_location` 
@@ -1916,8 +1926,8 @@ class pirates_supervisor extends tesseract{
 			ON `stc_status_down_list_equipment_number`=a.`stc_cpumpd_id` 
 			LEFT JOIN `stc_customer_pump_details` b 
 			ON `stc_status_down_list_equipment_type`=b.`stc_cpumpd_id` 
-			LEFT JOIN `stc_agents` 
-			ON `stc_status_down_list_created_by`=`stc_agents_id` 
+			LEFT JOIN `stc_cust_pro_supervisor` 
+			ON `stc_status_down_list_created_by`=`stc_cust_pro_supervisor_id` 
 			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
 			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field." ".$search_field."
 			ORDER BY DATE(`stc_status_down_list_date`) DESC
@@ -1966,7 +1976,7 @@ class pirates_supervisor extends tesseract{
 
 				$actionsec='';
 				if($_SESSION['stc_agent_role']==3){
-					if(($row['stc_status_down_list_status']==4) || ($row['stc_status_down_list_status']==3)){
+					if(($row['stc_status_down_list_status']==4)){
 						$actionsec='
 							<a href="#" class="stc-set-to-close" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
 						';
@@ -1974,7 +1984,7 @@ class pirates_supervisor extends tesseract{
 						$actionsec='#';
 					}
 				}else{
-					if($row['stc_status_down_list_status']==3){
+					if($row['stc_status_down_list_status']==4){
 						$actionsec='
 							<a href="#" class="stc-set-to-complete" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
 						';
@@ -2038,6 +2048,24 @@ class pirates_supervisor extends tesseract{
 					$job_type=$stc_call_jobtyperow['stc_status_down_list_job_type_title'];
 					$job_varities=$stc_call_jobtyperow['stc_status_down_list_job_type_sub_title'];
 				}
+				$updator_id=$row['stc_status_down_list_updated_by'];
+				$updater_name='';
+				$updateqry=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_pro_supervisor_fullname` FROM stc_cust_pro_supervisor WHERE `stc_cust_pro_supervisor_id`=$updator_id
+				");
+				if(mysqli_num_rows($updateqry)>0){
+					$result=mysqli_fetch_assoc($updateqry);
+					$updater_name=$result['stc_cust_pro_supervisor_fullname'];
+				}
+				$supdator_id=$row['stc_status_down_list_status_updated_by'];
+				$supdater_name='';
+				$supdateqry=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_pro_supervisor_fullname` FROM stc_cust_pro_supervisor WHERE `stc_cust_pro_supervisor_id`=$supdator_id
+				");
+				if(mysqli_num_rows($supdateqry)>0){
+					$result=mysqli_fetch_assoc($supdateqry);
+					$supdater_name=$result['stc_cust_pro_supervisor_fullname'];
+				}
 				$optimusprime.='
 					<tr>
 						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
@@ -2067,6 +2095,11 @@ class pirates_supervisor extends tesseract{
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_jobdone_details'].'<br>'.$updatejobdetails.'
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
+						<td>'.$row['stc_cust_pro_supervisor_fullname'].'</td>
+						<td>'.$updater_name.'</td>
+						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_updated_date'])).'</td>
+						<td>'.$supdater_name.'</td>
+						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_status_updated_on'])).'</td>
 						<td class="text-center">'.$actionsec.'</td>
 					</tr>
 				';
