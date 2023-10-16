@@ -8,6 +8,15 @@
 
     <!-- Sidebar -->
     <div class="sidebar">
+      <!-- Sidebar user panel (optional) -->
+      <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+        <div class="image">
+          <img src="{{ url('public/dist/img/avatar5.png')}}" class="img-circle elevation-2" alt="User Image">
+        </div>
+        <div class="info">
+          <a href="#" class="d-block">{{ Auth::user()->name}}</a>
+        </div>
+      </div>
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
@@ -34,19 +43,37 @@
               <li class="nav-item">
                 <a href="{{ url('/users/admin') }}" class="nav-link @if(Request::segment(2) == 'admin') active @endif">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>Admin</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ url('/users/tradingusers') }}" class="nav-link @if(Request::segment(2) == 'tradingusers') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Trading</p>
+                  <p>Super Admin</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ url('/users/electronicsusers') }}" class="nav-link @if(Request::segment(2) == 'electronicsusers') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Electronics</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url('/users/groceriesusers') }}" class="nav-link @if(Request::segment(2) == 'groceriesusers') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Groceries</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url('/users/schoolusers') }}" class="nav-link @if(Request::segment(2) == 'schoolusers') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>School</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url('/users/uadminusers') }}" class="nav-link @if(Request::segment(2) == 'uadminusers') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>User Administration</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url('/users/tradingusers') }}" class="nav-link @if(Request::segment(2) == 'tradingusers') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Trading</p>
                 </a>
               </li>
             </ul>

@@ -656,12 +656,16 @@ class ragnarReportsViewRequiReports extends tesseract{
             foreach($stc_call_supqry as $stc_call_suprow){
                $sup_det=$stc_call_suprow['stc_cust_pro_supervisor_fullname'].'<br>'.$stc_call_suprow['stc_cust_pro_supervisor_contact'];
             }
-
+            $p_title=$row['stc_cust_project_title'];
+            if((strpos($p_title,"(GTO")>0) || (strpos($p_title,"(WOG")>0) || (strpos($p_title,"(STO")>0)){
+               $strpos=strpos($p_title,"(");
+               $p_title=substr($p_title,0, $strpos);
+            }
             $ivar.='
                <tr>
                   <td class="text-center">'.$row['stc_status_down_list_id'].'</td>
                   <td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
-                  <td>'.$row['stc_cust_project_title'].'</td>
+                  <td>'.$p_title.'</td>
                   <td>'.$eq_type.' '.$eq_number.'</td>
                   <td class="text-right">'.$row['stc_status_down_list_qty'].'</td>
                   <td class="text-right">'.$row['stc_status_down_list_capacity'].'</td>

@@ -29,7 +29,7 @@
               <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
               <li class="breadcrumb-item"><a href="#">User</a></li>
               <li class="breadcrumb-item"><a href="#">{{!empty($page_title) ? $page_title : ''}}</a></li>
-              <li class="breadcrumb-item active"><a href="#">Add</a></li>
+              <li class="breadcrumb-item active"><a href="#">Edit</a></li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -51,11 +51,12 @@
                 <div class="card-body">
                   <div class="form-group">
                     <label for="name">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" value="{{$getRecord->name}}" placeholder="Enter name">
+                    <input type="text" class="form-control" id="name" name="name" value="{{old('name', $getRecord->name)}}" placeholder="Enter name">
                   </div>
                   <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" value="{{$getRecord->email}}" placeholder="Enter email">
+                    <input type="email" class="form-control" id="email" name="email" value="{{old('email', $getRecord->email)}}" placeholder="Enter email">
+                    <div style="color:red;">{{ $errors->first('email') }}</div>
                   </div>
                   <div class="form-group">
                     <label for="passowrd">Password</label>
