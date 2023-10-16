@@ -3338,3 +3338,6 @@
 [13-Oct-2023 13:30:27 Asia/Kolkata] PHP Warning:  implode(): Invalid arguments passed in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 116
 [13-Oct-2023 13:30:27 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 121
 [13-Oct-2023 15:03:54 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
+[14-Oct-2023 12:31:36 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
+[14-Oct-2023 12:33:39 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593
+[16-Oct-2023 14:20:23 Asia/Kolkata] PHP Notice:  Undefined index: eq_type_nu in /home/c2484kn1eg0y/public_html/stc_sub_agent47/nemesis/stc_std.php on line 593

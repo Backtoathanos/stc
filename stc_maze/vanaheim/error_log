@@ -5,3 +5,6 @@
 [22-Aug-2023 16:36:24 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
 [22-Aug-2023 16:36:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 685
 [09-Sep-2023 16:14:50 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 711
+[16-Oct-2023 15:52:09 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[16-Oct-2023 15:52:09 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1578
+[16-Oct-2023 15:52:09 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
