@@ -2932,7 +2932,7 @@ if(isset($_POST['stc_cust_supervisor_action'])){
 	}
 	$headers = "MIME-Version: 1.0" . "\r\n"; 
 	$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n"; 
-	$headers .= 'From: '.$from.'STC Associates' . "\r\n";
+	$headers .= 'From: '.$from;
 	$sup_password=randomPassword();
 	$maildesc= '
 		<!DOCTYPE html>
@@ -3452,8 +3452,8 @@ if(isset($_POST['stc_send_mail'])){
 			$from="info@agent.stcassociate.com";
 		}
 		$headers = "MIME-Version: 1.0" . "\r\n"; 
-		$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n"; 
-		$headers .= 'From: '.$from.'STC Associates' . "\r\n";
+		$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";  
+		$headers .= 'From: '.$from;
 		$maildesc= '
 			<!DOCTYPE html>
 			<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
