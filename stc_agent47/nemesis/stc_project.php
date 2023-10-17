@@ -1966,7 +1966,7 @@ class pirates_supervisor extends tesseract{
 							<td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
 					';
 					
-					$today = $rec_date=='' ? date("Y/m/d") : $rec_date; 
+					$today = $rec_date>1970 ? date("Y/m/d", strtotime($row['stc_status_down_list_rect_date'])) : date("Y/m/d") ; 
 					$startTimeStamp = strtotime(date('Y-m-d', strtotime($row['stc_status_down_list_date'])));
 		            $endTimeStamp = strtotime($today);
 
