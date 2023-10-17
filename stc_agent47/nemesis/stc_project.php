@@ -2926,6 +2926,10 @@ if(isset($_POST['stc_cust_supervisor_action'])){
 		return implode($pass); //turn the array into a string
 	}
 	$from="info@stcassociate.com";
+	$website=$_SERVER['SERVER_NAME'];
+	if(strpos($website, 'agent')!=''){
+		$from="info@agent.stcassociate.com";
+	}
 	$headers = "MIME-Version: 1.0" . "\r\n"; 
 	$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n"; 
 	$headers .= 'From: '.$from.'STC Associates' . "\r\n";
@@ -3444,8 +3448,8 @@ if(isset($_POST['stc_send_mail'])){
 	}else{
 		$from="info@stcassociate.com";
 		$website=$_SERVER['SERVER_NAME'];
-		if(strpos($website, 'agent')==''){
-			$from="info@stcassociate.com";
+		if(strpos($website, 'agent')!=''){
+			$from="info@agent.stcassociate.com";
 		}
 		$headers = "MIME-Version: 1.0" . "\r\n"; 
 		$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n"; 
