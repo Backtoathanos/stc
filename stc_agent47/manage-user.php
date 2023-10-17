@@ -261,7 +261,7 @@ include_once("../MCU/db.php");
                                                                                 $address=$address.'...';
                                                                             }
                                                                             $blacknwhitestyle='style="-webkit-filter: grayscale(100%);"';
-                                                                            if($sitenamerow['stc_cust_pro_supervisor_status']=='1'){
+                                                                            if($supsubrow['stc_cust_pro_supervisor_status']=='1'){
                                                                                 $blacknwhitestyle='';
                                                                             }
                                                                             echo '
