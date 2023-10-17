@@ -217,7 +217,8 @@ include_once("../MCU/db.php");
                                                                                 `stc_cust_pro_supervisor_whatsapp`,
                                                                                 `stc_cust_pro_supervisor_email`,
                                                                                 `stc_cust_pro_supervisor_category`,
-                                                                                `stc_cust_pro_supervisor_status`
+                                                                                `stc_cust_pro_supervisor_status`,
+                                                                                `stc_cust_pro_supervisor_password`
                                                                             FROM `stc_cust_pro_supervisor`
                                                                             INNER JOIN `stc_agents` 
                                                                             ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` 
@@ -236,25 +237,6 @@ include_once("../MCU/db.php");
                                                                             foreach($sitenameqry as $sitenamerow){
                                                                                 $sitename.=$sitenamerow['stc_cust_project_title'].'<br>';
                                                                             }
-                                                                            // echo "
-                                                                            //     <tr>
-                                                                            //         <td>
-                                                                            //             STC/S/A/".substr("0000{$supsubrow['stc_cust_pro_supervisor_id']}", -5)."</br>
-                                                                            //             ".$supsubrow['stc_cust_pro_supervisor_fullname']."
-                                                                            //         </td>
-                                                                            //         <td>".$supsubrow['stc_cust_pro_supervisor_address']."</td>
-                                                                            //         <td>
-                                                                            //             +91-".$supsubrow['stc_cust_pro_supervisor_contact']."</br>
-                                                                            //             <a href='http://wa.me/7209581823'>
-                                                                            //             +91-".$supsubrow['stc_cust_pro_supervisor_whatsapp']."
-                                                                            //             </a>
-                                                                            //         </td>
-                                                                            //         <td>".$supsubrow['stc_cust_pro_supervisor_email']."</td>
-                                                                            //         <td>".$sitename."</td>
-                                                                            //         <td>".$supsubrow['stc_cust_pro_supervisor_category']."</td>
-                                                                            //         <td><a href='#' class='stc-edit-user-btn' id='".$supsubrow['stc_cust_pro_supervisor_id']."'>Edit User</a></td>
-                                                                            //     </tr>
-                                                                            // ";
                                                                             $address=$supsubrow['stc_cust_pro_supervisor_address'];
                                                                             if(strlen($address)>33){
                                                                                 $address=substr($address, 0,33);
@@ -285,6 +267,16 @@ include_once("../MCU/db.php");
                                                                                                 <a href="#" class="stc-user-edit" title="Edit" data-toggle="modal" data-target=".bd-edituser-modal-lg" id="'.$supsubrow['stc_cust_pro_supervisor_id'].'"><i class="fas fa-edit"></i></a>
                                                                                                 <a href="#" class="stc-user-view" title="View" data-toggle="modal" data-target=".bd-showuser-modal-lg" id="'.$supsubrow['stc_cust_pro_supervisor_id'].'"> <i class="fas fa-eye"></i></a>
                                                                                                 <a href="#" class="stc-user-collaborate" title="Collaborate"> <i class="fas fa-handshake-o"></i></a>
+                                                                                                <a 
+                                                                                                    href="#" 
+                                                                                                    class="stc-user-mail" 
+                                                                                                    title="Mail" 
+                                                                                                    id="'.$supsubrow['stc_cust_pro_supervisor_id'].'" 
+                                                                                                    contact="'.$supsubrow['stc_cust_pro_supervisor_contact'].'" 
+                                                                                                    user-password="'.$supsubrow['stc_cust_pro_supervisor_password'].'" 
+                                                                                                    email="'.$supsubrow['stc_cust_pro_supervisor_email'].'" 
+                                                                                                    fullname="'.$supsubrow['stc_cust_pro_supervisor_fullname'].'"
+                                                                                                > <i class="fas fa-envelope"></i></a>                                                                                                
                                                                                             </div>
                                                                                         </div>
                                                                                     </div>
@@ -667,6 +659,35 @@ include_once("../MCU/db.php");
                     }
                 });
             });
+
+            $('body').delegate('.stc-user-mail', 'click', function(e){
+                var user_id=$(this).attr("id");
+                var contact=$(this).attr("contact");
+                var password=$(this).attr("user-password");
+                var email=$(this).attr("email");
+                var fullname=$(this).attr("fullname");
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        stc_send_mail:1,
+                        user_id:user_id,
+                        contact:contact,
+                        password:password,
+                        email:email,
+                        fullname:fullname
+                    },
+                    dataType : "JSON",
+                    success : function(response){
+                        if(response=="reload"){
+                            widnow.location.reload();
+                        }else{
+                            alert(response);
+                        }
+                    }
+                });
+            });
+            
         });
     </script>
 </body>

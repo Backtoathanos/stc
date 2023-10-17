@@ -2926,6 +2926,10 @@ if(isset($_POST['stc_cust_supervisor_action'])){
 		return implode($pass); //turn the array into a string
 	}
 	$from="info@stcassociate.com";
+	$website=$_SERVER['SERVER_NAME'];
+	if(strpos($website, 'agent')!=''){
+		$from="info@agent.stcassociate.com";
+	}
 	$headers = "MIME-Version: 1.0" . "\r\n"; 
 	$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n"; 
 	$headers .= 'From: '.$from.'STC Associates' . "\r\n";
@@ -2995,7 +2999,7 @@ if(isset($_POST['stc_cust_supervisor_action'])){
                       <td style="padding:30px;background-color:#ffffff;">
                         <h1 style="margin-top:0;margin-bottom:16px;font-size:26px;line-height:32px;font-weight:bold;letter-spacing:-0.02em;">Welcome to STC Associates</h1>
                         <p style="margin:0;">You are registered as a Project Supervisor from your sr.Executive - '.$_SESSION['stc_agent_name'].'.
-                            Here is a link of your platform <a href="http://stcassociate.com/stc_sub_agent47/" style="color:#e50d70;text-decoration:underline;">Click me</a> wth your<br>
+                            Here is a link of your platform <a href="http://subagent.stcassociate.com/" style="color:#e50d70;text-decoration:underline;">Click me</a> wth your<br>
                             User id - <b>'.$sup_cont.'</b><br>
                             Password - <b>'.$sup_password.'</b>
                         </p>
@@ -3429,6 +3433,135 @@ if(isset($_POST['stc_req_edit_item_update'])){
 	$odin_req=new pirates_supervisor();
 	$odin_req_out=$odin_req->stc_change_req_item_update($req_item_id, $req_item_name);
 	echo $odin_req_out;
+}
+
+// send mail to new user for id password
+if(isset($_POST['stc_send_mail'])){
+	$user_id=$_POST['user_id'];
+	$contact=$_POST['contact'];
+	$password=$_POST['password'];
+	$email=$_POST['email'];
+	$fullname=$_POST['fullname'];
+	$odin_req_out='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$odin_req_out='reload';
+	}else{
+		$from="info@stcassociate.com";
+		$website=$_SERVER['SERVER_NAME'];
+		if(strpos($website, 'agent')!=''){
+			$from="info@agent.stcassociate.com";
+		}
+		$headers = "MIME-Version: 1.0" . "\r\n"; 
+		$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n"; 
+		$headers .= 'From: '.$from.'STC Associates' . "\r\n";
+		$maildesc= '
+			<!DOCTYPE html>
+			<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:o="urn:schemas-microsoft-com:office:office">
+			<head>
+			<meta charset="utf-8">
+			<meta name="viewport" content="width=device-width,initial-scale=1">
+			<meta name="x-apple-disable-message-reformatting">
+			<title></title>
+			<!--[if mso]>
+			<style>
+				table {border-collapse:collapse;border-spacing:0;border:none;margin:0;}
+				div, td {padding:0;}
+				div {margin:0 !important;}
+			</style>
+			<noscript>
+				<xml>
+				<o:OfficeDocumentSettings>
+					<o:PixelsPerInch>96</o:PixelsPerInch>
+				</o:OfficeDocumentSettings>
+				</xml>
+			</noscript>
+			<![endif]-->
+			<style>
+				table, td, div, h1, p {
+				font-family: Arial, sans-serif;
+				}
+				@media screen and (max-width: 530px) {
+				.unsub {
+					display: block;
+					padding: 8px;
+					margin-top: 14px;
+					border-radius: 6px;
+					background-color: #555555;
+					text-decoration: none !important;
+					font-weight: bold;
+				}
+				.col-lge {
+					max-width: 100% !important;
+				}
+				}
+				@media screen and (min-width: 531px) {
+				.col-sml {
+					max-width: 27% !important;
+				}
+				.col-lge {
+					max-width: 73% !important;
+				}
+				}
+			</style>
+			</head>
+			<body style="margin:0;padding:0;word-spacing:normal;background-color:#939297;">
+			<div role="article" aria-roledescription="email" lang="en" style="text-size-adjust:100%;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;background-color:#939297;">
+				<table role="presentation" style="width:100%;border:none;border-spacing:0;">
+				<tr>
+					<td align="center" style="padding:0;">
+					<table role="presentation" style="width:94%;max-width:600px;border:none;border-spacing:0;text-align:left;font-family:Arial,sans-serif;font-size:16px;line-height:22px;color:#363636;">
+						<tr>
+						<td style="padding:40px 30px 30px 30px;text-align:center;font-size:24px;font-weight:bold;">
+							<a href="http://www.example.com/" style="text-decoration:none;"><img src="http://stcassociate.com/stc_symbiote/img/stc_logo.png" width="165" alt="Logo" style="border-radius: 50%;width:80%;max-width:165px;height:auto;border:none;text-decoration:none;color:#ffffff;"></a>
+						</td>
+						</tr>
+						<tr>
+						<td style="padding:30px;background-color:#ffffff;">
+							<h1 style="margin-top:0;margin-bottom:16px;font-size:26px;line-height:32px;font-weight:bold;letter-spacing:-0.02em;">Welcome to STC Associates</h1>
+							<p style="margin:0;">You are registered as a Project Supervisor from your sr.Executive - '.$_SESSION['stc_agent_name'].'.
+								Here is a link of your platform <a href="http://subagent.stcassociate.com/" style="color:#e50d70;text-decoration:underline;">Click me</a> wth your<br>
+								User id - <b>'.$contact.'</b><br>
+								Password - <b>'.$password.'</b>
+							</p>
+						</td>
+						</tr>
+						<tr>
+						<td style="padding:0;font-size:24px;line-height:28px;font-weight:bold;">
+							<a href="#" style="text-decoration:none;"><img src="https://library.kissclipart.com/20180904/vzw/kissclipart-supervisor-dibujo-clipart-construction-laborer-cli-c856a67bc49abb0e.jpg" width="600" alt="" style="width:100%;height:auto;display:block;border:none;text-decoration:none;color:#363636;"></a>
+						</td>
+						</tr>
+						<tr>
+							<td style="padding:30px;text-align:center;font-size:12px;background-color:#404040;color:#cccccc;">
+							<p style="margin:0;font-size:14px;line-height:20px;">&reg; STC Associates, Jamshedpur 2021<br><a class="unsub" href="#" style="color:#cccccc;text-decoration:underline;">This is System generated mail. Please do not reply.</a></p>
+							</td>
+						</tr>
+					</table>
+					<!--[if mso]>
+					</td>
+					</tr>
+					<tr>
+						<td style="padding:30px;text-align:center;font-size:12px;background-color:#404040;color:#cccccc;">
+						<p style="margin:0;font-size:14px;line-height:20px;">&reg; STC Associates, Jamshedpur 2021<br><a class="unsub" href="#" style="color:#cccccc;text-decoration:underline;">This is System generated mail. Please do not reply.</a></p>
+						</td>
+					</tr>
+					</table>
+					<![endif]-->
+					</td>
+				</tr>
+				</table>
+			</div>
+			</body>
+			</html> 	
+		';
+		if($_SESSION['mail_check_sess']!=$user_id){
+			mail($email, "Welcome ".$fullname, $maildesc, $headers);
+			$_SESSION['mail_check_sess']=$user_id;
+		}else{
+			$odin_req_out="Mail already sent please check inbox or junk mail.";
+		}
+		
+	}
+	echo json_encode($odin_req_out);
 }
 
 /*---------------------------------------------Procurement tracker Objects section-------------------------------------------------*/
