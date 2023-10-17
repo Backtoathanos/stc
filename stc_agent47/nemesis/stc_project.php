@@ -1839,9 +1839,7 @@ class pirates_supervisor extends tesseract{
 						<th class="text-center">JOB PLANNING</th>
 						<th class="text-center">JOB TYPE</th>
 						<th class="text-center">VARIETIES OF JOB</th>
-						<th class="text-center">CREATED BY</th>
 						<th class="text-center">PERMIT NO</th>
-						<th class="text-center">CREATER NAME & MOBILE NO</th>
 						<th class="text-center">RESPONSIBLE PERSON NAME & MOBILE NO</th>
 						<th class="text-center">DOWN REASON</th>
 						<th class="text-center">MATERIALS REQ</th>
@@ -1857,6 +1855,7 @@ class pirates_supervisor extends tesseract{
 						<th class="text-center">JOB DONE DETAILS</th>
 						<th class="text-center">REMARKS</th>
 						<th class="text-center">CREATED BY</th>
+						<th class="text-center">DESIGNATION</th>
 						<th class="text-center">UPDATED BY</th>
 						<th class="text-center">UPDATED ON</th>
 						<th class="text-center">STATUS UPDATED BY</th>
@@ -1915,6 +1914,8 @@ class pirates_supervisor extends tesseract{
 			    `stc_status_down_list_status`,
 			    `stc_status_down_list_created_by`,
 			    `stc_cust_pro_supervisor_fullname`,
+			    `stc_cust_pro_supervisor_contact`,
+			    `stc_cust_pro_supervisor_category`,
 				`stc_status_down_list_updated_by`,
 				`stc_status_down_list_updated_date`,
 				`stc_status_down_list_status_updated_by`,
@@ -2082,9 +2083,7 @@ class pirates_supervisor extends tesseract{
 						<td>'.$row['stc_status_down_list_jobtype'].'</td>
 						<td>'.$job_type.'</td>
 						<td>'.$job_varities.'</td>
-						<td>'.$row['stc_status_down_list_created_by_select'].'</td>
 						<td>'.$row['stc_status_down_list_permit_no'].'</td>
-						<td>'.$row['stc_status_down_list_creator_details'].'</td>
 						<td>'.$row['stc_status_down_list_responsive_person'].'</td>
 						<td>'.$row['stc_status_down_list_reason'].'</td>
 						<td>'.$row['stc_status_down_list_material_desc'].'</td>
@@ -2099,7 +2098,8 @@ class pirates_supervisor extends tesseract{
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_jobdone_details'].'<br>'.$updatejobdetails.'
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
-						<td>'.$row['stc_cust_pro_supervisor_fullname'].'</td>
+						<td>'.$row['stc_cust_pro_supervisor_fullname'].'<br>'.$row['stc_cust_pro_supervisor_contact'].'</td>
+						<td  class="text-center">'.$row['stc_cust_pro_supervisor_category'].'</td>
 						<td>'.$updater_name.'</td>
 						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_updated_date'])).'</td>
 						<td>'.$supdater_name.'</td>

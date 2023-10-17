@@ -216,7 +216,8 @@ include_once("../MCU/db.php");
                                                                                 `stc_cust_pro_supervisor_contact`,
                                                                                 `stc_cust_pro_supervisor_whatsapp`,
                                                                                 `stc_cust_pro_supervisor_email`,
-                                                                                `stc_cust_pro_supervisor_category`
+                                                                                `stc_cust_pro_supervisor_category`,
+                                                                                `stc_cust_pro_supervisor_status`
                                                                             FROM `stc_cust_pro_supervisor`
                                                                             INNER JOIN `stc_agents` 
                                                                             ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` 
@@ -259,9 +260,13 @@ include_once("../MCU/db.php");
                                                                                 $address=substr($address, 0,33);
                                                                                 $address=$address.'...';
                                                                             }
+                                                                            $blacknwhitestyle='style="-webkit-filter: grayscale(100%);"';
+                                                                            if($sitenamerow['stc_cust_pro_supervisor_status']=='1'){
+                                                                                $blacknwhitestyle='';
+                                                                            }
                                                                             echo '
                                                                                 <div class="col-md-3 usertarget" style="margin-bottom:15px;">
-                                                                                    <div class="card profile-card-3">
+                                                                                    <div class="card profile-card-3" '.$blacknwhitestyle.'>
                                                                                         <div class="background-block">
                                                                                             <img src="https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&h=650&w=940" alt="profile-sample1" class="background"/>
                                                                                         </div>

@@ -823,7 +823,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Job Planning (auto save):</h5><br>
-                                <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-plannning"><option>Preventive Maintanance</option><option>Breakdown Maintanance</option>
+                                <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-plannning"><option>Preventive Maintenance</option><option>Breakdown Maintenance</option>
                                 </select> 
                             </div>
                         </div>
