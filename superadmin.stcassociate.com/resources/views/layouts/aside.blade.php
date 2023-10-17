@@ -41,12 +41,6 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{ url('/users/admin') }}" class="nav-link @if(Request::segment(2) == 'admin') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Super Admin</p>
-                </a>
-              </li>
-              <li class="nav-item">
                 <a href="{{ url('/users/electronicsusers') }}" class="nav-link @if(Request::segment(2) == 'electronicsusers') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Electronics</p>
@@ -59,21 +53,33 @@
                 </a>
               </li>
               <li class="nav-item">
+                <a href="{{ url('/users/managerusers') }}" class="nav-link @if(Request::segment(2) == 'managerusers') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Manager</p>
+                </a>
+              </li>
+              <li class="nav-item">
                 <a href="{{ url('/users/schoolusers') }}" class="nav-link @if(Request::segment(2) == 'schoolusers') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>School</p>
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ url('/users/uadminusers') }}" class="nav-link @if(Request::segment(2) == 'uadminusers') active @endif">
+                <a href="{{ url('/users/admin') }}" class="nav-link @if(Request::segment(2) == 'admin') active @endif">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>User Administration</p>
+                  <p>Super Admin</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="{{ url('/users/tradingusers') }}" class="nav-link @if(Request::segment(2) == 'tradingusers') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Trading</p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ url('/users/uadminusers') }}" class="nav-link @if(Request::segment(2) == 'uadminusers') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>User Administration</p>
                 </a>
               </li>
             </ul>
