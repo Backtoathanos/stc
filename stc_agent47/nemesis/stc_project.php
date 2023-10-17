@@ -1845,8 +1845,8 @@ class pirates_supervisor extends tesseract{
 						<th class="text-center">MATERIALS REQ</th>
 						<th class="text-center">MANPOWER REQ</th>
 						<th class="text-center">TOOLS REQ</th>
-						<th class="text-center">WORK COMPLETION TARGET PERIOD</th>
-						<th class="text-center">ACTUAL WORK COMPLETION PERIOD</th>
+						<th class="text-center">WORK COMPLETION TARGET DATE</th>
+						<th class="text-center">ACTUAL WORK COMPLETION DATE</th>
 						<th class="text-center">USED MATERIAL</th>
 						<th class="text-center">STOCK MATERIAL</th>
 						<th class="text-center">DOWN PERIOD</th>
@@ -1961,19 +1961,19 @@ class pirates_supervisor extends tesseract{
 
 				$dperiod='0';
 
-				// if($row['stc_status_down_list_equipment_status']=="Down"){
+				if($row['stc_status_down_list_equipment_status']=="Down"){
 					$eqstatus='
 							<td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
 					';
+				}
 					
-					$today = $rec_date>1970 ? date("Y/m/d", strtotime($row['stc_status_down_list_rect_date'])) : date("Y/m/d") ; 
+					$today = !empty($row['stc_status_down_list_rect_date']) ? date("Y/m/d", strtotime($row['stc_status_down_list_rect_date'])) : date("Y/m/d") ; 
 					$startTimeStamp = strtotime(date('Y-m-d', strtotime($row['stc_status_down_list_date'])));
 		            $endTimeStamp = strtotime($today);
 
 		            $timeDiff = abs($endTimeStamp - $startTimeStamp);
 
 		            $dperiod = $timeDiff/86400;
-				// }
 
 				$actionsec='';
 				if($_SESSION['stc_agent_role']==3){
