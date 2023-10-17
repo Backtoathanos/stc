@@ -1961,19 +1961,19 @@ class pirates_supervisor extends tesseract{
 
 				$dperiod='0';
 
-				if($row['stc_status_down_list_equipment_status']=="Down"){
+				// if($row['stc_status_down_list_equipment_status']=="Down"){
 					$eqstatus='
 							<td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
 					';
 					
-					$today = date("Y/m/d"); 
+					$today = $rec_date=='' ? date("Y/m/d") : $rec_date; 
 					$startTimeStamp = strtotime(date('Y-m-d', strtotime($row['stc_status_down_list_date'])));
 		            $endTimeStamp = strtotime($today);
 
 		            $timeDiff = abs($endTimeStamp - $startTimeStamp);
 
 		            $dperiod = $timeDiff/86400;
-				}
+				// }
 
 				$actionsec='';
 				if($_SESSION['stc_agent_role']==3){
