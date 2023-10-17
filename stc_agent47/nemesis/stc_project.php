@@ -2066,6 +2066,10 @@ class pirates_supervisor extends tesseract{
 					$result=mysqli_fetch_assoc($supdateqry);
 					$supdater_name=$result['stc_cust_pro_supervisor_fullname'];
 				}
+				$statusupdatedate=date('d-m-Y', strtotime($row['stc_status_down_list_status_updated_on']));
+				if(date('Y', strtotime($row['stc_status_down_list_status_updated_on']))==1970){
+					$statusupdatedate='';
+				}
 				$optimusprime.='
 					<tr>
 						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
@@ -2099,7 +2103,7 @@ class pirates_supervisor extends tesseract{
 						<td>'.$updater_name.'</td>
 						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_updated_date'])).'</td>
 						<td>'.$supdater_name.'</td>
-						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_status_updated_on'])).'</td>
+						<td>'.$statusupdatedate.'</td>
 						<td class="text-center">'.$actionsec.'</td>
 					</tr>
 				';
