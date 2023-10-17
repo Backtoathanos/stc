@@ -3553,8 +3553,9 @@ if(isset($_POST['stc_send_mail'])){
 			</body>
 			</html> 	
 		';
-		if(empty($_SESSION['mail_check_sess'])){
+		if($_SESSION['mail_check_sess']!=$user_id){
 			mail($email, "Welcome ".$fullname, $maildesc, $headers);
+			$_SESSION['mail_check_sess']=$user_id;
 		}else{
 			$odin_req_out="Mail already sent please check inbox or junk mail.";
 		}
