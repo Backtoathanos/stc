@@ -594,15 +594,15 @@ class ragnarReportsViewRequiReports extends tesseract{
                $eqstatus='
                      <td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
                ';
-               
-               $today = date("Y/m/d"); 
-               $startTimeStamp = strtotime(date('Y-m-d', strtotime($row['stc_status_down_list_date'])));
-                  $endTimeStamp = strtotime($today);
-
-                  $timeDiff = abs($endTimeStamp - $startTimeStamp);
-
-                  $dperiod = $timeDiff/86400;
             }
+               
+            $today = !empty($row['stc_status_down_list_rect_date']) ? date("Y/m/d", strtotime($row['stc_status_down_list_rect_date'])) : date("Y/m/d") ; 
+				$startTimeStamp = strtotime(date('Y-m-d', strtotime($row['stc_status_down_list_date'])));
+		      $endTimeStamp = strtotime($today);
+
+		      $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+		      $dperiod = $timeDiff/86400;
 
             $actionsec='';
             if($row['stc_status_down_list_status']==3){

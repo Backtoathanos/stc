@@ -1831,6 +1831,7 @@ class pirates_supervisor extends tesseract{
 					<tr>
 						<th class="text-center">DATE</th>
 						<th class="text-center">LOCATION</th>
+						<th class="text-center">SUB LOCATION</th>
 						<th class="text-center">DEPARTMENT</th>
 						<th class="text-center">AREA</th>
 						<th class="text-center">EQUIPMENT TYPE</th>
@@ -1890,6 +1891,7 @@ class pirates_supervisor extends tesseract{
 			    `stc_status_down_list_id`,
 			    `stc_status_down_list_date`,
 			    `stc_cust_project_title`,
+				`stc_status_down_list_plocation`,
 			    `stc_status_down_list_sub_location`,
 			    `stc_status_down_list_area`,
 			    `stc_status_down_list_equipment_type`,
@@ -2074,6 +2076,7 @@ class pirates_supervisor extends tesseract{
 				$optimusprime.='
 					<tr>
 						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
+						<td>'.$row['stc_status_down_list_plocation'].'</td>
 						<td>'.$row['stc_cust_project_title'].'</td>
 						<td>'.$row['stc_status_down_list_sub_location'].'</td>
 						<td>'.$row['stc_status_down_list_area'].'</td>

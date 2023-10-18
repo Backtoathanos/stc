@@ -9,6 +9,8 @@ use App\Http\Controllers\ElectronicsUsersController;
 use App\Http\Controllers\SchoolUsersController;
 use App\Http\Controllers\GroceriesUsersController;
 use App\Http\Controllers\SuperAdminUsersController;
+use App\Http\Controllers\ManagerUsersController;
+use App\Http\Controllers\SiteUsersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -107,4 +109,30 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/users/uadminusers/edit/{id}', [AdminUsersController::class, 'update']);
     
     Route::get('/users/uadminusers/delete/{id}', [AdminUsersController::class, 'delete']);
+    
+    // user manager route
+    Route::get('/users/managerusers', [ManagerUsersController::class, 'show']);
+
+    Route::get('/users/managerusers/create', [ManagerUsersController::class, 'create']);
+    
+    Route::post('/users/managerusers/create', [ManagerUsersController::class, 'insert']);
+
+    Route::get('/users/managerusers/edit/{id}', [ManagerUsersController::class, 'edit']);
+
+    Route::post('/users/managerusers/edit/{id}', [ManagerUsersController::class, 'update']);
+    
+    Route::get('/users/managerusers/delete/{id}', [ManagerUsersController::class, 'delete']);
+    
+    // user site user route
+    Route::get('/users/siteusers', [SiteUsersController::class, 'show']);
+
+    Route::get('/users/siteusers/create', [SiteUsersController::class, 'create']);
+    
+    Route::post('/users/siteusers/create', [SiteUsersController::class, 'insert']);
+
+    Route::get('/users/siteusers/edit/{id}', [SiteUsersController::class, 'edit']);
+
+    Route::post('/users/siteusers/edit/{id}', [SiteUsersController::class, 'update']);
+    
+    Route::get('/users/siteusers/delete/{id}', [SiteUsersController::class, 'delete']);
 });
