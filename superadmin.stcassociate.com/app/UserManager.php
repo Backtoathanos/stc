@@ -21,4 +21,12 @@ class UserManager extends Model
     static public function getSingle($id){
         return UserManager::find($id);
     }
+
+    
+
+    static public function getManagerForSite(){
+        return UserManager::select('stc_agents.*')->
+                            orderBy('stc_agents_name', 'asc')->
+                            get();
+    }
 }

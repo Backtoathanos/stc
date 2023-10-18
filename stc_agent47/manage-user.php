@@ -716,7 +716,7 @@ include_once("../MCU/db.php");
                                                         include_once("../MCU/db.php");
                                                         $cityqry=mysqli_query($con, "
                                                             SELECT distinct `stc_customer_id`, `stc_customer_name` FROM `stc_customer`
-                                                            INNER JOIN `stc_agent_requested_customer` 
+                                                            LEFT JOIN `stc_agent_requested_customer` 
                                                             ON `stc_agent_requested_customer_cust_id`=`stc_customer_id` 
                                                             ORDER BY `stc_customer_name` ASC
 
