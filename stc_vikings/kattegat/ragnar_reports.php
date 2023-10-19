@@ -510,7 +510,9 @@ class ragnarReportsViewRequiReports extends tesseract{
       $ivarpreqry=mysqli_query($this->stc_dbs, "
          SELECT 
              `stc_cust_project_title`,
-             `stc_status_down_list_status`
+             `stc_status_down_list_status`,
+             `stc_status_down_list_date`,
+             `stc_status_down_list_rect_date`
          FROM `stc_status_down_list` 
          INNER JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
@@ -520,21 +522,60 @@ class ragnarReportsViewRequiReports extends tesseract{
       $sitename="";
       $jobdone=0;
       $pendingjon=0;
+      $jobdone48=0;
+      $pendingjon48=0;
       if(mysqli_num_rows($ivarpreqry)>0){
+         $currenthr=date("Y/m/d");
          foreach($ivarpreqry as $prerow){
             if($prerow['stc_status_down_list_status']==1){
                $pendingjon++;
+               $today = date("Y/m/d") ; 
+               $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_date'])));
+               $endTimeStamp = strtotime($today);
+
+               $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+               $dperiod = $timeDiff/86400;
+               $checkmate=$dperiod;
+               if($dperiod<2){
+                  $pendingjon48++;
+               }
             }elseif($prerow['stc_status_down_list_status']==3){
                $jobdone++;
+               $today = date("Y/m/d") ; 
+               $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_rect_date'])));
+               $endTimeStamp = strtotime($today);
+
+               $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+               $dperiod = $timeDiff/86400;
+               $checkmate=$dperiod;
+               if($dperiod<2){
+                  $jobdone48++;
+               }
             }
+
+            
          }
          $ivar.='
             <table class="table table-bordered table-responsive" id="stc-show-std-detailspre-table">
                <tr>
-                  <td class="text-center">TOTAL WORK-DONE:-</td>
+                  <td class="text-center" colspan="4">TOTAL JOB ACTIVITY (All time)</td>
+                  <td class="text-center" colspan="4">DAILY JOB ACTIVITY(within 48hr)</td>
+                  <td class="text-center"></td>
+               </tr>
+               <tr>
+                  <td class="text-center">WORK-DONE:-</td>
                   <td class="text-center" style="background-color: #a9d08e;">'.$jobdone.'</td>
                   <td class="text-center">DOWN JOB:-</td>
-                  <td class="text-center" style="background-color: #ffc000;">'.$pendingjon.'</td>
+                  <td class="text-center" style="background-color: #ff6767;">'.$pendingjon.'</td>
+                  <td class="text-center">WORK-DONE:-</td>
+                  <td class="text-center" style="background-color: #a9d08e;">'.$pendingjon48.'</td>
+                  <td class="text-center">DOWN JOB:-</td>
+                  <td class="text-center" style="background-color: #ff6767;">'.$jobdone48.'</td>
+                  <td class="text-center">
+                     <a href="#" class="btn btn-primary">Filter</a>
+                  </td>
                </tr>
             </table>
          ';
