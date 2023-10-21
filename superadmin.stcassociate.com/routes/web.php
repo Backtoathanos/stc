@@ -11,6 +11,8 @@ use App\Http\Controllers\GroceriesUsersController;
 use App\Http\Controllers\SuperAdminUsersController;
 use App\Http\Controllers\ManagerUsersController;
 use App\Http\Controllers\SiteUsersController;
+use App\Http\Controllers\CityController;
+use App\Http\Controllers\StateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -135,4 +137,18 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/users/siteusers/edit/{id}', [SiteUsersController::class, 'update']);
     
     Route::get('/users/siteusers/delete/{id}', [SiteUsersController::class, 'delete']);
+    
+    //  city through ajax
+    Route::get('/master/city', [CityController::class, 'show']);    
+    Route::get('/master/city/list', [CityController::class, 'list']);
+    Route::post('/master/city/create', [CityController::class, 'create']); 
+    Route::post('/master/city/edit', [CityController::class, 'update']);    
+    Route::get('/master/city/delete', [CityController::class, 'delete']);
+
+    //  state through ajax
+    Route::get('/master/state', [StateController::class, 'show']);    
+    Route::get('/master/state/list', [StateController::class, 'list']);
+    Route::post('/master/state/create', [StateController::class, 'create']); 
+    Route::post('/master/state/edit', [StateController::class, 'update']);    
+    Route::get('/master/state/delete', [StateController::class, 'delete']);
 });

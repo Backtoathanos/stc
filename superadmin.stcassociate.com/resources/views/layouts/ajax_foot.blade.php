@@ -11,7 +11,7 @@
   <!-- ChartJS -->
   <script src="{{ asset('public/plugins/chart.js/Chart.min.js') }}"></script>
   <!-- Sparkline -->
-  <script src="{{ asset('public/plugins/sparklines/sparkline.js') }}"></script>
+  <!-- <script src="{{ asset('public/plugins/sparklines/sparkline.js') }}"></script> -->
   <!-- JQVMap -->
   <script src="{{ asset('public/plugins/jqvmap/jquery.vmap.min.js') }}"></script>
   <script src="{{ asset('public/plugins/jqvmap/maps/jquery.vmap.usa.js') }}"></script>
@@ -31,7 +31,7 @@
   <!-- AdminLTE for demo purposes -->
   <script src="{{ asset('public/dist/js/demo.js') }}"></script>
   <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-  <script src="{{ asset('public/dist/js/pages/dashboard.js') }}"></script>
+  <!-- <script src="{{ asset('public/dist/js/pages/dashboard.js') }}"></script> -->
   
   <!-- DataTables  & Plugins -->
   <script src="{{ asset('public/plugins/datatables/jquery.dataTables.min.js') }}"></script>
@@ -46,14 +46,6 @@
   <script src="{{ asset('public/plugins/datatables-buttons/js/buttons.html5.min.js') }}"></script>
   <script src="{{ asset('public/plugins/datatables-buttons/js/buttons.print.min.js') }}"></script>
   <script src="{{ asset('public/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
-
-  <script>
-    $(function () {
-      $("#example1").DataTable({
-        "responsive": true, 
-        "lengthChange": false, 
-        "autoWidth": false,
-        "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-      }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
-    });
-  </script>
+  <script src="{{ asset('public/plugins/datatables-buttons/js/buttons.colVis.min.js') }}"></script>
+  <!-- SweetAlert2 -->
+  <script src="{{ asset('public/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
