@@ -473,6 +473,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          SELECT 
              `stc_status_down_list_id`,
              `stc_status_down_list_date`,
+             `stc_status_down_list_plocation`,
              `stc_cust_project_title`,
              `stc_status_down_list_sub_location`,
              `stc_status_down_list_area`,
@@ -536,7 +537,6 @@ class ragnarReportsViewRequiReports extends tesseract{
                $timeDiff = abs($endTimeStamp - $startTimeStamp);
 
                $dperiod = $timeDiff/86400;
-               $checkmate=$dperiod;
                if($dperiod<2){
                   $pendingjon48++;
                }
@@ -549,7 +549,6 @@ class ragnarReportsViewRequiReports extends tesseract{
                $timeDiff = abs($endTimeStamp - $startTimeStamp);
 
                $dperiod = $timeDiff/86400;
-               $checkmate=$dperiod;
                if($dperiod<2){
                   $jobdone48++;
                }
@@ -589,6 +588,8 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th class="text-center">SL NO</th>
                      <th class="text-center">DATE</th>
                      <th class="text-center">LOCATION</th>
+                     <th class="text-center">DEPARTMENT</th>
+                     <th class="text-center">AREA</th>
                      <th class="text-center">EQUIPMENT DETAILS</th>
                      <th class="text-center">QTY</th>
                      <th class="text-center">CAPACITY</th>
@@ -706,7 +707,9 @@ class ragnarReportsViewRequiReports extends tesseract{
                <tr>
                   <td class="text-center">'.$row['stc_status_down_list_id'].'</td>
                   <td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
+                  <td>'.$row['stc_status_down_list_plocation'].'</td>
                   <td>'.$p_title.'</td>
+                  <td>'.$row['stc_status_down_list_area'].'</td>
                   <td>'.$eq_type.' '.$eq_number.'</td>
                   <td class="text-right">'.$row['stc_status_down_list_qty'].'</td>
                   <td class="text-right">'.$row['stc_status_down_list_capacity'].'</td>
