@@ -13,6 +13,12 @@ use App\Http\Controllers\ManagerUsersController;
 use App\Http\Controllers\SiteUsersController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\StateController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\SubCategoryController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\RackController;
+use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -151,4 +157,46 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/master/state/create', [StateController::class, 'create']); 
     Route::post('/master/state/edit', [StateController::class, 'update']);    
     Route::get('/master/state/delete', [StateController::class, 'delete']);
+
+    //  category through ajax
+    Route::get('/master/category', [CategoryController::class, 'show']);    
+    Route::get('/master/category/list', [CategoryController::class, 'list']);
+    Route::post('/master/category/create', [CategoryController::class, 'create']); 
+    Route::post('/master/category/edit', [CategoryController::class, 'update']);    
+    Route::get('/master/category/delete', [CategoryController::class, 'delete']);
+
+    //  subcategory through ajax
+    Route::get('/master/subcategory', [SubCategoryController::class, 'show']);    
+    Route::get('/master/subcategory/list', [SubCategoryController::class, 'list']);
+    Route::post('/master/subcategory/create', [SubCategoryController::class, 'create']); 
+    Route::post('/master/subcategory/edit', [SubCategoryController::class, 'update']);    
+    Route::get('/master/subcategory/delete', [SubCategoryController::class, 'delete']);
+
+    //  brand through ajax
+    Route::get('/master/brand', [BrandController::class, 'show']);    
+    Route::get('/master/brand/list', [BrandController::class, 'list']);
+    Route::post('/master/brand/create', [BrandController::class, 'create']); 
+    Route::post('/master/brand/edit', [BrandController::class, 'update']);    
+    Route::get('/master/brand/delete', [BrandController::class, 'delete']);
+
+    //  rack through ajax
+    Route::get('/master/rack', [RackController::class, 'show']);    
+    Route::get('/master/rack/list', [RackController::class, 'list']);
+    Route::post('/master/rack/create', [RackController::class, 'create']); 
+    Route::post('/master/rack/edit', [RackController::class, 'update']);    
+    Route::get('/master/rack/delete', [RackController::class, 'delete']);
+
+    //  inventory through ajax
+    Route::get('/master/inventory', [InventoryController::class, 'show']);    
+    Route::get('/master/inventory/list', [InventoryController::class, 'list']);
+    Route::post('/master/inventory/create', [InventoryController::class, 'create']); 
+    Route::post('/master/inventory/edit', [InventoryController::class, 'update']);    
+    Route::get('/master/inventory/delete', [InventoryController::class, 'delete']);
+
+    //  product through ajax
+    Route::get('/master/product', [ProductController::class, 'show']);    
+    Route::get('/master/product/list', [ProductController::class, 'list']);
+    Route::post('/master/product/create', [ProductController::class, 'create']); 
+    Route::post('/master/product/edit', [ProductController::class, 'update']);    
+    Route::get('/master/product/delete', [ProductController::class, 'delete']);
 });
