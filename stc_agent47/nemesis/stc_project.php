@@ -2073,6 +2073,10 @@ class pirates_supervisor extends tesseract{
 				if(date('Y', strtotime($row['stc_status_down_list_status_updated_on']))==1970){
 					$statusupdatedate='';
 				}
+				$updated_date=date('d-m-Y', strtotime($row['stc_status_down_list_updated_date']));
+				if(date('Y', strtotime($row['stc_status_down_list_updated_date']))==1970){
+					$updated_date='';
+				}
 				$optimusprime.='
 					<tr>
 						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
@@ -2104,7 +2108,7 @@ class pirates_supervisor extends tesseract{
 						<td>'.$row['stc_cust_pro_supervisor_fullname'].'<br>'.$row['stc_cust_pro_supervisor_contact'].'</td>
 						<td  class="text-center">'.$row['stc_cust_pro_supervisor_category'].'</td>
 						<td>'.$updater_name.'</td>
-						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_updated_date'])).'</td>
+						<td>'.$updated_date.'</td>
 						<td>'.$supdater_name.'</td>
 						<td>'.$statusupdatedate.'</td>
 						<td class="text-center">'.$actionsec.'</td>

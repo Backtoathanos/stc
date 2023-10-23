@@ -44,7 +44,7 @@ include("kattegat/role_check.php");
                             </li>
                             <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#tab-content-2">
-                                    <span>View Sub Category</span>
+                                    <span>Add Sub Category</span>
                                 </a>
                             </li>
                             <li class="nav-item">
