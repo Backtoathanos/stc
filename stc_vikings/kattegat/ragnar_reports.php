@@ -504,6 +504,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
          WHERE `stc_status_down_list_status`<>5 
          AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."'
+         AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR
          ORDER BY DATE(`stc_status_down_list_date`) DESC
       ");
 
