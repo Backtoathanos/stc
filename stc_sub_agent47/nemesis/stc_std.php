@@ -132,7 +132,7 @@ class transformers extends tesseract{
 	}
 
 	// save std
-	public function stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning){
+	public function stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$tools_req='';
@@ -149,20 +149,20 @@ class transformers extends tesseract{
 			INSERT INTO `stc_status_down_list`(
 			    `stc_status_down_list_date`,
 			    `stc_status_down_list_plocation`,
-			    `stc_status_down_list_location`,
 			    `stc_status_down_list_sub_location`,
 			    `stc_status_down_list_area`,
 			    `stc_status_down_list_jobtype`,
+			    `stc_status_down_list_reason`,
 				`stc_status_down_list_equipment_status`,
 			    `stc_status_down_list_status`,
 			    `stc_status_down_list_created_by`
 			)VALUES(
 				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_slocation)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_dept)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_location)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_area)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $reason)."',
 				'".$status."',
 				'1',
 				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
@@ -706,14 +706,13 @@ if(isset($_POST['stc_std_hit'])){
 	$stc_dept=$_POST['stc_dept'];
 	$stc_area=$_POST['stc_area'];
 	$stc_j_plannning=$_POST['stc_j_plannning'];
+	$reason=$_POST['reason'];
 
 	$metabots=new transformers();
-	if(($stc_slocation=="NA") || ($stc_dept=="NA") || empty($stc_location) || empty($stc_area)){
-		$opmetabots="Please fill all the field, if no data available then fill with NA.";
-	}elseif(empty($_SESSION['stc_agent_sub_id'])){
+	if(empty($_SESSION['stc_agent_sub_id'])){
 		$opmetabots="Please login!!!";
 	}else{
-		$opmetabots=$metabots->stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning);
+		$opmetabots=$metabots->stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason);
 	}
 	echo $opmetabots;
 }

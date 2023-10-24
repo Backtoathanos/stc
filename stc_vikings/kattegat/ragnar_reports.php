@@ -500,12 +500,12 @@ class ragnarReportsViewRequiReports extends tesseract{
              `stc_status_down_list_status`,
              `stc_status_down_list_created_by`
          FROM `stc_status_down_list` 
-         INNER JOIN `stc_cust_project` 
+         LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
          WHERE `stc_status_down_list_status`<>5 
          AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."'
          AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR
-         ORDER BY DATE(`stc_status_down_list_date`) DESC
+         ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ");
 
 
@@ -516,10 +516,10 @@ class ragnarReportsViewRequiReports extends tesseract{
              `stc_status_down_list_date`,
              `stc_status_down_list_rect_date`
          FROM `stc_status_down_list` 
-         INNER JOIN `stc_cust_project` 
+         LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
          WHERE `stc_status_down_list_status`<>5 
-         ORDER BY DATE(`stc_status_down_list_date`) DESC
+         ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ");
       $sitename="";
       $jobdone=0;
@@ -589,7 +589,6 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th class="text-center">SL NO</th>
                      <th class="text-center">DATE</th>
                      <th class="text-center">LOCATION</th>
-                     <th class="text-center">DEPARTMENT</th>
                      <th class="text-center">AREA</th>
                      <th class="text-center">EQUIPMENT DETAILS</th>
                      <th class="text-center">QTY</th>
@@ -610,7 +609,7 @@ class ragnarReportsViewRequiReports extends tesseract{
             $status='';
             $status2color="";
             if($row['stc_status_down_list_status']==1){
-               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">PENDING</span></b>';
+               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">DOWN</span></b>';
                $status2color="#e91919";
                $pendingjon++;
             }elseif($row['stc_status_down_list_status']==2){
@@ -635,7 +634,7 @@ class ragnarReportsViewRequiReports extends tesseract{
 
             if($row['stc_status_down_list_status']==1){
                $eqstatus='
-                     <td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
+                     <td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_jobtype'].'</td>
                ';
             }
                
@@ -709,7 +708,6 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-center">'.$row['stc_status_down_list_id'].'</td>
                   <td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
                   <td>'.$row['stc_status_down_list_plocation'].'</td>
-                  <td>'.$p_title.'</td>
                   <td>'.$row['stc_status_down_list_area'].'</td>
                   <td>'.$eq_type.' '.$eq_number.'</td>
                   <td class="text-right">'.$row['stc_status_down_list_qty'].'</td>
