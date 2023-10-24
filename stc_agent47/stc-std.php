@@ -61,34 +61,11 @@ if(isset($_SESSION["stc_agent_id"])){
                                         <div class="card-body">
                                             <h5>Location/Site Name :</h5><br>
                                             <div class="card mb-3 widget-content">
-                                                <select class="btn btn-success form-control load_site_name_consump" id="stc-agent-sup-std-location-find">
-                                                    <?php 
-                                                        include_once("../MCU/db.php");
-                                                        echo '<option value="0" selected>Please select Sitename!!!</option>';
-                                                        $shownbystatus="WHERE `stc_agent_requested_customer_agent_id`='".$_SESSION['stc_agent_id']."'";
-                                                        if($_SESSION['stc_agent_role']==3){
-                                                            $shownbystatus='';
-                                                        }
-                                                        $stcagentspendreportssup=mysqli_query($con, "
-                                                            SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
-                                                            FROM `stc_cust_project`
-                                                            INNER JOIN `stc_status_down_list`
-                                                            ON `stc_cust_project_id`=`stc_status_down_list_location`
-                                                            INNER JOIN `stc_agent_requested_customer` 
-                                                            ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
-                                                            ".$shownbystatus."
-                                                            ORDER BY `stc_cust_project_title` ASC
-                                                        ");
-
-                                                        
-                                                        if(!empty(mysqli_num_rows($stcagentspendreportssup))){
-                                                            foreach($stcagentspendreportssup as $pendrepcheckrow){
-                                                                echo '<option align="left" value="'.$pendrepcheckrow['stc_cust_project_id'].'">'.$pendrepcheckrow['stc_cust_project_title'].'</option>';
-                                                            }
-                                                        }else{
-                                                            echo '<option value="0">No Site found!!!</option>';
-                                                        }
-                                                    ?>
+                                                <select class="btn btn-success form-control " id="stc-agent-sup-std-location-find">
+                                                    <option value="NA">Select</option>
+                                                    <option>TATA Steel - Jamshedpur</option>
+                                                    <option>TATA Steel - KPO</option>
+                                                    <option>Others</option>
                                                 </select> 
                                             </div>
                                         </div>
@@ -105,9 +82,9 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="col-md-4 col-xl-4"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
-                                            <h5>Status :</h5><br>
+                                            <h5>Work Status :</h5><br>
                                             <select class="form-control stc-agent-sup-status">
-                                                <option value="1">DOWN</option>
+                                                <option value="1">PLANNING</option>
                                                 <option value="2">WORK-IN-PROGRESS</option>
                                                 <option value="3">WORK DONE</option>
                                                 <option value="4">WORK COMPLETE</option>

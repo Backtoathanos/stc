@@ -159,7 +159,7 @@ class transformers extends tesseract{
 			)VALUES(
 				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_slocation)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_location)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_dept)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_area)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $reason)."',
@@ -186,10 +186,8 @@ class transformers extends tesseract{
 			SET
 			    `stc_status_down_list_location` = '".mysqli_real_escape_string($this->stc_dbs, $stc_dept)."',
 			    `stc_status_down_list_plocation` = '".mysqli_real_escape_string($this->stc_dbs, $stc_slocation)."',
-			    `stc_status_down_list_sub_location` = '".mysqli_real_escape_string($this->stc_dbs, $stc_location)."',
+			    `stc_status_down_list_sub_location` = '".mysqli_real_escape_string($this->stc_dbs, $stc_dept)."',
 			    `stc_status_down_list_area` = '".mysqli_real_escape_string($this->stc_dbs, $stc_area)."',
-			    `stc_status_down_list_equipment_type` = '".mysqli_real_escape_string($this->stc_dbs, $stc_eq_type)."',
-			    `stc_status_down_list_equipment_number` = '".mysqli_real_escape_string($this->stc_dbs, $stc_eq_number)."',
 			    `stc_status_down_list_varities_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_j_varities)."',
 			    `stc_status_down_list_jobtype` = '".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
 			    `stc_status_down_list_updated_by` = '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
@@ -205,12 +203,16 @@ class transformers extends tesseract{
 	}
 
 	// update std auto
-	public function stc_std_update($std_id, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $remarks){
+	public function stc_std_update($std_id, $plocation, $dept, $area, $eq_type, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $remarks){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_status_down_list` 
 			SET
+				`stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $plocation)."',
+				`stc_status_down_list_sub_location`='".mysqli_real_escape_string($this->stc_dbs, $dept)."',
+				`stc_status_down_list_area`='".mysqli_real_escape_string($this->stc_dbs, $area)."',
+				`stc_status_down_list_equipment_type`='".mysqli_real_escape_string($this->stc_dbs, $eq_type)."',
 				`stc_status_down_list_equipment_status`='".mysqli_real_escape_string($this->stc_dbs, $eq_status)."',
 				`stc_status_down_list_jobtype`='".mysqli_real_escape_string($this->stc_dbs, $j_plannning)."',
 				`stc_status_down_list_qty`='".mysqli_real_escape_string($this->stc_dbs, $qty)."',
@@ -276,7 +278,6 @@ class transformers extends tesseract{
 		if($_SESSION['stc_agent_sub_category']=='Supervisor'){
 			$head_hidden1='				
 				<th class="text-center">EQUIPMENT TYPE</th>
-				<th class="text-center">EQUIPMENT NO</th>
 				<th class="text-center">EQUIPMENT STATUS</th>
 				<th class="text-center">JOB TYPE</th>
 				<th class="text-center">JOB VARIETIES</th>
@@ -299,9 +300,8 @@ class transformers extends tesseract{
 					<tr>
 						<th class="text-center">DATE</th>
 						<th class="text-center">LOCATION</th>
-						<th class="text-center">SUB LOCATION</th>
-						<th class="text-center">AREA</th>
 						<th class="text-center">DEPARTMENT</th>
+						<th class="text-center">AREA</th>
 						<th class="text-center">JOB PLANNING</th>
 						'.$head_hidden1.'
 						<th class="text-center">STATUS</th>
@@ -345,9 +345,9 @@ class transformers extends tesseract{
 			ON `stc_cust_project_id`=`stc_status_down_list_location` 
 			LEFT JOIN `stc_cust_pro_supervisor` 
 			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
-			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
+			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
 			AND `stc_status_down_list_status`<>5
-			ORDER BY `stc_status_down_list_equipment_status` ASC
+			GROUP BY TIMESTAMP(`stc_status_down_list_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimeqry)>0){
 			foreach($optimusprimeqry as $row){
@@ -434,30 +434,32 @@ class transformers extends tesseract{
 							<td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
 					';
 				}
-				$eq_type='';
+				$eq_type=$row['stc_status_down_list_equipment_type'];
 				$eq_number='';
-				$stc_call_eqtypeqry=mysqli_query($this->stc_dbs, "
-					SELECT
-					    `stc_cpumpd_equipment_type`
-					FROM
-					    `stc_customer_pump_details`
-					WHERE
-					    `stc_cpumpd_id`='".$row['stc_status_down_list_equipment_type']."'
-				");
-				foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
-					$eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
-				}
+				if(ctype_digit($eq_type)){
+					$stc_call_eqtypeqry=mysqli_query($this->stc_dbs, "
+						SELECT
+							`stc_cpumpd_equipment_type`
+						FROM
+							`stc_customer_pump_details`
+						WHERE
+							`stc_cpumpd_id`='".$row['stc_status_down_list_equipment_type']."'
+					");
+					foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
+						$eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
+					}
 
-				$stc_call_eqnumberqry=mysqli_query($this->stc_dbs, "
-					SELECT
-					    `stc_cpumpd_equipment_number`
-					FROM
-					    `stc_customer_pump_details`
-					WHERE
-					    `stc_cpumpd_id`='".$row['stc_status_down_list_equipment_number']."'
-				");
-				foreach($stc_call_eqnumberqry as $stc_call_eqnumberrow){
-					$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
+					$stc_call_eqnumberqry=mysqli_query($this->stc_dbs, "
+						SELECT
+							`stc_cpumpd_equipment_number`
+						FROM
+							`stc_customer_pump_details`
+						WHERE
+							`stc_cpumpd_id`='".$row['stc_status_down_list_equipment_number']."'
+					");
+					foreach($stc_call_eqnumberqry as $stc_call_eqnumberrow){
+						$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
+					}
 				}
 
 				$job_type='';
@@ -491,7 +493,6 @@ class transformers extends tesseract{
 				if($_SESSION['stc_agent_sub_category']=='Supervisor'){
 					$hidden1='	
 						<td>'.$eq_type.'</td>
-						<td class="text-center">'.$eq_number.'</td>
 						'.$eqstatus.'
 						<td class="text-center">'.$job_type.'</td>
 						<td class="text-center">'.$job_varities.'</td>
@@ -513,9 +514,8 @@ class transformers extends tesseract{
 					<tr>
 						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
 						<td>'.$row['stc_status_down_list_plocation'].'</td>
-						<td>'.$row['stc_cust_project_title'].'</td>
-						<td>'.$row['stc_status_down_list_area'].'</td>
 						<td>'.$row['stc_status_down_list_sub_location'].'</td>
+						<td>'.$row['stc_status_down_list_area'].'</td>
 						<td>'.$row['stc_status_down_list_jobtype'].'</td>
 						'.$hidden1.'
 						<td class="text-center">'.$status.'</td>
@@ -726,14 +726,12 @@ if(isset($_POST['stc_std_update_mhit'])){
 	$stc_dept=$_POST['stc_dept'];
 	$stc_area=$_POST['stc_area'];
 	$stc_eq_number=$_POST['stc_eq_number'];
-	$stc_eq_type=$_POST['stc_eq_type'];
+	$stc_eq_type=1;
 	$stc_j_varities=$_POST['stc_j_varities'];
 	$stc_j_plannning=$_POST['stc_j_plannning'];
 
 	$metabots=new transformers();
-	if(($stc_dept=="NA") || empty($stc_location) || empty($stc_area)){
-		$opmetabots="Please fill all the field, if no data available then fill with NA.";
-	}elseif(empty($_SESSION['stc_agent_sub_id'])){
+	if(empty($_SESSION['stc_agent_sub_id'])){
 		$opmetabots="Please login!!!";
 	}else{
 		$opmetabots=$metabots->stc_std_updatem($stc_std_id, $stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_eq_number, $stc_eq_type, $stc_j_varities, $stc_j_plannning);
@@ -745,6 +743,10 @@ if(isset($_POST['stc_std_update_mhit'])){
 if(isset($_POST['stc_update_std_hit'])){
 
 	$std_id = $_POST['std_id'];
+	$plocation = $_POST['plocation'];
+	$dept = $_POST['dept'];
+	$area = $_POST['area'];
+	$eq_type = $_POST['eq_type'];
 	$eq_status = $_POST['eq_status'];
 	$j_plannning = $_POST['j_plannning'];
 	$qty = $_POST['qty'];
@@ -764,7 +766,7 @@ if(isset($_POST['stc_update_std_hit'])){
 	if(empty($_SESSION['stc_agent_sub_id'])){
 		$opmetabots="login";
 	}else{
-		$opmetabots=$metabots->stc_std_update($std_id, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $remarks);
+		$opmetabots=$metabots->stc_std_update($std_id, $plocation, $dept, $area, $eq_type, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $remarks);
 	}
 	echo json_encode($opmetabots);
 

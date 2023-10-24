@@ -1831,7 +1831,6 @@ class pirates_supervisor extends tesseract{
 					<tr>
 						<th class="text-center">DATE</th>
 						<th class="text-center">LOCATION</th>
-						<th class="text-center">SUB LOCATION</th>
 						<th class="text-center">DEPARTMENT</th>
 						<th class="text-center">AREA</th>
 						<th class="text-center">EQUIPMENT TYPE</th>
@@ -1931,7 +1930,7 @@ class pirates_supervisor extends tesseract{
 			ON `stc_status_down_list_equipment_type`=b.`stc_cpumpd_id` 
 			LEFT JOIN `stc_cust_pro_supervisor` 
 			ON `stc_status_down_list_created_by`=`stc_cust_pro_supervisor_id` 
-			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
+			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
 			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field." ".$search_field."
 			ORDER BY DATE(`stc_status_down_list_date`) DESC
 		");
@@ -2081,7 +2080,6 @@ class pirates_supervisor extends tesseract{
 					<tr>
 						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
 						<td>'.$row['stc_status_down_list_plocation'].'</td>
-						<td>'.$row['stc_cust_project_title'].'</td>
 						<td>'.$row['stc_status_down_list_sub_location'].'</td>
 						<td>'.$row['stc_status_down_list_area'].'</td>
 						<td>'.$eq_type.'</td>
