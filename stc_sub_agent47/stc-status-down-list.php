@@ -71,19 +71,27 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <button class="form-control btn bg-success text-white mb-3 stc-std-operation-btn" type="create" data-toggle="modal" data-target=".bd-create-std-modal">Add Status Down List</button>
                                                 </div>
                                             </div>
+                                            <?php
+                                                if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
+                                            ?>
                                             <div class="row">
                                                 <div class="col-lg-3 col-md-3">
                                                     <h5 style="position: relative;top: 8px;">Location/Site Name :</h5>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7">
-                                                    <select class="form-control load_site_name_consump" id="stc-agent-sup-std-location-find">
-                                                        <option>No Site Found!!!</option>
+                                                    <select class="form-control" id="stc-agent-sup-std-location-find">
+                                                        <option>TATA Steel - Jamshedpur</option>
+                                                        <option>TATA Steel - KPO</option>
+                                                        <option>Others</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-lg-2 col-md-2">
                                                     <a href="#" class="form-control btn btn-success stc-std-list-show-hit">Find</a>
                                                 </div>
                                             </div>
+                                            <?php
+                                                }
+                                            ?>
                                         </div>
                                     </div>
                                 </div>
@@ -329,8 +337,11 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-agent-sup-std-hidden-std-id').val(response_sdl.stc_status_down_list_id);
                         $('#stc-agent-sup-std-sublocation').val(response_sdl.stc_status_down_list_plocation);
                         $('#stc-agent-sup-std-location').val(response_sdl.stc_status_down_list_location);
-                        $('#stc-agent-sup-std-sub-location').val(response_sdl.stc_status_down_list_sub_location);
-                        $('#stc-agent-sup-std-sub-location').change();
+                        // $('#stc-agent-sup-std-sub-location').val(response_sdl.stc_status_down_list_sub_location);
+                        $('.stc-agent-sup-std-sub-location').val(response_sdl.stc_status_down_list_sub_location);
+                        $('.stc-agent-sup-std-area').val(response_sdl.stc_status_down_list_area);
+                        $('.stc-agent-sup-std-equipment-type').val(response_sdl.stc_status_down_list_equipment_type);
+                        // $('#stc-agent-sup-std-sub-location').change();
                         $('#stc-agent-sup-std-equipment-status').val(response_sdl.stc_status_down_list_equipment_status);
                         $('#stc-agent-sup-std-job-plannning').val(response_sdl.stc_status_down_list_jobtype);
                         $(".stc-agent-sup-std-qty").val(response_sdl.stc_status_down_list_qty);
@@ -346,13 +357,16 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-agent-sup-std-target-date').val(response_sdl.stc_status_down_list_target_date);
                         $('.stc-agent-sup-std-remarks').val(response_sdl.stc_status_down_list_remarks);
                         $('.stc-std-tools-req-item-show').html(response_sdl.stc_status_down_list_tools_req);
-                        $('#stc-agent-sup-std-area').val(response_sdl.stc_status_down_list_area);
                     }
                 });
             }
 
             function stc_update_std(){
                 var std_id = $('#stc-agent-sup-std-hidden-std-id').val();
+                var plocation = $('#stc-agent-sup-std-sublocation').val();
+                var dept = $('.stc-agent-sup-std-sub-location').val();
+                var area = $('.stc-agent-sup-std-area').val();
+                var eq_type = $('.stc-agent-sup-std-equipment-type').val();
                 var eq_status = $('#stc-agent-sup-std-equipment-status').val();
                 var j_plannning = $('#stc-agent-sup-std-job-plannning').val();
                 var qty=$(".stc-agent-sup-std-qty").val();
@@ -376,6 +390,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     data        : {
                         stc_update_std_hit:1,
                         std_id:std_id,
+                        plocation:plocation,
+                        dept:dept,
+                        area:area,
+                        eq_type:eq_type,
                         eq_status:eq_status,
                         j_plannning:j_plannning,
                         qty:qty,
@@ -427,19 +445,25 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             }
 
             $('body').delegate('.stc-std-update-on-focusout', 'focusout', function(e){
-                $('.attribute-message-show').remove();
-                $(this).after('<p class="text-success attribute-message-show">Record updated.</p>');
-                stc_update_std();
-                var location_id=$('#stc-agent-sup-std-location-find').val();
-                std_list_call(location_id);
+                var type = $('.stc-agent-sup-std-save').attr('operation');
+                if(type=="auto"){
+                    $('.attribute-message-show').remove();
+                    $(this).after('<p class="text-success attribute-message-show">Record updated.</p>');
+                    stc_update_std();
+                    var location_id=$('#stc-agent-sup-std-location-find').val();
+                    std_list_call(location_id);
+                }
             });
 
             $('body').delegate('.stc-std-update-on-change', 'focusout', function(e){
-                $('.attribute-message-show').remove();
-                $(this).after('<p class="text-success attribute-message-show">Record updated.</p>');
-                stc_update_std();
-                var location_id=$('#stc-agent-sup-std-location-find').val();
-                std_list_call(location_id);
+                var type = $('.stc-agent-sup-std-save').attr('operation');
+                if(type=="auto"){
+                    $('.attribute-message-show').remove();
+                    $(this).after('<p class="text-success attribute-message-show">Record updated.</p>');
+                    stc_update_std();
+                    var location_id=$('#stc-agent-sup-std-location-find').val();
+                    std_list_call(location_id);
+                }
             });
 
             $('body').delegate('.stc-agent-sup-std-tools-req-btn', 'click', function(e){
@@ -523,7 +547,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var work_permit_no=$(".stc-agent-sup-std-upermit-no").val();
                 if(jobdonedetails==""){
                     alert("Please provide job done details.");
-                }else{
+                }else if(jobdonedetails.length>15){
                     $.ajax({
                         url         : "nemesis/stc_std.php",
                         method      : "POST",
@@ -542,6 +566,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             std_list_call(location_id);
                         }
                     });
+                }else{
+                    alert("Please write complete job done details.");
                 }
             });
 
@@ -597,6 +623,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     $('.stc-agent-sup-std-save').removeAttr('operation');
                     $('.stc-agent-sup-std-save').attr('operation', 'manual');
                     $('.stc-std-section-hideshow').hide();
+                    $('.stc-std-update-on-focusout').val();
+                    $('.stc-std-update-on-focusout').val('');
                 }else{
                     $('.stc-agent-sup-std-save').removeAttr('operation');
                     $('.stc-agent-sup-std-save').attr('operation', 'auto');
@@ -731,7 +759,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <h5>Location :</h5><br>
                                 <input type="hidden" id="stc-agent-sup-std-hidden-std-id">
                                 <input type="hidden" id="stc-agent-sup-std-hidden-location-id">
-                                <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-sublocation">
+                                <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-sublocation">
                                     <option value="NA">Select</option>
                                     <option>TATA Steel - Jamshedpur</option>
                                     <option>TATA Steel - KPO</option>
@@ -755,7 +783,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <h5>Department : </h5><br>
                                 <!-- <select class="btn btn-success form-control stc-agent-sup-std-sub-location text-left" id="stc-agent-sup-std-sub-location"><option>Please select location first!!!</option>
                                 </select>  -->
-                                <input type="text" class="form-control stc-agent-sup-std-sub-location" placeholder="Enter Department"/>
+                                <input type="text" class="form-control stc-agent-sup-std-sub-location stc-std-update-on-focusout" placeholder="Enter Department"/>
                             </div>
                         </div>
                     </div>
@@ -765,7 +793,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <h5>Area : </h5><br>
                                 <!-- <select class="btn btn-success form-control stc-agent-sup-std-area text-left" id="stc-agent-sup-std-area"><option>Please select department first!!!</option>
                                 </select>  -->
-                                <input type="text" class="form-control stc-agent-sup-std-area" placeholder="Enter Area"/>
+                                <input type="text" class="form-control stc-agent-sup-std-area stc-std-update-on-focusout" placeholder="Enter Area"/>
                             </div>
                         </div>
                     </div>
@@ -775,7 +803,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <h5>Equipment Type :</h5><br>
                                 <!-- <select class="btn btn-success form-control load_equipment_type_consump text-left" id="stc-agent-sup-std-equipment-type"><option>Please select area first!!!</option>
                                 </select>  -->
-                                <input type="text" class="form-control stc-agent-sup-std-equipment-type" placeholder="Enter Equipment Details"/>
+                                <input type="text" class="form-control stc-agent-sup-std-equipment-type stc-std-update-on-focusout" placeholder="Enter Equipment Details"/>
                             </div>
                         </div>
                     </div>
@@ -824,7 +852,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Job Planning :</h5><br>
-                                <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-plannning">
+                                <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-job-plannning">
                                     <option>BREAKDOWN MAINTENANCE</option>
                                     <option>CALL ATTEND</option>
                                     <option>DAILY JOB ACTIVITY</option>
@@ -838,28 +866,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Reason:</h5><br>
-                                <textarea class="form-control" id="stc-agent-sup-std-reason" placeholder="Reason"></textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12 col-xl-12"> 
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <a href="#" class="form-control btn btn-success stc-agent-sup-std-save">Save</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <p>Below fields are auto save. Please put information and switch to next section your data will be saved automatically.</p>
+                                <textarea class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-reason" placeholder="Reason"></textarea>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6 col-xl-6" style="display:none;"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Equipment Number (auto save):</h5><br>
+                                <h5>Equipment Number :</h5><br>
                                 <select class="btn btn-success form-control load_equipment_number_consump text-left" id="stc-agent-sup-std-equipment-number" disabled><option>Please select equipment no first!!!</option>
                                 </select> 
                                 <!-- <input type="text" class="form-control stc-agent-sup-std-equipment-number" placeholder="Enter Equipment Number"/> -->
@@ -869,7 +883,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Equipment Status (auto save):</h5><br>
+                                <h5>Equipment Status :</h5><br>
                                 <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-equipment-status"><option>Down</option><option>Running</option>
                                 </select> 
                             </div>
@@ -878,7 +892,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-3 col-xl-3 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Quantity (auto save):</h5><br>
+                                <h5>Quantity :</h5><br>
                                 <input type="number" class="form-control stc-agent-sup-std-qty stc-std-update-on-focusout" placeholder="Enter Quantity">
                             </div>
                         </div>
@@ -886,32 +900,32 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-3 col-xl-3 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Capacity (auto save):</h5><br>
+                                <h5>Capacity :</h5><br>
                                 <input type="text" class="form-control stc-agent-sup-std-capacity stc-std-update-on-focusout" placeholder="Enter Capacity">
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 col-xl-4 stc-std-section-hideshow"> 
+                    <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Reason Attribute (auto save):</h5><br>
-                                <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-reasonattribite"><option>GLOBAL</option><option>VOLTAS</option>
+                                <h5>Reason Attribute :</h5><br>
+                                <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-reasonattribite"><option>GLOBAL</option><option>VOLTAS</option><option>CLIENT</option>
                                 </select> 
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 col-xl-4 stc-std-section-hideshow"> 
+                    <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Permit No (auto save):</h5><br>
+                                <h5>Permit No :</h5><br>
                                 <input type="text" class="form-control stc-agent-sup-std-permit-no stc-std-update-on-focusout" placeholder="Enter Permit No">
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4 col-xl-4 stc-std-section-hideshow">  
+                    <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Responsible Person (auto save):</h5><br>
+                                <h5>Responsible Person :</h5><br>
                                 <input type="text" class="form-control stc-agent-sup-std-responsive-person stc-std-update-on-focusout" placeholder="Enter Responsive Person">
                             </div>
                         </div>
@@ -919,7 +933,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Material Requisition (auto save):</h5><br>
+                                <h5>Material Requisition :</h5><br>
                                 <textarea class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-material-desc" placeholder="Material Description"></textarea>
                             </div>
                         </div>
@@ -927,7 +941,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Manpower Request (auto save):</h5><br>
+                                <h5>Manpower Request :</h5><br>
                                 <input type="text" class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-manpower-req" placeholder="Manpower Request" required>
                             </div>
                         </div>
@@ -935,7 +949,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Work Completion Target Date (auto save):</h5><br>
+                                <h5>Work Completion Target Date :</h5><br>
                                 <input type="date" class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-target-date" <?php echo date("Y-m-d");?> required>
                             </div>
                         </div>
@@ -964,8 +978,15 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Any comment (auto save):</h5><br>
+                                <h5>Any comment :</h5><br>
                                 <textarea type="text" class="form-control stc-agent-sup-std-remarks stc-std-update-on-focusout" placeholder="Enter Any Comment"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xl-12"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <a href="#" class="form-control btn btn-success stc-agent-sup-std-save">Save</a>
                             </div>
                         </div>
                     </div>
