@@ -295,7 +295,7 @@ class transformers extends tesseract{
 			';
 		}
 		$optimusprime='
-			<table class="table table-bordered table-responsives">
+			<table class="table table-bordered table-responsive">
 				<thead>
 					<tr>
 						<th class="text-center">DATE</th>

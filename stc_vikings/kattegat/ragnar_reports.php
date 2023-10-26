@@ -600,7 +600,7 @@ class ragnarReportsViewRequiReports extends tesseract{
 
       if(mysqli_num_rows($ivarqry)>0){
          $ivar.='
-            <table class="table table-bordered" id="stc-show-std-details-table">
+            <table class="table table-bordered table-responsive" id="stc-show-std-details-table">
                <thead>
                   <tr>
                      <th class="text-center">SL NO</th>
@@ -611,7 +611,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th class="text-center">EQUIPMENT DETAILS</th>
                      <th class="text-center">QTY</th>
                      <th class="text-center">CAPACITY</th>
-                     <th class="text-center">REASON</th>
+                     <th style="width:25%" class="text-center">REASON</th>
                      <th class="text-center">STATUS</th>
                      <th class="text-center">DELAY(DAYS)</th>
                   </tr>
@@ -758,7 +758,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>'.$eq_type.' '.$eq_number.'</td>
                   <td class="text-right">'.$row['stc_status_down_list_qty'].'</td>
                   <td class="text-right">'.$row['stc_status_down_list_capacity'].'</td>
-                  <td style="width:10%">'.$row['stc_status_down_list_reason'].'</td>
+                  <td>'.$row['stc_status_down_list_reason'].'</td>
                   <td  class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>
                </tr>
