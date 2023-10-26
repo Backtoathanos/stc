@@ -502,8 +502,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          FROM `stc_status_down_list` 
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
-         WHERE `stc_status_down_list_status`<>5 
-         AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."'
+         WHERE `stc_status_down_list_status`<>5 AND `stc_status_down_list_status`<>4
          AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ");
@@ -523,8 +522,10 @@ class ragnarReportsViewRequiReports extends tesseract{
       ");
       $sitename="";
       $jobdone=0;
+      $progress=0;
       $pendingjon=0;
       $jobdone48=0;
+      $progress48=0;
       $pendingjon48=0;
       if(mysqli_num_rows($ivarpreqry)>0){
          $currenthr=date("Y/m/d");
@@ -540,6 +541,18 @@ class ragnarReportsViewRequiReports extends tesseract{
                $dperiod = $timeDiff/86400;
                if($dperiod<2){
                   $pendingjon48++;
+               }
+            }elseif($prerow['stc_status_down_list_status']==2){
+               $progress++;
+               $today = date("Y/m/d") ; 
+               $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_date'])));
+               $endTimeStamp = strtotime($today);
+
+               $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+               $dperiod = $timeDiff/86400;
+               if($dperiod<2){
+                  $progress48++;
                }
             }elseif($prerow['stc_status_down_list_status']==3){
                $jobdone++;
@@ -560,22 +573,26 @@ class ragnarReportsViewRequiReports extends tesseract{
          $ivar.='
             <table class="table table-bordered table-responsive" id="stc-show-std-detailspre-table">
                <tr>
-                  <td class="text-center" colspan="4">TOTAL JOB ACTIVITY (All time)</td>
-                  <td class="text-center" colspan="4">DAILY JOB ACTIVITY(within 48hr)</td>
-                  <td class="text-center"></td>
+                  <td class="text-center">LABEL</td>
+                  <td class="text-center">DOWN</td>
+                  <td class="text-center">WORK-IN-PROGRESS</td>
+                  <td class="text-center">WORK DONE</td>
+                  <td class="text-center">FILTER</td>
                </tr>
                <tr>
-                  <td class="text-center">WORK-DONE:-</td>
-                  <td class="text-center" style="background-color: #a9d08e;">'.$jobdone.'</td>
-                  <td class="text-center">DOWN JOB:-</td>
-                  <td class="text-center" style="background-color: #ff6767;">'.$pendingjon.'</td>
-                  <td class="text-center">WORK-DONE:-</td>
-                  <td class="text-center" style="background-color: #a9d08e;">'.$pendingjon48.'</td>
-                  <td class="text-center">DOWN JOB:-</td>
-                  <td class="text-center" style="background-color: #ff6767;">'.$jobdone48.'</td>
-                  <td class="text-center">
-                     <a href="#" class="btn btn-primary">Filter</a>
+                  <td class="text-center">DAILY JOB ACTIVITY(within 48hr)</td>
+                  <td class="text-right" style="background-color: #ff6767;">'.$pendingjon48.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$progress48.'</td>
+                  <td class="text-right" style="background-color: #a9d08e;">'.$jobdone48.'</td>
+                  <td class="text-center" rowspan="2">
+                     <a href="#" class="btn btn-primary">FILTER</a>
                   </td>
+               </tr>
+               <tr>
+                  <td class="text-center">TOTAL JOB ACTIVITY (All time)</td>
+                  <td class="text-right" style="background-color: #ff6767;">'.$pendingjon.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$progress.'</td>
+                  <td class="text-right" style="background-color: #a9d08e;">'.$jobdone.'</td>
                </tr>
             </table>
          ';
@@ -583,7 +600,7 @@ class ragnarReportsViewRequiReports extends tesseract{
 
       if(mysqli_num_rows($ivarqry)>0){
          $ivar.='
-            <table class="table table-bordered table-responsive" id="stc-show-std-details-table">
+            <table class="table table-bordered" id="stc-show-std-details-table">
                <thead>
                   <tr>
                      <th class="text-center">SL NO</th>
@@ -594,7 +611,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th class="text-center">EQUIPMENT DETAILS</th>
                      <th class="text-center">QTY</th>
                      <th class="text-center">CAPACITY</th>
-                     <th class="text-center">DOWN REASON</th>
+                     <th class="text-center">REASON</th>
                      <th class="text-center">STATUS</th>
                      <th class="text-center">DELAY(DAYS)</th>
                   </tr>
@@ -704,10 +721,37 @@ class ragnarReportsViewRequiReports extends tesseract{
                $strpos=strpos($p_title,"(");
                $p_title=substr($p_title,0, $strpos);
             }
+
+            $eq_type=$row['stc_status_down_list_equipment_type'];
+				if(ctype_digit($eq_type)){
+					$stc_call_eqtypeqry=mysqli_query($this->stc_dbs, "
+						SELECT
+							`stc_cpumpd_equipment_type`
+						FROM
+							`stc_customer_pump_details`
+						WHERE
+							`stc_cpumpd_id`='".$row['stc_status_down_list_equipment_type']."'
+					");
+					foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
+						$eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
+					}
+
+					$stc_call_eqnumberqry=mysqli_query($this->stc_dbs, "
+						SELECT
+							`stc_cpumpd_equipment_number`
+						FROM
+							`stc_customer_pump_details`
+						WHERE
+							`stc_cpumpd_id`='".$row['stc_status_down_list_equipment_number']."'
+					");
+					foreach($stc_call_eqnumberqry as $stc_call_eqnumberrow){
+						$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
+					}
+				}
             $ivar.='
                <tr>
                   <td class="text-center">'.$row['stc_status_down_list_id'].'</td>
-                  <td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
+                  <td>'.date('d-m-Y h:i a', strtotime($row['stc_status_down_list_date'])).'</td>
                   <td>'.$row['stc_status_down_list_plocation'].'</td>
                   <td>'.$row['stc_status_down_list_sub_location'].'</td>
                   <td>'.$row['stc_status_down_list_area'].'</td>

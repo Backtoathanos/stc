@@ -152,20 +152,24 @@ if(isset($_SESSION["stc_agent_id"])){
                 var location_id=$('#stc-agent-sup-std-location-find').val();
                 var search=$('.stc-agent-sup-search-field').val();
                 var status=$('.stc-agent-sup-status').val();
-                $.ajax({
-                    url         : "nemesis/stc_project.php",
-                    method      : "POST",
-                    data        : {
-                        stc_down_list_hit:1,
-                        location_id:location_id,
-                        search:search,
-                        status:status
-                    },
-                    success     : function(response_sdl){
-                        // console.log(response_sdl);
-                        $('.stc-std-search-result').html(response_sdl);
-                    }
-                });
+                if(location_id!="NA"){
+                    $.ajax({
+                        url         : "nemesis/stc_project.php",
+                        method      : "POST",
+                        data        : {
+                            stc_down_list_hit:1,
+                            location_id:location_id,
+                            search:search,
+                            status:status
+                        },
+                        success     : function(response_sdl){
+                            // console.log(response_sdl);
+                            $('.stc-std-search-result').html(response_sdl);
+                        }
+                    });
+                }else{
+                    alert("Please select location/sitename");
+                }
             });
 
             // change status
