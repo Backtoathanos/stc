@@ -1941,24 +1941,25 @@ class pirates_supervisor extends tesseract{
 				$rec_date=(date('Y', strtotime($row['stc_status_down_list_rect_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_rect_date'])) : 'NA';
 				$tar_date=(date('Y', strtotime($row['stc_status_down_list_target_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_target_date'])) : 'NA';
 
-				$status='';
 				$updatejobdetails='';
+				$status='';
 				$statusbgcolor = '';
 				if($row['stc_status_down_list_status']==1){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">DOWN</span></b>';
-					$statusbgcolor = 'style="background-color: #e91919;"';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">PLANNING</span></b>';
+					$statusbgcolor = 'style="background-color: #00f9b4;"';
 				}elseif($row['stc_status_down_list_status']==2){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-IN-PROGRESS</span></b>';
-					$statusbgcolor = 'style="background-color: #f6f900;"';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">DOWN</span></b>';
+					$statusbgcolor = 'style="background-color: #e91919;"';
 				}elseif($row['stc_status_down_list_status']==3){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-DONE</span></b>';
-					$statusbgcolor = 'style="background-color: #60f900;"';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-IN-PROGRESS</span></b>';
+					$statusbgcolor = 'style="background-color: #f6f900;"';
 				}elseif($row['stc_status_down_list_status']==4){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-COMPLETE</span></b>';
-					$updatejobdetails='<a href="#" class="stc-cust-std-update btn btn-primary" message="'.$row['stc_status_down_list_jobdone_details'].'" id="'.$row['stc_status_down_list_id'].'">Update me</a></td>';
-					$statusbgcolor = 'style="background-color: #5cd25c;"';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-DONE</span></b>';
+					$statusbgcolor = 'style="background-color: #2aef00;"';
+				}elseif($row['stc_status_down_list_status']==5){
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-COMPLETE</span></b>';
 				}else{
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">CLOSED</span></b>';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">CLOSE</span></b>';
 				}
 				
 				$eqstatus='

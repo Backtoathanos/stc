@@ -84,11 +84,12 @@ if(isset($_SESSION["stc_agent_id"])){
                                         <div class="card-body">
                                             <h5>Work Status :</h5><br>
                                             <select class="form-control stc-agent-sup-status">
-                                                <option value="1">DOWN</option>
-                                                <option value="2">WORK-IN-PROGRESS</option>
-                                                <option value="3">WORK DONE</option>
-                                                <option value="4">WORK COMPLETE</option>
-                                                <option value="5">CLOSED</option>
+                                                <option value="1">PLANNING</option>
+                                                <option value="2">DOWN</option>
+                                                <option value="3">WORK-IN-PROGRESS</option>
+                                                <option value="4">WORK DONE</option>
+                                                <option value="5">WORK COMPLETE</option>
+                                                <option value="6">CLOSED</option>
                                             </select>
                                         </div>
                                     </div>
