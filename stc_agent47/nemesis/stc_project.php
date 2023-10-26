@@ -1931,7 +1931,7 @@ class pirates_supervisor extends tesseract{
 			LEFT JOIN `stc_cust_pro_supervisor` 
 			ON `stc_status_down_list_created_by`=`stc_cust_pro_supervisor_id` 
 			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
-			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field." ".$search_field."
+			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field."
 			ORDER BY DATE(`stc_status_down_list_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimeqry)>0){
@@ -2081,6 +2081,33 @@ class pirates_supervisor extends tesseract{
 				if(date('Y', strtotime($row['stc_status_down_list_updated_date']))==1970){
 					$updated_date='';
 				}
+				$eq_type=$row['stc_status_down_list_equipment_type'];
+				if(ctype_digit($eq_type)){
+					$stc_call_eqtypeqry=mysqli_query($this->stc_dbs, "
+						SELECT
+							`stc_cpumpd_equipment_type`
+						FROM
+							`stc_customer_pump_details`
+						WHERE
+							`stc_cpumpd_id`='".$row['stc_status_down_list_equipment_type']."'
+					");
+					foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
+						$eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
+					}
+
+					$stc_call_eqnumberqry=mysqli_query($this->stc_dbs, "
+						SELECT
+							`stc_cpumpd_equipment_number`
+						FROM
+							`stc_customer_pump_details`
+						WHERE
+							`stc_cpumpd_id`='".$row['stc_status_down_list_equipment_number']."'
+					");
+					foreach($stc_call_eqnumberqry as $stc_call_eqnumberrow){
+						$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
+					}
+				}
+
 				$optimusprime.='
 					<tr>
 						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
