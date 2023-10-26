@@ -249,6 +249,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var eq_number = $('#stc-agent-sup-std-equipment-number').val();
                 var eq_status = $('#stc-agent-sup-std-equipment-status').val();
                 var j_plannning = $('#stc-agent-sup-std-job-plannning').val();
+                var action_status = $('#stc-agent-sup-std-action-status').val();
                 var qty=$(".stc-agent-sup-std-qty").val();
                 var capacity=$(".stc-agent-sup-std-capacity").val();
                 var reasonattribute=$("#stc-agent-sup-std-reasonattribite").val();
@@ -275,7 +276,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             stc_dept:dept,
                             stc_area:area,
                             stc_j_plannning:j_plannning,
-                            reason:reason
+                            reason:reason,
+                            action_status:action_status
                         },
                         success     : function(response_std){
                             // console.log(response_std);
@@ -623,12 +625,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     $('.stc-agent-sup-std-save').removeAttr('operation');
                     $('.stc-agent-sup-std-save').attr('operation', 'manual');
                     $('.stc-std-section-hideshow').hide();
+                    $('.stc-std-section-achideshow').show();
                     $('.stc-std-update-on-focusout').val();
                     $('.stc-std-update-on-focusout').val('');
                 }else{
                     $('.stc-agent-sup-std-save').removeAttr('operation');
                     $('.stc-agent-sup-std-save').attr('operation', 'auto');
                     $('.stc-std-section-hideshow').show();
+                    $('.stc-std-section-achideshow').hide();
                     var std_id=$(this).attr("id");
                     $('#stc-agent-sup-std-hidden-std-id').val(std_id);
                     load_std_perticular(std_id);
@@ -760,7 +764,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <input type="hidden" id="stc-agent-sup-std-hidden-std-id">
                                 <input type="hidden" id="stc-agent-sup-std-hidden-location-id">
                                 <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-sublocation">
-                                    <option value="NA">Select</option>
                                     <option>TATA Steel - Jamshedpur</option>
                                     <option>TATA Steel - KPO</option>
                                     <option>Others</option>
@@ -810,7 +813,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Job Type :</h5><br>
+                                <h5>Job Category :</h5><br>
                                 <label for="ELECTRICAL">
                                     <input type="checkbox" style="position: relative;top: 2px;" id="ELECTRICAL" class="stc-agent-sup-std-job-type" value="'ELECTRICAL'"> ELECTRICAL
                                 </label>
@@ -851,7 +854,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Job Planning :</h5><br>
+                                <h5>Type of Job :</h5><br>
                                 <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-job-plannning">
                                     <option>BREAKDOWN MAINTENANCE</option>
                                     <option>CALL ATTEND</option>
@@ -867,6 +870,17 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             <div class="card-body">
                                 <h5>Reason:</h5><br>
                                 <textarea class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-reason" placeholder="Reason"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-6 stc-std-section-achideshow"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Action :</h5><br>
+                                <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-action-status">
+                                    <option value="1">DOWN</option>
+                                    <option value="2">WORK-IN-PROGRESS</option>
+                                </select> 
                             </div>
                         </div>
                     </div>

@@ -1943,15 +1943,20 @@ class pirates_supervisor extends tesseract{
 
 				$status='';
 				$updatejobdetails='';
+				$statusbgcolor = '';
 				if($row['stc_status_down_list_status']==1){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">PLANNING</span></b>';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">DOWN</span></b>';
+					$statusbgcolor = 'style="background-color: #e91919;"';
 				}elseif($row['stc_status_down_list_status']==2){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-IN-PROGRESS</span></b>';
+					$statusbgcolor = 'style="background-color: #f6f900;"';
 				}elseif($row['stc_status_down_list_status']==3){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-DONE</span></b>';
+					$statusbgcolor = 'style="background-color: #60f900;"';
 				}elseif($row['stc_status_down_list_status']==4){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-COMPLETE</span></b>';
 					$updatejobdetails='<a href="#" class="stc-cust-std-update btn btn-primary" message="'.$row['stc_status_down_list_jobdone_details'].'" id="'.$row['stc_status_down_list_id'].'">Update me</a></td>';
+					$statusbgcolor = 'style="background-color: #5cd25c;"';
 				}else{
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">CLOSED</span></b>';
 				}
@@ -2099,7 +2104,7 @@ class pirates_supervisor extends tesseract{
 						<td>NA</td>
 						<td>NA</td>
 						<td>'.$dperiod.' Days</td>
-						<td>'.$status.'</td>
+						<td class="text-center" '.$statusbgcolor.'>'.$status.'</td>
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_jobdone_details'].'<br>'.$updatejobdetails.'
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
