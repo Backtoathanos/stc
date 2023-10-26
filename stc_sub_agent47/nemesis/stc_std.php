@@ -132,7 +132,7 @@ class transformers extends tesseract{
 	}
 
 	// save std
-	public function stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason){
+	public function stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $action_status){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$tools_req='';
@@ -164,7 +164,7 @@ class transformers extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $reason)."',
 				'".$status."',
-				'1',
+				'".mysqli_real_escape_string($this->stc_dbs, $action_status)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
 			)
 		");
@@ -279,7 +279,7 @@ class transformers extends tesseract{
 			$head_hidden1='				
 				<th class="text-center">EQUIPMENT TYPE</th>
 				<th class="text-center">EQUIPMENT STATUS</th>
-				<th class="text-center">JOB TYPE</th>
+				<th class="text-center">TYPE OF JOB</th>
 				<th class="text-center">JOB VARIETIES</th>
 				<th class="text-center">MATERIAL DESCRIPTION</th>
 				<th class="text-center">TARGET DATE</th>
@@ -357,13 +357,16 @@ class transformers extends tesseract{
 				$tar_date=(date('Y', strtotime($row['stc_status_down_list_target_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_target_date'])) : 'NA';
 
 				$status='';
-
+				$statusbgcolor = '';
 				if($row['stc_status_down_list_status']==1){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">PLANNING</span></b>';
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">DOWN</span></b>';
+					$statusbgcolor = 'style="background-color: #e91919;"';
 				}elseif($row['stc_status_down_list_status']==2){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-IN-PROGRESS</span></b>';
+					$statusbgcolor = 'style="background-color: #f6f900;"';
 				}elseif($row['stc_status_down_list_status']==3){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-DONE</span></b>';
+					$statusbgcolor = 'style="background-color: #60f900;"';
 				}elseif($row['stc_status_down_list_status']==4){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-COMPLETE</span></b>';
 				}else{
@@ -501,12 +504,16 @@ class transformers extends tesseract{
 					';
 				}
 				if($_SESSION['stc_agent_sub_category']=='Site Incharge'){
+					$updatedon='';
+					if(date('Y', strtotime($row['stc_status_down_list_updated_date']))!=1970){
+						$updatedon = date('d-m-Y', strtotime($row['stc_status_down_list_updated_date']));
+					}
 					$hidden2='	
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
 						<td>'.$row['stc_cust_pro_supervisor_fullname'].'</td>
 						<td>'.$updater_name.'</td>
-						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_updated_date'])).'</td>
+						<td>'.$updatedon.'</td>
 					';
 				}
 
@@ -518,7 +525,7 @@ class transformers extends tesseract{
 						<td>'.$row['stc_status_down_list_area'].'</td>
 						<td>'.$row['stc_status_down_list_jobtype'].'</td>
 						'.$hidden1.'
-						<td class="text-center">'.$status.'</td>
+						<td class="text-center" '.$statusbgcolor.'>'.$status.'</td>
 						'.$hidden2.'
 						<td class="text-center">
 							'.$actionsec.'
@@ -707,12 +714,13 @@ if(isset($_POST['stc_std_hit'])){
 	$stc_area=$_POST['stc_area'];
 	$stc_j_plannning=$_POST['stc_j_plannning'];
 	$reason=$_POST['reason'];
+	$action_status = $_POST['action_status'];
 
 	$metabots=new transformers();
 	if(empty($_SESSION['stc_agent_sub_id'])){
 		$opmetabots="Please login!!!";
 	}else{
-		$opmetabots=$metabots->stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason);
+		$opmetabots=$metabots->stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $action_status);
 	}
 	echo $opmetabots;
 }

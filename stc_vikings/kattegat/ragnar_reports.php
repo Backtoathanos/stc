@@ -589,6 +589,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th class="text-center">SL NO</th>
                      <th class="text-center">DATE</th>
                      <th class="text-center">LOCATION</th>
+                     <th class="text-center">DEPARTMENT</th>
                      <th class="text-center">AREA</th>
                      <th class="text-center">EQUIPMENT DETAILS</th>
                      <th class="text-center">QTY</th>
@@ -614,10 +615,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                $pendingjon++;
             }elseif($row['stc_status_down_list_status']==2){
                $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-IN-PROGRESS</span></b>';
-               $status2color="#bbbe38";
+               $status2color="#f6f900";
             }elseif($row['stc_status_down_list_status']==3){
                $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-DONE</span></b>';
-               $status2color="#38be7a";
+               $status2color="#60f900";
                $jobdone++;
             }elseif($row['stc_status_down_list_status']==4){
                $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-COMPLETE</span></b>';
@@ -708,6 +709,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-center">'.$row['stc_status_down_list_id'].'</td>
                   <td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
                   <td>'.$row['stc_status_down_list_plocation'].'</td>
+                  <td>'.$row['stc_status_down_list_sub_location'].'</td>
                   <td>'.$row['stc_status_down_list_area'].'</td>
                   <td>'.$eq_type.' '.$eq_number.'</td>
                   <td class="text-right">'.$row['stc_status_down_list_qty'].'</td>
