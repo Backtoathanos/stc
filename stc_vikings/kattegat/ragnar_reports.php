@@ -521,9 +521,11 @@ class ragnarReportsViewRequiReports extends tesseract{
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ");
       $sitename="";
+      $planning=0;
       $jobdone=0;
       $progress=0;
       $pendingjon=0;
+      $planning48=0;
       $jobdone48=0;
       $progress48=0;
       $pendingjon48=0;
@@ -531,6 +533,18 @@ class ragnarReportsViewRequiReports extends tesseract{
          $currenthr=date("Y/m/d");
          foreach($ivarpreqry as $prerow){
             if($prerow['stc_status_down_list_status']==1){
+               $planning++;
+               $today = date("Y/m/d") ; 
+               $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_date'])));
+               $endTimeStamp = strtotime($today);
+
+               $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+               $dperiod = $timeDiff/86400;
+               if($dperiod<2){
+                  $planning48++;
+               }
+            }elseif($prerow['stc_status_down_list_status']==2){
                $pendingjon++;
                $today = date("Y/m/d") ; 
                $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_date'])));
@@ -542,7 +556,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                if($dperiod<2){
                   $pendingjon48++;
                }
-            }elseif($prerow['stc_status_down_list_status']==2){
+            }elseif($prerow['stc_status_down_list_status']==3){
                $progress++;
                $today = date("Y/m/d") ; 
                $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_date'])));
@@ -554,7 +568,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                if($dperiod<2){
                   $progress48++;
                }
-            }elseif($prerow['stc_status_down_list_status']==3){
+            }elseif($prerow['stc_status_down_list_status']==4){
                $jobdone++;
                $today = date("Y/m/d") ; 
                $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_rect_date'])));
@@ -574,6 +588,7 @@ class ragnarReportsViewRequiReports extends tesseract{
             <table class="table table-bordered table-responsive" id="stc-show-std-detailspre-table">
                <tr>
                   <td class="text-center">LABEL</td>
+                  <td class="text-center">PLANNING</td>
                   <td class="text-center">DOWN</td>
                   <td class="text-center">WORK-IN-PROGRESS</td>
                   <td class="text-center">WORK DONE</td>
@@ -581,6 +596,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                </tr>
                <tr>
                   <td class="text-center">DAILY JOB ACTIVITY(within 48hr)</td>
+                  <td class="text-right" style="background-color: #00f9b4;">'.$planning48.'</td>
                   <td class="text-right" style="background-color: #ff6767;">'.$pendingjon48.'</td>
                   <td class="text-right" style="background-color: #f6f900;">'.$progress48.'</td>
                   <td class="text-right" style="background-color: #a9d08e;">'.$jobdone48.'</td>
@@ -590,6 +606,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                </tr>
                <tr>
                   <td class="text-center">TOTAL JOB ACTIVITY (All time)</td>
+                  <td class="text-right" style="background-color: #00f9b4;">'.$planning.'</td>
                   <td class="text-right" style="background-color: #ff6767;">'.$pendingjon.'</td>
                   <td class="text-right" style="background-color: #f6f900;">'.$progress.'</td>
                   <td class="text-right" style="background-color: #a9d08e;">'.$jobdone.'</td>
@@ -627,17 +644,20 @@ class ragnarReportsViewRequiReports extends tesseract{
             $status='';
             $status2color="";
             if($row['stc_status_down_list_status']==1){
-               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">DOWN</span></b>';
-               $status2color="#e91919";
+               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">PLANNING</span></b>';
+               $status2color="#00f9b4";
                $pendingjon++;
             }elseif($row['stc_status_down_list_status']==2){
+               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">DOWN</span></b>';
+               $status2color="#e91919";
+            }elseif($row['stc_status_down_list_status']==3){
                $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-IN-PROGRESS</span></b>';
                $status2color="#f6f900";
-            }elseif($row['stc_status_down_list_status']==3){
-               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-DONE</span></b>';
-               $status2color="#60f900";
                $jobdone++;
             }elseif($row['stc_status_down_list_status']==4){
+               $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-DONE</span></b>';
+               $status2color="#60f900";
+            }elseif($row['stc_status_down_list_status']==5){
                $status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000;">WORK-COMPLETE</span></b>';
                $status2color="#38be7a";
             }else{

@@ -359,15 +359,18 @@ class transformers extends tesseract{
 				$status='';
 				$statusbgcolor = '';
 				if($row['stc_status_down_list_status']==1){
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">PLANNING</span></b>';
+					$statusbgcolor = 'style="background-color: #00f9b4;"';
+				}elseif($row['stc_status_down_list_status']==2){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">DOWN</span></b>';
 					$statusbgcolor = 'style="background-color: #e91919;"';
-				}elseif($row['stc_status_down_list_status']==2){
+				}elseif($row['stc_status_down_list_status']==3){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-IN-PROGRESS</span></b>';
 					$statusbgcolor = 'style="background-color: #f6f900;"';
-				}elseif($row['stc_status_down_list_status']==3){
-					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-DONE</span></b>';
-					$statusbgcolor = 'style="background-color: #60f900;"';
 				}elseif($row['stc_status_down_list_status']==4){
+					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-DONE</span></b>';
+					$statusbgcolor = 'style="background-color: #2aef00;"';
+				}elseif($row['stc_status_down_list_status']==5){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-COMPLETE</span></b>';
 				}else{
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">CLOSE</span></b>';
@@ -397,8 +400,9 @@ class transformers extends tesseract{
 							<a href="javascript:void(0)" class="btn bg-success text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
 							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
 								<option status="NA">SELECT STATUS</option>
-								<option status="2">WORK-IN-PROGRESS</option>
-								<option status="3">WORK-DONE</option>
+								<option status="2">DOWN</option>
+								<option status="3">WORK-IN-PROGRESS</option>
+								<option status="4">WORK-DONE</option>
 							</select>
 							<a href="#" class="stc-add-to-pending btn btn-danger" style="font-size:10px;margin-top:4px;" id="'.$row['stc_status_down_list_id'].'">Add Pending Reason</a>
 						';
@@ -407,17 +411,27 @@ class transformers extends tesseract{
 							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
 								<option status="NA">SELECT STATUS</option>
 								<option status="1">PENDING</option>
-								<option status="3">WORK-DONE</option>
+								<option status="3">WORK-IN-PROGRESS</option>
+								<option status="4">WORK-DONE</option>
+							</select>
+						';
+					}elseif($row['stc_status_down_list_status']==3){
+						$actionsec='
+							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
+								<option status="NA">SELECT STATUS</option>
+								<option status="1">PENDING</option>
+								<option status="2">DOWN</option>
+								<option status="4">WORK-DONE</option>
 							</select>
 						';
 					}else{
 						$actionsec='#';
 					}
 				}elseif($_SESSION['stc_agent_sub_category']=="Site Incharge"){
-					if($row['stc_status_down_list_status']==3){
+					if($row['stc_status_down_list_status']==4){
 						$actionsec='
-							<a href="javascript:void(0)" class="btn btn-success update-status-si" data-id="'.$row['stc_status_down_list_id'].'" actiontype="4"><i class="fa fa-thumbs-up"></i></a>
-							<a href="javascript:void(0)" class="btn btn-danger update-status-si" data-id="'.$row['stc_status_down_list_id'].'" actiontype="1"><i class="fa fa-thumbs-down"></i></a>
+							<a href="javascript:void(0)" class="btn btn-success update-status-si" data-id="'.$row['stc_status_down_list_id'].'" actiontype="5"><i class="fa fa-thumbs-up"></i></a>
+							<a href="javascript:void(0)" class="btn btn-danger update-status-si" style="background-color: #00f9b4;" data-id="'.$row['stc_status_down_list_id'].'" actiontype="1"><i class="fa fa-thumbs-down"></i></a>
 						';
 					}else{
 						$actionsec='#';
@@ -425,7 +439,6 @@ class transformers extends tesseract{
 				}else{
 					$actionsec='#';
 				}
-
 				$eqstatus='
 						<td class="text-center" style="font-weight:bold;background: #5cd25c;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
 				';

@@ -517,12 +517,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 status_id=$('option:selected', this).attr("status");
                 var jobdonedetails='';
                 if(status_id=="NA"){
-                }else if(status_id==3){
+                }else if(status_id==4){
                     var permit_no=$(this).parent().find('.stc-std-permit-no-hidden-call').val();  
                     $('.stc-agent-sup-std-upermit-no').val(permit_no);
                     $('.bd-std-jobdonedetails-modal-lg').modal('show');
                     sdl_id=$(this).attr("id");
-                    status_id='3';
+                    status_id='4';
                 }else{
                     $.ajax({
                         url         : "nemesis/stc_std.php",
@@ -878,8 +878,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             <div class="card-body">
                                 <h5>Action :</h5><br>
                                 <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-action-status">
-                                    <option value="1">DOWN</option>
-                                    <option value="2">WORK-IN-PROGRESS</option>
+                                    <option value="1">PLANNING</option>
+                                    <option value="2">DOWN</option>
+                                    <option value="3">WORK-IN-PROGRESS</option>
                                 </select> 
                             </div>
                         </div>
