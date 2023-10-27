@@ -1914,6 +1914,7 @@ class pirates_supervisor extends tesseract{
 			    `stc_status_down_list_tools_req`,
 			    `stc_status_down_list_status`,
 			    `stc_status_down_list_created_by`,
+			    `stc_cust_pro_supervisor_created_by`,
 			    `stc_cust_pro_supervisor_fullname`,
 			    `stc_cust_pro_supervisor_contact`,
 			    `stc_cust_pro_supervisor_category`,
@@ -1984,7 +1985,7 @@ class pirates_supervisor extends tesseract{
 
 				$actionsec='';
 				if($_SESSION['stc_agent_role']==3){
-					if(($row['stc_status_down_list_status']==4)){
+					if(($row['stc_status_down_list_status']==5)){
 						$actionsec='
 							<a href="#" class="stc-set-to-close" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
 						';
@@ -1992,10 +1993,14 @@ class pirates_supervisor extends tesseract{
 						$actionsec='#';
 					}
 				}else{
-					if($row['stc_status_down_list_status']==4){
-						$actionsec='
-							<a href="#" class="stc-set-to-complete" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
-						';
+					if($row['stc_cust_pro_supervisor_created_by']==$_SESSION['stc_agent_id']){
+						if($row['stc_status_down_list_status']==5){
+							$actionsec='
+								<a href="#" class="stc-set-to-complete" style="font-size:20px" id="'.$row['stc_status_down_list_id'].'"><i class="fas fa-thumbs-up"></i></a>
+							';
+						}else{
+							$actionsec='#';
+						}
 					}else{
 						$actionsec='#';
 					}
