@@ -197,7 +197,7 @@ if(isset($_SESSION["stc_agent_id"])){
             $('body').delegate('.stc-set-to-close', 'click', function(e){
                 e.preventDefault();
                 var sdl_id=$(this).attr("id");
-                var status_id='5';
+                var status_id='6';
                 $.ajax({
                     url         : "nemesis/stc_project.php",
                     method      : "POST",
