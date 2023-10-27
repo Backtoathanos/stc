@@ -346,6 +346,7 @@ class transformers extends tesseract{
 			LEFT JOIN `stc_cust_pro_supervisor` 
 			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
 			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
+			AND `stc_status_down_list_status`<>6
 			AND `stc_status_down_list_status`<>5
 			GROUP BY TIMESTAMP(`stc_status_down_list_date`) DESC
 		");
