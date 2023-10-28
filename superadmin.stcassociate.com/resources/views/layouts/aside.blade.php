@@ -231,6 +231,14 @@
             </ul>
           </li>
           <li class="nav-item">
+            <a href="https://stcassociate.com/templates/AdminLTE-3.1.0/index.html" class="nav-link">
+              <i class="nav-icon fas fa-dashboard"></i>
+              <p>
+                Template
+              </p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="{{ url('/logout') }}" class="nav-link">
               <i class="nav-icon fas fa-sign-out-alt"></i>
               <p>

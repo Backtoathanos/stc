@@ -1313,24 +1313,46 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             var finalwidth=screenwidth - (screenwidth * 0.20);
             var percent=finalwidth/screenwidth * 100;
             $('.stc-show-std-details').width(finalwidth);
-            stc_call_std();
-            function stc_call_std(){
-                var projectid = $(".load_site_name_consump").val();
-                var status = $(".stc-std-load-status").val();
+
+            var filter = 0;
+            stc_call_std(filter);
+            function stc_call_std(filter){
+                var datefrom    =   $(".std-filter-date-from").val();
+                var dateto      =   $(".std-filter-date-to").val();
+                var location    =   $(".std-filter-location").val();
+                var area        =   $(".std-filter-area").val();
+                var department  =   $(".std-filter-department").val();
+                var typeofjob   =   $(".std-filter-typeofjob").val();
+                var status      =   $(".std-filter-status").val();
+                var filter      =   filter;
                 $('.stc-show-std-details').html("Please wait...");
                 $.ajax({
-                url     : "kattegat/ragnar_reports.php",
-                method  : "POST",
-                data    : {
-                  Stc_std_details:1,
-                  status:status
-                },
-                success : function(data){
-                    // console.log(data);
-                    $('.stc-show-std-details').html(data);
-                }
-              });
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "POST",
+                    data    : {
+                    Stc_std_details:1,
+                    datefrom:datefrom,
+                    dateto:dateto,
+                    location:location,
+                    area:area,
+                    department:department,
+                    typeofjob:typeofjob,
+                    status:status,
+                    filter:filter
+                    },
+                    success : function(data){
+                        // console.log(data);
+                        $('.stc-show-std-details').html(data);
+                    }
+                });
             }
+
+            // find std 
+            $('body').delegate('.std-filter-find-btn', 'click', function(e){
+                e.preventDefault();
+                var filter = 1;
+                stc_call_std(filter);
+            });
 
             // }
             // on change call agents
@@ -1862,4 +1884,110 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
       </div>
     </div>
   </div>
+</div>
+
+<!-- search filter for status down list -->
+<div class="modal fade bd-stdfilter-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Status Down List Filter</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-12 col-xl-4 mb-4">
+                                        <h5 class="card-title">From</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control std-filter-date-from" placeholder="search here">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4 mb-4">
+                                        <h5 class="card-title">To</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control std-filter-date-to" placeholder="search here">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4 mb-4">
+                                        <h5 class="card-title">Location</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control std-filter-location">
+                                                <option value="NA">Select</option>
+                                                <option>Tata Steel - Jamshedpur</option>
+                                                <option>Tata Steel - KPO</option>
+                                                <option>Others</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4 mb-4">
+                                        <h5 class="card-title">Area</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control std-filter-area">
+                                                <option value="NA">Select</option>
+                                                <option>Tata Steel - Jamshedpur</option>
+                                                <option>Tata Steel - KPO</option>
+                                                <option>Others</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4 mb-4">
+                                        <h5 class="card-title">Department</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control std-filter-department">
+                                                <option value="NA">Select</option>
+                                                <option>Tata Steel - Jamshedpur</option>
+                                                <option>Tata Steel - KPO</option>
+                                                <option>Others</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4 mb-4">
+                                        <h5 class="card-title">Type Of Job</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control std-filter-typeofjob">
+                                                <option value="NA">SELECT</option>
+                                                <option>BREAKDOWN MAINTENANCE</option>
+                                                <option>CALL ATTEND</option>
+                                                <option>DAILY JOB ACTIVITY</option>
+                                                <option>DOWN</option>
+                                                <option>PREVENTIVE MAINTENANCE</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4 mb-4">
+                                        <h5 class="card-title">STATUS</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control std-filter-status">
+                                                <option value="NA">SELECT</option>
+                                                <option value="1">PLANNING</option>
+                                                <option value="2">DOWN</option>
+                                                <option value="3">WORK-IN-PROGRESS</option>
+                                                <option value="4">WORK DONE</option>
+                                                <option value="5">WORK COMPLETE</option>
+                                                <option value="6">CLOSE</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                        <div class="position-relative form-group">
+                                            <button type="submit" class="form-control btn btn-success std-filter-find-btn">Find</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-close" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
