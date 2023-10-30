@@ -1320,31 +1320,44 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var datefrom    =   $(".std-filter-date-from").val();
                 var dateto      =   $(".std-filter-date-to").val();
                 var location    =   $(".std-filter-location").val();
-                var area        =   $(".std-filter-area").val();
                 var department  =   $(".std-filter-department").val();
                 var typeofjob   =   $(".std-filter-typeofjob").val();
                 var status      =   $(".std-filter-status").val();
                 var filter      =   filter;
-                $('.stc-show-std-details').html("Please wait...");
-                $.ajax({
-                    url     : "kattegat/ragnar_reports.php",
-                    method  : "POST",
-                    data    : {
-                    Stc_std_details:1,
-                    datefrom:datefrom,
-                    dateto:dateto,
-                    location:location,
-                    area:area,
-                    department:department,
-                    typeofjob:typeofjob,
-                    status:status,
-                    filter:filter
-                    },
-                    success : function(data){
-                        // console.log(data);
-                        $('.stc-show-std-details').html(data);
-                    }
-                });
+                var validated   =   1;
+                var message     =   "";
+                if(datefrom!='' && dateto==''){
+                    message ="please fill both date.";
+                    validated=0;
+                }else if(dateto!='' && datefrom==''){
+                    message ="please fill both date.";
+                    validated=0;
+                }
+                if(validated==1){
+                    $('.stc-show-std-details').html("Please wait...");
+                    $.ajax({
+                        url     : "kattegat/ragnar_reports.php",
+                        method  : "POST",
+                        data    : {
+                        Stc_std_details:1,
+                        datefrom:datefrom,
+                        dateto:dateto,
+                        location:location,
+                        department:department,
+                        typeofjob:typeofjob,
+                        status:status,
+                        filter:filter
+                        },
+                        success : function(data){
+                            // console.log(data);
+                            $('.stc-show-std-details').html(data);
+                            $('.bd-stdfilter-modal-lg').modal('hide');
+                            $('.modal-backdrop.fade.show').removeClass('modal-backdrop fade show');
+                        }
+                    });
+                }else{
+                    alert(message);
+                }
             }
 
             // find std 
@@ -1918,18 +1931,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <h5 class="card-title">Location</h5>
                                         <div class="position-relative form-group">
                                             <select class="form-control std-filter-location">
-                                                <option value="NA">Select</option>
-                                                <option>Tata Steel - Jamshedpur</option>
-                                                <option>Tata Steel - KPO</option>
-                                                <option>Others</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-12 col-xl-4 mb-4">
-                                        <h5 class="card-title">Area</h5>
-                                        <div class="position-relative form-group">
-                                            <select class="form-control std-filter-area">
-                                                <option value="NA">Select</option>
+                                                <option value="NA">SELECT</option>
                                                 <option>Tata Steel - Jamshedpur</option>
                                                 <option>Tata Steel - KPO</option>
                                                 <option>Others</option>
@@ -1940,10 +1942,22 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <h5 class="card-title">Department</h5>
                                         <div class="position-relative form-group">
                                             <select class="form-control std-filter-department">
-                                                <option value="NA">Select</option>
-                                                <option>Tata Steel - Jamshedpur</option>
-                                                <option>Tata Steel - KPO</option>
-                                                <option>Others</option>
+                                                <option value="NA">SELECT</option>
+                                                <?php
+                                                    include_once("../MCU/db.php");
+                                                    $dep_query=mysqli_query($con, "
+                                                        SELECT DISTINCT
+                                                            `stc_status_down_list_sub_location`
+                                                        FROM
+                                                            `stc_status_down_list`
+                                                        ORDER BY
+                                                            `stc_status_down_list_sub_location`
+                                                        ASC                                                
+                                                    ");
+                                                    foreach($dep_query as $dep_row){
+                                                        echo '<option>'.$dep_row['stc_status_down_list_sub_location'].'</option>';
+                                                    }
+                                                ?>
                                             </select>
                                         </div>
                                     </div>
@@ -1970,7 +1984,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <option value="3">WORK-IN-PROGRESS</option>
                                                 <option value="4">WORK DONE</option>
                                                 <option value="5">WORK COMPLETE</option>
-                                                <option value="6">CLOSE</option>
                                             </select>
                                         </div>
                                     </div>
