@@ -203,9 +203,13 @@ class transformers extends tesseract{
 	}
 
 	// update std auto
-	public function stc_std_update($std_id, $plocation, $dept, $area, $eq_type, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $remarks){
+	public function stc_std_update($std_id, $plocation, $dept, $area, $eq_type, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $jobdonedet, $remarks){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
+		$jobdoneact='';
+		if(!empty($jobdonedet)){
+			$jobdoneact = "`stc_status_down_list_jobdone_details`='".mysqli_real_escape_string($this->stc_dbs, $jobdonedet)."',";
+		}
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_status_down_list` 
 			SET
@@ -227,6 +231,7 @@ class transformers extends tesseract{
 				`stc_status_down_list_manpower_req`='".mysqli_real_escape_string($this->stc_dbs, $manpower_req)."',
 				`stc_status_down_list_target_date`='".mysqli_real_escape_string($this->stc_dbs, $target_date)."',
 				`stc_status_down_list_remarks`='".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
+				".$jobdoneact."
 				`stc_status_down_list_updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
 			WHERE
 				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $std_id)."'
@@ -289,6 +294,7 @@ class transformers extends tesseract{
 			$head_hidden2='
 			<th class="text-center">PENDING REASON</th>
 			<th class="text-center">REMARKS</th>
+			<th class="text-center">JOB DONE DETAILS</th>
 			<th class="text-center">CREATED BY</th>
 			<th class="text-center">UPDATED BY</th>
 			<th class="text-center">UPDATED ON</th>
@@ -334,6 +340,7 @@ class transformers extends tesseract{
 				`stc_status_down_list_target_date`,
 				`stc_status_down_list_permit_no`,
 				`stc_status_down_list_jobpending_details`,
+				`stc_status_down_list_jobdone_details`,
 				`stc_status_down_list_varities_id`,
 				`stc_status_down_list_equipment_type`,
 				`stc_status_down_list_equipment_number`,
@@ -349,7 +356,7 @@ class transformers extends tesseract{
 			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
 			AND `stc_status_down_list_status`<>6
 			AND `stc_status_down_list_status`<>5
-			GROUP BY TIMESTAMP(`stc_status_down_list_date`) DESC
+			ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimeqry)>0){
 			foreach($optimusprimeqry as $row){
@@ -533,6 +540,7 @@ class transformers extends tesseract{
 					$hidden2='	
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
+						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
 						<td>'.$row['stc_cust_pro_supervisor_fullname'].'</td>
 						<td>'.$updater_name.'</td>
 						<td>'.$updatedon.'</td>
@@ -791,13 +799,14 @@ if(isset($_POST['stc_update_std_hit'])){
 	$material_desc = $_POST['material_desc'];
 	$manpower_req = $_POST['manpower_req'];
 	$target_date = $_POST['target_date'];
+	$jobdonedet = $_POST['jobdonedet'];
 	$remarks = $_POST['remarks'];
 
 	$metabots=new transformers();
 	if(empty($_SESSION['stc_agent_sub_id'])){
 		$opmetabots="login";
 	}else{
-		$opmetabots=$metabots->stc_std_update($std_id, $plocation, $dept, $area, $eq_type, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $remarks);
+		$opmetabots=$metabots->stc_std_update($std_id, $plocation, $dept, $area, $eq_type, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $jobdonedet, $remarks);
 	}
 	echo json_encode($opmetabots);
 
