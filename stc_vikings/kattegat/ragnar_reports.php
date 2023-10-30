@@ -467,13 +467,25 @@ class ragnarReportsViewMerchantLedger extends tesseract{
 
 class ragnarReportsViewRequiReports extends tesseract{
    // call std
-   public function stc_call_std($datefrom, $dateto, $location, $area, $department, $typeofjob, $status, $filter){
+   public function stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $filter){
       $ivar='';
       $query_filter = '';
       if($filter == 1){
-         $query_filter='';
+         $datefilter='';
+         if($location!="NA"){
+            $query_filter.="AND `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location)."'";
+         }
+         if($department!="NA"){
+            $query_filter.="AND `stc_status_down_list_sub_location`='".mysqli_real_escape_string($this->stc_dbs, $department)."'";
+         }
+         if($typeofjob!="NA"){
+            $query_filter.="AND `stc_status_down_list_jobtype`='".mysqli_real_escape_string($this->stc_dbs, $typeofjob)."'";
+         }
+         if($status!="NA"){
+            $query_filter.="AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."'";
+         }
       }else{
-         $query_filter='`stc_status_down_list_status`<>6 AND `stc_status_down_list_status`<>5 AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR';
+         $query_filter='AND `stc_status_down_list_status`<>6 AND `stc_status_down_list_status`<>5 AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR';
       }
       $ivarqry=mysqli_query($this->stc_dbs, "
          SELECT 
@@ -508,17 +520,17 @@ class ragnarReportsViewRequiReports extends tesseract{
          FROM `stc_status_down_list` 
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
-         WHERE ".$query_filter."         
+         WHERE `stc_status_down_list_status`<>0 ".$query_filter."         
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ");
-
 
       $ivarpreqry=mysqli_query($this->stc_dbs, "
          SELECT 
              `stc_cust_project_title`,
              `stc_status_down_list_status`,
              `stc_status_down_list_date`,
-             `stc_status_down_list_rect_date`
+             `stc_status_down_list_rect_date`,
+             `stc_status_down_list_jobtype`
          FROM `stc_status_down_list` 
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
@@ -526,6 +538,8 @@ class ragnarReportsViewRequiReports extends tesseract{
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ");
       $sitename="";
+      $callattend=0;
+      $callattend48=0;
       $planning=0;
       $jobdone=0;
       $progress=0;
@@ -537,62 +551,48 @@ class ragnarReportsViewRequiReports extends tesseract{
       if(mysqli_num_rows($ivarpreqry)>0){
          $currenthr=date("Y/m/d");
          foreach($ivarpreqry as $prerow){
+            $today = date("Y/m/d") ; 
+            $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_date'])));
+            $endTimeStamp = strtotime($today);
+
+            $timeDiff = abs($endTimeStamp - $startTimeStamp);
+
+            $dperiod = $timeDiff/86400;
+            
+            if($prerow['stc_status_down_list_jobtype']=="CALL ATTEND"){
+               $callattend++;
+               if($dperiod<2){
+                  $callattend48++;
+               }
+            }
+
             if($prerow['stc_status_down_list_status']==1){
                $planning++;
-               $today = date("Y/m/d") ; 
-               $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_date'])));
-               $endTimeStamp = strtotime($today);
-
-               $timeDiff = abs($endTimeStamp - $startTimeStamp);
-
-               $dperiod = $timeDiff/86400;
                if($dperiod<2){
                   $planning48++;
                }
             }elseif($prerow['stc_status_down_list_status']==2){
                $pendingjon++;
-               $today = date("Y/m/d") ; 
-               $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_date'])));
-               $endTimeStamp = strtotime($today);
-
-               $timeDiff = abs($endTimeStamp - $startTimeStamp);
-
-               $dperiod = $timeDiff/86400;
                if($dperiod<2){
                   $pendingjon48++;
                }
             }elseif($prerow['stc_status_down_list_status']==3){
                $progress++;
-               $today = date("Y/m/d") ; 
-               $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_date'])));
-               $endTimeStamp = strtotime($today);
-
-               $timeDiff = abs($endTimeStamp - $startTimeStamp);
-
-               $dperiod = $timeDiff/86400;
                if($dperiod<2){
                   $progress48++;
                }
             }elseif($prerow['stc_status_down_list_status']==4){
                $jobdone++;
-               $today = date("Y/m/d") ; 
-               $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_rect_date'])));
-               $endTimeStamp = strtotime($today);
-
-               $timeDiff = abs($endTimeStamp - $startTimeStamp);
-
-               $dperiod = $timeDiff/86400;
                if($dperiod<2){
                   $jobdone48++;
                }
             }
-
-            
          }
          $ivar.='
             <table class="table table-bordered table-responsive" id="stc-show-std-detailspre-table">
                <tr>
                   <td class="text-center">LABEL</td>
+                  <td class="text-center">CALL ATTEND</td>
                   <td class="text-center">PLANNING</td>
                   <td class="text-center">DOWN</td>
                   <td class="text-center">WORK-IN-PROGRESS</td>
@@ -601,6 +601,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                </tr>
                <tr>
                   <td class="text-center">DAILY JOB ACTIVITY(within 48hr)</td>
+                  <td class="text-right" style="background-color: #f3bd42;">'.$callattend48.'</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$planning48.'</td>
                   <td class="text-right" style="background-color: #ff6767;">'.$pendingjon48.'</td>
                   <td class="text-right" style="background-color: #f6f900;">'.$progress48.'</td>
@@ -611,6 +612,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                </tr>
                <tr>
                   <td class="text-center">TOTAL JOB ACTIVITY (All time)</td>
+                  <td class="text-right" style="background-color: #f3bd42;">'.$callattend.'</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$planning.'</td>
                   <td class="text-right" style="background-color: #ff6767;">'.$pendingjon.'</td>
                   <td class="text-right" style="background-color: #f6f900;">'.$progress.'</td>
@@ -3459,13 +3461,12 @@ if(isset($_POST['Stc_std_details'])){
    $datefrom      =  $_POST['datefrom'];
    $dateto        =  $_POST['dateto'];
    $location      =  $_POST['location'];
-   $area          =  $_POST['area'];
    $department    =  $_POST['department'];
    $typeofjob     =  $_POST['typeofjob'];
    $status        =  $_POST['status'];
    $filter        =  $_POST['filter'];
    $bjornecustomer=new ragnarReportsViewRequiReports();   
-   $outbjornecustomer=$bjornecustomer->stc_call_std($datefrom, $dateto, $location, $area, $department, $typeofjob, $status, $filter);
+   $outbjornecustomer=$bjornecustomer->stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $filter);
    echo $outbjornecustomer;
 }
 
