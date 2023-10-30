@@ -279,7 +279,7 @@ class transformers extends tesseract{
 			$head_hidden1='				
 				<th class="text-center">EQUIPMENT TYPE</th>
 				<th class="text-center">EQUIPMENT STATUS</th>
-				<th class="text-center">TYPE OF JOB</th>
+				<th class="text-center">JOB PLANNING</th>
 				<th class="text-center">JOB VARIETIES</th>
 				<th class="text-center">MATERIAL DESCRIPTION</th>
 				<th class="text-center">TARGET DATE</th>
@@ -302,7 +302,8 @@ class transformers extends tesseract{
 						<th class="text-center">LOCATION</th>
 						<th class="text-center">DEPARTMENT</th>
 						<th class="text-center">AREA</th>
-						<th class="text-center">JOB PLANNING</th>
+						<th class="text-center">TYPE OF JOB</th>
+						<th class="text-center">REASON</th>
 						'.$head_hidden1.'
 						<th class="text-center">STATUS</th>
 						'.$head_hidden2.'
@@ -398,7 +399,7 @@ class transformers extends tesseract{
 				if($_SESSION['stc_agent_sub_category']=="Supervisor"){
 					if($row['stc_status_down_list_status']==1){
 						$actionsec='
-							<a href="javascript:void(0)" class="btn bg-success text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
+							<a href="javascript:void(0)" class="btn bg-danger text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
 							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
 								<option status="NA">SELECT STATUS</option>
 								<option status="2">DOWN</option>
@@ -431,8 +432,15 @@ class transformers extends tesseract{
 				}elseif($_SESSION['stc_agent_sub_category']=="Site Incharge"){
 					if($row['stc_status_down_list_status']==4){
 						$actionsec='
-							<a href="javascript:void(0)" class="btn btn-success update-status-si" data-id="'.$row['stc_status_down_list_id'].'" actiontype="5"><i class="fa fa-thumbs-up"></i></a>
-							<a href="javascript:void(0)" class="btn btn-danger update-status-si" style="background-color: #00f9b4;" data-id="'.$row['stc_status_down_list_id'].'" actiontype="1"><i class="fa fa-thumbs-down"></i></a>
+								<div class="col-sm-12 col-md-12">
+									<a href="javascript:void(0)" class="btn bg-danger text-white stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
+								</div>
+								<div class="col-sm-12 col-md-12">
+									<a href="javascript:void(0)" class="btn btn-success update-status-si" data-id="'.$row['stc_status_down_list_id'].'" actiontype="5"><i class="fa fa-thumbs-up"></i></a>
+								</div>
+								<div class="col-sm-12 col-md-12">
+										<a href="javascript:void(0)" class="btn btn-info update-status-si" style="background-color: #00f9b4;" data-id="'.$row['stc_status_down_list_id'].'" actiontype="1"><i class="fa fa-thumbs-down"></i></a>
+								</div>
 						';
 					}else{
 						$actionsec='#';
@@ -538,6 +546,7 @@ class transformers extends tesseract{
 						<td>'.$row['stc_status_down_list_sub_location'].'</td>
 						<td>'.$row['stc_status_down_list_area'].'</td>
 						<td>'.$row['stc_status_down_list_jobtype'].'</td>
+						<td>'.$row['stc_status_down_list_reason'].'</td>
 						'.$hidden1.'
 						<td class="text-center" '.$statusbgcolor.'>'.$status.'</td>
 						'.$hidden2.'
