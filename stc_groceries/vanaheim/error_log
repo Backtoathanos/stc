@@ -123,3 +123,11 @@
 [15-Oct-2023 12:16:01 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 2010
 [15-Oct-2023 12:16:01 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 2010
 [15-Oct-2023 12:16:01 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 2011
+[27-Oct-2023 17:51:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_trading_user_id in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 468
+[29-Oct-2023 12:32:35 Asia/Kolkata] PHP Notice:  Undefined index: stc_trading_user_id in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 468
+[29-Oct-2023 12:33:05 Asia/Kolkata] PHP Notice:  Undefined index: stc_trading_user_id in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 468
+[29-Oct-2023 12:33:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_trading_user_id in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 468
+[29-Oct-2023 12:34:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_trading_user_id in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 468
+[29-Oct-2023 12:35:20 Asia/Kolkata] PHP Notice:  Undefined index: stc_trading_user_id in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 468
+[29-Oct-2023 12:35:48 Asia/Kolkata] PHP Notice:  Undefined index: stc_trading_user_id in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 468
+[29-Oct-2023 13:02:01 Asia/Kolkata] PHP Notice:  Undefined index: stc_trading_user_id in /home/c2484kn1eg0y/public_html/stc_groceries/vanaheim/order_perform.php on line 468

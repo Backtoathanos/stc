@@ -467,8 +467,14 @@ class ragnarReportsViewMerchantLedger extends tesseract{
 
 class ragnarReportsViewRequiReports extends tesseract{
    // call std
-   public function stc_call_std($status){
+   public function stc_call_std($datefrom, $dateto, $location, $area, $department, $typeofjob, $status, $filter){
       $ivar='';
+      $query_filter = '';
+      if($filter == 1){
+         $query_filter='';
+      }else{
+         $query_filter='`stc_status_down_list_status`<>6 AND `stc_status_down_list_status`<>5 AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR';
+      }
       $ivarqry=mysqli_query($this->stc_dbs, "
          SELECT 
              `stc_status_down_list_id`,
@@ -502,8 +508,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          FROM `stc_status_down_list` 
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
-         WHERE `stc_status_down_list_status`<>6 AND `stc_status_down_list_status`<>5
-         AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR
+         WHERE ".$query_filter."         
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ");
 
@@ -601,7 +606,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-right" style="background-color: #f6f900;">'.$progress48.'</td>
                   <td class="text-right" style="background-color: #a9d08e;">'.$jobdone48.'</td>
                   <td class="text-center" rowspan="2">
-                     <a href="#" class="btn btn-primary">FILTER</a>
+                     <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
                   </td>
                </tr>
                <tr>
@@ -621,11 +626,12 @@ class ragnarReportsViewRequiReports extends tesseract{
                <thead>
                   <tr>
                      <th class="text-center">SL NO</th>
-                     <th class="text-center">DATE</th>
+                     <th class="text-center" style="width:6%" >DATE</th>
                      <th class="text-center">LOCATION</th>
                      <th class="text-center">DEPARTMENT</th>
                      <th class="text-center">AREA</th>
                      <th class="text-center">EQUIPMENT DETAILS</th>
+                     <th class="text-center">TYPE OF JOB</th>
                      <th class="text-center">QTY</th>
                      <th class="text-center">CAPACITY</th>
                      <th style="width:25%" class="text-center">REASON</th>
@@ -776,10 +782,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>'.$row['stc_status_down_list_sub_location'].'</td>
                   <td>'.$row['stc_status_down_list_area'].'</td>
                   <td>'.$eq_type.' '.$eq_number.'</td>
+                  <td class="text-center">'.$row['stc_status_down_list_jobtype'].'</td>
                   <td class="text-right">'.$row['stc_status_down_list_qty'].'</td>
                   <td class="text-right">'.$row['stc_status_down_list_capacity'].'</td>
                   <td>'.$row['stc_status_down_list_reason'].'</td>
-                  <td  class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
+                  <td class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>
                </tr>
             ';
@@ -3449,8 +3456,16 @@ if(isset($_POST['Stc_call_reports_on_merchants'])){
 // call std details
 if(isset($_POST['Stc_std_details'])){
    $status=$_POST['status'];
-   $bjornecustomer=new ragnarReportsViewRequiReports();
-   $outbjornecustomer=$bjornecustomer->stc_call_std($status);
+   $datefrom      =  $_POST['datefrom'];
+   $dateto        =  $_POST['dateto'];
+   $location      =  $_POST['location'];
+   $area          =  $_POST['area'];
+   $department    =  $_POST['department'];
+   $typeofjob     =  $_POST['typeofjob'];
+   $status        =  $_POST['status'];
+   $filter        =  $_POST['filter'];
+   $bjornecustomer=new ragnarReportsViewRequiReports();   
+   $outbjornecustomer=$bjornecustomer->stc_call_std($datefrom, $dateto, $location, $area, $department, $typeofjob, $status, $filter);
    echo $outbjornecustomer;
 }
 

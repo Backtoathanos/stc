@@ -30,9 +30,9 @@ if($_SESSION['stc_school_user_for']==2){
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput-typeahead.css" />
     <style>
-        .fade:not(.show) {
+        /* .fade:not(.show) {
           opacity: 10;
-        }
+        } */
       .d-flex {
         display: -webkit-box;
         display: -ms-flexbox;
@@ -500,7 +500,7 @@ if($_SESSION['stc_school_user_for']==2){
                                                 if($schedule_id==$schedule_row['stc_school_teacher_schedule_id']){
                                                   $schedule_data.='
                                                     <td class="text-center">
-                                                      <a href="javascript:void(0);" class="stc-school-show-student-default" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'" sub-id="'.$schedule_row['stc_school_teacher_schedule_subjectid'].'">
+                                                      <a href="javascript:void(0);" class="stc-school-show-student-default"  data-toggle="modal" data-target="#exampleModal" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'" sub-id="'.$schedule_row['stc_school_teacher_schedule_subjectid'].'">
                                                           <b>
                                                             Class - '.$schedule_row['stc_school_class_title'].'<br>
                                                             '.$schedule_row['stc_school_subject_title'].'<br>
@@ -925,7 +925,7 @@ if($_SESSION['stc_school_user_for']==2){
               $('.stc-show-student-nested-show').html(response_student);
               $('.stc-school-hidden-scclass-id').val(class_id);
               $('.stc-school-hidden-scsub-id').val(sub_id);
-              $('.stc-school-showstudent-res').modal('show');
+              // $('.stc-school-showstudent-res').modal('show');
               call_syllabus_det();
             }
           });
@@ -1162,15 +1162,15 @@ if($_SESSION['stc_school_user_for']==2){
           call_syllabus_quest();
         });
 
-        $('.modal-adjustment').css('top', '200px');
-        $(document).on('click', '.resp-1', function(){
-          $('.modal-adjustment').css('top', '200px');
-        });
+        // $('.modal-adjustment').css('top', '200px');
+        // $(document).on('click', '.resp-1', function(){
+        //   $('.modal-adjustment').css('top', '200px');
+        // });
 
 
-        $(document).on('click', '.resp-2', function(){
-          $('.modal-adjustment').css('top', '350px');
-        });
+        // $(document).on('click', '.resp-2', function(){
+        //   $('.modal-adjustment').css('top', '350px');
+        // });
         
         // $(document).on('click', '.modal-closebtn', function(e){
         //   e.preventDefault();
@@ -1181,13 +1181,43 @@ if($_SESSION['stc_school_user_for']==2){
     </script>
   </body>
   </html>
-
-<div class="modal fade bd-example-modal-xl stc-school-showstudent-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<!-- Modal -->
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div> -->
+<!-- <div class="modal fade bd-example-modal-xl stc-school-showstudent-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content modal-adjustment">
       <div class="modal-header">
         <h4 class="modal-title">Student Attendance</h4>
         <button type="button" class="btn btn-danger stc-school-exit-period">Exit</button>
+      </div>
+      <div class="modal-body"> -->
+
+<div class="modal fade stc-school-showstudent-res" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Student Attendance</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <button type="button" class="btn btn-danger stc-school-exit-period">Exit</button>
+        </button>
       </div>
       <div class="modal-body">
         <div class="row">
