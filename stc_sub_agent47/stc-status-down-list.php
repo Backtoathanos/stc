@@ -82,7 +82,16 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <select class="form-control" id="stc-agent-sup-std-location-find">
                                                         <option>TATA Steel - Jamshedpur</option>
                                                         <option>TATA Steel - KPO</option>
-                                                        <option>Others</option>
+                                                        <option>MTMH</option>
+                                                        <option>CRM BARA</option>
+                                                        <option>MANIPAL</option>
+                                                        <option>P&M MALL</option>
+                                                        <option>TATA CUMMINS</option>
+                                                        <option>XLRI</option>
+                                                        <option>RAIPUR AIIMS</option>
+                                                        <option>NML</option>
+                                                        <option>RSP</option>
+                                                        <option>IGH HOSPITAL</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-lg-2 col-md-2">
