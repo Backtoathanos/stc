@@ -1932,9 +1932,18 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="position-relative form-group">
                                             <select class="form-control std-filter-location">
                                                 <option value="NA">SELECT</option>
-                                                <option>Tata Steel - Jamshedpur</option>
-                                                <option>Tata Steel - KPO</option>
-                                                <option>Others</option>
+                                                <option>TATA Steel - Jamshedpur</option>
+                                                <option>TATA Steel - KPO</option>
+                                                <option>MTMH</option>
+                                                <option>CRM BARA</option>
+                                                <option>MANIPAL</option>
+                                                <option>P&M MALL</option>
+                                                <option>TATA CUMMINS</option>
+                                                <option>XLRI</option>
+                                                <option>RAIPUR AIIMS</option>
+                                                <option>NML</option>
+                                                <option>RSP</option>
+                                                <option>IGH HOSPITAL</option>
                                             </select>
                                         </div>
                                     </div>
