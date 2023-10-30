@@ -75,6 +75,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <option>NML</option>
                                                     <option>RSP</option>
                                                     <option>IGH HOSPITAL</option>
+                                                    <option>NEELACHAL ISPAT</option>
                                                 </select> 
                                             </div>
                                         </div>
@@ -117,7 +118,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="col-md-12 col-xl-12"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
-                                            <div class="card mb-3 widget-content stc-std-search-result tabledata-responsvie" >
+                                            <div class="card mb-3 widget-content stc-std-search-result" >
                                             </div>
                                         </div>
                                     </div>

@@ -92,6 +92,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <option>NML</option>
                                                         <option>RSP</option>
                                                         <option>IGH HOSPITAL</option>
+                                                        <option>NEELACHAL ISPAT</option>
                                                     </select>
                                                 </div>
                                                 <div class="col-lg-2 col-md-2">
@@ -366,6 +367,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-agent-sup-std-material-desc').val(response_sdl.stc_status_down_list_material_desc);
                         $('#stc-agent-sup-std-manpower-req').val(response_sdl.stc_status_down_list_manpower_req);
                         $('#stc-agent-sup-std-target-date').val(response_sdl.stc_status_down_list_target_date);
+                        $('.stc-agent-sup-std-jobdonedetails').val(response_sdl.stc_status_down_list_jobpending_details);
                         $('.stc-agent-sup-std-remarks').val(response_sdl.stc_status_down_list_remarks);
                         $('.stc-std-tools-req-item-show').html(response_sdl.stc_status_down_list_tools_req);
                     }
@@ -394,6 +396,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var manpower_req = $('#stc-agent-sup-std-manpower-req').val();
                 var target_date = $('#stc-agent-sup-std-target-date').val();
                 var tools_req=get_filter('stc-agent-sup-std-tools-req');
+                var jobdonedet = $('.stc-agent-sup-std-jobdonedetails').val();
                 var remarks = $('.stc-agent-sup-std-remarks').val();
                 $.ajax({
                     url         : "nemesis/stc_std.php",
@@ -420,6 +423,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         material_desc:material_desc,
                         manpower_req:manpower_req,
                         target_date:target_date,
+                        jobdonedet:jobdonedet,
                         remarks:remarks
                     },
                     dataType : 'JSON',
@@ -785,6 +789,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <option>NML</option>
                                     <option>RSP</option>
                                     <option>IGH HOSPITAL</option>
+                                    <option>NEELACHAL ISPAT</option>
                                 </select> 
                             </div>
                         </div>
@@ -1008,6 +1013,21 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
+                    <?php 
+                        if($_SESSION['stc_agent_sub_category']=="Site Incharge"){
+                    ?>
+
+                    <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Job Done Details :</h5><br>
+                                <textarea type="text" class="form-control stc-agent-sup-std-jobdonedetails stc-std-update-on-focusout" placeholder="Enter Job Done Details"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <?php
+                        }
+                    ?>
                     <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
@@ -1019,7 +1039,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-12 col-xl-12"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <a href="#" class="form-control btn btn-success stc-agent-sup-std-save">Save</a>
+                                <a href="#" class="form-control btn btn-success stc-agent-sup-std-save">Submit</a>
                             </div>
                         </div>
                     </div>

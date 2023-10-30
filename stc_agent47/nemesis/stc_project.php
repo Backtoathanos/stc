@@ -1933,7 +1933,7 @@ class pirates_supervisor extends tesseract{
 			ON `stc_status_down_list_created_by`=`stc_cust_pro_supervisor_id` 
 			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
 			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field."
-			ORDER BY DATE(`stc_status_down_list_date`) DESC
+			ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimeqry)>0){
 			foreach($optimusprimeqry as $row){
