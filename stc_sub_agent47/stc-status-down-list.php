@@ -367,7 +367,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-agent-sup-std-material-desc').val(response_sdl.stc_status_down_list_material_desc);
                         $('#stc-agent-sup-std-manpower-req').val(response_sdl.stc_status_down_list_manpower_req);
                         $('#stc-agent-sup-std-target-date').val(response_sdl.stc_status_down_list_target_date);
-                        $('.stc-agent-sup-std-jobdonedetails').val(response_sdl.stc_status_down_list_jobpending_details);
+                        $('.stc-agent-sup-std-jobdonedetails').val(response_sdl.stc_status_down_list_jobdone_details);
                         $('.stc-agent-sup-std-remarks').val(response_sdl.stc_status_down_list_remarks);
                         $('.stc-std-tools-req-item-show').html(response_sdl.stc_status_down_list_tools_req);
                     }
