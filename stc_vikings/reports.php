@@ -1359,6 +1359,13 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     alert(message);
                 }
             }
+            
+            $('body').delegate('.show-jobdonedetails', 'click', function(e){
+                e.preventDefault();
+                var jobdonedet = $(this).attr("data");
+                $('.jobdonedet_para').html(jobdonedet);
+                $('.show-jobdonedetailsmodal').modal('show');
+            });
 
             // find std 
             $('body').delegate('.std-filter-find-btn', 'click', function(e){
@@ -1978,7 +1985,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <option>BREAKDOWN MAINTENANCE</option>
                                                 <option>CALL ATTEND</option>
                                                 <option>DAILY JOB ACTIVITY</option>
-                                                <option>DOWN</option>
                                                 <option>PREVENTIVE MAINTENANCE</option>
                                             </select>
                                         </div>
@@ -2012,4 +2018,26 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             </div>
         </div>
     </div>
+</div>
+
+
+<div class="modal fade show-jobdonedetailsmodal stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Job Done Details</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <p class="jobdonedet_para"></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
