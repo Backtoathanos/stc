@@ -34,7 +34,21 @@ if(isset($_SESSION["stc_agent_id"])){
         .tabledata-responsvie{
                 overflow-x: auto;
                 white-space: nowrap;
-           }
+        }
+
+        .stc-datatable-filter-ul li{
+            display: none;
+        }
+        .stc-datatable-filter-ul{
+            background: #fbfbfb;
+            position: absolute;
+            top:91px;
+            z-index: 90;
+            list-style-type: none;
+        }
+        .stc-datatable-filter{
+            z-index: 90;
+        }
     </style>
 </head>
 <body>
@@ -110,9 +124,49 @@ if(isset($_SESSION["stc_agent_id"])){
                                             <div class="card mb-3 widget-content">
                                                 <a href="#" class="form-control btn btn-success stc-std-list-show-hit">Find</a>
                                             </div>
+                                                
+                                            <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-primary">Data Fields</a>
+                                                <?php 
+                                                    $data_filter = array(
+                                                        'EQUIPMENTTYPE' => 'EQUIPMENT TYPE',
+                                                        'EQUIPMENTNO' => 'EQUIPMENT NO',
+                                                        'EQUIPMENTSTATUS' => 'EQUIPMENT STATUS',
+                                                        'JOBPLANNING' => 'JOB PLANNING',
+                                                        'TYPEOFJOB' => 'TYPE OF JOB',
+                                                        'VARIETIESOFJOB' => 'VARIETIES OF JOB',
+                                                        'PERMITNO' => 'PERMIT NO',
+                                                        'RESPONSIBLEPERSONNAMEMOBILENO' => 'RESPONSIBLE PERSON NAME & MOBILE NO',
+                                                        'DOWNREASON' => 'DOWN REASON',
+                                                        'MATERIALSREQ' => 'MATERIALS REQ',
+                                                        'MANPOWERREQ' => 'MAN POWER REQ',
+                                                        'TOOLSREQ' => 'TOOLS REQ',
+                                                        'WORKCOMPLETIONTARGETDATE' => 'WORK COMPLETION TARGET DATE',
+                                                        'ACTUALWORKCOMPLETIONDATE' => 'ACTUAL WORK COMPLETI ON DATE',
+                                                        'USEDMATERIAL' => 'USED MATERIAL',
+                                                        'STOCKMATERIAL' => 'STOCK MATERIAL',
+                                                        'DOWNPERIOD' => 'DOWN PERIOD',
+                                                        'WORKSTATUS' => 'WORK STATUS',
+                                                        'PENDINGREASON' => 'PENDING REASON',
+                                                        'JOBDONEDETAILS' => 'JOB DONE DETAILS',
+                                                        'REMARKS' => 'REMARKS',
+                                                        'CREATEDBY' => 'CREATED BY',
+                                                        'DESIGNATION' => 'DESIGNATION',
+                                                        'UPDATEDBY' => 'UPDATED BY',
+                                                        'UPDATEDON' => 'UPDATED ON',
+                                                        'STATUSUPDATEDBY' => 'STATUS UPDATED BY',
+                                                        'STATUSUPDATEDON' => 'STATUS UPDATED ON'
+                                                    );
+                                                    foreach($data_filter as $data_filter_key=>$data_filter_row){
+                                                        echo '<li class="mt-2"><input type="checkbox" class="stc-datatable-filter" style="display:block;float:left;position:relative;top:3px" id="'.$data_filter_key.'" value="'.$data_filter_key.'"><span class="filter-span">'.$data_filter_row.'</span></li>';
+                                                    }
+                                                ?>
+                                                <!-- <li class="mt-2"><input type="checkbox" class="stc-datatable-filter" style="display:block;float:left;position:relative;top:3px" id="EQUIPMENTTYPE" value="EQUIPMENTTYPE"><span class="filter-span">EQUIPMENT TYPE</span></li>
+                                                <li class="mt-2"><input type="checkbox" class="stc-datatable-filter" style="display:block;float:left;position:relative;top:3px" id="EQUIPMENTNO" value="EQUIPMENTNO"><span class="filter-span">EQUIPMENT NO</span></li>
+                                                <li class="mt-2"><input type="checkbox" class="stc-datatable-filter" style="display:block;float:left;position:relative;top:3px" id="EQUIPMENTSTATUS" value="EQUIPMENTSTATUS"><span class="filter-span">EQUIPMENT STATUS</span></li> -->
+                                            </ul>
                                         </div>
                                     </div>
-                                </div>     
+                                </div>   
                             </div>
                             <div class="row">
                                 <div class="col-md-12 col-xl-12"> 
@@ -160,6 +214,7 @@ if(isset($_SESSION["stc_agent_id"])){
             // call status down list
             $('body').delegate('.stc-std-list-show-hit', 'click', function(e){
                 e.preventDefault();
+                $('.stc-datatable-filter-ul').hide();
                 var location_id=$('#stc-agent-sup-std-location-find').val();
                 var search=$('.stc-agent-sup-search-field').val();
                 var status=$('.stc-agent-sup-status').val();
@@ -176,6 +231,8 @@ if(isset($_SESSION["stc_agent_id"])){
                         success     : function(response_sdl){
                             // console.log(response_sdl);
                             $('.stc-std-search-result').html(response_sdl);
+                            $('.stc-datatable-filter-ul').show();
+                            $('.stc-datatable-filter').prop('checked', false);
                         }
                     });
                 }else{
@@ -256,6 +313,28 @@ if(isset($_SESSION["stc_agent_id"])){
                     });
                 }
             });
+
+            // data table filter
+            $('body').delegate('.stc-datatable-filter', 'change', function(e){
+                e.preventDefault();
+                var value = $(this).val();
+                if($(this).prop('checked')==true){
+                    $('.'+value).hide();
+                }else{
+                    $('.'+value).show();
+                }
+            });
+
+            $('body').delegate('.data-fields-display', 'click', function(e){
+                e.preventDefault();
+                $('.stc-datatable-filter-ul li').toggle(200);
+            });
+
+            $('body').delegate('.filter-span', 'click', function(e){
+                e.preventDefault();
+                $(this).parent().find('input').click();
+            });
+
         });
     </script>
 </body>

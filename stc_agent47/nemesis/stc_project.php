@@ -1833,34 +1833,34 @@ class pirates_supervisor extends tesseract{
 						<th class="text-center">LOCATION</th>
 						<th class="text-center">DEPARTMENT</th>
 						<th class="text-center">AREA</th>
-						<th class="text-center">EQUIPMENT TYPE</th>
-						<th class="text-center">EQUIPMENT NO</th>
-						<th class="text-center">EQUIPMENT STATUS</th>
-						<th class="text-center">JOB PLANNING</th>
-						<th class="text-center">JOB TYPE</th>
-						<th class="text-center">VARIETIES OF JOB</th>
-						<th class="text-center">PERMIT NO</th>
-						<th class="text-center">RESPONSIBLE PERSON NAME & MOBILE NO</th>
-						<th class="text-center">DOWN REASON</th>
-						<th class="text-center">MATERIALS REQ</th>
-						<th class="text-center">MANPOWER REQ</th>
-						<th class="text-center">TOOLS REQ</th>
-						<th class="text-center">WORK COMPLETION TARGET DATE</th>
-						<th class="text-center">ACTUAL WORK COMPLETION DATE</th>
-						<th class="text-center">USED MATERIAL</th>
-						<th class="text-center">STOCK MATERIAL</th>
-						<th class="text-center">DOWN PERIOD</th>
-						<th class="text-center">WORK STATUS</th>
-						<th class="text-center">PENDING REASON</th>
-						<th class="text-center">JOB DONE DETAILS</th>
-						<th class="text-center">REMARKS</th>
-						<th class="text-center">CREATED BY</th>
-						<th class="text-center">DESIGNATION</th>
-						<th class="text-center">UPDATED BY</th>
-						<th class="text-center">UPDATED ON</th>
-						<th class="text-center">STATUS UPDATED BY</th>
-						<th class="text-center">STATUS UPDATED ON</th>
-						<th class="text-center">ACTION</th>
+						<th class="text-center EQUIPMENTTYPE">EQUIPMENT TYPE</th>
+						<th class="text-center EQUIPMENTNO">EQUIPMENT NO</th>
+						<th class="text-center EQUIPMENTSTATUS">EQUIPMENT STATUS</th>
+						<th class="text-center JOBPLANNING">JOB PLANNING</th>
+						<th class="text-center TYPEOFJOB">TYPE OF JOB</th>
+						<th class="text-center VARIETIESOFJOB">VARIETIES OF JOB</th>
+						<th class="text-center PERMITNO">PERMIT NO</th>
+						<th class="text-center RESPONSIBLEPERSONNAMEMOBILENO">RESPONSIBLE PERSON NAME & MOBILE NO</th>
+						<th class="text-center DOWNREASON">DOWN REASON</th>
+						<th class="text-center MATERIALSREQ">MATERIALS REQ</th>
+						<th class="text-center MANPOWERREQ">MANPOWER REQ</th>
+						<th class="text-center TOOLSREQ">TOOLS REQ</th>
+						<th class="text-center WORKCOMPLETIONTARGETDATE">WORK COMPLETION TARGET DATE</th>
+						<th class="text-center ACTUALWORKCOMPLETIONDATE">ACTUAL WORK COMPLETION DATE</th>
+						<th class="text-center USEDMATERIAL">USED MATERIAL</th>
+						<th class="text-center STOCKMATERIAL">STOCK MATERIAL</th>
+						<th class="text-center DOWNPERIOD">DOWN PERIOD</th>
+						<th class="text-center WORKSTATUS">WORK STATUS</th>
+						<th class="text-center PENDINGREASON">PENDING REASON</th>
+						<th class="text-center JOBDONEDETAILS">JOB DONE DETAILS</th>
+						<th class="text-center REMARKS">REMARKS</th>
+						<th class="text-center CREATEDBY">CREATED BY</th>
+						<th class="text-center DESIGNATION">DESIGNATION</th>
+						<th class="text-center UPDATEDBY">UPDATED BY</th>
+						<th class="text-center UPDATEDON">UPDATED ON</th>
+						<th class="text-center STATUSUPDATEDBY">STATUS UPDATED BY</th>
+						<th class="text-center STATUSUPDATEDON">STATUS UPDATED ON</th>
+						<th class="text-center ">ACTION</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -1964,14 +1964,14 @@ class pirates_supervisor extends tesseract{
 				}
 				
 				$eqstatus='
-						<td class="text-center" style="font-weight:bold;background: #5cd25c;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
+						<td class="text-center EQUIPMENTSTATUS" style="font-weight:bold;background: #5cd25c;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
 				';
 
 				$dperiod='0';
 
 				if($row['stc_status_down_list_equipment_status']=="Down"){
 					$eqstatus='
-							<td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
+							<td class="text-center EQUIPMENTSTATUS" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
 					';
 				}
 					
@@ -2116,37 +2116,37 @@ class pirates_supervisor extends tesseract{
 
 				$optimusprime.='
 					<tr>
-						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
+						<td>'.date('d-m-Y h:i a', strtotime($row['stc_status_down_list_date'])).'</td>
 						<td>'.$row['stc_status_down_list_plocation'].'</td>
 						<td>'.$row['stc_status_down_list_sub_location'].'</td>
 						<td>'.$row['stc_status_down_list_area'].'</td>
-						<td>'.$eq_type.'</td>
-						<td>'.$eq_number.'</td>
+						<td class="EQUIPMENTTYPE">'.$eq_type.'</td>
+						<td class="EQUIPMENTNO">'.$eq_number.'</td>
 						'.$eqstatus.'
-						<td>'.$row['stc_status_down_list_jobtype'].'</td>
-						<td>'.$job_type.'</td>
-						<td>'.$job_varities.'</td>
-						<td>'.$row['stc_status_down_list_permit_no'].'</td>
-						<td>'.$row['stc_status_down_list_responsive_person'].'</td>
-						<td>'.$row['stc_status_down_list_reason'].'</td>
-						<td>'.$row['stc_status_down_list_material_desc'].'</td>
-						<td>'.$row['stc_status_down_list_manpower_req'].'</td>
-						<td>'.$row['stc_status_down_list_tools_req'].'</td>
-						<td>'.$tar_date.'</td>
-						<td>'.$rec_date.'</td>
-						<td>NA</td>
-						<td>NA</td>
-						<td>'.$dperiod.' Days</td>
-						<td class="text-center" '.$statusbgcolor.'>'.$status.'</td>
-						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
-						<td>'.$row['stc_status_down_list_jobdone_details'].'<br>'.$updatejobdetails.'
-						<td>'.$row['stc_status_down_list_remarks'].'</td>
-						<td>'.$row['stc_cust_pro_supervisor_fullname'].'<br>'.$row['stc_cust_pro_supervisor_contact'].'</td>
-						<td  class="text-center">'.$row['stc_cust_pro_supervisor_category'].'</td>
-						<td>'.$updater_name.'</td>
-						<td>'.$updated_date.'</td>
-						<td>'.$supdater_name.'</td>
-						<td>'.$statusupdatedate.'</td>
+						<td class="JOBPLANNING">'.$row['stc_status_down_list_jobtype'].'</td>
+						<td class="TYPEOFJOB">'.$job_type.'</td>
+						<td class="VARIETIESOFJOB">'.$job_varities.'</td>
+						<td class="PERMITNO">'.$row['stc_status_down_list_permit_no'].'</td>
+						<td class="RESPONSIBLEPERSONNAMEMOBILENO">'.$row['stc_status_down_list_responsive_person'].'</td>
+						<td class="DOWNREASON">'.$row['stc_status_down_list_reason'].'</td>
+						<td class="MATERIALSREQ">'.$row['stc_status_down_list_material_desc'].'</td>
+						<td class="MANPOWERREQ">'.$row['stc_status_down_list_manpower_req'].'</td>
+						<td class="TOOLSREQ">'.$row['stc_status_down_list_tools_req'].'</td>
+						<td class="WORKCOMPLETIONTARGETDATE">'.$tar_date.'</td>
+						<td class="ACTUALWORKCOMPLETIONDATE">'.$rec_date.'</td>
+						<td class="USEDMATERIAL">NA</td>
+						<td class="STOCKMATERIAL">NA</td>
+						<td class="DOWNPERIOD">'.$dperiod.' Days</td>
+						<td class="WORKSTATUS text-center" '.$statusbgcolor.'>'.$status.'</td>
+						<td class="PENDINGREASON">'.$row['stc_status_down_list_jobpending_details'].'</td>
+						<td class="JOBDONEDETAILS">'.$row['stc_status_down_list_jobdone_details'].'<br>'.$updatejobdetails.'
+						<td class="REMARKS">'.$row['stc_status_down_list_remarks'].'</td>
+						<td class="CREATEDBY">'.$row['stc_cust_pro_supervisor_fullname'].'<br>'.$row['stc_cust_pro_supervisor_contact'].'</td>
+						<td class="DESIGNATION text-center">'.$row['stc_cust_pro_supervisor_category'].'</td>
+						<td class="UPDATEDBY">'.$updater_name.'</td>
+						<td class="UPDATEDON">'.$updated_date.'</td>
+						<td class="STATUSUPDATEDBY">'.$supdater_name.'</td>
+						<td class="STATUSUPDATEDON">'.$statusupdatedate.'</td>
 						<td class="text-center">'.$actionsec.'</td>
 					</tr>
 				';
