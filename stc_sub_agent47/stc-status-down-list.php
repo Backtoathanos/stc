@@ -882,7 +882,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <option>BREAKDOWN MAINTENANCE</option>
                                     <option>CALL ATTEND</option>
                                     <option>DAILY JOB ACTIVITY</option>
-                                    <option>DOWN</option>
                                     <option>PREVENTIVE MAINTENANCE</option>
                                 </select> 
                             </div>

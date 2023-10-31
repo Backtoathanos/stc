@@ -472,6 +472,12 @@ class ragnarReportsViewRequiReports extends tesseract{
       $query_filter = '';
       if($filter == 1){
          $datefilter='';
+         if($datefrom!=""){
+            $query_filter.="
+               AND DATE(`stc_status_down_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $datefrom)."' 
+               AND '".mysqli_real_escape_string($this->stc_dbs, $dateto)."'
+            ";
+         }
          if($location!="NA"){
             $query_filter.="AND `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location)."'";
          }
@@ -523,6 +529,40 @@ class ragnarReportsViewRequiReports extends tesseract{
          WHERE `stc_status_down_list_status`<>6 ".$query_filter."         
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ");
+      $cquery="SELECT 
+      `stc_status_down_list_id`,
+      `stc_status_down_list_date`,
+      `stc_status_down_list_plocation`,
+      `stc_cust_project_title`,
+      `stc_status_down_list_sub_location`,
+      `stc_status_down_list_area`,
+      `stc_status_down_list_equipment_type`,
+      `stc_status_down_list_equipment_number`,
+      `stc_status_down_list_equipment_status`,
+      `stc_status_down_list_reason`,
+      `stc_status_down_list_manpower_req`,
+      `stc_status_down_list_material_desc`,
+      `stc_status_down_list_from_date`,
+      `stc_status_down_list_rect_date`,
+      `stc_status_down_list_remarks`,
+      `stc_status_down_list_jobdone_details`,
+      `stc_status_down_list_jobpending_details`,
+      `stc_status_down_list_jobtype`,
+      `stc_status_down_list_qty`,
+      `stc_status_down_list_capacity`,
+      `stc_status_down_list_reasonattribute`,
+      `stc_status_down_list_created_by_select`,
+      `stc_status_down_list_permit_no`,
+      `stc_status_down_list_creator_details`,
+      `stc_status_down_list_responsive_person`,
+      `stc_status_down_list_target_date`,
+      `stc_status_down_list_status`,
+      `stc_status_down_list_created_by`
+  FROM `stc_status_down_list` 
+  LEFT JOIN `stc_cust_project` 
+  ON `stc_cust_project_id`=`stc_status_down_list_location` 
+  WHERE `stc_status_down_list_status`<>6 ".$query_filter."         
+  ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC";
 
       $ivarpreqry=mysqli_query($this->stc_dbs, "
          SELECT 
@@ -777,6 +817,8 @@ class ragnarReportsViewRequiReports extends tesseract{
 						$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
 					}
 				}
+            $jobdonedet_value = $row['stc_status_down_list_jobdone_details'];
+            $jobdonedet = strlen($jobdonedet_value)>25 ? substr($jobdonedet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$jobdonedet_value.'">Read more' : $jobdonedet_value;
             $ivar.='
                <tr>
                   <td class="text-center">'.$row['stc_status_down_list_id'].'</td>
@@ -791,7 +833,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>'.$row['stc_status_down_list_reason'].'</td>
                   <td class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>
-                  <td>'.$row['stc_status_down_list_jobdone_details'].'</td>
+                  <td>'.$jobdonedet.'</td>
                </tr>
             ';
          }
