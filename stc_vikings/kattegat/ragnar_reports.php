@@ -520,7 +520,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          FROM `stc_status_down_list` 
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
-         WHERE `stc_status_down_list_status`<>0 ".$query_filter."         
+         WHERE `stc_status_down_list_status`<>6 ".$query_filter."         
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ");
 
@@ -639,6 +639,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th style="width:25%" class="text-center">REASON</th>
                      <th class="text-center">STATUS</th>
                      <th class="text-center">DELAY(DAYS)</th>
+                     <th class="text-center">JOB DONE DETAILS</th>
                   </tr>
                </thead>
                <tbody>
@@ -790,6 +791,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>'.$row['stc_status_down_list_reason'].'</td>
                   <td class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>
+                  <td>'.$row['stc_status_down_list_jobdone_details'].'</td>
                </tr>
             ';
          }
