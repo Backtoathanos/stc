@@ -370,7 +370,7 @@ if(isset($_GET['ppem_no'])){
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-    <?php //include "https://stcassociate.com/stc_symbiote/footer.php";?>
+    <?php include "https://stcassociate.com/stc_symbiote/footer.php";?>
     <script>
       $(document).ready(function(){
         $('#printInvoice').click(function(){
