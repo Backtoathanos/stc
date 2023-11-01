@@ -26,9 +26,10 @@ class witcher_supervisor extends tesseract{
 				foreach($optimusprimeimgqry as $optimusprimeimgrow){
 					$img_path=$optimusprimeimgrow['stc_safetytbm_img_location'];
 				}
+				// <img src="safety_img/'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
 
 				$safety_image='
-						<img src="safety_img/'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
+						<a href="javascript:void(0)" class="btn btn-info stc-safety-tbm-image-show-btn" data-src="safety_img/'.$img_path.'">View</a>
 				';
 				if($img_path==""){
 					$safety_image="
