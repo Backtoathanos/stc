@@ -142,7 +142,7 @@ class transformers extends tesseract{
 			}
 		}
 		$status="Running";
-		if($stc_j_plannning=="Breakdown Maintanance"){
+		if($stc_j_plannning=="BREAKDOWN MAINTENANCE" || $action_status==2){
 			$status="Down";
 		}
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
