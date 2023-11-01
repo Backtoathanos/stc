@@ -566,6 +566,14 @@ if(isset($_SESSION["stc_agent_id"])){
                     }
                 });
             }
+
+            // add image for tbm
+            $('body').delegate('.stc-safety-tbm-image-show-btn', 'click', function() {
+                var img_src=$(this).attr("data-src");
+                $(this).after('<img src="' + img_src + '" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">');
+                $(this).hide();
+            });
+
             
             function call_tbm_fields(){
                 var stc_tbm_no=$('.stc-tbm-no').val();
