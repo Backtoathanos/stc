@@ -295,7 +295,6 @@ class transformers extends tesseract{
 			<th class="text-center">PENDING REASON</th>
 			<th class="text-center">REMARKS</th>
 			<th class="text-center">JOB DONE DETAILS</th>
-			<th class="text-center">CREATED BY</th>
 			<th class="text-center">UPDATED BY</th>
 			<th class="text-center">UPDATED ON</th>
 			';
@@ -541,7 +540,6 @@ class transformers extends tesseract{
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
 						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
-						<td>'.$row['stc_cust_pro_supervisor_fullname'].'</td>
 						<td>'.$updater_name.'</td>
 						<td>'.$updatedon.'</td>
 					';
