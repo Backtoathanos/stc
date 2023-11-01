@@ -180,6 +180,9 @@ class transformers extends tesseract{
 	public function stc_std_updatem($stc_std_id, $stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_eq_number, $stc_eq_type, $stc_j_varities, $stc_j_plannning){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
+		if($stc_j_varities!=''){
+			$stc_j_varities = "`stc_status_down_list_varities_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_j_varities)."',";
+		}
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			UPDATE
 			    `stc_status_down_list`
@@ -188,7 +191,7 @@ class transformers extends tesseract{
 			    `stc_status_down_list_plocation` = '".mysqli_real_escape_string($this->stc_dbs, $stc_slocation)."',
 			    `stc_status_down_list_sub_location` = '".mysqli_real_escape_string($this->stc_dbs, $stc_dept)."',
 			    `stc_status_down_list_area` = '".mysqli_real_escape_string($this->stc_dbs, $stc_area)."',
-			    `stc_status_down_list_varities_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_j_varities)."',
+				".$stc_j_varities."
 			    `stc_status_down_list_jobtype` = '".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
 			    `stc_status_down_list_updated_by` = '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
 			WHERE 
