@@ -148,6 +148,11 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     </script>
     <script>
         $(document).ready(function(){
+            $('body').delegate('tr', 'click', function(e){
+                $('tr').css('background-color', '');
+                $(this).css('background-color', 'rgb(221 219 255)');
+            });
+
             // call site name vaia supervisor
             call_location();
             function call_location(){

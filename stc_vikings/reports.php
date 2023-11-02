@@ -1360,6 +1360,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 }
             }
             
+            $('body').delegate('tr', 'click', function(e){
+                $('tr').css('background-color', '');
+                $(this).css('background-color', 'rgb(221 219 255)');
+            });
+
             $('body').delegate('.show-jobdonedetails', 'click', function(e){
                 e.preventDefault();
                 var jobdonedet = $(this).attr("data");
