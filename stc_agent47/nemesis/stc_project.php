@@ -2438,7 +2438,7 @@ class pirates_supervisor extends tesseract{
 		if(mysqli_num_rows($optimusprimequery)>0){
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetytoolslist_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="../stc_agent47/safety-ttht-print-preview.php?ttht_no='.$optimusprimerow['stc_safetytoolslist_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetytoollist-edit" id="'.$optimusprimerow['stc_safetytoolslist_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetytoollist-delete" id="'.$optimusprimerow['stc_safetytoolslist_id'].'">Delete</a>
 				';
