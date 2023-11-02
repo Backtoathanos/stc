@@ -240,6 +240,11 @@ if(isset($_SESSION["stc_agent_id"])){
                 }
             });
 
+            $('body').delegate('tr', 'click', function(e){
+                $('tr').css('background-color', '');
+                $(this).css('background-color', 'rgb(221 219 255)');
+            });
+            
             // change status
             $('body').delegate('.stc-set-to-complete', 'click', function(e){
                 e.preventDefault();

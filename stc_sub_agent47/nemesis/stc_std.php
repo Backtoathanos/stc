@@ -604,7 +604,7 @@ class transformers extends tesseract{
 				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
 		");
 		if($optimusprime_qry){
-			if($status==3){
+			if($status==4){
 				$optimusprime_qry=mysqli_query($this->stc_dbs, "
 					UPDATE
 						`stc_status_down_list`
