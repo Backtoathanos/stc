@@ -794,7 +794,7 @@ class witcher_nearmiss extends tesseract{
 						</form>";
 				}
 				$action_show='
-					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetynearmiss_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="../stc_agent47/safety-nearmiss-print-preview.php?nearmiss_no='.$optimusprimerow['stc_safetynearmiss_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetynearmiss-edit" id="'.$optimusprimerow['stc_safetynearmiss_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetynearmiss-delete" id="'.$optimusprimerow['stc_safetynearmiss_id'].'">Delete</a>
 				';
@@ -950,7 +950,7 @@ class witcher_hotwork extends tesseract{
 		if(mysqli_num_rows($optimusprimequery)>0){
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetyhotwork_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="../stc_agent47/safety-hotwork-print-preview.php?hotwork_no='.$optimusprimerow['stc_safetyhotwork_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyhotwork-edit" id="'.$optimusprimerow['stc_safetyhotwork_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyhotwork-delete" id="'.$optimusprimerow['stc_safetyhotwork_id'].'">Delete</a>
 				';
