@@ -283,7 +283,7 @@ class transformers extends tesseract{
 	public function stc_call_status_down_list($location_id){
 		$head_hidden1 = '';
 		$head_hidden2 = '';
-		if($_SESSION['stc_agent_sub_category']=='Supervisor'){
+		if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
 			$head_hidden1='				
 				<th class="text-center">EQUIPMENT TYPE</th>
 				<th class="text-center">EQUIPMENT STATUS</th>
@@ -298,8 +298,6 @@ class transformers extends tesseract{
 			<th class="text-center">PENDING REASON</th>
 			<th class="text-center">REMARKS</th>
 			<th class="text-center">JOB DONE DETAILS</th>
-			<th class="text-center">UPDATED BY</th>
-			<th class="text-center">UPDATED ON</th>
 			';
 		}
 		$optimusprime='
@@ -365,7 +363,7 @@ class transformers extends tesseract{
 
 				$list_date=(date('Y', strtotime($row['stc_status_down_list_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_date'])) : 'NA';
 				$rec_date=(date('Y', strtotime($row['stc_status_down_list_rect_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_rect_date'])) : 'NA';
-				$tar_date=(date('Y', strtotime($row['stc_status_down_list_target_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_target_date'])) : 'NA';
+				$tar_date=(date('Y', strtotime($row['stc_status_down_list_target_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_target_date'])) : '';
 
 				$status='';
 				$statusbgcolor = '';
@@ -524,7 +522,7 @@ class transformers extends tesseract{
 				
 				$hidden1 = '';
 				$hidden2 = '';
-				if($_SESSION['stc_agent_sub_category']=='Supervisor'){
+				if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
 					$hidden1='	
 						<td>'.$eq_type.'</td>
 						'.$eqstatus.'
@@ -543,8 +541,6 @@ class transformers extends tesseract{
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
 						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
-						<td>'.$updater_name.'</td>
-						<td>'.$updatedon.'</td>
 					';
 				}
 
