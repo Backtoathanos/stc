@@ -381,9 +381,11 @@ class witcher_vhl extends tesseract{
 			ORDER BY DATE(`stc_safetyvehicle_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimequery)>0){
+			$website=$_SERVER['SERVER_NAME'];
+			$website = $website=="localhost" ? '..' : 'https://stcassociate.com';
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="../stc_agent47/safety-vhl-print-preview.php?vhl_no='.$optimusprimerow['stc_safetyvehicle_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="'.$website.'/stc_agent47/safety-vhl-print-preview.php?vhl_no='.$optimusprimerow['stc_safetyvehicle_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyvhl-edit" id="'.$optimusprimerow['stc_safetyvehicle_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyvhl-delete" id="'.$optimusprimerow['stc_safetyvehicle_id'].'">Delete</a>
 				';
@@ -534,9 +536,11 @@ class witcher_ppem extends tesseract{
 			ORDER BY DATE(`stc_safetyppem_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimequery)>0){
+			$website=$_SERVER['SERVER_NAME'];
+			$website = $website=="localhost" ? '..' : 'https://stcassociate.com';
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="../stc_agent47/safety-ppem-print-preview.php?ppem_no='.$optimusprimerow['stc_safetyppem_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="'.$website.'/stc_agent47/safety-ppem-print-preview.php?ppem_no='.$optimusprimerow['stc_safetyppem_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyppem-edit" id="'.$optimusprimerow['stc_safetyppem_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyppem-delete" id="'.$optimusprimerow['stc_safetyppem_id'].'">Delete</a>
 				';
@@ -793,8 +797,10 @@ class witcher_nearmiss extends tesseract{
 							<input type='submit' value='Upload' class='btn btn-success'>
 						</form>";
 				}
+				$website=$_SERVER['SERVER_NAME'];
+				$website = $website=="localhost" ? '..' : 'https://stcassociate.com';
 				$action_show='
-					<a href="../stc_agent47/safety-nearmiss-print-preview.php?nearmiss_no='.$optimusprimerow['stc_safetynearmiss_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="'.$website.'/stc_agent47/safety-nearmiss-print-preview.php?nearmiss_no='.$optimusprimerow['stc_safetynearmiss_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetynearmiss-edit" id="'.$optimusprimerow['stc_safetynearmiss_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetynearmiss-delete" id="'.$optimusprimerow['stc_safetynearmiss_id'].'">Delete</a>
 				';
@@ -948,9 +954,11 @@ class witcher_hotwork extends tesseract{
 			ORDER BY DATE(`stc_safetyhotwork_startingdate`) DESC
 		");
 		if(mysqli_num_rows($optimusprimequery)>0){
+			$website=$_SERVER['SERVER_NAME'];
+			$website = $website=="localhost" ? '..' : 'https://stcassociate.com';
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="../stc_agent47/safety-hotwork-print-preview.php?hotwork_no='.$optimusprimerow['stc_safetyhotwork_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="'.$website.'/stc_agent47/safety-hotwork-print-preview.php?hotwork_no='.$optimusprimerow['stc_safetyhotwork_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyhotwork-edit" id="'.$optimusprimerow['stc_safetyhotwork_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyhotwork-delete" id="'.$optimusprimerow['stc_safetyhotwork_id'].'">Delete</a>
 				';
@@ -1097,9 +1105,11 @@ class witcher_ppec extends tesseract{
 			ORDER BY DATE(`stc_safetyppec_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimequery)>0){
+			$website=$_SERVER['SERVER_NAME'];
+			$website = $website=="localhost" ? '..' : 'https://stcassociate.com';
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="../stc_agent47/stc-ppec-print-preview.php?ppec_no='.$optimusprimerow['stc_safetyppec_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="'.$website.'/stc_agent47/stc-ppec-print-preview.php?ppec_no='.$optimusprimerow['stc_safetyppec_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyppec-edit" id="'.$optimusprimerow['stc_safetyppec_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyppec-delete" id="'.$optimusprimerow['stc_safetyppec_id'].'">Delete</a>
 				';
@@ -1342,9 +1352,11 @@ class witcher_toollist extends tesseract{
 			ORDER BY DATE(`stc_safetytoolslist_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimequery)>0){
+			$website=$_SERVER['SERVER_NAME'];
+			$website = $website=="localhost" ? '..' : 'https://stcassociate.com';
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="../stc_agent47/safety-ttht-print-preview.php?ttht_no='.$optimusprimerow['stc_safetytoolslist_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="'.$website.'/stc_agent47/safety-ttht-print-preview.php?ttht_no='.$optimusprimerow['stc_safetytoolslist_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetytoollist-edit" id="'.$optimusprimerow['stc_safetytoolslist_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetytoollist-delete" id="'.$optimusprimerow['stc_safetytoolslist_id'].'">Delete</a>
 				';
