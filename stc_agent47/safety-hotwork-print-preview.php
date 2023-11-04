@@ -1,12 +1,4 @@
-<?php
-ini_set("session.gc_maxlifetime", 21600);
-session_set_cookie_params(21600);
-session_start();
-if(empty(@$_SESSION['stc_agent_id'])){
-    header('location:index.html');
-}
 
-?>
 <?php 
 if(isset($_GET['hotwork_no'])){
     $num = $_GET['hotwork_no'];
@@ -20,7 +12,7 @@ if(isset($_GET['hotwork_no'])){
       LEFT JOIN `stc_cust_pro_supervisor`
       ON `stc_cust_pro_supervisor_id`=`stc_safetyhotwork_createdby`
       WHERE `stc_safetyhotwork_id`='".$_GET['hotwork_no']."'
-      ORDER BY DATE(`stc_safetynearmiss_date`) DESC
+      ORDER BY DATE(`stc_safetyhotwork_date`) DESC
     ");
     $get_stc_safety=mysqli_fetch_assoc($checksafetyqry);
 ?>
@@ -30,7 +22,7 @@ if(isset($_GET['hotwork_no'])){
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Tool Box Meeting</title>
+    <title>Hot Work</title>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css?family=Roboto:400,700" />
@@ -222,12 +214,14 @@ if(isset($_GET['hotwork_no'])){
         
         .head2-box{
           margin-top :15px;
-          border : 1px solid black;
         }
 
         .footer1-box{
           border : 1px solid black;
           padding-top :15px;
+        }
+        .width-40{
+            width :33.333%;
         }
 
         
@@ -253,11 +247,11 @@ if(isset($_GET['hotwork_no'])){
         </div>
         <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 head1-box">
           <div class="row">
-            <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4">
-              <p style="font-size:20px;" ><b>DOC NO:- VHL-01</b></p>
+            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
+              <p style="font-size:20px;" ><b>AUD-08</b></p>
             </div>
-            <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8">
-              <p style="font-size:20px;padding-left:60px;" ><b>VEHICLE INSPECTION</b></p>
+            <div class="col-xl-10 col-lg-10 col-md-10 col-sm-10">
+              <p style="font-size:20px;padding-left:0px;" ><b>INSPECTION REGISTER ELECTRIC WELDING AND FIRE PREVENTION EQUIPMENTS</b></p>
             </div>
           </div>
         </div>
@@ -269,91 +263,52 @@ if(isset($_GET['hotwork_no'])){
           <div class="row" style="margin-top: 20px;">
             <div class="col-xl-12 col-lg-12 col-md-12">
               <div class="row head2-box">
-                  <div class="col-xl-12 col-lg-12 col-md-12">
-                      <p>Vehicle description :- <?php echo $get_stc_safety['stc_safetyvehicle_desc']; ?></p>
+                  <div class="col-xl-4 col-lg-4 col-md-4 width-40">
+                      <p>W.O. NO :- <?php echo $get_stc_safety['stc_safetyhotwork_wono']; ?></p>
                   </div>
-                  <div class="col-xl-12 col-lg-12 col-md-12">
-                      <p>Vehicle Registration number :- <?php echo $get_stc_safety['stc_safetyvehicle_reg_no']; ?></p>
+                  <div class="col-xl-4 col-lg-4 col-md-4 width-40">
+                      <p>JOB SITE NAME :- <?php echo $get_stc_safety['stc_safetyhotwork_jobssitename']; ?></p>
                   </div>
-                  <div class="col-xl-6 col-lg-6 col-md-6 doi">
-                      <p>Date of inspection :- <?php echo date('d-m-Y', strtotime($get_stc_safety['stc_safetyvehicle_dateofinspection'])); ?></p>
-                  </div>
-                  <div class="col-xl-6 col-lg-6 col-md-6 dn">
-                      <p>Driver's name :- <?php echo $get_stc_safety['stc_safetyvehicle_driversname']; ?></p>
+                  <div class="col-xl-4 col-lg-4 col-md-4 width-40">
+                      <p>STARTING DATE :- <?php echo date('d-m-Y', strtotime($get_stc_safety['stc_safetyhotwork_startingdate'])); ?></p>
                   </div>
               </div>
               <div class="row">
                 <div class="col-xl-12 col-lg-12 col-md-12">
                     <table cellspacing="0" cellpadding="0" id="stc-ttht-table">
                       <tr>
-                          <th style="text-align:center;color:black;border:1px solid black;width:80%;">What should I check before operating the vehicle</th>
-                          <th style="text-align:center;color:black;border:1px solid black;">Yes</th>
-                          <th style="text-align:center;color:black;border:1px solid black;">No</th>
+                          <th style="text-align:center;color:black;border:1px solid black;">SN</th>
+                          <th style="text-align:center;color:black;border:1px solid black;width:80%;">EQUIPMENTS</th>
+                          <th style="text-align:center;color:black;border:1px solid black;">INSPECTED BY</th>
                       </tr>
-                      <?php
-                        $oprvhl = array(
-                          'stc_safetyvehicle_oil_level' => 'Oil level',
-                          'stc_safetyvehicle_brakefluidlevel' => 'Brake fluid level',
-                          'stc_safetyvehicle_waterlevel' => 'Water level',
-                          'stc_safetyvehicle_windscreen' => 'Windscreen washer level',
-                          'stc_safetyvehicle_adjustseat' => 'Adjust seat and controls',
-                          'stc_safetyvehicle_seatbelts' => 'Seat belts – check for operation (all)',
-                          'stc_safetyvehicle_parking_brake' => 'Parking brake – hold against slight acceleration',
-                          'stc_safetyvehicle_footbrake' => 'Foot brake – holds, stops vehicle smoothly',
-                          'stc_safetyvehicle_passengerbrake' => 'Passenger brake for Driving lessons',
-                          'stc_safetyvehicle_clutchgearshift' => 'Clutch and gearshift – shifts smoothly without jumping or jerking',
-                          'stc_safetyvehicle_mirrorsclean' => 'Mirrors clean and adjusted',
-                          'stc_safetyvehicle_doorlock' => 'Doors and door locks operate correctly',
-                          'stc_safetyvehicle_steering' => 'Steering – moves smoothly',
-                          'stc_safetyvehicle_lightsclearance' => 'Lights – clearance, headlights, tail, license plate, brake, indicator turn signals & alarm.',
-                          'stc_safetyvehicle_dashcontrolpanel' => 'Dash control panel – all lights and gauges are operational',
-                          'stc_safetyvehicle_horn' => 'Horn',
-                          'stc_safetyvehicle_alarm' => 'Vehicle reverse alarm',
-                          'stc_safetyvehicle_hydraulicsystem' => 'Hydraulic systems – no evidence of leaks and systems operate smoothly',
-                          'stc_safetyvehicle_sparetyre' => 'Check spare tyre',
-                          'stc_safetyvehicle_towbar' => 'Check tow bar (where fitted)',
-                          'stc_safetyvehicle_equipment' => 'Emergency equipment',
-                          'stc_safetyvehicle_firstaidkit' => 'First aid kit'
-                        );
-                        foreach($oprvhl as $key=>$oprvhlrow){
-                          $flag = '<td style="text-align:center;">✔</td><tdstyle="text-align:center;"></td>';
-                          $flag = ($get_stc_safety[$key]) ? $flag : '<td style="text-align:center;"></td><td style="text-align:center;">X</td>';
-                          echo '
-                            <tr>
-                              <td>'.$oprvhlrow.'</td>
-                              '.$flag.'
-                            </tr>
-                          ';
-                        }
-                      
-                      ?>
+                      <tr><td>1</td><td>ELECTRIC WELDING MACHINE </td>                                                                                       <td></td></tr>
+                      <tr><td>1.1</td><td>MAKE - <?php echo $get_stc_safety['stc_safetyhotwork_make'];?> SL NO. - <?php echo $get_stc_safety['stc_safetyhotwork_slno'];?></td>                                                                                                     <td></td></tr>
+                      <tr><td>1.2</td><td>CONNECTIONS ARE PROPER AND EFFECTIVELY INSULATED</td>                                                                <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_capaei']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.3</td><td>ON /OFF SWITCH IN GOOD WORKING CONDITION?</td>                                                                       <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_oosigwc']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.4</td><td>VOLTMETER/AMMETER CONNECTED & WORKING PROPERLY?</td>                                                                 <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_vacawp']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.5</td><td>REGULATOR WORKING PROPERLY</td>                                                                                      <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_rwp']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.6</td><td>THREE / SINGLE PHASE TRANSFORMER</td>                                                                                <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_tspt']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.7</td><td>CABLE (FROM MACHINE TO EARTH CLAMP)</td>                                                                             <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_cfmtec']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.8</td><td>GOOD EARTHING AND GROUNDING. (DOUBLE EARTHING)</td>                                                                  <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_geagde']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.9</td><td>CABLE (FROM MACHINE TO ELECTRODE HOLDER)</td>                                                                        <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_cfmteh']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.10</td><td>ELECTRODE HOLDER</td>                                                                                                <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_eh']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.11</td><td>WELDING MACHIN COMPLETELY COVERD AND NO LOOSE CONNECTIONS.</td>                                                      <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_wmccanlc']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.12</td><td>WHEELS FREELY ROTATING</td>                                                                                          <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_wfr']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>1.13</td><td>COMPATIBLE FIRE EXTINGUSHER AVAILABLE FOR THE WELDING SET</td>                                                       <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_cfeaftws']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>2</td><td>CABLE AND JOINTS</td>                                                                                                <td></td></tr>
+                      <tr><td>2.1</td><td>SUPPLY CABLE’S LENGTH EXCEEDING 5M</td>                                                                              <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_scle']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>2.2</td><td>CONNECTION TAKEN THROUGH ELCB’s?</td>                                                                                <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_ctte']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>2.3</td><td>WELDING CABLE OF PROPER RATING AND IN PROPER CONDITION WITHOUT ANY DAMAGES?</td>                                     <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_wcopraipcwad']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>2.4</td><td>CONNECTING LUGS TIGHTENED PROPERLY?</td>                                                                             <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_cltp']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>2.5</td><td>WELL INSULATED AND NO EXPOSED PARTS?</td>                                                                            <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_wianep']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>2.6</td><td>SIZE OF CABLE USED ARE PROPORTIONAL TO VOLTAGE SUPPLY</td>                                                           <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_socuaptvs']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>2.7</td><td>RETURN EARTH CABLE OF SUFFICIENT LENGTH? ARE ELECTRICAL CONDUCTORS PROHIBITED FROM BEING USED TO COMPLETE WORK-</td> <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_recoslaecpfbutcw']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>2.8</td><td>ANY OVERLOADING, WHERE BY CABLES BECOME HOT?</td>                                                                    <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_aowbcbh']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>2.9</td><td>ANY CONTACT WITH OIL / SHARP EDGES OR WATER?</td>                                                                    <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_acwoseow']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>2.10</td><td>ANY CABLES PROPERLY PLACED TO PREVENT TRIPPING HAZARDS?</td>                                                         <td style="text-align: center;"><?php echo ($get_stc_safety['stc_safetyhotwork_acpptpth']==1) ? '✔' : 'X'; ?></td></tr>
+                      <tr><td>3</td><td>SAND BUCKET (NEAR HOT WORK TO EXTINGUISH FIR)</td>
                     </table>
                 </div>
-              </div>
-              <div class="row footer1-box">
-                  <div class="col-xl-12 col-lg-12 col-md-12">
-                      <p>Name of Person undertaking vehicle inspection :- <?php echo $get_stc_safety['stc_safetyvehicle_personundertaking']; ?></p>
-                  </div>
-                  <div class="col-xl-12 col-lg-12 col-md-12">
-                      <p>Signature :- <?php echo $get_stc_safety['stc_safetyvehicle_signature']; ?></p>
-                  </div>
-                  <div class="col-xl-12 col-lg-12 col-md-12">
-                      <p>Vehicle faults to be reported immediately :- <?php echo $get_stc_safety['stc_safetyvehicle_faultsreported']; ?></p>
-                  </div>
-                  <div class="col-xl-12 col-lg-12 col-md-12">
-                      <b>REMBERMBER – What should I do before vehicle operation?</b>
-                  </div>
-              </div>
-              <div class="row footer1-box">
-                  <div class="col-xl-12 col-lg-12 col-md-12">
-                    <ul>
-                      <li> <b>Initially read, understand and follow the manufacturer’s operating manual. This will provide a wide range of information relative to the vehicle.</b></li>
-                      <li> <b>Know how to operate the vehicle and use and related equipment or attachments safely </b></li>
-                      <li> <b>Be familiar with the location and function of all controls </b></li>
-                      <li> <b>Develop a routine method of inspecting the vehicle </b></li>
-                      <li> <b>Before moving off, adjust the seat and mirrors and fasten seat belt/s </b></li>
-                    </ul>
-                  </div>
               </div>
               <div class="row">
                   <div class="col-xl-12 col-lg-12 col-md-12">
@@ -366,7 +321,11 @@ if(isset($_GET['hotwork_no'])){
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-    <!-- <?php //include "https://stcassociate.com/stc_symbiote/footer.php";?> -->
+        <?php 
+        $website=$_SERVER['SERVER_NAME'];
+			  $website = $website=="localhost" ? '../' : 'https://stcassociate.com';
+          include "'.$website.'/stc_symbiote/footer.php";
+        ?>
     <script>
       $(document).ready(function(){
         $('#printInvoice').click(function(){

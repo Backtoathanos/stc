@@ -1,12 +1,4 @@
-<?php
-ini_set("session.gc_maxlifetime", 21600);
-session_set_cookie_params(21600);
-session_start();
-if(empty(@$_SESSION['stc_agent_id'])){
-    header('location:index.html');
-}
 
-?>
 <?php 
 if(isset($_GET['vhl_no'])){
     $num = $_GET['vhl_no'];
@@ -366,7 +358,11 @@ if(isset($_GET['vhl_no'])){
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
-    <!-- <?php //include "https://stcassociate.com/stc_symbiote/footer.php";?> -->
+      <?php 
+        $website=$_SERVER['SERVER_NAME'];
+			  $website = $website=="localhost" ? '../' : 'https://stcassociate.com';
+          include "'.$website.'/stc_symbiote/footer.php";
+        ?>
     <script>
       $(document).ready(function(){
         $('#printInvoice').click(function(){
