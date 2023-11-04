@@ -1834,10 +1834,9 @@ class pirates_supervisor extends tesseract{
 						<th class="text-center">DEPARTMENT</th>
 						<th class="text-center">AREA</th>
 						<th class="text-center EQUIPMENTTYPE">EQUIPMENT TYPE</th>
-						<th class="text-center EQUIPMENTNO">EQUIPMENT NO</th>
 						<th class="text-center EQUIPMENTSTATUS">EQUIPMENT STATUS</th>
-						<th class="text-center JOBPLANNING">JOB PLANNING</th>
 						<th class="text-center TYPEOFJOB">TYPE OF JOB</th>
+						<th class="text-center JOBPLANNING">JOB CATEGORY</th>
 						<th class="text-center VARIETIESOFJOB">VARIETIES OF JOB</th>
 						<th class="text-center PERMITNO">PERMIT NO</th>
 						<th class="text-center RESPONSIBLEPERSONNAMEMOBILENO">RESPONSIBLE PERSON NAME & MOBILE NO</th>
@@ -2121,10 +2120,9 @@ class pirates_supervisor extends tesseract{
 						<td>'.$row['stc_status_down_list_sub_location'].'</td>
 						<td>'.$row['stc_status_down_list_area'].'</td>
 						<td class="EQUIPMENTTYPE">'.$eq_type.'</td>
-						<td class="EQUIPMENTNO">'.$eq_number.'</td>
 						'.$eqstatus.'
-						<td class="JOBPLANNING">'.$row['stc_status_down_list_jobtype'].'</td>
-						<td class="TYPEOFJOB">'.$job_type.'</td>
+						<td class="TYPEOFJOB">'.$row['stc_status_down_list_jobtype'].'</td>
+						<td class="JOBPLANNING">'.$job_type.'</td>
 						<td class="VARIETIESOFJOB">'.$job_varities.'</td>
 						<td class="PERMITNO">'.$row['stc_status_down_list_permit_no'].'</td>
 						<td class="RESPONSIBLEPERSONNAMEMOBILENO">'.$row['stc_status_down_list_responsive_person'].'</td>
