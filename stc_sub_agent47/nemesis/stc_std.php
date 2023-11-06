@@ -599,7 +599,7 @@ class transformers extends tesseract{
 				</tbody>
 			</table>
 		';
-		return $query;
+		return $optimusprime;
 	}
 
 	public function stc_std_call_perticular($std_id){
