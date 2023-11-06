@@ -319,6 +319,29 @@ class transformers extends tesseract{
 				<tbody>
 		';
 		$optimusprimeqry=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT `stc_cust_pro_supervisor_created_by`
+			FROM `stc_status_down_list` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
+			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
+		");
+		$manager = "AND (";
+		if(mysqli_num_rows($optimusprimeqry)>0){
+			$num_count = mysqli_num_rows($optimusprimeqry);
+			$counter = $num_count;
+			$sl=0;
+			foreach($optimusprimeqry as $optimusprimerow){
+				$sl++;
+				if($sl==1){
+					$manager .= "`stc_cust_pro_supervisor_created_by`=".$optimusprimerow['stc_cust_pro_supervisor_created_by'];
+				}else{
+					$manager .= " OR `stc_cust_pro_supervisor_created_by`=".$optimusprimerow['stc_cust_pro_supervisor_created_by'];
+				}
+			}
+			$manager .= ")";
+		}
+
+		$query = "
 			SELECT 		 	
 				`stc_status_down_list_id`,
 				`stc_status_down_list_date`,
@@ -328,7 +351,7 @@ class transformers extends tesseract{
 				`stc_status_down_list_sub_location`,
 				`stc_status_down_list_jobtype`,
 				`stc_status_down_list_created_by_select`,
-                `stc_status_down_list_creator_details`,
+				`stc_status_down_list_creator_details`,
 				`stc_status_down_list_equipment_status`,
 				`stc_status_down_list_reason`,
 				`stc_status_down_list_material_desc`,
@@ -354,10 +377,11 @@ class transformers extends tesseract{
 			LEFT JOIN `stc_cust_pro_supervisor` 
 			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
 			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
-			AND `stc_status_down_list_status`<>6
-			AND `stc_status_down_list_status`<>5
+			".$manager."
+			AND `stc_status_down_list_status`<5
 			ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
-		");
+		";
+		$optimusprimeqry=mysqli_query($this->stc_dbs, $query);
 		if(mysqli_num_rows($optimusprimeqry)>0){
 			foreach($optimusprimeqry as $row){
 
