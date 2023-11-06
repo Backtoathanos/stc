@@ -37,6 +37,106 @@ if(isset($_SESSION["stc_agent_id"])){
       
         .fade:not(.show) {
           opacity: 10;
+        }@import url("https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+        @import url('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700');
+        @import url('https://fonts.googleapis.com/css?family=Libre+Baskerville:400,700');
+        .profile-card-3 h1{float:left; width:100%; color:#232323; margin-bottom:30px; font-size: 14px;}
+        .profile-card-3 h1 span{font-family: 'Libre Baskerville', serif; display:block; font-size:45px; text-transform:none; margin-bottom:20px; margin-top:30px; font-weight:700}
+        .profile-card-3 h1 a{color:#131313; font-weight:bold;}
+        .profile-card-3 {
+          font-family: 'Open Sans', Arial, sans-serif;
+          position: relative;
+          float: left;
+          overflow: hidden;
+          width: 100%;
+          text-align: center;
+          height:368px;
+          border:none;
+        }
+        .profile-card-3 .background-block {
+            float: left;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+        .profile-card-3 .background-block .background {
+          width:100%;
+          vertical-align: top;
+          opacity: 0.9;
+          -webkit-filter: blur(0.5px);
+          filter: blur(0.5px);
+           -webkit-transform: scale(1.8);
+          transform: scale(2.8);
+        }
+        .profile-card-3 .card-content {
+          width: 100%;
+          padding: 15px 25px;
+          color:#232323;
+          float:left;
+          background:#efefef;
+          height:50%;
+          border-radius:0 0 5px 5px;
+          position: relative;
+          z-index: 9999;
+        }
+        .profile-card-3 .card-content::before {
+            content: '';
+            background: #efefef;
+            width: 120%;
+            height: 100%;
+            left: 11px;
+            bottom: 51px;
+            position: absolute;
+            z-index: -1;
+            transform: rotate(-13deg);
+        }
+        .profile-card-3 .profile {
+          border-radius: 50%;
+          position: absolute;
+          bottom: 50%;
+          left: 50%;
+          max-width: 100px;
+          opacity: 1;
+          box-shadow: 3px 3px 20px rgba(0, 0, 0, 0.5);
+          border: 2px solid rgba(255, 255, 255, 1);
+          -webkit-transform: translate(-50%, 0%);
+          transform: translate(-50%, 0%);
+          z-index:99999;
+        }
+        .profile-card-3 h2 {
+          margin: 0 0 5px;
+          font-weight: 600;
+          font-size:15px;
+        }
+        .profile-card-3 h2 small {
+          display: block;
+          font-size: 15px;
+          margin-top:10px;
+        }
+        .profile-card-3 i {
+          display: inline-block;
+            font-size: 16px;
+            color: #232323;
+            text-align: center;
+            border: 1px solid #232323;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            border-radius: 50%;
+            margin:0 5px;
+        }
+        .profile-card-3 .icon-block{
+            float:left;
+            width:100%;
+            margin-top:15px;
+        }
+        .profile-card-3 .icon-block a{
+            text-decoration:none;
+        }
+        .profile-card-3 i:hover {
+          background-color:#232323;
+          color:#fff;
+          text-decoration:none;
         }
     </style>
 </head>
@@ -248,25 +348,9 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card" style="width: auto;overflow-x: auto; white-space: nowrap;">
                                             <div class="card-body"><h5 class="card-title">Show Project</h5>
-                                                <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search By Project Name" class="form-control">
-                                                <?php
-                                                    $get_project_qry=mysqli_query($con, "
-                                                        SELECT 
-                                                            `stc_cust_project_id`,
-                                                            `stc_cust_project_date`,
-                                                            `stc_cust_project_title`,
-                                                            `stc_cust_project_refr`,
-                                                            `stc_cust_project_address`,
-                                                            `stc_cust_project_responsive_person`,
-                                                            `stc_cust_project_status`
-                                                        FROM 
-                                                            `stc_cust_project` 
-                                                        WHERE 
-                                                            `stc_cust_project_createdby`='".$_SESSION['stc_agent_id']."'
-                                                        ORDER BY `stc_cust_project_title` ASC
-                                                    ");
-                                                    
-                                                    if($_SESSION['stc_agent_role']==3){
+                                                <input type="text" class="form-control all_project_search mb-3" id="searchproject" onkeyup="myFunction()" placeholder="Search By Project Name">
+                                                <div class="row">
+                                                    <?php
                                                         $get_project_qry=mysqli_query($con, "
                                                             SELECT 
                                                                 `stc_cust_project_id`,
@@ -276,26 +360,33 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                 `stc_cust_project_address`,
                                                                 `stc_cust_project_responsive_person`,
                                                                 `stc_cust_project_status`
-                                                            FROM `stc_cust_project`
-                                                            INNER JOIN `stc_agent_requested_customer`
-                                                            ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id` 
-                                                            INNER JOIN `stc_agents`
-                                                            ON `stc_agent_requested_customer_agent_id`=`stc_agents_id` 
-                                                            WHERE `stc_agents_id`='".$_SESSION['stc_agent_id']."'
+                                                            FROM 
+                                                                `stc_cust_project` 
+                                                            WHERE 
+                                                                `stc_cust_project_createdby`='".$_SESSION['stc_agent_id']."'
                                                             ORDER BY `stc_cust_project_title` ASC
                                                         ");
-                                                    }
+                                                        
+                                                        if($_SESSION['stc_agent_role']==3){
+                                                            $get_project_qry=mysqli_query($con, "
+                                                                SELECT 
+                                                                    `stc_cust_project_id`,
+                                                                    `stc_cust_project_date`,
+                                                                    `stc_cust_project_title`,
+                                                                    `stc_cust_project_refr`,
+                                                                    `stc_cust_project_address`,
+                                                                    `stc_cust_project_responsive_person`,
+                                                                    `stc_cust_project_status`
+                                                                FROM `stc_cust_project`
+                                                                INNER JOIN `stc_agent_requested_customer`
+                                                                ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id` 
+                                                                INNER JOIN `stc_agents`
+                                                                ON `stc_agent_requested_customer_agent_id`=`stc_agents_id` 
+                                                                WHERE `stc_agents_id`='".$_SESSION['stc_agent_id']."'
+                                                                ORDER BY `stc_cust_project_title` ASC
+                                                            ");
+                                                        }
                                                     ?>
-                                                    <table class="table table-bordered table-responsive" id="stc-cust-project-table">
-                                                        <thead>
-                                                            <th class="text-center">Project ID<br>Project Date</th>
-                                                            <th class="text-center">Project Title</th>
-                                                            <th class="text-center">Project Address</th>
-                                                            <th class="text-center">Responsive Person</th>
-                                                            <th class="text-center">Status</th>
-                                                            <th class="text-center">Action</th>
-                                                        </thead>
-                                                        <tbody>
                                                     <?php
                                                     if(mysqli_num_rows($get_project_qry)>0){
                                                         foreach($get_project_qry as $get_project_row){
@@ -316,43 +407,64 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                     </a>
                                                                 ';
                                                             }
-                                                            echo '
-                                                                <tr>
-                                                                    <td>'.$get_project_row['stc_cust_project_id'].'<br>'.date('d-m-Y', strtotime($get_project_row['stc_cust_project_date'])).'</td>
-                                                                    <td>
-                                                                        '.$get_project_row['stc_cust_project_title'].'<br>
-                                                                        '.$get_project_row['stc_cust_project_refr'].'
-                                                                        <input type="hidden" id="stc-ag-edittitle'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_title'].'">
-                                                                        <input type="hidden" id="stc-ag-editrefre'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_refr'].'">
-                                                                    </td>
-                                                                    <td>
-                                                                        '.$get_project_row['stc_cust_project_address'].'                       
-                                                                        <input type="hidden" id="stc-ag-editaddress'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_address'].'">
-                                                                    </td>
-                                                                    <td>'.$get_project_row['stc_cust_project_responsive_person'].'</td>
-                                                                    <td>'.$status.'</td>
-                                                                    <td align="center">
-                                                                        <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-edit-ret" style="font-size: 25px;color: #cc7676;">
-                                                                            <i class="fas fa-edit"></i>
-                                                                        </a>
-                                                                        <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-show-ret" style="font-size: 25px;color: #cc7676;">
-                                                                            <i class="fas fa-eye"></i>
-                                                                        </a>
-                                                                        '.$indust.'
-                                                                    </td>
-                                                                </tr>
+                                                            // echo '
+                                                            //     <tr>
+                                                            //         <td>'.$get_project_row['stc_cust_project_id'].'<br>'.date('d-m-Y', strtotime($get_project_row['stc_cust_project_date'])).'</td>
+                                                            //         <td>
+                                                            //             '.$get_project_row['stc_cust_project_title'].'<br>
+                                                            //             '.$get_project_row['stc_cust_project_refr'].'
+                                                            //             <input type="hidden" id="stc-ag-edittitle'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_title'].'">
+                                                            //             <input type="hidden" id="stc-ag-editrefre'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_refr'].'">
+                                                            //         </td>
+                                                            //         <td>
+                                                            //             '.$get_project_row['stc_cust_project_address'].'                       
+                                                            //             <input type="hidden" id="stc-ag-editaddress'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_address'].'">
+                                                            //         </td>
+                                                            //         <td>'.$get_project_row['stc_cust_project_responsive_person'].'</td>
+                                                            //         <td>'.$status.'</td>
+                                                            //         <td align="center">
+                                                            //             <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-edit-ret" style="font-size: 25px;color: #cc7676;">
+                                                            //                 <i class="fas fa-edit"></i>
+                                                            //             </a>
+                                                            //             <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-show-ret" style="font-size: 25px;color: #cc7676;">
+                                                            //                 <i class="fas fa-eye"></i>
+                                                            //             </a>
+                                                            //             '.$indust.'
+                                                            //         </td>
+                                                            //     </tr>
+                                                            // ';
+                                                            $blacknwhitestyle='style="-webkit-filter: grayscale(100%);"';
+                                                            if($get_project_row['stc_cust_project_status']=='1'){
+                                                                $blacknwhitestyle='';
+                                                            }
+                                                            echo '<div class="col-md-3 projecttarget" style="margin-bottom:15px;">
+                                                                    <div class="card profile-card-3" '.$blacknwhitestyle.'>
+                                                                        <div class="background-block">
+                                                                            <img src="https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&h=650&w=940" alt="profile-sample1" class="background"/>
+                                                                        </div>
+                                                                        <div class="card-content">
+                                                                            <h2>'.$get_project_row['stc_cust_project_title'].'<small>'.$get_project_row['stc_cust_project_refr'].'</small></h2>
+                                                                            <input type="hidden" id="stc-ag-edittitle'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_title'].'">
+                                                                            <input type="hidden" id="stc-ag-editrefre'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_refr'].'">
+                                                                            <input type="hidden" id="stc-ag-editaddress'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_address'].'">
+                                                                            <h3 style="font-size: 0.75rem;">
+                                                                                '.$get_project_row['stc_cust_project_address'].'<br>
+                                                                                '.$get_project_row['stc_cust_project_responsive_person'].'
+
+                                                                            </h3>
+                                                                            <div class="icon-block">
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-edit-ret" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-edit"></i></a>
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-show-ret" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-eye"></i></a>
+                                                                                '.$indust.'
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
                                                             ';
                                                         }
-                                                    }else{
-                                                        ?>
-                                                        <tr>
-                                                            <td>No Record Found!!!</td>
-                                                        </tr>
-                                                        <?php
                                                     }
                                                     ?>
-                                                        </tbody>
-                                                    </table>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -905,22 +1017,17 @@ if(isset($_SESSION["stc_agent_id"])){
     </script>
     <script>
         function myFunction() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("stc-cust-project-table");
-            tr = table.getElementsByTagName("tr");
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[1];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }       
+          var input = document.getElementById("searchproject");
+          var filter = input.value.toLowerCase();
+          var nodes = document.getElementsByClassName('projecttarget');
+
+          for (i = 0; i < nodes.length; i++) {
+            if (nodes[i].innerText.toLowerCase().includes(filter)) {
+              nodes[i].style.display = "block";
+            } else {
+              nodes[i].style.display = "none";
             }
+          }
         }
 
         $(document).ready(function(e){
