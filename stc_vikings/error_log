@@ -3096,3 +3096,277 @@
 [31-Oct-2023 09:31:13 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
 [31-Oct-2023 09:45:07 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
 [31-Oct-2023 09:45:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[31-Oct-2023 17:01:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[31-Oct-2023 17:01:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[31-Oct-2023 11:31:43 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[31-Oct-2023 11:31:43 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[31-Oct-2023 12:41:24 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[31-Oct-2023 12:41:24 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[31-Oct-2023 14:21:03 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[31-Oct-2023 14:21:03 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[01-Nov-2023 03:13:18 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[01-Nov-2023 03:13:18 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[01-Nov-2023 09:10:56 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[01-Nov-2023 09:10:56 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[01-Nov-2023 03:41:02 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[01-Nov-2023 03:41:02 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[01-Nov-2023 09:18:17 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[01-Nov-2023 09:18:17 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[01-Nov-2023 09:27:00 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[01-Nov-2023 09:27:00 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[01-Nov-2023 03:57:02 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[01-Nov-2023 03:57:02 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[01-Nov-2023 03:57:48 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[01-Nov-2023 03:57:48 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[01-Nov-2023 03:57:48 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[01-Nov-2023 03:57:48 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[01-Nov-2023 03:57:48 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[01-Nov-2023 09:07:05 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[01-Nov-2023 09:07:05 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[01-Nov-2023 12:21:58 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[01-Nov-2023 12:21:58 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[02-Nov-2023 09:31:23 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[02-Nov-2023 09:31:23 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 04:05:28 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 04:05:28 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[02-Nov-2023 09:49:23 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[02-Nov-2023 09:49:23 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 04:19:48 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 04:19:48 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[02-Nov-2023 10:55:54 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[02-Nov-2023 10:55:54 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 05:42:27 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 05:42:27 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[02-Nov-2023 11:37:13 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 11:37:13 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 11:37:13 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 11:37:37 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 11:37:37 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 11:37:37 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 11:38:10 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 11:38:10 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 11:38:10 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 11:50:18 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[02-Nov-2023 11:50:18 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 06:25:02 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 06:25:02 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[02-Nov-2023 12:14:35 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:14:35 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:14:35 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:17:35 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:17:35 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:17:35 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:17:54 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:17:54 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:17:54 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:18:17 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:18:17 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:18:17 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:18:39 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:18:39 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:18:39 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:18:59 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:18:59 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:18:59 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:19:21 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:19:21 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:19:21 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:19:44 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:19:44 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:19:44 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:20:08 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:20:08 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:20:08 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:53:10 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:53:10 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:53:10 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:53:33 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:53:33 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:53:33 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:53:54 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:53:54 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:53:54 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:54:16 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:54:16 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:54:16 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:54:36 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:54:36 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:54:36 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:54:59 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:54:59 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:54:59 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:55:20 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:55:20 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:55:20 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:55:44 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:55:44 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:55:44 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:56:07 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:56:07 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:56:07 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:56:31 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:56:31 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:56:31 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:56:56 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:56:56 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:56:56 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:57:19 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:57:19 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 12:57:19 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:15:47 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:15:47 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:15:47 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:16:06 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:16:06 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:16:06 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:16:25 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:16:25 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:16:25 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:16:46 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:16:46 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:16:46 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:17:09 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:17:09 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:17:09 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:17:31 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:17:31 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:17:31 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:18:30 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:18:30 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:18:30 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:18:52 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:18:52 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:18:52 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:19:16 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:19:16 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:19:16 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:19:41 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:19:41 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:19:41 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:20:03 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:20:03 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:20:03 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:20:24 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:20:24 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:20:24 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview.php on line 1287
+[02-Nov-2023 14:24:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[02-Nov-2023 14:24:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 08:54:54 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 08:54:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[02-Nov-2023 16:02:21 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[02-Nov-2023 16:02:21 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 10:34:18 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 10:34:18 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[02-Nov-2023 10:55:23 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 10:55:23 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[02-Nov-2023 10:55:23 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[02-Nov-2023 10:55:23 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[02-Nov-2023 10:55:23 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[02-Nov-2023 16:38:37 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[02-Nov-2023 16:38:37 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 11:08:41 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 11:08:41 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[02-Nov-2023 16:41:57 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[02-Nov-2023 16:41:57 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 15:16:43 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 15:16:43 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[02-Nov-2023 17:12:56 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[02-Nov-2023 17:12:56 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[03-Nov-2023 03:33:04 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 03:33:04 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[03-Nov-2023 09:13:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[03-Nov-2023 09:13:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 03:47:08 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 03:47:08 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[03-Nov-2023 09:30:06 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[03-Nov-2023 09:30:06 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 04:00:08 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 04:00:08 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[03-Nov-2023 09:56:15 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[03-Nov-2023 09:56:15 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 04:26:19 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 04:26:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[03-Nov-2023 11:01:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[03-Nov-2023 11:01:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 05:37:43 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 05:37:43 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[03-Nov-2023 14:42:35 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[03-Nov-2023 14:42:35 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 09:12:38 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[03-Nov-2023 09:12:38 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[04-Nov-2023 09:23:33 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[04-Nov-2023 09:23:33 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 03:54:09 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 03:54:09 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[04-Nov-2023 14:17:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[04-Nov-2023 14:17:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 11:10:19 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 11:10:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[04-Nov-2023 11:17:27 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 11:17:27 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[04-Nov-2023 11:17:27 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[04-Nov-2023 11:17:27 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[04-Nov-2023 11:17:27 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[04-Nov-2023 17:49:05 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[04-Nov-2023 17:49:05 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 12:19:07 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 12:19:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[04-Nov-2023 17:57:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[04-Nov-2023 17:57:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 13:13:26 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 13:13:26 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[04-Nov-2023 13:15:11 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 13:15:11 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[04-Nov-2023 13:16:17 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 13:16:17 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[04-Nov-2023 13:17:15 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 13:17:15 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[04-Nov-2023 13:27:31 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[04-Nov-2023 13:27:31 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[05-Nov-2023 11:14:18 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[05-Nov-2023 11:14:18 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[05-Nov-2023 11:14:18 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[05-Nov-2023 11:14:18 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[05-Nov-2023 11:14:18 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[05-Nov-2023 11:14:18 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[05-Nov-2023 11:14:22 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[05-Nov-2023 11:14:22 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[05-Nov-2023 11:14:22 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[05-Nov-2023 11:14:22 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[05-Nov-2023 11:14:22 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[05-Nov-2023 11:14:22 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[05-Nov-2023 13:50:23 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[05-Nov-2023 13:50:23 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[05-Nov-2023 13:50:23 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[06-Nov-2023 03:46:51 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 03:46:51 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[06-Nov-2023 10:14:21 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[06-Nov-2023 10:14:21 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 04:44:23 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 04:44:23 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[06-Nov-2023 05:06:13 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 05:06:13 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[06-Nov-2023 05:06:13 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[06-Nov-2023 05:06:13 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[06-Nov-2023 05:06:13 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[06-Nov-2023 10:36:15 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[06-Nov-2023 10:36:15 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 13:53:44 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[06-Nov-2023 13:53:44 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[06-Nov-2023 13:53:44 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[06-Nov-2023 14:12:48 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[06-Nov-2023 14:12:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 14:22:08 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[06-Nov-2023 14:22:08 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 08:52:26 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 08:52:26 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[06-Nov-2023 09:32:59 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 09:32:59 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[06-Nov-2023 11:09:46 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 11:09:46 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[06-Nov-2023 17:19:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[06-Nov-2023 17:19:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 11:49:15 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 11:49:15 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[06-Nov-2023 12:22:04 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 12:22:04 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167

@@ -947,3 +947,55 @@
 [30-Oct-2023 16:26:16 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
 [31-Oct-2023 09:17:49 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
 [31-Oct-2023 09:23:55 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[31-Oct-2023 17:02:58 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[01-Nov-2023 09:11:16 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[01-Nov-2023 09:33:30 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[01-Nov-2023 14:11:56 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[02-Nov-2023 09:35:53 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[02-Nov-2023 09:51:27 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[02-Nov-2023 11:12:40 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[02-Nov-2023 11:55:36 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[02-Nov-2023 14:25:02 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[02-Nov-2023 16:04:47 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[02-Nov-2023 16:38:48 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[02-Nov-2023 19:12:10 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[03-Nov-2023 09:17:51 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[03-Nov-2023 09:30:13 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[03-Nov-2023 09:37:33 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[03-Nov-2023 09:56:23 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[03-Nov-2023 14:42:43 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[04-Nov-2023 09:24:27 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[04-Nov-2023 09:43:56 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[04-Nov-2023 10:59:36 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[04-Nov-2023 11:42:19 Asia/Kolkata] PHP Notice:  Undefined variable: bjornebegval in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 1407
+[04-Nov-2023 11:42:19 Asia/Kolkata] PHP Notice:  Undefined variable: bjorneendval in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 1407
+[04-Nov-2023 11:42:19 Asia/Kolkata] PHP Notice:  Undefined variable: bjornebegval in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 1412
+[04-Nov-2023 11:42:19 Asia/Kolkata] PHP Notice:  Undefined variable: bjorneendval in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 1419
+[04-Nov-2023 11:42:53 Asia/Kolkata] PHP Notice:  Undefined variable: bjornebegval in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 1407
+[04-Nov-2023 11:42:53 Asia/Kolkata] PHP Notice:  Undefined variable: bjorneendval in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 1407
+[04-Nov-2023 11:42:53 Asia/Kolkata] PHP Notice:  Undefined variable: bjornebegval in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 1412
+[04-Nov-2023 11:42:53 Asia/Kolkata] PHP Notice:  Undefined variable: bjorneendval in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 1419
+[04-Nov-2023 16:41:27 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[04-Nov-2023 18:57:42 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[05-Nov-2023 13:43:48 Asia/Kolkata] PHP Notice:  Undefined index: stc_direct_challan_sess in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2876
+[05-Nov-2023 13:43:48 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2876
+[05-Nov-2023 13:44:23 Asia/Kolkata] PHP Notice:  Undefined index: stc_direct_challan_sess in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2876
+[05-Nov-2023 13:44:23 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2876
+[05-Nov-2023 13:47:05 Asia/Kolkata] PHP Notice:  Undefined index: stc_direct_challan_sess in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2867
+[05-Nov-2023 13:47:05 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2867
+[05-Nov-2023 13:47:21 Asia/Kolkata] PHP Notice:  Undefined index: stc_direct_challan_sess in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2876
+[05-Nov-2023 13:47:21 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2876
+[05-Nov-2023 13:47:36 Asia/Kolkata] PHP Notice:  Undefined index: stc_direct_challan_sess in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2876
+[05-Nov-2023 13:47:36 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2876
+[06-Nov-2023 09:16:58 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[06-Nov-2023 10:14:31 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[06-Nov-2023 10:36:33 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[06-Nov-2023 10:43:38 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[06-Nov-2023 11:20:38 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 760
+[06-Nov-2023 14:22:56 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[06-Nov-2023 14:23:10 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 760
+[06-Nov-2023 15:03:08 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[06-Nov-2023 15:16:36 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 760
+[06-Nov-2023 16:14:26 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 760
+[06-Nov-2023 16:53:10 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691
+[06-Nov-2023 17:19:21 Asia/Kolkata] PHP Notice:  Undefined index: month in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_lothbrok.php on line 691

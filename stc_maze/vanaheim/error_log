@@ -8,3 +8,5 @@
 [16-Oct-2023 15:52:09 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
 [16-Oct-2023 15:52:09 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1578
 [16-Oct-2023 15:52:09 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[04-Nov-2023 14:18:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_silent_challan_sess in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1726
+[04-Nov-2023 14:18:27 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1726
