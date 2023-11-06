@@ -325,8 +325,9 @@ class transformers extends tesseract{
 			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
 			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
 		");
-		$manager = "AND (";
+		$manager = "";
 		if(mysqli_num_rows($optimusprimeqry)>0){
+			$manager = "AND (";
 			$num_count = mysqli_num_rows($optimusprimeqry);
 			$counter = $num_count;
 			$sl=0;
@@ -598,7 +599,7 @@ class transformers extends tesseract{
 				</tbody>
 			</table>
 		';
-		return $optimusprime;
+		return $query;
 	}
 
 	public function stc_std_call_perticular($std_id){
