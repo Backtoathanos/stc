@@ -10,6 +10,7 @@ if(isset($_SESSION["stc_agent_id"])){
 }else{ 
     header("Location:index.html"); 
 } 
+include_once("../MCU/db.php");
 ?> 
 <!doctype html>
 <html lang="en">
@@ -163,21 +164,21 @@ if(isset($_SESSION["stc_agent_id"])){
                             </div>
                         </div>            
                         <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-0" data-toggle="tab" href="#create-project">
                                     <span>Create Project <b>X</b></span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="nav-item">
                                 <a role="tab" class="nav-link active" id="tab-1" data-toggle="tab" href="#show-project">
                                     <span>Show Project <b>O</b></span>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#check-linkup">
                                     <span>Add Project Details <b><i class="fas fa-plus"></i></b></span>
                                 </a>
-                            </li>
+                            </li> -->
                             <?php 
                                 if($_SESSION['stc_agent_role']==3){
                             ?>   
@@ -196,159 +197,30 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <span>Add Job Type <b><i class="fa fa-tasks"></i></b></span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-5" data-toggle="tab" href="#dept">
+                                    <span>Add Department <b><i class="fa fa-tasks"></i></b></span>
+                                </a>
+                            </li>
                             <?php      
                                 }
                             ?>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane tabs-animation fade" id="create-project" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Create Project</h5>
-                                                <form class="create-project-form">
-                                                    <div class="row">
-                                                        <div class="col-sm-12 col-md-12">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class=""><b>Customer name</b></label>
-                                                                <select name="stc_cust_pro_cust" class="form-control" required>
-                                                                    <?php 
-                                                                        include_once("../MCU/db.php");
-                                                                        $cityqry=mysqli_query($con, "
-                                                                            SELECT `stc_customer_id`,`stc_customer_name` FROM `stc_customer`
-                                                                            INNER JOIN `stc_agent_requested_customer`
-                                                                            ON `stc_customer_id`=`stc_agent_requested_customer_cust_id`
-                                                                            WHERE `stc_agent_requested_customer_agent_id`='".$_SESSION['stc_agent_id']."'
-
-                                                                        ");
-                                                                        foreach($cityqry as $custrow){
-                                                                            echo '<option value="'.$custrow['stc_customer_id'].'">'.$custrow['stc_customer_name'].'</option>';
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Project title/ Site name</b></label>
-                                                                <input placeholder="Enter your project name" type="text" name="stc_cust_pro_title" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-sm-12 col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Project Reference No</b></label>
-                                                                <input placeholder="Enter your project reference. Ex:- GTO/123/21-22 or PWOG/123/21-22" type="text" name="stc_cust_pro_refr" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                    </div>                                                        
-                                                    <div class="position-relative form-group">
-                                                        <label for="exampleText" class="">Project address</b></label>
-                                                        <textarea id="exampleText" class="form-control" name="stc_cust_pro_address" placeholder="Enter your project address" required></textarea>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class=""><b>City</b></label>
-                                                                <select name="stc_cust_pro_city" class="form-control" required>
-                                                                    <?php 
-                                                                        $cityqry=mysqli_query($con, "
-                                                                            SELECT * FROM `stc_city` ORDER BY `stc_city_name` ASC
-                                                                        ");
-                                                                        foreach($cityqry as $cityrow){
-                                                                            echo '<option value="'.$cityrow['stc_city_id'].'">'.$cityrow['stc_city_name'].'</option>';
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class=""><b>State</b></label>
-                                                                <select name="stc_cust_pro_state" class="form-control" required>
-                                                                    <?php 
-                                                                        include_once("../MCU/db.php");
-                                                                        $cityqry=mysqli_query($con, "
-                                                                            SELECT * FROM `stc_state` ORDER BY `stc_state_name` ASC
-                                                                        ");
-                                                                        foreach($cityqry as $cityrow){
-                                                                            echo '<option value="'.$cityrow['stc_state_id'].'">'.$cityrow['stc_state_name'].'</option>';
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Responsible person</b></label>
-                                                                <input placeholder="Enter your responsible person name" name="stc_cust_pro_responperson" type="text" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class=""><b>Supervisor Quantity</b></label>
-                                                                <select id="exampleSelect" name="stc_cust_pro_supquantity" class="form-control" required>
-                                                                    <option value="1">1</option>
-                                                                    <option value="2">2</option>
-                                                                    <option value="3">3</option>
-                                                                    <option value="4">4</option>
-                                                                    <option value="5">5</option>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class=""><b>Project begining date</b></label>
-                                                                <input type="date" placeholder="Please select project beg date" name="stc_cust_pro_begdate" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class=""><b>Project ending date</b></label>
-                                                                <input type="date" placeholder="Please select project beg date" name="stc_cust_pro_enddate" class="mb-2 form-control" required>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row">                                                        
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleEmail" class="">Begining budget</b></label>
-                                                                <div class="input-group">
-                                                                    <div class="input-group-prepend">
-                                                                        <span class="input-group-text"><i class="fas fa-rupee-sign"></i></span>
-                                                                    </div>
-                                                                    <input placeholder="Enter project begining budget" type="text" name="stc_cust_pro_begbudget" class="form-control"  required>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class=""><b>Status</b></label>
-                                                                <select name="stc_cust_pro_status" class="form-control" required>
-                                                                    <option value="1">Active</option>
-                                                                    <option value="0">off</option>
-                                                                </select>
-                                                                <input type="hidden" name="stc_cust_project_action">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <button class="mt-1 btn btn-primary">Add</button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="tab-pane tabs-animation fade show active" id="show-project" role="tabpanel">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card" style="width: auto;overflow-x: auto; white-space: nowrap;">
                                             <div class="card-body"><h5 class="card-title">Show Project</h5>
+                                                <!-- <input type="text" class="form-control all_project_search mb-3" id="searchproject" onkeyup="myFunction()" placeholder="Search By Project Name"> -->
+                                                <div class="row mb-3 mt-3">
+                                                    <div class="col-md-3">
+                                                        <button type="button" class="btn mr-2 mb-2 btn-primary form-control stcAdduser" data-toggle="modal" data-target=".bd-addproject-modal-lg"><i class="fas fa-plus-circle"></i> Add Project</button>
+                                                    </div>
+                                                    <div class="col-md-9">
                                                 <input type="text" class="form-control all_project_search mb-3" id="searchproject" onkeyup="myFunction()" placeholder="Search By Project Name">
+                                                    </div>                                      
+                                                </div>
                                                 <div class="row">
                                                     <?php
                                                         $get_project_qry=mysqli_query($con, "
@@ -399,10 +271,10 @@ if(isset($_SESSION["stc_agent_id"])){
                                                             $indust='';
                                                             if($_SESSION['stc_agent_role']==3){
                                                                 $indust='
-                                                                    <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-ahu-show-ret" style="font-size: 25px;color: #cc7676;">
+                                                                    <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Project AHU Details" class="stc-project-ahu-show-ret" style="font-size: 25px;color: #cc7676;">
                                                                         <i class="fas fa-cogs"></i>
                                                                     </a>
-                                                                    <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-pump-show-ret" style="font-size: 25px;color: #cc7676;">
+                                                                    <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Project Pump Details" class="stc-project-pump-show-ret" style="font-size: 25px;color: #cc7676;">
                                                                         <i class="fa fa-industry"></i>
                                                                     </a>
                                                                 ';
@@ -453,8 +325,9 @@ if(isset($_SESSION["stc_agent_id"])){
 
                                                                             </h3>
                                                                             <div class="icon-block">
-                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-edit-ret" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-edit"></i></a>
-                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-show-ret" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-eye"></i></a>
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Edit Project" class="stc-project-edit-ret" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-edit"></i></a>
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "View Project Details" class="stc-project-show-ret" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-eye"></i></a>
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Add Project Details" class="add-project-details-btn" style="font-size: 25px;color: #cc7676;" data-toggle="modal" data-target=".bd-addprojectdetails-modal-lg"> <i class="fas fa-file"></i></a>
                                                                                 '.$indust.'
                                                                             </div>
                                                                         </div>
@@ -469,188 +342,6 @@ if(isset($_SESSION["stc_agent_id"])){
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="tab-pane tabs-animation fade" id="check-linkup" role="tabpanel">
-                                <form class="stc-ag-pro-det-form">
-                                    <div class="row">
-                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                            <div class="main-card mb-3 card">
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                                            <h5 class="card-title" align="center">Project Details</h5>
-                                                        </div>
-                                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                                            <h5 class="card-title">Project Name</h5>
-                                                            <div class="position-relative form-group">
-                                                                <select class="form-control stc-ag-project-id">
-                                                                    <?php
-                                                                        $pro_qry=mysqli_query($con, "
-                                                                            SELECT 
-                                                                                `stc_cust_project_id`,
-                                                                                `stc_cust_project_title`
-                                                                            FROM `stc_cust_project` 
-                                                                            WHERE `stc_cust_project_createdby`='".$_SESSION["stc_agent_id"]."'
-                                                                        ");
-                                                                        if(mysqli_num_rows($pro_qry)>0){
-                                                                            echo "<option>Please Select Project!!!</option>";
-                                                                            foreach($pro_qry as $prorow){
-                                                                                echo "<option value='".$prorow['stc_cust_project_id']."'>".$prorow['stc_cust_project_title']."</option>";
-                                                                            }
-                                                                        }else{
-                                                                            echo "<option>No Project Found!!!</option>";
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">Customer Name</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="text" class="form-control stc-ag-cust-name" placeholder="Enter Customer Name">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">Customer Email Id</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="text" class="form-control stc-ag-cust-emailid" placeholder="Enter Email Id">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4 col-sm-12 col-xl-4">
-                                                            <h5 class="card-title">Customer Contact Number</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="number" class="form-control stc-ag-cont-number" placeholder="Enter Customer Contact Number">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4 col-sm-12 col-xl-4">
-                                                            <h5 class="card-title">Purpose</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="text" class="form-control stc-ag-purpose" placeholder="Enter Purpose">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-4 col-sm-12 col-xl-4">
-                                                            <h5 class="card-title">Ref Contact</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="text" class="form-control stc-ag-ref-contact" placeholder="Enter Reference contact">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                                            <h5 class="card-title">Job Details</h5>
-                                                            <div class="position-relative form-group">
-                                                                <textarea class="form-control stc-ag-job-details" placeholder="Enter Job Details"></textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                            <div class="main-card mb-3 card">
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                                            <h5 class="card-title" align="center">Quotation Details</h5>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">Quotation Number</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="text" class="form-control stc-ag-quot-number" placeholder="Enter Quotation Number">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">Quotation Date</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="date" class="form-control stc-ag-quote-date" placeholder="Enter Quotation Date">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">Basic Value</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="number" class="form-control stc-ag-basic-value" placeholder="Enter Basic Value">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">GST Value</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="number" class="form-control stc-ag-gst-value" placeholder="Enter GST Value">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">Quotation By</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="text" class="form-control stc-ag-quoted-by" placeholder="Enter Quotation By">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">Mode of Quotation</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="text" class="form-control stc-ag-mode-of-quotation" placeholder="Enter Mode of Quotation">
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                            <div class="main-card mb-3 card">
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                                            <h5 class="card-title" align="center">Customer Feedback</h5>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">Target Price</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="number" class="form-control stc-ag-target-price" placeholder="Enter Target Price">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">Status</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="text" class="form-control stc-ag-status" placeholder="Enter Status">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                                            <h5 class="card-title">Remarks</h5>
-                                                            <div class="position-relative form-group">
-                                                                <textarea class="form-control stc-ag-remarks" placeholder="Enter Remarks">
-                                                                </textarea>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                            <div class="main-card mb-3 card">
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                                            <h5 class="card-title" align="center">Order Details</h5>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">PO Number</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="text" class="form-control stc-ag-po-number" placeholder="Enter PO Number">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-6 col-sm-12 col-xl-6">
-                                                            <h5 class="card-title">PO Value</h5>
-                                                            <div class="position-relative form-group">
-                                                                <input type="number" class="form-control stc-ag-po-value" placeholder="Enter PO Value">
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-12 col-sm-12 col-xl-12">
-                                                            <div class="position-relative form-group">
-                                                                <button type="submit" class="form-control btn btn-primary stc-ag-save-project-record">Save</button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </form>
                             </div>
                             <div class="tab-pane tabs-animation fade" id="ahu-details" role="tabpanel">
                                 <div class="row">
@@ -968,6 +659,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                         <table class="table table-hover table-bordered table-responsive" id="job-type-table">
                                                             <thead>
                                                                 <tr>
+                                                                    <th>Sl No</th>
                                                                     <th>Job Type</th>
                                                                     <th>Job Varities</th>
                                                                     <th>Action</th>
@@ -975,8 +667,64 @@ if(isset($_SESSION["stc_agent_id"])){
                                                             </thead>
                                                             <tbody class="job-type-show">                                                         
                                                                 <tr>
-                                                                    <td>Job Type</td>
-                                                                    <td>Job Varities</td>
+                                                                    <td>Loading..</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane tabs-animation fade" id="dept" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body"><h5 class="card-title">Add Department</h5>
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-6">
+                                                        <div class="position-relative form-group">
+                                                            <label for="exampleSelect" class=""><b>Location</b></label>
+                                                            <input type="text" class="form-control stc_dept_locname" placeholder="Enter Location Name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-6">
+                                                        <div class="position-relative form-group">
+                                                            <label for="exampleSelect" class=""><b>Department</b></label>
+                                                            <input type="text" class="form-control stc_dept_deptname" placeholder="Enter Department Name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-12 col-md-12">
+                                                        <div class="position-relative form-group">
+                                                            <input type="submit" class="form-control btn btn-success stc_cus_dept" value="Save">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body"><h5 class="card-title">Show Department</h5>
+                                                <div class="row">
+                                                    <div class="col-sm-12 col-md-6">
+                                                        <input type="text" class="form-control" id="department-tableInput"  placeholder="search by choice">
+                                                        <table class="table table-hover table-bordered table-responsive" id="department-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Sl No</th>
+                                                                    <th>Location</th>
+                                                                    <th>Department</th>
+                                                                    <th>Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody class="department-show">                                                         
+                                                                <tr>
+                                                                    <td>Loading..</td>
                                                                 </tr>
                                                             </tbody>
                                                         </table>
@@ -1434,7 +1182,7 @@ if(isset($_SESSION["stc_agent_id"])){
                         // console.log(res_data);
                         var response=res_data.trim();
                         if(response=="Login"){
-                            window.location.reload();
+                            stc_cust_job_type();
                         }else if(response=="jtype"){
                             alert("Please select Job type first!!!");
                         }else if(response=="No"){
@@ -1479,6 +1227,58 @@ if(isset($_SESSION["stc_agent_id"])){
                 });
             });
 
+            
+            // save job type            
+            $('.stc_cus_dept').click(function(e){
+                e.preventDefault();
+                var stc_locname = $('.stc_dept_locname').val();
+                var stc_deptname = $('.stc_dept_deptname').val();
+
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_ag_rproject_department:1,
+                        stc_locname:stc_locname,
+                        stc_deptname:stc_deptname
+                    },
+                    dataType    : "JSON",
+                    success     : function(res_data){
+                        // console.log(res_data);
+                        var response=res_data.trim();
+                        if(response=="Login"){
+                            stc_cust_department();
+                        }else if(response=="empty"){
+                            alert("Please fill both field!!!");
+                        }else if(response=="No"){
+                            alert("Please check entered details properly !!!");
+                        }else if(response=="duplicate"){
+                            alert("This record already saved!!!");
+                        }else if(response=="yes"){
+                            alert("Department saved.");
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+
+            // department show
+            stc_cust_department();
+            function stc_cust_department(){
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_ag_department_show:1
+                    },
+                    dataType    : "JSON",
+                    success     : function(res_data){
+                        // console.log(res_data);
+                        $('.department-show').html(res_data);
+                    }
+                });
+            }
+
             // job type show
             stc_cust_job_type();
             function stc_cust_job_type(){
@@ -1495,6 +1295,45 @@ if(isset($_SESSION["stc_agent_id"])){
                     }
                 });
             }
+            
+            $('body').delegate('.dept-edit-btn', 'click', function(e){
+                e.preventDefault();
+                var id=$(this).attr('id');
+                $(this).hide();
+                $('.res-hidedl'+id).show();
+                $('.res-hidedd'+id).show();
+                $('.res-hide'+id).show();
+            });
+
+            $('body').delegate('.dept-save-btn', 'click', function(e){
+                e.preventDefault();
+                var jobtid=$(this).attr('id');
+                var loc=$('.res-hidedl'+jobtid).val();
+                var dept=$('.res-hidedd'+jobtid).val();
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_ag_department_show_save:1,
+                        jobtid:jobtid,
+                        loc:loc,
+                        dept:dept
+                    },
+                    dataType    : "JSON",
+                    success     : function(res_data){
+                        // console.log(res_data);
+                        alert(res_data);
+                        window.location.reload();
+                    }
+                });
+            });
+
+            $("#department-tableInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#department-table tbody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
 
             $('body').delegate('.job-type-edit-btn', 'click', function(e){
                 e.preventDefault();
@@ -1534,10 +1373,371 @@ if(isset($_SESSION["stc_agent_id"])){
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 });
             });
+
+            $("#job-type-tableInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#job-type-table tbody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+            
+            $('body').delegate('.add-project-details-btn', 'click', function(e){
+                var value = $(this).attr('id');
+                $('.stc-ag-project-id').val(value);
+
+            });
         });
     </script>
 </body>
 </html>
+
+<div class="modal fade bd-addproject-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Project</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body"><h5 class="card-title">Create Project</h5>
+                                <form class="create-project-form">
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-12">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleSelect" class=""><b>Customer name</b></label>
+                                                <select name="stc_cust_pro_cust" class="form-control" required>
+                                                    <?php 
+                                                        $cityqry=mysqli_query($con, "
+                                                            SELECT `stc_customer_id`,`stc_customer_name` FROM `stc_customer`
+                                                            INNER JOIN `stc_agent_requested_customer`
+                                                            ON `stc_customer_id`=`stc_agent_requested_customer_cust_id`
+                                                            WHERE `stc_agent_requested_customer_agent_id`='".$_SESSION['stc_agent_id']."'
+
+                                                        ");
+                                                        foreach($cityqry as $custrow){
+                                                            echo '<option value="'.$custrow['stc_customer_id'].'">'.$custrow['stc_customer_name'].'</option>';
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleEmail" class="">Project title/ Site name</b></label>
+                                                <input placeholder="Enter your project name" type="text" name="stc_cust_pro_title" class="mb-2 form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleEmail" class="">Project Reference No</b></label>
+                                                <input placeholder="Enter your project reference. Ex:- GTO/123/21-22 or PWOG/123/21-22" type="text" name="stc_cust_pro_refr" class="mb-2 form-control" required>
+                                            </div>
+                                        </div>
+                                    </div>                                                        
+                                    <div class="position-relative form-group">
+                                        <label for="exampleText" class="">Project address</b></label>
+                                        <textarea id="exampleText" class="form-control" name="stc_cust_pro_address" placeholder="Enter your project address" required></textarea>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleSelect" class=""><b>City</b></label>
+                                                <select name="stc_cust_pro_city" class="form-control" required>
+                                                    <?php 
+                                                        $cityqry=mysqli_query($con, "
+                                                            SELECT * FROM `stc_city` ORDER BY `stc_city_name` ASC
+                                                        ");
+                                                        foreach($cityqry as $cityrow){
+                                                            echo '<option value="'.$cityrow['stc_city_id'].'">'.$cityrow['stc_city_name'].'</option>';
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleSelect" class=""><b>State</b></label>
+                                                <select name="stc_cust_pro_state" class="form-control" required>
+                                                    <?php 
+                                                        include_once("../MCU/db.php");
+                                                        $cityqry=mysqli_query($con, "
+                                                            SELECT * FROM `stc_state` ORDER BY `stc_state_name` ASC
+                                                        ");
+                                                        foreach($cityqry as $cityrow){
+                                                            echo '<option value="'.$cityrow['stc_state_id'].'">'.$cityrow['stc_state_name'].'</option>';
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleEmail" class="">Responsible person</b></label>
+                                                <input placeholder="Enter your responsible person name" name="stc_cust_pro_responperson" type="text" class="mb-2 form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleSelect" class=""><b>Supervisor Quantity</b></label>
+                                                <select id="exampleSelect" name="stc_cust_pro_supquantity" class="form-control" required>
+                                                    <option value="1">1</option>
+                                                    <option value="2">2</option>
+                                                    <option value="3">3</option>
+                                                    <option value="4">4</option>
+                                                    <option value="5">5</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleSelect" class=""><b>Project begining date</b></label>
+                                                <input type="date" placeholder="Please select project beg date" name="stc_cust_pro_begdate" class="mb-2 form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleSelect" class=""><b>Project ending date</b></label>
+                                                <input type="date" placeholder="Please select project beg date" name="stc_cust_pro_enddate" class="mb-2 form-control" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">                                                        
+                                        <div class="col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleEmail" class="">Begining budget</b></label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fas fa-rupee-sign"></i></span>
+                                                    </div>
+                                                    <input placeholder="Enter project begining budget" type="text" name="stc_cust_pro_begbudget" class="form-control"  required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleSelect" class=""><b>Status</b></label>
+                                                <select name="stc_cust_pro_status" class="form-control" required>
+                                                    <option value="1">Active</option>
+                                                    <option value="0">off</option>
+                                                </select>
+                                                <input type="hidden" name="stc_cust_project_action">
+                                            </div>
+                                        </div>
+                                    </div>
+                                                    
+                                    <button class="mt-1 btn btn-primary form-control">Save</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-addprojectdetails-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Project Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="stc-ag-pro-det-form">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-xl-12">
+                            <div class="main-card mb-3 card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-xl-12">
+                                            <h5 class="card-title" align="center">Add Project Details</h5>
+                                        </div>
+                                        <div class="col-md-12 col-sm-12 col-xl-12">
+                                            <h5 class="card-title">Project Name</h5>
+                                            <div class="position-relative form-group">
+                                                <select class="form-control stc-ag-project-id" disabled>
+                                                    <?php
+                                                        $pro_qry=mysqli_query($con, "
+                                                            SELECT 
+                                                                `stc_cust_project_id`,
+                                                                `stc_cust_project_title`
+                                                            FROM `stc_cust_project` 
+                                                            WHERE `stc_cust_project_createdby`='".$_SESSION["stc_agent_id"]."'
+                                                        ");
+                                                        if(mysqli_num_rows($pro_qry)>0){
+                                                            echo "<option>Please Select Project!!!</option>";
+                                                            foreach($pro_qry as $prorow){
+                                                                echo "<option value='".$prorow['stc_cust_project_id']."'>".$prorow['stc_cust_project_title']."</option>";
+                                                            }
+                                                        }else{
+                                                            echo "<option>No Project Found!!!</option>";
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">Customer Name</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="text" class="form-control stc-ag-cust-name" placeholder="Enter Customer Name">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">Customer Email Id</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="text" class="form-control stc-ag-cust-emailid" placeholder="Enter Email Id">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-12 col-xl-4">
+                                            <h5 class="card-title">Customer Contact Number</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="number" class="form-control stc-ag-cont-number" placeholder="Enter Customer Contact Number">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-12 col-xl-4">
+                                            <h5 class="card-title">Purpose</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="text" class="form-control stc-ag-purpose" placeholder="Enter Purpose">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 col-sm-12 col-xl-4">
+                                            <h5 class="card-title">Ref Contact</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="text" class="form-control stc-ag-ref-contact" placeholder="Enter Reference contact">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 col-sm-12 col-xl-12">
+                                            <h5 class="card-title">Job Details</h5>
+                                            <div class="position-relative form-group">
+                                                <textarea class="form-control stc-ag-job-details" placeholder="Enter Job Details"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xl-12">
+                            <div class="main-card mb-3 card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-xl-12">
+                                            <h5 class="card-title" align="center">Quotation Details</h5>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">Quotation Number</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="text" class="form-control stc-ag-quot-number" placeholder="Enter Quotation Number">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">Quotation Date</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="date" class="form-control stc-ag-quote-date" placeholder="Enter Quotation Date">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">Basic Value</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="number" class="form-control stc-ag-basic-value" placeholder="Enter Basic Value">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">GST Value</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="number" class="form-control stc-ag-gst-value" placeholder="Enter GST Value">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">Quotation By</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="text" class="form-control stc-ag-quoted-by" placeholder="Enter Quotation By">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">Mode of Quotation</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="text" class="form-control stc-ag-mode-of-quotation" placeholder="Enter Mode of Quotation">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xl-12">
+                            <div class="main-card mb-3 card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-xl-12">
+                                            <h5 class="card-title" align="center">Customer Feedback</h5>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">Target Price</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="number" class="form-control stc-ag-target-price" placeholder="Enter Target Price">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">Status</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="text" class="form-control stc-ag-status" placeholder="Enter Status">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 col-sm-12 col-xl-12">
+                                            <h5 class="card-title">Remarks</h5>
+                                            <div class="position-relative form-group">
+                                                <textarea class="form-control stc-ag-remarks" placeholder="Enter Remarks">
+                                                </textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xl-12">
+                            <div class="main-card mb-3 card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12 col-xl-12">
+                                            <h5 class="card-title" align="center">Order Details</h5>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">PO Number</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="text" class="form-control stc-ag-po-number" placeholder="Enter PO Number">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 col-sm-12 col-xl-6">
+                                            <h5 class="card-title">PO Value</h5>
+                                            <div class="position-relative form-group">
+                                                <input type="number" class="form-control stc-ag-po-value" placeholder="Enter PO Value">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 col-sm-12 col-xl-12">
+                                            <div class="position-relative form-group">
+                                                <button type="submit" class="form-control btn btn-primary stc-ag-save-project-record">Save</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade bd-projectdetails-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
