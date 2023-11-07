@@ -569,6 +569,37 @@ class pirates_project extends tesseract{
 		return $blackpearl;
 	}
 
+	// save department
+	public function stc_department_set($stc_locname, $stc_deptname){
+		$blackpearl='';
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_status_down_list_department` 
+			WHERE `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $stc_locname)."' 
+			AND `stc_status_down_list_department_dept`='".mysqli_real_escape_string($this->stc_dbs, $stc_deptname)."'
+		");
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			$blackpearl='duplicate';
+		}else{
+			$blackpearl_qry_set=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_status_down_list_department`(
+					`stc_status_down_list_department_location`,
+					`stc_status_down_list_department_dept`,
+					`stc_status_down_list_department_created_by`
+				) VALUES(
+					'".mysqli_real_escape_string($this->stc_dbs, $stc_locname)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stc_deptname)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
+				)
+			");
+			if($blackpearl_qry_set){
+				$blackpearl="yes";
+			}else{
+				$blackpearl="No";
+			}
+		}
+		return $blackpearl;
+	}
+
 	// show job type
 	public function stc_job_type_show(){
 		$blackpearl='';
@@ -586,9 +617,12 @@ class pirates_project extends tesseract{
 			ORDER BY `stc_status_down_list_job_type_title` ASC
 		");
 		if(mysqli_num_rows($blackpearl_checkqry)>0){
+			$slno=0;
 			foreach($blackpearl_checkqry as $blackpearl_checkrow){
+				$slno++;
 				$blackpearl.='
 					<tr>
+						<td>'.$slno.'</td>
 						<td>'.$blackpearl_checkrow['stc_status_down_list_job_type_title'].'
 							<select class="form-control res-hidejt'.$blackpearl_checkrow['stc_status_down_list_job_type_id'].'" style="display:none;">
                         	    <option>ELECTRICAL</option>
@@ -620,6 +654,52 @@ class pirates_project extends tesseract{
 		return $blackpearl;
 	}
 
+	// show department
+	public function stc_department_show(){
+		$blackpearl='';
+		$blackpearl_checkqry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_status_down_list_department_id`,
+				`stc_status_down_list_department_date`,
+				`stc_status_down_list_department_location`,
+				`stc_status_down_list_department_dept`,
+				`stc_status_down_list_department_created_by`
+			FROM
+				`stc_status_down_list_department`
+			WHERE
+				`stc_status_down_list_department_created_by`='".mysqli_real_escape_string($this->stc_dbs, @$_SESSION['stc_agent_id'])."'
+			ORDER BY `stc_status_down_list_department_location` ASC
+		");
+		if(mysqli_num_rows($blackpearl_checkqry)>0){
+			$slno=0;
+			foreach($blackpearl_checkqry as $blackpearl_checkrow){
+				$slno++;
+				$blackpearl.='
+					<tr>
+						<td>'.$slno.'</td>
+						<td>'.$blackpearl_checkrow['stc_status_down_list_department_location'].'
+							<input type="text" class="form-control res-hidedl'.$blackpearl_checkrow['stc_status_down_list_department_id'].'" style="display:none;" value="'.$blackpearl_checkrow['stc_status_down_list_department_location'].'">
+						</td>
+						<td>'.$blackpearl_checkrow['stc_status_down_list_department_dept'].'
+							<input type="text" class="form-control res-hidedd'.$blackpearl_checkrow['stc_status_down_list_department_id'].'" style="display:none;" value="'.$blackpearl_checkrow['stc_status_down_list_department_dept'].'">
+						</td>
+						<td>
+							<a href="#" class="form-control req-hide dept-edit-btn" id="'.$blackpearl_checkrow['stc_status_down_list_department_id'].'">Edit</a>
+							<a href="#" class="form-control res-hide'.$blackpearl_checkrow['stc_status_down_list_department_id'].' dept-save-btn" style="display:none;" id="'.$blackpearl_checkrow['stc_status_down_list_department_id'].'">Save</a>
+						</td>
+					</tr>
+				';
+			}
+		}else{
+			$blackpearl.='
+				<tr>
+					<td colspan="3">No records found!!!</td>
+				</tr>
+			';
+		}
+		return $blackpearl;
+	}
+
 	// save
 	public function stc_job_type_show_update($jobtype, $jobvarities, $jobtid){
 		$blackpearl='';
@@ -630,6 +710,26 @@ class pirates_project extends tesseract{
 			$blackpearl="Job type updated!!!";
 		}else{
 			$blackpearl="Hmmm!!! Something went wrong, Job type not updated!!!";
+		}
+		return $blackpearl;
+	}
+
+	// save
+	public function stc_department_show_update($loc, $dept, $jobtid){
+		$blackpearl='';
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			UPDATE 
+				`stc_status_down_list_department` 
+			SET 
+				`stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $loc)."', 
+				`stc_status_down_list_department_dept`='".mysqli_real_escape_string($this->stc_dbs, $dept)."' 
+			WHERE 
+				`stc_status_down_list_department_id`='".mysqli_real_escape_string($this->stc_dbs, $jobtid)."'
+		");
+		if($blackpearl_qry){
+			$blackpearl="Department updated!!!";
+		}else{
+			$blackpearl="Hmmm!!! Something went wrong, Department not updated!!!";
 		}
 		return $blackpearl;
 	}
@@ -2928,6 +3028,23 @@ if(isset($_POST['stc_ag_rpump_details_remove'])){
 	echo json_encode($opobjcrproj);
 }
 
+// save job type
+if(isset($_POST['stc_ag_rproject_department'])){
+	$stc_locname=$_POST['stc_locname'];
+	$stc_deptname=$_POST['stc_deptname'];
+	$opobjcrproj='';
+	$objcrproj=new pirates_project();
+	if(empty($_SESSION['stc_agent_id'])){
+		$opobjcrproj = 'Login';
+	}elseif($stc_locname=="" || $stc_deptname==""){
+		$opobjcrproj = 'empty';
+	}else{
+		$opobjcrproj=$objcrproj->stc_department_set($stc_locname, $stc_deptname);
+	}
+	// echo $opobjcrproj;
+	echo json_encode($opobjcrproj);
+}
+
 // show job type
 if(isset($_POST['stc_ag_job_type_show'])){
 	$objcrproj=new pirates_project();
@@ -2936,6 +3053,19 @@ if(isset($_POST['stc_ag_job_type_show'])){
 		$opobjcrproj = 'Login';
 	}else{
 		$opobjcrproj=$objcrproj->stc_job_type_show();
+	}
+	// echo $opobjcrproj;
+	echo json_encode($opobjcrproj);
+}
+
+// show job type
+if(isset($_POST['stc_ag_department_show'])){
+	$objcrproj=new pirates_project();
+	$opobjcrproj='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$opobjcrproj = 'Login';
+	}else{
+		$opobjcrproj=$objcrproj->stc_department_show();
 	}
 	// echo $opobjcrproj;
 	echo json_encode($opobjcrproj);
@@ -2953,6 +3083,23 @@ if(isset($_POST['stc_ag_job_type_show_save'])){
 		$opobjcrproj = 'Login';
 	}else{
 		$opobjcrproj=$objcrproj->stc_job_type_show_update($jobtype, $jobvarities, $jobtid);
+	}
+	// echo $opobjcrproj;
+	echo json_encode($opobjcrproj);
+}
+
+// department update
+if(isset($_POST['stc_ag_department_show_save'])){
+	$loc=$_POST['loc'];
+	$dept=$_POST['dept'];
+	$jobtid=$_POST['jobtid'];
+
+	$objcrproj=new pirates_project();
+	$opobjcrproj='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$opobjcrproj = 'Login';
+	}else{
+		$opobjcrproj=$objcrproj->stc_department_show_update($loc, $dept, $jobtid);
 	}
 	// echo $opobjcrproj;
 	echo json_encode($opobjcrproj);
