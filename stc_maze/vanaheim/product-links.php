@@ -384,37 +384,39 @@ class aetherSale extends tesseract{
 				}elseif($inv_qty>$einv_qty){
 					$colortr='style="color: red;background: #ffcc00;font-weight: bold;"';
 				}
-				$odin.='
-					<tr '.$colortr.'>
-       					<td title="Item ID">
-       					  <p>'.$row["stc_product_id"].'</p>
-       					</td>
-       					<td title="Item Description">
-       					  <p>'.$row["stc_product_name"].'</p>
-       					</td>
-       					<td class="text-center" title="Item Category">
-       					  <p>'.$row["stc_cat_name"].'</p>
-       					</td>
-       					<td class="text-right" title="Total PO Quantity">
-       					  <p>'.number_format($total_po_qty, 2).'</p>
-       					</td>
-       					<td class="text-right" title="Total GRN Quantity">
-       					  <p>'.number_format($allgrn_qty, 2).'</p>
-       					</td>
-       					<td class="text-right" title="Inventory Quantity">
-       					  <p>'.number_format($inv_qty, 2).'</p>
-       					</td>
-       					<td class="text-right" title="Challan Quantity">
-       					  <p>'.number_format($challan_qty, 2).'</p>
-       					</td>
-       					<td class="text-right" title="Electronics Inventory Quantity">
-       					  <p>'.number_format($einv_qty, 2).'</p>
-       					</td>
-       					<td class="text-right" title="Electronics Challan Quantity">
-       					  <p>'.number_format($echallan_qty, 2).'</p>
-       					</td>
-            		</tr>         	
-		    	';		
+				if($echallan_qty>$challan_qty){
+					$odin.='
+						<tr '.$colortr.'>
+							<td title="Item ID">
+							<p>'.$row["stc_product_id"].'</p>
+							</td>
+							<td title="Item Description">
+							<p>'.$row["stc_product_name"].'</p>
+							</td>
+							<td class="text-center" title="Item Category">
+							<p>'.$row["stc_cat_name"].'</p>
+							</td>
+							<td class="text-right" title="Total PO Quantity">
+							<p>'.number_format($total_po_qty, 2).'</p>
+							</td>
+							<td class="text-right" title="Total GRN Quantity">
+							<p>'.number_format($allgrn_qty, 2).'</p>
+							</td>
+							<td class="text-right" title="Inventory Quantity">
+							<p>'.number_format($inv_qty, 2).'</p>
+							</td>
+							<td class="text-right" title="Challan Quantity">
+							<p>'.number_format($challan_qty, 2).'</p>
+							</td>
+							<td class="text-right" title="Electronics Inventory Quantity">
+							<p>'.number_format($einv_qty, 2).'</p>
+							</td>
+							<td class="text-right" title="Electronics Challan Quantity">
+							<p>'.number_format($echallan_qty, 2).'</p>
+							</td>
+						</tr>         	
+					';		
+				}
 
 		    	if($counter==15){
 		    		break;
