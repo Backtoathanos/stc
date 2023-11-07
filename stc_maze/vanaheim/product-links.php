@@ -384,7 +384,7 @@ class aetherSale extends tesseract{
 				}elseif($inv_qty>$einv_qty){
 					$colortr='style="color: red;background: #ffcc00;font-weight: bold;"';
 				}
-				if($echallan_qty>$challan_qty){
+				if($einv_qty>$inv_qty){
 					$odin.='
 						<tr '.$colortr.'>
 							<td title="Item ID">
