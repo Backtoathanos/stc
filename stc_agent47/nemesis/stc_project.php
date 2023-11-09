@@ -570,11 +570,12 @@ class pirates_project extends tesseract{
 	}
 
 	// save department
-	public function stc_department_set($stc_locname, $stc_deptname){
+	public function stc_department_set($stc_locname, $stc_deptname, $stc_dept_pro_id){
 		$blackpearl='';
 		$blackpearl_qry=mysqli_query($this->stc_dbs, "
 			SELECT * FROM `stc_status_down_list_department` 
-			WHERE `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $stc_locname)."' 
+			WHERE  `stc_status_down_list_department_loc_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_dept_pro_id)."'  
+			AND `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $stc_locname)."' 
 			AND `stc_status_down_list_department_dept`='".mysqli_real_escape_string($this->stc_dbs, $stc_deptname)."'
 		");
 		if(mysqli_num_rows($blackpearl_qry)>0){
@@ -582,10 +583,12 @@ class pirates_project extends tesseract{
 		}else{
 			$blackpearl_qry_set=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_status_down_list_department`(
+					`stc_status_down_list_department_loc_id`,
 					`stc_status_down_list_department_location`,
 					`stc_status_down_list_department_dept`,
 					`stc_status_down_list_department_created_by`
 				) VALUES(
+					'".mysqli_real_escape_string($this->stc_dbs, $stc_dept_pro_id)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $stc_locname)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $stc_deptname)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."'
@@ -611,7 +614,7 @@ class pirates_project extends tesseract{
 				`stc_status_down_list_job_type_sub_title`,
 				`stc_status_down_list_job_type_created_by`
 			FROM
-				`stc_status_down_list_job_type`
+				`stc_status_down_list_job_type`		
 			WHERE
 				`stc_status_down_list_job_type_created_by`='".mysqli_real_escape_string($this->stc_dbs, @$_SESSION['stc_agent_id'])."'
 			ORDER BY `stc_status_down_list_job_type_title` ASC
@@ -658,16 +661,19 @@ class pirates_project extends tesseract{
 	public function stc_department_show(){
 		$blackpearl='';
 		$blackpearl_checkqry=mysqli_query($this->stc_dbs, "
-			SELECT
+			SELECT 
 				`stc_status_down_list_department_id`,
 				`stc_status_down_list_department_date`,
+				`stc_cust_project_title`,
 				`stc_status_down_list_department_location`,
 				`stc_status_down_list_department_dept`,
 				`stc_status_down_list_department_created_by`
-			FROM
-				`stc_status_down_list_department`
-			WHERE
-				`stc_status_down_list_department_created_by`='".mysqli_real_escape_string($this->stc_dbs, @$_SESSION['stc_agent_id'])."'
+			FROM `stc_agent_requested_customer`
+			INNER JOIN `stc_cust_project`
+			ON `stc_cust_project_cust_id`=`stc_agent_requested_customer_cust_id`
+			INNER JOIN `stc_status_down_list_department`
+			ON `stc_status_down_list_department_loc_id`=`stc_cust_project_id`
+			WHERE `stc_agent_requested_customer_agent_id`='".mysqli_real_escape_string($this->stc_dbs, @$_SESSION['stc_agent_id'])."'
 			ORDER BY `stc_status_down_list_department_location` ASC
 		");
 		if(mysqli_num_rows($blackpearl_checkqry)>0){
@@ -677,6 +683,8 @@ class pirates_project extends tesseract{
 				$blackpearl.='
 					<tr>
 						<td>'.$slno.'</td>
+						<td>'.$blackpearl_checkrow['stc_cust_project_title'].'
+						</td>
 						<td>'.$blackpearl_checkrow['stc_status_down_list_department_location'].'
 							<input type="text" class="form-control res-hidedl'.$blackpearl_checkrow['stc_status_down_list_department_id'].'" style="display:none;" value="'.$blackpearl_checkrow['stc_status_down_list_department_location'].'">
 						</td>
@@ -1940,7 +1948,7 @@ class pirates_supervisor extends tesseract{
 						<th class="text-center VARIETIESOFJOB">VARIETIES OF JOB</th>
 						<th class="text-center PERMITNO">PERMIT NO</th>
 						<th class="text-center RESPONSIBLEPERSONNAMEMOBILENO">RESPONSIBLE PERSON NAME & MOBILE NO</th>
-						<th class="text-center DOWNREASON">DOWN REASON</th>
+						<th class="text-center DOWNREASON">REASON</th>
 						<th class="text-center MATERIALSREQ">MATERIALS REQ</th>
 						<th class="text-center MANPOWERREQ">MANPOWER REQ</th>
 						<th class="text-center TOOLSREQ">TOOLS REQ</th>
@@ -3032,6 +3040,7 @@ if(isset($_POST['stc_ag_rpump_details_remove'])){
 if(isset($_POST['stc_ag_rproject_department'])){
 	$stc_locname=$_POST['stc_locname'];
 	$stc_deptname=$_POST['stc_deptname'];
+	$stc_dept_pro_id=$_POST['stc_dept_pro_id'];
 	$opobjcrproj='';
 	$objcrproj=new pirates_project();
 	if(empty($_SESSION['stc_agent_id'])){
@@ -3039,7 +3048,7 @@ if(isset($_POST['stc_ag_rproject_department'])){
 	}elseif($stc_locname=="" || $stc_deptname==""){
 		$opobjcrproj = 'empty';
 	}else{
-		$opobjcrproj=$objcrproj->stc_department_set($stc_locname, $stc_deptname);
+		$opobjcrproj=$objcrproj->stc_department_set($stc_locname, $stc_deptname, $stc_dept_pro_id);
 	}
 	// echo $opobjcrproj;
 	echo json_encode($opobjcrproj);

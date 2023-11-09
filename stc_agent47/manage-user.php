@@ -179,6 +179,11 @@ include_once("../MCU/db.php");
                                     <span><b>O</b> Link Project </span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#link-department">
+                                    <span><b>D</b> Link Department </span>
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane tabs-animation fade show active" id="show-supervisor" role="tabpanel">
@@ -299,6 +304,67 @@ include_once("../MCU/db.php");
                                     <div class="col-md-10">
                                         <div class="main-card mb-3 card">
                                             <div class="card-body"><h5 class="card-title">Link Project</h5>
+                                                <form class="stc-project-alot-cust">
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleSelect" class="">Select Project</label>
+                                                                <select name="stc_alot_pro_project" id="#" class="form-control" required>
+                                                                    <?php 
+                                                                        $proseleqry=mysqli_query($con, "
+                                                                            SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
+                                                                            FROM `stc_cust_project` 
+                                                                            INNER JOIN `stc_agent_requested_customer` 
+                                                                            ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
+                                                                            WHERE `stc_agent_requested_customer_agent_id`='".$_SESSION['stc_agent_id']."'
+                                                                        ");
+                                                                        foreach($proseleqry as $proselrow){
+                                                                            echo '<option value="'.$proselrow['stc_cust_project_id'].'">'.$proselrow['stc_cust_project_title'].'</option>';
+                                                                        }
+                                                                    ?>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-12">
+                                                            <div class="position-relative form-group">
+                                                                <label for="exampleSelect" class="">Select User</label>
+                                                                <select name="stc_alot_pro_supervisor" id="exampleSelect" class="form-control" required>
+                                                                    <?php 
+                                                                        $proseleqry=mysqli_query($con, "
+                                                                            SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` 
+                                                                            FROM `stc_cust_pro_supervisor` 
+                                                                            WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'
+                                                                            ORDER BY `stc_cust_pro_supervisor_fullname` ASC
+                                                                        ");
+                                                                        if(mysqli_num_rows($proseleqry)>0){
+                                                                            foreach($proseleqry as $proselrow){
+                                                                                echo '<option value="'.$proselrow['stc_cust_pro_supervisor_id'].'">'.$proselrow['stc_cust_pro_supervisor_fullname'].'</option>';
+                                                                            }
+                                                                        }else{
+                                                                            echo '<option value="NA">No User Found!!!</option>';
+                                                                        }
+                                                                    ?>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-12 col-md-12">
+                                                            <div class="position-relative form-group">
+                                                                <input type="hidden" name="stc_alot_project_action">
+                                                                <button class="mt-1 btn btn-warning">Add</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane tabs-animation fade" id="link-department" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-10">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body"><h5 class="card-title">Link Department</h5>
                                                 <form class="stc-project-alot-cust">
                                                     <div class="row">
                                                         <div class="col-md-12">
