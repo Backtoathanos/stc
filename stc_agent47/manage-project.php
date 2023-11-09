@@ -655,7 +655,7 @@ include_once("../MCU/db.php");
                                             <div class="card-body"><h5 class="card-title">Show Job Type</h5>
                                                 <div class="row">
                                                     <div class="col-sm-12 col-md-6">
-                                                        <input type="text" class="form-control" id="job-type-tableInput"  placeholder="search by choice">
+                                                        <input type="text" class="form-control" id="job-type-tableInput"  placeholder="Search by choice">
                                                         <table class="table table-hover table-bordered table-responsive" id="job-type-table">
                                                             <thead>
                                                                 <tr>
@@ -684,6 +684,31 @@ include_once("../MCU/db.php");
                                         <div class="main-card mb-3 card">
                                             <div class="card-body"><h5 class="card-title">Add Department</h5>
                                                 <div class="row">
+                                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                                        <h5 class="card-title">Project Name</h5>
+                                                        <div class="position-relative form-group">
+                                                            <select class="form-control stc_dept_pro_id">
+                                                                <?php
+                                                                    $cityqry=mysqli_query($con, "
+                                                                        SELECT 
+                                                                            `stc_cust_project_id`,
+                                                                            `stc_cust_project_title`
+                                                                        FROM `stc_cust_project`
+                                                                        INNER JOIN `stc_agent_requested_customer`
+                                                                        ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id` 
+                                                                        INNER JOIN `stc_agents`
+                                                                        ON `stc_agent_requested_customer_agent_id`=`stc_agents_id` 
+                                                                        WHERE `stc_agents_id`='".$_SESSION['stc_agent_id']."'
+                                                                        ORDER BY `stc_cust_project_title` ASC
+
+                                                                    ");
+                                                                    foreach($cityqry as $custrow){
+                                                                        echo '<option value="'.$custrow['stc_cust_project_id'].'">'.$custrow['stc_cust_project_title'].'</option>';
+                                                                    }
+                                                                ?>
+                                                            </select>
+                                                        </div>
+                                                    </div>
                                                     <div class="col-sm-12 col-md-6">
                                                         <div class="position-relative form-group">
                                                             <label for="exampleSelect" class=""><b>Location</b></label>
@@ -712,11 +737,12 @@ include_once("../MCU/db.php");
                                             <div class="card-body"><h5 class="card-title">Show Department</h5>
                                                 <div class="row">
                                                     <div class="col-sm-12 col-md-6">
-                                                        <input type="text" class="form-control" id="department-tableInput"  placeholder="search by choice">
+                                                        <input type="text" class="form-control" id="department-tableInput"  placeholder="Search by choice">
                                                         <table class="table table-hover table-bordered table-responsive" id="department-table">
                                                             <thead>
                                                                 <tr>
                                                                     <th>Sl No</th>
+                                                                    <th>Project</th>
                                                                     <th>Location</th>
                                                                     <th>Department</th>
                                                                     <th>Action</th>
@@ -1233,6 +1259,7 @@ include_once("../MCU/db.php");
                 e.preventDefault();
                 var stc_locname = $('.stc_dept_locname').val();
                 var stc_deptname = $('.stc_dept_deptname').val();
+                var stc_dept_pro_id = $('.stc_dept_pro_id').val();
 
                 $.ajax({
                     url         : "nemesis/stc_project.php",
@@ -1240,7 +1267,8 @@ include_once("../MCU/db.php");
                     data        : {
                         stc_ag_rproject_department:1,
                         stc_locname:stc_locname,
-                        stc_deptname:stc_deptname
+                        stc_deptname:stc_deptname,
+                        stc_dept_pro_id:stc_dept_pro_id
                     },
                     dataType    : "JSON",
                     success     : function(res_data){
@@ -1323,7 +1351,7 @@ include_once("../MCU/db.php");
                     success     : function(res_data){
                         // console.log(res_data);
                         alert(res_data);
-                        window.location.reload();
+                        stc_cust_department();
                     }
                 });
             });

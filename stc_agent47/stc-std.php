@@ -136,7 +136,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                         'VARIETIESOFJOB' => 'VARIETIES OF JOB',
                                                         'PERMITNO' => 'PERMIT NO',
                                                         'RESPONSIBLEPERSONNAMEMOBILENO' => 'RESPONSIBLE PERSON NAME & MOBILE NO',
-                                                        'DOWNREASON' => 'DOWN REASON',
+                                                        'DOWNREASON' => 'REASON',
                                                         'MATERIALSREQ' => 'MATERIALS REQ',
                                                         'MANPOWERREQ' => 'MAN POWER REQ',
                                                         'TOOLSREQ' => 'TOOLS REQ',

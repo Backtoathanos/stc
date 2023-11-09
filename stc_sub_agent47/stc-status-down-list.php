@@ -76,23 +76,26 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             ?>
                                             <div class="row">
                                                 <div class="col-lg-3 col-md-3">
-                                                    <h5 style="position: relative;top: 8px;">Location/Site Name :</h5>
+                                                    <h5 style="position: relative;top: 8px;">Department :</h5>
                                                 </div>
                                                 <div class="col-lg-7 col-md-7">
                                                     <select class="form-control" id="stc-agent-sup-std-location-find">
-                                                        <option>TATA Steel - Jamshedpur</option>
-                                                        <option>TATA Steel - KPO</option>
-                                                        <option>MTMH</option>
-                                                        <option>CRM BARA</option>
-                                                        <option>MANIPAL</option>
-                                                        <option>P&M MALL</option>
-                                                        <option>TATA CUMMINS</option>
-                                                        <option>XLRI</option>
-                                                        <option>RAIPUR AIIMS</option>
-                                                        <option>NML</option>
-                                                        <option>RSP</option>
-                                                        <option>IGH HOSPITAL</option>
-                                                        <option>NEELACHAL ISPAT</option>
+                                                    <?php
+                                                            include_once("../MCU/db.php");
+                                                            $dept_qry=mysqli_query($con, "
+                                                                SELECT DISTINCT  `stc_status_down_list_department_dept`, `stc_cust_project_id`
+                                                                FROM `stc_cust_pro_attend_supervise`
+                                                                INNER JOIN `stc_cust_project` 
+                                                                ON `stc_cust_project_id`=`stc_cust_pro_attend_supervise_pro_id` 
+                                                                INNER JOIN `stc_status_down_list_department` 
+                                                                ON `stc_cust_project_id`=`stc_status_down_list_department_loc_id` 			
+                                                                WHERE `stc_cust_pro_attend_supervise_super_id`='".mysqli_real_escape_string($con, $_SESSION['stc_agent_sub_id'])."'
+                                                                ORDER BY `stc_status_down_list_department_dept` ASC
+                                                            ");
+                                                            foreach($dept_qry as $dept_row){
+                                                                echo '<option value="'.$dept_row['stc_cust_project_id'].'">'.$dept_row['stc_status_down_list_department_dept'].'</option>';
+                                                            }
+                                                        ?>                                                        
                                                     </select>
                                                 </div>
                                                 <div class="col-lg-2 col-md-2">
@@ -152,7 +155,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 $('tr').css('background-color', '');
                 $(this).css('background-color', 'rgb(221 219 255)');
             });
-
+            
+            var locationarr = [];
+            var departmentarr = [];
             // call site name vaia supervisor
             call_location();
             function call_location(){
@@ -160,12 +165,42 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     url     : "nemesis/stc_std.php",
                     method  : "POST",
                     data    : {call_location:1},
+                    dataType  : "JSON",
                     success : function(response){
                         // console.log(response);
-                        $('.load_site_name_consump').html(response);
+                        $('#stc-agent-sup-std-sublocation').html(response);
                     }
                 });
             }
+
+            $('body').delegate('#stc-agent-sup-std-sublocation', 'change', function(e){
+                e.preventDefault();
+                var loca_id = $(this).val();
+                $.ajax({
+                    url     : "nemesis/stc_std.php",
+                    method  : "POST",
+                    data    : {call_department:1,loca_id:loca_id},
+                    dataType  : "JSON",
+                    success : function(response){
+                        // console.log(response);
+                        $('#stc-agent-sup-std-dept').html(response);
+                    }
+                });
+            });
+
+            // call site name vaia supervisor
+            // call_location();
+            // function call_location(){
+            //     $.ajax({
+            //         url     : "nemesis/stc_std.php",
+            //         method  : "POST",
+            //         data    : {call_location:1},
+            //         success : function(response){
+            //             // console.log(response);
+            //             $('.load_site_name_consump').html(response);
+            //         }
+            //     });
+            // }
 
              // call equipment type on select location
             // $('body').delegate('.load_site_name_consump', 'change', function(e){
@@ -257,7 +292,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 e.preventDefault();
                 var operation=$(this).attr('operation');
                 var slocation  = $('#stc-agent-sup-std-sublocation').val();
-                var location = $('.stc-agent-sup-std-sub-location option:selected').text();
+                var location = $('.stc-agent-sup-std-sub-location option:selected').attr('data-id');
                 var dept = $('.stc-agent-sup-std-sub-location').val();
                 var area = $('.stc-agent-sup-std-area').val();
                 var eq_type = $('#stc-agent-sup-std-equipment-type').val();
@@ -812,9 +847,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Department : </h5><br>
-                                <!-- <select class="btn btn-success form-control stc-agent-sup-std-sub-location text-left" id="stc-agent-sup-std-sub-location"><option>Please select location first!!!</option>
-                                </select>  -->
-                                <input type="text" class="form-control stc-agent-sup-std-sub-location stc-std-update-on-focusout" placeholder="Enter Department"/>
+                                <select class="btn btn-success form-control stc-agent-sup-std-sub-location text-left" id="stc-agent-sup-std-dept"><option>Please select location first!!!</option>
+                                </select>  
+                                <!-- <input type="text" class="form-control stc-agent-sup-std-sub-location stc-std-update-on-focusout" placeholder="Enter Department"/> -->
                             </div>
                         </div>
                     </div>

@@ -6,6 +6,54 @@ include "../../MCU/obdb.php";
 /*------------------------------------------For Agents--------------------------------------------*/
 /*------------------------------------------------------------------------------------------------*/
 class transformers extends tesseract{
+	// call location department	
+	public function stc_call_locdept(){
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT `stc_status_down_list_department_location`
+			FROM `stc_cust_pro_attend_supervise`
+			INNER JOIN `stc_cust_project` 
+			ON `stc_cust_project_id`=`stc_cust_pro_attend_supervise_pro_id` 
+			INNER JOIN `stc_status_down_list_department` 
+			ON `stc_cust_project_id`=`stc_status_down_list_department_loc_id` 
+			WHERE `stc_cust_pro_attend_supervise_super_id`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."' ORDER BY `stc_status_down_list_department_location` ASC
+		");
+		$optimusprime = "";
+		$do_action=mysqli_num_rows($optimusprimequery);
+		if($do_action == 0){
+			$optimusprime = "empty";
+		}else{
+			$optimusprime.='<option>Select</option>';	
+			foreach ($optimusprimequery as $row) {
+				$optimusprime.='<option>'.$row['stc_status_down_list_department_location'].'</option>';		
+			}			
+		}
+		return $optimusprime;
+	}
+	
+	// call location department	
+	public function stc_call_deptloc($loca_id){
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT  `stc_status_down_list_department_dept`, `stc_cust_project_id`
+			FROM `stc_cust_pro_attend_supervise`
+			INNER JOIN `stc_cust_project` 
+			ON `stc_cust_project_id`=`stc_cust_pro_attend_supervise_pro_id` 
+			INNER JOIN `stc_status_down_list_department` 
+			ON `stc_cust_project_id`=`stc_status_down_list_department_loc_id` 			
+			WHERE `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $loca_id)."'
+			AND `stc_cust_pro_attend_supervise_super_id`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
+		");
+		$optimusprime = "";
+		$do_action=mysqli_num_rows($optimusprimequery);
+		if($do_action == 0){
+			$optimusprime = "empty";
+		}else{
+			foreach ($optimusprimequery as $row) {
+				$optimusprime.='<option data-id="'.$row['stc_cust_project_id'].'">'.$row['stc_status_down_list_department_dept'].'</option>';		
+			}			
+		}
+		return $optimusprime;
+	}
+
 	// call sitename
 	public function stc_call_location(){
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
@@ -149,6 +197,7 @@ class transformers extends tesseract{
 			INSERT INTO `stc_status_down_list`(
 			    `stc_status_down_list_date`,
 			    `stc_status_down_list_plocation`,
+			    `stc_status_down_list_location`,
 			    `stc_status_down_list_sub_location`,
 			    `stc_status_down_list_area`,
 			    `stc_status_down_list_jobtype`,
@@ -159,6 +208,7 @@ class transformers extends tesseract{
 			)VALUES(
 				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_slocation)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_location)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_dept)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_area)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
@@ -287,7 +337,7 @@ class transformers extends tesseract{
 			$head_hidden1='				
 				<th class="text-center">EQUIPMENT TYPE</th>
 				<th class="text-center">EQUIPMENT STATUS</th>
-				<th class="text-center">JOB PLANNING</th>
+				<th class="text-center">JOB CATEGORIES</th>
 				<th class="text-center">JOB VARIETIES</th>
 				<th class="text-center">MATERIAL DESCRIPTION</th>
 				<th class="text-center">TARGET DATE</th>
@@ -323,7 +373,7 @@ class transformers extends tesseract{
 			FROM `stc_status_down_list` 
 			LEFT JOIN `stc_cust_pro_supervisor`
 			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
-			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
+			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
 		");
 		$manager = "";
 		if(mysqli_num_rows($optimusprimeqry)>0){
@@ -377,7 +427,7 @@ class transformers extends tesseract{
 			ON `stc_cust_project_id`=`stc_status_down_list_location` 
 			LEFT JOIN `stc_cust_pro_supervisor` 
 			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
-			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
+			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
 			".$manager."
 			AND `stc_status_down_list_status`<5
 			ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
@@ -706,20 +756,35 @@ class transformers extends tesseract{
 /*-----------------------------------------------------------------------------------*/
 /*---------------------------------For Status Down List------------------------------*/
 /*-----------------------------------------------------------------------------------*/
-// call sitename
+// call location
 if(isset($_POST['call_location'])){
 	$metabots=new transformers();
-	$opmetabots=$metabots->stc_call_location();
-	echo $opmetabots;
+	$opmetabots=$metabots->stc_call_locdept();
+	echo json_encode($opmetabots);
 }
 
-// call department
+// call departemnt
 if(isset($_POST['call_department'])){
 	$loca_id=$_POST['loca_id'];
 	$metabots=new transformers();
-	$opmetabots=$metabots->stc_call_department($loca_id);
-	echo $opmetabots;
+	$opmetabots=$metabots->stc_call_deptloc($loca_id);
+	echo json_encode($opmetabots);
 }
+
+// call sitename
+// if(isset($_POST['call_location'])){
+// 	$metabots=new transformers();
+// 	$opmetabots=$metabots->stc_call_location();
+// 	echo $opmetabots;
+// }
+
+// call department
+// if(isset($_POST['call_department'])){
+// 	$loca_id=$_POST['loca_id'];
+// 	$metabots=new transformers();
+// 	$opmetabots=$metabots->stc_call_department($loca_id);
+// 	echo $opmetabots;
+// }
 
 // call area
 if(isset($_POST['call_area'])){
@@ -889,7 +954,6 @@ if(isset($_POST['stc_jobpending_save_hit'])){
 	$out_sdl_status=$sdl_status->stc_sdl_jobpending_save($sld_id, $jobpendingdetails);
 	echo $out_sdl_status;
 }
-
 
 // update status for job complete or job pending
 if(isset($_POST['stc_jobcomplete_update_hit'])){
