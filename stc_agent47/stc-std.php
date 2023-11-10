@@ -77,7 +77,20 @@ if(isset($_SESSION["stc_agent_id"])){
                                             <div class="card mb-3 widget-content">
                                                 <select class="btn btn-success form-control " id="stc-agent-sup-std-location-find">
                                                     <option value="NA">Select</option>
-                                                    <option>TATA Steel - Jamshedpur</option>
+                                                    <?php
+                                                        include_once("../MCU/db.php");
+                                                        $dept_qry=mysqli_query($con, "
+                                                            SELECT
+                                                                DISTINCT `stc_status_down_list_plocation`
+                                                            FROM
+                                                                `stc_status_down_list`
+                                                            ORDER BY `stc_status_down_list_plocation` ASC
+                                                        ");
+                                                        foreach($dept_qry as $dept_row){
+                                                            echo '<option>'.$dept_row['stc_status_down_list_plocation'].'</option>';
+                                                        }
+                                                    ?>
+                                                    <!-- <option>TATA Steel - Jamshedpur</option>
                                                     <option>TATA Steel - KPO</option>
                                                     <option>MTMH</option>
                                                     <option>CRM BARA</option>
@@ -89,7 +102,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <option>NML</option>
                                                     <option>RSP</option>
                                                     <option>IGH HOSPITAL</option>
-                                                    <option>NEELACHAL ISPAT</option>
+                                                    <option>NEELACHAL ISPAT</option> -->
                                                 </select> 
                                             </div>
                                         </div>
