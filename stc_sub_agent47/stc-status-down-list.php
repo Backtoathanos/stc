@@ -188,6 +188,15 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 });
             });
 
+            $('body').delegate('#stc-agent-sup-std-dept', 'change', function(e){
+                e.preventDefault();
+                var department=$(this).val();
+                var loc_id = $(this).find('option:selected').data('id');
+                console.log(loc_id);
+                $('.stc-agent-sup-std-sub-locationbyid').val(department);
+                $('.stc-agent-sup-std-siteid').val(loc_id);
+            });
+
             // call site name vaia supervisor
             // call_location();
             // function call_location(){
@@ -292,8 +301,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 e.preventDefault();
                 var operation=$(this).attr('operation');
                 var slocation  = $('#stc-agent-sup-std-sublocation').val();
-                var location = $('.stc-agent-sup-std-sub-location option:selected').attr('data-id');
-                var dept = $('.stc-agent-sup-std-sub-location').val();
+                var location = $('.stc-agent-sup-std-siteid').val();
+                var dept = $('.stc-agent-sup-std-sub-locationbyid').val();
                 var area = $('.stc-agent-sup-std-area').val();
                 var eq_type = $('#stc-agent-sup-std-equipment-type').val();
                 var eq_number = $('#stc-agent-sup-std-equipment-number').val();
@@ -315,34 +324,41 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var target_date = $('#stc-agent-sup-std-target-date').val();
                 var tools_req=get_filter('stc-agent-sup-std-tools-req');
                 var remarks = $('.stc-agent-sup-std-remarks').val();
+                $('.message-alert').remove();
                 if(operation=="manual"){
-                    $.ajax({
-                        url         : "nemesis/stc_std.php",
-                        method      : "POST",
-                        data        : {
-                            stc_std_hit:1,
-                            stc_slocation:slocation,
-                            stc_location:location,
-                            stc_dept:dept,
-                            stc_area:area,
-                            stc_j_plannning:j_plannning,
-                            reason:reason,
-                            action_status:action_status
-                        },
-                        success     : function(response_std){
-                            // console.log(response_std);
-                            var response=response_std.trim();
-                            if(response=="Status Down List saved. Thankyou!!!"){
-                                alert(response_std);
-                                window.location.reload();
-                            }else if(response=="Please login!!!"){
-                                alert(response_std);
-                                window.location.reload();
-                            }else{
-                                alert(response_std);
+                    var check_dept = $('#stc-agent-sup-std-dept').val();
+                    if(check_dept!="NA"){
+                        $.ajax({
+                            url         : "nemesis/stc_std.php",
+                            method      : "POST",
+                            data        : {
+                                stc_std_hit:1,
+                                stc_slocation:slocation,
+                                stc_location:location,
+                                stc_dept:dept,
+                                stc_area:area,
+                                stc_j_plannning:j_plannning,
+                                reason:reason,
+                                action_status:action_status
+                            },
+                            success     : function(response_std){
+                                // console.log(response_std);
+                                var response=response_std.trim();
+                                if(response=="Status Down List saved. Thankyou!!!"){
+                                    alert(response_std);
+                                    window.location.reload();
+                                }else if(response=="Please login!!!"){
+                                    alert(response_std);
+                                    window.location.reload();
+                                }else{
+                                    alert(response_std);
+                                }
                             }
-                        }
-                    });
+                        });
+                    }else{
+                        alert('Please select department.');
+                        $('#stc-agent-sup-std-dept').after('<p class="text-danger message-alert">Please select department.</p>');
+                    }
                 }else{
                     var std_id=$('#stc-agent-sup-std-hidden-std-id').val();
                     $.ajax({
@@ -388,12 +404,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     success     : function(response_sdl){
                         $('#stc-agent-sup-std-hidden-std-id').val(response_sdl.stc_status_down_list_id);
                         $('#stc-agent-sup-std-sublocation').val(response_sdl.stc_status_down_list_plocation);
-                        $('#stc-agent-sup-std-location').val(response_sdl.stc_status_down_list_location);
+                        // $('#stc-agent-sup-std-location').val(response_sdl.stc_status_down_list_location);
+                        $('.stc-agent-sup-std-sub-locationbyid').val(response_sdl.stc_status_down_list_sub_location);
+                        $('.stc-agent-sup-std-siteid').val(response_sdl.stc_status_down_list_location);
                         // $('#stc-agent-sup-std-sub-location').val(response_sdl.stc_status_down_list_sub_location);
                         $('.stc-agent-sup-std-sub-location').val(response_sdl.stc_status_down_list_sub_location);
                         $('.stc-agent-sup-std-area').val(response_sdl.stc_status_down_list_area);
                         $('.stc-agent-sup-std-equipment-type').val(response_sdl.stc_status_down_list_equipment_type);
-                        // $('#stc-agent-sup-std-sub-location').change();
+                        $('#stc-agent-sup-std-sublocation').change();
                         $('#stc-agent-sup-std-equipment-status').val(response_sdl.stc_status_down_list_equipment_status);
                         $('#stc-agent-sup-std-job-plannning').val(response_sdl.stc_status_down_list_jobtype);
                         $(".stc-agent-sup-std-qty").val(response_sdl.stc_status_down_list_qty);
@@ -417,7 +435,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             function stc_update_std(){
                 var std_id = $('#stc-agent-sup-std-hidden-std-id').val();
                 var plocation = $('#stc-agent-sup-std-sublocation').val();
-                var dept = $('.stc-agent-sup-std-sub-location').val();
+                var location = $('.stc-agent-sup-std-siteid').val();
+                var dept = $('.stc-agent-sup-std-sub-locationbyid').val();
                 var area = $('.stc-agent-sup-std-area').val();
                 var eq_type = $('.stc-agent-sup-std-equipment-type').val();
                 var eq_status = $('#stc-agent-sup-std-equipment-status').val();
@@ -445,6 +464,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         stc_update_std_hit:1,
                         std_id:std_id,
                         plocation:plocation,
+                        location:location,
                         dept:dept,
                         area:area,
                         eq_type:eq_type,
@@ -847,9 +867,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Department : </h5><br>
-                                <select class="btn btn-success form-control stc-agent-sup-std-sub-location text-left" id="stc-agent-sup-std-dept"><option>Please select location first!!!</option>
+                                <select class="btn btn-success form-control stc-agent-sup-std-sub-location text-left stc-std-update-on-change" id="stc-agent-sup-std-dept"><option>Please select location first!!!</option>
                                 </select>  
-                                <!-- <input type="text" class="form-control stc-agent-sup-std-sub-location stc-std-update-on-focusout" placeholder="Enter Department"/> -->
+                                <input type="hidden" class="form-control stc-agent-sup-std-sub-locationbyid"/>
+                                <input type="hidden" class="form-control stc-agent-sup-std-siteid"/>
                             </div>
                         </div>
                     </div>
