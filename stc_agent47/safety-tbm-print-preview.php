@@ -189,6 +189,20 @@ if(isset($_GET['tbm_no'])){
             float: right;
             margin-right: 0px;
           }
+          
+          .headblock1{
+            width : 40%;
+          }
+          
+          .headblock2{
+            width : 60%;
+          }
+
+          .head-width{
+            width : 30%;
+          }
+          .head-width2{
+            width : 40%;
           }
       }
     </style>
@@ -220,21 +234,21 @@ if(isset($_GET['tbm_no'])){
           <div class="row" style="margin-top: 10px;">
             <div class="col-xl-12 col-lg-12 col-md-12">
               <div class="row">
-                <div class="col-xl-4 col-lg-4 col-md-4">
+                <div class="col-xl-4 col-lg-4 col-md-4 headblock1">
                   <h4>GASPL/OHS/TBT-01</h4>
                 </div>
-                <div class="col-xl-4 col-lg-4 col-md-4">
+                <div class="col-xl-4 col-lg-4 col-md-4 headblock2">
                   <h2 >टूल बॉक्स मीटिंग</h2>
                 </div>
               </div>
             </div>
-            <div class="col-xl-4 col-lg-4 col-md-4">
+            <div class="col-xl-4 col-lg-4 col-md-4 head-width">
                 <h4>दिनांक :- <span style="text-decoration: underline;"><?php echo date('d-m-Y', strtotime($get_stc_safety['stc_safetytbm_date']));?></span></h4>
             </div>
-            <div class="col-xl-4 col-lg-4 col-md-4">
+            <div class="col-xl-4 col-lg-4 col-md-4 head-width">
                 <h4>समय: <span style="text-decoration: underline;"><?php echo date('h:i A', strtotime($get_stc_safety['stc_safetytbm_time']));?></span></h4> 
             </div>
-            <div class="col-xl-4 col-lg-4 col-md-4">
+            <div class="col-xl-4 col-lg-4 col-md-4 head-width2">
                 <h4>स्थान: <span style="text-decoration: underline;"><?php echo $get_stc_safety['stc_safetytbm_place'];?></span></h4>
             </div>
             <div class="col-xl-12 col-lg-12 col-md-12">
@@ -287,12 +301,12 @@ if(isset($_GET['tbm_no'])){
             <div class="col-xl-12 col-lg-12 col-md-12" style="height: 120px;">
               <h4>4. SOP जो उस दिन के कार्य से सम्बंधित हो उसके बारे में जानकारी दे तथा नोट करें : <span><?php echo $get_stc_safety['stc_safetytbm_ptfour'];?></span></h4><br>
             </div>
-            <div class="col-xl-12 col-lg-12 col-md-12" style="height: 120px;">
+            <div class="col-xl-12 col-lg-12 col-md-12" style="height: 190px;">
               <h4>5. कर्मचारी को उनके व्यक्तिगत जिम्मेदारियां की याद दिलाये : उचित पीपीई , हाउसकीपिंग , टूल्स एंड
               टाकल्स , बिजली उपकरण की स्थिति, ६ दिशा के खतरे, विशेष ज़रूरत जैसे वर्क परमिट , मधपान निषेद
               ,सुरक्छित वयवहार ,टीम वर्क की भावना , कोई खतरनाक वास्तु इत्यादि : <span><?php echo $get_stc_safety['stc_safetytbm_ptfive'];?></span></h4><br>
             </div>
-            <div class="col-xl-12 col-lg-12 col-md-12" style="height: 120px;">
+            <div class="col-xl-12 col-lg-12 col-md-12" style="height: 120px;"><br>
               <h4>6. सुरक्षा लिखित सन्देश कर्मचारी के साथ साझा करें : <span><?php echo $get_stc_safety['stc_safetytbm_ptsix'];?></span></h4><br>
             </div>
             <div class="col-xl-12 col-lg-12 col-md-12">
@@ -328,12 +342,12 @@ if(isset($_GET['tbm_no'])){
             </div>
             <div class="col-xl-12 col-lg-12 col-md-12">
               <h4>सुपरवाइजर / इंजीनियर का हस्ताक्षर</h4>
-            </div><br><br><br><br><br><br><br><br><br><br><br><br>
+            </div><br><br><br><br><br><br><br><br>
             <div class="row">
-              <div class="col-xl-4 col-lg-4 col-md-4">
+              <div class="col-xl-4 col-lg-4 col-md-4 headblock1">
                 <h4>GASPL/OHS/TBT-01</h4>
               </div>
-              <div class="col-xl-4 col-lg-4 col-md-4">
+              <div class="col-xl-4 col-lg-4 col-md-4 headblock2">
                 <h2 >टूल बॉक्स मीटिंग</h2>
               </div>
             </div>
@@ -437,8 +451,8 @@ if(isset($_GET['tbm_no'])){
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
       <?php 
         $website=$_SERVER['SERVER_NAME'];
-			  $website = $website=="localhost" ? '../' : 'https://stcassociate.com';
-          include "'.$website.'/stc_symbiote/footer.php";
+			  $website = $website=="localhost" ? '..' : 'https://stcassociate.com';
+          include $website."/stc_symbiote/footer.php";
         ?>
     <script>
       $(document).ready(function(){
