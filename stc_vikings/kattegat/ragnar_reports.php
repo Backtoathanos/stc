@@ -874,6 +874,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th class="text-center">QTY</th>
                      <th class="text-center">CAPACITY</th>
                      <th style="width:25%" class="text-center">REASON</th>
+                     <th class="text-center">REASON ATTRIBUTE</th>
                      <th class="text-center">STATUS</th>
                      <th class="text-center">DELAY(DAYS)</th>
                      <th class="text-center">JOB DONE DETAILS</th>
@@ -1028,9 +1029,13 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-right">'.$row['stc_status_down_list_qty'].'</td>
                   <td class="text-right">'.$row['stc_status_down_list_capacity'].'</td>
                   <td>'.$row['stc_status_down_list_reason'].'</td>
+                  <td>'.$row['stc_status_down_list_reasonattribute'].'</td>
                   <td class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>
-                  <td>'.$jobdonedet.'</td>
+                  <td>
+                     <span class="jobdonedet-view">'.$jobdonedet.'</span>
+                     <span class="jobdonedet-print" style="display:none;">'.$jobdonedet_value.'</span>
+                  </td>
                </tr>
             ';
          }
