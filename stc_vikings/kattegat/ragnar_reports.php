@@ -466,6 +466,20 @@ class ragnarReportsViewMerchantLedger extends tesseract{
 }
 
 class ragnarReportsViewRequiReports extends tesseract{
+   // call departments
+   public function stc_call_departments($location){
+      $ivar='';
+      $ivar_query=mysqli_query($this->stc_dbs, "
+         SELECT * FROM `stc_status_down_list_department`
+         WHERE `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $location)."'
+         ORDER BY `stc_status_down_list_department_dept` ASC
+      ");
+      foreach($ivar_query as $ivar_row){
+         $ivar.='<option>'.$ivar_row['stc_status_down_list_department_dept'].'</option>';
+      }
+      return $ivar;
+   }
+
    // call std
    public function stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $filter){
       $ivar='';
@@ -493,76 +507,43 @@ class ragnarReportsViewRequiReports extends tesseract{
       }else{
          $query_filter='AND `stc_status_down_list_status`<>6 AND `stc_status_down_list_status`<>5 AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR';
       }
-      $ivarqry=mysqli_query($this->stc_dbs, "
+      $query ="
          SELECT 
-             `stc_status_down_list_id`,
-             `stc_status_down_list_date`,
-             `stc_status_down_list_plocation`,
-             `stc_cust_project_title`,
-             `stc_status_down_list_sub_location`,
-             `stc_status_down_list_area`,
-             `stc_status_down_list_equipment_type`,
-             `stc_status_down_list_equipment_number`,
-             `stc_status_down_list_equipment_status`,
-             `stc_status_down_list_reason`,
-             `stc_status_down_list_manpower_req`,
-             `stc_status_down_list_material_desc`,
-             `stc_status_down_list_from_date`,
-             `stc_status_down_list_rect_date`,
-             `stc_status_down_list_remarks`,
-             `stc_status_down_list_jobdone_details`,
-             `stc_status_down_list_jobpending_details`,
-             `stc_status_down_list_jobtype`,
-             `stc_status_down_list_qty`,
-             `stc_status_down_list_capacity`,
-             `stc_status_down_list_reasonattribute`,
-             `stc_status_down_list_created_by_select`,
-             `stc_status_down_list_permit_no`,
-             `stc_status_down_list_creator_details`,
-             `stc_status_down_list_responsive_person`,
-             `stc_status_down_list_target_date`,
-             `stc_status_down_list_status`,
-             `stc_status_down_list_created_by`
+            `stc_status_down_list_id`,
+            `stc_status_down_list_date`,
+            `stc_status_down_list_plocation`,
+            `stc_cust_project_title`,
+            `stc_status_down_list_sub_location`,
+            `stc_status_down_list_area`,
+            `stc_status_down_list_equipment_type`,
+            `stc_status_down_list_equipment_number`,
+            `stc_status_down_list_equipment_status`,
+            `stc_status_down_list_reason`,
+            `stc_status_down_list_manpower_req`,
+            `stc_status_down_list_material_desc`,
+            `stc_status_down_list_from_date`,
+            `stc_status_down_list_rect_date`,
+            `stc_status_down_list_remarks`,
+            `stc_status_down_list_jobdone_details`,
+            `stc_status_down_list_jobpending_details`,
+            `stc_status_down_list_jobtype`,
+            `stc_status_down_list_qty`,
+            `stc_status_down_list_capacity`,
+            `stc_status_down_list_reasonattribute`,
+            `stc_status_down_list_created_by_select`,
+            `stc_status_down_list_permit_no`,
+            `stc_status_down_list_creator_details`,
+            `stc_status_down_list_responsive_person`,
+            `stc_status_down_list_target_date`,
+            `stc_status_down_list_status`,
+            `stc_status_down_list_created_by`
          FROM `stc_status_down_list` 
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
          WHERE `stc_status_down_list_status`<>6 ".$query_filter."         
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
-      ");
-      $cquery="SELECT 
-      `stc_status_down_list_id`,
-      `stc_status_down_list_date`,
-      `stc_status_down_list_plocation`,
-      `stc_cust_project_title`,
-      `stc_status_down_list_sub_location`,
-      `stc_status_down_list_area`,
-      `stc_status_down_list_equipment_type`,
-      `stc_status_down_list_equipment_number`,
-      `stc_status_down_list_equipment_status`,
-      `stc_status_down_list_reason`,
-      `stc_status_down_list_manpower_req`,
-      `stc_status_down_list_material_desc`,
-      `stc_status_down_list_from_date`,
-      `stc_status_down_list_rect_date`,
-      `stc_status_down_list_remarks`,
-      `stc_status_down_list_jobdone_details`,
-      `stc_status_down_list_jobpending_details`,
-      `stc_status_down_list_jobtype`,
-      `stc_status_down_list_qty`,
-      `stc_status_down_list_capacity`,
-      `stc_status_down_list_reasonattribute`,
-      `stc_status_down_list_created_by_select`,
-      `stc_status_down_list_permit_no`,
-      `stc_status_down_list_creator_details`,
-      `stc_status_down_list_responsive_person`,
-      `stc_status_down_list_target_date`,
-      `stc_status_down_list_status`,
-      `stc_status_down_list_created_by`
-  FROM `stc_status_down_list` 
-  LEFT JOIN `stc_cust_project` 
-  ON `stc_cust_project_id`=`stc_status_down_list_location` 
-  WHERE `stc_status_down_list_status`<>6 ".$query_filter."         
-  ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC";
+      ";
+      $ivarqry=mysqli_query($this->stc_dbs, $query);
 
       $ivarpreqry=mysqli_query($this->stc_dbs, "
          SELECT 
@@ -580,14 +561,27 @@ class ragnarReportsViewRequiReports extends tesseract{
       $sitename="";
       $callattend=0;
       $callattend48=0;
+
+      $cplanning=$cjobdone=$cprogress=$cpendingjon=0;
+      $bmplanning=$bmjobdone=$bmprogress=$bmpendingjon=0;
+      $djaplanning=$djajobdone=$djaprogress=$djapendingjon=0;
+      $pmplanning=$pmjobdone=$pmprogress=$pmpendingjon=0;
+
+      $cplanning48=$cjobdone48=$cprogress48=$cpendingjon48=0;
+      $bmplanning48=$bmjobdone48=$bmprogress48=$bmpendingjon48=0;
+      $djaplanning48=$djajobdone48=$djaprogress48=$djapendingjon48=0;
+      $pmplanning48=$pmjobdone48=$pmprogress48=$pmpendingjon48=0;
+      
       $planning=0;
       $jobdone=0;
       $progress=0;
       $pendingjon=0;
+
       $planning48=0;
       $jobdone48=0;
       $progress48=0;
       $pendingjon48=0;
+
       if(mysqli_num_rows($ivarpreqry)>0){
          $currenthr=date("Y/m/d");
          foreach($ivarpreqry as $prerow){
@@ -599,64 +593,267 @@ class ragnarReportsViewRequiReports extends tesseract{
 
             $dperiod = $timeDiff/86400;
             
-            if($prerow['stc_status_down_list_jobtype']=="CALL ATTEND"){
-               $callattend++;
-               if($dperiod<2){
-                  $callattend48++;
+            if($prerow['stc_status_down_list_jobtype']=="BREAKDOWN MAINTENANCE"){
+               if($prerow['stc_status_down_list_status']==1){
+                  $bmplanning++;
+                  if ($dperiod<2) $bmplanning48++;
+               }else if($prerow['stc_status_down_list_status']==2){
+                  $bmpendingjon++;
+                  if ($dperiod<2) $bmpendingjon48++;
+               }else if($prerow['stc_status_down_list_status']==3){
+                  $bmprogress++;
+                  if ($dperiod<2) $bmprogress++;
+               }else if($prerow['stc_status_down_list_status']==4){
+                  $bmpendingjon++;
+                  if ($dperiod<2) $bmpendingjon48++;
+               }else if($prerow['stc_status_down_list_status']==4){
+                  $bmjobdone++;
+                  if ($dperiod<2) $bmjobdone48++;
                }
-            }
-
-            if($prerow['stc_status_down_list_status']==1){
-               $planning++;
-               if($dperiod<2){
-                  $planning48++;
+            }else if($prerow['stc_status_down_list_jobtype']=="CALL ATTEND"){
+               if($prerow['stc_status_down_list_status']==1){
+                  $cplanning++;
+                  if ($dperiod<2) $cplanning48++;
+               }else if($prerow['stc_status_down_list_status']==2){
+                  $cpendingjon++;
+                  if ($dperiod<2) $cpendingjon48++;
+               }else if($prerow['stc_status_down_list_status']==3){
+                  $cprogress++;
+                  if ($dperiod<2) $cprogress++;
+               }else if($prerow['stc_status_down_list_status']==4){
+                  $cpendingjon++;
+                  if ($dperiod<2) $cpendingjon48++;
+               }else if($prerow['stc_status_down_list_status']==4){
+                  $cjobdone++;
+                  if ($dperiod<2) $cjobdone48++;
                }
-            }elseif($prerow['stc_status_down_list_status']==2){
-               $pendingjon++;
-               if($dperiod<2){
-                  $pendingjon48++;
+            }else if($prerow['stc_status_down_list_jobtype']=="DAILY JOB ACTIVITY"){
+               if($prerow['stc_status_down_list_status']==1){
+                  $djaplanning++;
+                  if ($dperiod<2) $djaplanning48++;
+               }else if($prerow['stc_status_down_list_status']==2){
+                  $djapendingjon++;
+                  if ($dperiod<2) $djapendingjon48++;
+               }else if($prerow['stc_status_down_list_status']==3){
+                  $djaprogress++;
+                  if ($dperiod<2) $djaprogress++;
+               }else if($prerow['stc_status_down_list_status']==4){
+                  $djapendingjon++;
+                  if ($dperiod<2) $djapendingjon48++;
+               }else if($prerow['stc_status_down_list_status']==4){
+                  $djajobdone++;
+                  if ($dperiod<2) $djajobdone48++;
                }
-            }elseif($prerow['stc_status_down_list_status']==3){
-               $progress++;
-               if($dperiod<2){
-                  $progress48++;
-               }
-            }elseif($prerow['stc_status_down_list_status']==4){
-               $jobdone++;
-               if($dperiod<2){
-                  $jobdone48++;
+            }else if($prerow['stc_status_down_list_jobtype']=="PREVENTIVE MAINTENANCE"){
+               if($prerow['stc_status_down_list_status']==1){
+                  $pmplanning++;
+                  if ($dperiod<2) $pmplanning48++;
+               }else if($prerow['stc_status_down_list_status']==2){
+                  $pmpendingjon++;
+                  if ($dperiod<2) $pmpendingjon48++;
+               }else if($prerow['stc_status_down_list_status']==3){
+                  $pmprogress++;
+                  if ($dperiod<2) $pmprogress++;
+               }else if($prerow['stc_status_down_list_status']==4){
+                  $pmpendingjon++;
+                  if ($dperiod<2) $pmpendingjon48++;
+               }else if($prerow['stc_status_down_list_status']==4){
+                  $pmjobdone++;
+                  if ($dperiod<2) $pmjobdone48++;
                }
             }
          }
+         $bmtotal48 = $bmpendingjon48 + $bmplanning48 + $bmprogress48 + $bmjobdone48;
+         $ctotal48 = $cpendingjon48 + $cplanning48 + $cprogress48 + $cjobdone48;
+         $djatotal48 = $djapendingjon48 + $djaplanning48 + $djaprogress48 + $djajobdone48;
+         $pmtotal48 = $pmpendingjon48 + $pmplanning48 + $pmprogress48 + $pmjobdone48;
+         
+         $bmtotal = $bmpendingjon + $bmplanning + $bmprogress + $bmjobdone;
+         $ctotal = $cpendingjon + $cplanning + $cprogress + $cjobdone;
+         $djatotal = $djapendingjon + $djaplanning + $djaprogress + $djajobdone;
+         $pmtotal = $pmpendingjon + $pmplanning + $pmprogress + $pmjobdone;
          $ivar.='
             <table class="table table-bordered table-responsive" id="stc-show-std-detailspre-table">
                <tr>
                   <td class="text-center">LABEL</td>
+                  <td class="text-center">BREAKDOWN MAINTENANCE</td>
                   <td class="text-center">CALL ATTEND</td>
-                  <td class="text-center">PLANNING</td>
-                  <td class="text-center">DOWN</td>
-                  <td class="text-center">WORK-IN-PROGRESS</td>
-                  <td class="text-center">WORK DONE</td>
+                  <td class="text-center">DAILY JOB ACTIVITY</td>
+                  <td class="text-center">PREVENTIVE MAINTENANCE</td>
                   <td class="text-center">FILTER</td>
                </tr>
                <tr>
                   <td class="text-center">DAILY JOB ACTIVITY(within 48hr)</td>
-                  <td class="text-right" style="background-color: #f3bd42;">'.$callattend48.'</td>
-                  <td class="text-right" style="background-color: #00f9b4;">'.$planning48.'</td>
-                  <td class="text-right" style="background-color: #ff6767;">'.$pendingjon48.'</td>
-                  <td class="text-right" style="background-color: #f6f900;">'.$progress48.'</td>
-                  <td class="text-right" style="background-color: #a9d08e;">'.$jobdone48.'</td>
+                  <td>
+                     <table class="table">
+                        <tr>
+                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
+                        </tr>
+                        <tr>
+                           <td class="text-right" style="background-color: #ff6767;">'.$bmpendingjon48.'</td>
+                           <td class="text-right" style="background-color: #00f9b4;">'.$bmplanning48.'</td>
+                           <td class="text-right" style="background-color: #f6f900;">'.$bmprogress48.'</td>
+                           <td class="text-right" style="background-color: #a9d08e;">'.$bmjobdone48.'</td>
+                        </tr>
+                        <tr>
+                           <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
+                           <td class="text-right">'.$bmtotal48.'</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td>
+                     <table class="table">
+                        <tr>
+                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
+                        </tr>
+                        <tr>
+                           <td class="text-right" style="background-color: #ff6767;">'.$cpendingjon48.'</td>
+                           <td class="text-right" style="background-color: #00f9b4;">'.$cplanning48.'</td>
+                           <td class="text-right" style="background-color: #f6f900;">'.$cprogress48.'</td>
+                           <td class="text-right" style="background-color: #a9d08e;">'.$cjobdone48.'</td>
+                        </tr>
+                        <tr>
+                           <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
+                           <td class="text-right">'.$ctotal48.'</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td>
+                     <table class="table">
+                        <tr>
+                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
+                        </tr>
+                        <tr>
+                           <td class="text-right" style="background-color: #ff6767;">'.$djapendingjon48.'</td>
+                           <td class="text-right" style="background-color: #00f9b4;">'.$djaplanning48.'</td>
+                           <td class="text-right" style="background-color: #f6f900;">'.$djaprogress48.'</td>
+                           <td class="text-right" style="background-color: #a9d08e;">'.$djajobdone48.'</td>
+                        </tr>
+                        <tr>
+                           <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
+                           <td class="text-right">'.$djatotal48.'</td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td>
+                     <table class="table">
+                        <tr>
+                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
+                        </tr>
+                        <tr>
+                           <td class="text-right" style="background-color: #ff6767;">'.$pmpendingjon48.'</td>
+                           <td class="text-right" style="background-color: #00f9b4;">'.$pmplanning48.'</td>
+                           <td class="text-right" style="background-color: #f6f900;">'.$pmprogress48.'</td>
+                           <td class="text-right" style="background-color: #a9d08e;">'.$pmjobdone48.'</td>
+                        </tr>
+                        <tr>
+                           <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
+                           <td class="text-right">'.$pmtotal48.'</td>
+                        </tr>
+                     </table>
+                  </td>
                   <td class="text-center" rowspan="2">
                      <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
                   </td>
                </tr>
                <tr>
                   <td class="text-center">TOTAL JOB ACTIVITY (All time)</td>
-                  <td class="text-right" style="background-color: #f3bd42;">'.$callattend.'</td>
-                  <td class="text-right" style="background-color: #00f9b4;">'.$planning.'</td>
-                  <td class="text-right" style="background-color: #ff6767;">'.$pendingjon.'</td>
-                  <td class="text-right" style="background-color: #f6f900;">'.$progress.'</td>
-                  <td class="text-right" style="background-color: #a9d08e;">'.$jobdone.'</td>
+                  <td>
+                     <table class="table">
+                        <tr>
+                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
+                        </tr>
+                        <tr>
+                           <td class="text-right" style="background-color: #ff6767;">'.$bmpendingjon.'</td>
+                           <td class="text-right" style="background-color: #00f9b4;">'.$bmplanning.'</td>
+                           <td class="text-right" style="background-color: #f6f900;">'.$bmprogress.'</td>
+                           <td class="text-right" style="background-color: #a9d08e;">'.$bmjobdone.'</td>
+                        </tr>
+                        <tr>
+                           <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
+                           <td class="text-right">'.$bmtotal.'</td>
+                           <td class="text-right"></td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td>
+                     <table class="table">
+                        <tr>
+                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
+                        </tr>
+                        <tr>
+                           <td class="text-right" style="background-color: #ff6767;">'.$cpendingjon.'</td>
+                           <td class="text-right" style="background-color: #00f9b4;">'.$cplanning.'</td>
+                           <td class="text-right" style="background-color: #f6f900;">'.$cprogress.'</td>
+                           <td class="text-right" style="background-color: #a9d08e;">'.$cjobdone.'</td>
+                        </tr>
+                        <tr>
+                           <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
+                           <td class="text-right">'.$ctotal.'</td>
+                           <td class="text-right"></td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td>
+                     <table class="table">
+                        <tr>
+                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
+                        </tr>
+                        <tr>
+                           <td class="text-right" style="background-color: #ff6767;">'.$djapendingjon.'</td>
+                           <td class="text-right" style="background-color: #00f9b4;">'.$djaplanning.'</td>
+                           <td class="text-right" style="background-color: #f6f900;">'.$djaprogress.'</td>
+                           <td class="text-right" style="background-color: #a9d08e;">'.$djajobdone.'</td>
+                        </tr>
+                        <tr>
+                           <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
+                           <td class="text-right">'.$djatotal.'</td>
+                           <td class="text-right"></td>
+                        </tr>
+                     </table>
+                  </td>
+                  <td>
+                     <table class="table">
+                        <tr>
+                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
+                           <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
+                        </tr>
+                        <tr>
+                           <td class="text-right" style="background-color: #ff6767;">'.$pmpendingjon.'</td>
+                           <td class="text-right" style="background-color: #00f9b4;">'.$pmplanning.'</td>
+                           <td class="text-right" style="background-color: #f6f900;">'.$pmprogress.'</td>
+                           <td class="text-right" style="background-color: #a9d08e;">'.$pmjobdone.'</td>
+                        </tr>
+                        <tr>
+                           <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
+                           <td class="text-right">'.$pmtotal.'</td>
+                           <td class="text-right"></td>
+                        </tr>
+                     </table>
+                  </td>
                </tr>
             </table>
          ';
@@ -3499,6 +3696,14 @@ if(isset($_POST['Stc_call_reports_on_merchants'])){
 }
 
 #<-----------------------------Object sections of requisition reports class-------------------------------->
+// call location
+if(isset($_POST['Stc_std_department'])){
+   $location      =  $_POST['location'];
+   $bjornedepartment=new ragnarReportsViewRequiReports();  
+   $outbjornedepartment=$bjornedepartment->stc_call_departments($location);
+   echo $outbjornedepartment;
+}
+
 // call std details
 if(isset($_POST['Stc_std_details'])){
    $status=$_POST['status'];

@@ -3370,3 +3370,515 @@
 [06-Nov-2023 11:49:15 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
 [06-Nov-2023 12:22:04 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
 [06-Nov-2023 12:22:04 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[06-Nov-2023 22:08:59 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[06-Nov-2023 22:08:59 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 03:40:09 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 03:40:09 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[07-Nov-2023 03:40:09 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[07-Nov-2023 03:40:09 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[07-Nov-2023 03:40:09 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[07-Nov-2023 09:22:37 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Nov-2023 09:22:37 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 04:42:52 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 04:42:52 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[07-Nov-2023 04:42:52 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[07-Nov-2023 04:42:52 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[07-Nov-2023 04:42:52 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[07-Nov-2023 05:13:14 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 11:16:55 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[07-Nov-2023 11:16:55 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[07-Nov-2023 11:16:55 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[07-Nov-2023 11:58:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Nov-2023 11:58:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 06:45:19 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 06:45:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[07-Nov-2023 06:45:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[07-Nov-2023 06:45:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[07-Nov-2023 06:45:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[07-Nov-2023 06:45:59 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 06:45:59 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 07:04:46 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 07:04:47 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 14:13:45 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Nov-2023 14:13:45 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 08:43:49 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 08:43:49 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 14:16:23 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Nov-2023 14:16:23 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 08:46:28 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 08:46:28 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 15:29:31 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Nov-2023 15:29:31 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 09:59:35 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 09:59:35 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 15:37:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Nov-2023 15:37:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 10:07:37 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 10:07:37 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 15:42:48 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[07-Nov-2023 15:42:48 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[07-Nov-2023 15:42:48 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/challan-preview.php on line 598
+[07-Nov-2023 16:55:15 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[07-Nov-2023 16:55:15 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[07-Nov-2023 16:55:15 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[07-Nov-2023 16:55:15 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[07-Nov-2023 16:55:15 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[07-Nov-2023 16:55:15 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[07-Nov-2023 12:03:19 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 12:03:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 17:44:25 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Nov-2023 17:44:25 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 17:54:01 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Nov-2023 17:54:01 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 12:24:03 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 12:24:03 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 18:02:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Nov-2023 18:02:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 12:35:12 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 12:35:12 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 18:43:24 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[07-Nov-2023 18:43:24 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 13:29:15 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 13:29:15 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 13:42:58 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 13:42:58 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[07-Nov-2023 15:57:02 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[07-Nov-2023 15:57:03 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 09:11:11 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[08-Nov-2023 09:11:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 09:12:54 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[08-Nov-2023 09:12:54 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 03:43:01 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 03:43:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 03:47:21 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 03:47:21 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 03:54:01 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 03:54:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 05:08:50 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 05:08:50 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 11:00:43 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[08-Nov-2023 11:00:43 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 05:31:54 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 05:31:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 11:33:23 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[08-Nov-2023 11:33:23 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 06:03:27 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 06:03:27 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 06:49:12 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 06:49:12 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 08:30:32 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 08:30:32 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[08-Nov-2023 08:30:32 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[08-Nov-2023 08:30:32 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[08-Nov-2023 08:30:32 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[08-Nov-2023 14:12:57 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[08-Nov-2023 14:12:57 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 08:43:00 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 08:43:00 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 14:13:02 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[08-Nov-2023 14:13:02 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 08:43:12 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 08:43:12 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 14:31:49 Asia/Kolkata] PHP Notice:  Undefined index: invono in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview-additional.php on line 59
+[08-Nov-2023 14:37:24 Asia/Kolkata] PHP Notice:  Undefined index: invono in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview-additional.php on line 59
+[08-Nov-2023 14:42:46 Asia/Kolkata] PHP Notice:  Undefined index: invono in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview-additional.php on line 59
+[08-Nov-2023 14:43:15 Asia/Kolkata] PHP Notice:  Undefined index: invono in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview-additional.php on line 59
+[08-Nov-2023 09:22:56 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 09:22:56 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 14:55:12 Asia/Kolkata] PHP Notice:  Undefined index: invono in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-preview-additional.php on line 59
+[08-Nov-2023 14:55:13 Asia/Kolkata] PHP Notice:  Undefined index: invono in /home/c2484kn1eg0y/public_html/stc_vikings/sale-print-upgraded-additional.php on line 59
+[08-Nov-2023 15:35:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[08-Nov-2023 15:35:48 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 15:35:48 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[08-Nov-2023 15:35:48 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 10:06:00 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 10:06:00 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 10:20:19 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 10:20:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 17:31:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[08-Nov-2023 17:31:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 12:06:04 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 12:06:04 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 17:51:31 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[08-Nov-2023 17:51:31 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 12:21:33 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 12:21:33 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 12:31:27 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 12:31:27 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 13:28:10 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 13:28:10 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 13:29:55 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 13:29:55 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 13:32:57 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 13:32:57 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[08-Nov-2023 13:33:05 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[08-Nov-2023 13:33:05 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[09-Nov-2023 02:53:27 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 02:53:27 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[09-Nov-2023 02:53:43 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 02:53:43 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[09-Nov-2023 09:04:08 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[09-Nov-2023 09:04:08 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 09:14:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[09-Nov-2023 09:14:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 03:44:49 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 03:44:49 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[09-Nov-2023 04:07:19 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 04:07:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[09-Nov-2023 04:34:17 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 04:34:17 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[09-Nov-2023 04:34:17 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[09-Nov-2023 04:34:17 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[09-Nov-2023 04:34:17 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[09-Nov-2023 10:04:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[09-Nov-2023 10:04:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 04:34:24 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 10:38:51 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:38:51 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:38:51 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:38:51 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:38:51 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:38:51 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:39:25 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:39:25 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:39:25 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:39:25 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:39:25 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:39:25 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:39:52 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:39:52 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:39:52 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:39:52 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:39:52 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:39:52 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:40:17 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:40:17 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:40:17 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:40:17 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:40:17 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:40:17 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:42:52 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:42:52 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:42:52 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 10:42:52 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:42:52 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 10:42:52 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 11:34:55 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 11:34:55 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 11:34:55 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[09-Nov-2023 11:34:55 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 11:34:55 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 11:34:55 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[09-Nov-2023 06:07:52 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 11:37:55 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[09-Nov-2023 11:37:55 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 06:07:58 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 06:07:58 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[09-Nov-2023 11:41:11 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[09-Nov-2023 11:41:11 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 11:42:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[09-Nov-2023 11:42:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 06:12:52 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 08:45:16 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 08:45:16 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[09-Nov-2023 14:43:59 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[09-Nov-2023 14:43:59 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 15:29:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[09-Nov-2023 15:29:40 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 09:59:42 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 09:59:42 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[09-Nov-2023 16:18:20 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[09-Nov-2023 16:18:20 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 11:18:26 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 11:18:26 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[09-Nov-2023 11:30:06 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 11:30:06 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[09-Nov-2023 12:01:12 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 12:01:12 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[09-Nov-2023 12:01:12 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[09-Nov-2023 12:01:12 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[09-Nov-2023 12:01:12 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[09-Nov-2023 18:51:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[09-Nov-2023 18:51:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 13:21:25 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[09-Nov-2023 13:21:25 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 03:42:52 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 03:42:52 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 09:16:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[10-Nov-2023 09:16:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 03:48:35 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 03:48:35 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 04:01:50 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 04:01:50 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 04:24:17 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 04:24:18 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 10:25:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[10-Nov-2023 10:25:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 05:27:14 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 05:27:14 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 05:35:14 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 05:35:14 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[10-Nov-2023 05:35:14 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[10-Nov-2023 05:35:14 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[10-Nov-2023 05:35:14 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[10-Nov-2023 11:05:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[10-Nov-2023 11:05:14 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 05:35:19 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 05:35:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 06:05:55 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 15:03:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[10-Nov-2023 15:03:46 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 10:16:44 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 10:16:44 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 10:20:41 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 10:20:41 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 15:50:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[10-Nov-2023 15:50:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 10:21:02 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 10:21:02 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 17:35:02 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[10-Nov-2023 17:35:02 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 12:05:06 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 12:05:06 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[10-Nov-2023 17:51:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[10-Nov-2023 17:51:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 12:21:41 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[10-Nov-2023 12:21:41 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[11-Nov-2023 03:30:25 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 03:30:25 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[11-Nov-2023 09:16:06 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[11-Nov-2023 09:16:06 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 03:46:18 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 03:46:18 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[11-Nov-2023 03:55:07 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 03:55:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[11-Nov-2023 09:43:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[11-Nov-2023 09:43:19 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 04:13:21 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 04:13:21 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[11-Nov-2023 10:11:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[11-Nov-2023 10:11:22 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 04:41:24 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 04:41:24 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[11-Nov-2023 11:01:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[11-Nov-2023 11:01:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 05:31:41 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 05:31:41 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[11-Nov-2023 14:22:44 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[11-Nov-2023 14:22:45 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 08:52:48 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 08:52:48 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[11-Nov-2023 14:34:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[11-Nov-2023 14:34:50 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 09:07:10 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[11-Nov-2023 09:07:10 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[11-Nov-2023 17:31:04 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[11-Nov-2023 17:31:04 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[12-Nov-2023 04:05:44 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[12-Nov-2023 04:05:44 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[12-Nov-2023 04:47:31 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[12-Nov-2023 04:47:31 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[13-Nov-2023 03:47:59 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 03:47:59 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[13-Nov-2023 04:08:44 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 04:08:44 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[13-Nov-2023 09:39:52 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[13-Nov-2023 09:39:52 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[13-Nov-2023 09:39:52 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[13-Nov-2023 09:39:52 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[13-Nov-2023 09:39:52 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[13-Nov-2023 09:39:52 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[13-Nov-2023 09:40:18 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[13-Nov-2023 09:40:18 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[13-Nov-2023 09:40:18 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[13-Nov-2023 09:40:18 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[13-Nov-2023 09:40:18 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[13-Nov-2023 09:40:18 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[13-Nov-2023 04:39:33 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 04:39:33 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[13-Nov-2023 04:39:33 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[13-Nov-2023 04:39:33 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[13-Nov-2023 04:39:33 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[13-Nov-2023 05:37:56 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 05:37:56 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[13-Nov-2023 05:37:56 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[13-Nov-2023 05:37:56 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[13-Nov-2023 05:37:56 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[13-Nov-2023 07:16:23 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 07:16:23 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[13-Nov-2023 07:16:23 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 59
+[13-Nov-2023 07:16:23 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 87
+[13-Nov-2023 07:16:23 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 105
+[13-Nov-2023 14:12:23 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[13-Nov-2023 14:12:23 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[13-Nov-2023 14:12:23 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[13-Nov-2023 14:12:23 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[13-Nov-2023 14:12:23 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[13-Nov-2023 14:12:23 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[13-Nov-2023 09:25:43 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 09:25:43 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[13-Nov-2023 09:29:05 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 09:29:05 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[13-Nov-2023 15:29:43 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[13-Nov-2023 15:29:43 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 09:59:48 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 09:59:48 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[13-Nov-2023 11:31:14 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 11:31:14 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[13-Nov-2023 11:31:14 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[13-Nov-2023 11:31:14 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[13-Nov-2023 11:31:14 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[13-Nov-2023 18:17:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[13-Nov-2023 18:17:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 13:12:00 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 13:12:00 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[13-Nov-2023 14:31:18 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[13-Nov-2023 14:31:18 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 09:15:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[14-Nov-2023 09:15:47 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 03:46:20 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 03:46:20 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 03:50:18 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 03:50:18 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 09:41:44 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[14-Nov-2023 09:41:44 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 04:12:12 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 04:12:12 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 04:29:59 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 04:29:59 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 05:04:54 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 05:04:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 05:04:54 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 05:04:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 05:04:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 05:04:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[14-Nov-2023 05:04:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[14-Nov-2023 05:19:34 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 05:19:34 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 05:19:34 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 05:19:34 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[14-Nov-2023 05:19:34 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[14-Nov-2023 05:22:27 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 05:22:27 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 06:40:38 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 06:40:38 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 07:04:54 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 07:04:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 07:04:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 07:04:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[14-Nov-2023 07:04:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[14-Nov-2023 07:06:44 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 07:06:44 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 07:09:00 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 07:09:00 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 07:13:46 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 07:13:46 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 08:04:07 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 08:04:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 08:04:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 08:04:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[14-Nov-2023 08:04:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[14-Nov-2023 08:48:31 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 08:48:31 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 08:48:31 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 08:48:31 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[14-Nov-2023 08:48:31 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[14-Nov-2023 09:11:46 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 09:11:46 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 09:26:16 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 09:26:16 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 09:26:18 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 09:26:18 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 09:26:18 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 09:26:18 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[14-Nov-2023 09:26:18 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[14-Nov-2023 15:03:16 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[14-Nov-2023 15:03:16 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 15:35:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[14-Nov-2023 15:35:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 10:06:02 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 10:06:02 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 10:23:35 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 10:23:35 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 10:23:35 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[14-Nov-2023 10:23:35 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[14-Nov-2023 10:23:35 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[14-Nov-2023 10:57:03 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 10:57:03 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 11:52:48 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 11:52:48 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 17:45:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[14-Nov-2023 17:45:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 12:16:00 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[14-Nov-2023 12:16:00 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[14-Nov-2023 17:49:45 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[14-Nov-2023 17:49:45 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[14-Nov-2023 17:49:45 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[14-Nov-2023 17:49:45 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[14-Nov-2023 17:49:45 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[14-Nov-2023 17:49:45 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[15-Nov-2023 09:05:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[15-Nov-2023 09:05:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 03:36:25 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 03:36:25 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 09:14:02 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[15-Nov-2023 09:14:02 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 03:44:43 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 03:44:43 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 09:47:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[15-Nov-2023 09:47:30 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 04:17:33 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 04:17:33 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 04:17:33 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 04:17:33 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[15-Nov-2023 04:17:33 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[15-Nov-2023 04:17:36 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 04:23:47 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 04:23:47 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 06:18:07 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 06:18:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 06:18:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 06:18:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[15-Nov-2023 06:18:07 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[15-Nov-2023 11:53:36 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[15-Nov-2023 11:53:36 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[15-Nov-2023 11:53:36 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[15-Nov-2023 11:53:36 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[15-Nov-2023 11:53:36 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[15-Nov-2023 11:53:36 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[15-Nov-2023 06:30:19 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 06:30:19 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 12:03:13 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[15-Nov-2023 12:03:13 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 06:33:17 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 06:33:17 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 06:43:51 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 06:43:51 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 06:47:04 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 06:47:04 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 07:03:04 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 07:03:04 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 08:31:54 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 08:31:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 08:31:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 08:31:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[15-Nov-2023 08:31:54 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[15-Nov-2023 08:44:50 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 08:46:39 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 08:48:01 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 08:48:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 09:03:01 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 09:03:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 10:01:04 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 10:01:04 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 10:12:17 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 10:12:17 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 16:38:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[15-Nov-2023 16:38:39 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 11:08:41 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 11:08:41 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 11:11:01 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 11:11:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 11:11:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 11:11:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[15-Nov-2023 11:11:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109

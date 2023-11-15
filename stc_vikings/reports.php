@@ -45,6 +45,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         .fade:not(.show) {
           opacity: 10;
         }
+
+        .message-alert{
+            color : red;
+        }
     </style>
 </head>
 <body>
@@ -1313,6 +1317,35 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             var finalwidth=screenwidth - (screenwidth * 0.20);
             var percent=finalwidth/screenwidth * 100;
             $('.stc-show-std-details').width(finalwidth);
+            
+            $('body').delegate('.std-filter-department', 'click', function(){
+                var values = $(this).val();
+                $('.message-alert').remove();
+                if(values=="NA"){
+                    alert("Please select location first.");
+                    $('.std-filter-location').after('<p class="message-alert">Please select Location first.</p>');
+                }
+            });
+            $('body').delegate('.std-filter-location', 'change', function(){
+                var location = $(this).val();
+                $('.message-alert').remove();
+                if(location!="NA"){
+                    $.ajax({
+                        url     : "kattegat/ragnar_reports.php",
+                        method  : "POST",
+                        data    : {
+                        Stc_std_department:1,
+                        location:location
+                        },
+                        success : function(data){
+                            // console.log(data);
+                            $('.std-filter-department').html(data);
+                        }
+                    });
+                }else{
+                    $('.std-filter-department').html('<option value="NA">SELECT LOCATION FIRST.</option>');
+                }
+            });
 
             var filter = 0;
             stc_call_std(filter);
@@ -1944,18 +1977,19 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="position-relative form-group">
                                             <select class="form-control std-filter-location">
                                                 <option value="NA">SELECT</option>
-                                                <option>TATA Steel - Jamshedpur</option>
-                                                <option>TATA Steel - KPO</option>
-                                                <option>MTMH</option>
-                                                <option>CRM BARA</option>
-                                                <option>MANIPAL</option>
-                                                <option>P&M MALL</option>
-                                                <option>TATA CUMMINS</option>
-                                                <option>XLRI</option>
-                                                <option>RAIPUR AIIMS</option>
-                                                <option>NML</option>
-                                                <option>RSP</option>
-                                                <option>IGH HOSPITAL</option>
+                                                <?php 
+                                                    include_once("../MCU/db.php");
+                                                    $dept_qry=mysqli_query($con, "
+                                                        SELECT
+                                                            DISTINCT `stc_status_down_list_plocation`
+                                                        FROM
+                                                            `stc_status_down_list`
+                                                        ORDER BY `stc_status_down_list_plocation` ASC
+                                                    ");
+                                                    foreach($dept_qry as $dept_row){
+                                                        echo '<option>'.$dept_row['stc_status_down_list_plocation'].'</option>';
+                                                    }
+                                                ?>
                                             </select>
                                         </div>
                                     </div>
@@ -1963,22 +1997,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <h5 class="card-title">Department</h5>
                                         <div class="position-relative form-group">
                                             <select class="form-control std-filter-department">
-                                                <option value="NA">SELECT</option>
-                                                <?php
-                                                    include_once("../MCU/db.php");
-                                                    $dep_query=mysqli_query($con, "
-                                                        SELECT DISTINCT
-                                                            `stc_status_down_list_sub_location`
-                                                        FROM
-                                                            `stc_status_down_list`
-                                                        ORDER BY
-                                                            `stc_status_down_list_sub_location`
-                                                        ASC                                                
-                                                    ");
-                                                    foreach($dep_query as $dep_row){
-                                                        echo '<option>'.$dep_row['stc_status_down_list_sub_location'].'</option>';
-                                                    }
-                                                ?>
+                                                <option value="NA">SELECT LOCATION FIRST</option>
                                             </select>
                                         </div>
                                     </div>

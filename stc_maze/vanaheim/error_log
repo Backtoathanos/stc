@@ -10,3 +10,4 @@
 [16-Oct-2023 15:52:09 Asia/Kolkata] PHP Notice:  A non well formed numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
 [04-Nov-2023 14:18:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_silent_challan_sess in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1726
 [04-Nov-2023 14:18:27 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1726
+[13-Nov-2023 15:45:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 460
