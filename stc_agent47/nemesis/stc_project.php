@@ -1943,6 +1943,9 @@ class pirates_supervisor extends tesseract{
 						<th class="text-center">AREA</th>
 						<th class="text-center EQUIPMENTTYPE">EQUIPMENT TYPE</th>
 						<th class="text-center EQUIPMENTSTATUS">EQUIPMENT STATUS</th>
+						<th class="text-center QUANITTY">QUANITTY</th>
+						<th class="text-center CAPACITY">CAPACITY</th>
+						<th class="text-center REASONATTRIBUTE">REASON ATTRIBUTE</th>
 						<th class="text-center TYPEOFJOB">TYPE OF JOB</th>
 						<th class="text-center JOBPLANNING">JOB CATEGORY</th>
 						<th class="text-center VARIETIESOFJOB">VARIETIES OF JOB</th>
@@ -2003,6 +2006,9 @@ class pirates_supervisor extends tesseract{
 			    `stc_status_down_list_equipment_type`,
 			    `stc_status_down_list_equipment_number`,
 			    `stc_status_down_list_equipment_status`,
+				`stc_status_down_list_qty`,
+				`stc_status_down_list_capacity`,
+				`stc_status_down_list_reasonattribute`,
 			    `stc_status_down_list_reason`,
 			    `stc_status_down_list_manpower_req`,
 			    `stc_status_down_list_material_desc`,
@@ -2229,6 +2235,9 @@ class pirates_supervisor extends tesseract{
 						<td>'.$row['stc_status_down_list_area'].'</td>
 						<td class="EQUIPMENTTYPE">'.$eq_type.'</td>
 						'.$eqstatus.'
+						<td class="QUANITTY">'.$row['stc_status_down_list_qty'].'</td>
+						<td class="CAPACITY">'.$row['stc_status_down_list_capacity'].'</td>
+						<td class="REASONATTRIBUTE">'.$row['stc_status_down_list_reasonattribute'].'</td>
 						<td class="TYPEOFJOB">'.$row['stc_status_down_list_jobtype'].'</td>
 						<td class="JOBPLANNING">'.$job_type.'</td>
 						<td class="VARIETIESOFJOB">'.$job_varities.'</td>

@@ -983,29 +983,32 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-xl-12 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success " ><div class="stc-show-std-details">
-                                            <table class="table table-bordered">
-                                                <thead>
-                                                   <tr>
-                                                        <th class="text-center">SL NO</th>
-                                                        <th class="text-center">DATE</th>
-                                                        <th class="text-center">LOCATION</th>
-                                                        <th class="text-center">EQUIPMENT DETAILS</th>
-                                                        <th class="text-center">QTY</th>
-                                                        <th class="text-center">CAPACITY</th>
-                                                        <th class="text-center">DOWN REASON</th>
-                                                        <th class="text-center">STATUS</th>
-                                                        <th class="text-center">DELAY(DAYS)</th>
-                                                   </tr>
-                                                </thead>
-                                                <tbody>
-                                                  <tr>
-                                                    <td colspan="15">
-                                                        <h3>Search here.....</h3>
-                                                    </td>
-                                                  </tr>
-                                                </tbody>
-                                            </table></div>
+                                        <div class="card-border mb-3 card card-body border-success " >
+                                            <a href="javascript:void(0)" class="btn btn-success form-control print-btn-sdl">Print</a>
+                                            <div class="stc-show-std-details">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                    <tr>
+                                                            <th class="text-center">SL NO</th>
+                                                            <th class="text-center">DATE</th>
+                                                            <th class="text-center">LOCATION</th>
+                                                            <th class="text-center">EQUIPMENT DETAILS</th>
+                                                            <th class="text-center">QTY</th>
+                                                            <th class="text-center">CAPACITY</th>
+                                                            <th class="text-center">DOWN REASON</th>
+                                                            <th class="text-center">STATUS</th>
+                                                            <th class="text-center">DELAY(DAYS)</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <td colspan="15">
+                                                            <h3>Loading.....</h3>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1312,6 +1315,21 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         // }
 
         $(document).ready(function(){
+            $('body').delegate('.print-btn-sdl', 'click', function(){
+                $('.jobdonedet-view').hide();
+                $('.jobdonedet-print').show();
+                var pageTitle = 'Status Down List',
+                    stylesheet = '//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css',
+                    win = window.open('Landscape', 'Print', 'width=1500,height=1300');
+                win.document.write('<html><head><title>' + pageTitle + '</title>' +
+                    '<link rel="stylesheet" href="' + stylesheet + '"><style>table, th, td {border: 1px solid;padding:5px;}</style>' +
+                    '</head><body>' + $('#stc-show-std-details-table')[0].outerHTML + '</body></html>');
+                win.document.close();
+                win.print();
+                win.close();
+                return false;
+            });
+
             $('.hidden-project-excel-section').hide();
             var screenwidth=$(window).width();
             var finalwidth=screenwidth - (screenwidth * 0.20);

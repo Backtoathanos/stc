@@ -495,7 +495,7 @@ class transformers extends tesseract{
 						$actionsec='
 							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
 								<option status="NA">SELECT STATUS</option>
-								<option status="1">PENDING</option>
+								<option status="1">PLANNING</option>
 								<option status="3">WORK-IN-PROGRESS</option>
 								<option status="4">WORK-DONE</option>
 							</select>
@@ -504,7 +504,7 @@ class transformers extends tesseract{
 						$actionsec='
 							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
 								<option status="NA">SELECT STATUS</option>
-								<option status="1">PENDING</option>
+								<option status="1">PLANNING</option>
 								<option status="2">DOWN</option>
 								<option status="4">WORK-DONE</option>
 							</select>
@@ -677,18 +677,39 @@ class transformers extends tesseract{
 		");
 		if($optimusprime_qry){
 			if($status==4){
-				$optimusprime_qry=mysqli_query($this->stc_dbs, "
-					UPDATE
-						`stc_status_down_list`
-					SET
-						`stc_status_down_list_rect_date`='".mysqli_real_escape_string($this->stc_dbs, $date)."',
-						`stc_status_down_list_equipment_status`='Running',
-						`stc_status_down_list_permit_no`='".mysqli_real_escape_string($this->stc_dbs, $work_permit_no)."'  
-					WHERE
-						`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
+				$optimusprime_cqry=mysqli_query($this->stc_dbs, "
+					SELECT 
+						`stc_status_down_list_qty`,
+						`stc_status_down_list_capacity`,
+						`stc_status_down_list_reasonattribute`,
+						`stc_status_down_list_permit_no`
+					FROM `stc_status_down_list` 
+					WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."' 
 				");
+				$validated=1;
+				foreach($optimusprime_cqry as $optimusprime_crow){
+					if(($optimusprime_crow['stc_status_down_list_qty']==0) || ($optimusprime_crow['stc_status_down_list_capacity']=='') || ($optimusprime_crow['stc_status_down_list_reasonattribute']=='')){
+						$validated=0;
+					}
+				}
+				if($validated==1){
+					$optimusprime_qry=mysqli_query($this->stc_dbs, "
+						UPDATE
+							`stc_status_down_list`
+						SET
+							`stc_status_down_list_rect_date`='".mysqli_real_escape_string($this->stc_dbs, $date)."',
+							`stc_status_down_list_equipment_status`='Running',
+							`stc_status_down_list_permit_no`='".mysqli_real_escape_string($this->stc_dbs, $work_permit_no)."'  
+						WHERE
+							`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
+					");
+					$optimusprime = 'Status Updated!!!';
+				}else{
+					$optimusprime = 'Status not updated. Please fill all fields.';
+				}
+			}else{
+				$optimusprime = 'Status Updated!!!';
 			}
-			$optimusprime='Status Updated!!!';
 		}else{
 			$optimusprime='Hmmm!!! Somethig went wrong on changing status.';
 		}
@@ -880,20 +901,22 @@ if(isset($_POST['stc_update_std_hit'])){
 	$qty = $_POST['qty'];
 	$capacity = $_POST['capacity'];
 	$reasonattribute = $_POST['reasonattribute'];
-	$created_by_se = $_POST['created_by_se'];
+	$created_by_se = @$_POST['created_by_se'];
 	$permit_no = $_POST['permit_no'];
-	$creator_details = $_POST['creator_details'];
+	$creator_details = @$_POST['creator_details'];
 	$r_person = $_POST['r_person'];
 	$reason = $_POST['reason'];
 	$material_desc = $_POST['material_desc'];
 	$manpower_req = $_POST['manpower_req'];
 	$target_date = $_POST['target_date'];
-	$jobdonedet = $_POST['jobdonedet'];
+	$jobdonedet = @$_POST['jobdonedet'];
 	$remarks = $_POST['remarks'];
 
 	$metabots=new transformers();
 	if(empty($_SESSION['stc_agent_sub_id'])){
 		$opmetabots="login";
+	}else if($dept=="NA" || $dept=="" || $location=="NA" || $location==""){
+		$opmetabots="empty";
 	}else{
 		$opmetabots=$metabots->stc_std_update($std_id, $plocation, $location, $dept, $area, $eq_type, $eq_status, $j_plannning, $qty, $capacity, $reasonattribute, $created_by_se, $permit_no, $creator_details, $r_person, $reason, $material_desc, $manpower_req, $target_date, $jobdonedet, $remarks);
 	}

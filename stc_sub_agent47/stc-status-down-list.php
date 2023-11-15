@@ -404,6 +404,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     success     : function(response_sdl){
                         $('#stc-agent-sup-std-hidden-std-id').val(response_sdl.stc_status_down_list_id);
                         $('#stc-agent-sup-std-sublocation').val(response_sdl.stc_status_down_list_plocation);
+                        $('#stc-agent-sup-std-sublocationspan').html('<b>' + response_sdl.stc_status_down_list_plocation + '</b>');
+                        $('#stc-agent-sup-std-deptspan').html('<b>' + response_sdl.stc_status_down_list_sub_location + '</b>');
                         // $('#stc-agent-sup-std-location').val(response_sdl.stc_status_down_list_location);
                         $('.stc-agent-sup-std-sub-locationbyid').val(response_sdl.stc_status_down_list_sub_location);
                         $('.stc-agent-sup-std-siteid').val(response_sdl.stc_status_down_list_location);
@@ -490,6 +492,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     success     : function(response_sdl){
                         if(response_sdl=="login"){
                             window.location.reload();
+                        }else if(response_sdl=="empty"){
                         }else{
                             load_std_perticular(std_id)
                         }
@@ -634,11 +637,16 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             sdl_id:sdl_id
                         },
                         success     : function(response_sdl){
-                            alert(response_sdl);
-                            $('.bd-std-jobdonedetails-modal-lg').modal('hide');
-                            $(".stc-cust-ag-jobdonedetails").val('');
-                            var location_id=$('#stc-agent-sup-std-location-find').val();
-                            std_list_call(location_id);
+                            response_sdl=response_sdl.trim();
+                            if(response_sdl=="Status Updated!!!"){
+                                alert(response_sdl);
+                                $('.bd-std-jobdonedetails-modal-lg').modal('hide');
+                                $(".stc-cust-ag-jobdonedetails").val('');
+                                var location_id=$('#stc-agent-sup-std-location-find').val();
+                                std_list_call(location_id);
+                            }else{
+                                alert(response_sdl);
+                            }
                         }
                     });
                 }else{
@@ -833,7 +841,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Location :</h5><br>
+                                <h5>Location : <span id="stc-agent-sup-std-sublocationspan"></span></h5><br>
                                 <input type="hidden" id="stc-agent-sup-std-hidden-std-id">
                                 <input type="hidden" id="stc-agent-sup-std-hidden-location-id">
                                 <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-sublocation">
@@ -866,7 +874,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Department : </h5><br>
+                                <h5>Department : <span id="stc-agent-sup-std-deptspan"></span></h5><br>
                                 <select class="btn btn-success form-control stc-agent-sup-std-sub-location text-left stc-std-update-on-change" id="stc-agent-sup-std-dept"><option>Please select location first!!!</option>
                                 </select>  
                                 <input type="hidden" class="form-control stc-agent-sup-std-sub-locationbyid"/>
