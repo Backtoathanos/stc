@@ -21342,3 +21342,14 @@
 [15-Nov-2023 16:28:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 701
 [15-Nov-2023 16:28:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 1447
 [15-Nov-2023 16:28:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 1604
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_name in /home/c2484kn1eg0y/public_html/stc_agent47/header-nav.php on line 70
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_role in /home/c2484kn1eg0y/public_html/stc_agent47/sidebar-nav.php on line 80
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_role in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 183
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 238
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_role in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 242
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_role in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 272
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 381
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 556
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 701
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 1447
+[15-Nov-2023 17:33:42 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/manage-project.php on line 1604

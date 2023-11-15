@@ -3882,3 +3882,23 @@
 [15-Nov-2023 11:11:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
 [15-Nov-2023 11:11:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
 [15-Nov-2023 11:11:01 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[15-Nov-2023 17:06:13 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_id in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/role_check.php on line 10
+[15-Nov-2023 17:06:13 Asia/Kolkata] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 12:01:52 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 12:01:52 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/dashboard.php on line 167
+[15-Nov-2023 17:34:17 Asia/Kolkata] PHP Notice:  Undefined variable: haystack in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[15-Nov-2023 17:34:17 Asia/Kolkata] PHP Notice:  Undefined variable: needle in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[15-Nov-2023 17:34:17 Asia/Kolkata] PHP Deprecated:  strpos(): Non-string needles will be interpreted as strings in the future. Use an explicit chr() call to preserve the current behavior in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 36
+[15-Nov-2023 17:34:17 Asia/Kolkata] PHP Warning:  include(): https:// wrapper is disabled in the server configuration by allow_url_include=0 in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[15-Nov-2023 17:34:17 Asia/Kolkata] PHP Warning:  include(https://stcassociate.com/stc_symbiote/footer.php): failed to open stream: no suitable wrapper could be found in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[15-Nov-2023 17:34:17 Asia/Kolkata] PHP Warning:  include(): Failed opening 'https://stcassociate.com/stc_symbiote/footer.php' for inclusion (include_path='.:/opt/alt/php73/usr/share/pear') in /home/c2484kn1eg0y/public_html/stc_vikings/print-preview.php on line 432
+[15-Nov-2023 12:05:51 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 12:05:51 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 12:05:51 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 12:05:51 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[15-Nov-2023 12:05:51 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
+[15-Nov-2023 12:09:00 UTC] PHP Notice:  Undefined index: stc_empl_name in /home/c2484kn1eg0y/public_html/stc_vikings/header-nav.php on line 76
+[15-Nov-2023 12:09:00 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 12:09:00 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 63
+[15-Nov-2023 12:09:00 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 91
+[15-Nov-2023 12:09:00 UTC] PHP Notice:  Undefined index: stc_empl_role in /home/c2484kn1eg0y/public_html/stc_vikings/reports.php on line 109
