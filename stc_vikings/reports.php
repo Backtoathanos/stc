@@ -1315,18 +1315,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         // }
 
         $(document).ready(function(){
-            $('body').delegate('.print-btn-sdl', 'click', function(){
-                $('.jobdonedet-view').hide();
-                $('.jobdonedet-print').show();
-                var pageTitle = 'Status Down List',
-                    stylesheet = '//maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css',
-                    win = window.open('Landscape', 'Print', 'width=1500,height=1300');
-                win.document.write('<html><head><title>' + pageTitle + '</title>' + '<link rel="stylesheet" href="' + stylesheet + '"><style>table, th, td {border: 1px solid;padding:5px;}</style>' + '</head><body>' + $('#stc-show-std-details-table')[0].outerHTML + '</body></html>');
-                win.document.close();
-                win.print();
-                win.close();
-                return false;
-            });
 
             $('.hidden-project-excel-section').hide();
             var screenwidth=$(window).width();
