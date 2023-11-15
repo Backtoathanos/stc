@@ -310,9 +310,9 @@
 				$stconpdqry=mysqli_query($con, "
 					SELECT * FROM `stc_product` WHERE `stc_product_id`='".$_GET['pdid']."'
 				");
-				$callonlinepro=mysqli_fetch_assoc($stconpdqry);
 				$checkrow=mysqli_num_rows($stconpdqry);
 				if($checkrow>0){
+					$callonlinepro=mysqli_fetch_assoc($stconpdqry);
 					echo '
 						<div class="col-md-4 single-left">
 							<div class="flexslider">
@@ -519,7 +519,7 @@
 								<h5><a href="singlepeices.php?productname='.$getrelatpro['stc_product_name'].'&&pdid='.$getrelatpro['stc_product_id'].'""></a></h5>
 								<div class="">
 									<form action="#" method="post">  
-										<a href="singlepeices.php?productname='.$getrelatpro['stc_product_name'].'&&pdid='.$getrelatpro['stc_product_id'].'"" id="'.$callonlinepro['stc_product_id'].'">Get for qoute</a>
+										<a href="singlepeices.php?productname='.$getrelatpro['stc_product_name'].'&&pdid='.$getrelatpro['stc_product_id'].'"" id="'.$getrelatpro['stc_product_id'].'">Get for qoute</a>
 									</form>
 								</div> 
 							</div>
@@ -587,7 +587,7 @@
 										<p>'.$subcat.' '.$getrelatproa['stc_product_name'].'</p>
 										<div class="">
 											<form action="#" method="post">  
-												<a href="#" id="'.$callonlinepro['stc_product_id'].'" class="w3ls-cart">Get for qoute</a>
+												<a href="#" id="'.$getrelatproa['stc_product_id'].'" class="w3ls-cart">Get for qoute</a>
 											</form>
 										</div> 
 									</div>
