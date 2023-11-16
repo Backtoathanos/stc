@@ -66,11 +66,17 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="col-md-12 col-xl-12"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
+                                            <?php
+                                                if($_SESSION['stc_agent_sub_category']!="Supervisor" || $_SESSION['stc_agent_sub_category']!="Site Incharge"){
+                                            ?>
                                             <div class="row">
                                                 <div class="col-lg-2 col-md-2">
                                                     <button class="form-control btn bg-success text-white mb-3 stc-std-operation-btn" type="create" data-toggle="modal" data-target=".bd-create-std-modal">Add Status Down List</button>
                                                 </div>
                                             </div>
+                                            <?php
+                                                }
+                                            ?>
                                             <?php
                                                 if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
                                             ?>
