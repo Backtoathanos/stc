@@ -474,8 +474,13 @@ class ragnarReportsViewRequiReports extends tesseract{
          WHERE `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $location)."'
          ORDER BY `stc_status_down_list_department_dept` ASC
       ");
-      foreach($ivar_query as $ivar_row){
-         $ivar.='<option>'.$ivar_row['stc_status_down_list_department_dept'].'</option>';
+      if(mysqli_num_rows($ivar_query)>0){
+         $ivar='<option value="NA">SELECT</option>';
+         foreach($ivar_query as $ivar_row){
+            $ivar.='<option>'.$ivar_row['stc_status_down_list_department_dept'].'</option>';
+         }
+      }else{
+         $ivar='<option value="NA">NO DEPARTMENT FOUND</option>';
       }
       return $ivar;
    }
@@ -878,6 +883,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th class="text-center">STATUS</th>
                      <th class="text-center">DELAY(DAYS)</th>
                      <th class="text-center">JOB DONE DETAILS</th>
+                     <th class="text-center">ANY COMMENTS</th>
                   </tr>
                </thead>
                <tbody>
@@ -1036,6 +1042,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <span class="jobdonedet-view">'.$jobdonedet.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$jobdonedet_value.'</span>
                   </td>
+                  <td>'.$row['stc_status_down_list_remarks'].'</td>
                </tr>
             ';
          }
