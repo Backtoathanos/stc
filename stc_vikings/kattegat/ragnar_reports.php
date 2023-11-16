@@ -1021,6 +1021,8 @@ class ragnarReportsViewRequiReports extends tesseract{
 						$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
 					}
 				}
+            $reason_value = $row['stc_status_down_list_reason'];
+            $reasondet = strlen($reason_value)>25 ? substr($reason_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$reason_value.'">Read more' : $reason_value;
             $jobdonedet_value = $row['stc_status_down_list_jobdone_details'];
             $jobdonedet = strlen($jobdonedet_value)>25 ? substr($jobdonedet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$jobdonedet_value.'">Read more' : $jobdonedet_value;
             $ivar.='
@@ -1034,7 +1036,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-center">'.$row['stc_status_down_list_jobtype'].'</td>
                   <td class="text-right">'.$row['stc_status_down_list_qty'].'</td>
                   <td class="text-right">'.$row['stc_status_down_list_capacity'].'</td>
-                  <td>'.$row['stc_status_down_list_reason'].'</td>
+                  <td>
+                     <span class="jobdonedet-view">'.$reasondet.'</span>
+                     <span class="jobdonedet-print" style="display:none;">'.$reason_value.'</span>
+                  </td>
                   <td>'.$row['stc_status_down_list_reasonattribute'].'</td>
                   <td class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>
