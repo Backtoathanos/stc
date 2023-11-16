@@ -67,7 +67,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <?php
-                                                if($_SESSION['stc_agent_sub_category']!="Supervisor" || $_SESSION['stc_agent_sub_category']!="Site Incharge"){
+                                                if($_SESSION['stc_agent_sub_category']=="Supervisor" && $_SESSION['stc_agent_sub_category']!="Site Incharge"){
                                             ?>
                                             <div class="row">
                                                 <div class="col-lg-2 col-md-2">
