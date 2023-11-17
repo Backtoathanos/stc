@@ -1021,6 +1021,8 @@ class ragnarReportsViewRequiReports extends tesseract{
 						$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
 					}
 				}
+            $anycomm_value = $row['stc_status_down_list_remarks'];
+            $anycomdet = strlen($anycomm_value)>25 ? substr($anycomm_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$anycomm_value.'">Read more' : $anycomm_value;
             $reason_value = $row['stc_status_down_list_reason'];
             $reasondet = strlen($reason_value)>25 ? substr($reason_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$reason_value.'">Read more' : $reason_value;
             $jobdonedet_value = $row['stc_status_down_list_jobdone_details'];
@@ -1047,7 +1049,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <span class="jobdonedet-view">'.$jobdonedet.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$jobdonedet_value.'</span>
                   </td>
-                  <td>'.$row['stc_status_down_list_remarks'].'</td>
+                  <td>
+                     <span class="jobdonedet-view">'.$anycomdet.'</span>
+                     <span class="jobdonedet-print" style="display:none;">'.$anycomm_value.'</span>
+                  </td>
                </tr>
             ';
          }
