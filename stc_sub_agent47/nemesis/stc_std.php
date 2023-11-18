@@ -479,7 +479,7 @@ class transformers extends tesseract{
 				}
 
 				$actionsec='';
-				if($_SESSION['stc_agent_sub_category']=="Supervisor"){
+				if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
 					if($row['stc_status_down_list_status']==1){
 						$actionsec='
 							<a href="javascript:void(0)" class="btn bg-danger text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
