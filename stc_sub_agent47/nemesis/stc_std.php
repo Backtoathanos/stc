@@ -512,7 +512,8 @@ class transformers extends tesseract{
 					}else{
 						$actionsec='#';
 					}
-				}elseif($_SESSION['stc_agent_sub_category']=="Site Incharge"){
+				}
+				if($_SESSION['stc_agent_sub_category']=="Site Incharge"){
 					if($row['stc_status_down_list_status']==4){
 						$actionsec='
 								<div class="col-sm-12 col-md-12">
