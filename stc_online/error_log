@@ -1,0 +1,25 @@
+[15-Nov-2023 19:17:33 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[15-Nov-2023 19:31:19 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[16-Nov-2023 04:15:16 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[16-Nov-2023 05:06:44 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[16-Nov-2023 06:38:03 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[16-Nov-2023 12:58:18 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[16-Nov-2023 13:11:06 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 313
+[16-Nov-2023 13:11:09 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[16-Nov-2023 16:39:49 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 313
+[16-Nov-2023 13:53:20 UTC] PHP Notice:  Undefined index: product in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 290
+[16-Nov-2023 22:26:54 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[17-Nov-2023 00:25:32 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[18-Nov-2023 02:53:01 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 313
+[18-Nov-2023 06:08:17 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[18-Nov-2023 06:18:50 UTC] PHP Notice:  Undefined index: product in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 290
+[18-Nov-2023 15:51:04 UTC] PHP Notice:  Undefined index: productname in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 299
+[18-Nov-2023 15:51:05 UTC] PHP Notice:  Undefined index: productname in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 299
+[18-Nov-2023 22:13:28 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[19-Nov-2023 02:52:35 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[19-Nov-2023 00:55:13 UTC] PHP Notice:  Undefined index: product in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 290
+[19-Nov-2023 07:28:53 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[19-Nov-2023 13:09:02 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[19-Nov-2023 17:45:56 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[19-Nov-2023 12:48:49 UTC] PHP Notice:  Undefined index: product in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 290
+[20-Nov-2023 17:20:12 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 313
