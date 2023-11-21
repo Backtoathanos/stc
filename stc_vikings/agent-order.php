@@ -1177,22 +1177,25 @@ include("kattegat/role_check.php");
         });
 
         // material name change requistion
-        $('body').delegate('.stc-update-requis-material-name-hit', 'click', function(e){
+        $('body').delegate('.stc-update-requis-material-name-hit', 'focusout', function(e){
           e.preventDefault();
           var material_id=$(this).attr("id");
-          var material_name=$('#stc-update-requis-material-name'+material_id).val();
-          $.ajax({
-            url     : "kattegat/ragnar_order.php",
-            method  : "post",
-            data    : {
-              stc_update_requisition_items_hit:1,
-              material_id:material_id,
-              material_name:material_name
-            },
-            success : function(response_material_name){
-              alert(response_material_name);
-            }
-          });
+          var material_name=$(this).val();
+          
+          if (window.confirm("Are you sure, You want to change item name to " + material_name)) {
+            $.ajax({
+              url     : "kattegat/ragnar_order.php",
+              method  : "post",
+              data    : {
+                stc_update_requisition_items_hit:1,
+                material_id:material_id,
+                material_name:material_name
+              },
+              success : function(response_material_name){
+                alert(response_material_name);
+              }
+            });
+          }
         });
 
         var jsfiltercat;

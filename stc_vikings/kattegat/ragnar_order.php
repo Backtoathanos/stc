@@ -1110,19 +1110,19 @@ class ragnarRequisitionView extends tesseract{
 				foreach($getmerchndiseqry as $merchandrow){
 					$pd_name=$merchandrow['stc_product_name'];
 				}
-				$unitarray = array('Consumable', 'PPE', 'Supply',  'Tools & Tackles');
-				$unit_select= '<option value="NA">Please Select Item Type</option>';
-				foreach($unitarray as $unitarrayorw){
-					if($unitarrayorw==$ivarreqitemrow['stc_cust_super_requisition_items_type']){
-						$unit_select.='<option value="'.$unitarrayorw.'" selected>'.$unitarrayorw.'</option>';
+				$typearray = array('Consumable', 'PPE', 'Supply',  'Tools & Tackles');
+				$type_select= '<option value="NA">Please Select Item Type</option>';
+				foreach($typearray as $typearrayorw){
+					if($typearrayorw==$ivarreqitemrow['stc_cust_super_requisition_items_type']){
+						$type_select.='<option value="'.$typearrayorw.'" selected>'.$typearrayorw.'</option>';
 					}else{
-						$unit_select.='<option value="'.$unitarrayorw.'">'.$unitarrayorw.'</option>';
+						$type_select.='<option value="'.$typearrayorw.'">'.$typearrayorw.'</option>';
 					}
 				}
-				$unitarray = array('Consumable', 'PPE', 'Supply',  'Tools & Tackles');
-				$unit_select= '<option value="NA">Please Select Item Type</option>';
+				$unitarray = array('Nos', 'Set', 'Feet', 'Mtr', 'Sqmt', 'Ltr', 'Bag', 'Roll', 'Lot', 'Kgs', 'Pkt', 'Case', 'Bundle', 'Pair');
+				$unit_select= '<option value="NA">Please Select Unit</option>';
 				foreach($unitarray as $unitarrayorw){
-					if($unitarrayorw==$ivarreqitemrow['stc_cust_super_requisition_items_type']){
+					if(strtolower($unitarrayorw)==strtolower($ivarreqitemrow['stc_cust_super_requisition_list_items_unit'])){
 						$unit_select.='<option value="'.$unitarrayorw.'" selected>'.$unitarrayorw.'</option>';
 					}else{
 						$unit_select.='<option value="'.$unitarrayorw.'">'.$unitarrayorw.'</option>';
@@ -1132,65 +1132,43 @@ class ragnarRequisitionView extends tesseract{
 						<tr>
 							<td class="no">'.$sl.'</td>
 							<td class="text-left">
-								<h6>
-								  '.htmlspecialchars($ivarreqitemrow['stc_cust_super_requisition_list_items_title']).'
-								</h6>
 								<input 
 									type="text" 
-									id="stc-update-requis-material-name'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'"
-									class="form-control stc-update-requis-material-name" 
+									class="form-control stc-update-requis-material-name stc-update-requis-material-name-hit" 
 									placeholder="Please Enter Item Name" 
 									value="'.htmlspecialchars($ivarreqitemrow['stc_cust_super_requisition_list_items_title']).'"
-								>
-								<button
-									type="submit"
-									class="form-control btn btn-success stc-update-requis-material-name-hit"
 									id="'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'"
-								>Save</button>
+								>
 							</td>
 							<td class="unit">
 								<select
 								  class="custom-select stc-sup-req-type-change'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'"
 								  name="stcpdunit"
 								>
-								  	
-                                	'.$unit_select.'
+                                	'.$type_select.'
 								</select>
 							</td>
 							<td class="unit">
-								'.$ivarreqitemrow['stc_cust_super_requisition_list_items_unit'].'
 								<select
 								  class="custom-select stc-sup-req-unit-change'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'"
 								  name="stcpdunit"
-								>
-								  <option value="Nos">Nos</option>
-								  <option value="Set">Set</option>
-								  <option value="Feet">Feet</option>
-								  <option value="Mtr">Mtr</option>
-								  <option value="Sqmt">Sqmt</option>
-								  <option value="Ltr">Ltr</option>
-								  <option value="Bag">Bag</option>
-								  <option value="Roll">Roll</option>
-								  <option value="Lot">Lot</option>
-								  <option value="Kgs">Kgs</option>
-								  <option value="Pkt">Pkt</option>
-								  <option value="Case">Case</option>
-								  <option value="Bundle">Bundle</option>
-								  <option value="Pair">Pair</option>		
+								>	
 								  '.$unit_select.'						  
 								</select>
 							</td>
 							<td class="qty">
 								<input 
+									style="position:relative;top:14px;"
 									type="text" 
 									class="form-control stc-sup-req-qty-change'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'" 
 									placeholder="Quantity" title="Please Enter Requisition Quantity"
+									id="'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'"
 									value="'.number_format($ivarreqitemrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'"
 								>
-								<span style="position:relative;top:-31px;left:70px;">
+								<span style="position:relative;top:-19px;left:50px;">
 									<a 
 										href="#" 
-										style="font-size: 15px;border-radius: 40%;background: yellow;padding: 10px 14px;"
+										style="font-size: 16px;border-radius: 20%;background: yellow;padding: 10px 8px;"
 										class="stc-sup-req-something-change-hit"
 										id="'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'"
 									><i class="fa fa-arrow-right"></i></a>
