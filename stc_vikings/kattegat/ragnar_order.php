@@ -1110,6 +1110,24 @@ class ragnarRequisitionView extends tesseract{
 				foreach($getmerchndiseqry as $merchandrow){
 					$pd_name=$merchandrow['stc_product_name'];
 				}
+				$unitarray = array('Consumable', 'PPE', 'Supply',  'Tools & Tackles');
+				$unit_select= '<option value="NA">Please Select Item Type</option>';
+				foreach($unitarray as $unitarrayorw){
+					if($unitarrayorw==$ivarreqitemrow['stc_cust_super_requisition_items_type']){
+						$unit_select.='<option value="'.$unitarrayorw.'" selected>'.$unitarrayorw.'</option>';
+					}else{
+						$unit_select.='<option value="'.$unitarrayorw.'">'.$unitarrayorw.'</option>';
+					}
+				}
+				$unitarray = array('Consumable', 'PPE', 'Supply',  'Tools & Tackles');
+				$unit_select= '<option value="NA">Please Select Item Type</option>';
+				foreach($unitarray as $unitarrayorw){
+					if($unitarrayorw==$ivarreqitemrow['stc_cust_super_requisition_items_type']){
+						$unit_select.='<option value="'.$unitarrayorw.'" selected>'.$unitarrayorw.'</option>';
+					}else{
+						$unit_select.='<option value="'.$unitarrayorw.'">'.$unitarrayorw.'</option>';
+					}
+				}
 				$ivar.='
 						<tr>
 							<td class="no">'.$sl.'</td>
@@ -1131,16 +1149,12 @@ class ragnarRequisitionView extends tesseract{
 								>Save</button>
 							</td>
 							<td class="unit">
-								'.$ivarreqitemrow['stc_cust_super_requisition_items_type'].'
 								<select
 								  class="custom-select stc-sup-req-type-change'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'"
 								  name="stcpdunit"
 								>
-								  	<option value="NA">Please Select Item Type</option>
-                                	<option value="Consumable">CONSUMABLE</option>
-                                	<option value="PPE">PPE</option>
-                                	<option value="Supply">SUPPPLY</option>
-                                	<option value="Tools & Tackles">TOOLS & TACKLES</option>
+								  	
+                                	'.$unit_select.'
 								</select>
 							</td>
 							<td class="unit">
@@ -1162,7 +1176,8 @@ class ragnarRequisitionView extends tesseract{
 								  <option value="Pkt">Pkt</option>
 								  <option value="Case">Case</option>
 								  <option value="Bundle">Bundle</option>
-								  <option value="Pair">Pair</option>								  
+								  <option value="Pair">Pair</option>		
+								  '.$unit_select.'						  
 								</select>
 							</td>
 							<td class="qty">
@@ -1172,13 +1187,13 @@ class ragnarRequisitionView extends tesseract{
 									placeholder="Quantity" title="Please Enter Requisition Quantity"
 									value="'.number_format($ivarreqitemrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'"
 								>
-								<span>
+								<span style="position:relative;top:-31px;left:70px;">
 									<a 
 										href="#" 
-										style="font-size: 15px;border-radius: 40%;background: yellow;padding: 3px 20px;"
+										style="font-size: 15px;border-radius: 40%;background: yellow;padding: 10px 14px;"
 										class="stc-sup-req-something-change-hit"
 										id="'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'"
-									><i class="fa fa-arrow-down"></i></a>
+									><i class="fa fa-arrow-right"></i></a>
 								</span>
 							</td>
 							<td class="no">
