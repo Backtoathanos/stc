@@ -95,6 +95,24 @@
                             <td class="text-center">
                                 <a href="{{url('/users/managerusers/delete/'.$value->stc_agents_id)}}" class="btn btn-danger btn-sm" ><i class='fas fa-trash'></i></a>
                                 <a href="{{url('/users/managerusers/edit/'.$value->stc_agents_id)}}" class="btn btn-danger btn-sm" ><i class='fas fa-edit'></i></a>
+                                <?php     
+
+                                  $server = $_SERVER['SERVER_NAME']=="localhost" ? "http://localhost/stc" : "https://stcassociate.com";
+                                  $user_id = $value->stc_agents_id;
+                                  $user_type = "manager";
+                                  
+                                  
+                                  $simple_string =$user_id;
+                                  $ciphering = "AES-128-CTR";
+                                  $iv_length = openssl_cipher_iv_length($ciphering);
+                                  $options = 0;
+                                  $encryption_iv = '1234567891011121';
+                                  $encryption_key = "stc_associate_go";
+                                  $encryption = openssl_encrypt($simple_string, $ciphering, $encryption_key, $options, $encryption_iv);
+                                  
+                                  $url = $server.'/usercredentials.php?user_id='.$encryption.'&user_type='.$user_type;
+                                ?>
+                                <a href="<?php echo $url;?>" target="_blank" class="btn btn-danger btn-sm" ><i class='fas fa-arrow-right'></i></a>
                             </td>
                         </tr>
                         @endforeach
