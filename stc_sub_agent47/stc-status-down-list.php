@@ -332,6 +332,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var remarks = $('.stc-agent-sup-std-remarks').val();
                 $('.message-alert').remove();
                 if(operation=="manual"){
+                    $(this).prop("disabled", true);
                     var check_dept = $('#stc-agent-sup-std-dept').val();
                     if(check_dept!="NA"){
                         $.ajax({
