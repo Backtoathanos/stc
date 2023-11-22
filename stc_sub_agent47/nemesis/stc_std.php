@@ -529,8 +529,6 @@ class transformers extends tesseract{
 					}else{
 						$actionsec='#';
 					}
-				}else{
-					$actionsec='#';
 				}
 				$eqstatus='
 						<td class="text-center" style="font-weight:bold;background: #5cd25c;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
