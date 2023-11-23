@@ -688,7 +688,7 @@ class sceptor extends tesseract{
 #<------------------------------------------------------------------------------->
 
 if(isset($_POST["dashboard"])){	
-	$month=$_POST['month'];
+	$month=isset($_POST['month']) ? $_POST['month'] : '01';
 	$objtitems=new sceptor();
 	$objinventory=new sceptor();
 	$objtmerchant=new sceptor();

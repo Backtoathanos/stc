@@ -3231,7 +3231,7 @@ if(isset($_POST['stcreqperticularaction'])){
 	$bjornefilterreqcustomerid=$_POST['phpreqcustomerid'];
 	$bjornefilterreqnumber=$_POST['phpreqnumber'];
 	$bjornefilterreqsitename=$_POST['phpreqagents'];
-	$bjornefilterreqmaterials=$_POST['phpreqmaterials'];
+	$bjornefilterreqmaterials=isset($_POST['phpreqmaterials']) ? $_POST['phpreqmaterials'] : 'NA';
 	$bjornefilterrequrl_param=$_POST['url_param'];
 	$out='';
 	$objpdres=new ragnarRequisitionPertView();	
