@@ -416,10 +416,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     },
                     dataType : 'JSON',
                     success     : function(response_sdl){
-                        var jcat=response_sdl['stc_status_down_list_job_type_title'];
-                        $('.stc-agent-sup-std-job-type').prop('checked', false);
-                        $('#'+jcat).prop('checked', true);
-                        load_jobtype('jcat', response_sdl['stc_status_down_list_job_type_id']);
+                        if(response_sdl!="no"){
+                            var jcat=response_sdl['stc_status_down_list_job_type_title'];
+                            $('.stc-agent-sup-std-job-type').prop('checked', false);
+                            $('#'+jcat).prop('checked', true);
+                            load_jobtype('jcat', response_sdl['stc_status_down_list_job_type_id']);
+                        }
                     }
                 });
             }
