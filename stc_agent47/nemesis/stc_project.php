@@ -2405,7 +2405,7 @@ class pirates_supervisor extends tesseract{
 				if(!empty($_SESSION["stc_agent_id"])){
 					$action_show='
 						<a href="#" class="form-control btn btn-secondary stc-safetytbm-edit" id="'.$optimusprimerow['stc_safetytbm_id'].'">View</a>
-						<a href="'.$website.'safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetytbm_id'].'" class="form-control btn btn-danger">Print</a>
+						<a target="_blank" href="'.$website.'safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetytbm_id'].'" class="form-control btn btn-danger">Print</a>
 					';
 					// <img src="https://stcassociate.com/stc_sub_agent47/safety_img/'.$img_path.'" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">
 					$safety_image='
@@ -2511,7 +2511,7 @@ class pirates_supervisor extends tesseract{
 			$website = $website=="localhost" ? '' : 'https://stcassociate.com/stc_agent47/';
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="'.$website.'safety-ppem-print-preview.php?ppem_no='.$optimusprimerow['stc_safetyppem_id'].'" class="form-control btn btn-success" >View</a>
+					<a target="_blank" href="'.$website.'safety-ppem-print-preview.php?ppem_no='.$optimusprimerow['stc_safetyppem_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyppem-edit" id="'.$optimusprimerow['stc_safetyppem_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyppem-delete" id="'.$optimusprimerow['stc_safetyppem_id'].'">Delete</a>
 				';
@@ -2561,7 +2561,7 @@ class pirates_supervisor extends tesseract{
 			$website = $website=="localhost" ? '' : 'https://stcassociate.com/stc_agent47/';
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="'.$website.'safety-ttht-print-preview.php?ttht_no='.$optimusprimerow['stc_safetytoolslist_id'].'" class="form-control btn btn-success" >View</a>
+					<a target="_blank" href="'.$website.'safety-ttht-print-preview.php?ttht_no='.$optimusprimerow['stc_safetytoolslist_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetytoollist-edit" id="'.$optimusprimerow['stc_safetytoolslist_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetytoollist-delete" id="'.$optimusprimerow['stc_safetytoolslist_id'].'">Delete</a>
 				';
@@ -2611,7 +2611,7 @@ class pirates_supervisor extends tesseract{
 			$website = $website=="localhost" ? '' : 'https://stcassociate.com/stc_agent47/';
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="'.$website.'safety-vhl-print-preview.php?vhl_no='.$optimusprimerow['stc_safetyvehicle_id'].'" class="form-control btn btn-success" >View</a>
+					<a target="_blank" href="'.$website.'safety-vhl-print-preview.php?vhl_no='.$optimusprimerow['stc_safetyvehicle_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyvhl-edit" id="'.$optimusprimerow['stc_safetyvehicle_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyvhl-delete" id="'.$optimusprimerow['stc_safetyvehicle_id'].'">Delete</a>
 				';
@@ -2664,7 +2664,7 @@ class pirates_supervisor extends tesseract{
 			$website = $website=="localhost" ? '' : 'https://stcassociate.com/stc_agent47/';
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="'.$website.'safety-hotwork-print-preview.php?hotwork_no='.$optimusprimerow['stc_safetyhotwork_id'].'" class="form-control btn btn-success" >View</a>
+					<a target="_blank" href="'.$website.'safety-hotwork-print-preview.php?hotwork_no='.$optimusprimerow['stc_safetyhotwork_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyhotwork-edit" id="'.$optimusprimerow['stc_safetyhotwork_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyhotwork-delete" id="'.$optimusprimerow['stc_safetyhotwork_id'].'">Delete</a>
 				';
@@ -2736,7 +2736,7 @@ class pirates_supervisor extends tesseract{
 				$website=$_SERVER['SERVER_NAME'];
 				$website = $website=="localhost" ? '' : 'https://stcassociate.com/stc_agent47/';
 				$action_show='
-					<a href="'.$website.'safety-nearmiss-print-preview.php?nearmiss_no='.$optimusprimerow['stc_safetynearmiss_id'].'" class="form-control btn btn-success" >View</a>
+					<a target="_blank" href="'.$website.'safety-nearmiss-print-preview.php?nearmiss_no='.$optimusprimerow['stc_safetynearmiss_id'].'" class="form-control btn btn-success" >View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetynearmiss-edit" id="'.$optimusprimerow['stc_safetynearmiss_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetynearmiss-delete" id="'.$optimusprimerow['stc_safetynearmiss_id'].'">Delete</a>
 				';

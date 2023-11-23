@@ -316,7 +316,7 @@ if(isset($_GET['nearmiss_no'])){
       <?php 
         $website=$_SERVER['SERVER_NAME'];
 			  $website = $website=="localhost" ? '../' : 'https://stcassociate.com';
-          include "'.$website.'/stc_symbiote/footer.php";
+        include $website."/stc_symbiote/footer.php";
         ?>
     <script>
       $(document).ready(function(){

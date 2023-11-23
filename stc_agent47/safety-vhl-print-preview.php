@@ -308,7 +308,7 @@ if(isset($_GET['vhl_no'])){
                           'stc_safetyvehicle_firstaidkit' => 'First aid kit'
                         );
                         foreach($oprvhl as $key=>$oprvhlrow){
-                          $flag = '<td style="text-align:center;">✔</td><tdstyle="text-align:center;"></td>';
+                          $flag = '<td style="text-align:center;">✔</td><td style="text-align:center;"></td>';
                           $flag = ($get_stc_safety[$key]) ? $flag : '<td style="text-align:center;"></td><td style="text-align:center;">X</td>';
                           echo '
                             <tr>
@@ -361,7 +361,7 @@ if(isset($_GET['vhl_no'])){
       <?php 
         $website=$_SERVER['SERVER_NAME'];
 			  $website = $website=="localhost" ? '../' : 'https://stcassociate.com';
-          include "'.$website.'/stc_symbiote/footer.php";
+          include $website."/stc_symbiote/footer.php";
         ?>
     <script>
       $(document).ready(function(){
