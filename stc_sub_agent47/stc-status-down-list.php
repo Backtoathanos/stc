@@ -425,6 +425,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     }
                 });
             }
+            
             function load_std_perticular(std_id){
                 $.ajax({
                     url         : "nemesis/stc_std.php",
