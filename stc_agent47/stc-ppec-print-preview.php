@@ -226,6 +226,10 @@ if(isset($_GET['ppec_no'])){
             float: left;
             width: 90%;
           }
+
+          #stc-table-count tr, #stc-table-count td, #stc-table-count th{
+            font-size : 12px;
+          }
       }
     </style>
   </head>
@@ -240,11 +244,11 @@ if(isset($_GET['ppec_no'])){
         <!-- Create order -->
         <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
           <a target="_blank" id="logo_print_pre" href="#">
-            <img style="width: 150px;position: absolute;top: -60px;left: 5px;" src="images/globallogo.jpg">
+            <img style="width: 100px;position: absolute;top: -35px;left: 5px;" src="images/globallogo.jpg">
           </a>
         </div>
         <div class="col-xl-8 col-lg-8 col-md-8 col-sm-8">
-          <h2 style="position: relative;top: 10px;margin-bottom: 55px;" align="center">GLOBAL AC SYSTEM JSR PVT LTD.</h2>
+          <h2 style="position: relative;top: 10px;margin-bottom: 55px;font-size:25px;" align="center">GLOBAL AC SYSTEM JSR PVT LTD.</h2>
         </div>
         <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
         </div>
@@ -385,7 +389,7 @@ if(isset($_GET['ppec_no'])){
       <?php 
         $website=$_SERVER['SERVER_NAME'];
 			  $website = $website=="localhost" ? '../' : 'https://stcassociate.com';
-          include "'.$website.'/stc_symbiote/footer.php";
+        include $website."/stc_symbiote/footer.php";
       ?>
     <script>
       $(document).ready(function(){

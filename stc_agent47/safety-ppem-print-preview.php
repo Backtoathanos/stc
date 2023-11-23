@@ -128,6 +128,7 @@ if(isset($_GET['ppem_no'])){
 
       #stc-ppem-table,#stc-ppem-table tr, #stc-ppem-table tr td, #stc-ppem-table tr th {
         border: 1px solid black;
+        font-size : 15px;
       }
       #stc-ppem-table tr td{
         height : 10px;
@@ -198,6 +199,9 @@ if(isset($_GET['ppem_no'])){
 
         .header-title{
           font-size : 16px;
+        }
+        #stc-ppem-table,#stc-ppem-table tr, #stc-ppem-table tr td, #stc-ppem-table tr th {
+          font-size : 12px;
         }
       }
     </style>
@@ -365,7 +369,7 @@ if(isset($_GET['ppem_no'])){
       <?php 
         $website=$_SERVER['SERVER_NAME'];
 			  $website = $website=="localhost" ? '../' : 'https://stcassociate.com';
-          include "'.$website.'/stc_symbiote/footer.php";
+        include $website."/stc_symbiote/footer.php";
         ?>
     <script>
       $(document).ready(function(){
