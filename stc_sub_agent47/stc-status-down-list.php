@@ -501,7 +501,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             window.location.reload();
                         }else if(response_sdl=="empty"){
                         }else{
-                            load_std_perticular(std_id)
+                            // load_std_perticular(std_id)
                         }
                     }
                 });
@@ -555,8 +555,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 $('.attribute-message-show').remove();
                 $(this).after('<p class="text-success attribute-message-show">Record updated.</p>');
                 stc_update_std_toolsreq();
-                var location_id=$('#stc-agent-sup-std-location-find').val();
-                std_list_call(location_id);
+                // var location_id=$('#stc-agent-sup-std-location-find').val();
+                // std_list_call(location_id);
             });
             
             // filter tbm checkbox
