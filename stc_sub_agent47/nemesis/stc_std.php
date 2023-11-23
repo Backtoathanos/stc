@@ -75,7 +75,19 @@ class transformers extends tesseract{
 		}
 		return $optimusprime;
 	}
-
+	// call sitename
+	public function stc_call_jvarities($jvarites){
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT `stc_status_down_list_job_type_id`, `stc_status_down_list_job_type_title`,`stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type`
+			WHERE `stc_status_down_list_job_type_id`='".mysqli_real_escape_string($this->stc_dbs, $jvarites)."'
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			$optimusprime = mysqli_fetch_assoc($optimusprimequery);
+		}else{
+			$optimusprime = "no";
+		}
+		return $optimusprime;
+	}
 	// call department
 	public function stc_call_department($loca_id){
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
@@ -798,6 +810,12 @@ if(isset($_POST['call_department'])){
 // 	$opmetabots=$metabots->stc_call_location();
 // 	echo $opmetabots;
 // }
+if(isset($_POST['stc_std_perticular_jvarities_hit'])){
+	$jvarites=$_POST['jvarities'];
+	$metabots=new transformers();
+	$opmetabots=$metabots->stc_call_jvarities($jvarites);
+	echo json_encode($opmetabots);
+}
 
 // call department
 // if(isset($_POST['call_department'])){

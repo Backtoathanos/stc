@@ -283,9 +283,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 });
             });
 
-            // call equipment type on select location
-            $('body').delegate('.stc-agent-sup-std-job-type', 'change', function(e){
-                e.preventDefault();
+            
+            function load_jobtype(operation, value){
                 // var job_type = $(this).val();
                 var job_type = [];
                 $('.stc-agent-sup-std-job-type:checked').each(function(){
@@ -298,8 +297,16 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     success : function(response){
                         // console.log(response);
                         $('#stc-agent-sup-std-job-varities').html(response);
+                        if(operation=="jcat"){
+                            $('#stc-agent-sup-std-job-varities').val(value);
+                        }
                     }
                 });
+            }
+            // call equipment type on select location
+            $('body').delegate('.stc-agent-sup-std-job-type', 'change', function(e){
+                e.preventDefault();
+                load_jobtype('', '');
             });
 
             // save status down list
@@ -399,6 +406,23 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 }
             });
 
+            function load_jvarities(jvarities){
+                $.ajax({
+                    url         : "nemesis/stc_std.php",
+                    method      : "POST",
+                    data        : {
+                        stc_std_perticular_jvarities_hit:1,
+                        jvarities:jvarities
+                    },
+                    dataType : 'JSON',
+                    success     : function(response_sdl){
+                        var jcat=response_sdl['stc_status_down_list_job_type_title'];
+                        $('.stc-agent-sup-std-job-type').prop('checked', false);
+                        $('#'+jcat).prop('checked', true);
+                        load_jobtype('jcat', response_sdl['stc_status_down_list_job_type_id']);
+                    }
+                });
+            }
             function load_std_perticular(std_id){
                 $.ajax({
                     url         : "nemesis/stc_std.php",
@@ -437,6 +461,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('.stc-agent-sup-std-jobdonedetails').val(response_sdl.stc_status_down_list_jobdone_details);
                         $('.stc-agent-sup-std-remarks').val(response_sdl.stc_status_down_list_remarks);
                         $('.stc-std-tools-req-item-show').html(response_sdl.stc_status_down_list_tools_req);
+                        load_jvarities(response_sdl.stc_status_down_list_varities_id);
                     }
                 });
             }
