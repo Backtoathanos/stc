@@ -36,45 +36,45 @@
                     <ul class="vertical-nav-menu">
                         <li class="app-sidebar__heading">Dashboards</li>    
                         <li>
-                            <a href="dashboard.php" class="mm-active">
+                            <a href="dashboard.php?page=dashboard" class="dashboard">
                                 <i class="metismenu-icon pe-7s-home"></i>
                                 Home
                             </a>
                         </li>                    
                         <!-- Accounts -->
                         <li>
-                            <a href="#" class="mm-active">
+                            <a href="#" class="accounts">
                                 <i class="metismenu-icon pe-7s-server"></i>
                                 Accounts
                                 <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                             </a>
                             <ul>
                                 <li>
-                                    <a href="deposit.php">
+                                    <a href="deposit.php?page=accounts">
                                         <i class="metismenu-icon"></i>
                                         Deposit
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="payment-request.php">
+                                    <a href="payment-request.php?page=accounts">
                                         <i class="metismenu-icon"></i>
                                         Payment Request
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="payment-process.php">
+                                    <a href="payment-process.php?page=accounts">
                                         <i class="metismenu-icon"></i>
                                         Payment Process
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="payment-adjustment.php">
+                                    <a href="payment-adjustment.php?page=accounts">
                                         <i class="metismenu-icon"></i>
                                         Adjustments
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="na.php">
+                                    <a href="na.php?page=accounts">
                                         <i class="metismenu-icon"></i>
                                         Account Register
                                     </a>
@@ -83,38 +83,38 @@
                         </li>
                         <!-- Master -->
                         <li>
-                            <a href="#" class="mm-active">
+                            <a href="#" class="master">
                                 <i class="metismenu-icon pe-7s-diamond"></i>
                                 Master
                                 <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                             </a>
                             <ul>
                                 <li>
-                                    <a href="add-product.php">
+                                    <a href="add-product.php?page=master&subpage=addproduct" class="addproduct">
                                         <i class="metismenu-icon"></i>
                                         Add Product
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="add-merchant.php">
+                                    <a href="add-merchant.php?page=master&subpage=addmerchant" class="addmerchant">
                                         <i class="metismenu-icon"></i>
                                         Add Merchant
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="add-customer.php">
+                                    <a href="add-customer.php?page=master&subpage=addcustomer" class="addcustomer">
                                         <i class="metismenu-icon"></i>
                                         Add Customer
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="add-product-suppports.php">
+                                    <a href="add-product-suppports.php?page=master&subpage=addproductsupports" class="addproductsupports">
                                         <i class="metismenu-icon"></i>
                                         Add Product Supports
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="update-product-image.php">
+                                    <a href="update-product-image.php?page=master&subpage=updateproductimage" class="updateproductimage">
                                         <i class="metismenu-icon"></i>
                                         Update Product Image
                                     </a>
@@ -123,26 +123,26 @@
                         </li>
                         <!-- Purchase -->
                         <li>
-                            <a href="#" class="mm-active">
+                            <a href="#" class="purchase">
                                 <i class="metismenu-icon pe-7s-cart"></i>
                                 Purchase
                                 <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                             </a>
                             <ul>
                                 <li>
-                                    <a href="purchase-product.php">
+                                    <a href="purchase-product.php?page=purchase&subpage=purchaseorder" class="purchaseorder">
                                         <i class="metismenu-icon"></i>
                                         Purchase Order
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="purchase-payments.php">
+                                    <a href="purchase-payments.php?page=purchase&subpage=purchaseorderpayments" class="purchaseorderpayments">
                                         <i class="metismenu-icon"></i>
                                         Purchase Order Payments
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="inventory.php">
+                                    <a href="inventory.php?page=purchase&subpage=inventory" class="inventory">
                                         <i class="metismenu-icon"></i>
                                         Inventory
                                     </a>
@@ -151,56 +151,56 @@
                         </li>
                         <!-- Sale -->
                         <li>
-                            <a href="#" class="mm-active">
+                            <a href="#" class="sale">
                                 <i class="metismenu-icon pe-7s-credit"></i>
                                 Sale
                                 <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                             </a>
                             <ul>
                                 <li>
-                                    <a href="quote-quotation.php">
+                                    <a href="quote-quotation.php?page=sale&subpage=quotation" class="quotation">
                                         <i class="metismenu-icon"></i>
                                         Quotation
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="standard-challan.php">
+                                    <a href="standard-challan.php?page=sale&subpage=schallan" class="schallan">
                                         <i class="metismenu-icon"></i>
                                         Standard Challan
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="direct-challan.php">
+                                    <a href="direct-challan.php?page=sale&subpage=dchallan" class="dchallan">
                                         <i class="metismenu-icon"></i>
                                         Direct Challan
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="virtual-challan.php">
+                                    <a href="virtual-challan.php?page=sale&subpage=vchallan" class="vchallan">
                                         <i class="metismenu-icon"></i>
                                         Virtual Challan
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="adjust-tax-invoice.php">
+                                    <a href="adjust-tax-invoice.php?page=sale&subpage=aataxinvoice" class="aataxinvoice">
                                         <i class="metismenu-icon"></i>
                                         Adjust Tax Invoice
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="additional-tax-invoice.php">
+                                    <a href="additional-tax-invoice.php?page=sale&subpage=ataxinvoice" class="ataxinvoice">
                                         <i class="metismenu-icon"></i>
                                         Additional Tax Invoice
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="invoice-payment.php">
+                                    <a href="invoice-payment.php?page=sale&subpage=invoicepayments" class="invoicepayments">
                                         <i class="metismenu-icon"></i>
                                         Invoice Payments
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="sale-purchase-register.php">
+                                    <a href="sale-purchase-register.php?page=sale&subpage=salepurchaseregister" class="salepurchaseregister">
                                         <i class="metismenu-icon"></i>
                                         Sale Purchase Register
                                     </a>
@@ -209,7 +209,7 @@
                         </li>
                         <!-- Reports -->
                         <li>
-                            <a href="reports.php" class="mm-active">
+                            <a href="reports.php?page=reports" class="reports">
                                 <i class="metismenu-icon pe-7s-note2"></i>
                                 Reports
                             </a>

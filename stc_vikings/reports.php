@@ -49,6 +49,24 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         .message-alert{
             color : red;
         }
+
+        @media print {
+
+            #stc-show-std-detailspre-table ,.print-btn-sdl, .body-tabs, .header-user-info, .desctitlesdl, .print-preview-hide, .sl-hide{ 
+                display: none; 
+            }
+
+            #stc-show-std-details-table{
+                width:100%;
+                position:relative;
+                left:-60px;
+            }
+
+            .card{
+                border : 0px solid white;
+            }
+
+        }
     </style>
 </head>
 <body>
@@ -961,7 +979,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                 </div>
                             </div>
                             <div class="tab-pane tabs-animation fade" id="tab-content-10" role="tabpanel">
-                                <div class="row">
+                                <div class="row desctitlesdl">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
@@ -983,7 +1001,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-xl-12 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success " >
+                                        <div class="card-border mb-3 card card-body" >
                                             <a href="javascript:void(0)" class="btn btn-success form-control print-btn-sdl">Print</a>
                                             <div class="stc-show-std-details">
                                                 <table class="table table-bordered">
@@ -1315,6 +1333,16 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         // }
 
         $(document).ready(function(){
+            $('body').delegate('.print-btn-sdl', 'click', function(){
+                $('.jobdonedet-print').show();
+                $('.jobdonedet-view').hide();
+                Popup($('#stc-show-std-details-table')[0].innerHTML);
+                function Popup(data){
+                    window.print();
+                    return true;
+                }
+            });
+
 
             $('.hidden-project-excel-section').hide();
             var screenwidth=$(window).width();
