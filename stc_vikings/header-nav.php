@@ -77,10 +77,10 @@
                                         ?>
                                     </div>
                                 </div>
-                                <div class="widget-content-right header-user-info ml-3">
-                                    <a href="agent-order.php" style="font-size: 25px;">
+                                <div class="widget-content-right print-preview-hide header-user-info ml-3">
+                                    <a href="agent-order.php" style="font-size: 25px;" class="print-preview-hide">
                                         <i class="metismenu-icon pe-7s-bell"></i>
-                                        <span class="stc-notf-badge-for-order-left" style="
+                                        <span class="stc-notf-badge-for-order-left print-preview-hide" style="
                                             font-size: 17px;
                                             background: #ff7676;
                                             position: relative;
@@ -90,7 +90,7 @@
                                             left: -37px;
                                             top: -16px;
                                         ">0</span>
-                                        <span class="stc-notf-badge-for-order-right" style="
+                                        <span class="stc-notf-badge-for-order-right print-preview-hide" style="
                                             font-size: 17px;
                                             background: #72df70;
                                             position: relative;

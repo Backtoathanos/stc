@@ -869,21 +869,21 @@ class ragnarReportsViewRequiReports extends tesseract{
             <table class="table table-bordered table-responsive" id="stc-show-std-details-table">
                <thead>
                   <tr>
-                     <th class="text-center">SL NO</th>
-                     <th class="text-center" style="width:6%" >DATE</th>
-                     <th class="text-center">LOCATION</th>
-                     <th class="text-center">DEPARTMENT</th>
-                     <th class="text-center">AREA</th>
-                     <th class="text-center">EQUIPMENT DETAILS</th>
-                     <th class="text-center">TYPE OF JOB</th>
-                     <th class="text-center">QTY</th>
-                     <th class="text-center">CAPACITY</th>
-                     <th style="width:25%" class="text-center">REASON</th>
-                     <th class="text-center">REASON ATTRIBUTE</th>
-                     <th class="text-center">STATUS</th>
-                     <th class="text-center">DELAY(DAYS)</th>
-                     <th class="text-center">JOB DONE DETAILS</th>
-                     <th class="text-center">ANY COMMENTS</th>
+                     <th style="width:2%" class="text-center sl-hide">SL NO</th>
+                     <th style="width:3%" class="text-center">DATE</th>
+                     <th style="width:3%" class="text-center">LOCATION</th>
+                     <th style="width:1%" class="text-center">DEPARTMENT</th>
+                     <th style="width:2%" class="text-center">AREA</th>
+                     <th style="width:3%" class="text-center">EQUIPMENT DETAILS</th>
+                     <th style="width:3%" class="text-center">TYPE OF JOB</th>
+                     <th style="width:1%" class="text-center">QTY</th>
+                     <th style="width:1%" class="text-center">CAPACITY</th>
+                     <th style="width:4%" class="text-center">REASON</th>
+                     <th style="width:2%" class="text-center sl-hide">REASON ATTRIBUTE</th>
+                     <th style="width:1%" class="text-center">STATUS</th>
+                     <th style="width:1%" class="text-center">DELAY</th>
+                     <th style="width:3%" class="text-center">JOB DONE DETAILS</th>
+                     <th style="width:3%" class="text-center">ANY COMMENTS</th>
                   </tr>
                </thead>
                <tbody>
@@ -1029,7 +1029,7 @@ class ragnarReportsViewRequiReports extends tesseract{
             $jobdonedet = strlen($jobdonedet_value)>25 ? substr($jobdonedet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$jobdonedet_value.'">Read more' : $jobdonedet_value;
             $ivar.='
                <tr>
-                  <td class="text-center">'.$row['stc_status_down_list_id'].'</td>
+                  <td class="text-center sl-hide">'.$row['stc_status_down_list_id'].'</td>
                   <td>'.date('d-m-Y h:i a', strtotime($row['stc_status_down_list_date'])).'</td>
                   <td>'.$row['stc_status_down_list_plocation'].'</td>
                   <td>'.$row['stc_status_down_list_sub_location'].'</td>
@@ -1042,7 +1042,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <span class="jobdonedet-view">'.$reasondet.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$reason_value.'</span>
                   </td>
-                  <td>'.$row['stc_status_down_list_reasonattribute'].'</td>
+                  <td class="sl-hide">'.$row['stc_status_down_list_reasonattribute'].'</td>
                   <td class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>
                   <td>

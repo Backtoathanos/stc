@@ -1061,7 +1061,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Reason Attribute :</h5><br>
-                                <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-reasonattribite"><option>GLOBAL</option><option>VOLTAS</option><option>CLIENT</option>
+                                <select class="btn btn-success form-control text-left stc-std-update-on-change" id="stc-agent-sup-std-reasonattribite"><option>CLIENT</option><option>GLOBAL</option><option>SARA</option><option>VOLTAS</option>
                                 </select> 
                             </div>
                         </div>
