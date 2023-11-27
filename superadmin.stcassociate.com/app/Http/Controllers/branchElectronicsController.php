@@ -108,7 +108,9 @@ class branchElectronicsController extends Controller
             ->leftjoin('stc_sale_product_silent_challan_items','stc_sale_product_silent_challan_items.stc_sale_product_silent_challan_items_product_id','=','stc_electronics_inventory.stc_electronics_inventory_item_id')
             ->sum('stc_sale_product_silent_challan_items.stc_sale_product_silent_challan_items_product_qty');
             $echallanqty=$recordsechallan;
-            
+
+            $color = (($invqty + $challanqty) > ($inv_qty + $echallanqty)) ? "red" : "Black";
+
             $data_arr[] = array(
                 "stc_product_id" => $stc_product_id,
                 "stc_product_name" => $stc_product_name,
@@ -117,11 +119,11 @@ class branchElectronicsController extends Controller
                 "stc_brand_title" => $stc_brand_title,
                 "stc_product_hsncode" => $stc_product_hsncode,
                 "stc_product_gst" => $stc_product_gst,
-                "purchaseqty" => number_format($pqnty, 2),
-                "inventory" => number_format($invqty, 2),
-                "challanqty" => number_format($challanqty, 2),
+                "purchaseqty" => '<span style="color:'.$color.';">'.number_format($pqnty, 2).'</span>',
+                "inventory" => '<span style="color:'.$color.';">'.number_format($invqty, 2).'</span>',
+                "challanqty" => '<span style="color:'.$color.';">'.number_format($challanqty, 2).'</span>',
                 "stc_electronics_inventory_item_qty" => '<span id="display-quantity'.$id.'">'.number_format($inv_qty, 2).'</span>',
-                "echallanqty" => number_format($echallanqty, 2),
+                "echallanqty" => '<span style="color:'.$color.';">'.number_format($echallanqty, 2).'</span>',
                 "stc_product_unit" => $stc_product_unit,
                 "stc_product_avail" => $stc_product_status,
                 "actionData" => $actionData
