@@ -109,7 +109,7 @@ class branchElectronicsController extends Controller
             ->sum('stc_sale_product_silent_challan_items.stc_sale_product_silent_challan_items_product_qty');
             $echallanqty=$recordsechallan;
 
-            $color = (($invqty + $challanqty) > ($inv_qty + $echallanqty)) ? "red" : "Black";
+            $color = (($invqty + $challanqty) == ($inv_qty + $echallanqty)) ? "Black" : "red";
 
             $data_arr[] = array(
                 "stc_product_id" => $stc_product_id,
