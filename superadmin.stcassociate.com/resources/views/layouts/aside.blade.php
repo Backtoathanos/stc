@@ -41,7 +41,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{ url('/users/electronicsbranch') }}" class="nav-link @if(Request::segment(2) == 'electronicsbranch') active @endif">
+                <a href="{{ url('/branch/electronicsbranch') }}" class="nav-link @if(Request::segment(2) == 'electronicsbranch') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>STC Electronics</p>
                 </a>
