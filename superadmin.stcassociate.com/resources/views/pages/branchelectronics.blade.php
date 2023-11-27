@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>STC Associates | {{!empty($page_title) ? $page_title : ''}}</title>
   @include('layouts.head')
+  <style>
+    #example1 thead{
+        background: white;
+        position: sticky;
+        top: 0; /* Don't forget this, required for the stickiness */
+    }
+    /* #example1 thead th{
+        background: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    } */
+  </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
