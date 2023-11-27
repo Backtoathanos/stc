@@ -19,6 +19,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\RackController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\branchElectronicsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -199,4 +200,10 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/master/product/create', [ProductController::class, 'create']); 
     Route::post('/master/product/edit', [ProductController::class, 'update']);    
     Route::get('/master/product/delete', [ProductController::class, 'delete']);
+
+    Route::get('/branch/electronicsbranch', [branchElectronicsController::class, 'show']);  
+    Route::get('/branch/electronicsbranch/list', [branchElectronicsController::class, 'list']);  
+    Route::post('/branch/electronicsbranch/getSP', [branchElectronicsController::class, 'getSP']);
+    Route::post('/branch/electronicsbranch/edit', [branchElectronicsController::class, 'update']);    
+    Route::get('/branch/electronicsbranch/delete', [branchElectronicsController::class, 'delete']);
 });
