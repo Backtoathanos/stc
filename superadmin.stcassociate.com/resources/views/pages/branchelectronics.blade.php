@@ -79,6 +79,7 @@
                         <th class="text-center">Challan Quantity</th>
                         <th class="text-center">E.Inventory</th>
                         <th class="text-center">E.Challan Quantity</th>
+                        <th class="text-center">E.Return Quantity</th>
                         <th class="text-center">Unit</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Actions</th>
@@ -100,6 +101,7 @@
                         <th class="text-center">Challan Quantity</th>
                         <th class="text-center">E.Inventory</th>
                         <th class="text-center">E.Challan Quantity</th>
+                        <th class="text-center">E.Return Quantity</th>
                         <th class="text-center">Unit</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Actions</th>
@@ -163,6 +165,7 @@
                 { data: 'challanqty' },
                 { data: 'stc_electronics_inventory_item_qty' },
                 { data: 'echallanqty' },
+                { data: 'erschallanqty' },
                 { data: 'stc_product_unit' },
                 { data: 'stc_product_avail' },
                 { data: 'actionData' }
@@ -170,7 +173,6 @@
           columnDefs: [
             { "targets": 0, "className": "text-center", width : '4%'},
             { "targets": 1, "className": "text-left", width : '25%' },
-            { "targets": 2, "className": "text-left", },
             { "targets": 2, "className": "text-left", },
             { "targets": 3, "className": "text-center", },
             { "targets": 4, "className": "text-center", },
@@ -184,7 +186,8 @@
             { orderable: false, targets: 8 },
             { orderable: false, targets: 9 },
             { orderable: false, targets: 11 },
-            { orderable: false, targets: 14 },
+            { orderable: false, targets: 12 },
+            { orderable: false, targets: 15 },
           ]
         });
       }
@@ -410,6 +413,7 @@
                     <table class="table table-responsive table-stripped">
                         <thead>
                             <tr>
+                                <th>Purchase Id/ Date</th>
                                 <th>Purchase From</th>
                                 <th>Purchase Quantity</th>
                             </tr>
@@ -425,6 +429,7 @@
                     <table class="table table-responsive table-stripped">
                         <thead>
                             <tr>
+                                <th>Challan Id/Date</th>
                                 <th>Sold to</th>
                                 <th>Sold Quantity</th>
                             </tr>

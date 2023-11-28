@@ -109,7 +109,12 @@ class branchElectronicsController extends Controller
             ->sum('stc_sale_product_silent_challan_items.stc_sale_product_silent_challan_items_product_qty');
             $echallanqty=$recordsechallan;
 
-            $color = (($invqty + $challanqty) == ($inv_qty + $echallanqty)) ? "Black" : "red";
+            $recordserchallan = BranchElectronics::where('stc_electronics_inventory.stc_electronics_inventory_id', '=', $id )
+            ->leftjoin('stc_silent_challan_return_items','stc_silent_challan_return_items.stc_silent_challan_return_items_item_id','=','stc_electronics_inventory.stc_electronics_inventory_item_id')
+            ->sum('stc_silent_challan_return_items.stc_silent_challan_return_items_qty');
+            $erchallanqty=$recordserchallan;
+
+            $color = (($invqty + $challanqty) == ($inv_qty + ($echallanqty - $erchallanqty))) ? "Black" : "red";
 
             $data_arr[] = array(
                 "stc_product_id" => $stc_product_id,
@@ -124,6 +129,7 @@ class branchElectronicsController extends Controller
                 "challanqty" => '<span style="color:'.$color.';">'.number_format($challanqty, 2).'</span>',
                 "stc_electronics_inventory_item_qty" => '<span id="display-quantity'.$id.'">'.number_format($inv_qty, 2).'</span>',
                 "echallanqty" => '<span style="color:'.$color.';">'.number_format($echallanqty, 2).'</span>',
+                "erschallanqty" => '<span style="color:'.$color.';">'.number_format($erchallanqty, 2).'</span>',
                 "stc_product_unit" => $stc_product_unit,
                 "stc_product_avail" => $stc_product_status,
                 "actionData" => $actionData
@@ -169,6 +175,7 @@ class branchElectronicsController extends Controller
         $recordspurchase = BranchElectronics::where('stc_electronics_inventory.stc_electronics_inventory_id', '=', $id )
         ->leftjoin('stc_product','stc_product.stc_product_id','=','stc_electronics_inventory.stc_electronics_inventory_item_id')
         ->leftjoin('stc_product_grn_items','stc_product_grn_items.stc_product_grn_items_product_id','=','stc_product.stc_product_id')
+        ->leftjoin('stc_product_grn','stc_product_grn.stc_product_grn_id','=','stc_product_grn_items.stc_product_grn_items_grn_order_id')
         ->leftjoin('stc_purchase_product','stc_purchase_product.stc_purchase_product_id','=','stc_product_grn_items.stc_product_grn_items_purchase_order_id')
         ->leftjoin('stc_merchant','stc_merchant.stc_merchant_id','=','stc_purchase_product.stc_purchase_product_merchant_id')
         ->select(
@@ -177,6 +184,8 @@ class branchElectronicsController extends Controller
             'stc_purchase_product.stc_purchase_product_id', 
             'stc_merchant.stc_merchant_name', 
             'stc_product_grn_items.stc_product_grn_items_qty', 
+            'stc_product_grn.stc_product_grn_invoice_number', 
+            'stc_product_grn.stc_product_grn_invoice_date', 
             'stc_electronics_inventory.stc_electronics_inventory_item_qty',
             'stc_electronics_inventory.stc_electronics_inventory_item_id'
         )
@@ -191,6 +200,7 @@ class branchElectronicsController extends Controller
             $punit=$recordspurchaserow['stc_product_unit'];
             $purchaserec.="
                 <tr>
+                    <td>".$recordspurchaserow['stc_product_grn_invoice_number']." <br> ".date('d-m-Y', strtotime($recordspurchaserow['stc_product_grn_invoice_date']))."</td>
                     <td>".$recordspurchaserow['stc_merchant_name']."</td>
                     <td class='text-right'>".number_format($recordspurchaserow['stc_product_grn_items_qty'], 2)."/".$recordspurchaserow['stc_product_unit']."</td>
                 </tr>
@@ -205,7 +215,7 @@ class branchElectronicsController extends Controller
         }else{
             $purchaserec.="
                 <tr>
-                    <td><b>Total Purchased</b></td>
+                    <td colspan='2'><b>Total Purchased</b></td>
                     <td class='text-right'><b>".number_format($totalpquantity, 2)."/".$punit."</b></td>
                 </tr>
             ";
@@ -219,6 +229,8 @@ class branchElectronicsController extends Controller
             'stc_product.stc_product_name', 
             'stc_product.stc_product_unit', 
             'stc_sale_product_silent_challan.stc_sale_product_silent_challan_customer_name', 
+            'stc_sale_product_silent_challan.stc_sale_product_silent_challan_id', 
+            'stc_sale_product_silent_challan.stc_sale_product_silent_challan_date', 
             'stc_sale_product_silent_challan_items.stc_sale_product_silent_challan_items_product_qty'
         )
         ->get();
@@ -232,6 +244,7 @@ class branchElectronicsController extends Controller
             $sunit=$recordssalerow['stc_product_unit'];
             $salerec.="
                 <tr>
+                    <td>STC/".$recordssalerow['stc_sale_product_silent_challan_id']." <br> ".date('d-m-Y', strtotime($recordssalerow['stc_sale_product_silent_challan_date']))."</td>
                     <td>".$recordssalerow['stc_sale_product_silent_challan_customer_name']."</td>
                     <td class='text-right'>".number_format($recordssalerow['stc_sale_product_silent_challan_items_product_qty'], 2)."/".$recordssalerow['stc_product_unit']."</td>
                 </tr>
@@ -246,7 +259,7 @@ class branchElectronicsController extends Controller
         }else{
             $salerec.="
                 <tr>
-                    <td><b>Total Sold</b></td>
+                    <td colspan='2'><b>Total Sold</b></td>
                     <td class='text-right'><b>".number_format($totalsquantity, 2)."/".$sunit."</b></td>
                 </tr>
             ";
