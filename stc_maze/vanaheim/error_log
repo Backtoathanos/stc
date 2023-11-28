@@ -11,3 +11,11 @@
 [04-Nov-2023 14:18:27 Asia/Kolkata] PHP Notice:  Undefined index: stc_silent_challan_sess in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1726
 [04-Nov-2023 14:18:27 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1726
 [13-Nov-2023 15:45:12 Asia/Kolkata] PHP Notice:  Undefined index: stc_electro_user_id in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/sale-purchase-done.php on line 460
+[28-Nov-2023 15:17:59 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1671
+[28-Nov-2023 15:18:00 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1545
+[28-Nov-2023 15:18:00 Asia/Kolkata] PHP Warning:  number_format() expects parameter 1 to be float, string given in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1562
+[28-Nov-2023 15:18:00 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1569
+[28-Nov-2023 15:18:00 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1591
+[28-Nov-2023 15:22:25 Asia/Kolkata] PHP Warning:  A non-numeric value encountered in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1680
+[28-Nov-2023 16:18:14 Asia/Kolkata] PHP Notice:  Undefined index: silent_order_stcfc in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1769
+[28-Nov-2023 16:18:14 Asia/Kolkata] PHP Notice:  Undefined index: silent_order_stcpf in /home/c2484kn1eg0y/public_html/stc_maze/vanaheim/order_perform.php on line 1770
