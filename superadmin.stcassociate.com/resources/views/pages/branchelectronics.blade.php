@@ -242,11 +242,6 @@
             success: function(response) {
               // console.log(response);
               if(response.success==true){
-                if ( $.fn.DataTable.isDataTable('#example1') ) {
-                  $('#example1').DataTable().destroy();
-                }
-                dataTableAct="active";
-                getElectronicsProduct(dataTableAct);
                 $('.close-btn').click();
                 swalSuccess('success', 'Record updated.');
               }else{
