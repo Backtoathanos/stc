@@ -286,6 +286,7 @@ if(isset($_SESSION["stc_agent_id"])){
                 e.preventDefault();
                 var sdl_id=$(this).attr("id");
                 var status_id='6';
+                $(this).hide();
                 $.ajax({
                     url         : "nemesis/stc_project.php",
                     method      : "POST",
@@ -296,6 +297,7 @@ if(isset($_SESSION["stc_agent_id"])){
                     },
                     success     : function(response_sdl){
                         alert(response_sdl);
+                        $('.stc-std-list-show-hit').click();
                     }
                 });
             });
