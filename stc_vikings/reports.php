@@ -1443,8 +1443,54 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var filter = 1;
                 stc_call_std(filter);
             });
+            
+            $('body').delegate('.stc-edit-report', 'click', function(e){
+                e.preventDefault();
+                var sdl_id=$(this).attr('id');
+                $('.sdl-hidden-reports').val(sdl_id);
+                $('.update-sdlreportmodal').modal();
+            });
 
-            // }
+            $('body').delegate('.sdl-update-reportsdl-save', 'click', function(e){
+                var sdl_id=$('.sdl-hidden-reports').val();
+                var target_date=$('.std-sdl-target-date').val();
+                var remarks=$('.stc-sdl-remarks').val();
+                var validated=1;
+                $('.message-alert').remove();
+
+                if(target_date==""){
+                    $('.std-sdl-target-date').after('<p class="message-alert">Select target date.</p>');
+                    validated=0;
+                }
+
+                if(remarks==""){
+                    $('.stc-sdl-remarks').after('<p class="message-alert">Enter remarks.</p>');
+                    validated=0;
+                }
+                
+                if(validated==1){
+                    $.ajax({
+                        url     : "kattegat/ragnar_reports.php",
+                        method  : "POST",
+                        data    : {
+                            stc_sdl_update:1,
+                            sdl_id:sdl_id,
+                            target_date:target_date,
+                            remarks:remarks
+                        },
+                        success : function(data){
+                            if(data.trim()=="updated"){
+                                alert("Record updated.");
+                                $('.sdlurbtn-close').click();
+                                stc_call_std(0);
+                            }
+                        }
+                    });
+                }else{
+                    alert("Empty fields not acceptable.");
+                }
+            });
+
             // on change call agents
             $('body').delegate('#stc-on-call-customer-proj', 'change', function(e){
               e.preventDefault();
@@ -2076,7 +2122,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     </div>
 </div>
 
-
 <div class="modal fade show-jobdonedetailsmodal stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
@@ -2093,6 +2138,50 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade update-sdlreportmodal stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Update Status Down List</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xl-12">
+                    <div class="main-card mb-3 card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                    <h5 class="card-title">Target Date</h5>
+                                    <div class="position-relative form-group">
+                                        <input type="date" class="form-control std-sdl-target-date">
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                    <h5 class="card-title">Remarks</h5>
+                                    <div class="position-relative form-group">
+                                        <textarea class="form-control stc-sdl-remarks" placeholder="Enter remarks"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                    <div class="position-relative form-group">
+                                        <input type="hidden" class="sdl-hidden-reports">
+                                        <a href="javascript:void(0)" class="form-control btn btn-success sdl-update-reportsdl-save">Save<a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                                
+                </div>
+            </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default sdlurbtn-close" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
