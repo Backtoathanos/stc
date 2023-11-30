@@ -2070,8 +2070,10 @@ class pirates_supervisor extends tesseract{
 				}elseif($row['stc_status_down_list_status']==4){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-DONE</span></b>';
 					$statusbgcolor = 'style="background-color: #2aef00;"';
+					$updatejobdetails='<a href="javascript:void(0)" class="btn btn-primary stc-cust-std-update" id="'.$row['stc_status_down_list_id'].'" message="'.$row['stc_status_down_list_jobdone_details'].'">Update me</a>';
 				}elseif($row['stc_status_down_list_status']==5){
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">WORK-COMPLETE</span></b>';
+					$updatejobdetails='<a href="javascript:void(0)" class="btn btn-primary stc-cust-std-update" id="'.$row['stc_status_down_list_id'].'" message="'.$row['stc_status_down_list_jobdone_details'].'">Update me</a>';
 				}else{
 					$status='<b><span style="padding: 5px;margin: 0;width: 100%;color: #000000">CLOSE</span></b>';
 				}

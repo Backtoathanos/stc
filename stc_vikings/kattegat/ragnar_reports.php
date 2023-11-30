@@ -540,6 +540,8 @@ class ragnarReportsViewRequiReports extends tesseract{
             `stc_status_down_list_creator_details`,
             `stc_status_down_list_responsive_person`,
             `stc_status_down_list_target_date`,
+            `stc_status_down_list_fremarks`,
+            `stc_status_down_list_ftarget_date`,
             `stc_status_down_list_status`,
             `stc_status_down_list_created_by`
          FROM `stc_status_down_list` 
@@ -884,6 +886,9 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th style="width:1%" class="text-center">DELAY</th>
                      <th style="width:3%" class="text-center">JOB DONE DETAILS</th>
                      <th style="width:3%" class="text-center">ANY COMMENTS</th>
+                     <th style="width:3%" class="text-center">TARGET DATE</th>
+                     <th style="width:3%" class="text-center">REMARKS</th>
+                     <th style="width:3%" class="text-center sl-hide">ACTION</th>
                   </tr>
                </thead>
                <tbody>
@@ -1027,6 +1032,8 @@ class ragnarReportsViewRequiReports extends tesseract{
             $reasondet = strlen($reason_value)>25 ? substr($reason_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$reason_value.'">Read more' : $reason_value;
             $jobdonedet_value = $row['stc_status_down_list_jobdone_details'];
             $jobdonedet = strlen($jobdonedet_value)>25 ? substr($jobdonedet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$jobdonedet_value.'">Read more' : $jobdonedet_value;
+            $finalremarks_value = $row['stc_status_down_list_fremarks'];
+            $finalremarks = strlen($finalremarks_value)>25 ? substr($finalremarks_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$finalremarks_value.'">Read more' : $finalremarks_value;
             $ivar.='
                <tr>
                   <td class="text-center sl-hide">'.$row['stc_status_down_list_id'].'</td>
@@ -1053,6 +1060,12 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <span class="jobdonedet-view">'.$anycomdet.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$anycomm_value.'</span>
                   </td>
+                  <td class="text-center">'.date('d-m-Y H:i a', strtotime($row['stc_status_down_list_ftarget_date'])).'</td>
+                  <td>
+                     <span class="jobdonedet-view">'.$finalremarks.'</span>
+                     <span class="jobdonedet-print" style="display:none;">'.$finalremarks_value.'</span>
+                  </td>
+                  <td><a href="javascript:void(0)" class="btn btn-primary stc-edit-report" id="'.$row['stc_status_down_list_id'].'">Update</a></td>
                </tr>
             ';
          }
@@ -1068,6 +1081,22 @@ class ragnarReportsViewRequiReports extends tesseract{
             </tbody>
          </table>
       ';
+      return $ivar;
+   }
+
+   public function stc_call_std_update($sdl_id, $target_date, $remarks){
+      $ivar='';
+      $date=Date('d-m-Y h:i a');
+      $remarks = ", ".$date." - ".$remarks;
+      $ivarquery=mysqli_query($this->stc_dbs, "
+         UPDATE `stc_status_down_list` 
+         SET `stc_status_down_list_fremarks` = CONCAT(`stc_status_down_list_fremarks`,'".mysqli_real_escape_string($this->stc_dbs, $remarks)."'),
+            `stc_status_down_list_ftarget_date` = '".mysqli_real_escape_string($this->stc_dbs, $target_date)."' 
+         WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sdl_id)."';
+      ");
+      if($ivarquery){
+         $ivar="updated";
+      }
       return $ivar;
    }
 
@@ -3738,6 +3767,15 @@ if(isset($_POST['Stc_std_details'])){
    $filter        =  $_POST['filter'];
    $bjornecustomer=new ragnarReportsViewRequiReports();   
    $outbjornecustomer=$bjornecustomer->stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $filter);
+   echo $outbjornecustomer;
+}
+
+if(isset($_POST['stc_sdl_update'])){
+   $sdl_id=$_POST['sdl_id'];
+   $target_date=$_POST['target_date'];
+   $remarks=$_POST['remarks'];
+   $bjornecustomer=new ragnarReportsViewRequiReports();   
+   $outbjornecustomer=$bjornecustomer->stc_call_std_update($sdl_id, $target_date, $remarks);
    echo $outbjornecustomer;
 }
 
