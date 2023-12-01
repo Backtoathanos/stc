@@ -670,15 +670,34 @@ class ragnarReportsViewRequiReports extends tesseract{
                }
             }
          }
-         $bmtotal48 = $bmpendingjon48 + $bmplanning48 + $bmprogress48 + $bmjobdone48;
-         $ctotal48 = $cpendingjon48 + $cplanning48 + $cprogress48 + $cjobdone48;
-         $djatotal48 = $djapendingjon48 + $djaplanning48 + $djaprogress48 + $djajobdone48;
-         $pmtotal48 = $pmpendingjon48 + $pmplanning48 + $pmprogress48 + $pmjobdone48;
+         $bmtotal48 = $bmplanning48 + $bmprogress48 + $bmjobdone48;
+         $ctotal48 = $cplanning48 + $cprogress48 + $cjobdone48;
+         $djatotal48 = $djaplanning48 + $djaprogress48 + $djajobdone48;
+         $pmtotal48 = $pmplanning48 + $pmprogress48 + $pmjobdone48;
          
-         $bmtotal = $bmpendingjon + $bmplanning + $bmprogress + $bmjobdone;
-         $ctotal = $cpendingjon + $cplanning + $cprogress + $cjobdone;
-         $djatotal = $djapendingjon + $djaplanning + $djaprogress + $djajobdone;
-         $pmtotal = $pmpendingjon + $pmplanning + $pmprogress + $pmjobdone;
+         $bmtotal = $bmplanning + $bmprogress + $bmjobdone;
+         $ctotal = $cplanning + $cprogress + $cjobdone;
+         $djatotal = $djaplanning + $djaprogress + $djajobdone;
+         $pmtotal = $pmplanning + $pmprogress + $pmjobdone;
+
+         $data_filter = array(
+            '1' => 'SL NO',
+            '2' => 'DATE',
+            '3' => 'LOCATION',
+            '6' => 'EQUIPMENT DETAILS',
+            '11' => 'REASON ATTRIBUTE',
+            '12' => 'STATUS',
+            '13' => 'DELAY',
+            '14' => 'JOB DONE DETAILS',
+            '15' => 'ANY COMMENT',
+            '16' => 'TARGET DATE',
+            '17' => 'REMARKS',
+            '18' => 'ACTION'
+        );
+         $data_fields="";
+         foreach($data_filter as $data_filter_key=>$data_filter_row){
+            $data_fields.='<li class="mt-2"><input type="checkbox" class="stc-datatable-filter" style="display:block;float:left;position:relative;top:3px" id="'.$data_filter_key.'" value="'.$data_filter_key.'"><span class="filter-span">'.$data_filter_row.'</span></li>';
+         }
          $ivar.='
             <table class="table table-bordered table-responsive" id="stc-show-std-detailspre-table">
                <tr>
@@ -694,13 +713,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>
                      <table class="table">
                         <tr>
-                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
                            <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
                            <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
                            <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
                         </tr>
                         <tr>
-                           <td class="text-right" style="background-color: #ff6767;">'.$bmpendingjon48.'</td>
                            <td class="text-right" style="background-color: #00f9b4;">'.$bmplanning48.'</td>
                            <td class="text-right" style="background-color: #f6f900;">'.$bmprogress48.'</td>
                            <td class="text-right" style="background-color: #a9d08e;">'.$bmjobdone48.'</td>
@@ -714,13 +731,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>
                      <table class="table">
                         <tr>
-                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
                            <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
                            <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
                            <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
                         </tr>
                         <tr>
-                           <td class="text-right" style="background-color: #ff6767;">'.$cpendingjon48.'</td>
                            <td class="text-right" style="background-color: #00f9b4;">'.$cplanning48.'</td>
                            <td class="text-right" style="background-color: #f6f900;">'.$cprogress48.'</td>
                            <td class="text-right" style="background-color: #a9d08e;">'.$cjobdone48.'</td>
@@ -734,13 +749,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>
                      <table class="table">
                         <tr>
-                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
                            <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
                            <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
                            <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
                         </tr>
                         <tr>
-                           <td class="text-right" style="background-color: #ff6767;">'.$djapendingjon48.'</td>
                            <td class="text-right" style="background-color: #00f9b4;">'.$djaplanning48.'</td>
                            <td class="text-right" style="background-color: #f6f900;">'.$djaprogress48.'</td>
                            <td class="text-right" style="background-color: #a9d08e;">'.$djajobdone48.'</td>
@@ -754,13 +767,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>
                      <table class="table">
                         <tr>
-                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
                            <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
                            <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
                            <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
                         </tr>
                         <tr>
-                           <td class="text-right" style="background-color: #ff6767;">'.$pmpendingjon48.'</td>
                            <td class="text-right" style="background-color: #00f9b4;">'.$pmplanning48.'</td>
                            <td class="text-right" style="background-color: #f6f900;">'.$pmprogress48.'</td>
                            <td class="text-right" style="background-color: #a9d08e;">'.$pmjobdone48.'</td>
@@ -773,6 +784,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                   </td>
                   <td class="text-center" rowspan="2">
                      <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
+                     <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
+                     '.$data_fields.'
+                     </ul>
+
                   </td>
                </tr>
                <tr>
@@ -780,13 +795,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>
                      <table class="table">
                         <tr>
-                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
                            <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
                            <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
                            <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
                         </tr>
                         <tr>
-                           <td class="text-right" style="background-color: #ff6767;">'.$bmpendingjon.'</td>
                            <td class="text-right" style="background-color: #00f9b4;">'.$bmplanning.'</td>
                            <td class="text-right" style="background-color: #f6f900;">'.$bmprogress.'</td>
                            <td class="text-right" style="background-color: #a9d08e;">'.$bmjobdone.'</td>
@@ -801,13 +814,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>
                      <table class="table">
                         <tr>
-                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
                            <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
                            <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
                            <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
                         </tr>
                         <tr>
-                           <td class="text-right" style="background-color: #ff6767;">'.$cpendingjon.'</td>
                            <td class="text-right" style="background-color: #00f9b4;">'.$cplanning.'</td>
                            <td class="text-right" style="background-color: #f6f900;">'.$cprogress.'</td>
                            <td class="text-right" style="background-color: #a9d08e;">'.$cjobdone.'</td>
@@ -822,13 +833,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>
                      <table class="table">
                         <tr>
-                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
                            <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
                            <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
                            <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
                         </tr>
                         <tr>
-                           <td class="text-right" style="background-color: #ff6767;">'.$djapendingjon.'</td>
                            <td class="text-right" style="background-color: #00f9b4;">'.$djaplanning.'</td>
                            <td class="text-right" style="background-color: #f6f900;">'.$djaprogress.'</td>
                            <td class="text-right" style="background-color: #a9d08e;">'.$djajobdone.'</td>
@@ -843,13 +852,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>
                      <table class="table">
                         <tr>
-                           <td class="text-center" style="font-weight: bold; background-color: #ff6767;">D</td>
                            <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
                            <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
                            <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
                         </tr>
                         <tr>
-                           <td class="text-right" style="background-color: #ff6767;">'.$pmpendingjon.'</td>
                            <td class="text-right" style="background-color: #00f9b4;">'.$pmplanning.'</td>
                            <td class="text-right" style="background-color: #f6f900;">'.$pmprogress.'</td>
                            <td class="text-right" style="background-color: #a9d08e;">'.$pmjobdone.'</td>
@@ -868,10 +875,14 @@ class ragnarReportsViewRequiReports extends tesseract{
 
       if(mysqli_num_rows($ivarqry)>0){
          $ivar.='
+                     
+            <button class="mb-2 mr-2 btn btn-success btn-block stc-sdl-exportexcel-hit" data-type="excel">
+            <i class="fa fa-file-excel-o"></i> Export Excel
+            </button>
             <table class="table table-bordered table-responsive" id="stc-show-std-details-table">
                <thead>
                   <tr>
-                     <th style="width:2%" class="text-center sl-hide">SL NO</th>
+                     <th style="width:2%" class="text-center SLNO sl-hide">SL NO</th>
                      <th style="width:3%" class="text-center">DATE</th>
                      <th style="width:3%" class="text-center">LOCATION</th>
                      <th style="width:1%" class="text-center">DEPARTMENT</th>
@@ -1026,6 +1037,8 @@ class ragnarReportsViewRequiReports extends tesseract{
 						$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
 					}
 				}
+
+            $ftargetdate=$row['stc_status_down_list_ftarget_date']=="" ? "" : date('d-m-Y H:i a', strtotime($row['stc_status_down_list_ftarget_date']));
             $anycomm_value = $row['stc_status_down_list_remarks'];
             $anycomdet = strlen($anycomm_value)>25 ? substr($anycomm_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$anycomm_value.'">Read more' : $anycomm_value;
             $reason_value = $row['stc_status_down_list_reason'];
@@ -1036,7 +1049,7 @@ class ragnarReportsViewRequiReports extends tesseract{
             $finalremarks = strlen($finalremarks_value)>25 ? substr($finalremarks_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$finalremarks_value.'">Read more' : $finalremarks_value;
             $ivar.='
                <tr>
-                  <td class="text-center sl-hide">'.$row['stc_status_down_list_id'].'</td>
+                  <td class="text-center SLNO sl-hide">'.$row['stc_status_down_list_id'].'</td>
                   <td>'.date('d-m-Y h:i a', strtotime($row['stc_status_down_list_date'])).'</td>
                   <td>'.$row['stc_status_down_list_plocation'].'</td>
                   <td>'.$row['stc_status_down_list_sub_location'].'</td>
@@ -1060,7 +1073,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <span class="jobdonedet-view">'.$anycomdet.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$anycomm_value.'</span>
                   </td>
-                  <td class="text-center">'.date('d-m-Y H:i a', strtotime($row['stc_status_down_list_ftarget_date'])).'</td>
+                  <td class="text-center">'.$ftargetdate.'</td>
                   <td>
                      <span class="jobdonedet-view">'.$finalremarks.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$finalremarks_value.'</span>

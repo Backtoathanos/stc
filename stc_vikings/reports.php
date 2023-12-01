@@ -48,6 +48,22 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
 
         .message-alert{
             color : red;
+        }        
+
+        .stc-datatable-filter-ul li{
+            display: none;
+        }
+        .stc-datatable-filter-ul{
+            background: #fbfbfb;
+            position: fixed;
+            top:8%;
+            left:80%;
+            z-index: 90;
+            list-style-type: none;
+        }
+
+        .stc-datatable-filter{
+            z-index: 90;
         }
 
         @media print {
@@ -1491,6 +1507,40 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 }
             });
 
+            // data table filter
+            $('body').delegate('.stc-datatable-filter', 'change', function(e){
+                e.preventDefault();
+                var value = $(this).val();
+                if($(this).prop('checked')==true){
+                    // $('.'+value).hide();
+                    $('#stc-show-std-details-table td:nth-child('+value+'),th:nth-child('+value+')').hide();
+                }else{
+                    // $('.'+value).show();
+                    $('#stc-show-std-details-table td:nth-child('+value+'),th:nth-child('+value+')').show();
+                }
+            });
+
+            $('body').delegate('.data-fields-display', 'click', function(e){
+                e.preventDefault();                
+                $('.stc-datatable-filter-ul li').toggle(200);
+            });
+
+            $('body').delegate('.filter-span', 'click', function(e){
+                e.preventDefault();
+                $(this).parent().find('input').click();
+            });
+            
+            // create excel
+            $('body').delegate('.stc-sdl-exportexcel-hit', 'click', function(e){
+                e.preventDefault();
+                $("#stc-show-std-details-table").table2excel({
+                    filename: "stc-sdl-reports.xls"
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function(){
             // on change call agents
             $('body').delegate('#stc-on-call-customer-proj', 'change', function(e){
               e.preventDefault();
