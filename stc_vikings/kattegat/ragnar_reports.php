@@ -807,7 +807,6 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <tr>
                            <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
                            <td class="text-right">'.$bmtotal.'</td>
-                           <td class="text-right"></td>
                         </tr>
                      </table>
                   </td>
@@ -826,7 +825,6 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <tr>
                            <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
                            <td class="text-right">'.$ctotal.'</td>
-                           <td class="text-right"></td>
                         </tr>
                      </table>
                   </td>
@@ -845,7 +843,6 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <tr>
                            <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
                            <td class="text-right">'.$djatotal.'</td>
-                           <td class="text-right"></td>
                         </tr>
                      </table>
                   </td>
@@ -864,7 +861,6 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <tr>
                            <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
                            <td class="text-right">'.$pmtotal.'</td>
-                           <td class="text-right"></td>
                         </tr>
                      </table>
                   </td>
@@ -899,7 +895,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th style="width:3%" class="text-center">ANY COMMENTS</th>
                      <th style="width:3%" class="text-center">TARGET DATE</th>
                      <th style="width:3%" class="text-center">REMARKS</th>
-                     <th style="width:3%" class="text-center sl-hide">ACTION</th>
+                     <th style="width:3%" class="text-center sl-hide excel-hide">ACTION</th>
                   </tr>
                </thead>
                <tbody>
@@ -1040,13 +1036,14 @@ class ragnarReportsViewRequiReports extends tesseract{
 
             $ftargetdate=$row['stc_status_down_list_ftarget_date']=="" ? "" : date('d-m-Y H:i a', strtotime($row['stc_status_down_list_ftarget_date']));
             $anycomm_value = $row['stc_status_down_list_remarks'];
-            $anycomdet = strlen($anycomm_value)>25 ? substr($anycomm_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$anycomm_value.'">Read more' : $anycomm_value;
+            $anycomdet = strlen($anycomm_value)>25 ? substr($anycomm_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$anycomm_value.'">Read more</a>' : $anycomm_value;
             $reason_value = $row['stc_status_down_list_reason'];
-            $reasondet = strlen($reason_value)>25 ? substr($reason_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$reason_value.'">Read more' : $reason_value;
+            $reasondet = strlen($reason_value)>25 ? substr($reason_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$reason_value.'">Read more</a>' : $reason_value;
             $jobdonedet_value = $row['stc_status_down_list_jobdone_details'];
-            $jobdonedet = strlen($jobdonedet_value)>25 ? substr($jobdonedet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$jobdonedet_value.'">Read more' : $jobdonedet_value;
+            $jobdonedet = strlen($jobdonedet_value)>25 ? substr($jobdonedet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$jobdonedet_value.'">Read more</a>' : $jobdonedet_value;
             $finalremarks_value = $row['stc_status_down_list_fremarks'];
-            $finalremarks = strlen($finalremarks_value)>25 ? substr($finalremarks_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$finalremarks_value.'">Read more' : $finalremarks_value;
+            $finalremarks = strlen($finalremarks_value)>25 ? substr($finalremarks_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$finalremarks_value.'">Read more</a>' : $finalremarks_value;
+            $finalremarks_value = $row['stc_status_down_list_fremarks'];
             $ivar.='
                <tr>
                   <td class="text-center SLNO sl-hide">'.$row['stc_status_down_list_id'].'</td>
@@ -1078,7 +1075,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <span class="jobdonedet-view">'.$finalremarks.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$finalremarks_value.'</span>
                   </td>
-                  <td><a href="javascript:void(0)" class="btn btn-primary stc-edit-report" id="'.$row['stc_status_down_list_id'].'">Update</a></td>
+                  <td class="excel-hide"><a href="javascript:void(0)" class="btn btn-primary stc-edit-report" id="'.$row['stc_status_down_list_id'].'">Update</a></td>
                </tr>
             ';
          }

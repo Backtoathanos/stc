@@ -1018,7 +1018,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                     <div class="col-md-12 col-xl-12 col-sm-12"> 
                                         <div class="card-border mb-3 card card-body" >
-                                            <a href="javascript:void(0)" class="btn btn-success form-control print-btn-sdl">Print</a>
+                                            <!-- <a href="javascript:void(0)" class="btn btn-success form-control print-btn-sdl">Print</a> -->
                                             <div class="stc-show-std-details">
                                                 <table class="table table-bordered">
                                                     <thead>
@@ -1451,6 +1451,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var jobdonedet = $(this).attr("data");
                 $('.jobdonedet_para').html(jobdonedet);
                 $('.show-jobdonedetailsmodal').modal('show');
+                $(this).remove();
             });
 
             // find std 
@@ -1514,9 +1515,13 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 if($(this).prop('checked')==true){
                     // $('.'+value).hide();
                     $('#stc-show-std-details-table td:nth-child('+value+'),th:nth-child('+value+')').hide();
+                    $('#stc-show-std-details-table td:nth-child('+value+')').addClass('excel-hide');
+                    $('#stc-show-std-details-table th:nth-child('+value+')').addClass('excel-hide');
                 }else{
                     // $('.'+value).show();
                     $('#stc-show-std-details-table td:nth-child('+value+'),th:nth-child('+value+')').show();
+                    $('#stc-show-std-details-table td:nth-child('+value+')').addClass('excel-hide');
+                    $('#stc-show-std-details-table th:nth-child('+value+')').addClass('excel-hide');
                 }
             });
 
@@ -1533,9 +1538,18 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             // create excel
             $('body').delegate('.stc-sdl-exportexcel-hit', 'click', function(e){
                 e.preventDefault();
+                $('.jobdonedet-view').remove();
+                $('.excel-hide').remove();
+                var table = $(this).prev('#stc-show-std-details-table'); 
                 $("#stc-show-std-details-table").table2excel({
-                    filename: "stc-sdl-reports.xls"
+                    name: "Status Down List Reports",
+                    exclude_inputs: false, 
+                    preserveColors: true ,
+                    exclude_links: false, 
+                    filename: "stc-sdl-reports-" + new Date().toString().replace(/[\-\:\.]/g, "") + ".xls",
+                    columns: [0, 1, 2]
                 });
+                $('.std-filter-find-btn').click();
             });
         });
     </script>
