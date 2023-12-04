@@ -222,7 +222,7 @@ include_once("../MCU/db.php");
                                                                                 $status_selected=$requisrow['stc_cust_super_requisition_list_items_status']==1 ? $selected : $unselected;
                                                                                 $trid="stc-req-tr-".$requisrow['item_list_id'];
                                                                                 echo '
-                                                                                    <tr id="'.$trid.'">
+                                                                                    <tr id="'.$trid.'" class="tr-search-fromhere">
                                                                                         <td class="text-center">'.$sl.'</td>
                                                                                         <td>'.date('d-m-Y h:i a', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'</td>
                                                                                         <td>'.$requisrow['stc_cust_project_title'].'</td>
@@ -317,7 +317,7 @@ include_once("../MCU/db.php");
         $("#myInput").on("keyup", function(e) {
             e.preventDefault();
             var value = $(this).val().toLowerCase();
-            $("#stc-requis-table tr").filter(function() {
+            $("#stc-requis-table .tr-search-fromhere").filter(function() {
                 $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
             });
         });
