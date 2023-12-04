@@ -57,11 +57,11 @@ include_once("../MCU/db.php");
                             </div>
                         </div>            
                         <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-0" data-toggle="tab" href="#check-order">
                                     <span>Check Order <b><i class="pe-7s-look"></i></b></span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="nav-item">
                                 <a role="tab" class="nav-link active" id="tab-1" data-toggle="tab" href="#sup-requis">
                                     <span>Check Requisition <b><i class="pe-7s-look"></i></b></span>
@@ -155,21 +155,20 @@ include_once("../MCU/db.php");
                                                 <form class="#">
                                                     <div class="row">
                                                         <div class="col-md-12">
-                                                            <input type="text" id="myInput" onkeyup="myFunction()" placeholder="Search By Requisition ID" class="form-control">
-                                                            <table class="mb-0 table table-hover">
+                                                            <input type="text" id="myInput" placeholder="Search By Requisition ID" class="form-control">
+                                                            <table class="mb-0 table table-hover table-bordered table-responsive" id="stc-requis-table">
                                                                 <thead>
-                                                                    <th>Sl No</th>
-                                                                    <th>Requisition Date</th>
-                                                                    <th>Requisition For</th>
-                                                                    <th>Requisition From</th>
-                                                                    <th>Item Desc</th>
-                                                                    <th>Unit</th>
-                                                                    <th>Requis Qty</th>
-                                                                    <th>Requis Approve Qty</th>
-                                                                    <th>Requis Approved Qty</th>
-                                                                    <th>Requis Remains Qty</th>
-                                                                    <th>Status</th>
-                                                                    <th>Action</th>
+                                                                    <th class="text-center">Sl No</th>
+                                                                    <th class="text-center">Requisition Date</th>
+                                                                    <th class="text-center">Requisition For</th>
+                                                                    <th class="text-center">Requisition From</th>
+                                                                    <th class="text-center">Item Desc</th>
+                                                                    <th class="text-center">Unit</th>
+                                                                    <th class="text-center">Quantity</th>
+                                                                    <th class="text-center">Approve Quantity</th>
+                                                                    <th class="text-center">Remains Quantity</th>
+                                                                    <th class="text-center">Status</th>
+                                                                    <th class="text-center">Action</th>
                                                                 </thead>
                                                                 <tbody>
                                                                 <?php 
@@ -203,73 +202,51 @@ include_once("../MCU/db.php");
                                                                         $sl=0;
                                                                         if(mysqli_num_rows($requissuperqry)!=0){
                                                                             foreach($requissuperqry as $requisrow){
-
+                                                                                $actionstatus="";
                                                                                 if($requisrow['stc_cust_super_requisition_list_status']==1){
-                                                                                    $reqstatus="PROCESS";
+                                                                                    $actionstatus='
+                                                                                        <a href="#" class="btn btn-primary add_to_purchase" atc-ic="'.$requisrow['item_list_id'].'"id="add_to_accept_cart'.$requisrow['item_list_id'].'" title="Approve" style="font-size: 35px;color: black;"><i class="fas fa-plus-circle"></i></a>
+                                                                                        <a href="#" class="btn btn-danger remove_from_purchase" operat-ic="'.$requisrow['item_list_id'].'"id="rem_from_accept_cart'.$requisrow['item_list_id'].'" style="font-size: 35px;color: black;display:none;"><i class="fas fa-trash" ></i></a>
+                                                                                    ';
                                                                                 }elseif($requisrow['stc_cust_super_requisition_list_status']==2){
-                                                                                    $reqstatus="PASSED";
-                                                                                }elseif($requisrow['stc_cust_super_requisition_list_status']==3){
-                                                                                    $reqstatus="CLEARED";
+                                                                                    $actionstatus='<a href="#" class="btn btn-danger remove_from_purchase" operat-ic="'.$requisrow['item_list_id'].'"id="rem_from_accept_cart'.$requisrow['item_list_id'].'" style="font-size: 35px;color: black;"><i class="fas fa-trash" ></i></a>';
                                                                                 }else{
-                                                                                    $reqstatus="ACCEPTED";
+                                                                                    $actionstatus='#';
                                                                                 }
                                                                                 $changedstatus='';
                                                                                 $pdid=0;
                                                                                 $sl++;
                                                                                 $reminder=$requisrow['stc_cust_super_requisition_list_items_reqqty'] - $requisrow['stc_cust_super_requisition_list_items_approved_qty'];
-
-                                                                                $recoprqty=0;
-                                                                                foreach($recqtyoperations as $recoprrow){
-                                                                                    $recoprqty+=$recoprrow['stc_cust_super_requisition_list_items_rec_recqty'];
-                                                                                }
+                                                                                $selected="selected";
+                                                                                $unselected="";
+                                                                                $status_selected=$requisrow['stc_cust_super_requisition_list_items_status']==1 ? $selected : $unselected;
+                                                                                $trid="stc-req-tr-".$requisrow['item_list_id'];
                                                                                 echo '
-                                                                                    <tr>
-                                                                                        <td>'.$sl.'</td>
+                                                                                    <tr id="'.$trid.'">
+                                                                                        <td class="text-center">'.$sl.'</td>
                                                                                         <td>'.date('d-m-Y h:i a', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'</td>
                                                                                         <td>'.$requisrow['stc_cust_project_title'].'</td>
-                                                                                        <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
-                                                                                        <td>'.$requisrow['stc_cust_super_requisition_list_items_title'].'</td>
-                                                                                        <td>'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
-                                                                                        <td>'.number_format($requisrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
-                                                                                        <td>
-                                                                                            <input type="number" class="form-control stc-sup-appr-qty'.$requisrow['item_list_id'].'"
-                                                                                            value="'.$reminder.'">
+                                                                                        <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'
                                                                                         </td>
-                                                                                        <td>'.number_format($recqty, 2).'</td>
-                                                                                        <td>'.number_format($recoprqty, 2).'</td>
+                                                                                        <td><a href="javascript:void(0)" style="font-size: 15px;text-decoration: none;color: black;" class="edit-req-item" id="'.$requisrow['item_list_id'].'"> <i class="fas fa-edit" ></i> '.$requisrow['stc_cust_super_requisition_list_items_title'].'</a></td>
+                                                                                        <td class="text-center">'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
+                                                                                        <td class="text-right">
+                                                                                            '.number_format($requisrow['stc_cust_super_requisition_list_items_reqqty'], 2).'
+                                                                                            <input type="hidden" class="stc-sup-req-qty'.$requisrow['item_list_id'].'" value="'.$requisrow['stc_cust_super_requisition_list_items_reqqty'].'">
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            <input type="number" class="form-control stc-sup-appr-qty'.$requisrow['item_list_id'].'" style="width: 60px;padding: 4px;" value="'.$requisrow['stc_cust_super_requisition_list_items_approved_qty'].'">
+                                                                                        </td>
+                                                                                        <td class="text-right">'.number_format($requisrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
                                                                                         <td>
                                                                                             <select class="form-control stc-sup-items-status'.$requisrow['item_list_id'].'">
-                                                                                                <option value="1" selected>Allow</option>
-                                                                                                <option value="0">Not Allow</option>
+                                                                                                <option value="1" '.$selected.'>Allow</option>
+                                                                                                <option value="0" '.$unselected.'>Not Allow</option>
                                                                                             </select>
                                                                                         </td>
-                                                                                        <td>'.$changedstatus.'
-                                                                                            <a 
-                                                                                                href="#"
-                                                                                                class="btn btn-alert form-control add_to_accept_cart" 
-                                                                                                atc-ic="'.$requisrow['item_list_id'].'"
-                                                                                                id="add_to_accept_cart'.$requisrow['item_list_id'].'" 
-                                                                                                style="font-size: 20px;"><i class="fas fa-thumbs-up"
-                                                                                            ></i>
-                                                                                            </a>
-                                                                                            <a 
-                                                                                                href="#"
-                                                                                                class="btn btn-alert form-control rem_from_accept_cart" 
-                                                                                                operat-ic="'.$requisrow['item_list_id'].'"
-                                                                                                id="rem_from_accept_cart'.$requisrow['item_list_id'].'" 
-                                                                                                style="font-size: 20px;display:none;"
-                                                                                            ><i class="fas fa-trash" ></i>
-                                                                                            </a>								
-                                                                                            <a 
-                                                                                                href="#"
-                                                                                                class="btn btn-alert form-control edit-req-item" 
-                                                                                                id="'.$requisrow['item_list_id'].'" 
-                                                                                            ><i class="fas fa-edit" ></i>
-                                                                                            </a>
-                                                                                        </td>
+                                                                                        <td class="text-center">'.$actionstatus.'</td>
                                                                                     </tr>
                                                                                 ';
-                                                                                $pdid=$requisrow['list_id'];
                                                                             }
                                                                         }else{
                                                                                 echo '
@@ -302,24 +279,24 @@ include_once("../MCU/db.php");
     <!-- <script src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
     <script>
-        function myFunction() {
-            var input, filter, table, tr, td, i, txtValue;
-            input = document.getElementById("myInput");
-            filter = input.value.toUpperCase();
-            table = document.getElementById("stc-requis-table");
-            tr = table.getElementsByTagName("tr");
-            for (i = 0; i < tr.length; i++) {
-                td = tr[i].getElementsByTagName("td")[0];
-                if (td) {
-                    txtValue = td.textContent || td.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        tr[i].style.display = "";
-                    } else {
-                        tr[i].style.display = "none";
-                    }
-                }       
-            }
-        }
+        // function myFunction() {
+        //     var input, filter, table, tr, td, i, txtValue;
+        //     input = document.getElementById("myInput");
+        //     filter = input.value.toUpperCase();
+        //     table = document.getElementById("stc-requis-table");
+        //     tr = table.getElementsByTagName("tr");
+        //     for (i = 0; i < tr.length; i++) {
+        //         td = tr[i].getElementsByTagName("td")[0];
+        //         if (td) {
+        //             txtValue = td.textContent || td.innerText;
+        //             if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        //                 tr[i].style.display = "";
+        //             } else {
+        //                 tr[i].style.display = "none";
+        //             }
+        //         }       
+        //     }
+        // }
         $(document).ready(function(){
             $('body').delegate('.search-icon', 'click', function(e){
                 e.preventDefault();
@@ -335,6 +312,14 @@ include_once("../MCU/db.php");
                     window.location.href="stc-product.php?pd_name="+pd_title;
                 }
             });    
+        });
+
+        $("#myInput").on("keyup", function(e) {
+            e.preventDefault();
+            var value = $(this).val().toLowerCase();
+            $("#stc-requis-table tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
         });
     </script>
     <script>
@@ -430,6 +415,39 @@ include_once("../MCU/db.php");
             });
 
             /*--------------------------Requistion Section-------------------------*/
+            // add to purchase
+            $('body').delegate('.add_to_purchase', 'click', function(e){
+                e.preventDefault();
+                var item_id=$(this).attr("atc-ic");
+                var itemqty=$('.stc-sup-appr-qty'+item_id).val();
+                var itemreqqty=$('.stc-sup-req-qty'+item_id).val();
+                var itemstatus=$('.stc-sup-items-status'+item_id).val();
+                if((itemqty > 0) && (itemreqqty >= itemqty)){
+                    // $(this).css('display','none');
+                    $.ajax({
+                        url : "nemesis/stc_project.php",
+                        method : "POST",
+                        data : {
+                            stc_addtopurchase:1,
+                            item_id:item_id,
+                            itemqty:itemqty,
+                            itemstatus:itemstatus
+                        },
+                        success : function(requisition){
+                            // console.log(requisition);
+                            if(requisition.trim()=="success"){
+                                alert("Your requisition is sent. Thankyou and be patience from procurement approval.");
+                                $('#stc-req-tr-'+item_id).toggle('500');
+                                // $('#stc-req-tr-'+item_id).remove();
+                            }else{
+                                alert("Something went wrong. Please check and try again.");
+                            }
+                        }
+                    });
+                }else{
+                    alert("Invalid quantity.");
+                }
+            });
 
             // supervisor requist
             $('body').delegate('.ag-req-show-grid', 'click', function(e){
