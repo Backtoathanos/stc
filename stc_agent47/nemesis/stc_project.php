@@ -1684,7 +1684,35 @@ class pirates_supervisor extends tesseract{
 		}
 		return $blackpearl;
 	}
-
+	// add to purchase
+	public function stc_add_to_purchase($item_id, $itemqty, $itemstatus){
+		$blackpearl='';
+		$setapprqry=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_cust_super_requisition_list_items` 
+			SET 
+				`stc_cust_super_requisition_list_items_approved_qty`='".$itemqty."',
+				`stc_cust_super_requisition_list_items_status`='".$itemstatus."'
+			WHERE `stc_cust_super_requisition_list_id`='".$item_id."'
+		");
+		$getapprqry=mysqli_query($this->stc_dbs, "
+			select `stc_cust_super_requisition_list_items_req_id` 
+			from stc_cust_super_requisition_list_items 
+			where stc_cust_super_requisition_list_id='".$item_id."'
+		");
+		$result=mysqli_fetch_assoc($getapprqry);
+		$req_id=$result['stc_cust_super_requisition_list_items_req_id'];
+		if($setapprqry){
+			$setapprqry=mysqli_query($this->stc_dbs, "
+				UPDATE `stc_cust_super_requisition_list` 
+				SET `stc_cust_super_requisition_list_status`='2'
+				WHERE `stc_cust_super_requisition_list_id`='".$req_id."'
+			");
+			$blackpearl="success";
+		}else{
+			$blackpearl="not";
+		}
+		return $blackpearl;
+	}
 	// approved qty
 	public function stc_set_req_appr($odid){
 		$blackpearl='';
@@ -1720,8 +1748,6 @@ class pirates_supervisor extends tesseract{
 						}else{
 							$blackpearl="Your Requisition is Not Sent. Please Contact STC team:(";
 						}
-					}else{
-						$blackpearl="Hmm!!! Something Went Wrong. Please Try Again!!!";
 					}
 				}else{
 					$apprval=$apprqty + $reqrow['product_quantity'];
@@ -3448,6 +3474,18 @@ if(isset($_POST['place_order'])){
 	}
 	echo $out;
 }
+
+// go to requistion session
+if(isset($_POST['stc_addtopurchase'])){
+	$item_id=$_POST['item_id'];
+	$itemqty=$_POST['itemqty'];
+	$itemstatus=$_POST['itemstatus'];
+	$megabotspre=new pirates_supervisor();
+	$outmegabotspre=$megabotspre->stc_add_to_purchase($item_id, $itemqty, $itemstatus);
+	echo $outmegabotspre;
+
+}
+
 
 // go to requistion session
 if(isset($_POST['go_for_req_sess'])){
