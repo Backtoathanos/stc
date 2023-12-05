@@ -321,6 +321,8 @@ include_once("../MCU/db.php");
                 $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
             });
         });
+
+        <
     </script>
     <script>
         $(document).ready(function(){
