@@ -700,13 +700,13 @@ class ragnarReportsViewRequiReports extends tesseract{
          $totalpending+=$bmpendingday + $cpendingday + $djapendingday + $pmpendingday;
          
          $abmplanningday = $bmplanning + $bmprogress + $bmjobdone;
-         $abmpendingday = $bmplanningday - $bmjobdone;
+         $abmpendingday = $abmplanningday - $bmjobdone;
          $acplanningday = $cplanning + $cprogress + $cjobdone;
-         $acpendingday = $cplanningday - $cjobdone;
+         $acpendingday = $acplanningday - $cjobdone;
          $adjaplanningday = $djaplanning + $djaprogress + $djajobdone;
-         $adjapendingday = $djaplanningday - $djajobdone;
+         $adjapendingday = $adjaplanningday - $djajobdone;
          $apmplanningday = $pmplanning + $pmprogress + $pmjobdone;
-         $apmpendingday = $pmplanningday - $pmjobdone;
+         $apmpendingday = $apmplanningday - $pmjobdone;
          
          $atotalp+=$abmplanningday + $acplanningday + $adjaplanningday + $apmplanningday;
          $atotalwp+=$bmprogress + $cprogress + $djaprogress + $pmprogress;

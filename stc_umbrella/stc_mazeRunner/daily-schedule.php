@@ -30,9 +30,9 @@ if($_SESSION['stc_school_user_for']==2){
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput-typeahead.css" />
     <style>
-        /* .fade:not(.show) {
+        .fade:not(.show) {
           opacity: 10;
-        } */
+        }
       .d-flex {
         display: -webkit-box;
         display: -ms-flexbox;
