@@ -221,32 +221,34 @@ include_once("../MCU/db.php");
                                                                                 $unselected="";
                                                                                 $status_selected=$requisrow['stc_cust_super_requisition_list_items_status']==1 ? $selected : $unselected;
                                                                                 $trid="stc-req-tr-".$requisrow['item_list_id'];
-                                                                                echo '
-                                                                                    <tr id="'.$trid.'" class="tr-search-fromhere">
-                                                                                        <td class="text-center">'.$sl.'</td>
-                                                                                        <td>'.date('d-m-Y h:i a', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'</td>
-                                                                                        <td>'.$requisrow['stc_cust_project_title'].'</td>
-                                                                                        <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'
-                                                                                        </td>
-                                                                                        <td><a href="javascript:void(0)" style="font-size: 15px;text-decoration: none;color: black;" class="edit-req-item" id="'.$requisrow['item_list_id'].'"> <i class="fas fa-edit" ></i> '.$requisrow['stc_cust_super_requisition_list_items_title'].'</a></td>
-                                                                                        <td class="text-center">'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
-                                                                                        <td class="text-right">
-                                                                                            '.number_format($requisrow['stc_cust_super_requisition_list_items_reqqty'], 2).'
-                                                                                            <input type="hidden" class="stc-sup-req-qty'.$requisrow['item_list_id'].'" value="'.$requisrow['stc_cust_super_requisition_list_items_reqqty'].'">
-                                                                                        </td>
-                                                                                        <td>
-                                                                                            <input type="number" class="form-control stc-sup-appr-qty'.$requisrow['item_list_id'].'" style="width: 60px;padding: 4px;" value="'.$requisrow['stc_cust_super_requisition_list_items_approved_qty'].'">
-                                                                                        </td>
-                                                                                        <td class="text-right">'.number_format($requisrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
-                                                                                        <td>
-                                                                                            <select class="form-control stc-sup-items-status'.$requisrow['item_list_id'].'">
-                                                                                                <option value="1" '.$selected.'>Allow</option>
-                                                                                                <option value="0" '.$unselected.'>Not Allow</option>
-                                                                                            </select>
-                                                                                        </td>
-                                                                                        <td class="text-center">'.$actionstatus.'</td>
-                                                                                    </tr>
-                                                                                ';
+                                                                                if($requisrow['stc_cust_super_requisition_list_items_status']==1){
+                                                                                    echo '
+                                                                                        <tr id="'.$trid.'" class="tr-search-fromhere">
+                                                                                            <td class="text-center">'.$sl.'</td>
+                                                                                            <td>'.date('d-m-Y h:i a', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'</td>
+                                                                                            <td>'.$requisrow['stc_cust_project_title'].'</td>
+                                                                                            <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'
+                                                                                            </td>
+                                                                                            <td><a href="javascript:void(0)" style="font-size: 15px;text-decoration: none;color: black;" class="edit-req-item" id="'.$requisrow['item_list_id'].'"> <i class="fas fa-edit" ></i> '.$requisrow['stc_cust_super_requisition_list_items_title'].'</a></td>
+                                                                                            <td class="text-center">'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
+                                                                                            <td class="text-right">
+                                                                                                '.number_format($requisrow['stc_cust_super_requisition_list_items_reqqty'], 2).'
+                                                                                                <input type="hidden" class="stc-sup-req-qty'.$requisrow['item_list_id'].'" value="'.$requisrow['stc_cust_super_requisition_list_items_reqqty'].'">
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                <input type="number" class="form-control stc-sup-appr-qty'.$requisrow['item_list_id'].'" style="width: 60px;padding: 4px;" value="'.$requisrow['stc_cust_super_requisition_list_items_approved_qty'].'">
+                                                                                            </td>
+                                                                                            <td class="text-right">'.number_format($requisrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+                                                                                            <td>
+                                                                                                <select class="form-control stc-sup-items-status'.$requisrow['item_list_id'].'">
+                                                                                                    <option value="1" '.$selected.'>Allow</option>
+                                                                                                    <option value="0" '.$unselected.'>Not Allow</option>
+                                                                                                </select>
+                                                                                            </td>
+                                                                                            <td class="text-center">'.$actionstatus.'</td>
+                                                                                        </tr>
+                                                                                    ';
+                                                                                }
                                                                             }
                                                                         }else{
                                                                                 echo '
