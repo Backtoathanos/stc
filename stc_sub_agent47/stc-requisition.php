@@ -76,7 +76,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#create-req">
+                            <a role="tab" class="nav-link show" id="tab-2" data-toggle="tab" href="#create-req">
                                 <span>Create Requisition</span>
                             </a>
                         </li>
@@ -264,6 +264,21 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     </script>
     <script>
         $(document).ready(function(){
+            var url = document.location.href;
+            var qs = url.substring(url.indexOf('?') + 1).split('&');
+            for(var i = 0, result = {}; i < qs.length; i++){
+                qs[i] = qs[i].split('=');
+                result[qs[i][0]] = decodeURIComponent(qs[i][1]);
+            }
+            if(result.status=="add"){
+                $('.nav-link').removeClass("active");
+                $('.tab-pane').removeClass("active");
+                $('.nav-link:eq(1)').addClass("active");
+                $('.tab-pane:eq(1)').addClass("active");
+            }
+            
+            sdlno=result.sdl==undefined ? "0" : result.sdl;
+
             // search requistion by date
             $('body').delegate('.stc-sup-req-search', 'click', function(e){
                 e.preventDefault();
@@ -362,7 +377,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     method  : "POST",
                     data    : {
                             save_Dailylist:1,
-                            sup_site:sup_site
+                            sup_site:sup_site,
+                            sdlno:sdlno
                     },
                     success : function(response){
                         // console.log(response);

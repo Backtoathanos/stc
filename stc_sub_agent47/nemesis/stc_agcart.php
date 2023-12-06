@@ -98,11 +98,18 @@ class transformers extends tesseract{
 			WHERE 
 				`stc_cust_pro_attend_supervise_super_id`='".$_SESSION['stc_agent_sub_id']."'
 		");
-		$optimusprime='<option value="NA" selected>Select Site</option>';
+		$optimusprime='';
 		$do_action=mysqli_num_rows($optimusprimequery);
 		if($do_action == 0){
 			$optimusprime = "<option value='NA' selected>No Site Found !!</option>";
+		}elseif($do_action == 1){
+			foreach ($optimusprimequery as $row) {
+				$optimusprime.='
+							<option value="'.$row["stc_cust_project_id"].'">'.$row["stc_cust_project_title"].'</option>		               	
+		            	';				
+			}
 		}else{
+			$optimusprime='<option value="NA" selected>Select Site</option>';
 			foreach ($optimusprimequery as $row) {
 				$optimusprime.='
 							<option value="'.$row["stc_cust_project_id"].'">'.$row["stc_cust_project_title"].'</option>		               	
@@ -168,18 +175,20 @@ class transformers extends tesseract{
 }
 
 class witcher_supervisor extends tesseract{
-	public function stc_super_list_add($sup_site){
+	public function stc_super_list_add($sup_site, $sdlno){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_cust_super_requisition_list`(
 				`stc_cust_super_requisition_list_date`, 
+				`stc_cust_super_requisition_list_sdlid`, 
 				`stc_cust_super_requisition_list_super_id`, 
 				`stc_cust_super_requisition_list_project_id`, 
 				`stc_cust_super_requisition_list_status`, 
 				`stc_cust_super_requisition_list_approved_by`
 			) VALUES (
 				'".$date."',
+				'".$sdlno."',
 				'".$_SESSION['stc_agent_sub_id']."',
 				'".$sup_site."',
 				'1',
@@ -693,7 +702,7 @@ if(isset($_POST['show_Dailylist'])){
 	}else{
 			$out.='
 				<tr>
-					<td colspan="5" align="center">Requisition List is Empty:(</td>
+					<td colspan="5" align="center">Requisition list is empty:(</td>
 				</tr>
 			';
 	}
@@ -717,6 +726,7 @@ if(isset($_POST['delete_Dailylist'])){
 if(isset($_POST['save_Dailylist'])){
 	$out='';
 	$sup_site=$_POST['sup_site'];
+	$sdlno=isset($_POST['sdlno'])? $_POST['sdlno'] : 0;
 	$bumblebee=new witcher_supervisor();
 	$megatron=new witcher_supervisor();
 
@@ -727,7 +737,7 @@ if(isset($_POST['save_Dailylist'])){
 	}elseif(empty($_SESSION['stc_agent_sup_dailylist_cart_sess'])){
 		$out="Please Order atleast One Product!!!";
 	}else{
-		$outbumblembee=$bumblebee->stc_super_list_add($sup_site);
+		$outbumblembee=$bumblebee->stc_super_list_add($sup_site, $sdlno);
 		if($outbumblembee=="success"){
 			$outmegatron=$megatron->stc_super_list_items_add();
     			

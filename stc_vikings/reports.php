@@ -1366,7 +1366,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             var percent=finalwidth/screenwidth * 100;
             $('.stc-show-std-details').width(finalwidth);
             
-            $('body').delegate('.std-filter-department', 'click', function(){
+            $('body').delegate('.std-filter-department', 'change', function(){
                 var values = $(this).val();
                 $('.message-alert').remove();
                 if(values=="NA"){
@@ -1550,6 +1550,21 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     columns: [0, 1, 2]
                 });
                 $('.std-filter-find-btn').click();
+            });
+
+            $('body').delegate('.stc-sdl-material-show-req', 'click', function(e){
+                var sdl_id=$(this).attr("id");
+                $.ajax({
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "POST",
+                    data    : {
+                        stc_sdl_material_call:1,
+                        sdl_id:sdl_id
+                    },
+                    success : function(data){
+                        $('.show-material-list-sdl').html(data);
+                    }
+                });
             });
         });
     </script>
@@ -2126,6 +2141,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                             DISTINCT `stc_status_down_list_plocation`
                                                         FROM
                                                             `stc_status_down_list`
+                                                        WHERE 
+                                                            `stc_status_down_list_status`<'6'
+                                                        AND 
+                                                            `stc_status_down_list_plocation`<>''
                                                         ORDER BY `stc_status_down_list_plocation` ASC
                                                     ");
                                                     foreach($dept_qry as $dept_row){
@@ -2236,6 +2255,58 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     <div class="position-relative form-group">
                                         <input type="hidden" class="sdl-hidden-reports">
                                         <a href="javascript:void(0)" class="form-control btn btn-success sdl-update-reportsdl-save">Save<a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                                
+                </div>
+            </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default sdlurbtn-close" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade bd-stdmaterial-modal-lg stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Status Down List Material</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xl-12">
+                    <div class="main-card mb-3 card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                    <h5 class="card-title">Status Down List Material List</h5>
+                                    <div class="position-relative form-group">
+                                        <table class="table table-bordered table-hover table-responsive">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Date</th>
+                                                    <th>Item Desc</th>
+                                                    <th>Unit</th>
+                                                    <th>Purchase Requisition</th>
+                                                    <th>Manager Approve</th>
+                                                    <th>Proc Apprv</th>
+                                                    <th>Dispatch</th>
+                                                    <th>Recieved</th>
+                                                    <th>Pending</th>
+                                                    <th>Consumed</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="show-material-list-sdl">
+                                                
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </div>
