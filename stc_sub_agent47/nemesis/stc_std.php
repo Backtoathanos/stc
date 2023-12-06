@@ -361,6 +361,8 @@ class transformers extends tesseract{
 			<th class="text-center">PENDING REASON</th>
 			<th class="text-center">REMARKS</th>
 			<th class="text-center">JOB DONE DETAILS</th>
+			<th class="text-center">REMARKS BY BOSS</th>
+			<th class="text-center">TARGET DATE BY BOSS</th>
 			';
 		}
 		$optimusprime='
@@ -494,14 +496,15 @@ class transformers extends tesseract{
 				if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
 					if($row['stc_status_down_list_status']==1){
 						$actionsec='
-							<a href="javascript:void(0)" class="btn bg-danger text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
+							<a href="stc-requisition.php?sdl='.$row['stc_status_down_list_id'].'&status=add" class="btn bg-success text-white mb-3" placeholder="Add Requisiton"><i class="pe-7s-note2"></i></a>
+							<a href="javascript:void(0)" class="btn bg-danger text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" placeholder="Edit Status Down List" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
 							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
 								<option status="NA">SELECT STATUS</option>
 								<option status="2">DOWN</option>
 								<option status="3">WORK-IN-PROGRESS</option>
 								<option status="4">WORK-DONE</option>
 							</select>
-							<a href="#" class="stc-add-to-pending btn btn-danger" style="font-size:10px;margin-top:4px;" id="'.$row['stc_status_down_list_id'].'">Add Pending Reason</a>
+							<a href="#" class="stc-add-to-pending btn btn-danger" style="font-size:10px;margin-top:4px;" placeholder="Add Pending Reason" id="'.$row['stc_status_down_list_id'].'">Add Pending Reason</a>
 						';
 					}elseif($row['stc_status_down_list_status']==2){
 						$actionsec='
@@ -628,6 +631,8 @@ class transformers extends tesseract{
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
 						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
+						<td>'.$row['stc_status_down_list_fremarks'].'</td>
+						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_ftarget_date'])).'</td>
 					';
 				}
 
@@ -701,6 +706,7 @@ class transformers extends tesseract{
 				foreach($optimusprime_cqry as $optimusprime_crow){
 					if(($optimusprime_crow['stc_status_down_list_qty']==0) || ($optimusprime_crow['stc_status_down_list_capacity']=='') || ($optimusprime_crow['stc_status_down_list_reasonattribute']=='')){
 						$validated=0;
+						break;
 					}
 				}
 				if($validated==1){

@@ -751,7 +751,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-right" style="background-color: #82f900;">'.$djajobdone48.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$djapendingday.'</td>
                </tr>
-               <tr style="background-color:white;">
+               <tr style="background-color:white;border-bottom: 3px solid black;">
                   <td class="text-center">PREVENTIVE MAINTENANCE</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$pmplanningday.'</td>
                   <td class="text-right" style="background-color: #f6f900;">'.$pmprogress48.'</td>
@@ -760,10 +760,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                </tr>
                <tr style="background-color:white;border-bottom: 3px solid black;">
                   <td class="text-center">TOTAL</td>
-                  <td class="text-right" style="background-color: #00f9b4;"><b>'.$totalp.'</b></td>
-                  <td class="text-right" style="background-color: #f6f900;"><b>'.$totalwp.'</b></td>
-                  <td class="text-right" style="background-color: #00f9b4;"><b>'.$totalwd.'</b></td>
-                  <td class="text-right" style="background-color: #ff4545;"><b>'.$totalpending.'</b></td>
+                  <td class="text-right"><b>'.$totalp.'</b></td>
+                  <td class="text-right"><b>'.$totalwp.'</b></td>
+                  <td class="text-right"><b>'.$totalwd.'</b></td>
+                  <td class="text-right"><b>'.$totalpending.'</b></td>
                </tr>
                <tr style="background-color:white;">
                   <td class="text-center" rowspan="5">TOTAL DCP ACTIVITY (All time)</td>
@@ -787,19 +787,19 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-right" style="background-color: #82f900;">'.$djajobdone.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$adjapendingday.'</td>
                </tr>
-               <tr style="background-color:white;">
+               <tr style="background-color:white;border-bottom: 3px solid black;">
                   <td class="text-center">PREVENTIVE MAINTENANCE</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$apmplanningday.'</td>
                   <td class="text-right" style="background-color: #f6f900;">'.$pmprogress.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$pmjobdone.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$apmpendingday.'</td>
                </tr>
-               <tr style="background-color:white;">
+               <tr style="background-color:white;border-bottom: 3px solid black;">
                   <td class="text-center">TOTAL</td>
-                  <td class="text-right" style="background-color: #00f9b4;"><strong>'.$atotalp.'</strong></td>
-                  <td class="text-right" style="background-color: #f6f900;"><strong>'.$atotalwp.'</strong></td>
-                  <td class="text-right" style="background-color: #82f900;"><strong>'.$atotalwd.'</strong></td>
-                  <td class="text-right" style="background-color: #ff4545;"><strong>'.$atotalpending.'</strong></td>
+                  <td class="text-right"><strong>'.$atotalp.'</strong></td>
+                  <td class="text-right"><strong>'.$atotalwp.'</strong></td>
+                  <td class="text-right"><strong>'.$atotalwd.'</strong></td>
+                  <td class="text-right"><strong>'.$atotalpending.'</strong></td>
                </tr>
             </table>
          ';
@@ -825,6 +825,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th style="width:1%" class="text-center">CAPACITY</th>
                      <th style="width:4%" class="text-center">REASON</th>
                      <th style="width:2%" class="text-center sl-hide">REASON ATTRIBUTE</th>
+                     <th style="width:4%" class="text-center">MATERIAL</th>
                      <th style="width:1%" class="text-center">STATUS</th>
                      <th style="width:1%" class="text-center">DELAY</th>
                      <th style="width:3%" class="text-center">JOB DONE DETAILS</th>
@@ -969,6 +970,16 @@ class ragnarReportsViewRequiReports extends tesseract{
 						$eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
 					}
 				}
+            $material_view='<a href="javascript:void(0)" class="btn btn-primary stc-sdl-material-show-req" id="'.$row['stc_status_down_list_id'].'" data-toggle="modal" data-target=".bd-stdmaterial-modal-lg">View</a>';
+            $sdl_id=$row['stc_status_down_list_id'];
+            $stc_materquery=mysqli_query($this->stc_dbs, "
+               SELECT `stc_cust_super_requisition_list_id` 
+               FROM `stc_cust_super_requisition_list` 
+               WHERE `stc_cust_super_requisition_list_sdlid`='".$sdl_id."'
+				");
+            if(mysqli_num_rows($stc_materquery)==0){
+               $material_view='#';
+            }
 
             $ftargetdate=$row['stc_status_down_list_ftarget_date']=="" ? "" : date('d-m-Y H:i a', strtotime($row['stc_status_down_list_ftarget_date']));
             $anycomm_value = $row['stc_status_down_list_remarks'];
@@ -996,6 +1007,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <span class="jobdonedet-print" style="display:none;">'.$reason_value.'</span>
                   </td>
                   <td class="sl-hide">'.$row['stc_status_down_list_reasonattribute'].'</td>
+                  <td class="sl-hide text-center">'.$material_view.'</td>
                   <td class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>
                   <td>
@@ -1030,6 +1042,7 @@ class ragnarReportsViewRequiReports extends tesseract{
       return $ivar;
    }
 
+   // update remarks and target datae from admin
    public function stc_call_std_update($sdl_id, $target_date, $remarks){
       $ivar='';
       $date=Date('d-m-Y h:i a');
@@ -1043,6 +1056,115 @@ class ragnarReportsViewRequiReports extends tesseract{
       if($ivarquery){
          $ivar="updated";
       }
+      return $ivar;
+   }
+
+   // /call material list
+   public function stc_call_std_material($sdl_id){
+      $ivar='';
+      $slno=0;
+      $ivarquery=mysqli_query($this->stc_dbs, "
+         SELECT DISTINCT
+            `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
+            DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
+            `stc_cust_super_requisition_list_items_req_id`,
+            `stc_cust_super_requisition_list_items_title`,
+            `stc_cust_super_requisition_list_items_unit`,
+            `stc_cust_super_requisition_list_items_reqqty`,
+            `stc_cust_super_requisition_list_items_approved_qty`,
+            `stc_cust_super_requisition_items_finalqty`,
+            `stc_cust_super_requisition_list_items_status`
+         FROM `stc_cust_super_requisition_list_items`
+         INNER JOIN `stc_cust_super_requisition_list` 
+         ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+         WHERE 
+            `stc_cust_super_requisition_list_sdlid`='".mysqli_real_escape_string($this->stc_dbs, $sdl_id)."'
+         ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
+      ");
+      if(mysqli_num_rows($ivarquery)>0){
+			foreach($ivarquery as$requisitionrow){
+				$slno++;
+				$rqitemstts='';
+				$stcdispatchedqty=0;
+				$stcrecievedqty=0;
+				$stcpendingqty=0;
+				if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
+					$rqitemstts='ALLOW';
+				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
+					$rqitemstts='DIRECT';
+				}else{
+					$rqitemstts='NOT ALLOW';
+				}
+				$stcdecqtyqry=mysqli_query($this->stc_dbs, "
+					SELECT 
+						`stc_cust_super_requisition_list_items_rec_recqty`
+					FROM `stc_cust_super_requisition_list_items_rec` 
+					WHERE 
+						`stc_cust_super_requisition_list_items_rec_list_id`='".$requisitionrow['stc_cust_super_requisition_list_items_req_id']."' 
+					AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$requisitionrow['reqlistid']."'  
+				");
+				foreach($stcdecqtyqry as $dispatchedrow){
+					$stcdispatchedqty+=$dispatchedrow['stc_cust_super_requisition_list_items_rec_recqty'];
+				}
+
+				$stcrecqtyqry=mysqli_query($this->stc_dbs, "
+					SELECT 
+						`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+					FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
+					WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$requisitionrow['reqlistid']."'  
+				");
+				foreach($stcrecqtyqry as $recievedrow){
+					$stcrecievedqty+=$recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
+				}
+
+				$stcconsumedqty=0;
+				$stcconsrecqtyqry=mysqli_query($this->stc_dbs, "
+					SELECT 
+						SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
+					FROM `stc_cust_super_list_items_consumption_items` 
+					WHERE `stc_cust_super_list_items_consumption_items_name`='".$requisitionrow['reqlistid']."'  
+				");
+				foreach($stcconsrecqtyqry as $consumedrow){
+					$stcconsumedqty+=$consumedrow['consumable_qty'];
+				}
+
+				$stcpendingqty=$requisitionrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
+				if($stcpendingqty>0){
+					$stcpendingqty='
+						<p class="form-control" style="
+						    background: #ffd81a;
+						    color: red;
+						">
+							'.number_format($stcpendingqty, 2).'
+						</p>
+					';
+				}else{
+					$stcpendingqty=number_format($stcpendingqty, 2);
+				}
+				$ivar.='
+						<tr>
+							<td>'.$slno.'</td>
+							<td>'.$requisitionrow['stc_req_date'].'</td>
+							<td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
+							<td>'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
+							<td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+							<td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+							<td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+							<td align="right">'.number_format($stcdispatchedqty, 2).'</td>
+							<td align="right">'.number_format($stcrecievedqty, 2).'</td>
+							<td align="right">'.$stcpendingqty.'</td>
+							<td align="right">'.number_format($stcconsumedqty, 2).'</td>
+							<td>'.$rqitemstts.'</td>
+						</tr>
+				';
+			}
+		}else{
+			$ivar.='
+					<tr>
+						<td colspan="10">No requisition found!!!</td>
+					</tr>
+			';
+		}
       return $ivar;
    }
 
@@ -3716,12 +3838,21 @@ if(isset($_POST['Stc_std_details'])){
    echo $outbjornecustomer;
 }
 
+// update sdl
 if(isset($_POST['stc_sdl_update'])){
    $sdl_id=$_POST['sdl_id'];
    $target_date=$_POST['target_date'];
    $remarks=$_POST['remarks'];
    $bjornecustomer=new ragnarReportsViewRequiReports();   
    $outbjornecustomer=$bjornecustomer->stc_call_std_update($sdl_id, $target_date, $remarks);
+   echo $outbjornecustomer;
+}
+
+// call material  sdl
+if(isset($_POST['stc_sdl_material_call'])){
+   $sdl_id=$_POST['sdl_id'];
+   $bjornecustomer=new ragnarReportsViewRequiReports();   
+   $outbjornecustomer=$bjornecustomer->stc_call_std_material($sdl_id);
    echo $outbjornecustomer;
 }
 
