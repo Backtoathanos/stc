@@ -1687,6 +1687,7 @@ class pirates_supervisor extends tesseract{
 	// add to purchase
 	public function stc_add_to_purchase($item_id, $itemqty, $itemstatus){
 		$blackpearl='';
+		$itemstatus = $itemstatus == 1 ? 2 : 0;
 		$setapprqry=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_cust_super_requisition_list_items` 
 			SET 
@@ -1702,17 +1703,36 @@ class pirates_supervisor extends tesseract{
 		$result=mysqli_fetch_assoc($getapprqry);
 		$req_id=$result['stc_cust_super_requisition_list_items_req_id'];
 		if($setapprqry){
-			$setapprqry=mysqli_query($this->stc_dbs, "
-				UPDATE `stc_cust_super_requisition_list` 
-				SET `stc_cust_super_requisition_list_status`='2'
+			// check status from item
+			$checkquery=mysqli_query($this->stc_dbs, "
+				SELECT DISTINCT `stc_cust_super_requisition_list_status` 
+				FROM `stc_cust_super_requisition_list` 
 				WHERE `stc_cust_super_requisition_list_id`='".$req_id."'
 			");
+			$oneactive=0;
+			if(mysqli_num_rows($checkquery)>1){
+				$oneactive=2;
+			}else{
+				$result=mysqli_fetch_assoc($checkquery);
+			}
+			if($oneactive==1){
+				$resultstatus=$result['stc_cust_super_requisition_list_status'];
+				if($resultstatus==2){
+					$setapprqry=mysqli_query($this->stc_dbs, "
+						UPDATE `stc_cust_super_requisition_list` SET `stc_cust_super_requisition_list_status`='2' WHERE `stc_cust_super_requisition_list_id`='".$req_id."'
+					");
+					$setapprqry=mysqli_query($this->stc_dbs, "
+						UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`='1' WHERE `stc_cust_super_requisition_list_id`='".$item_id."'
+					");
+				}
+			}
 			$blackpearl="success";
 		}else{
 			$blackpearl="not";
 		}
 		return $blackpearl;
 	}
+
 	// approved qty
 	public function stc_set_req_appr($odid){
 		$blackpearl='';
