@@ -613,10 +613,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   if ($dperiod<2) $bmpendingjon48++;
                }else if($prerow['stc_status_down_list_status']==3){
                   $bmprogress++;
-                  if ($dperiod<2) $bmprogress++;
-               }else if($prerow['stc_status_down_list_status']==4){
-                  $bmpendingjon++;
-                  if ($dperiod<2) $bmpendingjon48++;
+                  if ($dperiod<2) $bmprogress48++;
                }else if($prerow['stc_status_down_list_status']==4){
                   $bmjobdone++;
                   if ($dperiod<2) $bmjobdone48++;
@@ -630,10 +627,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   if ($dperiod<2) $cpendingjon48++;
                }else if($prerow['stc_status_down_list_status']==3){
                   $cprogress++;
-                  if ($dperiod<2) $cprogress++;
-               }else if($prerow['stc_status_down_list_status']==4){
-                  $cpendingjon++;
-                  if ($dperiod<2) $cpendingjon48++;
+                  if ($dperiod<2) $cprogress48++;
                }else if($prerow['stc_status_down_list_status']==4){
                   $cjobdone++;
                   if ($dperiod<2) $cjobdone48++;
@@ -647,10 +641,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   if ($dperiod<2) $djapendingjon48++;
                }else if($prerow['stc_status_down_list_status']==3){
                   $djaprogress++;
-                  if ($dperiod<2) $djaprogress++;
-               }else if($prerow['stc_status_down_list_status']==4){
-                  $djapendingjon++;
-                  if ($dperiod<2) $djapendingjon48++;
+                  if ($dperiod<2) $djaprogress48++;
                }else if($prerow['stc_status_down_list_status']==4){
                   $djajobdone++;
                   if ($dperiod<2) $djajobdone48++;
@@ -664,25 +655,13 @@ class ragnarReportsViewRequiReports extends tesseract{
                   if ($dperiod<2) $pmpendingjon48++;
                }else if($prerow['stc_status_down_list_status']==3){
                   $pmprogress++;
-                  if ($dperiod<2) $pmprogress++;
-               }else if($prerow['stc_status_down_list_status']==4){
-                  $pmpendingjon++;
-                  if ($dperiod<2) $pmpendingjon48++;
+                  if ($dperiod<2) $pmprogress48++;
                }else if($prerow['stc_status_down_list_status']==4){
                   $pmjobdone++;
                   if ($dperiod<2) $pmjobdone48++;
                }
             }
          }
-         $bmtotal48 = $bmplanning48 + $bmprogress48 + $bmjobdone48;
-         $ctotal48 = $cplanning48 + $cprogress48 + $cjobdone48;
-         $djatotal48 = $djaplanning48 + $djaprogress48 + $djajobdone48;
-         $pmtotal48 = $pmplanning48 + $pmprogress48 + $pmjobdone48;
-         
-         $bmtotal = $bmplanning + $bmprogress + $bmjobdone;
-         $ctotal = $cplanning + $cprogress + $cjobdone;
-         $djatotal = $djaplanning + $djaprogress + $djajobdone;
-         $pmtotal = $pmplanning + $pmprogress + $pmjobdone;
 
          // new calculation from summary of sdl
          $bmplanningday = $bmplanning48 + $bmprogress48 + $bmjobdone48;
@@ -743,11 +722,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-center">PENDING</td>                  
                   <td class="text-center">FILTER</td>
                </tr>
-               <tr>
-                  <td class="text-center" rowspan="5">DAILY JOB ACTIVITY(within 48hr)</td>
+               <tr style="background-color:white;">
+                  <td class="text-center" rowspan="5">DAILY DCP ACTIVITY(within 48hr)</td>
                   <td class="text-center">BREAKDOWN MAINTENANCE</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$bmplanningday.'</td>
-                  <td class="text-right" style="background-color: #a9d08e;">'.$bmprogress48.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$bmprogress48.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$bmjobdone48.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$bmpendingday.'</td>
                   <td class="text-center" rowspan="10">
@@ -758,241 +737,72 @@ class ragnarReportsViewRequiReports extends tesseract{
 
                   </td>
                </tr>
-               <tr>
+               <tr style="background-color:white;">
                   <td class="text-center">CALL ATTEND</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$cplanningday.'</td>
-                  <td class="text-right" style="background-color: #a9d08e;">'.$cprogress48.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$cprogress48.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$cjobdone48.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$cpendingday.'</td>
                </tr>
-               <tr>
+               <tr style="background-color:white;">
                   <td class="text-center">DAILY JOB ACTIVITY</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$djaplanningday.'</td>
-                  <td class="text-right" style="background-color: #a9d08e;">'.$djaprogress48.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$djaprogress48.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$djajobdone48.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$djapendingday.'</td>
                </tr>
-               <tr>
+               <tr style="background-color:white;">
                   <td class="text-center">PREVENTIVE MAINTENANCE</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$pmplanningday.'</td>
-                  <td class="text-right" style="background-color: #a9d08e;">'.$pmprogress48.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$pmprogress48.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$pmjobdone48.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$pmpendingday.'</td>
                </tr>
-               <tr>
+               <tr style="background-color:white;border-bottom: 3px solid black;">
                   <td class="text-center">TOTAL</td>
                   <td class="text-right" style="background-color: #00f9b4;"><b>'.$totalp.'</b></td>
-                  <td class="text-right" style="background-color: #00f9b4;"><b>'.$totalwp.'</b></td>
+                  <td class="text-right" style="background-color: #f6f900;"><b>'.$totalwp.'</b></td>
                   <td class="text-right" style="background-color: #00f9b4;"><b>'.$totalwd.'</b></td>
                   <td class="text-right" style="background-color: #ff4545;"><b>'.$totalpending.'</b></td>
                </tr>
-               <tr>
-                  <td class="text-center" rowspan="5">TOTAL JOB ACTIVITY (All time)</td>
+               <tr style="background-color:white;">
+                  <td class="text-center" rowspan="5">TOTAL DCP ACTIVITY (All time)</td>
                   <td class="text-center">BREAKDOWN MAINTENANCE</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$abmplanningday.'</td>
-                  <td class="text-right" style="background-color: #a9d08e;">'.$bmprogress.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$bmprogress.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$bmjobdone.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$abmpendingday.'</td>
                </tr>
-               <tr>
+               <tr style="background-color:white;">
                   <td class="text-center">CALL ATTEND</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$acplanningday.'</td>
-                  <td class="text-right" style="background-color: #a9d08e;">'.$cprogress.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$cprogress.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$cjobdone.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$acpendingday.'</td>
                </tr>
-               <tr>
+               <tr style="background-color:white;">
                   <td class="text-center">DAILY JOB ACTIVITY</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$adjaplanningday.'</td>
-                  <td class="text-right" style="background-color: #a9d08e;">'.$djaprogress.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$djaprogress.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$djajobdone.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$adjapendingday.'</td>
                </tr>
-               <tr>
+               <tr style="background-color:white;">
                   <td class="text-center">PREVENTIVE MAINTENANCE</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$apmplanningday.'</td>
-                  <td class="text-right" style="background-color: #a9d08e;">'.$pmprogress.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$pmprogress.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$pmjobdone.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$apmpendingday.'</td>
                </tr>
-               <tr>
+               <tr style="background-color:white;">
                   <td class="text-center">TOTAL</td>
                   <td class="text-right" style="background-color: #00f9b4;"><strong>'.$atotalp.'</strong></td>
-                  <td class="text-right" style="background-color: #00f9b4;"><strong>'.$atotalwp.'</strong></td>
-                  <td class="text-right" style="background-color: #00f9b4;"><strong>'.$atotalwd.'</strong></td>
+                  <td class="text-right" style="background-color: #f6f900;"><strong>'.$atotalwp.'</strong></td>
+                  <td class="text-right" style="background-color: #82f900;"><strong>'.$atotalwd.'</strong></td>
                   <td class="text-right" style="background-color: #ff4545;"><strong>'.$atotalpending.'</strong></td>
                </tr>
             </table>
          ';
-         // $ivar.='
-         //    <table class="table table-bordered table-responsive" id="stc-show-std-detailspre-table">
-         //       <tr>
-         //          <td class="text-center">LABEL</td>
-         //          <td class="text-center">BREAKDOWN MAINTENANCE</td>
-         //          <td class="text-center">CALL ATTEND</td>
-         //          <td class="text-center">DAILY JOB ACTIVITY</td>
-         //          <td class="text-center">PREVENTIVE MAINTENANCE</td>
-         //          <td class="text-center">FILTER</td>
-         //       </tr>
-         //       <tr>
-         //          <td class="text-center">DAILY JOB ACTIVITY(within 48hr)</td>
-         //          <td>
-         //             <table class="table">
-         //                <tr>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-right" style="background-color: #00f9b4;">'.$bmplanning48.'</td>
-         //                   <td class="text-right" style="background-color: #f6f900;">'.$bmprogress48.'</td>
-         //                   <td class="text-right" style="background-color: #a9d08e;">'.$bmjobdone48.'</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
-         //                   <td class="text-right">'.$bmtotal48.'</td>
-         //                </tr>
-         //             </table>
-         //          </td>
-         //          <td>
-         //             <table class="table">
-         //                <tr>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-right" style="background-color: #00f9b4;">'.$cplanning48.'</td>
-         //                   <td class="text-right" style="background-color: #f6f900;">'.$cprogress48.'</td>
-         //                   <td class="text-right" style="background-color: #a9d08e;">'.$cjobdone48.'</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
-         //                   <td class="text-right">'.$ctotal48.'</td>
-         //                </tr>
-         //             </table>
-         //          </td>
-         //          <td>
-         //             <table class="table">
-         //                <tr>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-right" style="background-color: #00f9b4;">'.$djaplanning48.'</td>
-         //                   <td class="text-right" style="background-color: #f6f900;">'.$djaprogress48.'</td>
-         //                   <td class="text-right" style="background-color: #a9d08e;">'.$djajobdone48.'</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
-         //                   <td class="text-right">'.$djatotal48.'</td>
-         //                </tr>
-         //             </table>
-         //          </td>
-         //          <td>
-         //             <table class="table">
-         //                <tr>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-right" style="background-color: #00f9b4;">'.$pmplanning48.'</td>
-         //                   <td class="text-right" style="background-color: #f6f900;">'.$pmprogress48.'</td>
-         //                   <td class="text-right" style="background-color: #a9d08e;">'.$pmjobdone48.'</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
-         //                   <td class="text-right">'.$pmtotal48.'</td>
-         //                </tr>
-         //             </table>
-         //          </td>
-         //          <td class="text-center" rowspan="2">
-         //             <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
-         //             <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
-         //             '.$data_fields.'
-         //             </ul>
-
-         //          </td>
-         //       </tr>
-         //       <tr>
-         //          <td class="text-center">TOTAL JOB ACTIVITY (All time)</td>
-         //          <td>
-         //             <table class="table">
-         //                <tr>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-right" style="background-color: #00f9b4;">'.$bmplanning.'</td>
-         //                   <td class="text-right" style="background-color: #f6f900;">'.$bmprogress.'</td>
-         //                   <td class="text-right" style="background-color: #a9d08e;">'.$bmjobdone.'</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
-         //                   <td class="text-right">'.$bmtotal.'</td>
-         //                </tr>
-         //             </table>
-         //          </td>
-         //          <td>
-         //             <table class="table">
-         //                <tr>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-right" style="background-color: #00f9b4;">'.$cplanning.'</td>
-         //                   <td class="text-right" style="background-color: #f6f900;">'.$cprogress.'</td>
-         //                   <td class="text-right" style="background-color: #a9d08e;">'.$cjobdone.'</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
-         //                   <td class="text-right">'.$ctotal.'</td>
-         //                </tr>
-         //             </table>
-         //          </td>
-         //          <td>
-         //             <table class="table">
-         //                <tr>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-right" style="background-color: #00f9b4;">'.$djaplanning.'</td>
-         //                   <td class="text-right" style="background-color: #f6f900;">'.$djaprogress.'</td>
-         //                   <td class="text-right" style="background-color: #a9d08e;">'.$djajobdone.'</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
-         //                   <td class="text-right">'.$djatotal.'</td>
-         //                </tr>
-         //             </table>
-         //          </td>
-         //          <td>
-         //             <table class="table">
-         //                <tr>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #00f9b4;">P</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #f6f900;">WP</td>
-         //                   <td class="text-center" style="font-weight: bold; background-color: #a9d08e;">WC</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-right" style="background-color: #00f9b4;">'.$pmplanning.'</td>
-         //                   <td class="text-right" style="background-color: #f6f900;">'.$pmprogress.'</td>
-         //                   <td class="text-right" style="background-color: #a9d08e;">'.$pmjobdone.'</td>
-         //                </tr>
-         //                <tr>
-         //                   <td class="text-center" colspan="2" style="font-weight:bold;">Total</td>
-         //                   <td class="text-right">'.$pmtotal.'</td>
-         //                </tr>
-         //             </table>
-         //          </td>
-         //       </tr>
-         //    </table>
-         // ';
       }
 
       if(mysqli_num_rows($ivarqry)>0){
