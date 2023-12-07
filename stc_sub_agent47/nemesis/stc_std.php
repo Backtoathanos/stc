@@ -627,12 +627,13 @@ class transformers extends tesseract{
 					if(date('Y', strtotime($row['stc_status_down_list_updated_date']))!=1970){
 						$updatedon = date('d-m-Y', strtotime($row['stc_status_down_list_updated_date']));
 					}
+					$ftargetdate=$row['stc_status_down_list_ftarget_date']=='' ? "" : date('d-m-Y', strtotime($row['stc_status_down_list_ftarget_date']));
 					$hidden2='	
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
 						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
 						<td>'.$row['stc_status_down_list_fremarks'].'</td>
-						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_ftarget_date'])).'</td>
+						<td>'.$ftargetdate.'</td>
 					';
 				}
 
@@ -777,7 +778,7 @@ class transformers extends tesseract{
 			UPDATE 
 				`stc_status_down_list` 
 			SET 
-				`stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $actiontype)."',
+				`stc_status_down_list_status`='6',
 				`stc_status_down_list_status_updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."',
 				`stc_status_down_list_status_updated_on`='".mysqli_real_escape_string($this->stc_dbs, $date)."' 
 			WHERE 
