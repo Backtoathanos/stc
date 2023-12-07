@@ -3737,3 +3737,5 @@
 [27-Nov-2023 11:16:46 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 206
 [28-Nov-2023 03:48:59 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 191
 [28-Nov-2023 03:48:59 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 206
+[07-Dec-2023 10:10:22 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 191
+[07-Dec-2023 10:10:22 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 206
