@@ -715,7 +715,6 @@ class transformers extends tesseract{
 						UPDATE
 							`stc_status_down_list`
 						SET
-							`stc_status_down_list_status`='6',
 							`stc_status_down_list_rect_date`='".mysqli_real_escape_string($this->stc_dbs, $date)."',
 							`stc_status_down_list_equipment_status`='Running',
 							`stc_status_down_list_permit_no`='".mysqli_real_escape_string($this->stc_dbs, $work_permit_no)."'  
@@ -779,7 +778,7 @@ class transformers extends tesseract{
 			UPDATE 
 				`stc_status_down_list` 
 			SET 
-				`stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $actiontype)."',
+				`stc_status_down_list_status`='6',
 				`stc_status_down_list_status_updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."',
 				`stc_status_down_list_status_updated_on`='".mysqli_real_escape_string($this->stc_dbs, $date)."' 
 			WHERE 
