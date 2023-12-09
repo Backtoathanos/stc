@@ -774,11 +774,12 @@ class transformers extends tesseract{
 	public function stc_sdl_workcomplete_update($sld_id, $actiontype){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
+		$actiontype=$actiontype==5 ? 6 : 1; 
 		$optimusprime_updateqry=mysqli_query($this->stc_dbs, "
 			UPDATE 
 				`stc_status_down_list` 
 			SET 
-				`stc_status_down_list_status`='6',
+				`stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $actiontype)."',
 				`stc_status_down_list_status_updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."',
 				`stc_status_down_list_status_updated_on`='".mysqli_real_escape_string($this->stc_dbs, $date)."' 
 			WHERE 
