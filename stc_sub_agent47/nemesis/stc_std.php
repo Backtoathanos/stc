@@ -436,7 +436,9 @@ class transformers extends tesseract{
 				`stc_status_down_list_status`,
 				`stc_status_down_list_updated_by`,
 				`stc_status_down_list_updated_date`,
-				`stc_cust_pro_supervisor_fullname`
+				`stc_cust_pro_supervisor_fullname`,
+				`stc_status_down_list_fremarks`,
+				`stc_status_down_list_ftarget_date`
 			FROM `stc_status_down_list` 
 			LEFT JOIN `stc_cust_project` 
 			ON `stc_cust_project_id`=`stc_status_down_list_location` 
