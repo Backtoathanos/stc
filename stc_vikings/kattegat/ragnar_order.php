@@ -1098,17 +1098,18 @@ class ragnarRequisitionView extends tesseract{
 				$sl++;
 				$getmerchndiseqry=mysqli_query($this->stc_dbs, "
 					SELECT
-					    `stc_product_name`
-					FROM
-						`stc_cust_super_requisition_list_purchaser`
-						INNER JOIN `stc_product` 
-						ON `stc_product_id`=`stc_cust_super_requisition_list_purchaser_pd_id` 
-					WHERE
-						`stc_cust_super_requisition_list_purchaser_list_item_id`='".$ivarreqitemrow['stc_cust_super_requisition_list_id']."'
+					    `stc_product_name`,
+					    `stc_cust_super_requisition_list_purchaser_mer_id`
+					FROM`stc_cust_super_requisition_list_purchaser`
+					INNER JOIN `stc_product` 
+					ON `stc_product_id`=`stc_cust_super_requisition_list_purchaser_pd_id` 
+					WHERE `stc_cust_super_requisition_list_purchaser_list_item_id`='".$ivarreqitemrow['stc_cust_super_requisition_list_id']."'
 				");
 				$pd_name='';
+				$merchant_id='';
 				foreach($getmerchndiseqry as $merchandrow){
 					$pd_name=$merchandrow['stc_product_name'];
+					$merchant_id=$merchandrow['stc_cust_super_requisition_list_purchaser_mer_id'];
 				}
 				$typearray = array('Consumable', 'PPE', 'Supply',  'Tools & Tackles');
 				$type_select= '<option value="NA">Please Select Item Type</option>';
@@ -1127,6 +1128,21 @@ class ragnarRequisitionView extends tesseract{
 					}else{
 						$unit_select.='<option value="'.$unitarrayorw.'">'.$unitarrayorw.'</option>';
 					}
+				}
+				$check_loki=mysqli_query($this->stc_dbs, "SELECT `stc_merchant_id`, `stc_merchant_name` FROM `stc_merchant` GROUP BY `stc_merchant_name` ASC");
+				$odin='<option value="NA" selected>Select Merchant</option>';
+				$do_action=mysqli_num_rows($check_loki);
+				if($do_action == 0){
+					$odin = "<option value='NA' selected>No Merchant Found !!</option>";
+				}else{
+					foreach ($check_loki as $row) {
+						if($row["stc_merchant_id"]==$merchant_id){
+							$odin.='<option value="'.$row["stc_merchant_id"].'" selected>'.$row["stc_merchant_name"].'</option>';
+						}else{
+							$odin.='<option value="'.$row["stc_merchant_id"].'">'.$row["stc_merchant_name"].'</option>';
+						}	
+					}
+					
 				}
 				$ivar.='
 						<tr>
@@ -1182,7 +1198,7 @@ class ragnarRequisitionView extends tesseract{
 								<span class="stc-req-product-show-tag'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'">'.$pd_name.'</span>
 							</td>
 							<td class="no">
-								<select class="stc-call-merchant form-control js-example-basic-single" id="stc-req-mer'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'"></select>
+								<select class="form-control js-example-basic-single" id="stc-req-mer'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'">'.$odin.'</select>
 							</td>
 							<td class="no">
 								<a href="#" class="btn btn-success stc-req-merchandise-save" id="'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'">Save</a>

@@ -1162,7 +1162,7 @@ include("kattegat/role_check.php");
             },
             success : function(response_merchandise_data){
               $('.stc-req-item-show').html(response_merchandise_data);
-              stc_call_merchant();
+              // stc_call_merchant();
             }
           });
           $('.stc-call-for-select-merchant-res').modal("show");
@@ -1348,7 +1348,7 @@ include("kattegat/role_check.php");
               success : function(response_view){
                 var response=response_view.trim();
                 if(response=="Site selected!!!"){
-                  window.location="get-requisition.php";
+                  window.open("get-requisition.php");
                 }else{
                   alert(response_view);
                 }
