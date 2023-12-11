@@ -411,7 +411,7 @@ include_once("../MCU/db.php");
                     success : function(requisition){
                         // console.log(requisition);
                         alert(requisition);
-                        call_requisition_appr_cart();
+                        window.location.reload();
                     }
                 });
             });
