@@ -1705,14 +1705,14 @@ class pirates_supervisor extends tesseract{
 		if($setapprqry){
 			// check status from item
 			$checkquery=mysqli_query($this->stc_dbs, "
-				SELECT DISTINCT `stc_cust_super_requisition_list_status` 
-				FROM `stc_cust_super_requisition_list` 
-				WHERE `stc_cust_super_requisition_list_id`='".$req_id."'
+				SELECT DISTINCT `stc_cust_super_requisition_list_items_status` 
+				FROM `stc_cust_super_requisition_list_items` 
+				WHERE `stc_cust_super_requisition_list_items_req_id`='".$req_id."'
 			");
 			$oneactive=0;
 			if(mysqli_num_rows($checkquery)>1){
 				$oneactive=2;
-			}else{
+			}else if(mysqli_num_rows($checkquery)==1){
 				$result=mysqli_fetch_assoc($checkquery);
 			}
 			if($oneactive==1){
