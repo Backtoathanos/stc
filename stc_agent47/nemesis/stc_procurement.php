@@ -149,8 +149,8 @@ class procurement extends tesseract{
 
 				$findalqty=0;
 				foreach($reqitemqry as $reqitemrow){
-					foreach($_SESSION["stc_supervisor_req_final_cart_req_item_sess"] as $keys => $values){  
-					    if($_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['list_id'] == $reqqryrow['stc_cust_super_requisition_list_id'] && $_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['list_line_id'] == $reqitemrow['stc_cust_super_requisition_list_id']){  
+					foreach(@$_SESSION["stc_supervisor_req_final_cart_req_item_sess"] as $keys => $values){  
+					    if(@$_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['list_id'] == $reqqryrow['stc_cust_super_requisition_list_id'] && $_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['list_line_id'] == $reqitemrow['stc_cust_super_requisition_list_id']){  
 					        $findalqty=$_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['product_quantity'];
 				    	}  
 				  	}  
@@ -249,16 +249,60 @@ class procurement extends tesseract{
 				$missminute='';
 				$updatefinalqtqry=mysqli_query($this->stc_dbs, "
 					UPDATE `stc_cust_super_requisition_list_items` 
-					SET `stc_cust_super_requisition_items_finalqty`='".$custreqitemrow['product_quantity']."', `stc_cust_super_requisition_list_items_status`='".$custreqitemrow['itemstatus']."' 
+					SET `stc_cust_super_requisition_items_finalqty`='".$custreqitemrow['product_quantity']."', 
+					`stc_cust_super_requisition_list_items_status`='".$custreqitemrow['itemstatus']."' 
 					WHERE `stc_cust_super_requisition_list_id`='".$custreqitemrow['list_line_id']."'
 					AND `stc_cust_super_requisition_list_items_req_id`='".$custreqitemrow['list_id']."' 
 				");
+
+				$req_id=$custreqitemrow['list_line_id'];
+				$getproduct_qry=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_list_items_title`
+					FROM `stc_cust_super_requisition_list_items`
+					WHERE `stc_cust_super_requisition_list_id`='".$req_id."'
+				");
+				$pd_title='';
+				foreach($getproduct_qry as $getproduct_row){
+					$pd_title=$getproduct_row['stc_cust_super_requisition_list_items_title'];
+				}
+
+				$getproductinfo_qry=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_list_purchaser_list_item_id`, `stc_cust_super_requisition_list_purchaser_pd_id`,`stc_cust_super_requisition_list_purchaser_mer_id`
+					FROM `stc_cust_super_requisition_list_items`
+					INNER JOIN `stc_cust_super_requisition_list_purchaser`
+					ON `stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_purchaser_list_item_id`
+					WHERE `stc_cust_super_requisition_list_items_title`='".mysqli_real_escape_string($this->stc_dbs, $pd_title)."'
+					ORDER BY `stc_cust_super_requisition_list_purchaser_id` DESC LIMIT 0,1
+				");
+				if(mysqli_num_rows($getproductinfo_qry)>0){					
+					$reqlineitem_id=$custreqitemrow['list_line_id'];
+					$pd_id=0;
+					$merch_id=0;
+					foreach($getproductinfo_qry as $getproductinfo_row){
+						$pd_id=$getproductinfo_row['stc_cust_super_requisition_list_purchaser_pd_id'];
+						$merch_id=$getproductinfo_row['stc_cust_super_requisition_list_purchaser_mer_id'];
+					}
+					$odinset_qry=mysqli_query($this->stc_dbs, "
+						INSERT INTO `stc_cust_super_requisition_list_purchaser`(
+							`stc_cust_super_requisition_list_purchaser_list_item_id`, 
+							`stc_cust_super_requisition_list_purchaser_pd_id`, 
+							`stc_cust_super_requisition_list_purchaser_mer_id`, 
+							`stc_cust_super_requisition_list_purchaser_created_by`
+						) VALUES (
+							'".mysqli_real_escape_string($this->stc_dbs, $reqlineitem_id)."',
+							'".mysqli_real_escape_string($this->stc_dbs, $pd_id)."',
+							'".mysqli_real_escape_string($this->stc_dbs, $merch_id)."',
+							'1'
+						)
+					");
+				}
+
 				if($updatefinalqtqry){
 					$transformers="yes";
 				}else{
 					$transformers="no";
 				}
-			}
+			}			
 		}else{
 			$transformers="Hmm!!! Something went wrong on order creation. Please contact STC support team.";
 		}
