@@ -23,12 +23,11 @@ if($_SESSION['stc_school_user_for']==4){
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
     <!-- CSS Files -->
     <link href="../assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
     <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link href="../assets/demo/demo.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput-typeahead.css" />
+    <!-- <link href="../assets/demo/demo.css" rel="stylesheet" /> -->
     <style>
         .fade:not(.show) {
           opacity: 10;
@@ -466,7 +465,7 @@ if($_SESSION['stc_school_user_for']==4){
     </style>
   </head>
 
-  <body class="">
+  <body>
     <div class="wrapper ">
       <?php include_once("bar/sidebar.php");?>
       <div class="main-panel">
@@ -1396,7 +1395,7 @@ if($_SESSION['stc_school_user_for']==4){
         </div>
       </div>
     </div>
-    
+
     <!--   Core JS Files   -->
     <script src="../assets/js/core/jquery.min.js"></script>
     <script src="../assets/js/core/popper.min.js"></script>
@@ -2055,10 +2054,10 @@ if($_SESSION['stc_school_user_for']==4){
     </script>
   </body>
   </html>
-
-<div class="modal fade bd-example-modal-xl stc-school-showteacher-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  
+<div class="modal bd-example-modal-xl stc-school-showteacher-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content" style="top: 75px;">
+    <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">School Teacher</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -2097,9 +2096,9 @@ if($_SESSION['stc_school_user_for']==4){
   </div>
 </div>
 
-<div class="modal fade bd-example-modal-xl stc-school-showstud-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal bd-example-modal-xl stc-school-showstud-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content" style="top: 75px;">
+    <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">School Student</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -2107,7 +2106,6 @@ if($_SESSION['stc_school_user_for']==4){
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Student</h5>
             <div style="width: auto;overflow-x: auto; white-space: nowrap;">
               <table class="table table-hover table-bordered">
                 <thead>
@@ -2139,9 +2137,9 @@ if($_SESSION['stc_school_user_for']==4){
   </div>
 </div>
 
-<div class="modal fade bd-example-modal-xl stc-school-showsub-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal bd-example-modal-xl stc-school-showsub-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content" style="top: 75px;">
+    <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">School Subject</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -2149,7 +2147,6 @@ if($_SESSION['stc_school_user_for']==4){
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Subject</h5>            
             <div style="width: auto;overflow-x: auto; white-space: nowrap;">
               <table class="table table-hover table-bordered">
                 <thead>
@@ -2173,9 +2170,9 @@ if($_SESSION['stc_school_user_for']==4){
   </div>
 </div>
 
-<div class="modal fade bd-example-modal-xl stc-school-showclassroom-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal bd-example-modal-xl stc-school-showclassroom-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content" style="top: 75px;">
+    <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">School Clasroom</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -2183,7 +2180,6 @@ if($_SESSION['stc_school_user_for']==4){
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Classroom</h5>                          
             <div style="width: auto;overflow-x: auto; white-space: nowrap;">
               <table class="table table-hover table-bordered">
                 <thead>
@@ -2209,9 +2205,9 @@ if($_SESSION['stc_school_user_for']==4){
   </div>
 </div>
 
-<div class="modal fade bd-example-modal-xl stc-school-showschedule-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal bd-example-modal-xl stc-school-showschedule-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content" style="top: 75px;left: -200px;width: 1200px;">
+    <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">School Schedule</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -2219,7 +2215,6 @@ if($_SESSION['stc_school_user_for']==4){
       <div class="modal-body">
         <div class="row">
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Schedule</h5> 
             <select class="form-control btn btn-info stc-schedule-week">
               <option>Select</option>
               <?php

@@ -554,7 +554,7 @@ if($_SESSION['stc_school_user_for']==2){
                                                     if(($cur_time>$beg_time) && ($end_time>$cur_time)){
                                                       $schedule_data.='
                                                         <td class="text-center" style="background: #8cff32;font-weight: bold;">
-                                                          <a href="javascript:void(0);" class="stc-school-show-student" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'" sub-id="'.$schedule_row['stc_school_teacher_schedule_subjectid'].'">
+                                                          <a href="javascript:void(0);" class="stc-school-show-student" data-toggle="modal" data-target="#exampleModal" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'" sub-id="'.$schedule_row['stc_school_teacher_schedule_subjectid'].'">
                                                               <b>
                                                                 Class - '.$schedule_row['stc_school_class_title'].'<br>
                                                                 '.$schedule_row['stc_school_subject_title'].'<br>
@@ -899,7 +899,7 @@ if($_SESSION['stc_school_user_for']==2){
               $('.stc-show-student-nested-show').html(response_student);
               $('.stc-school-hidden-scclass-id').val(class_id);
               $('.stc-school-hidden-scsub-id').val(sub_id);
-              $('.stc-school-showstudent-res').modal('show');
+              // $('.stc-school-showstudent-res').modal('show');
               call_syllabus_det();
             }
           });
@@ -1210,8 +1210,8 @@ if($_SESSION['stc_school_user_for']==2){
       </div>
       <div class="modal-body"> -->
 
-<div class="modal fade stc-school-showstudent-res" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+<div class="modal fade stc-school-showstudent-res" data-backdrop="static" data-keyboard="false" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Student Attendance</h5>
