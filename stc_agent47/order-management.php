@@ -324,7 +324,6 @@ include_once("../MCU/db.php");
             });
         });
 
-        <
     </script>
     <script>
         $(document).ready(function(){
