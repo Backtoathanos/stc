@@ -1,16 +1,16 @@
 <?php
-ini_set("session.gc_maxlifetime", 21600);
-session_set_cookie_params(21600);
-session_start();
-if(empty(@$_SESSION['stc_school_user_id'])){
-    header('location:../index.html');
-}
-if($_SESSION['stc_school_user_for']==4){
-    header('location:forbidden.html');
-}
+  ini_set("session.gc_maxlifetime", 21600);
+  session_set_cookie_params(21600);
+  session_start();
+  if(empty(@$_SESSION['stc_school_user_id'])){
+      header('location:../index.html');
+  }
+  if($_SESSION['stc_school_user_for']==4){
+      header('location:forbidden.html');
+  }
 ?>
-  <!DOCTYPE html>
-  <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
   <head>
     <meta charset="utf-8" />
@@ -1811,6 +1811,51 @@ if($_SESSION['stc_school_user_for']==4){
           });
         });
 
+        // get url 
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const value = urlParams.get('modal');
+        if(value=="access"){
+          $('.stc-school-addsyllabus-res').modal('show');
+        }
+
+        // save syllabus
+        $(document).on('click', '.stc-school-sylsave-btn', function(e){
+          e.preventDefault();
+          var title=$('.stc-school-sylTitle').val();
+          var chapter=$('.stc-school-sylChapter').val();
+          var lesson=$('.stc-school-sylLesson').val();
+          var unit=$('.stc-school-sylUnit').val();
+          var date=$('.stc-school-sylDate').val();
+          var subject_id = urlParams.get('id');
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_add_syllabus_action : 1,
+              stc_subject_id:subject_id,
+              stc_title:title,
+              stc_chapter:chapter,
+              stc_lesson:lesson,
+              stc_unit:unit,
+              stc_date:date
+            },
+            success   : function(response){
+             // console.log(response);
+             response=response.trim();
+             if(response=="success"){
+              alert("Syllabus saved successfully.");
+              $('.stc-school-addsyllabus-res .form-control').val('');
+             }else if(response="empty"){
+              alert("Please enter title.");
+             }else if(response="failed"){
+              alert("Syllabus not saved. Please check and try again");
+             }else if(response="reload"){
+              window.location.reload();
+             }
+            }
+          });
+        });
 
         // save class to db
         $(document).on('click', '#stcschoolclassroomsave', function(e){
@@ -2053,8 +2098,64 @@ if($_SESSION['stc_school_user_for']==4){
       });
     </script>
   </body>
-  </html>
+</html>
   
+
+<!-- syllabus add -->
+
+<div class="modal bd-example-modal-xl stc-school-addsyllabus-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Add Syllabus</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>        
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <div class="mb-3">
+              <h3>Title</h3>
+              <textarea class="form-control stc-school-sylTitle" placeholder="Enter Title"></textarea>
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+            <div class="mb-3">
+              <h3>Chapter</h3>
+              <input type="text" class="form-control stc-school-sylChapter" placeholder="Enter Chapter">
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+            <div class="mb-3">
+              <h3>Lesson</h3>
+              <input type="text" class="form-control stc-school-sylLesson" placeholder="Enter Lesson">
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+            <div class="mb-3">
+              <h3>Unit</h3>
+              <input type="text" class="form-control stc-school-sylUnit" placeholder="Enter Unit">
+            </div>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
+            <div class="mb-3">
+              <h3>Complete Date</h3>
+              <input type="date" class="form-control stc-school-sylDate">
+            </div>
+          </div>
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto mt-3 mb-3">
+            <button class="btn btn-success stc-school-sylsave-btn form-control">Save</button>  
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- teacher show -->
+
 <div class="modal bd-example-modal-xl stc-school-showteacher-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -2158,8 +2259,7 @@ if($_SESSION['stc_school_user_for']==4){
                     <th class="text-center">Created by</th>
                     </tr>
                 </thead>
-                <tbody class="stc-subject-rec-show">
-                  
+                <tbody class="stc-subject-rec-show">                  
                 </tbody>
               </table>
             </div>
