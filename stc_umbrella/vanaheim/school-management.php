@@ -204,6 +204,44 @@ class Yggdrasil extends tesseract{
 		}
 		return $odin;
 	}
+	
+	public function stc_save_school_syllabus($stc_subject_id, $stc_title, $stc_chapter, $stc_lesson, $stc_unit, $stc_date){
+		$odin='';
+		$date=date("Y-m-d H:i:s");
+		$check_qry=mysqli_query($this->stc_dbs, "
+			SELECT `stc_school_subject_id` FROM `stc_school_subject` 
+			WHERE 
+				`stc_school_subject_subid`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementsubjectid)."' AND 
+				`stc_school_subject_title`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementsubjecttitle)."'
+		");
+		if(mysqli_num_rows($check_qry)>0){
+			$odin = "duplicate";
+		}else{
+			$set_loki=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_school_subject`(
+				    `stc_school_subject_subid`,
+				    `stc_school_subject_title`,
+				    `stc_school_subject_syllabusdetails`,
+				    `stc_school_subject_status`,
+				    `stc_school_subject_createdate`,
+				    `stc_school_subject_createdby`
+				)VALUES(
+					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementsubjectid)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementsubjecttitle)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementsubjectdetails)."',
+					'1',
+					'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+					'".$_SESSION['stc_school_user_id']."'
+				)
+			");
+			if($set_loki){
+				$odin = "success";
+			}else{
+				$odin = "wrong";
+			}
+		}
+		return $odin;
+	}
 
 	public function stc_save_school_class($stcschoolmanagementclassroomid, $stcschoolmanagementclassroomtitle, $stcschoolmanagementclassroomlocation, $stcschoolmanagementclassroomcapacity){
 		$odin='';
@@ -1181,6 +1219,26 @@ if(isset($_POST['save_subjectadd_action'])){
 		$out="empty";
 	}else{
 		$lokiheck=$valkyrie->stc_save_school_subject($stcschoolmanagementsubjectid, $stcschoolmanagementsubjecttitle, $stcschoolmanagementsubjectdetails);
+		$out=$lokiheck;
+	}
+	echo $out;
+}
+
+// save syllabus
+if(isset($_POST['stc_add_syllabus_action'])){
+	$stc_subject_id =$_POST['stc_subject_id'];
+	$stc_title =$_POST['stc_title'];
+	$stc_chapter =$_POST['stc_chapter'];
+	$stc_lesson =$_POST['stc_lesson'];
+	$stc_unit =$_POST['stc_unit'];
+	$stc_date =$_POST['stc_date'];
+	$valkyrie=new Yggdrasil();
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out="reload";
+	}else if(empty($stcschoolmanagementsubjecttitle)){
+		$out="empty";
+	}else{
+		$lokiheck=$valkyrie->stc_save_school_syllabus($stc_subject_id, $stc_title, $stc_chapter, $stc_lesson, $stc_unit, $stc_date);
 		$out=$lokiheck;
 	}
 	echo $out;

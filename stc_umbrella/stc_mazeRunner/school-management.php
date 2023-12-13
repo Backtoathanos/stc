@@ -2024,6 +2024,39 @@ if($_SESSION['stc_school_user_for']==4){
         if(value=="access"){
           $('.stc-school-addsyllabus-res').modal('show');
         }
+        $(document).on('click', '.stc-school-sylsave-btn', function(e){
+          e.preventDefault();
+          var title=$('.stc-school-sylTitle').val();
+          var chapter=$('.stc-school-sylChapter').val();
+          var lesson=$('.stc-school-sylLesson').val();
+          var unit=$('.stc-school-sylUnit').val();
+          var date=$('.stc-school-sylDate').val();
+          var subject_id = urlParams.get('id');
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_add_syllabus_action : 1,
+              stc_subject_id:subject_id,
+              stc_title:title,
+              stc_chapter:chapter,
+              stc_lesson:lesson,
+              stc_unit:unit,
+              stc_date:date
+            },
+            dataType: `JSON`,
+            success   : function(response){
+             // console.log(response);
+             if(response.status=="success"){
+              alert(response.message);
+             }else if(response.status="failed"){
+              alert(response.message);
+             }else if(response.status="reload"){
+              window.location.reload();
+             }
+            }
+          });
+        });
 
         $(document).on('click', '.stc-school-show-classroom-btn', function(e){
           e.preventDefault();
@@ -2083,25 +2116,25 @@ if($_SESSION['stc_school_user_for']==4){
           <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
             <div class="mb-3">
               <h3>Chapter</h3>
-              <input type="text" class="form-control stc-school-sylTitle" placeholder="Enter Chapter">
+              <input type="text" class="form-control stc-school-sylChapter" placeholder="Enter Chapter">
             </div>
           </div>
           <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
             <div class="mb-3">
               <h3>Lesson</h3>
-              <input type="text" class="form-control stc-school-sylTitle" placeholder="Enter Lesson">
+              <input type="text" class="form-control stc-school-sylLesson" placeholder="Enter Lesson">
             </div>
           </div>
           <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
             <div class="mb-3">
               <h3>Unit</h3>
-              <input type="text" class="form-control stc-school-sylTitle" placeholder="Enter Unit">
+              <input type="text" class="form-control stc-school-sylUnit" placeholder="Enter Unit">
             </div>
           </div>
           <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
             <div class="mb-3">
-              <label>Complete Date</label>
-              <input type="date" class="form-control stc-school-sylTitle">
+              <h3>Complete Date</h3>
+              <input type="date" class="form-control stc-school-sylComplete">
             </div>
           </div>
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto mt-3 mb-3">
