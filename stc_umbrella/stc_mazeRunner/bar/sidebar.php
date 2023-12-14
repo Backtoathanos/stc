@@ -48,6 +48,18 @@
           </li>';
           }
           ?>
+          <li class="nav-item student-attendance">
+            <a class="nav-link" href="./student-attendance.php?student-attendance=yes">
+                <i class="material-icons">edit_document</i>
+                <p>Student Attendance</p>
+            </a>
+          </li>
+          <li class="nav-item syllabus">
+            <a class="nav-link" href="./syllabus.php?syllabus=yes">
+                <i class="material-icons">menu_book</i>
+                <p>Syllabus</p>
+            </a>
+          </li>
         </ul>
       </div>
     </div>

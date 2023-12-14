@@ -752,12 +752,12 @@ class Yggdrasil extends tesseract{
 
 		$odinqry=mysqli_query($this->stc_dbs, "
 			SELECT
-			    `stc_school_syllabus_covered_id`,
-			    `stc_school_syllabus_covered_title`,
-			    `stc_school_syllabus_covered_chapter`,
-			    `stc_school_syllabus_covered_lession`,
-			    `stc_school_syllabus_covered_unit`,
-			    Date_FORMAT(`stc_school_syllabus_covered_completedate`, '%d %M %Y') as stc_school_syllabus_completedate
+			    `stc_school_syllabus_id`,
+			    `stc_school_syllabus_title`,
+			    `stc_school_syllabus_chapter`,
+			    `stc_school_syllabus_lession`,
+			    `stc_school_syllabus_unit`,
+			    Date_FORMAT(`stc_school_syllabus_completedate`, '%d %M %Y') as stc_school_syllabus_completedate
 			FROM
 			    `stc_school_syllabus_covered`
 			WHERE
@@ -1148,6 +1148,76 @@ class Yggdrasil extends tesseract{
 		$odin['message']=$message;
 		return $odin;
 	}
+
+	public function stc_call_student_attendance($class_id, $month){
+		$date=substr($month,5);
+		$monthday_arr=array(
+			'01' => 31,
+			'02' => 29,
+			'03' => 31,
+			'04' => 30,
+			'05' => 31,
+			'06' => 30,
+			'07' => 31,
+			'08' => 31,
+			'09' => 30,
+			'10' => 31,
+			'11' => 30,
+			'12' => 31
+		);
+		$validate=$monthday_arr[$date];
+		$monthday='';
+		$counter=0;
+		for($i=0; $i<$validate;$i++){
+			$counter++;
+			$monthday.='<td>'.$counter.'</td>';
+		}
+		$odin='
+			<table class="table table-hover table-bordered table-responsive">
+				<thead>
+					<td>Sl no</td>
+					<td>Student Id</td>
+					<td>Student Name</td>
+					'.$monthday.'
+				</thead>
+				<tbody class="stc-schoolattendance-show">
+		';
+		$odinattendanceqry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_school_student_id`,
+				`stc_school_student_studid`,
+				`stc_school_student_firstname`,
+				`stc_school_student_lastname`
+			FROM
+				`stc_school_student`
+			WHERE
+				`stc_school_student_classroomid`='".mysqli_real_escape_string($this->stc_dbs, $class_id)."'
+    	");
+    	if(mysqli_num_rows($odinattendanceqry)>0){
+			$slno=0;
+			foreach($odinattendanceqry as $odinclassrow){
+				$slno++;
+				$odin.='
+					<tr>
+						<td>'.$slno.'</td>
+						<td>'.$odinclassrow['stc_school_student_studid'].'</td>
+						<td>'.$odinclassrow['stc_school_student_firstname'].''.$odinclassrow['stc_school_student_lastname'].'</td>
+					</tr>
+				';
+			}
+    	}else{
+	    	$odin.="
+				<tr>
+					<td colspan='5'>No record found.</td>
+				</tr>
+			";
+		}
+		$odin.="
+				</tbody>
+			</table>
+		";
+		return $odin;
+	}
 }
 
 #<------------------------------------------------------------------------------------------>
@@ -1441,4 +1511,18 @@ if(isset($_POST['stc_remove_schedule_action'])){
 	echo json_encode($out);
 }
 
+
+// call student attendance
+if(isset($_POST['stc_call_studentattendance'])){
+	$class_id=$_POST['class_id'];
+	$month=$_POST['month'];
+	$out=array();
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out['reload']="reload";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_call_student_attendance($class_id, $month);
+	}
+	echo json_encode($out);
+}
 ?>

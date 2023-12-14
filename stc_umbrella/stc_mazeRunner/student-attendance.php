@@ -5,9 +5,9 @@ session_start();
 if(empty(@$_SESSION['stc_school_user_id'])){
     header('location:../index.html');
 }
-if($_SESSION['stc_school_user_for']==2){
-    header('location:forbidden.html');
-}
+// if($_SESSION['stc_school_user_for']==2){
+//     header('location:forbidden.html');
+// }
 ?>
   <!DOCTYPE html>
   <html lang="en">
@@ -17,7 +17,7 @@ if($_SESSION['stc_school_user_for']==2){
     <link rel="icon" type="image/png" href="../assets/img/stc_logo_title.png">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>
-      STC School || School Schedule
+      STC School || School Attendance
     </title>
     <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
     <!--     Fonts and icons     -->
@@ -401,7 +401,7 @@ if($_SESSION['stc_school_user_for']==2){
                         <ul class="nav nav-tabs" data-tabs="tabs">
                           <li class="nav-item">
                             <a class="nav-link active" href="#stc-create-attendance" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Schedule
+                              <i class="material-icons">add_circle</i> Student Attendance Details
                               <div class="ripple-container"></div>
                             </a>
                           </li>
@@ -414,190 +414,72 @@ if($_SESSION['stc_school_user_for']==2){
                       <div class="tab-pane active" id="stc-create-attendance">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Daily Schedule</h2>
+                            <h2 class="tm-block-title d-inline-block">Student Attendance Details</h2>
                           </div>
                         </div>
                         <div class="row">
-                          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
-                            <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
-                              <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <table class="table table-hover table-bordered table-responsive">
-                                      <thead>
-                                        <tr>
-                                          <td class="text-center"><b>Day</b></td>
-                                          <td class="text-center"><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></td>
-                                          <td class="text-center"><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></td>
-                                          <td class="text-center"><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></td>
-                                          <td class="text-center"><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                          <td class="text-center"><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                          <td class="text-center"><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                          <td class="text-center"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <?php 
-                                          include_once("../../MCU/db.php");
-                                          date_default_timezone_set('Asia/Kolkata');
-                                          $day_array=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
-                                          $data='';
-
-                                          $check_attendanceforsc=mysqli_query($con, "
-                                            SELECT `stc_school_teacher_attendance_scheduleid` FROM `stc_school_teacher_attendance` 
-                                            WHERE `stc_school_teacher_attendance_status`=1
-                                            AND `stc_school_teacher_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
-                                          ");
-                                          $att_counter=0;
-                                          $schedule_id=0;
-                                          if(mysqli_num_rows($check_attendanceforsc)>0){
-                                            $att_counter++;
-                                            foreach($check_attendanceforsc as $check_attendanceforscrow){
-                                              $schedule_id=$check_attendanceforscrow['stc_school_teacher_attendance_scheduleid'];
-                                            }
-                                          }
-
-                                          foreach($day_array as $class_row){
-                                            $tr_color='';
-                                            $schedule_data='';
-                                            $rev_counter=7;
-                                            $schedule_sql=mysqli_query($con, "
-                                              SELECT 
-                                                `stc_school_class_title`,
-                                                `stc_school_teacher_schedule_id`,
-                                                `stc_school_subject_title`,
-                                                `stc_school_teacher_schedule_day`,
-                                                `stc_school_teacher_schedule_classid`,
-                                                `stc_school_teacher_schedule_subjectid`,
-                                                `stc_school_teacher_schedule_begtime`,
-                                                `stc_school_teacher_schedule_endtime` 
-                                              FROM 
-                                                `stc_school_teacher_schedule` 
-                                              LEFT JOIN 
-                                                `stc_school_subject`
-                                              ON 
-                                                `stc_school_teacher_schedule_subjectid`=`stc_school_subject_id`
-                                              LEFT JOIN 
-                                                `stc_school_class`
-                                              ON 
-                                                `stc_school_teacher_schedule_classid`=`stc_school_class_id`
-                                              WHERE 
-                                                `stc_school_teacher_schedule_day`='".$class_row."' AND 
-                                                `stc_school_teacher_schedule_teacherid`='".$_SESSION['stc_school_teacher_id']."'
-                                              ORDER BY TIME(`stc_school_teacher_schedule_begtime`) ASC
-                                            ");
-                                            foreach($schedule_sql as $schedule_row){                                                
-                                              $rev_counter--;
-                                              
-                                              $missed_class = '<span style="bfont-size: 110px; color: red; position: absolute; margin: 25px 5px 5px 0px;">X</span>';
-                                              $completed_class = '<span style="font-size: 110px;color: green;position: absolute;margin: 28px 5px 5px -20px;">✔</span>';
-                                              $day=date("l");
-                                              if($att_counter>0){
-                                                if($schedule_id==$schedule_row['stc_school_teacher_schedule_id']){
-                                                  $schedule_data.='
-                                                    <td class="text-center">
-                                                      <a href="javascript:void(0);" class="stc-school-show-student-default"  data-toggle="modal" data-target="#exampleModal" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'" sub-id="'.$schedule_row['stc_school_teacher_schedule_subjectid'].'">
-                                                          <b>
-                                                            Class - '.$schedule_row['stc_school_class_title'].'<br>
-                                                            '.$schedule_row['stc_school_subject_title'].'<br>
-                                                            '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                                            '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'
-                                                          </b>
-                                                      </a>
-                                                    </td>
-                                                  ';
-                                                }else{
-                                                  $schedule_data.='
-                                                      <td class="text-center">
-                                                          <b>
-                                                            Class - '.$schedule_row['stc_school_class_title'].'<br>
-                                                            '.$schedule_row['stc_school_subject_title'].'<br>
-                                                            '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                                            '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'
-                                                          </b>
-                                                      
-                                                      </td>
-                                                  ';
-                                                }
-                                              }else{
-                                                if($class_row!=$day){
-                                                  $schedule_data.='
-                                                      <td class="text-center">
-                                                          <b>
-                                                            Class - '.$schedule_row['stc_school_class_title'].'<br>
-                                                            '.$schedule_row['stc_school_subject_title'].'<br>
-                                                            '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                                            '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'
-                                                          </b>
-                                                      
-                                                      </td>
-                                                  ';
-                                                }else{
-                                                  $tr_color="background:#fdff32;";
-                                                  if($schedule_row['stc_school_subject_title']=="NA"){
-                                                    $schedule_data.='
-                                                        <td class="text-center">
-                                                            <b>
-                                                              '.$schedule_row['stc_school_subject_title'].'
-                                                            </b>
-                                                        
-                                                        </td>
-                                                    ';
-                                                  }else{
-                                                    $cur_time=date('h:i');
-                                                    $beg_time=date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime']));
-                                                    $end_time=date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime']));
-                                                    if(($cur_time>$beg_time) && ($end_time>$cur_time)){
-                                                      $schedule_data.='
-                                                        <td class="text-center" style="background: #8cff32;font-weight: bold;">
-                                                          <a href="javascript:void(0);" class="stc-school-show-student" data-toggle="modal" data-target="#exampleModal" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'" sub-id="'.$schedule_row['stc_school_teacher_schedule_subjectid'].'">
-                                                              <b>
-                                                                Class - '.$schedule_row['stc_school_class_title'].'<br>
-                                                                '.$schedule_row['stc_school_subject_title'].'<br>
-                                                                '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                                                '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'
-                                                              </b>
-                                                          </a>
-                                                        </td>
-                                                      ';
-                                                    }else{
-                                                      $schedule_data.='
-                                                          <td class="text-center">
-                                                              <b>
-                                                                Class - '.$schedule_row['stc_school_class_title'].'<br>
-                                                                '.$schedule_row['stc_school_subject_title'].'<br>
-                                                                '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                                                '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'
-                                                              </b>
-                                                          
-                                                          </td>
-                                                      ';
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            }
-                                            $hash_rec='';
-                                            for($i = 0; $i<$rev_counter; $i++){
-                                              $hash_rec.='<td class="text-center"><b>NA</b></td>';
-                                            }
-                                            $data.='
-                                                  <tr style="'.$tr_color.'">
-                                                    <td class="text-center">'.$class_row.'</td>
-                                                    '.$schedule_data.$hash_rec.'
-                                                  </tr>
-                                            ';
-                                          }
-                                          echo $data;
-
-                                        ?>
-                                      </tbody>
-                                    </table>
-                                  </div>
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
+                                <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-6 col-lg-6">
+                                            <div class="mb-3">
+                                                <h5
+                                                for="name"
+                                                >Month
+                                                </h5>
+                                                <input
+                                                    name="stcattendmonth"
+                                                    type="month"
+                                                    class="form-control validate stcattendmonth"
+                                                    value="<?php echo date('Y-m'); ?>"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 col-md-6 col-lg-6">
+                                            <div class="mb-3">
+                                                <h5
+                                                for="name"
+                                                >Class name
+                                                </h5>
+                                                <select
+                                                    name="stcattendclassname"
+                                                    class="form-control validate stcattendclassname"
+                                                    style="padding-left: 15px;"
+                                                    
+                                                >
+                                                    <?php 
+                                                        include_once("../../MCU/db.php");
+                                                        $school_sql=mysqli_query($con, "
+                                                            SELECT DISTINCT `stc_school_class_id`,`stc_school_class_title` FROM stc_school_class ORDER BY `stc_school_class_title` ASC
+                                                        ");
+                                                        foreach($school_sql as $school_row){
+                                                            echo '<option value="'.$school_row['stc_school_class_id'].'">'.$school_row['stc_school_class_title'].'</option>';
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 col-md-12 col-lg-12">
+                                            <div class="mb-3">
+                                                <button type="button" class="form-control btn btn-success" id="stcschoolattendance">Show Attendance</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                              </div>
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
+                                        <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
+                                            <div class="row">
+                                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                                    <div class="mb-3 stc-schoolattendance-show">
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -875,337 +757,28 @@ if($_SESSION['stc_school_user_for']==2){
     <!-- canteen section -->
     <script>
       $(document).ready(function(){
-        $(document).on('click', '.stc-school-show-student', function(e){
+        $(document).on('click', '#stcschoolattendance', function(e){
           e.preventDefault();
-          var schedule_id=$(this).attr('id');
-          var class_id=$(this).attr('class-id');
-          var sub_id=$(this).attr('sub-id');
+          var month=$('.stcattendmonth').val();
+          var class_id=$('.stcattendclassname').val();
           $.ajax({  
             url       : "../vanaheim/school-management.php",
             method    : "POST",  
             data      : {
-              stc_call_student : 1,
-              schedule_id:schedule_id,
-              class_id:class_id
-            },
-            // dataType: `JSON`,
-            success   : function(response_student){
-             // console.log(data);
-              $('.stc-school-hidden-schedule-id').val(schedule_id);
-              $('.stc-show-student-nested-show').html(response_student);
-              $('.stc-school-hidden-scclass-id').val(class_id);
-              $('.stc-school-hidden-scsub-id').val(sub_id);
-              // $('.stc-school-showstudent-res').modal('show');
-              call_syllabus_det();
-            }
-          });
-        });
-
-        $(document).on('click', '.stc-school-show-student-default', function(e){
-          e.preventDefault();
-          var schedule_id=$(this).attr('id');
-          var class_id=$(this).attr('class-id');
-          var sub_id=$(this).attr('sub-id');
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_call_student_default : 1,
-              schedule_id:schedule_id,
-              class_id:class_id
-            },
-            // dataType: `JSON`,
-            success   : function(response_student){
-             // console.log(data);
-              $('.stc-school-hidden-schedule-id').val(schedule_id);
-              $('.stc-show-student-nested-show').html(response_student);
-              $('.stc-school-hidden-scclass-id').val(class_id);
-              $('.stc-school-hidden-scsub-id').val(sub_id);
-              // $('.stc-school-showstudent-res').modal('show');
-              call_syllabus_det();
-            }
-          });
-        });
-
-        $(document).on('click', '.stc-school-exit-period', function(e){
-          e.preventDefault();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_call_lecture_end : 1
-            },
-            // dataType: `JSON`,
-            success   : function(response_student){
-             // console.log(data);
-              var response=response_student.trim();
-              if(response=="reload"){
-                window.location.reload();
-              }else{
-                $('.stc-school-showstudent-res').modal('hide');
-                window.location.reload();
-              }
-            }
-          });
-        });
-
-        $(document).on('click', '.stc-attend-check', function(e){
-          var stvalue=$(this).val();
-          if(stvalue==0){
-            $(this).parent().parent().find('.stc-school-student-att-save').hide();
-          }else{
-            $(this).parent().parent().find('.stc-school-student-att-save').show();
-          }
-        });
-        
-        $(document).on('click', '.stc-school-student-att-save', function(e){
-          e.preventDefault();
-          $(this).hide(500);
-          var stc_stid = $(this).attr('id');
-          var stc_stclassid = $(this).attr('classid');
-          var stc_stsubid = $(this).attr('subid');
-          var stc_sthwperc = $('.stc-school-stu-attendance-hw'+stc_stid).val();
-          var stc_stcatt = $('.stc-school-stu-attendance-but'+stc_stid + ':checked').val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_student_save : 1,
-              stc_stid : stc_stid,
-              stc_stsubid : stc_stsubid,
-              stc_stclassid : stc_stclassid,
-              stc_sthwperc : stc_sthwperc,
-              stc_stcatt : stc_stcatt
-            },
-            // dataType: `JSON`,
-            success   : function(response_student){
-             // console.log(response_student);
-              var response=response_student.trim();
-              if(response=="reload"){
-                window.location.reload();
-              }else if(response=="success"){
-                alert("Student record updated!!!");
-              }else{
-                alert("Something went wrong!!! Please check & try again.");
-                $('.stc-school-student-att-save').show(500);
-              }
-            }
-          });
-        });
-
-        $(document).on('click', '.save-lecture', function(e){
-          e.preventDefault();
-          var schedule_id=$('.stc-school-hidden-schedule-id').val();
-          var classtype=$('#classtype').val();
-          var chapter=$('#chapter').val();
-          var lession=$('#lession').val();
-          var Syllabus=$('#Syllabus').val();
-          var Unit=$('#unit-should-be').val();
-          var remarks=$('#remarks').val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_lecturedet_save : 1,
-              schedule_id : schedule_id,
-              classtype : classtype,
-              chapter : chapter,
-              lession : lession,
-              Syllabus : Syllabus,
-              Unit : Unit,
-              remarks : remarks
-            },
-            // dataType: `JSON`,
-            success   : function(response_student){
-             // console.log(response_student);
-              call_syllabus_det();
-              var response=response_student.trim();
-              if(response=="reload"){
-                window.location.reload();
-              }else if(response=="success"){
-                $('#classtype').val('NA');
-                $('#chapter').val('');
-                $('#lession').val('');
-                $('#Syllabus').val('');
-                $('#remarks').val('');
-                alert("Record updated!!!");
-              }else if(response=="empty"){
-                alert("Please fill all fields, if you dont have any then write NA.");
-              }else{
-                alert("Something went wrong!!! Please check & try again.");
-              }
-            }
-          });
-        });
-
-        $(document).on('click', '.add-question', function(e){
-          e.preventDefault();
-          var schedule_id=$('.stc-school-hidden-schedule-id').val();
-          var questions=$('#Questions').val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_lecturedetquestion_save : 1,
-              schedule_id : schedule_id,
-              questions : questions
-            },
-            // dataType: `JSON`,
-            success   : function(response_student){
-             // console.log(response_student);
-              var response=response_student.trim();
-              if(response=="reload"){
-                window.location.reload();
-              }else if(response=="success"){
-                call_syllabus_quest();
-                alert("Record updated!!!");
-                $('#Questions').val('');
-              }else if(response=="empty"){
-                alert("Please fill all fields, if you dont have any then write NA.");
-              }else{
-                alert("Something went wrong!!! Please check & try again.");
-              }
-            }
-          });
-        });
-
-        var sy_syllabus = new Array();
-        function call_syllabus_det(){
-          var schedule_id=$('.stc-school-hidden-schedule-id').val();
-          var class_id=$('.stc-school-hidden-scclass-id').val();
-          var sub_id=$('.stc-school-hidden-scsub-id').val();
-          $.ajax({
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_syllabusdet_call : 1,
-              schedule_id:schedule_id,
+              stc_call_studentattendance : 1,
               class_id:class_id,
-              sub_id:sub_id
+              month:month
             },
             dataType: `JSON`,
             success   : function(response_student){
-              $('.stc-show-student-syllabusdet-show').html(response_student.lecture_details);
-              var syl_result= response_student.syllabus_details;
-              sy_syllabus.push(syl_result);
-              var syllabus_output='<option value="NA">Select</option>';
-              for(var i=0; i<sy_syllabus[0].length;i++){
-                syllabus_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_title + '</option>';
-              }
-              $('#Syllabus').html(syllabus_output);
-              call_syllabus_quest();
+                $('.stc-schoolattendance-show').html(response_student);
             }
           });
-        }
-
-        $(document).on('change', '#Syllabus', function(){
-          var syll_id = $(this).val();
-          var chapter_output = '<option value="NA">Select</option>';
-          for(var i=0; i<sy_syllabus[0].length;i++){
-            chapter_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_chapter + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_chapter + '</option>';
-          }
-          $('#chapter').html(chapter_output);
         });
-
-        $(document).on('change', '#chapter', function(){
-          var syll_id = $(this).val();
-          var lession_output = '<option value="NA">Select</option>';
-          for(var i=0; i<sy_syllabus[0].length;i++){
-            lession_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_lession + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_lession + '</option>';
-          }
-          $('#lession').html(lession_output);
-        });
-
-        $(document).on('change', '#lession', function(){
-          var syll_id = $(this).val();
-          var unit_output = '<option value="NA">Select</option>';
-          for(var i=0; i<sy_syllabus[0].length;i++){
-            unit_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_unit + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_unit + '</option>';
-          }
-          $('#unit-should-be').html(unit_output);
-        });
-
-        $(document).on('change', '#unit-should-be', function(){
-          var syll_id = $(this).val();
-          var cdate_output = '';
-          for(var i=0; i<sy_syllabus[0].length;i++){
-            if(syll_id==sy_syllabus[0][i].stc_school_syllabus_id){
-              cdate_output=sy_syllabus[0][i].stc_school_syllabus_completedate;
-            }
-          }
-          $('#complete-date').val(cdate_output);
-        });
-
-        function call_syllabus_quest(){
-          var question_id=$('.stc-syllabus-out:checked').attr("id");
-          if(question_id>0){
-            $.ajax({
-              url       : "../vanaheim/school-management.php",
-              method    : "POST",  
-              data      : {
-                stc_syllabusquest_call : 1,
-                question_id:question_id
-              },
-              // dataType: `JSON`,
-              success   : function(response_student){
-                $('.stc-show-student-syllabusquest-show').html(response_student);
-              }
-            });
-          }
-        }
-
-        $(document).on('click', '.stc-syllabus-out', function(){
-          call_syllabus_quest();
-        });
-
-        // $('.modal-adjustment').css('top', '200px');
-        // $(document).on('click', '.resp-1', function(){
-        //   $('.modal-adjustment').css('top', '200px');
-        // });
-
-
-        // $(document).on('click', '.resp-2', function(){
-        //   $('.modal-adjustment').css('top', '350px');
-        // });
-        
-        // $(document).on('click', '.modal-closebtn', function(e){
-        //   e.preventDefault();
-        //   $('.stc-school-showstudent-res').modal('hide');
-        //   window.location.reload();
-        // });
       });
     </script>
   </body>
   </html>
-<!-- Modal -->
-<!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div> -->
-<!-- <div class="modal fade bd-example-modal-xl stc-school-showstudent-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content modal-adjustment">
-      <div class="modal-header">
-        <h4 class="modal-title">Student Attendance</h4>
-        <button type="button" class="btn btn-danger stc-school-exit-period">Exit</button>
-      </div>
-      <div class="modal-body"> -->
-
 <div class="modal fade stc-school-showstudent-res" data-backdrop="static" data-keyboard="false" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
