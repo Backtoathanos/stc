@@ -752,12 +752,12 @@ class Yggdrasil extends tesseract{
 
 		$odinqry=mysqli_query($this->stc_dbs, "
 			SELECT
-			    `stc_school_syllabus_covered_id`,
-			    `stc_school_syllabus_covered_title`,
-			    `stc_school_syllabus_covered_chapter`,
-			    `stc_school_syllabus_covered_lession`,
-			    `stc_school_syllabus_covered_unit`,
-			    Date_FORMAT(`stc_school_syllabus_covered_completedate`, '%d %M %Y') as stc_school_syllabus_completedate
+			    `stc_school_syllabus_id`,
+			    `stc_school_syllabus_title`,
+			    `stc_school_syllabus_chapter`,
+			    `stc_school_syllabus_lession`,
+			    `stc_school_syllabus_unit`,
+			    Date_FORMAT(`stc_school_syllabus_completedate`, '%d %M %Y') as stc_school_syllabus_completedate
 			FROM
 			    `stc_school_syllabus_covered`
 			WHERE
@@ -1148,6 +1148,126 @@ class Yggdrasil extends tesseract{
 		$odin['message']=$message;
 		return $odin;
 	}
+
+	public function stc_call_student_attendance($class_id, $month){
+		// $date=substr($month,5);
+		$months=date('m', strtotime($month));
+		$year=date('Y', strtotime($month));
+		$monthday_arr=array(
+			'01' => 31,
+			'02' => 28,
+			'03' => 31,
+			'04' => 30,
+			'05' => 31,
+			'06' => 30,
+			'07' => 31,
+			'08' => 31,
+			'09' => 30,
+			'10' => 31,
+			'11' => 30,
+			'12' => 31
+		);
+		$validate=$monthday_arr[$months];
+		$monthday='';
+		$counter=0;
+		for($i=0; $i<$validate;$i++){
+			$counter++;
+			$monthday.='<th class="text-center">'.$counter.'</th>';
+		}
+		$odin='
+			<table class="table table-hover table-bordered">
+				<thead>
+					<th class="text-center">Sl No</th>
+					<th class="text-center">Student Id</th>
+					<th class="text-center">Student Name</th>
+					'.$monthday.'
+					<th class="text-center">Total</th>
+				</thead>
+				<tbody class="stc-schoolattendance-show">
+		';
+		$odinattendanceqry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_school_student_id`,
+				`stc_school_student_studid`,
+				`stc_school_student_firstname`,
+				`stc_school_student_lastname`
+			FROM
+				`stc_school_student`
+			WHERE
+				`stc_school_student_classroomid`='".mysqli_real_escape_string($this->stc_dbs, $class_id)."'
+    	");
+    	if(mysqli_num_rows($odinattendanceqry)>0){
+			$slno=0;
+			foreach($odinattendanceqry as $odinclassrow){
+				$slno++;
+				$stu_id=$odinclassrow['stc_school_student_id'];
+				$attendance='';
+				$att_counter=0;
+				$totalattendance=0;
+				for($i=0; $i<$validate;$i++){
+					$att_counter++;
+					$query="
+						SELECT
+							`stc_school_student_attendance_id`,
+							`stc_school_student_attendance_date`,
+							`stc_school_student_attendance_stuid`,
+							`stc_school_student_attendance_classid`,
+							`stc_school_student_attendance_subid`,
+							`stc_school_student_attendance_attendance`,
+							`stc_school_student_attendance_hw`,
+							`stc_school_student_attendance_status`,
+							`stc_school_student_attendance_createdate`,
+							`stc_school_student_attendance_createdby`
+						FROM
+							`stc_school_student_attendance`
+						WHERE
+							`stc_school_student_attendance_stuid`='".mysqli_real_escape_string($this->stc_dbs, $stu_id)."'
+						AND 
+							MONTH(`stc_school_student_attendance_createdate`)='".mysqli_real_escape_string($this->stc_dbs, $months)."'
+						AND 
+							YEAR(`stc_school_student_attendance_createdate`)='".mysqli_real_escape_string($this->stc_dbs, $year)."'
+						AND 
+							DAY(`stc_school_student_attendance_createdate`)='".mysqli_real_escape_string($this->stc_dbs, $att_counter)."'
+					";
+					$odinattendanceqry=mysqli_query($this->stc_dbs, $query);
+					// $attendance.='<td class="text-center">'.$query.'</td>';
+					if(mysqli_num_rows($odinattendanceqry)>0){
+						$presentcounter=mysqli_num_rows($odinattendanceqry);
+						$totalattendance+=$presentcounter;
+						$attendance.='<td class="text-center" title="Lecture" style="background-color: #80d049;">'.$presentcounter.'</td>';
+					}else{
+						$attendance.='<td class="text-center" style="background-color: #d00d1f">A</td>';
+					}
+					
+				}
+				$tot_color = 'style="background-color: #d00d1f;"';
+				if($totalattendance>0){
+					$tot_color = 'style="background-color: #80d049;"';
+				}
+				$odin.='
+					<tr>
+						<td class="text-center">'.$slno.'</td>
+						<td>'.$odinclassrow['stc_school_student_studid'].'</td>
+						<td>'.$odinclassrow['stc_school_student_firstname'].''.$odinclassrow['stc_school_student_lastname'].'</td>
+						'.$attendance.'
+						<td class="text-right btn" data-toggle="modal" data-target="#exampleModal" '.$tot_color.'>'.$totalattendance.' Lecture</td>
+					</tr>
+				';
+			}
+    	}else{
+			$colsapn=$counter + 3;
+	    	$odin.="
+				<tr>
+					<td colspan='".$colsapn."'>No record found.</td>
+				</tr>
+			";
+		}
+		$odin.="
+				</tbody>
+			</table>
+		";
+		return $odin;
+	}
 }
 
 #<------------------------------------------------------------------------------------------>
@@ -1441,4 +1561,18 @@ if(isset($_POST['stc_remove_schedule_action'])){
 	echo json_encode($out);
 }
 
+
+// call student attendance
+if(isset($_POST['stc_call_studentattendance'])){
+	$class_id=$_POST['class_id'];
+	$month=$_POST['month'];
+	$out=array();
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out['reload']="reload";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_call_student_attendance($class_id, $month);
+	}
+	echo json_encode($out);
+}
 ?>
