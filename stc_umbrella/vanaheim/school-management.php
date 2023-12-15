@@ -1150,10 +1150,12 @@ class Yggdrasil extends tesseract{
 	}
 
 	public function stc_call_student_attendance($class_id, $month){
-		$date=substr($month,5);
+		// $date=substr($month,5);
+		$months=date('m', strtotime($month));
+		$year=date('Y', strtotime($month));
 		$monthday_arr=array(
 			'01' => 31,
-			'02' => 29,
+			'02' => 28,
 			'03' => 31,
 			'04' => 30,
 			'05' => 31,
@@ -1165,20 +1167,21 @@ class Yggdrasil extends tesseract{
 			'11' => 30,
 			'12' => 31
 		);
-		$validate=$monthday_arr[$date];
+		$validate=$monthday_arr[$months];
 		$monthday='';
 		$counter=0;
 		for($i=0; $i<$validate;$i++){
 			$counter++;
-			$monthday.='<td>'.$counter.'</td>';
+			$monthday.='<th class="text-center">'.$counter.'</th>';
 		}
 		$odin='
-			<table class="table table-hover table-bordered table-responsive">
+			<table class="table table-hover table-bordered">
 				<thead>
-					<td>Sl no</td>
-					<td>Student Id</td>
-					<td>Student Name</td>
+					<th class="text-center">Sl No</th>
+					<th class="text-center">Student Id</th>
+					<th class="text-center">Student Name</th>
 					'.$monthday.'
+					<th class="text-center">Total</th>
 				</thead>
 				<tbody class="stc-schoolattendance-show">
 		';
@@ -1197,18 +1200,65 @@ class Yggdrasil extends tesseract{
 			$slno=0;
 			foreach($odinattendanceqry as $odinclassrow){
 				$slno++;
+				$stu_id=$odinclassrow['stc_school_student_id'];
+				$attendance='';
+				$att_counter=0;
+				$totalattendance=0;
+				for($i=0; $i<$validate;$i++){
+					$att_counter++;
+					$query="
+						SELECT
+							`stc_school_student_attendance_id`,
+							`stc_school_student_attendance_date`,
+							`stc_school_student_attendance_stuid`,
+							`stc_school_student_attendance_classid`,
+							`stc_school_student_attendance_subid`,
+							`stc_school_student_attendance_attendance`,
+							`stc_school_student_attendance_hw`,
+							`stc_school_student_attendance_status`,
+							`stc_school_student_attendance_createdate`,
+							`stc_school_student_attendance_createdby`
+						FROM
+							`stc_school_student_attendance`
+						WHERE
+							`stc_school_student_attendance_stuid`='".mysqli_real_escape_string($this->stc_dbs, $stu_id)."'
+						AND 
+							MONTH(`stc_school_student_attendance_createdate`)='".mysqli_real_escape_string($this->stc_dbs, $months)."'
+						AND 
+							YEAR(`stc_school_student_attendance_createdate`)='".mysqli_real_escape_string($this->stc_dbs, $year)."'
+						AND 
+							DAY(`stc_school_student_attendance_createdate`)='".mysqli_real_escape_string($this->stc_dbs, $att_counter)."'
+					";
+					$odinattendanceqry=mysqli_query($this->stc_dbs, $query);
+					// $attendance.='<td class="text-center">'.$query.'</td>';
+					if(mysqli_num_rows($odinattendanceqry)>0){
+						$presentcounter=mysqli_num_rows($odinattendanceqry);
+						$totalattendance+=$presentcounter;
+						$attendance.='<td class="text-center" title="Lecture" style="background-color: #80d049;">'.$presentcounter.'</td>';
+					}else{
+						$attendance.='<td class="text-center" style="background-color: #d00d1f">A</td>';
+					}
+					
+				}
+				$tot_color = 'style="background-color: #d00d1f;"';
+				if($totalattendance>0){
+					$tot_color = 'style="background-color: #80d049;"';
+				}
 				$odin.='
 					<tr>
-						<td>'.$slno.'</td>
+						<td class="text-center">'.$slno.'</td>
 						<td>'.$odinclassrow['stc_school_student_studid'].'</td>
 						<td>'.$odinclassrow['stc_school_student_firstname'].''.$odinclassrow['stc_school_student_lastname'].'</td>
+						'.$attendance.'
+						<td class="text-right btn" data-toggle="modal" data-target="#exampleModal" '.$tot_color.'>'.$totalattendance.' Lecture</td>
 					</tr>
 				';
 			}
     	}else{
+			$colsapn=$counter + 3;
 	    	$odin.="
 				<tr>
-					<td colspan='5'>No record found.</td>
+					<td colspan='".$colsapn."'>No record found.</td>
 				</tr>
 			";
 		}

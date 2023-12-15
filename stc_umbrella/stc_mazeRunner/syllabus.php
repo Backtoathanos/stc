@@ -17,7 +17,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
     <link rel="icon" type="image/png" href="../assets/img/stc_logo_title.png">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>
-      STC School || School Attendance
+      STC School || Syllabus
     </title>
     <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
     <!--     Fonts and icons     -->
@@ -401,7 +401,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
                         <ul class="nav nav-tabs" data-tabs="tabs">
                           <li class="nav-item">
                             <a class="nav-link active" href="#stc-create-attendance" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Student Attendance Details
+                              <i class="material-icons">add_circle</i> Syllabus
                               <div class="ripple-container"></div>
                             </a>
                           </li>
@@ -411,69 +411,26 @@ if(empty(@$_SESSION['stc_school_user_id'])){
                   </div>
                   <div class="card-body">
                     <div class="tab-content">
-                      <div class="tab-pane active" id="stc-create-attendance">
-                        <div class="row">
-                          <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Student Attendance Details</h2>
-                          </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
-                                <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
-                                    <div class="row">
-                                        <div class="col-sm-12 col-md-6 col-lg-6">
-                                            <div class="mb-3">
-                                                <h5
-                                                for="name"
-                                                >Month
-                                                </h5>
-                                                <input
-                                                    name="stcattendmonth"
-                                                    type="month"
-                                                    class="form-control validate stcattendmonth"
-                                                    value="<?php echo date('Y-m'); ?>"
-                                                />
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-12 col-md-6 col-lg-6">
-                                            <div class="mb-3">
-                                                <h5
-                                                for="name"
-                                                >Class name
-                                                </h5>
-                                                <select
-                                                    name="stcattendclassname"
-                                                    class="form-control validate stcattendclassname"
-                                                    style="padding-left: 15px;"
-                                                    
-                                                >
-                                                    <?php 
-                                                        include_once("../../MCU/db.php");
-                                                        $school_sql=mysqli_query($con, "
-                                                            SELECT DISTINCT `stc_school_class_id`,`stc_school_class_title` FROM stc_school_class ORDER BY `stc_school_class_title` ASC
-                                                        ");
-                                                        foreach($school_sql as $school_row){
-                                                            echo '<option value="'.$school_row['stc_school_class_id'].'">'.$school_row['stc_school_class_title'].'</option>';
-                                                        }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-12 col-md-12 col-lg-12">
-                                            <div class="mb-3">
-                                                <button type="button" class="form-control btn btn-success" id="stcschoolattendance">Show Attendance</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row stc-schoolattendance-div" style="display:none;">
-                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
-                                        <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
-                                            <div class="row">
-                                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                                    <div class="mb-3 stc-schoolattendance-show">
-                                                        
-                                                    </div>
+                        <div class="tab-pane active">
+                            <div class="row">
+                            <div class="col-12">
+                                <h2 class="tm-block-title d-inline-block">Syllabus</h2>
+                            </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
+                                    <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-6 col-lg-6">
+                                                <div class="mb-3">
+                                                    <h5
+                                                    for="name"
+                                                    >Subject
+                                                    </h5>
+                                                    <select class="form-control">
+                                                        <option>English</option>
+                                                        <option>Math</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
@@ -481,7 +438,6 @@ if(empty(@$_SESSION['stc_school_user_id'])){
                                 </div>
                             </div>
                         </div>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -719,9 +675,9 @@ if(empty(@$_SESSION['stc_school_user_id'])){
       $(document).ready(function() {
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
-        const value = urlParams.get('student-attendance');
+        const value = urlParams.get('syllabus');
         if(value=="yes"){
-          $('.student-attendance').addClass('active');
+          $('.syllabus').addClass('active');
         }
       });
     </script>
@@ -754,7 +710,6 @@ if(empty(@$_SESSION['stc_school_user_id'])){
         });
       });
     </script>
-    <!-- canteen section -->
     <script>
       $(document).ready(function(){
         $(document).on('click', '#stcschoolattendance', function(e){
@@ -775,15 +730,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
                 $('.stc-schoolattendance-show').html(response_student);
             }
           });
-        });
-
-        // show attendance modal
-        $(document).on('click', '.stc-school-exit-attend-details', function(e){
-          $('.stc-school-showattendancedet-res').modal('hide');
-          $('.stc-school-showattendancedet-res').css('display', 'none');
-        });
-
-        
+        });       
 
       });
     </script>
