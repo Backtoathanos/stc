@@ -766,8 +766,12 @@ class Yggdrasil extends tesseract{
 			    `stc_school_syllabus_covered_subid`='".mysqli_real_escape_string($this->stc_dbs, $sub_id)."'
 		");
 		$syllabus_details=array();
-		foreach($odinqry as $odinqryrow){
-			$syllabus_details[]=$odinqryrow;
+		if(mysqli_num_rows($odinqry)>0){
+			foreach($odinqry as $odinqryrow){
+				$syllabus_details[]=$odinqryrow;
+			}
+		}else{
+			$syllabus_details[]=0;
 		}
 		$odin=array(
 			'lecture_details' => $lecture_details,
@@ -1172,16 +1176,16 @@ class Yggdrasil extends tesseract{
 		$counter=0;
 		for($i=0; $i<$validate;$i++){
 			$counter++;
-			$monthday.='<th class="text-center">'.$counter.'</th>';
+			$monthday.='<th class="text-center long">'.$counter.'</th>';
 		}
 		$odin='
 			<table class="table table-hover table-bordered">
 				<thead>
-					<th class="text-center">Sl No</th>
-					<th class="text-center">Student Id</th>
-					<th class="text-center">Student Name</th>
+					<th class="text-center headcol">Sl No</th>
+					<th class="text-center headcol">Student Id</th>
+					<th class="text-center headcol">Student Name</th>
 					'.$monthday.'
-					<th class="text-center">Total</th>
+					<th class="text-center long">Total</th>
 				</thead>
 				<tbody class="stc-schoolattendance-show">
 		';
@@ -1234,21 +1238,21 @@ class Yggdrasil extends tesseract{
 					if(mysqli_num_rows($odinattendanceqry)>0){
 						$presentcounter=mysqli_num_rows($odinattendanceqry);
 						$totalattendance+=$presentcounter;
-						$attendance.='<td class="text-center" title="Lecture" style="background-color: #80d049;">'.$presentcounter.'</td>';
+						$attendance.='<td class="text-center long" title="Lecture" style="background-color: #80d049;">'.$presentcounter.'</td>';
 					}else{
-						$attendance.='<td class="text-center" style="background-color: #d00d1f">A</td>';
+						$attendance.='<td class="text-center long" style="background-color: #fff7bd">A</td>';
 					}
 					
 				}
-				$tot_color = 'style="background-color: #d00d1f;"';
+				$tot_color = 'style="background-color: #ffc07e;"';
 				if($totalattendance>0){
 					$tot_color = 'style="background-color: #80d049;"';
 				}
 				$odin.='
 					<tr>
-						<td class="text-center">'.$slno.'</td>
-						<td>'.$odinclassrow['stc_school_student_studid'].'</td>
-						<td>'.$odinclassrow['stc_school_student_firstname'].''.$odinclassrow['stc_school_student_lastname'].'</td>
+						<td class="text-center headcol">'.$slno.'</td>
+						<td class="headcol">'.$odinclassrow['stc_school_student_studid'].'</td>
+						<td class="headcol">'.$odinclassrow['stc_school_student_firstname'].''.$odinclassrow['stc_school_student_lastname'].'</td>
 						'.$attendance.'
 						<td class="text-right btn" data-toggle="modal" data-target="#exampleModal" '.$tot_color.'>'.$totalattendance.' Lecture</td>
 					</tr>

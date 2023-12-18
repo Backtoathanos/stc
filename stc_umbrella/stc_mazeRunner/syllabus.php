@@ -434,6 +434,13 @@ if(empty(@$_SESSION['stc_school_user_id'])){
                                                 </div>
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-sm-12 col-md-12 col-lg-12">
+                                              <div class="mb-3">
+                                                
+                                              </div>
+                                          </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
