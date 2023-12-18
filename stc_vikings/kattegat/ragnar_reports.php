@@ -1799,7 +1799,7 @@ class ragnarReportsViewElectronicsPurchaseSaleReports extends tesseract{
             `stc_daily_purchase` 
          ON 
             `stc_daily_purchase_id` = `stc_daily_purchase_items_order_id`
-         INNER JOIN 
+         LEFT JOIN 
             `stc_electronics_user` 
          ON 
             `stc_electronics_user_id` = `stc_daily_purchase_createdby`
@@ -1877,7 +1877,6 @@ class ragnarReportsViewElectronicsPurchaseSaleReports extends tesseract{
             }else{
                $coldues='<h6>'.number_format($dues, 2).'</h6>';
             }
-
             $odin.='
                <tr>
                      <td class="text-center">
