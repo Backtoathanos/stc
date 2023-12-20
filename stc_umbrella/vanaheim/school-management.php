@@ -11,7 +11,11 @@ class Yggdrasil extends tesseract{
 		$odin='';
 		$date=date("Y-m-d H:i:s");
 		$check_qry=mysqli_query($this->stc_dbs, "
-			SELECT `stc_school_teacher_id` FROM `stc_school_teacher` WHERE `stc_school_teacher_teachid`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteacherid)."' OR `stc_school_teacher_email`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteacheremail)."' OR `stc_school_teacher_contact` = '".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteachernumber)."'
+			SELECT `stc_school_teacher_id` 
+			FROM `stc_school_teacher` 
+			WHERE `stc_school_teacher_teachid`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteacherid)."' 
+			OR `stc_school_teacher_email`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteacheremail)."' 
+			OR `stc_school_teacher_contact` = '".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteachernumber)."'
 		");
 		if(mysqli_num_rows($check_qry)>0){
 			$odin = "duplicate";
@@ -85,14 +89,18 @@ class Yggdrasil extends tesseract{
 					)
 				");
 				$get_teachid=mysqli_query($this->stc_dbs, "
-					SELECT `stc_school_user_id` FROM `stc_school` WHERE `stc_school_user_contact`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteachernumber)."'
+					SELECT `stc_school_user_id` 
+					FROM `stc_school` 
+					WHERE `stc_school_user_contact`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteachernumber)."'
 				");
 				$userid=0;
 				foreach($get_teachid as $get_teachrow){
-					$userid=$get_teachrow['userid'];
+					$userid=$get_teachrow['stc_school_user_id'];
 				}
 				$update_teach=mysqli_query($this->stc_dbs, "
-					UPDATE `stc_school_teacher` SET `stc_school_teacher_userid`='".mysqli_real_escape_string($this->stc_dbs, $userid)."' WHERE `stc_school_teacher_contact`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteachernumber)."'
+					UPDATE `stc_school_teacher` 
+					SET `stc_school_teacher_userid`='".mysqli_real_escape_string($this->stc_dbs, $userid)."' 
+					WHERE `stc_school_teacher_contact`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolmanagementteachernumber)."'
 				");
 				$odin = "success";
 			}else{
@@ -449,7 +457,7 @@ class Yggdrasil extends tesseract{
 						}
 					}
     			}else{
-    	      		$periods.='<td>NA</td>';
+    	      		$periods.='<td>NA'.$query.'</td>';
     			}
     		}
     	  
