@@ -457,7 +457,7 @@ class Yggdrasil extends tesseract{
 						}
 					}
     			}else{
-    	      		$periods.='<td>NA'.$query.'</td>';
+    	      		$periods.='<td>NA</td>';
     			}
     		}
     	  
