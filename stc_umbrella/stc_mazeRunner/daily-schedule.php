@@ -879,40 +879,42 @@ if($_SESSION['stc_school_user_for']==2){
           });
         });
         
-        // $(document).on('change', '.stc-attend-check', function(e){
-        //   var stc_stid = $(this).attr('id');
-        //   var stc_stclassid = $(this).attr('classid');
-        //   var stc_stsubid = $(this).attr('subid');
-        //   var stc_sthwperc = 0;
-        //   var stc_stcatt = $(this).val();
-        //   if(stc_stcatt>0){
-        //     $.ajax({  
-        //       url       : "../vanaheim/school-management.php",
-        //       method    : "POST",  
-        //       data      : {
-        //         stc_student_save : 1,
-        //         stc_stid : stc_stid,
-        //         stc_stsubid : stc_stsubid,
-        //         stc_stclassid : stc_stclassid,
-        //         stc_sthwperc : stc_sthwperc,
-        //         stc_stcatt : stc_stcatt
-        //       },
-        //       // dataType: `JSON`,
-        //       success   : function(response_student){
-        //       // console.log(response_student);
-        //         var response=response_student.trim();
-        //         if(response=="reload"){
-        //           window.location.reload();
-        //         }else if(response=="success"){
-        //           alert("Student record updated!!!");
-        //         }else{
-        //           alert("Something went wrong!!! Please check & try again.");
-        //           $('.stc-school-student-att-save').show(500);
-        //         }
-        //       }
-        //     });
-        //   }
-        // });
+        $(document).on('change', '.stc-attend-check', function(e){
+          var stc_stid = $(this).attr('id');
+          var stc_stclassid = $(this).attr('classid');
+          var stc_stsubid = $(this).attr('subid');
+          var stc_sthwperc = 0;
+          var stc_stcatt = $(this).val();
+          if(stc_stcatt>0){
+            $.ajax({  
+              url       : "../vanaheim/school-management.php",
+              method    : "POST",  
+              data      : {
+                stc_student_save : 1,
+                stc_stid : stc_stid,
+                stc_stsubid : stc_stsubid,
+                stc_stclassid : stc_stclassid,
+                stc_sthwperc : stc_sthwperc,
+                stc_stcatt : stc_stcatt
+              },
+              // dataType: `JSON`,
+              success   : function(response_student){
+              // console.log(response_student);
+                var response=response_student.trim();
+                if(response=="reload"){
+                  window.location.reload();
+                }else if(response=="success"){
+                  alert("Student attendance updated!!!");
+                }else{
+                  alert("Something went wrong!!! Please check & try again.");
+                  $('.stc-school-student-att-save').show(500);
+                }
+              }else{
+                  alert("Student attendance updated!!!");
+              }
+            });
+          }
+        });
 
         $(document).on('click', '.save-lecture', function(e){
           e.preventDefault();
