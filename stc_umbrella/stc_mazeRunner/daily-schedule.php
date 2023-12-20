@@ -909,10 +909,10 @@ if($_SESSION['stc_school_user_for']==2){
                   alert("Something went wrong!!! Please check & try again.");
                   $('.stc-school-student-att-save').show(500);
                 }
-              }else{
-                  alert("Student attendance updated!!!");
               }
             });
+          }else{            
+            alert("Student attendance updated!!!");
           }
         });
 
