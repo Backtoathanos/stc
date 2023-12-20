@@ -335,6 +335,139 @@ class Yggdrasil extends tesseract{
 		return $odin;
 	}
 
+	public function stc_call_teacher_schedule(){
+		$odin='';
+		date_default_timezone_set('Asia/Kolkata');
+    	$day_array=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
+    	$check_attendanceforsc=mysqli_query($this->stc_dbs, "
+    		SELECT `stc_school_teacher_attendance_scheduleid` FROM `stc_school_teacher_attendance` 
+    		WHERE `stc_school_teacher_attendance_status`=1
+    		AND `stc_school_teacher_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
+    	");
+    	$att_counter=0;
+    	$schedule_id=0;
+    	if(mysqli_num_rows($check_attendanceforsc)>0){
+    		$att_counter++;
+    		foreach($check_attendanceforsc as $check_attendanceforscrow){
+    			$schedule_id=$check_attendanceforscrow['stc_school_teacher_attendance_scheduleid'];
+    		}
+    	}
+    	$odinclassqry=mysqli_query($this->stc_dbs, "
+    		SELECT `stc_school_teacher_attendance_scheduleid` FROM `stc_school_teacher_attendance` 
+    		WHERE `stc_school_teacher_attendance_status`=1
+    		AND `stc_school_teacher_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
+    	");
+    	
+    	foreach($day_array as $day){
+    		$tr_color='';
+    		$counter=0;
+    		$periods='';
+    		$days=date("l");
+    		for($i=0;$i<7;$i++){
+    			$counter++;
+    			$query="
+    				SELECT
+    				  `stc_school_class_title`,
+    				  `stc_school_teacher_schedule_id`,
+    				  `stc_school_subject_title`,
+    				  `stc_school_teacher_schedule_day`,
+    				  `stc_school_teacher_schedule_classid`,
+    				  `stc_school_teacher_schedule_subjectid`,
+    				  `stc_school_teacher_schedule_begtime`,
+    				  `stc_school_teacher_schedule_endtime` 
+    				FROM `stc_school_teacher_schedule`
+    				LEFT JOIN `stc_school_class`
+    				ON `stc_school_teacher_schedule_classid`=`stc_school_class_id`
+    				LEFT JOIN `stc_school_subject`
+    				ON `stc_school_teacher_schedule_subjectid`=`stc_school_subject_id`
+    				WHERE `stc_school_teacher_schedule_day`='".$day."'
+    				AND `stc_school_teacher_schedule_teacherid`='".$_SESSION['stc_school_teacher_id']."'
+    				AND `stc_school_teacher_schedule_period`='".$counter."'
+    			";
+    			$periodquery=mysqli_query($this->stc_dbs, $query);
+    			if(mysqli_num_rows($periodquery)>0){
+					foreach($periodquery as $period){
+						
+						$time=date('h:i');
+						$time_flag="n";
+						if($day==$days){
+						$tr_color="style='background:#fdff32;'";
+						$time_flag = ($time > date('h:i', strtotime($period['stc_school_teacher_schedule_begtime']))) && ($time < date('h:i', strtotime($period['stc_school_teacher_schedule_endtime']))) ? "y" : "n";
+						} 
+						if($att_counter>0){
+							if($time_flag=="y"){
+								$periods.='                                                        
+								<td class="text-center">
+									<a href="javascript:void(0);" class="stc-school-show-student-default"  data-toggle="modal" data-target="#exampleModal" id="'.$period['stc_school_teacher_schedule_id'].'" class-id="'.$period['stc_school_teacher_schedule_classid'].'" sub-id="'.$period['stc_school_teacher_schedule_subjectid'].'">
+										<b>
+										Class - '.$period['stc_school_class_title'].'<br>
+										'.$period['stc_school_subject_title'].'<br>
+										'.date('h:i', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
+										'.date('h:i', strtotime($period['stc_school_teacher_schedule_endtime'])).'
+										</b>
+									</a>
+								</td>
+								';
+							}else{
+								$periods.='
+								<td class="text-center">
+									<b>
+									Class - '.$period['stc_school_class_title'].'<br>
+									'.$period['stc_school_subject_title'].'<br>
+									'.date('h:i a', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
+									'.date('h:i a', strtotime($period['stc_school_teacher_schedule_endtime'])).' 
+									</b>
+								</td>
+								';
+							}
+						}else{
+							if($time_flag=="y"){
+								$periods.='
+								<td class="text-center"  style="background: #8cff32;font-weight: bold;">
+									<a href="javascript:void(0);" class="stc-school-show-student" data-toggle="modal" data-target="#exampleModal" id="'.$period['stc_school_teacher_schedule_id'].'" class-id="'.$period['stc_school_teacher_schedule_classid'].'" sub-id="'.$period['stc_school_teacher_schedule_subjectid'].'">
+										<b>
+										Class - '.$period['stc_school_class_title'].'<br>
+										'.$period['stc_school_subject_title'].'<br>
+										'.date('h:i', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
+										'.date('h:i', strtotime($period['stc_school_teacher_schedule_endtime'])).'
+										</b>
+									</a>
+								</td>
+								';
+							}else{
+								$periods.='
+								<td class="text-center">
+									<b>
+									Class - '.$period['stc_school_class_title'].'<br>
+									'.$period['stc_school_subject_title'].'<br>
+									'.date('h:i a', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
+									'.date('h:i a', strtotime($period['stc_school_teacher_schedule_endtime'])).' 
+									</b>
+								</td>
+								';
+							}
+						}
+					}
+    			}else{
+    	      		$periods.='<td>NA</td>';
+    			}
+    		}
+    	  
+    		$odin .= '
+    			<tr '.$tr_color.'>
+    				<td>'.$day.'</td>
+    				'.$periods.'
+    			</tr>    
+    		';
+    	}
+		$att_result = $att_counter>0 ? "y" : "n";
+		$odin=array(
+			'schedule' => $odin,
+			'att_result' => $att_result
+		);
+		return $odin;
+	}
+
 	public function stc_call_school_student($schedule_id, $class_id){
 		$odin='';
 		$date=date("Y-m-d H:i:s");
@@ -414,17 +547,13 @@ class Yggdrasil extends tesseract{
 						<td class="text-center"><b>'.$odin_sturow['stc_school_class_title'].'</b></td>
 						<td class="text-center"><b>'.$odin_sturow['stc_school_subject_title'].'</b></td>
 						<td>
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" value="1" checked> 
-							<label for="p'.$odin_sturow['stc_school_student_id'].'">Present</label>
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="1"> 
+							<label for="'.$odin_sturow['stc_school_student_id'].'">Present</label>
 						</td>
 						<td>
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" value="0"> 
-							<label for="a'.$odin_sturow['stc_school_student_id'].'">Absent</label>
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="0"> 
+							<label for="'.$odin_sturow['stc_school_student_id'].'">Absent</label>
 						</td>
-						<td>
-							<input type="number" class="stc-school-stu-attendance-hw'.$odin_sturow['stc_school_student_id'].' form-control" min="0" max="100" id="'.$odin_sturow['stc_school_student_id'].'" placeholder="Type here.."> 
-						</td>
-						<td>'.$updatebtn.'</td>
 					</tr>
 				';
 			}
@@ -490,17 +619,13 @@ class Yggdrasil extends tesseract{
 						<td class="text-center"><b>'.$odin_sturow['stc_school_class_title'].'</b></td>
 						<td class="text-center"><b>'.$odin_sturow['stc_school_subject_title'].'</b></td>
 						<td>
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" value="1" checked> 
-							<label for="p'.$odin_sturow['stc_school_student_id'].'">Present</label>
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="1"> 
+							<label for="'.$odin_sturow['stc_school_student_id'].'">Present</label>
 						</td>
 						<td>
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" value="0"> 
-							<label for="a'.$odin_sturow['stc_school_student_id'].'">Absent</label>
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="0"> 
+							<label for="'.$odin_sturow['stc_school_student_id'].'">Absent</label>
 						</td>
-						<td>
-							<input type="number" class="stc-school-stu-attendance-hw'.$odin_sturow['stc_school_student_id'].' form-control" min="0" max="100" id="'.$odin_sturow['stc_school_student_id'].'" placeholder="Type here.."> 
-						</td>
-						<td>'.$updatebtn.'</td>
 					</tr>
 				';
 			}
@@ -529,7 +654,7 @@ class Yggdrasil extends tesseract{
 			WHERE `stc_school_lecture_status`='3' 
 			AND `stc_school_lecture_createdby`='".$_SESSION['stc_school_user_id']."'
 		");
-		$odin_teacherattuqry=mysqli_query($this->stc_dbs, "
+		$odin_studentattuqry=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_school_student_attendance` 
 			SET `stc_school_student_attendance_status`='1' 
 			WHERE `stc_school_student_attendance_status`='3' 
@@ -1414,6 +1539,13 @@ if(isset($_POST['save_schduleadd_action'])){
 	echo $out;
 }
 
+// call schedule for teacher
+if(isset($_POST['stc_teacherschedule_call'])){
+	$valkyrie=new Yggdrasil();
+	$lokiheck=$valkyrie->stc_call_teacher_schedule();
+	echo json_encode($lokiheck);
+}
+
 // call student for attendance
 if(isset($_POST['stc_call_student'])){
 	$schedule_id=$_POST['schedule_id'];
@@ -1435,12 +1567,20 @@ if(isset($_POST['stc_call_student_default'])){
 // end lecturer from teacher
 if(isset($_POST['stc_call_lecture_end'])){
 	$class_id=$_POST['class_id'];
+	$student_id=$_POST['student_id'];
+	$sub_id=$_POST['sub_id'];
+	$attendance=$_POST['attendance'];
 	$out='';
 	if(empty($_SESSION['stc_school_user_id'])){
 		$out="reload";
 	}else{
 		$valkyrie=new Yggdrasil();
 		$out=$valkyrie->stc_call_school_lecturer_end();
+		for($i=0;$i<strlen($student_id);$i++){
+			if($attendance[$i]==1){
+				$valkyrie->stc_call_school_student_save($student_id[$i], $sub_id[$i], $class_id[$i], 0, $attendance[$i]);
+			}
+		}
 	}
 	echo $out;
 }
@@ -1564,7 +1704,6 @@ if(isset($_POST['stc_remove_schedule_action'])){
 	}
 	echo json_encode($out);
 }
-
 
 // call student attendance
 if(isset($_POST['stc_call_studentattendance'])){

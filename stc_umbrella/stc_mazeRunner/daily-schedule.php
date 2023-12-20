@@ -26,6 +26,10 @@ if($_SESSION['stc_school_user_for']==2){
     <!-- CSS Files -->
     <link href="../assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
     <style>
+        .stc-stuattendance-table{
+          width:auto;
+          overflow-x: scroll;
+        }
         .stc-schoolschedule-show{
           width:auto;
           overflow-x: scroll;
@@ -440,314 +444,12 @@ if($_SESSION['stc_school_user_for']==2){
                                           <td class="text-center"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
                                         </tr>
                                       </thead>
-                                      <tbody>
-                                        <?php 
-                                          include_once("../../MCU/db.php");
-                                          date_default_timezone_set('Asia/Kolkata');
-                                          $day_array=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
-                                          $check_attendanceforsc=mysqli_query($con, "
-                                            SELECT `stc_school_teacher_attendance_scheduleid` FROM `stc_school_teacher_attendance` 
-                                            WHERE `stc_school_teacher_attendance_status`=1
-                                            AND `stc_school_teacher_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
-                                          ");
-                                          $att_counter=0;
-                                          $schedule_id=0;
-                                          if(mysqli_num_rows($check_attendanceforsc)>0){
-                                            $att_counter++;
-                                            foreach($check_attendanceforsc as $check_attendanceforscrow){
-                                              $schedule_id=$check_attendanceforscrow['stc_school_teacher_attendance_scheduleid'];
-                                            }
-                                          }
-                                          $odinclassqry=mysqli_query($con, "
-                                            SELECT `stc_school_teacher_attendance_scheduleid` FROM `stc_school_teacher_attendance` 
-                                            WHERE `stc_school_teacher_attendance_status`=1
-                                            AND `stc_school_teacher_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
-                                          ");
-                                          
-                                          foreach($day_array as $day){
-                                            $tr_color='';
-                                            $counter=0;
-                                            $periods='';
-                                            $days=date("l");
-                                            for($i=0;$i<7;$i++){
-                                              $counter++;
-                                              $query="
-                                                SELECT
-                                                  `stc_school_class_title`,
-                                                  `stc_school_teacher_schedule_id`,
-                                                  `stc_school_subject_title`,
-                                                  `stc_school_teacher_schedule_day`,
-                                                  `stc_school_teacher_schedule_classid`,
-                                                  `stc_school_teacher_schedule_subjectid`,
-                                                  `stc_school_teacher_schedule_begtime`,
-                                                  `stc_school_teacher_schedule_endtime` 
-                                                FROM `stc_school_teacher_schedule`
-                                                LEFT JOIN `stc_school_class`
-                                                ON `stc_school_teacher_schedule_classid`=`stc_school_class_id`
-                                                LEFT JOIN `stc_school_subject`
-                                                ON `stc_school_teacher_schedule_subjectid`=`stc_school_subject_id`
-                                                WHERE `stc_school_teacher_schedule_day`='".$day."'
-                                                AND `stc_school_teacher_schedule_teacherid`='".$_SESSION['stc_school_teacher_id']."'
-                                                AND `stc_school_teacher_schedule_period`='".$counter."'
-                                              ";
-                                              $periodquery=mysqli_query($con, $query);
-                                              if(mysqli_num_rows($periodquery)>0){
-                                                foreach($periodquery as $period){
-                                                  
-                                                  $time=date('h:i');
-                                                  $time_flag="n";
-                                                  if($day==$days){
-                                                    $tr_color="style='background:#fdff32;'";
-                                                    $time_flag = ($time > date('h:i', strtotime($period['stc_school_teacher_schedule_begtime']))) && ($time < date('h:i', strtotime($period['stc_school_teacher_schedule_endtime']))) ? "y" : "n";
-                                                  } 
-                                                  if($att_counter>0){
-                                                    if($time_flag=="y"){
-                                                      $periods.='                                                        
-                                                        <td class="text-center">
-                                                          <a href="javascript:void(0);" class="stc-school-show-student-default"  data-toggle="modal" data-target="#exampleModal" id="'.$period['stc_school_teacher_schedule_id'].'" class-id="'.$period['stc_school_teacher_schedule_classid'].'" sub-id="'.$period['stc_school_teacher_schedule_subjectid'].'">
-                                                              <b>
-                                                                Class - '.$period['stc_school_class_title'].'<br>
-                                                                '.$period['stc_school_subject_title'].'<br>
-                                                                '.date('h:i', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
-                                                                '.date('h:i', strtotime($period['stc_school_teacher_schedule_endtime'])).'
-                                                              </b>
-                                                          </a>
-                                                        </td>
-                                                      ';
-                                                    }else{
-                                                      $periods.='
-                                                        <td class="text-center">
-                                                          <b>
-                                                            Class - '.$period['stc_school_class_title'].'<br>
-                                                            '.$period['stc_school_subject_title'].'<br>
-                                                            '.date('h:i a', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
-                                                            '.date('h:i a', strtotime($period['stc_school_teacher_schedule_endtime'])).' 
-                                                          </b>
-                                                        </td>
-                                                      ';
-                                                    }
-                                                  }else{
-                                                    if($time_flag=="y"){
-                                                      $periods.='
-                                                        <td class="text-center"  style="background: #8cff32;font-weight: bold;">
-                                                          <a href="javascript:void(0);" class="stc-school-show-student" data-toggle="modal" data-target="#exampleModal" id="'.$period['stc_school_teacher_schedule_id'].'" class-id="'.$period['stc_school_teacher_schedule_classid'].'" sub-id="'.$period['stc_school_teacher_schedule_subjectid'].'">
-                                                              <b>
-                                                                Class - '.$period['stc_school_class_title'].'<br>
-                                                                '.$period['stc_school_subject_title'].'<br>
-                                                                '.date('h:i', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
-                                                                '.date('h:i', strtotime($period['stc_school_teacher_schedule_endtime'])).'
-                                                              </b>
-                                                          </a>
-                                                        </td>
-                                                      ';
-                                                    }else{
-                                                      $periods.='
-                                                        <td class="text-center">
-                                                          <b>
-                                                            Class - '.$period['stc_school_class_title'].'<br>
-                                                            '.$period['stc_school_subject_title'].'<br>
-                                                            '.date('h:i a', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
-                                                            '.date('h:i a', strtotime($period['stc_school_teacher_schedule_endtime'])).' 
-                                                          </b>
-                                                        </td>
-                                                      ';
-                                                    }
-                                                  }
-                                                }
-                                              }else{
-                                                $periods.='<td>NA</td>';
-                                              }
-                                            }
-                                            
-                                            echo '
-                                              <tr '.$tr_color.'>
-                                                <td>'.$day.'</td>
-                                                '.$periods.'
-                                              </tr>    
-                                            ';
-                                          }
-                                        ?>
+                                      <tbody class="stc-teacher-schedule-show-table">
                                       </tbody>
                                     </table>
                                   </div>
                                 </div>
                               </div>
-                              <!-- <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <table class="table table-hover table-bordered table-responsive">
-                                      <thead>
-                                        <tr>
-                                          <td class="text-center"><b>Day</b></td>
-                                          <td class="text-center"><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></td>
-                                          <td class="text-center"><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></td>
-                                          <td class="text-center"><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></td>
-                                          <td class="text-center"><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                          <td class="text-center"><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                          <td class="text-center"><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                          <td class="text-center"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                        </tr>
-                                      </thead>
-                                      <tbody>
-                                        <?php 
-                                          // include_once("../../MCU/db.php");
-                                          // date_default_timezone_set('Asia/Kolkata');
-                                          // $day_array=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
-                                          // $data='';
-
-                                          // $check_attendanceforsc=mysqli_query($con, "
-                                          //   SELECT `stc_school_teacher_attendance_scheduleid` FROM `stc_school_teacher_attendance` 
-                                          //   WHERE `stc_school_teacher_attendance_status`=1
-                                          //   AND `stc_school_teacher_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
-                                          // ");
-                                          // $att_counter=0;
-                                          // $schedule_id=0;
-                                          // if(mysqli_num_rows($check_attendanceforsc)>0){
-                                          //   $att_counter++;
-                                          //   foreach($check_attendanceforsc as $check_attendanceforscrow){
-                                          //     $schedule_id=$check_attendanceforscrow['stc_school_teacher_attendance_scheduleid'];
-                                          //   }
-                                          // }
-
-                                          // foreach($day_array as $class_row){
-                                          //   $tr_color='';
-                                          //   $schedule_data='';
-                                          //   $rev_counter=7;
-                                          //   $schedule_sql=mysqli_query($con, "
-                                          //     SELECT 
-                                          //       `stc_school_class_title`,
-                                          //       `stc_school_teacher_schedule_id`,
-                                          //       `stc_school_subject_title`,
-                                          //       `stc_school_teacher_schedule_day`,
-                                          //       `stc_school_teacher_schedule_classid`,
-                                          //       `stc_school_teacher_schedule_subjectid`,
-                                          //       `stc_school_teacher_schedule_begtime`,
-                                          //       `stc_school_teacher_schedule_endtime` 
-                                          //     FROM 
-                                          //       `stc_school_teacher_schedule` 
-                                          //     LEFT JOIN 
-                                          //       `stc_school_subject`
-                                          //     ON 
-                                          //       `stc_school_teacher_schedule_subjectid`=`stc_school_subject_id`
-                                          //     LEFT JOIN 
-                                          //       `stc_school_class`
-                                          //     ON 
-                                          //       `stc_school_teacher_schedule_classid`=`stc_school_class_id`
-                                          //     WHERE 
-                                          //       `stc_school_teacher_schedule_day`='".$class_row."' AND 
-                                          //       `stc_school_teacher_schedule_teacherid`='".$_SESSION['stc_school_teacher_id']."'
-                                          //     ORDER BY TIME(`stc_school_teacher_schedule_begtime`) ASC
-                                          //   ");
-                                          //   foreach($schedule_sql as $schedule_row){                                                
-                                          //     $rev_counter--;
-                                              
-                                          //     $missed_class = '<span style="bfont-size: 110px; color: red; position: absolute; margin: 25px 5px 5px 0px;">X</span>';
-                                          //     $completed_class = '<span style="font-size: 110px;color: green;position: absolute;margin: 28px 5px 5px -20px;">✔</span>';
-                                          //     $day=date("l");
-                                          //     if($att_counter>0){
-                                          //       if($schedule_id==$schedule_row['stc_school_teacher_schedule_id']){
-                                          //         $schedule_data.='
-                                          //           <td class="text-center">
-                                          //             <a href="javascript:void(0);" class="stc-school-show-student-default"  data-toggle="modal" data-target="#exampleModal" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'" sub-id="'.$schedule_row['stc_school_teacher_schedule_subjectid'].'">
-                                          //                 <b>
-                                          //                   Class - '.$schedule_row['stc_school_class_title'].'<br>
-                                          //                   '.$schedule_row['stc_school_subject_title'].'<br>
-                                          //                   '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                          //                   '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'
-                                          //                 </b>
-                                          //             </a>
-                                          //           </td>
-                                          //         ';
-                                          //       }else{
-                                          //         $schedule_data.='
-                                          //             <td class="text-center">
-                                          //                 <b>
-                                          //                   Class - '.$schedule_row['stc_school_class_title'].'<br>
-                                          //                   '.$schedule_row['stc_school_subject_title'].'<br>
-                                          //                   '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                          //                   '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'
-                                          //                 </b>
-                                                      
-                                          //             </td>
-                                          //         ';
-                                          //       }
-                                          //     }else{
-                                          //       if($class_row!=$day){
-                                          //         $schedule_data.='
-                                          //             <td class="text-center">
-                                          //                 <b>
-                                          //                   Class - '.$schedule_row['stc_school_class_title'].'<br>
-                                          //                   '.$schedule_row['stc_school_subject_title'].'<br>
-                                          //                   '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                          //                   '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'
-                                          //                 </b>
-                                                      
-                                          //             </td>
-                                          //         ';
-                                          //       }else{
-                                          //         $tr_color="background:#fdff32;";
-                                          //         if($schedule_row['stc_school_subject_title']=="NA"){
-                                          //           $schedule_data.='
-                                          //               <td class="text-center">
-                                          //                   <b>
-                                          //                     '.$schedule_row['stc_school_subject_title'].'
-                                          //                   </b>
-                                                        
-                                          //               </td>
-                                          //           ';
-                                          //         }else{
-                                          //           $cur_time=date('h:i');
-                                          //           $beg_time=date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime']));
-                                          //           $end_time=date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime']));
-                                          //           if(($cur_time>$beg_time) && ($end_time>$cur_time)){
-                                          //             $schedule_data.='
-                                          //               <td class="text-center" style="background: #8cff32;font-weight: bold;">
-                                          //                 <a href="javascript:void(0);" class="stc-school-show-student" data-toggle="modal" data-target="#exampleModal" id="'.$schedule_row['stc_school_teacher_schedule_id'].'" class-id="'.$schedule_row['stc_school_teacher_schedule_classid'].'" sub-id="'.$schedule_row['stc_school_teacher_schedule_subjectid'].'">
-                                          //                     <b>
-                                          //                       Class - '.$schedule_row['stc_school_class_title'].'<br>
-                                          //                       '.$schedule_row['stc_school_subject_title'].'<br>
-                                          //                       '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                          //                       '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'
-                                          //                     </b>
-                                          //                 </a>
-                                          //               </td>
-                                          //             ';
-                                          //           }else{
-                                          //             $schedule_data.='
-                                          //                 <td class="text-center">
-                                          //                     <b>
-                                          //                       Class - '.$schedule_row['stc_school_class_title'].'<br>
-                                          //                       '.$schedule_row['stc_school_subject_title'].'<br>
-                                          //                       '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_begtime'])).' - 
-                                          //                       '.date('h:i', strtotime($schedule_row['stc_school_teacher_schedule_endtime'])).'
-                                          //                     </b>
-                                                          
-                                          //                 </td>
-                                          //             ';
-                                          //           }
-                                          //         }
-                                          //       }
-                                          //     }
-                                          //   }
-                                          //   $hash_rec='';
-                                          //   for($i = 0; $i<$rev_counter; $i++){
-                                          //     $hash_rec.='<td class="text-center"><b>NA</b></td>';
-                                          //   }
-                                          //   $data.='
-                                          //         <tr style="'.$tr_color.'">
-                                          //           <td class="text-center">'.$class_row.'</td>
-                                          //           '.$schedule_data.$hash_rec.'
-                                          //         </tr>
-                                          //   ';
-                                          // }
-                                          // echo $data;
-
-                                        ?>
-                                      </tbody>
-                                    </table>
-                                  </div>
-                                </div>
-                              </div> -->
                             </div>
                           </div>
                         </div>
@@ -1024,9 +726,26 @@ if($_SESSION['stc_school_user_for']==2){
         });
       });
     </script>
-    <!-- canteen section -->
     <script>
       $(document).ready(function(){
+        call_scedule()
+        function call_scedule(){
+          $.ajax({
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_teacherschedule_call : 1
+            },
+            dataType: `JSON`,
+            success   : function(response_teacher){
+              $('.stc-teacher-schedule-show-table').html(response_teacher.schedule);
+              if(response_teacher.att_result=="y"){
+                $('.stc-school-show-student-default').click();
+              }
+            }
+          });
+        }
+
         $(document).on('click', '.stc-school-show-student', function(e){
           e.preventDefault();
           var schedule_id=$(this).attr('id');
@@ -1081,11 +800,26 @@ if($_SESSION['stc_school_user_for']==2){
 
         $(document).on('click', '.stc-school-exit-period', function(e){
           e.preventDefault();
+          var student_id = [];
+          var sub_id = [];
+          var class_id = [];
+          var attendance = [];
+          $('.stc-attend-check:checked').each(function () {
+            student_id.push($(this).attr('id')); 
+            sub_id.push($(this).attr('subid')); 
+            class_id.push($(this).attr('classid')); 
+            attendance.push($(this).val()); 
+          });
           $.ajax({  
             url       : "../vanaheim/school-management.php",
             method    : "POST",  
             data      : {
-              stc_call_lecture_end : 1
+              stc_call_lecture_end : 1,
+              student_id : student_id,
+              sub_id : sub_id,
+              class_id : class_id,
+              attendance : attendance
+
             },
             // dataType: `JSON`,
             success   : function(response_student){
@@ -1101,14 +835,14 @@ if($_SESSION['stc_school_user_for']==2){
           });
         });
 
-        $(document).on('click', '.stc-attend-check', function(e){
-          var stvalue=$(this).val();
-          if(stvalue==0){
-            $(this).parent().parent().find('.stc-school-student-att-save').hide();
-          }else{
-            $(this).parent().parent().find('.stc-school-student-att-save').show();
-          }
-        });
+        // $(document).on('click', '.stc-attend-check', function(e){
+        //   var stvalue=$(this).val();
+        //   if(stvalue==0){
+        //     $(this).parent().parent().find('.stc-school-student-att-save').hide();
+        //   }else{
+        //     $(this).parent().parent().find('.stc-school-student-att-save').show();
+        //   }
+        // });
         
         $(document).on('click', '.stc-school-student-att-save', function(e){
           e.preventDefault();
@@ -1144,6 +878,41 @@ if($_SESSION['stc_school_user_for']==2){
             }
           });
         });
+        
+        // $(document).on('change', '.stc-attend-check', function(e){
+        //   var stc_stid = $(this).attr('id');
+        //   var stc_stclassid = $(this).attr('classid');
+        //   var stc_stsubid = $(this).attr('subid');
+        //   var stc_sthwperc = 0;
+        //   var stc_stcatt = $(this).val();
+        //   if(stc_stcatt>0){
+        //     $.ajax({  
+        //       url       : "../vanaheim/school-management.php",
+        //       method    : "POST",  
+        //       data      : {
+        //         stc_student_save : 1,
+        //         stc_stid : stc_stid,
+        //         stc_stsubid : stc_stsubid,
+        //         stc_stclassid : stc_stclassid,
+        //         stc_sthwperc : stc_sthwperc,
+        //         stc_stcatt : stc_stcatt
+        //       },
+        //       // dataType: `JSON`,
+        //       success   : function(response_student){
+        //       // console.log(response_student);
+        //         var response=response_student.trim();
+        //         if(response=="reload"){
+        //           window.location.reload();
+        //         }else if(response=="success"){
+        //           alert("Student record updated!!!");
+        //         }else{
+        //           alert("Something went wrong!!! Please check & try again.");
+        //           $('.stc-school-student-att-save').show(500);
+        //         }
+        //       }
+        //     });
+        //   }
+        // });
 
         $(document).on('click', '.save-lecture', function(e){
           e.preventDefault();
@@ -1309,54 +1078,10 @@ if($_SESSION['stc_school_user_for']==2){
         $(document).on('click', '.stc-syllabus-out', function(){
           call_syllabus_quest();
         });
-
-        // $('.modal-adjustment').css('top', '200px');
-        // $(document).on('click', '.resp-1', function(){
-        //   $('.modal-adjustment').css('top', '200px');
-        // });
-
-
-        // $(document).on('click', '.resp-2', function(){
-        //   $('.modal-adjustment').css('top', '350px');
-        // });
-        
-        // $(document).on('click', '.modal-closebtn', function(e){
-        //   e.preventDefault();
-        //   $('.stc-school-showstudent-res').modal('hide');
-        //   window.location.reload();
-        // });
       });
     </script>
   </body>
   </html>
-<!-- Modal -->
-<!-- <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        ...
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div> -->
-<!-- <div class="modal fade bd-example-modal-xl stc-school-showstudent-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content modal-adjustment">
-      <div class="modal-header">
-        <h4 class="modal-title">Student Attendance</h4>
-        <button type="button" class="btn btn-danger stc-school-exit-period">Exit</button>
-      </div>
-      <div class="modal-body"> -->
 
 <div class="modal fade stc-school-showstudent-res" data-backdrop="static" data-keyboard="false" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -1406,17 +1131,15 @@ if($_SESSION['stc_school_user_for']==2){
                         <input type="hidden" class="stc-school-hidden-scclass-id">
                         <input type="hidden" class="stc-school-hidden-scsub-id">
                         <!-- <h5>School Attendance</h5> -->
-                        <div class="mb-3">
-                          <table class="table table-hover table-bordered table-responsive">
+                        <div class="mb-3 stc-stuattendance-table">
+                          <table class="table table-hover table-bordered">
                             <thead>
                               <tr>
-                                <th class="text-center">Student ID</th>
-                                <th class="text-center">Student Name</th>
-                                <th class="text-center">Class</th>
-                                <th class="text-center">Subject</th>
-                                <th class="text-center" colspan="2">Attendance</th>
-                                <th class="text-center">HW Done %</th>
-                                <th class="text-center">Action</th>
+                                <th class="text-center"><b>Student ID</b></th>
+                                <th class="text-center"><b>Student Name</b></th>
+                                <th class="text-center"><b>Class</b></th>
+                                <th class="text-center"><b>Subject</b></th>
+                                <th class="text-center" colspan="2"><b>Attendance</b></th>
                               </tr>
                             </thead>
                             <tbody class="stc-show-student-nested-show">
