@@ -1370,16 +1370,20 @@ class Yggdrasil extends tesseract{
 					// $attendance.='<td class="text-center">'.$query.'</td>';
 					if(mysqli_num_rows($odinattendanceqry)>0){
 						$presentcounter=mysqli_num_rows($odinattendanceqry);
-						$totalattendance+=$presentcounter;
-						$attendance.='<td class="text-center long" title="Lecture" style="background-color: #80d049;">'.$presentcounter.'</td>';
+						$class_minutes=0;
+						foreach($odinattendanceqry as $row ){
+							$class_minutes+=40;
+						}
+						$totalattendance+=$class_minutes;
+						$attendance.='<td class="text-center long" title="Lecture" style="background-color: #80d049;">'.$class_minutes.'</td>';
 					}else{
 						$attendance.='<td class="text-center long" style="background-color: #fff7bd">A</td>';
 					}
 					
 				}
-				$tot_color = 'style="background-color: #ffc07e;"';
+				$tot_time = '<td class="text-center" style="background-color: #ffc07e;">NA</td>';
 				if($totalattendance>0){
-					$tot_color = 'style="background-color: #80d049;"';
+					$tot_time = '<td class="text-center btn" data-toggle="modal" data-target="#exampleModal" style="background-color: #80d049;">'.$totalattendance.' Minutes</td>';
 				}
 				$odin.='
 					<tr>
@@ -1387,7 +1391,7 @@ class Yggdrasil extends tesseract{
 						<td class="headcol">'.$odinclassrow['stc_school_student_studid'].'</td>
 						<td class="headcol">'.$odinclassrow['stc_school_student_firstname'].''.$odinclassrow['stc_school_student_lastname'].'</td>
 						'.$attendance.'
-						<td class="text-right btn" data-toggle="modal" data-target="#exampleModal" '.$tot_color.'>'.$totalattendance.' Lecture</td>
+						'.$tot_time.'
 					</tr>
 				';
 			}
