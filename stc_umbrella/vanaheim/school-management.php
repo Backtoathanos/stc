@@ -399,8 +399,20 @@ class Yggdrasil extends tesseract{
 						$time=date('h:i');
 						$time_flag="n";
 						if($day==$days){
-						$tr_color="style='background:#fdff32;'";
-						$time_flag = ($time > date('h:i', strtotime($period['stc_school_teacher_schedule_begtime']))) && ($time < date('h:i', strtotime($period['stc_school_teacher_schedule_endtime']))) ? "y" : "n";
+							$tr_color="style='background:#fdff32;'";
+							// $time_flag = ($time > date('h:i', strtotime($period['stc_school_teacher_schedule_begtime']))) && ($time < date('h:i', strtotime($period['stc_school_teacher_schedule_endtime']))) ? "y" : "n";
+							if(date('h', strtotime($period['stc_school_teacher_schedule_begtime']))=="12" && date('h', strtotime($period['stc_school_teacher_schedule_endtime']))=="1"){	
+								$time_flag = "y";
+							}else{	
+								if(
+									($time > date('h:i', strtotime($period['stc_school_teacher_schedule_begtime'])) && 
+									$time < date('h:i', strtotime($period['stc_school_teacher_schedule_endtime'])))
+								){
+									$time_flag = "y";
+								}else{
+									$time_flag = "n";
+								}
+							}
 						} 
 						if($att_counter>0){
 							if($time_flag=="y"){
@@ -1367,19 +1379,35 @@ class Yggdrasil extends tesseract{
 							DAY(`stc_school_student_attendance_createdate`)='".mysqli_real_escape_string($this->stc_dbs, $att_counter)."'
 					";
 					$odinattendanceqry=mysqli_query($this->stc_dbs, $query);
-					// $attendance.='<td class="text-center">'.$query.'</td>';
 					if(mysqli_num_rows($odinattendanceqry)>0){
 						$presentcounter=mysqli_num_rows($odinattendanceqry);
 						$class_minutes=0;
 						foreach($odinattendanceqry as $row ){
-							$class_minutes+=40;
+							if($row['stc_school_student_attendance_status']==1){
+								$attend_redu_flag="";
+								foreach($odinattendanceqry as $row2){
+									if(
+										($row['stc_school_student_attendance_stuid']==$row2['stc_school_student_attendance_stuid']) AND 
+										($row['stc_school_student_attendance_classid']==$row2['stc_school_student_attendance_classid']) AND 
+										($row['stc_school_student_attendance_subid']==$row2['stc_school_student_attendance_subid']) AND 
+										($row['stc_school_student_attendance_attendance']==$row2['stc_school_student_attendance_attendance']) AND 
+										(date('h', strtotime($row['stc_school_student_attendance_createdate']))==date('h', strtotime($row2['stc_school_student_attendance_createdate'])))
+									){
+										$attend_redu_flag="yes";
+									}else{
+										$attend_redu_flag="no";
+									}
+								}
+								if($attend_redu_flag=="no"){
+									$class_minutes+=40;
+								}
+							}
 						}
 						$totalattendance+=$class_minutes;
 						$attendance.='<td class="text-center long" title="Lecture" style="background-color: #80d049;">'.$class_minutes.'</td>';
 					}else{
 						$attendance.='<td class="text-center long" style="background-color: #fff7bd">A</td>';
 					}
-					
 				}
 				$tot_time = '<td class="text-center" style="background-color: #ffc07e;">NA</td>';
 				if($totalattendance>0){
