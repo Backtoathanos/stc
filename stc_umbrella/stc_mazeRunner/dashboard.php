@@ -38,97 +38,15 @@ if(empty(@$_SESSION['stc_school_user_id'])){
       <div class="content">
         <div class="container-fluid">
           <div class="row">
-            <div class="col-lg-3 col-md-6 col-sm-6">
+            <div class="col-lg-12 col-md-12 col-sm-12">
               <div class="card card-stats">
                 <div class="card-header card-header-warning card-header-icon">
-                  <div class="card-icon">
-                    <i class="material-icons">content_copy</i>
-                  </div>
-                  <p class="card-category">Total Customer</p>
-                  <h3 class="card-title">
-                    #
-                    <small></small>
+                  <h3 class="card-title text-left mt-4 ml-4">
+                    Hi <?php echo $_SESSION['stc_school_user_name']; ?>
                   </h3>
                 </div>
                 <div class="card-footer">
                   <div class="stats">
-                    <i class="material-icons">local_offer</i> Carry On 
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <div class="card card-stats">
-                <div class="card-header card-header-success card-header-icon">
-                  <div class="card-icon">
-                    <i class="material-icons">store</i>
-                  </div>
-                  <p class="card-category">Revenue</p>
-                  <p class="card-title">#</p>
-                </div>
-                <div class="card-footer">
-                  <div class="stats">
-                    <i class="material-icons">date_range</i> Last 1 Month
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <div class="card card-stats">
-                <div class="card-header card-header-danger card-header-icon">
-                  <div class="card-icon">
-                    <i class="fa fa-user-secret" aria-hidden="true"></i>
-                  </div>
-                  <p class="card-category">Total Agent</p>
-                  <h3 class="card-title">
-                    #
-                  </h3>
-                </div>
-                <div class="card-footer">
-                  <div class="stats">
-                    <i class="material-icons">local_offer</i> Tracked from STC Electronics
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-3 col-md-6 col-sm-6">
-              <div class="card card-stats">
-                <div class="card-header card-header-info card-header-icon">
-                  <div class="card-icon">
-                    <i class="fa fa-instagram"></i>
-                  </div>
-                  <p class="card-category">Followers</p>
-                  <h3 class="card-title">+
-                    #
-                  </h3>
-                </div>
-                <div class="card-footer">
-                  <div class="stats">
-                    <i class="material-icons">update</i> Just Updated
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12 col-sm-12">
-              <div class="card card-chart">
-                <div class="card-header">
-                    <h2 class="text-center">Analytics Reports From #</h2>
-                #
-                <div style="width:100%;hieght:20%;text-align:center">
-                    <div>Sales </div>
-                    <canvas  id="chartjs_bar"></canvas> 
-                </div> 
-                </div>
-                <div class="card-body">
-                  <h4 class="card-title">Daily Sales</h4>
-                  <p class="card-category">
-                    <span class="text-success"><i class="fa fa-long-arrow-up"></i>  </span> </p>
-                </div>
-                <div class="card-footer">
-                  <div class="stats">
-                    <i class="material-icons">access_time</i> updated a minutes ago
                   </div>
                 </div>
               </div>
