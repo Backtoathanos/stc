@@ -1393,6 +1393,7 @@ class Yggdrasil extends tesseract{
 										($row['stc_school_student_attendance_classid']==$row2['stc_school_student_attendance_classid']) AND 
 										($row['stc_school_student_attendance_subid']==$row2['stc_school_student_attendance_subid']) AND 
 										($row['stc_school_student_attendance_attendance']==$row2['stc_school_student_attendance_attendance']) AND 
+										($row['stc_school_student_attendance_createdby']==$row2['stc_school_student_attendance_createdby']) AND 
 										(date('h', strtotime($row['stc_school_student_attendance_createdate']))==date('h', strtotime($row2['stc_school_student_attendance_createdate'])))
 									){
 										$counter++;
@@ -1418,7 +1419,7 @@ class Yggdrasil extends tesseract{
 					<tr>
 						<td class="text-center headcol">'.$slno.'</td>
 						<td class="headcol">'.$odinclassrow['stc_school_student_studid'].'</td>
-						<td class="headcol">'.$odinclassrow['stc_school_student_firstname'].''.$odinclassrow['stc_school_student_lastname'].'</td>
+						<td class="headcol">'.$odinclassrow['stc_school_student_firstname'].' '.$odinclassrow['stc_school_student_lastname'].'</td>
 						'.$attendance.'
 						'.$tot_time.'
 					</tr>
