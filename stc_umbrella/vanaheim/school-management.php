@@ -1387,25 +1387,25 @@ class Yggdrasil extends tesseract{
 							if($row['stc_school_student_attendance_status']==1){
 								$attend_redu_flag="";
 								$counter=0;
-								foreach($odinattendanceqry as $row2){
-									if(
-										($row['stc_school_student_attendance_stuid']==$row2['stc_school_student_attendance_stuid']) AND 
-										($row['stc_school_student_attendance_classid']==$row2['stc_school_student_attendance_classid']) AND 
-										($row['stc_school_student_attendance_subid']==$row2['stc_school_student_attendance_subid']) AND 
-										($row['stc_school_student_attendance_attendance']==$row2['stc_school_student_attendance_attendance']) AND 
-										(date('h', strtotime($row['stc_school_student_attendance_createdate']))==date('h', strtotime($row2['stc_school_student_attendance_createdate'])))
-									){
-										$counter++;
-										$attend_redu_flag=$counter==2 ? "yes" : "no";
-										break;
-									}else{
-										$attend_redu_flag="no";
-										$counter=0;
-									}
-								}
-								if($attend_redu_flag=="no"){
+								// foreach($odinattendanceqry as $row2){
+								// 	if(
+								// 		($row['stc_school_student_attendance_stuid']==$row2['stc_school_student_attendance_stuid']) AND 
+								// 		($row['stc_school_student_attendance_classid']==$row2['stc_school_student_attendance_classid']) AND 
+								// 		($row['stc_school_student_attendance_subid']==$row2['stc_school_student_attendance_subid']) AND 
+								// 		($row['stc_school_student_attendance_attendance']==$row2['stc_school_student_attendance_attendance']) AND 
+								// 		(date('h', strtotime($row['stc_school_student_attendance_createdate']))==date('h', strtotime($row2['stc_school_student_attendance_createdate'])))
+								// 	){
+								// 		$counter++;
+								// 		$attend_redu_flag=$counter==2 ? "yes" : "no";
+								// 		break;
+								// 	}else{
+								// 		$attend_redu_flag="no";
+								// 		$counter=0;
+								// 	}
+								// }
+								// if($attend_redu_flag=="no"){
 									$class_minutes+=40;
-								}
+								// }
 							}
 						}
 						$totalattendance+=$class_minutes;
