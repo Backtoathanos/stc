@@ -1377,6 +1377,7 @@ class Yggdrasil extends tesseract{
 							YEAR(`stc_school_student_attendance_createdate`)='".mysqli_real_escape_string($this->stc_dbs, $year)."'
 						AND 
 							DAY(`stc_school_student_attendance_createdate`)='".mysqli_real_escape_string($this->stc_dbs, $att_counter)."'
+						ORDER BY `stc_school_student_attendance_id` ASC 
 					";
 					$odinattendanceqry=mysqli_query($this->stc_dbs, $query);
 					if(mysqli_num_rows($odinattendanceqry)>0){
@@ -1385,6 +1386,7 @@ class Yggdrasil extends tesseract{
 						foreach($odinattendanceqry as $row ){
 							if($row['stc_school_student_attendance_status']==1){
 								$attend_redu_flag="";
+								$counter=0;
 								foreach($odinattendanceqry as $row2){
 									if(
 										($row['stc_school_student_attendance_stuid']==$row2['stc_school_student_attendance_stuid']) AND 
@@ -1393,9 +1395,12 @@ class Yggdrasil extends tesseract{
 										($row['stc_school_student_attendance_attendance']==$row2['stc_school_student_attendance_attendance']) AND 
 										(date('h', strtotime($row['stc_school_student_attendance_createdate']))==date('h', strtotime($row2['stc_school_student_attendance_createdate'])))
 									){
-										$attend_redu_flag="yes";
+										$counter++;
+										$attend_redu_flag=$counter==2 ? "yes" : "no";
+										break;
 									}else{
 										$attend_redu_flag="no";
+										$counter=0;
 									}
 								}
 								if($attend_redu_flag=="no"){
