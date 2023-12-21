@@ -444,7 +444,134 @@ if($_SESSION['stc_school_user_for']==2){
                                           <td class="text-center"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
                                         </tr>
                                       </thead>
-                                      <tbody class="stc-teacher-schedule-show-table">
+                                      <!-- <tbody class="stc-teacher-schedule-show-table"> -->
+                                      <tbody>
+                                        <?php 
+                                        include_once("../../MCU/db.php");
+                                        date_default_timezone_set('Asia/Kolkata');
+                                        $day_array=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
+                                        $check_attendanceforsc=mysqli_query($con, "
+                                          SELECT `stc_school_teacher_attendance_scheduleid` FROM `stc_school_teacher_attendance` 
+                                          WHERE `stc_school_teacher_attendance_status`=1
+                                          AND `stc_school_teacher_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
+                                        ");
+                                        $att_counter=0;
+                                        $schedule_id=0;
+                                        if(mysqli_num_rows($check_attendanceforsc)>0){
+                                          $att_counter++;
+                                          foreach($check_attendanceforsc as $check_attendanceforscrow){
+                                            $schedule_id=$check_attendanceforscrow['stc_school_teacher_attendance_scheduleid'];
+                                          }
+                                        }
+                                        $odinclassqry=mysqli_query($con, "
+                                          SELECT `stc_school_teacher_attendance_scheduleid` FROM `stc_school_teacher_attendance` 
+                                          WHERE `stc_school_teacher_attendance_status`=1
+                                          AND `stc_school_teacher_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
+                                        ");
+                                        
+                                        foreach($day_array as $day){
+                                          $tr_color='';
+                                          $counter=0;
+                                          $periods='';
+                                          $days=date("l");
+                                          for($i=0;$i<7;$i++){
+                                            $counter++;
+                                            $query="
+                                              SELECT
+                                                `stc_school_class_title`,
+                                                `stc_school_teacher_schedule_id`,
+                                                `stc_school_subject_title`,
+                                                `stc_school_teacher_schedule_day`,
+                                                `stc_school_teacher_schedule_classid`,
+                                                `stc_school_teacher_schedule_subjectid`,
+                                                `stc_school_teacher_schedule_begtime`,
+                                                `stc_school_teacher_schedule_endtime` 
+                                              FROM `stc_school_teacher_schedule`
+                                              LEFT JOIN `stc_school_class`
+                                              ON `stc_school_teacher_schedule_classid`=`stc_school_class_id`
+                                              LEFT JOIN `stc_school_subject`
+                                              ON `stc_school_teacher_schedule_subjectid`=`stc_school_subject_id`
+                                              WHERE `stc_school_teacher_schedule_day`='".$day."'
+                                              AND `stc_school_teacher_schedule_teacherid`='".$_SESSION['stc_school_teacher_id']."'
+                                              AND `stc_school_teacher_schedule_period`='".$counter."'
+                                            ";
+                                            $periodquery=mysqli_query($con, $query);
+                                            if(mysqli_num_rows($periodquery)>0){
+                                              foreach($periodquery as $period){
+                                                
+                                                $time=date('h:i');
+                                                $time_flag="n";
+                                                if($day==$days){
+                                                  $tr_color="style='background:#fdff32;'";
+                                                  $time_flag = ($time > date('h:i', strtotime($period['stc_school_teacher_schedule_begtime']))) && ($time < date('h:i', strtotime($period['stc_school_teacher_schedule_endtime']))) ? "y" : "n";
+                                                } 
+                                                if($att_counter>0){
+                                                  if($time_flag=="y"){
+                                                    $periods.='                                                        
+                                                      <td class="text-center">
+                                                        <a href="javascript:void(0);" class="stc-school-show-student-default"  data-toggle="modal" data-target="#exampleModal" id="'.$period['stc_school_teacher_schedule_id'].'" class-id="'.$period['stc_school_teacher_schedule_classid'].'" sub-id="'.$period['stc_school_teacher_schedule_subjectid'].'">
+                                                            <b>
+                                                              Class - '.$period['stc_school_class_title'].'<br>
+                                                              '.$period['stc_school_subject_title'].'<br>
+                                                              '.date('h:i', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
+                                                              '.date('h:i', strtotime($period['stc_school_teacher_schedule_endtime'])).'
+                                                            </b>
+                                                        </a>
+                                                      </td>
+                                                    ';
+                                                  }else{
+                                                    $periods.='
+                                                      <td class="text-center">
+                                                        <b>
+                                                          Class - '.$period['stc_school_class_title'].'<br>
+                                                          '.$period['stc_school_subject_title'].'<br>
+                                                          '.date('h:i a', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
+                                                          '.date('h:i a', strtotime($period['stc_school_teacher_schedule_endtime'])).' 
+                                                        </b>
+                                                      </td>
+                                                    ';
+                                                  }
+                                                }else{
+                                                  if($time_flag=="y"){
+                                                    $periods.='
+                                                      <td class="text-center"  style="background: #8cff32;font-weight: bold;">
+                                                        <a href="javascript:void(0);" class="stc-school-show-student" data-toggle="modal" data-target="#exampleModal" id="'.$period['stc_school_teacher_schedule_id'].'" class-id="'.$period['stc_school_teacher_schedule_classid'].'" sub-id="'.$period['stc_school_teacher_schedule_subjectid'].'">
+                                                            <b>
+                                                              Class - '.$period['stc_school_class_title'].'<br>
+                                                              '.$period['stc_school_subject_title'].'<br>
+                                                              '.date('h:i', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
+                                                              '.date('h:i', strtotime($period['stc_school_teacher_schedule_endtime'])).'
+                                                            </b>
+                                                        </a>
+                                                      </td>
+                                                    ';
+                                                  }else{
+                                                    $periods.='
+                                                      <td class="text-center">
+                                                        <b>
+                                                          Class - '.$period['stc_school_class_title'].'<br>
+                                                          '.$period['stc_school_subject_title'].'<br>
+                                                          '.date('h:i a', strtotime($period['stc_school_teacher_schedule_begtime'])).' - 
+                                                          '.date('h:i a', strtotime($period['stc_school_teacher_schedule_endtime'])).' 
+                                                        </b>
+                                                      </td>
+                                                    ';
+                                                  }
+                                                }
+                                              }
+                                            }else{
+                                              $periods.='<td>NA</td>';
+                                            }
+                                          }
+                                          
+                                          echo '
+                                            <tr '.$tr_color.'>
+                                              <td>'.$day.'</td>
+                                              '.$periods.'
+                                            </tr>    
+                                          ';
+                                        }
+                                      ?>
                                       </tbody>
                                     </table>
                                   </div>
