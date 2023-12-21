@@ -12,24 +12,14 @@
           <div class="collapse navbar-collapse justify-content-end">
             <form class="navbar-form">
               <div class="input-group no-border">
-                <input type="text" value="" class="form-control stc-elec-pd-search-val" placeholder="Search...">
+                <!-- <input type="text" value="" class="form-control stc-elec-pd-search-val" placeholder="Search...">
                 <button type="submit" href="" class="btn btn-white btn-round btn-just-icon stc-elec-pd-search-hit">
                   <i class="material-icons">search</i>
                   <div class="ripple-container"></div>
-                </button>
+                </button> -->
               </div>
             </form>
             <ul class="navbar-nav">
-              <li class="nav-item dropdown active">
-                <a class="nav-link" href="#" id="navbarDropdownMenuLink">
-                  <i class="material-icons">notifications</i>
-                  <span class="notification">
-                  </span>
-                  <p class="d-lg-none d-md-block">
-                    Some Actions
-                  </p>
-                </a>
-              </li>
               <li class="nav-item dropdown">
                 <a class="nav-link" href="javascript:;" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="material-icons">person</i>
@@ -38,7 +28,7 @@
                   </p>
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
-                  <a class="dropdown-item" href="#">Profile</a>
+                  <!-- <a class="dropdown-item" href="#">Profile</a> -->
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="../vanaheim/logoutsess.php">Log out</a>
                 </div>

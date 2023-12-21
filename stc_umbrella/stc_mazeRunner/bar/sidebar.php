@@ -54,12 +54,12 @@
                 <p>Student Attendance</p>
             </a>
           </li>
-          <li class="nav-item syllabus">
+          <!-- <li class="nav-item syllabus">
             <a class="nav-link" href="./syllabus.php?syllabus=yes">
                 <i class="material-icons">menu_book</i>
                 <p>Syllabus</p>
             </a>
-          </li>
+          </li> -->
         </ul>
       </div>
     </div>
