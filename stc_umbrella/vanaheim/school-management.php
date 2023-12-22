@@ -692,42 +692,59 @@ class Yggdrasil extends tesseract{
 		$odin='';
 		$date=date("Y-m-d H:i:s");
 		$endtime=date("H:i:s");
-		$odin_studentuqry=mysqli_query($this->stc_dbs, "
-			UPDATE `stc_school_student_attendance` 
-			SET `stc_school_student_attendance_hw`= '".mysqli_real_escape_string($this->stc_dbs, $stc_sthwperc)."', `stc_school_student_attendance_status`='1' 
-			WHERE `stc_school_student_attendance_status`='2' 
+		$hour=date("H");
+		$odin_studentgqry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_school_student_attendance_id`
+			FROM `stc_school_student_attendance`
+			WHERE `stc_school_student_attendance_status`='1' 
 			AND `stc_school_student_attendance_stuid`='".mysqli_real_escape_string($this->stc_dbs, $stc_stid)."'
 			AND `stc_school_student_attendance_classid`='".mysqli_real_escape_string($this->stc_dbs, $stc_stclassid)."'
 			AND `stc_school_student_attendance_subid`='".mysqli_real_escape_string($this->stc_dbs, $stc_stsubid)."'
+			AND HOUR(`stc_school_student_attendance_createdate`)='".mysqli_real_escape_string($this->stc_dbs, $hour)."'
 			AND `stc_school_student_attendance_attendance`='1'
 		");
-		$odin_studentaqry=mysqli_query($this->stc_dbs, "
-			INSERT INTO `stc_school_student_attendance`(
-				`stc_school_student_attendance_date`,
-				`stc_school_student_attendance_stuid`,
-				`stc_school_student_attendance_classid`,
-				`stc_school_student_attendance_subid`,
-				`stc_school_student_attendance_attendance`,
-				`stc_school_student_attendance_hw`,
-				`stc_school_student_attendance_status`,
-				`stc_school_student_attendance_createdate`,
-				`stc_school_student_attendance_createdby`
-			)VALUES(
-				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_stid)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_stclassid)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_stsubid)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $stc_stcatt)."',
-				'0',
-				'3',
-				'".mysqli_real_escape_string($this->stc_dbs, $date)."',
-				'".$_SESSION['stc_school_user_id']."'
-			)
-		");
-		if($odin_studentaqry){
-			$odin="success";
+		if(mysqli_num_rows($odin_studentgqry)==0){
+			$odin_studentuqry=mysqli_query($this->stc_dbs, "
+				UPDATE `stc_school_student_attendance` 
+				SET `stc_school_student_attendance_hw`= '".mysqli_real_escape_string($this->stc_dbs, $stc_sthwperc)."', `stc_school_student_attendance_status`='1' 
+				WHERE `stc_school_student_attendance_status`='1' 
+				AND `stc_school_student_attendance_stuid`='".mysqli_real_escape_string($this->stc_dbs, $stc_stid)."'
+				AND `stc_school_student_attendance_classid`='".mysqli_real_escape_string($this->stc_dbs, $stc_stclassid)."'
+				AND `stc_school_student_attendance_subid`='".mysqli_real_escape_string($this->stc_dbs, $stc_stsubid)."'
+				AND `stc_school_student_attendance_attendance`='1'
+			");
+			$odin_studentaqry=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_school_student_attendance`(
+					`stc_school_student_attendance_date`,
+					`stc_school_student_attendance_stuid`,
+					`stc_school_student_attendance_classid`,
+					`stc_school_student_attendance_subid`,
+					`stc_school_student_attendance_attendance`,
+					`stc_school_student_attendance_hw`,
+					`stc_school_student_attendance_status`,
+					`stc_school_student_attendance_createdate`,
+					`stc_school_student_attendance_createdby`
+				)VALUES(
+					'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stc_stid)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stc_stclassid)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stc_stsubid)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $stc_stcatt)."',
+					'0',
+					'3',
+					'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+					'".$_SESSION['stc_school_user_id']."'
+				)
+			");
+
+			if($odin_studentaqry){
+				$odin="success";
+			}else{
+				$odin="failed";
+			}
 		}else{
-			$odin="failed";
+			$odin="duplicate";
 		}
 		return $odin;
 	}
@@ -1385,24 +1402,44 @@ class Yggdrasil extends tesseract{
 						$class_minutes=0;
 						foreach($odinattendanceqry as $row ){
 							if($row['stc_school_student_attendance_status']==1){
-								$attend_redu_flag="";
-								$counter=0;
-								foreach($odinattendanceqry as $row2){
-									if(
-										($row['stc_school_student_attendance_stuid']==$row2['stc_school_student_attendance_stuid']) AND 
-										($row['stc_school_student_attendance_classid']==$row2['stc_school_student_attendance_classid']) AND 
-										($row['stc_school_student_attendance_subid']==$row2['stc_school_student_attendance_subid']) AND 
-										($row['stc_school_student_attendance_attendance']==$row2['stc_school_student_attendance_attendance']) AND 
-										($row['stc_school_student_attendance_createdby']==$row2['stc_school_student_attendance_createdby']) AND 
-										(date('h', strtotime($row['stc_school_student_attendance_createdate']))==date('h', strtotime($row2['stc_school_student_attendance_createdate'])))
-									){
-										$counter++;
-									}
-								}
-								$attend_redu_flag = $counter>1 ? "yes" : "no";
-								if($attend_redu_flag=="no"){
-									$class_minutes+=40;
-								}
+								$teacher_id=$row['stc_school_student_attendance_createdby'];
+								$query=mysqli_query($this->stc_dbs, "
+									SELECT `stc_school_teacher_id` FROM `stc_school_teacher` WHERE `stc_school_teacher_userid`=".$teacher_id."
+								");
+								$result=mysqli_fetch_assoc($query);
+								$teacheruid=$result['stc_school_teacher_id'];
+								$classid=$row['stc_school_student_attendance_classid'];
+								$subid=$row['stc_school_student_attendance_subid'];
+								$query="
+									SELECT 
+										`stc_school_teacher_schedule_begtime`,
+										`stc_school_teacher_schedule_endtime` 
+									FROM `stc_school_teacher_schedule` 
+									LEFT JOIN `stc_school`
+									ON `stc_school_teacher_schedule_teacherid`=`stc_school_user_id` 
+									LEFT JOIN `stc_school_teacher`
+									ON `stc_school_teacher_userid`=`stc_school_user_id` 
+									WHERE `stc_school_teacher_schedule_teacherid`=".$teacheruid."
+									AND `stc_school_teacher_schedule_classid`=".$classid."
+									AND `stc_school_teacher_schedule_subjectid`=".$subid."
+									LIMIT 0,1
+								";
+								$query=mysqli_query($this->stc_dbs, "
+									SELECT 
+										MINUTE(TIMEDIFF(`stc_school_teacher_schedule_begtime`, `stc_school_teacher_schedule_endtime`)) as duration
+									FROM `stc_school_teacher_schedule` 
+									LEFT JOIN `stc_school`
+									ON `stc_school_teacher_schedule_teacherid`=`stc_school_user_id` 
+									LEFT JOIN `stc_school_teacher`
+									ON `stc_school_teacher_userid`=`stc_school_user_id` 
+									WHERE `stc_school_teacher_schedule_teacherid`=".$teacheruid."
+									AND `stc_school_teacher_schedule_classid`=".$classid."
+									AND `stc_school_teacher_schedule_subjectid`=".$subid."
+									LIMIT 0,1
+								");
+								$result = mysqli_fetch_assoc($query);
+								$duration = $result['duration'];
+								$class_minutes+=$duration;
 							}
 						}
 						$totalattendance+=$class_minutes;

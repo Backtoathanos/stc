@@ -905,6 +905,8 @@ if($_SESSION['stc_school_user_for']==2){
                   window.location.reload();
                 }else if(response=="success"){
                   alert("Student attendance updated!!!");
+                }else if(response=="duplicate"){
+                  alert("Student attendance already updated!!!");
                 }else{
                   alert("Something went wrong!!! Please check & try again.");
                   $('.stc-school-student-att-save').show(500);
