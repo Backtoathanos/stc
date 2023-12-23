@@ -90,7 +90,7 @@
 			$_SESSION['stc_school_user_name']=$user_name;
 			$_SESSION['stc_school_user_for']=$user_for;
 			$_SESSION['stc_school_teacher_id']=$teacher_id;
-            header('Location:stc_umbrella/stc_mazeRunner/dashboard.php');
+            header('Location:stc_umbrella/stc_mazeRunner/dashboard.php?dashboard=yes');
         }else{
             header('Location:404.shtml');
         }
