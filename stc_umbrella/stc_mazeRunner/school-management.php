@@ -23,7 +23,7 @@
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
-  <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
     <!-- CSS Files -->
     <link href="../assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
     <!-- CSS Just for demo purpose, don't include it in your project -->
@@ -484,31 +484,31 @@
                         <ul class="nav nav-tabs" data-tabs="tabs">
                           <li class="nav-item">
                             <a class="nav-link active" href="#stc-create-teacher" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Create teacher
+                              <i class="material-icons">add_circle</i> teacher
                               <div class="ripple-container"></div>
                             </a>
                           </li>
                           <li class="nav-item">
                             <a class="nav-link " href="#stc-create-student" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Create student
+                              <i class="material-icons">add_circle</i> student
                               <div class="ripple-container"></div>
                             </a>
                           </li>
                           <li class="nav-item">
                             <a class="nav-link " href="#stc-create-subject" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Create Subject
+                              <i class="material-icons">add_circle</i> Subject
                               <div class="ripple-container"></div>
                             </a>
                           </li>
                           <li class="nav-item">
                             <a class="nav-link " href="#stc-create-classroom" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Create Class Room
+                              <i class="material-icons">add_circle</i> Class Room
                               <div class="ripple-container"></div>
                             </a>
                           </li>
                           <li class="nav-item">
                             <a class="nav-link " href="#stc-create-shedule" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Create Schedule
+                              <i class="material-icons">add_circle</i> Schedule
                               <div class="ripple-container"></div>
                             </a>
                           </li>
@@ -521,7 +521,7 @@
                       <div class="tab-pane active" id="stc-create-teacher">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Create Teacher</h2>
+                            <h2 class="tm-block-title d-inline-block">Add Teacher</h2>
                           </div>
                         </div>
                         <div class="row">
@@ -534,226 +534,30 @@
                                       href="javascript:void(0)"
                                       class="form-control btn btn-success stc-school-show-teach-btn"
                                       value=""
-                                    >Show Teacher</a>
+                                    >Add Teacher</a>
                                   </div>
                                 </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Teacher ID
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementteacherid"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementteacherid"
-                                      value=""
-                                      placeholder="Enter Teacher ID No"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >First Name
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementteacherfirstname"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementteacherfirstname"
-                                      value=""
-                                      placeholder="Enter Teacher First Name"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Last Name
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementteacherlastname"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementteacherlastname"
-                                      value=""
-                                      placeholder="Enter Teacher Last Name"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Date of Birth
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementteacherdateofbirth"
-                                      type="date"
-                                      class="form-control validate stcschoolmanagementteacherdateofbirth"
-                                      value=""
-                                      placeholder="Date of Birth"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Gender
-                                    </h5>
-                                    <label
-                                      for="name"
-                                      >
-                                      <input
-                                        name="stcschoolmanagementteachergender"
-                                        type="radio"
-                                        class="stcschoolmanagementteachergender"
-                                        value="Male"
-                                        checked
-                                      />
-                                      Male
-                                    </label> &nbsp &nbsp
-                                    <label
-                                      for="name"
-                                      >
-                                      <input
-                                        name="stcschoolmanagementteachergender"
-                                        type="radio"
-                                        class="stcschoolmanagementteachergender"
-                                        value="Female"
-                                      />
-                                      Female
-                                    </label>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Blood Group
-                                    </h5>
-                                     <select 
-                                        class="form-control stcschoolmanagementteacherbloodgroup" 
-                                        name="stcschoolmanagementteacherbloodgroup" 
-                                        >
-                                        <option value="0">--Select--</option> 
-                                        <option value="a_positive">A+</option>
-                                        <option value="a_negative">A-</option>
-                                        <option value="b_positive">B+</option>
-                                        <option value="b_negative">B-</option>
-                                        <option value="o_positive">O+</option>
-                                        <option value="o_negative">O-</option>
-                                        <option value="ab_positive">AB+</option>
-                                        <option value="ab_negative">AB-</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Email
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementteacheremail"
-                                      type="email"
-                                      class="form-control validate stcschoolmanagementteacheremail"
-                                      value=""
-                                      placeholder="Enter Teacher Email"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Contact
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementteachernumber"
-                                      type="number"
-                                      class="form-control validate stcschoolmanagementteachernumber"
-                                      value=""
-                                      placeholder="Enter Teacher Contact No"
-                                      maxlength="10"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Address
-                                    </h5>
-                                    <textarea 
-                                      name="stcschoolmanagementteacheraddress"
-                                      class="form-control validate stcschoolmanagementteacheraddress"
-                                      value=""
-                                      placeholder="Enter Teacher Address"
-                                      ></textarea>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Skills
-                                    </h5>
-                                    <textarea 
-                                      name="stcschoolmanagementteacherskills"
-                                      class="form-control validate stcschoolmanagementteacherskills"
-                                      value=""
-                                      placeholder="Enter Teacher Skills"
-                                      ></textarea>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Religion
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementteacherreligion"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementteacherreligion"
-                                      value=""
-                                      placeholder="Enter Teacher Religion"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Joining Date
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementteacherjoiningdate"
-                                      type="date"
-                                      class="form-control validate stcschoolmanagementteacherjoiningdate"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Remarks
-                                    </h5>
-                                    <textarea 
-                                      name="stcschoolmanagementteacherremarks"
-                                      class="form-control validate stcschoolmanagementteacherremarks"
-                                      value=""
-                                      placeholder="Remarks"
-                                      ></textarea>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolteachersave">Add Teacher</button>
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                                  <div class="mb-3"  style="width: auto;overflow-x: auto; white-space: nowrap;" >
+                                    <table class="table table-hover table-bordered">
+                                      <thead>
+                                        <tr>
+                                          <th class="text-center"><b>Sl No</b></th>
+                                          <th class="text-center"><b>Teacher Name</b></th>
+                                          <th class="text-center"><b>Teacher DOB</b></th>
+                                          <th class="text-center"><b>Gender</b></th>
+                                          <th class="text-center"><b>Blood Group</b></th>
+                                          <th class="text-center"><b>Email</b></th>
+                                          <th class="text-center"><b>Contact</b></th>
+                                          <th class="text-center"><b>Address</b></th>
+                                          <th class="text-center"><b>Skills</b></th>
+                                          <th class="text-center"><b>Religion</b></th>
+                                          <th class="text-center"><b>Join Date</b></th>
+                                          <th class="text-center"><b>Remarks</b></th>
+                                        </tr>
+                                      </thead>
+                                      <tbody class="stc-teacher-rec-show"></tbody>
+                                    </table>
                                   </div>
                                 </div>
                               </div>
@@ -767,7 +571,7 @@
                       <div class="tab-pane " id="stc-create-student">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Create Student</h2>
+                            <h2 class="tm-block-title d-inline-block">Add Student</h2>
                           </div>
                         </div>
                         <div class="row">
@@ -780,254 +584,31 @@
                                       href="javascript:void(0)"
                                       class="form-control btn btn-success stc-school-show-stud-btn"
                                       value=""
-                                    >Show Student</a>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Student ID
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementstudentid"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementstudentid"
-                                      value=""
-                                      placeholder="Enter Student ID No"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >First Name
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementstudentfirstname"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementstudentfirstname"
-                                      value=""
-                                      placeholder="Enter Student First Name"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Last Name
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementstudentlastname"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementstudentlastname"
-                                      value=""
-                                      placeholder="Enter Student Last Name"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Date of Birth
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementstudentdateofbirth"
-                                      type="date"
-                                      class="form-control validate stcschoolmanagementstudentdateofbirth"
-                                      value=""
-                                      placeholder="Date of Birth"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Gender
-                                    </h5>
-                                    <label
-                                      for="name"
-                                      >
-                                      <input
-                                        name="stcschoolmanagementstudentgender"
-                                        type="radio"
-                                        class="stcschoolmanagementstudentgender"
-                                        value="Male"
-                                        checked
-                                      />
-                                      Male
-                                    </label> &nbsp &nbsp
-                                    <label
-                                      for="name"
-                                      >
-                                      <input
-                                        name="stcschoolmanagementstudentgender"
-                                        type="radio"
-                                        class="stcschoolmanagementstudentgender"
-                                        value="Female"
-                                      />
-                                      Female
-                                    </label>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Blood Group
-                                    </h5>
-                                     <select 
-                                        class="form-control stcschoolmanagementstudentbloodgroup" 
-                                        name="stcschoolmanagementstudentbloodgroup" 
-                                        >
-                                        <option value="0">--Select--</option> 
-                                        <option value="a_positive">A+</option>
-                                        <option value="a_negative">A-</option>
-                                        <option value="b_positive">B+</option>
-                                        <option value="b_negative">B-</option>
-                                        <option value="o_positive">O+</option>
-                                        <option value="o_negative">O-</option>
-                                        <option value="ab_positive">AB+</option>
-                                        <option value="ab_negative">AB-</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Email
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementstudentemail"
-                                      type="email"
-                                      class="form-control validate stcschoolmanagementstudentemail"
-                                      value=""
-                                      placeholder="Enter Student Email"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Contact
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementstudentnumber"
-                                      type="number"
-                                      class="form-control validate stcschoolmanagementstudentnumber"
-                                      value=""
-                                      placeholder="Enter Student Contact No"
-                                      maxlength="10"
-                                    />
+                                    >Add Student</a>
                                   </div>
                                 </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Address
-                                    </h5>
-                                    <textarea 
-                                      name="stcschoolmanagementStudentaddress"
-                                      class="form-control validate stcschoolmanagementStudentaddress"
-                                      value=""
-                                      placeholder="Enter Student Address"
-                                      ></textarea>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Religion
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementstudentreligion"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementstudentreligion"
-                                      value=""
-                                      placeholder="Enter Student Religion"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Admission Date
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementstudentjoiningdate"
-                                      type="date"
-                                      class="form-control validate stcschoolmanagementstudentjoiningdate"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Class Room
-                                    </h5>
-                                     <select 
-                                        class="form-control stcschoolmanagementstudentclassroom" 
-                                        name="stcschoolmanagementstudentclassroom" 
-                                        >
-                                        <option value="0">--Select--</option>
-                                        <?php
-                                          include_once("../../MCU/db.php");
-
-                                          $class_sql=mysqli_query($con, "
-                                              select * from stc_school_class where stc_school_class_status=1
-                                          ");
-                                          foreach($class_sql as $classrow){
-                                            echo '<option value="'.$classrow['stc_school_class_id'].'">'.$classrow['stc_school_class_title'].'</option>';
-
-                                        ?> 
-                                        <?php 
-                                          }                                          
-                                        ?>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Parent / Guardian Name
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementstudentparentguardianfullname"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementstudentparentguardianfullname"
-                                      value=""
-                                      placeholder="Enter Parent / Guardian Full Name"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Remarks
-                                    </h5>
-                                    <textarea 
-                                      name="stcschoolmanagementstudentremarks"
-                                      class="form-control validate stcschoolmanagementstudentremarks"
-                                      value=""
-                                      placeholder="Remarks"
-                                      ></textarea>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolstudentsave">Add Student</button>
+                                  <div class="mb-3"  style="width: auto;overflow-x: auto; white-space: nowrap;" >
+                                    <table class="table table-hover table-bordered">
+                                      <thead>
+                                        <tr>
+                                          <th class="text-center"><b>Student Id</b></th>
+                                          <th class="text-center"><b>Student Name</b></th>
+                                          <th class="text-center"><b>Student DOB</b></th>
+                                          <th class="text-center"><b>Gender</b></th>
+                                          <th class="text-center"><b>Blood Group</b></th>
+                                          <th class="text-center"><b>Email</b></th>
+                                          <th class="text-center"><b>Contact</b></th>
+                                          <th class="text-center"><b>Address</b></th>
+                                          <th class="text-center"><b>Religion</b></th>
+                                          <th class="text-center"><b>Admission Date</b></th>
+                                          <th class="text-center"><b>Classroom</b></th>
+                                          <th class="text-center"><b>Parent/Guardian Name</b></th>
+                                          <th class="text-center"><b>Remarks</b></th>
+                                        </tr>
+                                      </thead>
+                                      <tbody class="stc-student-rec-show"></tbody>
+                                    </table>
                                   </div>
                                 </div>
                               </div>
@@ -1041,7 +622,7 @@
                       <div class="tab-pane " id="stc-create-subject">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Create Subject</h2>
+                            <h2 class="tm-block-title d-inline-block">Add Subject</h2>
                           </div>
                         </div>
                         <div class="row">
@@ -1054,56 +635,24 @@
                                       href="javascript:void(0)"
                                       class="form-control btn btn-success stc-school-show-subject-btn"
                                       value=""
-                                    >Show Subject</a>
+                                    >Add Subject</a>
                                   </div>
                                 </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Subject ID
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementsubjectid"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementsubjectid"
-                                      value=""
-                                      placeholder="Enter Subject ID"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Subject Title
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementsubjecttitle"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementsubjecttitle"
-                                      value=""
-                                      placeholder="Enter Subject Title"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Syllubus Details
-                                    </h5>
-                                    <textarea 
-                                      name="stcschoolmanagementsubjectdetails"
-                                      class="form-control validate stcschoolmanagementsubjectdetails"
-                                      value=""
-                                      placeholder="Enter Complete Syllubus Details"
-                                      ></textarea>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolsubjectsave">Add Subject</button>
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                                  <div class="mb-3" style="width: auto;overflow-x: auto; white-space: nowrap;">
+                                    <table class="table table-hover table-bordered">
+                                      <thead>
+                                        <tr>
+                                          <th class="text-center"><b>Subject Id</b></th>
+                                          <th class="text-center"><b>Subject Title</b></th>
+                                          <th class="text-center"><b>Syllabus Details</b></th>
+                                          <th class="text-center"><b>Addd Date</b></th>
+                                          <th class="text-center"><b>Addd by</b></th>
+                                          <th class="text-center"><b>Action</b></th>
+                                          </tr>
+                                      </thead>
+                                      <tbody class="stc-subject-rec-show"></tbody>
+                                    </table>
                                   </div>
                                 </div>
                               </div>
@@ -1117,7 +666,7 @@
                       <div class="tab-pane " id="stc-create-classroom">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Create Class Room</h2>
+                            <h2 class="tm-block-title d-inline-block">Add Class Room</h2>
                           </div>
                         </div>
                         <div class="row">
@@ -1130,72 +679,25 @@
                                       href="javascript:void(0)"
                                       class="form-control btn btn-success stc-school-show-classroom-btn"
                                       value=""
-                                    >Show Classroom</a>
+                                    >Add Classroom</a>
                                   </div>
                                 </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Class Room ID
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementclassroomid"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementclassroomid"
-                                      value=""
-                                      placeholder="Enter Class Room ID"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Class Room Title
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementclassroomtitle"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementclassroomtitle"
-                                      value=""
-                                      placeholder="Enter Class Room Title"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Location
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementclassroomlocation"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementclassroomlocation"
-                                      value=""
-                                      placeholder="Enter Class Room Location"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Capacity
-                                    </h5>
-                                    <input
-                                      name="stcschoolmanagementclassroomcapacity"
-                                      type="text"
-                                      class="form-control validate stcschoolmanagementclassroomcapacity"
-                                      value=""
-                                      placeholder="Enter Class Room Capacity"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolclassroomsave">Add Class Room</button>
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                                  <div style="width: auto;overflow-x: auto; white-space: nowrap;">
+                                    <table class="table table-hover table-bordered">
+                                      <thead>
+                                        <tr>
+                                          <th class="text-center"><b>Classroom ID</b></th>
+                                          <th class="text-center"><b>Classroom Title</b></th>
+                                          <th class="text-center">Loaction</th>
+                                          <th class="text-center">Capacity</th>
+                                          <th class="text-center"><b>Addd Date</b></th>
+                                          <th class="text-center"><b>Addd by</b></th>
+                                          <th class="text-center"><b>Action</b></th>
+                                        </tr>
+                                      </thead>
+                                      <tbody class="stc-classroom-rec-show"></tbody>
+                                    </table>
                                   </div>
                                 </div>
                               </div>
@@ -1209,7 +711,7 @@
                       <div class="tab-pane " id="stc-create-shedule">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Create Schedule</h2>
+                            <h2 class="tm-block-title d-inline-block">Add Schedule</h2>
                           </div>
                         </div>
                         <div class="row">
@@ -1222,163 +724,42 @@
                                       href="javascript:void(0)"
                                       class="form-control btn btn-success stc-school-show-schedule-btn"
                                       value=""
-                                    >Show Schedule</a>
+                                    >Add Schedule</a>
                                   </div>
                                 </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Teacher
-                                    </h5>
-                                    <select
-                                      name="stcschoolscheduleteacher"
-                                      type="text"
-                                      class="form-control validate stcschoolscheduleteacher"
-                                      ><option value="NA">Select</option>
-                                      <?php
-                                        $teacher_sql=mysqli_query($con, "
-                                            select * from stc_school_teacher where stc_school_teacher_status=1
-                                        ");
-                                        foreach($teacher_sql as $teacherrow){
-                                          echo '<option value="'.$teacherrow['stc_school_teacher_id'].'">'.$teacherrow['stc_school_teacher_firstname'].' - '.$teacherrow['stc_school_teacher_teachid'].'</option>';
-
-                                      ?> 
-                                      <?php 
-                                        }                                          
-                                      ?>
-                                      
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Subject
-                                    </h5>
-                                    <select
-                                      name="stcschoolschedulesubject"
-                                      type="text"
-                                      class="form-control validate stcschoolschedulesubject"
-                                      ><option value="NA">Select</option>
-                                      <?php
-                                        $subject_sql=mysqli_query($con, "
-                                            select * from stc_school_subject where stc_school_subject_status=1
-                                        ");
-                                        foreach($subject_sql as $subjectrow){
-                                          echo '<option value="'.$subjectrow['stc_school_subject_id'].'">'.$subjectrow['stc_school_subject_title'].' - '.$subjectrow['stc_school_subject_subid'].'</option>';
-
-                                      ?> 
-                                      <?php 
-                                        }                                          
-                                      ?>
-                                      
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Class
-                                    </h5>
-                                    <select
-                                      name="stcschoolscheduleclass"
-                                      type="text"
-                                      class="form-control validate stcschoolscheduleclass"
-                                      ><option value="NA">Select</option>
-                                      <?php
-                                        $sclass_sql=mysqli_query($con, "
-                                            select * from stc_school_class where stc_school_class_status=1
-                                        ");
-                                        foreach($sclass_sql as $sclassrow){
-                                          echo '<option value="'.$sclassrow['stc_school_class_id'].'">'.$sclassrow['stc_school_class_title'].' - '.$sclassrow['stc_school_class_classid'].'</option>';
-
-                                      ?> 
-                                      <?php 
-                                        }      
-
-                                        // $date=date();
-                                        date_default_timezone_set('Asia/Kolkata');
-                                        $time=date('H:i:s');                                    
-                                      ?>                                      
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-6 col-lg-6">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Day
-                                    </h5>
-                                    <select
-                                      name="stcschoolscheduleday"
-                                      type="text"
-                                      class="form-control validate stcschoolscheduleday"
-                                      >
-                                      ><option value="NA">Select</option>
-                                      <option value="Monday">Monday</option>
-                                      <option value="Tuesday">Tuesday</option>
-                                      <option value="Wednesday">Wednesday</option>
-                                      <option value="Thursday">Thursday</option>
-                                      <option value="Friday">Friday</option>
-                                      <option value="Saturday">Saturday</option>
-                                      
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-4">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Period
-                                    </h5>
-                                    <select
-                                      name="stcschoolscheduleperiod"
-                                      class="form-control validate stcschoolscheduleperiod" 
-                                    ><option>Select</option>
-                                    <option value="1"><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></option>
-                                    <option value="2"><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></option>
-                                    <option value="3"><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></option>
-                                    <option value="4"><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
-                                    <option value="5"><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
-                                    <option value="6"><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
-                                    <option value="7"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-4">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >Start Time
-                                    </h5>
-                                    <input
-                                      name="stcschoolschedulestarttime"
-                                      type="time"
-                                      class="form-control validate stcschoolschedulestarttime"
-                                      value="<?php echo $time;?>"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-4 col-lg-4">
-                                  <div class="mb-3">
-                                    <h5
-                                      for="name"
-                                      >End Time
-                                    </h5>
-                                    <input
-                                      name="stcschoolscheduleendtime"
-                                      type="time"
-                                      class="form-control validate stcschoolscheduleendtime"
-                                      value="<?php echo $time;?>"
-                                    />
-                                  </div>
-                                </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolschedulesave">Add Schedule</button>
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                                  <select class="form-control btn btn-info stc-schedule-week">
+                                    <option>Select</option>
+                                    <?php
+                                    $day_arr=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+                                    $day=date("l");
+                                      foreach($day_arr as $day_arr_row){
+                                        if($day==$day_arr_row){
+                                          echo '<option selected>'.$day_arr_row.'</option>';
+                                        }else{
+                                          echo '<option>'.$day_arr_row.'</option>';
+                                        }
+                                      }
+                                    ?>
+                                  </select>                       
+                                  <div class="mb-3" style="width: auto;overflow-x: auto; white-space: nowrap;">
+                                    <table class="table table-hover table-bordered">
+                                      <thead>
+                                        <tr>
+                                          <td class="text-center"><b>Class</b></td>
+                                          <td class="text-center"><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></td>
+                                          <td class="text-center"><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></td>
+                                          <td class="text-center"><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></td>
+                                          <td class="text-center"><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
+                                          <td class="text-center"><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
+                                          <td class="text-center"><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
+                                          <td class="text-center"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
+                                        </tr>
+                                      </thead>
+                                      <tbody class="stc-schedule-rec-show">
+                                        
+                                      </tbody>
+                                    </table>
                                   </div>
                                 </div>
                               </div>
@@ -2101,7 +1482,7 @@
 </html>
   
 
-<!-- syllabus add -->
+<!-- syllabus modal -->
 
 <div class="modal bd-example-modal-xl stc-school-addsyllabus-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
@@ -2154,8 +1535,7 @@
   </div>
 </div>
 
-<!-- teacher show -->
-
+<!-- teacher modal -->
 <div class="modal bd-example-modal-xl stc-school-showteacher-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -2165,30 +1545,223 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Teacher</h5>            
-            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
-              <table class="table table-hover table-bordered">
-                <thead>
-                  <tr>
-                    <th class="text-center">Sl No</th>
-                    <th class="text-center">Teacher Name</th>
-                    <th class="text-center">Teacher DOB</th>
-                    <th class="text-center">Gender</th>
-                    <th class="text-center">Blood Group</th>
-                    <th class="text-center">Email</th>
-                    <th class="text-center">Contact</th>
-                    <th class="text-center">Address</th>
-                    <th class="text-center">Skills</th>
-                    <th class="text-center">Religion</th>
-                    <th class="text-center">Join Date</th>
-                    <th class="text-center">Remarks</th>
-                  </tr>
-                </thead>
-                <tbody class="stc-teacher-rec-show">
-                  
-                </tbody>
-              </table>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Teacher ID
+              </h5>
+              <input
+                name="stcschoolmanagementteacherid"
+                type="text"
+                class="form-control validate stcschoolmanagementteacherid"
+                value=""
+                placeholder="Enter Teacher ID No"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >First Name
+              </h5>
+              <input
+                name="stcschoolmanagementteacherfirstname"
+                type="text"
+                class="form-control validate stcschoolmanagementteacherfirstname"
+                value=""
+                placeholder="Enter Teacher First Name"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Last Name
+              </h5>
+              <input
+                name="stcschoolmanagementteacherlastname"
+                type="text"
+                class="form-control validate stcschoolmanagementteacherlastname"
+                value=""
+                placeholder="Enter Teacher Last Name"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Date of Birth
+              </h5>
+              <input
+                name="stcschoolmanagementteacherdateofbirth"
+                type="date"
+                class="form-control validate stcschoolmanagementteacherdateofbirth"
+                value=""
+                placeholder="Date of Birth"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Gender
+              </h5>
+              <label
+                for="name"
+                >
+                <input
+                  name="stcschoolmanagementteachergender"
+                  type="radio"
+                  class="stcschoolmanagementteachergender"
+                  value="Male"
+                  checked
+                />
+                Male
+              </label> &nbsp &nbsp
+              <label
+                for="name"
+                >
+                <input
+                  name="stcschoolmanagementteachergender"
+                  type="radio"
+                  class="stcschoolmanagementteachergender"
+                  value="Female"
+                />
+                Female
+              </label>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Blood Group
+              </h5>
+               <select 
+                  class="form-control stcschoolmanagementteacherbloodgroup" 
+                  name="stcschoolmanagementteacherbloodgroup" 
+                  >
+                  <option value="0">--Select--</option> 
+                  <option value="a_positive">A+</option>
+                  <option value="a_negative">A-</option>
+                  <option value="b_positive">B+</option>
+                  <option value="b_negative">B-</option>
+                  <option value="o_positive">O+</option>
+                  <option value="o_negative">O-</option>
+                  <option value="ab_positive">AB+</option>
+                  <option value="ab_negative">AB-</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Email
+              </h5>
+              <input
+                name="stcschoolmanagementteacheremail"
+                type="email"
+                class="form-control validate stcschoolmanagementteacheremail"
+                value=""
+                placeholder="Enter Teacher Email"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Contact
+              </h5>
+              <input
+                name="stcschoolmanagementteachernumber"
+                type="number"
+                class="form-control validate stcschoolmanagementteachernumber"
+                value=""
+                placeholder="Enter Teacher Contact No"
+                maxlength="10"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Address
+              </h5>
+              <textarea 
+                name="stcschoolmanagementteacheraddress"
+                class="form-control validate stcschoolmanagementteacheraddress"
+                value=""
+                placeholder="Enter Teacher Address"
+                ></textarea>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Skills
+              </h5>
+              <textarea 
+                name="stcschoolmanagementteacherskills"
+                class="form-control validate stcschoolmanagementteacherskills"
+                value=""
+                placeholder="Enter Teacher Skills"
+                ></textarea>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Religion
+              </h5>
+              <input
+                name="stcschoolmanagementteacherreligion"
+                type="text"
+                class="form-control validate stcschoolmanagementteacherreligion"
+                value=""
+                placeholder="Enter Teacher Religion"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Joining Date
+              </h5>
+              <input
+                name="stcschoolmanagementteacherjoiningdate"
+                type="date"
+                class="form-control validate stcschoolmanagementteacherjoiningdate"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Remarks
+              </h5>
+              <textarea 
+                name="stcschoolmanagementteacherremarks"
+                class="form-control validate stcschoolmanagementteacherremarks"
+                value=""
+                placeholder="Remarks"
+                ></textarea>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="mb-3">
+              <button type="button" name="search" class="form-control btn btn-success" id="stcschoolteachersave">Add Teacher</button>
             </div>
           </div>
         </div>
@@ -2197,39 +1770,269 @@
   </div>
 </div>
 
+<!-- student modal -->
 <div class="modal bd-example-modal-xl stc-school-showstud-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">School Student</h4>
+        <h4 class="modal-title">School Add Student</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
-        <div class="row">
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
-              <table class="table table-hover table-bordered">
-                <thead>
-                  <tr>
-                    <th class="text-center">Student Id</th>
-                    <th class="text-center">Student Name</th>
-                    <th class="text-center">Stuednt DOB</th>
-                    <th class="text-center">Gender</th>
-                    <th class="text-center">Blood Group</th>
-                    <th class="text-center">Email</th>
-                    <th class="text-center">Contact</th>
-                    <th class="text-center">Address</th>
-                    <th class="text-center">Religion</th>
-                    <th class="text-center">Admission Date</th>
-                    <th class="text-center">Classroom</th>
-                    <th class="text-center">Parent/Guardian Name</th>
-                    <th class="text-center">Remarks</th>
-                  </tr>
-                </thead>
-                <tbody class="stc-student-rec-show">
-                  
-                </tbody>
-              </table>
+        
+      <div class="row">
+            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
+              <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
+                <div class="row">
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Student ID
+                      </h5>
+                      <input
+                        name="stcschoolmanagementstudentid"
+                        type="text"
+                        class="form-control validate stcschoolmanagementstudentid"
+                        value=""
+                        placeholder="Enter Student ID No"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >First Name
+                      </h5>
+                      <input
+                        name="stcschoolmanagementstudentfirstname"
+                        type="text"
+                        class="form-control validate stcschoolmanagementstudentfirstname"
+                        value=""
+                        placeholder="Enter Student First Name"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Last Name
+                      </h5>
+                      <input
+                        name="stcschoolmanagementstudentlastname"
+                        type="text"
+                        class="form-control validate stcschoolmanagementstudentlastname"
+                        value=""
+                        placeholder="Enter Student Last Name"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Date of Birth
+                      </h5>
+                      <input
+                        name="stcschoolmanagementstudentdateofbirth"
+                        type="date"
+                        class="form-control validate stcschoolmanagementstudentdateofbirth"
+                        value=""
+                        placeholder="Date of Birth"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Gender
+                      </h5>
+                      <label
+                        for="name"
+                        >
+                        <input
+                          name="stcschoolmanagementstudentgender"
+                          type="radio"
+                          class="stcschoolmanagementstudentgender"
+                          value="Male"
+                          checked
+                        />
+                        Male
+                      </label> &nbsp &nbsp
+                      <label
+                        for="name"
+                        >
+                        <input
+                          name="stcschoolmanagementstudentgender"
+                          type="radio"
+                          class="stcschoolmanagementstudentgender"
+                          value="Female"
+                        />
+                        Female
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Blood Group
+                      </h5>
+                       <select 
+                          class="form-control stcschoolmanagementstudentbloodgroup" 
+                          name="stcschoolmanagementstudentbloodgroup" 
+                          >
+                          <option value="0">--Select--</option> 
+                          <option value="a_positive">A+</option>
+                          <option value="a_negative">A-</option>
+                          <option value="b_positive">B+</option>
+                          <option value="b_negative">B-</option>
+                          <option value="o_positive">O+</option>
+                          <option value="o_negative">O-</option>
+                          <option value="ab_positive">AB+</option>
+                          <option value="ab_negative">AB-</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Email
+                      </h5>
+                      <input
+                        name="stcschoolmanagementstudentemail"
+                        type="email"
+                        class="form-control validate stcschoolmanagementstudentemail"
+                        value=""
+                        placeholder="Enter Student Email"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Contact
+                      </h5>
+                      <input
+                        name="stcschoolmanagementstudentnumber"
+                        type="number"
+                        class="form-control validate stcschoolmanagementstudentnumber"
+                        value=""
+                        placeholder="Enter Student Contact No"
+                        maxlength="10"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Address
+                      </h5>
+                      <textarea 
+                        name="stcschoolmanagementStudentaddress"
+                        class="form-control validate stcschoolmanagementStudentaddress"
+                        value=""
+                        placeholder="Enter Student Address"
+                        ></textarea>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Religion
+                      </h5>
+                      <input
+                        name="stcschoolmanagementstudentreligion"
+                        type="text"
+                        class="form-control validate stcschoolmanagementstudentreligion"
+                        value=""
+                        placeholder="Enter Student Religion"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Admission Date
+                      </h5>
+                      <input
+                        name="stcschoolmanagementstudentjoiningdate"
+                        type="date"
+                        class="form-control validate stcschoolmanagementstudentjoiningdate"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Class Room
+                      </h5>
+                       <select 
+                          class="form-control stcschoolmanagementstudentclassroom" 
+                          name="stcschoolmanagementstudentclassroom" 
+                          >
+                          <option value="0">--Select--</option>
+                          <?php
+                            include_once("../../MCU/db.php");
+
+                            $class_sql=mysqli_query($con, "
+                                select * from stc_school_class where stc_school_class_status=1
+                            ");
+                            foreach($class_sql as $classrow){
+                              echo '<option value="'.$classrow['stc_school_class_id'].'">'.$classrow['stc_school_class_title'].'</option>';
+
+                          ?> 
+                          <?php 
+                            }                                          
+                          ?>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-6 col-lg-6">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Parent / Guardian Name
+                      </h5>
+                      <input
+                        name="stcschoolmanagementstudentparentguardianfullname"
+                        type="text"
+                        class="form-control validate stcschoolmanagementstudentparentguardianfullname"
+                        value=""
+                        placeholder="Enter Parent / Guardian Full Name"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="mb-3">
+                      <h5
+                        for="name"
+                        >Remarks
+                      </h5>
+                      <textarea 
+                        name="stcschoolmanagementstudentremarks"
+                        class="form-control validate stcschoolmanagementstudentremarks"
+                        value=""
+                        placeholder="Remarks"
+                        ></textarea>
+                    </div>
+                  </div>
+                  <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div class="mb-3">
+                      <button type="button" name="search" class="form-control btn btn-success" id="stcschoolstudentsave">Add Student</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2238,6 +2041,7 @@
   </div>
 </div>
 
+<!-- subject modal -->
 <div class="modal bd-example-modal-xl stc-school-showsub-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -2247,21 +2051,53 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
-              <table class="table table-hover table-bordered">
-                <thead>
-                  <tr>
-                    <th class="text-center">Subject Id</th>
-                    <th class="text-center">Subject Title</th>
-                    <th class="text-center">Syllabus Details</th>
-                    <th class="text-center">Created Date</th>
-                    <th class="text-center">Created by</th>
-                    </tr>
-                </thead>
-                <tbody class="stc-subject-rec-show">                  
-                </tbody>
-              </table>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Subject ID
+              </h5>
+              <input
+                name="stcschoolmanagementsubjectid"
+                type="text"
+                class="form-control validate stcschoolmanagementsubjectid"
+                value=""
+                placeholder="Enter Subject ID"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Subject Title
+              </h5>
+              <input
+                name="stcschoolmanagementsubjecttitle"
+                type="text"
+                class="form-control validate stcschoolmanagementsubjecttitle"
+                value=""
+                placeholder="Enter Subject Title"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Syllubus Details
+              </h5>
+              <textarea 
+                name="stcschoolmanagementsubjectdetails"
+                class="form-control validate stcschoolmanagementsubjectdetails"
+                value=""
+                placeholder="Enter Complete Syllubus Details"
+                ></textarea>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="mb-3">
+              <button type="button" name="search" class="form-control btn btn-success" id="stcschoolsubjectsave">Add Subject</button>
             </div>
           </div>
         </div>
@@ -2270,6 +2106,7 @@
   </div>
 </div>
 
+<!-- class room modal-->
 <div class="modal bd-example-modal-xl stc-school-showclassroom-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -2279,24 +2116,69 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
-              <table class="table table-hover table-bordered">
-                <thead>
-                  <tr>
-                    <th class="text-center">Classroom ID</th>
-                    <th class="text-center">Classroom Title</th>
-                    <th class="text-center">Loaction</th>
-                    <th class="text-center">Capacity</th>
-                    <th class="text-center">Created Date</th>
-                    <th class="text-center">Created by</th>
-                    <th class="text-center">Action</th>
-                  </tr>
-                </thead>
-                <tbody class="stc-classroom-rec-show">
-                  
-                </tbody>
-              </table>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Class Room ID
+              </h5>
+              <input
+                name="stcschoolmanagementclassroomid"
+                type="text"
+                class="form-control validate stcschoolmanagementclassroomid"
+                value=""
+                placeholder="Enter Class Room ID"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Class Room Title
+              </h5>
+              <input
+                name="stcschoolmanagementclassroomtitle"
+                type="text"
+                class="form-control validate stcschoolmanagementclassroomtitle"
+                value=""
+                placeholder="Enter Class Room Title"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Location
+              </h5>
+              <input
+                name="stcschoolmanagementclassroomlocation"
+                type="text"
+                class="form-control validate stcschoolmanagementclassroomlocation"
+                value=""
+                placeholder="Enter Class Room Location"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Capacity
+              </h5>
+              <input
+                name="stcschoolmanagementclassroomcapacity"
+                type="text"
+                class="form-control validate stcschoolmanagementclassroomcapacity"
+                value=""
+                placeholder="Enter Class Room Capacity"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="mb-3">
+              <button type="button" name="search" class="form-control btn btn-success" id="stcschoolclassroomsave">Add Class Room</button>
             </div>
           </div>
         </div>
@@ -2305,6 +2187,7 @@
   </div>
 </div>
 
+<!-- schedule modal -->
 <div class="modal bd-example-modal-xl stc-school-showschedule-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -2314,39 +2197,160 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <select class="form-control btn btn-info stc-schedule-week">
-              <option>Select</option>
-              <?php
-              $day_arr=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
-              $day=date("l");
-                foreach($day_arr as $day_arr_row){
-                  if($day==$day_arr_row){
-                    echo '<option selected>'.$day_arr_row.'</option>';
-                  }else{
-                    echo '<option>'.$day_arr_row.'</option>';
-                  }
-                }
-              ?>
-            </select>                       
-            <div style="width: auto;overflow-x: auto; white-space: nowrap;">
-              <table class="table table-hover table-bordered">
-                <thead>
-                  <tr>
-                    <td class="text-center"><b>Class</b></td>
-                    <td class="text-center"><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></td>
-                    <td class="text-center"><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></td>
-                    <td class="text-center"><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></td>
-                    <td class="text-center"><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                    <td class="text-center"><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                    <td class="text-center"><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                    <td class="text-center"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                  </tr>
-                </thead>
-                <tbody class="stc-schedule-rec-show">
-                  
-                </tbody>
-              </table>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Teacher
+              </h5>
+              <select
+                name="stcschoolscheduleteacher"
+                type="text"
+                class="form-control validate stcschoolscheduleteacher"
+                ><option value="NA">Select</option>
+                <?php
+                  $teacher_sql=mysqli_query($con, "
+                      select * from stc_school_teacher where stc_school_teacher_status=1
+                  ");
+                  foreach($teacher_sql as $teacherrow){
+                    echo '<option value="'.$teacherrow['stc_school_teacher_id'].'">'.$teacherrow['stc_school_teacher_firstname'].' - '.$teacherrow['stc_school_teacher_teachid'].'</option>';
+
+                ?> 
+                <?php 
+                  }                                          
+                ?>
+                
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Subject
+              </h5>
+              <select
+                name="stcschoolschedulesubject"
+                type="text"
+                class="form-control validate stcschoolschedulesubject"
+                ><option value="NA">Select</option>
+                <?php
+                  $subject_sql=mysqli_query($con, "
+                      select * from stc_school_subject where stc_school_subject_status=1
+                  ");
+                  foreach($subject_sql as $subjectrow){
+                    echo '<option value="'.$subjectrow['stc_school_subject_id'].'">'.$subjectrow['stc_school_subject_title'].' - '.$subjectrow['stc_school_subject_subid'].'</option>';
+
+                ?> 
+                <?php 
+                  }                                          
+                ?>
+                
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Class
+              </h5>
+              <select
+                name="stcschoolscheduleclass"
+                type="text"
+                class="form-control validate stcschoolscheduleclass"
+                ><option value="NA">Select</option>
+                <?php
+                  $sclass_sql=mysqli_query($con, "
+                      select * from stc_school_class where stc_school_class_status=1
+                  ");
+                  foreach($sclass_sql as $sclassrow){
+                    echo '<option value="'.$sclassrow['stc_school_class_id'].'">'.$sclassrow['stc_school_class_title'].' - '.$sclassrow['stc_school_class_classid'].'</option>';
+
+                ?> 
+                <?php 
+                  }      
+
+                  // $date=date();
+                  date_default_timezone_set('Asia/Kolkata');
+                  $time=date('H:i:s');                                    
+                ?>                                      
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-6 col-lg-6">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Day
+              </h5>
+              <select
+                name="stcschoolscheduleday"
+                type="text"
+                class="form-control validate stcschoolscheduleday"
+                >
+                ><option value="NA">Select</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+                <option value="Saturday">Saturday</option>
+                
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-4 col-lg-4">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Period
+              </h5>
+              <select
+                name="stcschoolscheduleperiod"
+                class="form-control validate stcschoolscheduleperiod" 
+              ><option>Select</option>
+              <option value="1"><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></option>
+              <option value="2"><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></option>
+              <option value="3"><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></option>
+              <option value="4"><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+              <option value="5"><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+              <option value="6"><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+              <option value="7"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></option>
+              </select>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-4 col-lg-4">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Start Time
+              </h5>
+              <input
+                name="stcschoolschedulestarttime"
+                type="time"
+                class="form-control validate stcschoolschedulestarttime"
+                value="<?php echo $time;?>"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-4 col-lg-4">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >End Time
+              </h5>
+              <input
+                name="stcschoolscheduleendtime"
+                type="time"
+                class="form-control validate stcschoolscheduleendtime"
+                value="<?php echo $time;?>"
+              />
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="mb-3">
+              <button type="button" name="search" class="form-control btn btn-success" id="stcschoolschedulesave">Add Schedule</button>
             </div>
           </div>
         </div>
