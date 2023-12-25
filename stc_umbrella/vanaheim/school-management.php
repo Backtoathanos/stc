@@ -973,6 +973,8 @@ class Yggdrasil extends tesseract{
 	}
 
 	public function stc_call_records(){
+		$bgroup=array( "a_positive" => "A+", "b_positive" => "B+", "o_positive" => "O+", "ab_positive" => "AB+", "a_negative" => "A-", "b_negative" => "B-", "o_negative" => "O-", "ab_negative" => "AB-", "0" => "NA");
+		
 		$odinteacherqry=mysqli_query($this->stc_dbs, "
 			SELECT
 			    `stc_school_teacher_userid`,
@@ -1008,16 +1010,16 @@ class Yggdrasil extends tesseract{
 				$teacher_records.='
 					<tr>
 						<td class="text-center">'.$slno.'</td>
-						<td>'.$row['stc_school_teacher_firstname'].' '.$row['stc_school_teacher_lastname'].'</td>
-						<td>'.date('d-m-Y', strtotime($row['stc_school_teacher_dob'])).'</td>
+						<td>'.ucfirst(strtolower($row['stc_school_teacher_firstname'])).' '.ucfirst(strtolower($row['stc_school_teacher_lastname'])).'</td>
+						<td class="text-center>'.date('d-m-Y', strtotime($row['stc_school_teacher_dob'])).'</td>
 						<td>'.$row['stc_school_teacher_gender'].'</td>
-						<td>'.$row['stc_school_teacher_bloodgroup'].'</td>
-						<td>'.$row['stc_school_teacher_email'].'</td>
+						<td class="text-center">'.$bgroup[trim($row['stc_school_teacher_bloodgroup'])].'</td>
+						<td>'.strtolower($row['stc_school_teacher_email']).'</td>
 						<td>'.$row['stc_school_teacher_contact'].'</td>
 						<td>'.$row['stc_school_teacher_address'].'</td>
 						<td>'.$row['stc_school_teacher_skills'].'</td>
-						<td>'.$row['stc_school_teacher_religion'].'</td>
-						<td>'.date('d-m-Y', strtotime($row['stc_school_teacher_joindate'])).'</td>
+						<td class="text-center">'.ucfirst(strtolower($row['stc_school_teacher_religion'])).'</td>
+						<td class="text-center">'.date('d-m-Y', strtotime($row['stc_school_teacher_joindate'])).'</td>
 						<td>'.$row['stc_school_teacher_remarks'].'</td>
 					</tr>
 				';
@@ -1068,17 +1070,16 @@ class Yggdrasil extends tesseract{
 					<tr>
 						<td class="text-center">'.$slno.'</td>
 						<td>'.$row['stc_school_student_firstname'].' '.$row['stc_school_student_lastname'].'</td>
-						<td>'.date('d-m-Y', strtotime($row['stc_school_student_dob'])).'</td>
+						<td class="text-center>'.date('d-m-Y', strtotime($row['stc_school_student_dob'])).'</td>
 						<td>'.$row['stc_school_student_gender'].'</td>
-						<td>'.$row['stc_school_student_bloodgroup'].'</td>
+						<td class="text-center">'.$bgroup[trim($row['stc_school_student_bloodgroup'])].'</td>
 						<td>'.$row['stc_school_student_email'].'</td>
 						<td>'.$row['stc_school_student_contact'].'</td>
 						<td>'.$row['stc_school_student_address'].'</td>
-						<td>'.$row['stc_school_student_religion'].'</td>
-						<td>'.date('d-m-Y', strtotime($row['stc_school_student_admissiondate'])).'</td>
+						<td class="text-center">'.ucfirst(strtolower($row['stc_school_student_religion'])).'</td>
+						<td class="text-center">'.date('d-m-Y', strtotime($row['stc_school_student_admissiondate'])).'</td>
 						<td>'.$row['stc_school_class_title'].'</td>
 						<td>'.$row['stc_school_student_guardianname'].'</td>
-						<td>'.$row['stc_school_student_remarks'].'</td>
 						<td>'.$row['stc_school_student_remarks'].'</td>
 					</tr>
 				';
