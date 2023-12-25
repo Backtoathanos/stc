@@ -782,17 +782,71 @@ if(empty(@$_SESSION['stc_school_user_id'])){
           });
         });
 
-        // show attendance modal
-        $(document).on('click', '.stc-school-exit-attend-details', function(e){
-          $('.stc-school-showattendancedet-res').modal('hide');
-          $('.stc-school-showattendancedet-res').css('display', 'none');
+        $(document).on('click', '.stc-school-student-att-show', function(e){
+          e.preventDefault();
+          var student_id = $(this).attr("id");
+          var month=$('.stcattendmonth').val();
+          var classes=$('.stcattendclassname').val();
+          window.location.href='student-attendance.php?student-attendance=yes&student_id='+student_id+'&month='+month+'&class='+classes;
         });
+        
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        
+        if(urlParams.get('student_id')!=undefined){
+          get_student_attendance();
+        }
+        
+        function get_student_attendance(){
+          const student_id = urlParams.get('student_id');
+          const month = urlParams.get('month');
+          const classes = urlParams.get('class');
+          $.ajax({
+            url     : "../vanaheim/school-management.php",
+            method  : "POST",
+            data    : {
+              stc_student_attendance_get:1,
+              student_id:student_id
+            },
+            dataType : "JSON",
+            success : function(reponse){
+              if(reponse.status=="success"){
+                $('.modallabelstudentid').html('<br><b>'+reponse.data.studentid+'</b>');
+                $('.modallabelstudentname').html('<br><b>'+reponse.data.name+'</b>');
+                $('.modallabelclass').html('<br><b>'+reponse.data.class+'</b>');
+                $('.modallabeltatttendance').html('<br><b>'+reponse.data.total_attendance+'</b>');
+                $('.modallabelatttendance').html(reponse.data.attendance);
+                $('.stcattendmonth').val(month);
+                $('.stcattendclassname').val(classes);
+                $('#stcschoolattendance').click();
+                $('#stcschoolattendance').after('<a href="javascript:void(0)" id="stc-school-showattendancedet-res-btn" data-toggle="modal" data-target="#exampleModal" ></a>');
+                $('#stc-school-showattendancedet-res-btn').click();
+              }
+            }
+          });
+        }
+
+        // hide attendance modal
+        $(document).on('click', '.stc-school-exit-attend-details', function(e){
+          // $('.stc-school-showattendancedet-res').modal('hide');
+          // $('.stc-school-showattendancedet-res').css('display', 'none');
+          var month=$('.stcattendmonth').val();
+          var classes=$('.stcattendclassname').val();
+          window.location.href="student-attendance.php?student-attendance=yes&action=hit"+'&month='+month+'&class='+classes;
+        });
+
+        if(urlParams.get('action')!=undefined){
+          const month = urlParams.get('month');
+          const classes = urlParams.get('class');
+          $('.stcattendmonth').val(month);
+          $('.stcattendclassname').val(classes);
+          $('#stcschoolattendance').click();
+        }
 
         $(document).on('scroll', '.stc-schoolattendance-show table', function(e){
           e.preventDefault();
           var space_width=$('.stc-schoolattendance-show table').width();
           // console.log(space_width);
-
         });
 
       });
@@ -803,8 +857,8 @@ if(empty(@$_SESSION['stc_school_user_id'])){
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Attendance Details</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">X</button>
+        <h5 class="modal-title" id="exampleModalLabel">Attendance Class Details</h5>
+        <button type="button" class="close stc-school-exit-attend-details" data-dismiss="modal" aria-label="Close">X</button>
       </div>
       <div class="modal-body">
         <div class="row">
@@ -815,39 +869,33 @@ if(empty(@$_SESSION['stc_school_user_id'])){
                   <div class="tab-pane active" id="stc-show-attendance">
                     <div class="row">
                       <div class="col-12">
-                        <h2 class="tm-block-title d-inline-block">Attendance Details</h2>
+                        <h2 class="tm-block-title d-inline-block">Attendance Class Details</h2>
                       </div>
                     </div>
                     <div class="row">
                       <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 mx-auto">
                         <div class="mb-3">
-                          <label>Student Id : <span class="avc"></span></label>
+                          <label>Student Id : <span class="modallabelstudentid"></span></label>
                         </div>
                       </div>   
                       <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 mx-auto">
                         <div class="mb-3">
-                          <label>Student Name : <span class="avc"></span></label>
+                          <label>Student Name : <span class="modallabelstudentname"></span></label>
                         </div>
                       </div>   
                       <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 mx-auto">
                         <div class="mb-3">
-                          <label>Class : <span class="avc"></span></label>
+                          <label>Class : <span class="modallabelclass"></span></label>
                         </div>
                       </div>    
                       <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12 mx-auto">
                         <div class="mb-3">
-                          <label>Total Attendance : <span class="avc"></span></label>
+                          <label>Total Attendance : <span class="modallabeltatttendance"></span></label>
                         </div>
                       </div>   
                       <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
                         <div class="mb-3">
-                          <div class="row">
-                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-                              <label>Math</label>
-                            </div>
-                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-                              <label>1</label>
-                            </div>
+                          <div class="row modallabelatttendance">
                           </div>
                         </div>
                       </div>   

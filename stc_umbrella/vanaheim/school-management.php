@@ -1451,7 +1451,7 @@ class Yggdrasil extends tesseract{
 				}
 				$tot_time = '<td class="text-center" style="background-color: #ffc07e;">NA</td>';
 				if($totalattendance>0){
-					$tot_time = '<td class="text-center btn" data-toggle="modal" data-target="#exampleModal" style="background-color: #80d049;">'.$totalattendance.' Minutes</td>';
+					$tot_time = '<td class="text-center btn stc-school-student-att-show" id="'.$odinclassrow['stc_school_student_id'].'" style="background-color: #80d049;">'.$totalattendance.' Minutes</td>';
 				}
 				$odin.='
 					<tr>
@@ -1475,6 +1475,139 @@ class Yggdrasil extends tesseract{
 				</tbody>
 			</table>
 		";
+		return $odin;
+	}
+
+	public function stc_call_pertstudent_details($student_id){
+		$odin_gquery=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_school_student_id`, 
+				`stc_school_student_studid`,
+				LOWER(`stc_school_student_firstname`) as firstname,
+				LOWER(`stc_school_student_lastname`) as lastname,
+				`stc_school_student_classroomid`,
+				`stc_school_class_title`
+			FROM `stc_school_student`
+			LEFT JOIN `stc_school_class`
+			ON `stc_school_student_classroomid`=`stc_school_class_id`
+			WHERE `stc_school_student_id`='".mysqli_real_escape_string($this->stc_dbs, $student_id)."'
+		");
+		$out='';
+		if(mysqli_num_rows($odin_gquery)>0){
+			$result=mysqli_fetch_assoc($odin_gquery);
+			$studentid=$result['stc_school_student_studid'];
+			$name=ucfirst($result['firstname']).' '.ucfirst($result['lastname']);
+			$class=$result['stc_school_class_title'];
+			$classid=$result['stc_school_student_classroomid'];
+			$total_attendance=0;
+			$total_class=0;
+			$montharray = array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+			$attendance='
+				<div class="text-center col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+					<div style="font-size: 25px;font-weight: bold;border-bottom: 1px solid black;padding-top:5px;}">
+						<h3>Month</h3>
+					</div>
+				</div>
+				<div class="text-center col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+					<div style="font-size: 25px;font-weight: bold;border-bottom: 1px solid black;padding-top:5px;}">
+						<h3>Total Class</h3>
+					</div>
+				</div>
+				<div class="text-center col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+					<div style="font-size: 25px;font-weight: bold;border-bottom: 1px solid black;padding-top:5px;}">
+						<h3>Attended Class</h3>
+					</div>
+				</div>
+			';
+			$counter=0;
+			for($i=0;$i<count($montharray);$i++){
+				$counter++;
+				$query="
+					SELECT
+						`stc_school_student_attendance_id`,
+						`stc_school_student_attendance_date`,
+						`stc_school_student_attendance_stuid`,
+						`stc_school_student_attendance_classid`,
+						`stc_school_student_attendance_subid`,
+						`stc_school_student_attendance_attendance`,
+						`stc_school_student_attendance_status`
+					FROM
+						`stc_school_student_attendance`
+					WHERE
+						`stc_school_student_attendance_stuid`='".$student_id."' 
+					AND
+						`stc_school_student_attendance_classid`='".$classid."' 
+					AND
+						MONTH(`stc_school_student_attendance_date`)='".$counter."'
+				";
+				$odin_gquery=mysqli_query($this->stc_dbs, $query);
+				$result=mysqli_num_rows($odin_gquery);
+
+				$odin_gthrquery=mysqli_query($this->stc_dbs, "
+					SELECT `stc_school_teacher_schedule_id` FROM `stc_school_teacher_schedule` WHERE `stc_school_teacher_schedule_classid`='".$classid."'
+				");
+				$hrresult=mysqli_num_rows($odin_gthrquery) * 4;
+				if($result>0){
+					$attendance.='
+						<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+							'.$montharray[$i].'
+						</div>
+						<div class="text-center col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+							<b>'.$hrresult.'</b>
+						</div>
+						<div class="text-center col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+							<b>'.$result.'</b>
+						</div>
+					';
+					$total_attendance+=$result;					
+				}else{
+					$attendance.='
+						<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+							'.$montharray[$i].'
+						</div>
+						<div class="text-center col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+							<b>'.$hrresult.'</b>
+						</div>
+						<div class="text-center col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+							<b>0</b>
+						</div>
+					';
+				}
+				$total_class+=$hrresult;
+			}
+			
+			$attendance.='
+				<div class="text-center col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+					<div style="font-size: 25px;font-weight: bold;border-top: 1px solid black;padding-top:8px;}">
+						Total
+					</div>
+				</div>
+				<div class="text-center col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+					<div style="font-size: 25px;font-weight: bold;border-top: 1px solid black;padding-top:8px;}">
+						<strong>'.$total_class.'</strong>
+					</div>
+				</div>
+				<div class="text-center col-xl-4 col-lg-4 col-md-4 col-sm-12 mx-auto">
+					<div style="font-size: 25px;font-weight: bold;border-top: 1px solid black;padding-top:8px;}">
+						<strong>'.$total_attendance.'</strong>
+					</div>
+				</div>
+			';
+			$status="success";
+			$out=array(
+				'studentid' => $studentid,
+				'name' => $name,
+				'class' => $class,
+				'attendance' => $attendance,
+				'total_attendance' => $total_attendance
+			);
+		}else{
+			$out="NA";
+		}
+		$odin = array(
+			'status' => $status,
+			'data'	=> $out
+		);
 		return $odin;
 	}
 }
@@ -1797,5 +1930,18 @@ if(isset($_POST['stc_call_studentattendance'])){
 		$out=$valkyrie->stc_call_student_attendance($class_id, $month);
 	}
 	echo json_encode($out);
+}
+
+if(isset($_POST['stc_student_attendance_get'])){
+	$student_id=$_POST['student_id'];
+	$out=array();
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out['reload']="reload";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_call_pertstudent_details($student_id);
+	}
+	echo json_encode($out);
+	
 }
 ?>

@@ -2235,6 +2235,23 @@
       </div>
       <div class="modal-body">
         <div class="row">
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Class Type
+              </h5>
+              <select
+                name="stcschoolscheduletype"
+                type="text"
+                class="form-control validate stcschoolscheduletype"
+                ><option value="NA">Select</option>
+                <option value="1">Academic Class</option>   
+                <option value="2">Coaching Class</option>   
+                <option value="3">Self Study</option>                
+              </select>
+            </div>
+          </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
               <h5
