@@ -21721,3 +21721,7 @@
 [28-Nov-2023 18:37:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_role in /home/c2484kn1eg0y/public_html/stc_agent47/sidebar-nav.php on line 80
 [28-Nov-2023 18:37:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/order-management.php on line 107
 [28-Nov-2023 18:37:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/order-management.php on line 183
+[26-Dec-2023 11:42:41 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_name in /home/c2484kn1eg0y/public_html/stc_agent47/header-nav.php on line 70
+[26-Dec-2023 11:42:41 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_role in /home/c2484kn1eg0y/public_html/stc_agent47/sidebar-nav.php on line 80
+[26-Dec-2023 11:42:41 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/order-management.php on line 107
+[26-Dec-2023 11:42:41 Asia/Kolkata] PHP Notice:  Undefined index: stc_agent_id in /home/c2484kn1eg0y/public_html/stc_agent47/order-management.php on line 198
