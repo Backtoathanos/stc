@@ -533,13 +533,13 @@
                                     <a
                                       href="javascript:void(0)"
                                       class="form-control btn btn-success stc-school-show-teach-btn"
-                                      value=""
                                     >Add Teacher</a>
                                   </div>
                                 </div>
                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
                                   <div class="mb-3"  style="width: auto;overflow-x: auto; white-space: nowrap;" >
-                                    <table class="table table-hover table-bordered">
+                                    <input id="teachersearch" type="text" class="form-control mb-3" placeholder="Search here...">
+                                    <table class="table table-hover table-bordered mb-3">
                                       <thead>
                                         <tr>
                                           <th class="text-center"><b>Sl No</b></th>
@@ -582,16 +582,18 @@
                                   <div class="mb-3">
                                     <a
                                       href="javascript:void(0)"
-                                      class="form-control btn btn-success stc-school-show-stud-btn"
+                                      class="btn btn-success form-control stc-school-show-stud-btn"
                                       value=""
                                     >Add Student</a>
                                   </div>
                                 </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
                                   <div class="mb-3"  style="width: auto;overflow-x: auto; white-space: nowrap;" >
-                                    <table class="table table-hover table-bordered">
+                                    <input id="studentsearch" type="text" class="form-control mb-3" placeholder="Search here...">
+                                    <table class="table table-hover table-bordered mb-3">
                                       <thead>
                                         <tr>
+                                          <th class="text-center"><b>Sl No</b></th>
                                           <th class="text-center"><b>Student Id</b></th>
                                           <th class="text-center"><b>Student Name</b></th>
                                           <th class="text-center"><b>Student DOB</b></th>
@@ -640,7 +642,8 @@
                                 </div>
                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
                                   <div class="mb-3" style="width: auto;overflow-x: auto; white-space: nowrap;">
-                                    <table class="table table-hover table-bordered">
+                                    <input id="subjectsearch" type="text" class="form-control mb-3" placeholder="Search here...">
+                                    <table class="table table-hover table-bordered mb-3">
                                       <thead>
                                         <tr>
                                           <th class="text-center"><b>Subject Id</b></th>
@@ -683,8 +686,9 @@
                                   </div>
                                 </div>
                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-                                  <div style="width: auto;overflow-x: auto; white-space: nowrap;">
-                                    <table class="table table-hover table-bordered">
+                                  <div class="mb-3" style="width: auto;overflow-x: auto; white-space: nowrap;">
+                                    <input id="classsearch" type="text" class="form-control mb-3" placeholder="Search here...">
+                                    <table class="table table-hover table-bordered mb-3">
                                       <thead>
                                         <tr>
                                           <th class="text-center"><b>Classroom ID</b></th>
@@ -743,7 +747,8 @@
                                     ?>
                                   </select>                       
                                   <div class="mb-3" style="width: auto;overflow-x: auto; white-space: nowrap;">
-                                    <table class="table table-hover table-bordered">
+                                    <input id="schedulesearch" type="text" class="form-control mb-3" placeholder="Search here...">
+                                    <table class="table table-hover table-bordered mb-3">
                                       <thead>
                                         <tr>
                                           <td class="text-center"><b>Class</b></td>
@@ -1042,6 +1047,40 @@
     <!-- data show section -->
     <script>
       $(document).ready(function(){
+        $("#teachersearch").on("keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $(".stc-teacher-rec-show tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
+
+        $("#studentsearch").on("keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $(".stc-student-rec-show tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
+
+        $("#classsearch").on("keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $(".stc-classroom-rec-show tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
+
+        $("#subjectsearch").on("keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $(".stc-subject-rec-show tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
+
+        $("#schedulesearch").on("keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $(".stc-schedule-rec-show tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
 
         // save teacher to db
         $(document).on('click', '#stcschoolteachersave', function(e){
@@ -2197,6 +2236,23 @@
       </div>
       <div class="modal-body">
         <div class="row">
+          <div class="col-sm-12 col-md-12 col-lg-12">
+            <div class="mb-3">
+              <h5
+                for="name"
+                >Class Type
+              </h5>
+              <select
+                name="stcschoolscheduletype"
+                type="text"
+                class="form-control validate stcschoolscheduletype"
+                ><option value="NA">Select</option>
+                <option value="1">Academic Class</option>   
+                <option value="2">Coaching Class</option>   
+                <option value="3">Self Study</option>                
+              </select>
+            </div>
+          </div>
           <div class="col-sm-12 col-md-6 col-lg-6">
             <div class="mb-3">
               <h5
