@@ -593,6 +593,7 @@
                                     <table class="table table-hover table-bordered mb-3">
                                       <thead>
                                         <tr>
+                                          <th class="text-center"><b>Sl No</b></th>
                                           <th class="text-center"><b>Student Id</b></th>
                                           <th class="text-center"><b>Student Name</b></th>
                                           <th class="text-center"><b>Student DOB</b></th>

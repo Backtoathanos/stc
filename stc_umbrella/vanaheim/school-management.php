@@ -1011,7 +1011,7 @@ class Yggdrasil extends tesseract{
 					<tr>
 						<td class="text-center">'.$slno.'</td>
 						<td>'.ucfirst(strtolower($row['stc_school_teacher_firstname'])).' '.ucfirst(strtolower($row['stc_school_teacher_lastname'])).'</td>
-						<td class="text-center>'.date('d-m-Y', strtotime($row['stc_school_teacher_dob'])).'</td>
+						<td class="text-center">'.date('d-m-Y', strtotime($row['stc_school_teacher_dob'])).'</td>
 						<td>'.$row['stc_school_teacher_gender'].'</td>
 						<td class="text-center">'.$bgroup[trim($row['stc_school_teacher_bloodgroup'])].'</td>
 						<td>'.strtolower($row['stc_school_teacher_email']).'</td>
@@ -1069,8 +1069,9 @@ class Yggdrasil extends tesseract{
 				$student_records.='
 					<tr>
 						<td class="text-center">'.$slno.'</td>
+						<td>'.$row['stc_school_student_studid'].'</td>
 						<td>'.$row['stc_school_student_firstname'].' '.$row['stc_school_student_lastname'].'</td>
-						<td class="text-center>'.date('d-m-Y', strtotime($row['stc_school_student_dob'])).'</td>
+						<td class="text-center">'.date('d-m-Y', strtotime($row['stc_school_student_dob'])).'</td>
 						<td>'.$row['stc_school_student_gender'].'</td>
 						<td class="text-center">'.$bgroup[trim($row['stc_school_student_bloodgroup'])].'</td>
 						<td>'.$row['stc_school_student_email'].'</td>
