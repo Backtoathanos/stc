@@ -4,7 +4,7 @@ date_default_timezone_set('Asia/Kolkata');
 define('DB_SERVER','localhost');
 define('DB_USER','nausher');
 define('DB_PASS' ,'ZX5#*,PPq$5;');
-define('DB_NAME', 'stc_associate_go');
+define('DB_NAME', 'dev_stc_associate_go');
 class tesseract {
 	function __construct(){
 	$con = mysqli_connect(DB_SERVER,DB_USER,DB_PASS,DB_NAME);
