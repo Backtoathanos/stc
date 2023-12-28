@@ -374,7 +374,8 @@ class Yggdrasil extends tesseract{
     		$counter=0;
     		$periods='';
     		$days=date("l");
-    		for($i=0;$i<7;$i++){
+			$range=$type>1 ? 3 : 7;
+    		for($i=0;$i<$range;$i++){
     			$counter++;
 				$type_qry='';
 				if($type>0){
