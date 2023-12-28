@@ -294,7 +294,7 @@ class Yggdrasil extends tesseract{
 		return $odin;
 	}
 
-	public function stc_save_school_schedule($stcschoolscheduleteacher, $stcschoolschedulesubject, $stcschoolscheduleclass, $stcschoolscheduleday, $stcschoolschedulestarttime, $stcschoolscheduleendtime, $stcschoolscheduleperiod){
+	public function stc_save_school_schedule($stcschoolscheduletype, $stcschoolscheduleteacher, $stcschoolschedulesubject, $stcschoolscheduleclass, $stcschoolscheduleday, $stcschoolschedulestarttime, $stcschoolscheduleendtime, $stcschoolscheduleperiod){
 		$odin='';
 		$date=date("Y-m-d H:i:s");
 		$check_qry=mysqli_query($this->stc_dbs, "
@@ -302,6 +302,7 @@ class Yggdrasil extends tesseract{
 				`stc_school_teacher_schedule_id` 
 			FROM `stc_school_teacher_schedule` 
 			WHERE 
+				`stc_school_teacher_schedule_classtype`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduletype)."' AND 
 				`stc_school_teacher_schedule_classid`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleclass)."' AND 
 				`stc_school_teacher_schedule_day`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleday)."' AND 
 				`stc_school_teacher_schedule_period`='".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleperiod)."'
@@ -311,6 +312,7 @@ class Yggdrasil extends tesseract{
 		}else{
 			$set_loki=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_school_teacher_schedule`(
+					`stc_school_teacher_schedule_classtype`,
 					`stc_school_teacher_schedule_teacherid`,
 					`stc_school_teacher_schedule_classid`,
 					`stc_school_teacher_schedule_subjectid`,
@@ -322,6 +324,7 @@ class Yggdrasil extends tesseract{
 					`stc_school_teacher_schedule_createdate`,
 					`stc_school_teacher_schedule_createdby`
 				)VALUES(
+					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduletype)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleteacher)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolscheduleclass)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $stcschoolschedulesubject)."',
@@ -343,7 +346,7 @@ class Yggdrasil extends tesseract{
 		return $odin;
 	}
 
-	public function stc_call_teacher_schedule(){
+	public function stc_call_teacher_schedule($type){
 		$odin='';
 		date_default_timezone_set('Asia/Kolkata');
     	$day_array=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
@@ -373,6 +376,11 @@ class Yggdrasil extends tesseract{
     		$days=date("l");
     		for($i=0;$i<7;$i++){
     			$counter++;
+				$type_qry='';
+				if($type>0){
+					$type_qry="
+    				AND `stc_school_teacher_schedule_classtype`='".mysqli_real_escape_string($this->stc_dbs, $type)."'";
+				}
     			$query="
     				SELECT
     				  `stc_school_class_title`,
@@ -390,7 +398,7 @@ class Yggdrasil extends tesseract{
     				ON `stc_school_teacher_schedule_subjectid`=`stc_school_subject_id`
     				WHERE `stc_school_teacher_schedule_day`='".$day."'
     				AND `stc_school_teacher_schedule_teacherid`='".$_SESSION['stc_school_teacher_id']."'
-    				AND `stc_school_teacher_schedule_period`='".$counter."'
+    				AND `stc_school_teacher_schedule_period`='".$counter."' ".$type_qry."
     			";
     			$periodquery=mysqli_query($this->stc_dbs, $query);
     			if(mysqli_num_rows($periodquery)>0){
@@ -469,7 +477,7 @@ class Yggdrasil extends tesseract{
 						}
 					}
     			}else{
-    	      		$periods.='<td>NA</td>';
+    	      		$periods.='<td class="text-center">NA</td>';
     			}
     		}
     	  
@@ -1733,6 +1741,7 @@ if(isset($_POST['save_classadd_action'])){
 
 // save schedule
 if(isset($_POST['save_schduleadd_action'])){
+	$stcschoolscheduletype =$_POST['stcschoolscheduletype'];
 	$stcschoolscheduleteacher =$_POST['stcschoolscheduleteacher'];
 	$stcschoolschedulesubject =$_POST['stcschoolschedulesubject'];
 	$stcschoolscheduleclass =$_POST['stcschoolscheduleclass'];
@@ -1744,10 +1753,10 @@ if(isset($_POST['save_schduleadd_action'])){
 	$valkyrie=new Yggdrasil();
 	if(empty($_SESSION['stc_school_user_id'])){
 		$out="reload";
-	}else if($stcschoolscheduleteacher=="NA" || $stcschoolschedulesubject=="NA" || $stcschoolscheduleclass=="NA" || $stcschoolscheduleday=="NA"){
+	}else if($stcschoolscheduletype=="NA" || $stcschoolscheduleteacher=="NA" || $stcschoolschedulesubject=="NA" || $stcschoolscheduleclass=="NA" || $stcschoolscheduleday=="NA"){
 		$out="empty";
 	}else{		
-		$lokiheck=$valkyrie->stc_save_school_schedule($stcschoolscheduleteacher, $stcschoolschedulesubject, $stcschoolscheduleclass, $stcschoolscheduleday, $stcschoolschedulestarttime, $stcschoolscheduleendtime, $stcschoolscheduleperiod);
+		$lokiheck=$valkyrie->stc_save_school_schedule($stcschoolscheduletype, $stcschoolscheduleteacher, $stcschoolschedulesubject, $stcschoolscheduleclass, $stcschoolscheduleday, $stcschoolschedulestarttime, $stcschoolscheduleendtime, $stcschoolscheduleperiod);
 		$out=$lokiheck;
 	}
 	echo $out;
@@ -1755,8 +1764,9 @@ if(isset($_POST['save_schduleadd_action'])){
 
 // call schedule for teacher
 if(isset($_POST['stc_teacherschedule_call'])){
+	$type=$_POST['type'];
 	$valkyrie=new Yggdrasil();
-	$lokiheck=$valkyrie->stc_call_teacher_schedule();
+	$lokiheck=$valkyrie->stc_call_teacher_schedule($type);
 	echo json_encode($lokiheck);
 }
 

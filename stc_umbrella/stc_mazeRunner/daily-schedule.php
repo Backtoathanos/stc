@@ -408,8 +408,20 @@ if($_SESSION['stc_school_user_for']==2){
                         <span class="nav-tabs-title">Tasks:</span>
                         <ul class="nav nav-tabs" data-tabs="tabs">
                           <li class="nav-item">
-                            <a class="nav-link active" href="#stc-create-attendance" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Schedule
+                            <a class="nav-link stc-school-show-schedultwtype active" href="#stc-create-attendance" id="1" data-toggle="tab">
+                              <i class="material-icons">add_circle</i> Academic Schedule
+                              <div class="ripple-container"></div>
+                            </a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link stc-school-show-schedultwtype" href="#stc-create-attendance" id="2" data-toggle="tab">
+                              <i class="material-icons">add_circle</i> Coaching Schedule
+                              <div class="ripple-container"></div>
+                            </a>
+                          </li>
+                          <li class="nav-item">
+                            <a class="nav-link stc-school-show-schedultwtype" href="#stc-create-attendance" id="3" data-toggle="tab">
+                              <i class="material-icons">add_circle</i> Self Study Schedule
                               <div class="ripple-container"></div>
                             </a>
                           </li>
@@ -728,19 +740,31 @@ if($_SESSION['stc_school_user_for']==2){
     </script>
     <script>
       $(document).ready(function(){
-        call_scedule()
-        function call_scedule(){
+
+        $(document).on('click', '.stc-school-show-schedultwtype', function(e){
+          var type=$(this).attr("id");
+          call_scedule(type, 2);
+        });
+        
+        call_scedule(0, 0);
+        function call_scedule(type, type2){
           $.ajax({
             url       : "../vanaheim/school-management.php",
             method    : "POST",  
             data      : {
-              stc_teacherschedule_call : 1
+              stc_teacherschedule_call : 1,
+              type:type
             },
             dataType: `JSON`,
             success   : function(response_teacher){
               $('.stc-teacher-schedule-show-table').html(response_teacher.schedule);
               if(response_teacher.att_result=="y"){
                 $('.stc-school-show-student-default').click();
+              }else{
+                if(type2==0){
+                  type2++;
+                  call_scedule(1);
+                }
               }
             }
           });
