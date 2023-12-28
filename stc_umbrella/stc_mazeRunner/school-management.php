@@ -693,10 +693,10 @@
                                         <tr>
                                           <th class="text-center"><b>Classroom ID</b></th>
                                           <th class="text-center"><b>Classroom Title</b></th>
-                                          <th class="text-center">Loaction</th>
-                                          <th class="text-center">Capacity</th>
-                                          <th class="text-center"><b>Addd Date</b></th>
-                                          <th class="text-center"><b>Addd by</b></th>
+                                          <th class="text-center"><b>Loaction</b></th>
+                                          <th class="text-center"><b>Capacity</b></th>
+                                          <th class="text-center"><b>Add Date</b></th>
+                                          <th class="text-center"><b>Add by</b></th>
                                           <th class="text-center"><b>Action</b></th>
                                         </tr>
                                       </thead>
@@ -761,9 +761,7 @@
                                           <td class="text-center"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
                                         </tr>
                                       </thead>
-                                      <tbody class="stc-schedule-rec-show">
-                                        
-                                      </tbody>
+                                      <tbody class="stc-schedule-rec-show"></tbody>
                                     </table>
                                   </div>
                                 </div>
@@ -1317,6 +1315,7 @@
         // save shedule to db
         $(document).on('click', '#stcschoolschedulesave', function(e){
           e.preventDefault();
+          var stcschoolscheduletype         = $('.stcschoolscheduletype').val();
           var stcschoolscheduleteacher      = $('.stcschoolscheduleteacher').val();
           var stcschoolschedulesubject      = $('.stcschoolschedulesubject').val();
           var stcschoolscheduleclass        = $('.stcschoolscheduleclass').val();
@@ -1329,6 +1328,7 @@
             method    : "POST",  
             data      : {
               stcschoolscheduleteacher:stcschoolscheduleteacher,
+              stcschoolscheduletype:stcschoolscheduletype,
               stcschoolschedulesubject:stcschoolschedulesubject,
               stcschoolscheduleclass:stcschoolscheduleclass,
               stcschoolscheduleday:stcschoolscheduleday,
@@ -1514,7 +1514,6 @@
           $(this).parent().parent().find('.stc-class-upd-btn-show').show();
         }); 
         
-         
       });
     </script>
   </body>
