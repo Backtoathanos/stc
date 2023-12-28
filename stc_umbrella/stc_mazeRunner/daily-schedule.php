@@ -758,6 +758,11 @@ if($_SESSION['stc_school_user_for']==2){
             dataType: `JSON`,
             success   : function(response_teacher){
               $('.stc-teacher-schedule-show-table').html(response_teacher.schedule);
+              if(type==1){
+                $('.stc-schoolschedule-show table thead tr td').show();
+              }else{
+                $('.stc-schoolschedule-show table thead tr td:eq(4),td:eq(5),td:eq(6),td:eq(7)').hide();
+              }
               if(response_teacher.att_result=="y"){
                 $('.stc-school-show-student-default').click();
               }else{
