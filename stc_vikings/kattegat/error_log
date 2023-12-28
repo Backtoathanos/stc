@@ -1143,3 +1143,9 @@
 [23-Nov-2023 11:07:02 Asia/Kolkata] 
 [23-Nov-2023 11:07:20 Asia/Kolkata] 
 [23-Nov-2023 11:19:31 Asia/Kolkata] 
+[26-Dec-2023 12:59:46 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 913
+[26-Dec-2023 13:22:05 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 913
+[26-Dec-2023 15:06:01 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 913
+[26-Dec-2023 17:37:00 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 913
+[28-Dec-2023 10:57:58 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 976
+[28-Dec-2023 10:57:58 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 976

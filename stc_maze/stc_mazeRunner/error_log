@@ -164,3 +164,5 @@
 [28-Nov-2023 08:44:17 UTC] PHP Notice:  Undefined index: stc_electro_user_for in /home/c2484kn1eg0y/public_html/stc_maze/stc_mazeRunner/inventory.php on line 10
 [28-Nov-2023 15:51:33 Asia/Kolkata] PHP Notice:  Undefined index: stc_silent_print_prevew in /home/c2484kn1eg0y/public_html/stc_maze/stc_mazeRunner/silent-invoice-print-preview.php on line 625
 [28-Nov-2023 15:51:33 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_maze/stc_mazeRunner/silent-invoice-print-preview.php on line 625
+[28-Dec-2023 03:56:51 UTC] PHP Notice:  Undefined index: stc_electro_user_for in /home/c2484kn1eg0y/public_html/stc_maze/stc_mazeRunner/purchase-sale.php on line 10
+[28-Dec-2023 03:56:51 UTC] PHP Notice:  Undefined index: stc_electro_user_for in /home/c2484kn1eg0y/public_html/stc_maze/stc_mazeRunner/purchase-sale.php on line 10
