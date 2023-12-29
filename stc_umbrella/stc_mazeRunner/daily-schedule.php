@@ -9,8 +9,8 @@ if($_SESSION['stc_school_user_for']==2){
     header('location:forbidden.html');
 }
 ?>
-  <!DOCTYPE html>
-  <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
   <head>
     <meta charset="utf-8" />
@@ -1114,7 +1114,7 @@ if($_SESSION['stc_school_user_for']==2){
       });
     </script>
   </body>
-  </html>
+</html>
 
 <div class="modal fade stc-school-showstudent-res" data-backdrop="static" data-keyboard="false" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
