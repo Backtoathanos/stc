@@ -472,6 +472,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-agent-sup-std-manpower-req').val(response_sdl.stc_status_down_list_manpower_req);
                         $('#stc-agent-sup-std-target-date').val(response_sdl.stc_status_down_list_target_date);
                         $('.stc-agent-sup-std-jobdonedetails').val(response_sdl.stc_status_down_list_jobdone_details);
+                        $('.stc-agent-sup-std-failurerootcost').val(response_sdl.stc_status_down_list_failurerootcost);
                         $('.stc-agent-sup-std-remarks').val(response_sdl.stc_status_down_list_remarks);
                         $('.stc-std-tools-req-item-show').html(response_sdl.stc_status_down_list_tools_req);
                         load_dept("dept", response_sdl.stc_status_down_list_location);
@@ -504,6 +505,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var target_date = $('#stc-agent-sup-std-target-date').val();
                 var tools_req=get_filter('stc-agent-sup-std-tools-req');
                 var jobdonedet = $('.stc-agent-sup-std-jobdonedetails').val();
+                var farootcost = $('.stc-agent-sup-std-failurerootcost').val();
                 var remarks = $('.stc-agent-sup-std-remarks').val();
                 $.ajax({
                     url         : "nemesis/stc_std.php",
@@ -532,6 +534,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         manpower_req:manpower_req,
                         target_date:target_date,
                         jobdonedet:jobdonedet,
+                        farootcost:farootcost,
                         remarks:remarks
                     },
                     dataType : 'JSON',
@@ -1130,6 +1133,15 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <?php 
                         if($_SESSION['stc_agent_sub_category']=="Site Incharge"){
                     ?>
+
+                    <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Failure Root Cost :</h5><br>
+                                <textarea type="text" class="form-control stc-agent-sup-std-failurerootcost stc-std-update-on-focusout" placeholder="Enter Failure root cost"></textarea>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
