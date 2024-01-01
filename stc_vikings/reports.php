@@ -2305,8 +2305,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
                                     <h5 class="card-title">Material List</h5>
-                                    <div class="position-relative form-group">
-                                        <table class="table table-bordered table-hover table-responsive">
+                                    <div class="position-relative form-group" style="overflow-x:auto;">
+                                        <table class="table table-bordered table-hover">
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
