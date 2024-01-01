@@ -1137,8 +1137,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Failure Root Cost :</h5><br>
-                                <textarea type="text" class="form-control stc-agent-sup-std-failurerootcost stc-std-update-on-focusout" placeholder="Enter Failure root cost"></textarea>
+                                <h5>Failure Root Cause :</h5><br>
+                                <textarea type="text" class="form-control stc-agent-sup-std-failurerootcost stc-std-update-on-focusout" placeholder="Enter Failure root cause"></textarea>
                             </div>
                         </div>
                     </div>

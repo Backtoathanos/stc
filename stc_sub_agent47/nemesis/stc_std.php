@@ -360,11 +360,11 @@ class transformers extends tesseract{
 		if($_SESSION['stc_agent_sub_category']=='Site Incharge'){
 			$head_hidden2='
 			<th class="text-center">PENDING REASON</th>
-			<th class="text-center">REMARKS</th>
+			<th class="text-center">ANY COMMENT</th>
+			<th class="text-center">FAILURE ROOT CAUSE</th>
 			<th class="text-center">JOB DONE DETAILS</th>
-			<th class="text-center">FAILURE ROOT COST</th>
-			<th class="text-center">REMARKS BY BOSS</th>
-			<th class="text-center">TARGET DATE BY BOSS</th>
+			<th class="text-center">REMARKS BY HOD</th>
+			<th class="text-center">TARGET DATE BY HOD</th>
 			';
 		}
 		$optimusprime='
@@ -636,8 +636,8 @@ class transformers extends tesseract{
 					$hidden2='	
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
-						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
 						<td>'.$row['stc_status_down_list_failurerootcost'].'</td>
+						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
 						<td>'.$row['stc_status_down_list_fremarks'].'</td>
 						<td>'.$ftargetdate.'</td>
 					';
