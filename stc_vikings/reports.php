@@ -1564,10 +1564,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     dataType : "JSON",
                     success : function(data){
                         $('.show-material-list-sdl').html(data.data);
-                        $('.downlistno').html('<b>'+data.Downlist+'</b>');
-                        $('.downlistdate').html('<b>'+data.downlistdate+'</b>');
-                        $('.reqnumber').html('<b>'+data.reqno+'</b>');
-                        $('.reqdate').html('<b>'+data.reqdate+'</b>');
+                        $('.downlistno').html('<b>Requisition Number : '+data.Downlist+'</b>');
+                        $('.downlistdate').html('<b>Requisition Date : '+data.downlistdate+'</b>');
+                        $('.reqnumber').html('<b>SDL Number : '+data.reqno+'</b>');
+                        $('.reqdate').html('<b>SDL Date : '+data.reqdate+'</b>');
                         $('.sublocation').html('<b>'+data.sublocation+'</b>');
                     }
                 });
@@ -2290,18 +2290,18 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-4 col-sm-4 col-xl-4 mb-4">
-                                    <p class="card-title">Status Down List Number & Date</p>
-                                    <p class="downlistno"></p>
-                                    <p class="downlistdate"></p>
+                                    <p class="card-title">Status Down List</p>
+                                    <span class="downlistno"></span><br>
+                                    <span class="downlistdate"></span>
                                 </div>
                                 <div class="col-md-4 col-sm-4 col-xl-4 mb-4">
-                                    <p class="card-title">Requisition Number & date</p>
-                                    <p class="reqnumber"></p>
-                                    <p class="reqdate"></p>
+                                    <p class="card-title">Material Requisition</p>
+                                    <span class="reqnumber"></span><br>
+                                    <span class="reqdate"></span>
                                 </div>
                                 <div class="col-md-4 col-sm-4 col-xl-4 mb-4">
-                                    <p class="card-title">Department</p>
-                                    <p class="sublocation"></p>
+                                    <p class="card-title">Department</p><br>
+                                    <span class="sublocation"></span>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
                                     <h5 class="card-title">Material List</h5>

@@ -435,7 +435,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     }
                 });
             }
-
+            
             function load_std_perticular(std_id){
                 $.ajax({
                     url         : "nemesis/stc_std.php",
@@ -1133,7 +1133,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <?php 
                         if($_SESSION['stc_agent_sub_category']=="Site Incharge"){
                     ?>
-
                     <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
