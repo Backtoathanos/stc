@@ -1564,10 +1564,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     dataType : "JSON",
                     success : function(data){
                         $('.show-material-list-sdl').html(data.data);
-                        $('.downlistno').html('<b>Requisition Number : '+data.Downlist+'</b>');
-                        $('.downlistdate').html('<b>Requisition Date : '+data.downlistdate+'</b>');
-                        $('.reqnumber').html('<b>SDL Number : '+data.reqno+'</b>');
-                        $('.reqdate').html('<b>SDL Date : '+data.reqdate+'</b>');
+                        $('.downlistno').html('<b>SDL Number : '+data.Downlist+'</b>');
+                        $('.downlistdate').html('<b>SDL Date : '+data.downlistdate+'</b>');
+                        $('.reqnumber').html('<b>Requisition Number : '+data.reqno+'</b>');
+                        $('.reqdate').html('<b>Requisition Date : '+data.reqdate+'</b>');
                         $('.sublocation').html('<b>'+data.sublocation+'</b>');
                     }
                 });
