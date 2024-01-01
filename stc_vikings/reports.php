@@ -1561,8 +1561,14 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         stc_sdl_material_call:1,
                         sdl_id:sdl_id
                     },
+                    dataType : "JSON",
                     success : function(data){
-                        $('.show-material-list-sdl').html(data);
+                        $('.show-material-list-sdl').html(data.data);
+                        $('.downlistno').html('<b>'+data.Downlist+'</b>');
+                        $('.downlistdate').html('<b>'+data.downlistdate+'</b>');
+                        $('.reqnumber').html('<b>'+data.reqno+'</b>');
+                        $('.reqdate').html('<b>'+data.reqdate+'</b>');
+                        $('.sublocation').html('<b>'+data.sublocation+'</b>');
                     }
                 });
             });
@@ -2283,8 +2289,22 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     <div class="main-card mb-3 card">
                         <div class="card-body">
                             <div class="row">
+                                <div class="col-md-4 col-sm-4 col-xl-4 mb-4">
+                                    <p class="card-title">Status Down List Number & Date</p>
+                                    <p class="downlistno"></p>
+                                    <p class="downlistdate"></p>
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-xl-4 mb-4">
+                                    <p class="card-title">Requisition Number & date</p>
+                                    <p class="reqnumber"></p>
+                                    <p class="reqdate"></p>
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-xl-4 mb-4">
+                                    <p class="card-title">Department</p>
+                                    <p class="sublocation"></p>
+                                </div>
                                 <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
-                                    <h5 class="card-title">Status Down List Material List</h5>
+                                    <h5 class="card-title">Material List</h5>
                                     <div class="position-relative form-group">
                                         <table class="table table-bordered table-hover table-responsive">
                                             <thead>
