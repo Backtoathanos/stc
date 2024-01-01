@@ -2300,7 +2300,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     <span class="reqdate"></span>
                                 </div>
                                 <div class="col-md-4 col-sm-4 col-xl-4 mb-4">
-                                    <p class="card-title">Department</p><br>
+                                    <p class="card-title">Department</p>
                                     <span class="sublocation"></span>
                                 </div>
                                 <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
