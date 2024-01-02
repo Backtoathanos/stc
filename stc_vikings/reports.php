@@ -2190,6 +2190,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <option value="3">WORK-IN-PROGRESS</option>
                                                 <option value="4">WORK DONE</option>
                                                 <option value="5">WORK COMPLETE</option>
+                                                <option value="6">CLOSE</option>
                                             </select>
                                         </div>
                                     </div>
