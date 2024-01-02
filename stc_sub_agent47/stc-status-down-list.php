@@ -323,7 +323,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var location = $('.stc-agent-sup-std-siteid').val();
                 var dept = $('.stc-agent-sup-std-sub-locationbyid').val();
                 var area = $('.stc-agent-sup-std-area').val();
-                var eq_type = $('#stc-agent-sup-std-equipment-type').val();
+                var eq_type = $('.stc-agent-sup-std-equipment-type').val();
                 var eq_number = $('#stc-agent-sup-std-equipment-number').val();
                 var eq_status = $('#stc-agent-sup-std-equipment-status').val();
                 var j_plannning = $('#stc-agent-sup-std-job-plannning').val();
@@ -359,6 +359,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 stc_area:area,
                                 stc_j_plannning:j_plannning,
                                 reason:reason,
+                                eq_type:eq_type,
                                 action_status:action_status
                             },
                             success     : function(response_std){
@@ -941,6 +942,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
+                    <?php if(($_SESSION['stc_agent_sub_category']=="Site Incharge") || ($_SESSION['stc_agent_sub_category']=="Supervisor")){ ?>
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
@@ -951,6 +953,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
+                    <?php }?>
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
@@ -1013,6 +1016,18 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
+                    <?php if(($_SESSION['stc_agent_sub_category']!="Site Incharge") && ($_SESSION['stc_agent_sub_category']!="Supervisor")){ ?>
+                    <div class="col-md-6 col-xl-6"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Equipment Type :</h5><br>
+                                <!-- <select class="btn btn-success form-control load_equipment_type_consump text-left" id="stc-agent-sup-std-equipment-type"><option>Please select area first!!!</option>
+                                </select>  -->
+                                <input type="text" class="form-control stc-agent-sup-std-equipment-type" placeholder="Enter Equipment Details"/>
+                            </div>
+                        </div>
+                    </div>
+                    <?php }?>
                     <div class="col-md-6 col-xl-6 stc-std-section-achideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
