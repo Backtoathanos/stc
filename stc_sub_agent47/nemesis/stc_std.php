@@ -192,7 +192,7 @@ class transformers extends tesseract{
 	}
 
 	// save std
-	public function stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $action_status){
+	public function stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $eq_type, $action_status){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$tools_req='';
@@ -214,6 +214,7 @@ class transformers extends tesseract{
 			    `stc_status_down_list_area`,
 			    `stc_status_down_list_jobtype`,
 			    `stc_status_down_list_reason`,
+			    `stc_status_down_list_equipment_type`,
 				`stc_status_down_list_equipment_status`,
 			    `stc_status_down_list_status`,
 			    `stc_status_down_list_created_by`
@@ -225,6 +226,7 @@ class transformers extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_area)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $reason)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $eq_type)."',
 				'".$status."',
 				'".mysqli_real_escape_string($this->stc_dbs, $action_status)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
@@ -885,13 +887,14 @@ if(isset($_POST['stc_std_hit'])){
 	$stc_area=$_POST['stc_area'];
 	$stc_j_plannning=$_POST['stc_j_plannning'];
 	$reason=$_POST['reason'];
+	$eq_type=$_POST['eq_type'];
 	$action_status = $_POST['action_status'];
 
 	$metabots=new transformers();
 	if(empty($_SESSION['stc_agent_sub_id'])){
 		$opmetabots="Please login!!!";
 	}else{
-		$opmetabots=$metabots->stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $action_status);
+		$opmetabots=$metabots->stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $eq_type, $action_status);
 	}
 	echo $opmetabots;
 }
