@@ -543,11 +543,12 @@ class ragnarReportsViewRequiReports extends tesseract{
             `stc_status_down_list_fremarks`,
             `stc_status_down_list_ftarget_date`,
             `stc_status_down_list_status`,
+            `stc_status_down_list_failurerootcost`,
             `stc_status_down_list_created_by`
          FROM `stc_status_down_list` 
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
-         WHERE `stc_status_down_list_status`<>6 ".$query_filter."         
+         WHERE `stc_status_down_list_date`<>'' ".$query_filter."         
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ";
       $ivarqry=mysqli_query($this->stc_dbs, $query);
@@ -700,11 +701,12 @@ class ragnarReportsViewRequiReports extends tesseract{
             '11' => 'REASON ATTRIBUTE',
             '12' => 'STATUS',
             '13' => 'DELAY',
-            '14' => 'JOB DONE DETAILS',
-            '15' => 'ANY COMMENT',
-            '16' => 'TARGET DATE',
-            '17' => 'REMARKS',
-            '18' => 'ACTION'
+            '14' => 'FRC REPORTS',
+            '15' => 'JOB DONE DETAILS',
+            '16' => 'ANY COMMENT',
+            '17' => 'TARGET DATE',
+            '18' => 'REMARKS',
+            '19' => 'ACTION'
          );
          
          $data_fields="";
@@ -828,6 +830,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th style="width:4%" class="text-center">MATERIAL</th>
                      <th style="width:1%" class="text-center">STATUS</th>
                      <th style="width:1%" class="text-center">DELAY</th>
+                     <th style="width:3%" class="text-center">FRC REPORTS</th>
                      <th style="width:3%" class="text-center">JOB DONE DETAILS</th>
                      <th style="width:3%" class="text-center">ANY COMMENTS</th>
                      <th style="width:3%" class="text-center">TARGET DATE</th>
@@ -981,6 +984,8 @@ class ragnarReportsViewRequiReports extends tesseract{
                $material_view='#';
             }
 
+            $frcrdet_value = $row['stc_status_down_list_failurerootcost'];
+            $frcrdet = strlen($frcrdet_value)>25 ? substr($frcrdet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$frcrdet_value.'">Read more</a>' : $frcrdet_value;
             $ftargetdate=$row['stc_status_down_list_ftarget_date']=="" ? "" : date('d-m-Y H:i a', strtotime($row['stc_status_down_list_ftarget_date']));
             $anycomm_value = $row['stc_status_down_list_remarks'];
             $anycomdet = strlen($anycomm_value)>25 ? substr($anycomm_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$anycomm_value.'">Read more</a>' : $anycomm_value;
@@ -1010,6 +1015,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="sl-hide text-center">'.$material_view.'</td>
                   <td class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>
+                  <td>
+                     <span class="jobdonedet-view">'.$frcrdet.'</span>
+                     <span class="jobdonedet-print" style="display:none;">'.$frcrdet_value.'</span>
+                  </td>
                   <td>
                      <span class="jobdonedet-view">'.$jobdonedet.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$jobdonedet_value.'</span>
@@ -1063,10 +1072,16 @@ class ragnarReportsViewRequiReports extends tesseract{
    public function stc_call_std_material($sdl_id){
       $ivar='';
       $slno=0;
+      $reqno=0;
+      $reqdate='';
+      $downlistdate='';
+      $sublocation='';
       $ivarquery=mysqli_query($this->stc_dbs, "
          SELECT DISTINCT
             `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
             DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
+            `stc_status_down_list_sub_location`,
+            `stc_status_down_list_date`,
             `stc_cust_super_requisition_list_items_req_id`,
             `stc_cust_super_requisition_list_items_title`,
             `stc_cust_super_requisition_list_items_unit`,
@@ -1075,8 +1090,10 @@ class ragnarReportsViewRequiReports extends tesseract{
             `stc_cust_super_requisition_items_finalqty`,
             `stc_cust_super_requisition_list_items_status`
          FROM `stc_cust_super_requisition_list_items`
-         INNER JOIN `stc_cust_super_requisition_list` 
+         LEFT JOIN `stc_cust_super_requisition_list` 
          ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+         LEFT JOIN `stc_status_down_list` 
+         ON `stc_status_down_list_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_sdlid`
          WHERE 
             `stc_cust_super_requisition_list_sdlid`='".mysqli_real_escape_string($this->stc_dbs, $sdl_id)."'
          ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
@@ -1087,7 +1104,11 @@ class ragnarReportsViewRequiReports extends tesseract{
 				$rqitemstts='';
 				$stcdispatchedqty=0;
 				$stcrecievedqty=0;
-				$stcpendingqty=0;
+				$stcpendingqty=0;      
+            $downlistdate=date('d-m-Y', strtotime($requisitionrow['stc_status_down_list_date']));
+            $reqno=$requisitionrow['reqlistid'];
+            $sublocation=$requisitionrow['stc_status_down_list_sub_location'];            
+            $reqdate=date('d-m-Y', strtotime($requisitionrow['stc_req_date']));
 				if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
 					$rqitemstts='ALLOW';
 				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
@@ -1165,7 +1186,15 @@ class ragnarReportsViewRequiReports extends tesseract{
 					</tr>
 			';
 		}
-      return $ivar;
+      $out_ivar = array(
+         'data'=> $ivar,
+         'Downlist'=> $sdl_id,
+         'downlistdate'=>$downlistdate,
+         'reqno'=> $reqno,
+         'reqdate'=> $reqdate,
+         'sublocation'=> $sublocation,
+      );
+      return $out_ivar;
    }
 
    // call customer
@@ -1716,7 +1745,8 @@ class ragnarReportsViewProjReports extends tesseract{
                </tr>
          ';
       }
-
+      $bjornebegval=0;
+      $bjorneendval=0;
       $optimusprime.= '
          <tr>
             <td colspan="2">
@@ -1793,20 +1823,14 @@ class ragnarReportsViewElectronicsPurchaseSaleReports extends tesseract{
             `stc_daily_purchase_items_tax`,
             `stc_daily_purchase_remarks`,
             `stc_electronics_user_fullName`
-         FROM
-            `stc_daily_purchase_items`
-         INNER JOIN 
-            `stc_daily_purchase` 
-         ON 
-            `stc_daily_purchase_id` = `stc_daily_purchase_items_order_id`
-         LEFT JOIN 
-            `stc_electronics_user` 
-         ON 
-            `stc_electronics_user_id` = `stc_daily_purchase_createdby`
-         WHERE
-            (DATE(`stc_daily_purchase_refr_date`) 
-            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
-            AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."') 
+         FROM `stc_daily_purchase_items`
+         INNER JOIN `stc_daily_purchase` 
+         ON `stc_daily_purchase_id` = `stc_daily_purchase_items_order_id`
+         LEFT JOIN `stc_electronics_user` 
+         ON  `stc_electronics_user_id` = `stc_daily_purchase_createdby`
+         WHERE DATE(`stc_daily_purchase_refr_date`) 
+         BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
+         AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."'
          ORDER BY DATE(`stc_daily_purchase_refr_date`) DESC
       ");
       $odin='
@@ -3852,7 +3876,7 @@ if(isset($_POST['stc_sdl_material_call'])){
    $sdl_id=$_POST['sdl_id'];
    $bjornecustomer=new ragnarReportsViewRequiReports();   
    $outbjornecustomer=$bjornecustomer->stc_call_std_material($sdl_id);
-   echo $outbjornecustomer;
+   echo json_encode($outbjornecustomer);
 }
 
 // call customer

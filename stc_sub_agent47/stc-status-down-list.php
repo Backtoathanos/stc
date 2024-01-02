@@ -323,7 +323,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var location = $('.stc-agent-sup-std-siteid').val();
                 var dept = $('.stc-agent-sup-std-sub-locationbyid').val();
                 var area = $('.stc-agent-sup-std-area').val();
-                var eq_type = $('#stc-agent-sup-std-equipment-type').val();
+                var eq_type = $('.stc-agent-sup-std-equipment-type').val();
                 var eq_number = $('#stc-agent-sup-std-equipment-number').val();
                 var eq_status = $('#stc-agent-sup-std-equipment-status').val();
                 var j_plannning = $('#stc-agent-sup-std-job-plannning').val();
@@ -359,6 +359,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 stc_area:area,
                                 stc_j_plannning:j_plannning,
                                 reason:reason,
+                                eq_type:eq_type,
                                 action_status:action_status
                             },
                             success     : function(response_std){
@@ -435,7 +436,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     }
                 });
             }
-
+            
             function load_std_perticular(std_id){
                 $.ajax({
                     url         : "nemesis/stc_std.php",
@@ -472,6 +473,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-agent-sup-std-manpower-req').val(response_sdl.stc_status_down_list_manpower_req);
                         $('#stc-agent-sup-std-target-date').val(response_sdl.stc_status_down_list_target_date);
                         $('.stc-agent-sup-std-jobdonedetails').val(response_sdl.stc_status_down_list_jobdone_details);
+                        $('.stc-agent-sup-std-failurerootcost').val(response_sdl.stc_status_down_list_failurerootcost);
                         $('.stc-agent-sup-std-remarks').val(response_sdl.stc_status_down_list_remarks);
                         $('.stc-std-tools-req-item-show').html(response_sdl.stc_status_down_list_tools_req);
                         load_dept("dept", response_sdl.stc_status_down_list_location);
@@ -504,6 +506,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var target_date = $('#stc-agent-sup-std-target-date').val();
                 var tools_req=get_filter('stc-agent-sup-std-tools-req');
                 var jobdonedet = $('.stc-agent-sup-std-jobdonedetails').val();
+                var farootcost = $('.stc-agent-sup-std-failurerootcost').val();
                 var remarks = $('.stc-agent-sup-std-remarks').val();
                 $.ajax({
                     url         : "nemesis/stc_std.php",
@@ -532,6 +535,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         manpower_req:manpower_req,
                         target_date:target_date,
                         jobdonedet:jobdonedet,
+                        farootcost:farootcost,
                         remarks:remarks
                     },
                     dataType : 'JSON',
@@ -938,6 +942,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
+                    <?php if(($_SESSION['stc_agent_sub_category']=="Site Incharge") || ($_SESSION['stc_agent_sub_category']=="Supervisor")){ ?>
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
@@ -948,6 +953,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
+                    <?php }?>
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
@@ -1010,6 +1016,18 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
+                    <?php if(($_SESSION['stc_agent_sub_category']!="Site Incharge") && ($_SESSION['stc_agent_sub_category']!="Supervisor")){ ?>
+                    <div class="col-md-6 col-xl-6"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Equipment Type :</h5><br>
+                                <!-- <select class="btn btn-success form-control load_equipment_type_consump text-left" id="stc-agent-sup-std-equipment-type"><option>Please select area first!!!</option>
+                                </select>  -->
+                                <input type="text" class="form-control stc-agent-sup-std-equipment-type" placeholder="Enter Equipment Details"/>
+                            </div>
+                        </div>
+                    </div>
+                    <?php }?>
                     <div class="col-md-6 col-xl-6 stc-std-section-achideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
@@ -1130,6 +1148,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <?php 
                         if($_SESSION['stc_agent_sub_category']=="Site Incharge"){
                     ?>
+                    <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Failure Root Cause :</h5><br>
+                                <textarea type="text" class="form-control stc-agent-sup-std-failurerootcost stc-std-update-on-focusout" placeholder="Enter Failure root cause"></textarea>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
