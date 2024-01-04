@@ -691,53 +691,49 @@ class transformers extends tesseract{
 	public function stc_sdl_status_update($status, $sld_id, $jobdonedetails, $work_permit_no){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
-		$optimusprime_qry=mysqli_query($this->stc_dbs, "
-			UPDATE 
-				`stc_status_down_list` 
-			SET 
-				`stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."',
-				`stc_status_down_list_jobdone_details`='".mysqli_real_escape_string($this->stc_dbs, $jobdonedetails)."'
-			WHERE 
-				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
-		");
-		if($optimusprime_qry){
-			if($status==4){
-				$optimusprime_cqry=mysqli_query($this->stc_dbs, "
-					SELECT 
-						`stc_status_down_list_qty`,
-						`stc_status_down_list_capacity`,
-						`stc_status_down_list_reasonattribute`,
-						`stc_status_down_list_permit_no`
-					FROM `stc_status_down_list` 
-					WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."' 
+		if($status==4){
+			$optimusprime_cqry=mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_status_down_list_qty`,
+					`stc_status_down_list_capacity`,
+					`stc_status_down_list_reasonattribute`,
+					`stc_status_down_list_permit_no`
+				FROM `stc_status_down_list` 
+				WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."' 
+			");
+			$validated=1;
+			foreach($optimusprime_cqry as $optimusprime_crow){
+				if(($optimusprime_crow['stc_status_down_list_qty']==0) || ($optimusprime_crow['stc_status_down_list_capacity']=='') || ($optimusprime_crow['stc_status_down_list_reasonattribute']=='')){
+					$validated=0;
+					break;
+				}
+			}
+			if($validated==1){
+				$optimusprime_qry=mysqli_query($this->stc_dbs, "
+					UPDATE
+						`stc_status_down_list`
+					SET
+						`stc_status_down_list_rect_date`='".mysqli_real_escape_string($this->stc_dbs, $date)."',
+						`stc_status_down_list_equipment_status`='Running',
+						`stc_status_down_list_permit_no`='".mysqli_real_escape_string($this->stc_dbs, $work_permit_no)."'  
+					WHERE
+						`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
 				");
-				$validated=1;
-				foreach($optimusprime_cqry as $optimusprime_crow){
-					if(($optimusprime_crow['stc_status_down_list_qty']==0) || ($optimusprime_crow['stc_status_down_list_capacity']=='') || ($optimusprime_crow['stc_status_down_list_reasonattribute']=='')){
-						$validated=0;
-						break;
-					}
-				}
-				if($validated==1){
-					$optimusprime_qry=mysqli_query($this->stc_dbs, "
-						UPDATE
-							`stc_status_down_list`
-						SET
-							`stc_status_down_list_rect_date`='".mysqli_real_escape_string($this->stc_dbs, $date)."',
-							`stc_status_down_list_equipment_status`='Running',
-							`stc_status_down_list_permit_no`='".mysqli_real_escape_string($this->stc_dbs, $work_permit_no)."'  
-						WHERE
-							`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
-					");
-					$optimusprime = 'Status Updated!!!';
-				}else{
-					$optimusprime = 'Status not updated. Please fill all fields.';
-				}
-			}else{
 				$optimusprime = 'Status Updated!!!';
+			}else{
+				$optimusprime = 'Status not updated. Please fill all fields.';
 			}
 		}else{
-			$optimusprime='Hmmm!!! Somethig went wrong on changing status.';
+			$optimusprime_qry=mysqli_query($this->stc_dbs, "
+				UPDATE 
+					`stc_status_down_list` 
+				SET 
+					`stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."',
+					`stc_status_down_list_jobdone_details`='".mysqli_real_escape_string($this->stc_dbs, $jobdonedetails)."'
+				WHERE 
+					`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
+			");
+			$optimusprime = 'Status Updated!!!';
 		}
 		return $optimusprime;
 	}
