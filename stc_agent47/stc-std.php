@@ -80,10 +80,13 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <?php
                                                         include_once("../MCU/db.php");
                                                         $dept_qry=mysqli_query($con, "
-                                                            SELECT
-                                                                DISTINCT `stc_status_down_list_plocation`
-                                                            FROM
-                                                                `stc_status_down_list`
+                                                            SELECT DISTINCT `stc_status_down_list_plocation`
+                                                            FROM `stc_status_down_list`
+                                                            INNER JOIN `stc_cust_pro_supervisor`
+                                                            ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by`
+                                                            WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'
+                                                            AND `stc_status_down_list_plocation`<>''
+                                                            AND `stc_status_down_list_plocation`<>'Select'
                                                             ORDER BY `stc_status_down_list_plocation` ASC
                                                         ");
                                                         foreach($dept_qry as $dept_row){
