@@ -479,9 +479,14 @@ class Yggdrasil extends tesseract{
 	public function stc_save_school_income($schoolname, $income){
 		$odin='';
 		$date=date("Y-m-d");
+		$year=date("Y");
 		$month=date("m", strtotime($date));
 		$odincheckqry=mysqli_query($this->stc_dbs, "
-			SELECT * FROM `stc_school_month_closing` WHERE MONTH(`stc_school_month_closing_date`)='".$month."' AND `stc_school_fee_which_school`='".mysqli_real_escape_string($this->stc_dbs, $schoolname)."' ORDER BY MONTH(`stc_school_month_closing_date`) DESC
+			SELECT * FROM `stc_school_month_closing` 
+			WHERE MONTH(`stc_school_month_closing_date`)='".$month."'
+			AND YEAR(`stc_school_month_closing_date`)='".$year."' 
+			AND `stc_school_fee_which_school`='".mysqli_real_escape_string($this->stc_dbs, $schoolname)."' 
+			ORDER BY MONTH(`stc_school_month_closing_date`) DESC
 		");
 		if(mysqli_num_rows($odincheckqry)>0){
 			$odin='Already added!!!';
