@@ -1449,7 +1449,7 @@ class Yggdrasil extends tesseract{
 									LIMIT 0,1
 								");
 								$result = mysqli_fetch_assoc($query);
-								$duration = $result['duration'];
+								$duration = mysqli_num_rows($query)>0 ? $result['duration'] : 0;
 								$class_minutes+=$duration;
 							}
 						}
