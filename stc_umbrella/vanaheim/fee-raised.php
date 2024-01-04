@@ -522,7 +522,8 @@ class Yggdrasil extends tesseract{
 				<tbody>
 		';
 		$odinqry=mysqli_query($this->stc_dbs, "
-			SELECT * FROM `stc_school_month_closing` WHERE `stc_school_month_closing_created_by`='".$_SESSION['stc_school_user_id']."'
+			SELECT * FROM `stc_school_month_closing` WHERE `stc_school_month_closing_created_by`='".$_SESSION['stc_school_user_id']."' 
+			ORDER BY TIMESTAMP(`stc_school_month_closing_date`) DESC
 		");
 		foreach($odinqry as $odinrow){
 			$odin.='
