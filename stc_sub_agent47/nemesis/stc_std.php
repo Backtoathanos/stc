@@ -503,15 +503,15 @@ class transformers extends tesseract{
 				if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
 					if($row['stc_status_down_list_status']==1){
 						$actionsec='
-							<a href="stc-requisition.php?sdl='.$row['stc_status_down_list_id'].'&status=add" class="btn bg-success text-white mb-3" placeholder="Add Requisiton"><i class="pe-7s-note2"></i></a>
-							<a href="javascript:void(0)" class="btn bg-danger text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" placeholder="Edit Status Down List" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
+							<a href="stc-requisition.php?sdl='.$row['stc_status_down_list_id'].'&status=add" class="btn bg-success text-white mb-3" title="Add Requisiton"><i class="pe-7s-note2"></i></a>
+							<a href="javascript:void(0)" class="btn bg-danger text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" title="Edit Status Down List" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
 							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
 								<option status="NA">SELECT STATUS</option>
 								<option status="2">DOWN</option>
 								<option status="3">WORK-IN-PROGRESS</option>
 								<option status="4">WORK-DONE</option>
 							</select>
-							<a href="#" class="stc-add-to-pending btn btn-danger" style="font-size:10px;margin-top:4px;" placeholder="Add Pending Reason" id="'.$row['stc_status_down_list_id'].'">Add Pending Reason</a>
+							<a href="#" class="stc-add-to-pending btn btn-danger" style="font-size:10px;margin-top:4px;" title="Add Pending Reason" id="'.$row['stc_status_down_list_id'].'">Add Pending Reason</a>
 						';
 					}elseif($row['stc_status_down_list_status']==2){
 						$actionsec='
@@ -530,6 +530,7 @@ class transformers extends tesseract{
 								<option status="2">DOWN</option>
 								<option status="4">WORK-DONE</option>
 							</select>
+							<a href="#" class="stc-add-to-pending btn btn-danger" style="font-size:10px;margin-top:4px;" title="Add Pending Reason" id="'.$row['stc_status_down_list_id'].'">Add Pending Reason</a>
 						';
 					}else{
 						$actionsec='#';
@@ -539,13 +540,13 @@ class transformers extends tesseract{
 					if($row['stc_status_down_list_status']==4){
 						$actionsec='
 								<div class="col-sm-12 col-md-12">
-									<a href="javascript:void(0)" class="btn bg-danger text-white stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
+									<a href="javascript:void(0)" class="btn bg-danger text-white stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" title="Edit Status Down List" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
 								</div>
 								<div class="col-sm-12 col-md-12">
-									<a href="javascript:void(0)" class="btn btn-success update-status-si" data-id="'.$row['stc_status_down_list_id'].'" actiontype="5"><i class="fa fa-thumbs-up"></i></a>
+									<a href="javascript:void(0)" class="btn btn-success update-status-si" data-id="'.$row['stc_status_down_list_id'].'" title="Job close" actiontype="5"><i class="fa fa-thumbs-up"></i></a>
 								</div>
 								<div class="col-sm-12 col-md-12">
-										<a href="javascript:void(0)" class="btn btn-info update-status-si" style="background-color: #00f9b4;" data-id="'.$row['stc_status_down_list_id'].'" actiontype="1"><i class="fa fa-thumbs-down"></i></a>
+										<a href="javascript:void(0)" class="btn btn-info update-status-si" style="background-color: #00f9b4;" data-id="'.$row['stc_status_down_list_id'].'" title="Job down" actiontype="1"><i class="fa fa-thumbs-down"></i></a>
 								</div>
 						';
 					}else{
