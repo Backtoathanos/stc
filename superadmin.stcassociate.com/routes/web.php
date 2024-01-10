@@ -20,6 +20,7 @@ use App\Http\Controllers\RackController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\branchElectronicsController;
+use App\Http\Controllers\SchoolController;
 
 /*
 |--------------------------------------------------------------------------
@@ -206,4 +207,10 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/branch/electronicsbranch/getSP', [branchElectronicsController::class, 'getSP']);
     Route::post('/branch/electronicsbranch/edit', [branchElectronicsController::class, 'update']);    
     Route::get('/branch/electronicsbranch/delete', [branchElectronicsController::class, 'delete']);
+
+    
+    Route::get('/branch/school', [SchoolController::class, 'show']);    
+    Route::get('/branch/school/list', [SchoolController::class, 'list']);
+    Route::post('/branch/school/edit', [SchoolController::class, 'update']);   
+    Route::get('/branch/school/delete', [SchoolController::class, 'delete']);
 });

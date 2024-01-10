@@ -59,7 +59,7 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ url('/users/schoolbranch') }}" class="nav-link @if(Request::segment(2) == 'schoolbranch') active @endif">
+                <a href="{{ url('/branch/school') }}" class="nav-link @if(Request::segment(2) == 'schoolbranch') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>School</p>
                 </a>
