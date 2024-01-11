@@ -117,6 +117,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-12" data-toggle="tab" href="#tab-content-12">
+                                    <span>Material Requisition Details</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-10" data-toggle="tab" href="#tab-content-10">
                                     <span>Status Down List</span>
                                 </a>
@@ -162,6 +167,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                             ?>
                         </ul>
                         <div class="tab-content">
+                            <!-- merchant ledger -->
                             <div class="tab-pane tabs-animation fade show active" id="tab-content-1" role="tabpanel">
                                 <div class="row">
                                     <div class="col-md-12">
@@ -250,6 +256,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div> -->
+                            <!-- customer agent requisition -->
                             <div class="tab-pane tabs-animation fade" id="tab-content-3" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -390,6 +397,180 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <!-- material requisition details -->
+                            <div class="tab-pane tabs-animation fade" id="tab-content-12" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="description" align="center"
+                                              >View Material Requisition Details
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="stc-mrd-from"
+                                              >From
+                                            </h5>
+                                            <input 
+                                                type="date"
+                                                id="stc-mrd-from"
+                                                class="custom-select stc-mrd-from"
+                                                name="stc-mrd-from"
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="stc-mrd-to"
+                                              >To
+                                            </h5>
+                                            <input 
+                                                type="date"
+                                                id="stc-mrd-to"
+                                                class="custom-select stc-mrd-to"
+                                                name="stc-mrd-to"
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="stc-mrd-tojob"
+                                              >Type of Job
+                                            </h5>
+                                            <select
+                                              id="stc-mrd-tojob"
+                                              class="custom-select stc-mrd-tojob"
+                                              name="stccustomer"
+                                            ><option value="NA">Select</option>
+                                            <option value="1">Project</option>
+                                            <option value="2">Service</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="name"
+                                              >Customer Name
+                                            </h5>
+                                            <select
+                                              id="stc-mrd-customer"
+                                              class="custom-select stc-select-customer"
+                                              name="stccustomer"
+                                            ><option value="NA">Please Select Customer First</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="name"
+                                              >Location
+                                            </h5>
+                                            <select
+                                              id="stc-mrd-location"
+                                              class="custom-select stc-mrd-lcoation"
+                                              name="stccustomer"
+                                            ><option value="NA">Please Select Customer First</option>
+                                            </select>
+                                        </div>
+                                    </div>       
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="name"
+                                              >Department
+                                            </h5>
+                                            <select
+                                              id="stc-mrd-dept"
+                                              class="custom-select stc-mrd-dept"
+                                              name="stccustomer"
+                                            ><option value="NA">Please Select Customer First</option>
+                                            </select>
+                                        </div>
+                                    </div>            
+                                    <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="name"
+                                              >Type of Material
+                                            </h5>
+                                            <select
+                                              id="stc-mrd-tomaterial"
+                                              class="custom-select stc-mrd-tomaterial"
+                                              name="stccustomer"
+                                            ><option value="NA">Select</option>
+                                            <option>Tools</option>
+                                            <option>PPE</option>
+                                            <option>Consumable</option>
+                                            <option>Supply</option>
+                                            <option>Storeset</option>
+                                            </select>
+                                        </div>
+                                    </div>                         
+                                    <div class="col-md-10 col-xl-10 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <button class="mb-2 mr-2 btn btn-success btn-block stc-mrd-hit">
+                                                <i class="metismenu-icon pe-7s-search"></i> Find
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xl-2 col-sm-12 hidden-project-excel-section"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <button class="mb-2 mr-2 btn btn-success btn-block stc-mrd-exportexcel-hit" data-type="excel">
+                                                <i class="fa fa-file-excel-o"></i> Export Excel
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                          <table class="mb-0 table table-bordered" id="stc-reports-mrd-view">
+                                            <thead>
+                                            <tr>
+                                                <th>P.No</th>
+                                                <th>Date & Time</th>
+                                                <th>Item Description</th>
+                                                <th>Unit</th>
+                                                <th>Qty</th>
+                                                <th>Manager Appr. Qty</th>
+                                                <th>E-Proc Appr. Qty</th>
+                                                <th>Dispatch Quantity</th>
+                                                <!-- <th>Dispatch Date & Time</th> -->
+                                                <th>Recieved Qty <br>Date & Time</th>
+                                                <th>Pending Qty</th>
+                                                <th>Consumable Qty</th>
+                                                <th>Stock Qty</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="stc-reports-mrd-view">
+                                              <tr>
+                                                <td colspan="2">
+                                                  <button type="button" class="btn btn-primary projbegbuttoninvsearch" style="float:right;">
+                                                    <i class="fas fa-arrow-left"></i>
+                                                  </button>
+                                                  <input type="hidden" class="projbegvalueinputsearch" value="0">
+                                                </td>
+                                                <td colspan="11">
+                                                  <button type="button" class="btn btn-primary projendbuttoninvsearch">
+                                                    <i class="fas fa-arrow-right"></i>
+                                                  </button>
+                                                  <input type="hidden" class="projendvalueinputsearch" value="30">
+                                                </td>
+                                              </tr>
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- customer agent project -->
                             <div class="tab-pane tabs-animation fade" id="tab-content-4" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -478,6 +659,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <!-- stc electronics -->
                             <div class="tab-pane tabs-animation fade" id="tab-content-5" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -581,6 +763,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <!-- stc trading -->
                             <div class="tab-pane tabs-animation fade" id="tab-content-6" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -683,6 +866,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <!-- school canteen -->
                             <div class="tab-pane tabs-animation fade" id="tab-content-7" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -763,6 +947,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <!-- school fee -->
                             <div class="tab-pane tabs-animation fade" id="tab-content-8" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -892,6 +1077,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <!-- stc groceries -->
                             <div class="tab-pane tabs-animation fade" id="tab-content-9" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -994,6 +1180,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <!-- status down list -->
                             <div class="tab-pane tabs-animation fade" id="tab-content-10" role="tabpanel">
                                 <div class="row desctitlesdl">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -1047,6 +1234,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <!-- school attendance -->
                             <div class="tab-pane tabs-animation fade" id="tab-content-11" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -1374,6 +1562,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     $('.std-filter-location').after('<p class="message-alert">Please select Location first.</p>');
                 }
             });
+
             $('body').delegate('.std-filter-location', 'change', function(){
                 var location = $(this).val();
                 $('.message-alert').remove();
@@ -1821,6 +2010,150 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     </script>
     <script>
         $(document).ready(function(){
+            var filter_school = {};
+            $('.hidden-fee-excel-section').hide();
+            
+            //school checklbox filter
+            function get_filter(class_name){
+                var filter = [];
+                $('.' + class_name + ':checked').each(function(){
+                   filter.push($(this).val()); 
+                });
+                return filter;
+            }
+            //set school to cookies            
+            $('body').delegate('.common_selector', 'click', function(){
+               // e.preventDefault();
+                if($(this).hasClass('stcsfchool')){
+                    filter_school['school'] = get_filter('stcsfchool');
+                }
+                
+            });
+            // call school canteen
+            $('body').delegate('.stcs-schoolfee-hit', 'click', function(e){
+                // e.preventDefault();
+                $('.hidden-fee-excel-section').show();
+                var beg_date=$('.stcsfbegdate').val();
+                var end_date=$('.stcsfenddate').val();
+                var school_n=filter_school['school'];
+                $.ajax({
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "post",
+                    data    : {
+                        stc_find_school_fee_reports:1,
+                        beg_date:beg_date,
+                        end_date:end_date,
+                        school_name:school_n
+                    },
+                    success : function(response_sandp){
+                        // console.log(response_sandp);
+                        $('.stc-reports-school-fee-view').html(response_sandp);
+                    }
+                });
+                
+            });
+
+            // create excel
+            $('body').delegate('.stc-fee-exportexcel-hit', 'click', function(e){
+                e.preventDefault();
+                $("#stc-school-name-table").table2excel({
+                    filename: "stc-fee-reports.xls"
+                });
+            });
+
+            // call attendance
+            $('body').delegate('.stc-school-att-find', 'click', function(e){
+                e.preventDefault();
+                var stc_school_month = $('.stc-school-month').val();
+                $.ajax({
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "post",
+                    data    : {
+                        stc_find_school_attendance:1,
+                        stc_school_month:stc_school_month
+                    },
+                    success : function(response_sandp){
+                        // console.log(response_sandp);
+                        $('.stc-show-school-attendance').html(response_sandp);
+                    }
+                });
+            });
+        });
+    </script>
+    <!-- mrd -->    
+    <script>
+        $(document).ready(function(){
+
+            // call location for mrd
+            $('body').delegate('#stc-mrd-customer', 'change', function(e){
+                e.preventDefault();
+                var customer_id = $(this).val();
+                $.ajax({
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "post",
+                    data    : {
+                        stc_mrd_call_location:1,
+                        customer_id:customer_id
+                    },
+                    success : function(response){
+                        // console.log(response);
+                        $('#stc-mrd-location').html(response);
+                    }
+                });
+            });
+
+            // call department for mrd
+            $('body').delegate('#stc-mrd-location', 'change', function(e){
+                e.preventDefault();
+                var location = $(this).val();
+                $.ajax({
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "post",
+                    data    : {
+                        stc_mrd_call_dept:1,
+                        location:location
+                    },
+                    success : function(response){
+                        // console.log(response);
+                        $('#stc-mrd-dept').html(response);
+                    }
+                });
+            });
+
+            // call find for mrd
+            $('body').delegate('.stc-mrd-hit', 'click', function(e){
+                e.preventDefault();
+                var from = $("#stc-mrd-from").val();
+                var to = $("#stc-mrd-to").val();
+                var tojob = $("#stc-mrd-tojob").val();
+                var customer = $("#stc-mrd-customer").val();
+                var location = $("#stc-mrd-location").val();
+                var dept = $("#stc-mrd-dept").val();
+                var tomaterial = $("#stc-mrd-tomaterial").val();
+                if(from!="" && to!=""){
+                    $.ajax({
+                        url     : "kattegat/ragnar_reports.php",
+                        method  : "post",
+                        data    : {
+                            stc_mrd_call_mrd:1,
+                            from:from,
+                            to:to,
+                            tojob:tojob,
+                            customer:customer,
+                            location:location,
+                            dept:dept,
+                            tomaterial:tomaterial
+                        },
+                        success : function(response){
+                            // console.log(response);
+                            $('.stc-reports-mrd-view').html(response);
+                        }
+                    });
+                }else{
+                    alert("Please select date.");
+                }
+            });
+
             var filter_school = {};
             $('.hidden-fee-excel-section').hide();
             
