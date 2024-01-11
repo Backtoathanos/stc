@@ -78,7 +78,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 }
                                             ?>
                                             <?php
-                                                if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
+                                                // if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
                                             ?>
                                             <div class="row">
                                                 <div class="col-lg-3 col-md-3">
@@ -109,7 +109,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 </div>
                                             </div>
                                             <?php
-                                                }
+                                                // }
                                             ?>
                                         </div>
                                     </div>
@@ -360,7 +360,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 stc_j_plannning:j_plannning,
                                 reason:reason,
                                 eq_type:eq_type,
-                                action_status:action_status
+                                action_status:action_status,
+                                creator_details:creator_details
                             },
                             success     : function(response_std){
                                 // console.log(response_std);
@@ -1020,6 +1021,15 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
+                                <h5>Creator Name & Contact Number :</h5><br>
+                                <!-- <input type="text" class="form-control stc-agent-sup-std-creator-details stc-std-update-on-focusout" placeholder="Enter Responsive Person"> -->
+                                <textarea class="form-control stc-agent-sup-std-creator-details" placeholder="Enter Creator Name & Contact Number"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-6"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
                                 <h5>Equipment Type :</h5><br>
                                 <!-- <select class="btn btn-success form-control load_equipment_type_consump text-left" id="stc-agent-sup-std-equipment-type"><option>Please select area first!!!</option>
                                 </select>  -->
@@ -1092,6 +1102,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
+                    <?php if(($_SESSION['stc_agent_sub_category']=="Site Incharge") || ($_SESSION['stc_agent_sub_category']=="Supervisor")){ ?>
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
@@ -1100,6 +1111,16 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-6 col-xl-6"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Creator Name & Contact Number :</h5><br>
+                                <!-- <input type="text" class="form-control stc-agent-sup-std-creator-details stc-std-update-on-focusout" placeholder="Enter Responsive Person"> -->
+                                <textarea class="form-control stc-agent-sup-std-creator-details stc-std-update-on-focusout" placeholder="Enter Creator Name & Contact Number"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <?php } ?>
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">

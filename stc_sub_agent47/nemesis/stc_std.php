@@ -192,7 +192,7 @@ class transformers extends tesseract{
 	}
 
 	// save std
-	public function stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $eq_type, $action_status){
+	public function stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $eq_type, $action_status, $creator_details){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		$tools_req='';
@@ -216,6 +216,7 @@ class transformers extends tesseract{
 			    `stc_status_down_list_reason`,
 			    `stc_status_down_list_equipment_type`,
 				`stc_status_down_list_equipment_status`,
+				`stc_status_down_list_creator_details`,
 			    `stc_status_down_list_status`,
 			    `stc_status_down_list_created_by`
 			)VALUES(
@@ -228,6 +229,7 @@ class transformers extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $reason)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $eq_type)."',
 				'".$status."',
+				'".mysqli_real_escape_string($this->stc_dbs, $creator_details)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $action_status)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
 			)
@@ -349,15 +351,18 @@ class transformers extends tesseract{
 	public function stc_call_status_down_list($location_id){
 		$head_hidden1 = '';
 		$head_hidden2 = '';
+		$head_hidden3 = '';
 		if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
 			$head_hidden1='				
-				<th class="text-center">EQUIPMENT TYPE</th>
 				<th class="text-center">EQUIPMENT STATUS</th>
 				<th class="text-center">JOB CATEGORIES</th>
 				<th class="text-center">JOB VARIETIES</th>
 				<th class="text-center">MATERIAL DESCRIPTION</th>
 				<th class="text-center">TARGET DATE</th>
 			';
+			$head_hidden3='		
+				<th class="text-center">ACTION</th>
+			';		
 		}
 		if($_SESSION['stc_agent_sub_category']=='Site Incharge'){
 			$head_hidden2='
@@ -379,10 +384,12 @@ class transformers extends tesseract{
 						<th class="text-center">AREA</th>
 						<th class="text-center">TYPE OF JOB</th>
 						<th class="text-center">REASON</th>
+						<th class="text-center">EQUIPMENT TYPE</th>
 						'.$head_hidden1.'
+						<th class="text-center">CREATOR NAME & CONTACT NUMBER</th>
 						<th class="text-center">STATUS</th>
 						'.$head_hidden2.'
-						<th class="text-center">ACTION</th>
+						'.$head_hidden3.'
 					</tr>
 				</thead>
 				<tbody>
@@ -620,14 +627,20 @@ class transformers extends tesseract{
 				
 				$hidden1 = '';
 				$hidden2 = '';
+				$hidden3 = '';
 				if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
 					$hidden1='	
-						<td>'.$eq_type.'</td>
 						'.$eqstatus.'
 						<td class="text-center">'.$job_type.'</td>
 						<td class="text-center">'.$job_varities.'</td>
 						<td>'.$row['stc_status_down_list_material_desc'].'</td>
 						<td>'.$tar_date.'</td>
+					';
+					$hidden3='	
+						<td class="text-center">
+							'.$actionsec.'
+							<input type="hidden" class="stc-std-permit-no-hidden-call" value="'.$row['stc_status_down_list_permit_no'].'" id="'.$row['stc_cust_project_title'].'">
+						</td>
 					';
 				}
 				if($_SESSION['stc_agent_sub_category']=='Site Incharge'){
@@ -654,13 +667,12 @@ class transformers extends tesseract{
 						<td>'.$row['stc_status_down_list_area'].'</td>
 						<td>'.$row['stc_status_down_list_jobtype'].'</td>
 						<td>'.$row['stc_status_down_list_reason'].'</td>
+						<td>'.$eq_type.'</td>
 						'.$hidden1.'
+						<td>'.$row['stc_status_down_list_creator_details'].'</td>
 						<td class="text-center" '.$statusbgcolor.'>'.$status.'</td>
 						'.$hidden2.'
-						<td class="text-center">
-							'.$actionsec.'
-							<input type="hidden" class="stc-std-permit-no-hidden-call" value="'.$row['stc_status_down_list_permit_no'].'" id="'.$row['stc_cust_project_title'].'">
-						</td>
+						'.$hidden3.'
 					</tr>
 				';
 			}
@@ -888,12 +900,13 @@ if(isset($_POST['stc_std_hit'])){
 	$reason=$_POST['reason'];
 	$eq_type=$_POST['eq_type'];
 	$action_status = $_POST['action_status'];
+	$creator_details = $_POST['creator_details'];
 
 	$metabots=new transformers();
 	if(empty($_SESSION['stc_agent_sub_id'])){
 		$opmetabots="Please login!!!";
 	}else{
-		$opmetabots=$metabots->stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $eq_type, $action_status);
+		$opmetabots=$metabots->stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $eq_type, $action_status, $creator_details);
 	}
 	echo $opmetabots;
 }

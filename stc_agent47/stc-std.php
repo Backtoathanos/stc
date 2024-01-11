@@ -168,6 +168,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                         'PENDINGREASON' => 'PENDING REASON',
                                                         'JOBDONEDETAILS' => 'JOB DONE DETAILS',
                                                         'REMARKS' => 'REMARKS',
+                                                        'CREATEDDETAILS' => 'CREATOR NAME & CONTACT NUMBER',
                                                         'CREATEDBY' => 'CREATED BY',
                                                         'DESIGNATION' => 'DESIGNATION',
                                                         'UPDATEDBY' => 'UPDATED BY',

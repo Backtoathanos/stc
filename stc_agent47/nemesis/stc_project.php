@@ -2005,6 +2005,7 @@ class pirates_supervisor extends tesseract{
 						<th class="text-center PENDINGREASON">PENDING REASON</th>
 						<th class="text-center JOBDONEDETAILS">JOB DONE DETAILS</th>
 						<th class="text-center REMARKS">REMARKS</th>
+						<th class="text-center CREATEDDETAILS">CREATOR NAME & CONTACT NUMBER</th>
 						<th class="text-center CREATEDBY">CREATED BY</th>
 						<th class="text-center DESIGNATION">DESIGNATION</th>
 						<th class="text-center UPDATEDBY">UPDATED BY</th>
@@ -2299,6 +2300,7 @@ class pirates_supervisor extends tesseract{
 						<td class="PENDINGREASON">'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td class="JOBDONEDETAILS">'.$row['stc_status_down_list_jobdone_details'].'<br>'.$updatejobdetails.'
 						<td class="REMARKS">'.$row['stc_status_down_list_remarks'].'</td>
+						<td class="CREATEDDETAILS">'.$row['stc_status_down_list_creator_details'].'</td>
 						<td class="CREATEDBY">'.$row['stc_cust_pro_supervisor_fullname'].'<br>'.$row['stc_cust_pro_supervisor_contact'].'</td>
 						<td class="DESIGNATION text-center">'.$row['stc_cust_pro_supervisor_category'].'</td>
 						<td class="UPDATEDBY">'.$updater_name.'</td>
