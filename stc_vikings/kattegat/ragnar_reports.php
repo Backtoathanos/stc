@@ -3931,8 +3931,8 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
 					FROM `stc_cust_super_requisition_list_items_rec` 
 					WHERE 
 						(
-                     `stc_cust_super_requisition_list_items_rec_list_id`='".$odin_get_mrdrow['req_id']."' 
-					   AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$odin_get_mrdrow['req_item_id']."'  
+                     `stc_cust_super_requisition_list_items_rec_list_id`='".$odin_get_mrdrow['req_item_id']."' 
+					   AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$odin_get_mrdrow['req_id']."'  
                )
             ");
 				foreach($stcdecqtyqry as $dispatchedrow){
