@@ -3816,6 +3816,186 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
       return $ivar;
    }
 }
+
+class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
+   // call mrd location
+   public function stc_mrd_location_call($customer_id){
+      $odin='<option value="NA">Select</option>';
+      $odin_get_locqry=mysqli_query($this->stc_dbs, "
+         SELECT DISTINCT `stc_status_down_list_plocation` 
+         FROM `stc_status_down_list` 
+         INNER JOIN `stc_cust_pro_supervisor` 
+         ON `stc_status_down_list_created_by`=`stc_cust_pro_supervisor_id` 
+         WHERE `stc_cust_pro_supervisor_cust_id`='".mysqli_real_escape_string($this->stc_dbs, $customer_id)."'
+         AND `stc_status_down_list_plocation`<>''
+         ORDER BY `stc_status_down_list_plocation` ASC
+      ");
+      if(mysqli_num_rows($odin_get_locqry)>0){
+         foreach($odin_get_locqry as $odin_get_locrow){
+            $odin.='
+               <option>'.$odin_get_locrow['stc_status_down_list_plocation'].'</option>
+            ';
+         }
+      }else{
+         $odin.='
+            <option value="NA">Location not found.</option>
+         ';
+      }
+      return $odin;
+   }
+
+   // call mrd dept
+   public function stc_mrd_dept_call($location){
+      $odin='<option value="NA">Select</option>';
+      $odin_get_deptqry=mysqli_query($this->stc_dbs, "
+         SELECT DISTINCT`stc_status_down_list_sub_location` 
+         FROM `stc_status_down_list` 
+         WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location)."'
+         AND `stc_status_down_list_sub_location`<>''
+         ORDER BY `stc_status_down_list_sub_location` ASC
+      ");
+      if(mysqli_num_rows($odin_get_deptqry)>0){
+         foreach($odin_get_deptqry as $odin_get_deptrow){
+            $odin.='
+               <option>'.$odin_get_deptrow['stc_status_down_list_sub_location'].'</option>
+            ';
+         }
+      }else{
+         $odin.='
+            <option value="NA">Department not found.</option>
+         ';
+      }
+      return $odin;
+   }
+
+   // call mrd
+   public function stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $tomaterial){      
+      $odin='';
+      $filter_query='';
+      if(empty($from)){
+         $filter_query.='';
+      }
+      if($tojob=="2"){
+         $filter_query.=" AND R.stc_cust_super_requisition_list_sdlid<>0";
+      }
+      if($customer!="NA"){
+         $filter_query.=" AND stc_cust_project_cust_id='".mysqli_real_escape_string($this->stc_dbs, $customer)."'";
+      }
+      $sdl_joiner='';
+      if($location!="NA"){
+         $sdl_joiner='            
+            LEFT JOIN `stc_status_down_list`
+            ON R.`stc_cust_super_requisition_list_sdlid`=`stc_status_down_list_id`
+         ';
+         $filter_query.=" AND stc_status_down_list_plocation='".mysqli_real_escape_string($this->stc_dbs, $location)."'";
+      }
+      if($dept!="NA"){
+         $filter_query.=" AND stc_status_down_list_sub_location='".mysqli_real_escape_string($this->stc_dbs, $dept)."'";
+      }
+      if($tomaterial!="NA"){
+         $filter_query.=" AND I.stc_cust_super_requisition_items_type='".mysqli_real_escape_string($this->stc_dbs, $tomaterial)."'";
+      }
+      $query= "
+         SELECT 
+            R.`stc_cust_super_requisition_list_id` as req_id,
+            I.`stc_cust_super_requisition_list_id` as req_item_id,
+            R.`stc_cust_super_requisition_list_date`,
+            R.`stc_cust_super_requisition_list_sdlid`,
+            I.`stc_cust_super_requisition_list_items_title`, 
+            I.`stc_cust_super_requisition_list_items_unit`,
+            I.`stc_cust_super_requisition_list_items_reqqty`,
+            I.`stc_cust_super_requisition_list_items_approved_qty`,
+            I.`stc_cust_super_requisition_items_finalqty`,
+            I.`stc_cust_super_requisition_items_type`,
+            `stc_cust_project_cust_id`  
+         FROM `stc_cust_super_requisition_list_items` I
+         LEFT JOIN `stc_cust_super_requisition_list` R
+         ON R.`stc_cust_super_requisition_list_id`=I.`stc_cust_super_requisition_list_id`
+         LEFT JOIN `stc_cust_project`
+         ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
+         ".$sdl_joiner."
+         WHERE DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $from)."'
+         AND '".mysqli_real_escape_string($this->stc_dbs, $to)."' ".$filter_query."
+      ";
+      $odin_get_mrdqry=mysqli_query($this->stc_dbs, $query);
+      if(mysqli_num_rows($odin_get_mrdqry)>0){
+         foreach($odin_get_mrdqry as $odin_get_mrdrow){
+            $pno='';
+            if($location!="NA"){
+               $pno=$odin_get_mrdrow['stc_cust_super_requisition_list_sdlid'];
+            }
+            $stcdispatchedqty=0;
+            $stcdecqtyqry=mysqli_query($this->stc_dbs, "
+					SELECT 
+						`stc_cust_super_requisition_list_items_rec_recqty`
+					FROM `stc_cust_super_requisition_list_items_rec` 
+					WHERE 
+						(
+                     `stc_cust_super_requisition_list_items_rec_list_id`='".$odin_get_mrdrow['req_id']."' 
+					   AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$odin_get_mrdrow['req_item_id']."'  
+               )
+            ");
+				foreach($stcdecqtyqry as $dispatchedrow){
+					$stcdispatchedqty+=$dispatchedrow['stc_cust_super_requisition_list_items_rec_recqty'];
+				}
+
+            $stcrecqry=mysqli_query($this->stc_dbs, "
+					SELECT 
+						`stc_cust_super_requisition_rec_items_fr_supervisor_date`,
+						`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+					FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
+					WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$odin_get_mrdrow['req_item_id']."'  
+				");
+            
+            $stcrecieveddate='';
+            $stcrecievedqty=0;
+            if(mysqli_num_rows($stcrecqry)>0){
+               foreach($stcrecqry as $recievedrow){
+                  $stcrecieveddate=date('d-m-Y h:i:s a', strtotime($recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_date']));
+                  $stcrecievedqty+=$recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
+               }
+            }
+
+            $stcconsumedqty=0;
+				$stcconsrecqtyqry=mysqli_query($this->stc_dbs, "
+					SELECT 
+						SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
+					FROM `stc_cust_super_list_items_consumption_items` 
+					WHERE `stc_cust_super_list_items_consumption_items_name`='".mysqli_real_escape_string($this->stc_dbs, $odin_get_mrdrow['stc_cust_super_requisition_list_items_title'])."'  
+				");
+				foreach($stcconsrecqtyqry as $consumedrow){
+					$stcconsumedqty+=$consumedrow['consumable_qty'];
+				}
+            
+            $stcpendingqty=$odin_get_mrdrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
+            $stockqty=$stcrecievedqty - $stcconsumedqty;
+            $odin.='
+               <tr>
+                  <td>'.$pno.'</td>
+                  <td class="text-center">'.date('d-m-Y h:i:s a', strtotime($odin_get_mrdrow['stc_cust_super_requisition_list_date'])).'</td>
+                  <td>'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_title'].'</td>
+                  <td class="text-center">'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_unit'].'</td>
+                  <td class="text-right">'.number_format($odin_get_mrdrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+                  <td class="text-right">'.number_format($odin_get_mrdrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+                  <td class="text-right">'.number_format($odin_get_mrdrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+                  <td class="text-right">'.number_format($stcdispatchedqty, 2).'</td>
+                  <td class="text-center">'.$stcrecieveddate.'</td>
+                  <td class="text-right">'.number_format($stcpendingqty, 2).'</td>
+                  <td class="text-right">'.number_format($stcconsumedqty, 2).'</td>
+                  <td class="text-right">'.number_format($stockqty, 2).'</td>
+               </tr>
+            ';
+         }
+      }else{
+         $odin.='
+            <tr>
+               <td>No record found.</td>
+            </tr>
+         ';
+      }
+      return $odin;
+   }
+}
 #<--------------------------------------------------------------------------------------------------------->
 #<--------------------------------------Object sections of reports class----------------------------------->
 #<--------------------------------------------------------------------------------------------------------->
@@ -4084,6 +4264,45 @@ if(isset($_POST['stc_find_school_attendance'])){
    $bjorneschoolfee=new ragnarReportsViewSchoolFeeReports();
 
    $out=$bjorneschoolfee->stc_school_call_attendance($stc_school_month);
+   echo $out;
+}
+
+#<----------------------------Object sections of mrd reports class--------------------------------->
+// call mrd location
+if(isset($_POST['stc_mrd_call_location'])){
+   $out='';
+   $customer_id=$_POST['customer_id'];
+
+   $bjorneschoolfee=new ragnarReportsViewMaterialRequisitionDetails();
+
+   $out=$bjorneschoolfee->stc_mrd_location_call($customer_id);
+   echo $out;
+}
+
+// call mrd dept
+if(isset($_POST['stc_mrd_call_dept'])){
+   $out='';
+   $location=$_POST['location'];
+
+   $bjorneschoolfee=new ragnarReportsViewMaterialRequisitionDetails();
+
+   $out=$bjorneschoolfee->stc_mrd_dept_call($location);
+   echo $out;
+}
+
+if(isset($_POST['stc_mrd_call_mrd'])){
+   $out='';
+   $from=date('Y-m-d', strtotime($_POST['from']));
+   $to=date('Y-m-d', strtotime($_POST['to']));
+   $tojob=$_POST['tojob'];
+   $customer=$_POST['customer'];
+   $location=$_POST['location'];
+   $dept=$_POST['dept'];
+   $tomaterial=$_POST['tomaterial'];
+
+   $bjorneschoolfee=new ragnarReportsViewMaterialRequisitionDetails();
+
+   $out=$bjorneschoolfee->stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $tomaterial);
    echo $out;
 }
 ?>
