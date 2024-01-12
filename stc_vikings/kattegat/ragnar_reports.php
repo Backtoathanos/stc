@@ -3910,7 +3910,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
             `stc_cust_project_cust_id`  
          FROM `stc_cust_super_requisition_list_items` I
          LEFT JOIN `stc_cust_super_requisition_list` R
-         ON R.`stc_cust_super_requisition_list_id`=I.`stc_cust_super_requisition_list_id`
+         ON R.`stc_cust_super_requisition_list_id`=I.`stc_cust_super_requisition_list_items_req_id`
          LEFT JOIN `stc_cust_project`
          ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
          ".$sdl_joiner."
@@ -3931,8 +3931,8 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
 					FROM `stc_cust_super_requisition_list_items_rec` 
 					WHERE 
 						(
-                     `stc_cust_super_requisition_list_items_rec_list_id`='".$odin_get_mrdrow['req_item_id']."' 
-					   AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$odin_get_mrdrow['req_id']."'  
+                     `stc_cust_super_requisition_list_items_rec_list_id`='".$odin_get_mrdrow['req_id']."' 
+					   AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$odin_get_mrdrow['req_item_id']."'  
                )
             ");
 				foreach($stcdecqtyqry as $dispatchedrow){
@@ -3964,11 +3964,11 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
 					WHERE `stc_cust_super_list_items_consumption_items_name`='".mysqli_real_escape_string($this->stc_dbs, $odin_get_mrdrow['stc_cust_super_requisition_list_items_title'])."'  
 				");
 				foreach($stcconsrecqtyqry as $consumedrow){
-					$stcconsumedqty+=$consumedrow['consumable_qty'];
+					$stcconsumedqty+=$consumedrow['consumable_qty']==null ? 0 : $consumedrow['consumable_qty'];
 				}
             
             $stcpendingqty=$odin_get_mrdrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
-            $stockqty=$stcrecievedqty - $stcconsumedqty;
+            $stockqty=$stcdispatchedqty - $stcconsumedqty;
             $odin.='
                <tr>
                   <td>'.$pno.'</td>
