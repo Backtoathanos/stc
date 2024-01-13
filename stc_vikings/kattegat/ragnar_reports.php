@@ -3968,7 +3968,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
 				}
             
             $stcpendingqty=$odin_get_mrdrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
-            $stockqty=$stcdispatchedqty - $stcconsumedqty;
+            $stockqty=$stcrecievedqty - $stcconsumedqty;
             $odin.='
                <tr>
                   <td>'.$pno.'</td>
