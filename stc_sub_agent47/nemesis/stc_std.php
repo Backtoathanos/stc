@@ -75,6 +75,7 @@ class transformers extends tesseract{
 		}
 		return $optimusprime;
 	}
+	
 	// call sitename
 	public function stc_call_jvarities($jvarites){
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
@@ -88,6 +89,7 @@ class transformers extends tesseract{
 		}
 		return $optimusprime;
 	}
+
 	// call department
 	public function stc_call_department($loca_id){
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
@@ -359,6 +361,7 @@ class transformers extends tesseract{
 				<th class="text-center">JOB VARIETIES</th>
 				<th class="text-center">MATERIAL DESCRIPTION</th>
 				<th class="text-center">TARGET DATE</th>
+				<th class="text-center">PENDING REASON</th>
 			';
 			$head_hidden3='		
 				<th class="text-center">ACTION</th>
@@ -366,7 +369,6 @@ class transformers extends tesseract{
 		}
 		if($_SESSION['stc_agent_sub_category']=='Site Incharge'){
 			$head_hidden2='
-			<th class="text-center">PENDING REASON</th>
 			<th class="text-center">ANY COMMENT</th>
 			<th class="text-center">FAILURE ROOT CAUSE</th>
 			<th class="text-center">JOB DONE DETAILS</th>
@@ -556,6 +558,12 @@ class transformers extends tesseract{
 										<a href="javascript:void(0)" class="btn btn-info update-status-si" style="background-color: #00f9b4;" data-id="'.$row['stc_status_down_list_id'].'" title="Job down" actiontype="1"><i class="fa fa-thumbs-down"></i></a>
 								</div>
 						';
+					}else if($row['stc_status_down_list_status']==3 || $row['stc_status_down_list_status']==2){
+						$actionsec='
+								<div class="col-sm-12 col-md-12">
+									<a href="javascript:void(0)" class="btn bg-danger text-white stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" title="Edit Status Down List" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
+								</div>
+						';
 					}else{
 						$actionsec='#';
 					}
@@ -635,6 +643,7 @@ class transformers extends tesseract{
 						<td class="text-center">'.$job_varities.'</td>
 						<td>'.$row['stc_status_down_list_material_desc'].'</td>
 						<td>'.$tar_date.'</td>
+						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 					';
 					$hidden3='	
 						<td class="text-center">
@@ -650,7 +659,6 @@ class transformers extends tesseract{
 					}
 					$ftargetdate=$row['stc_status_down_list_ftarget_date']=='' ? "" : date('d-m-Y', strtotime($row['stc_status_down_list_ftarget_date']));
 					$hidden2='	
-						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
 						<td>'.$row['stc_status_down_list_remarks'].'</td>
 						<td>'.$row['stc_status_down_list_failurerootcost'].'</td>
 						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
