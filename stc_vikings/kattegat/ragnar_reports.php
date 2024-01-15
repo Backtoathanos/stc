@@ -548,7 +548,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          FROM `stc_status_down_list` 
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
-         WHERE `stc_status_down_list_date`<>'' ".$query_filter."         
+         WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' ".$query_filter."         
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ";
       $ivarqry=mysqli_query($this->stc_dbs, $query);
@@ -913,8 +913,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                WHERE
                    `stc_cpumpd_id`='".$row['stc_status_down_list_equipment_type']."'
             ");
-            foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
-               $eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
+            if(mysqli_num_rows($stc_call_eqtypeqry)>0){
+               foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
+                  $eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
+               }
             }
 
             $stc_call_eqnumberqry=mysqli_query($this->stc_dbs, "
@@ -925,8 +927,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                WHERE
                    `stc_cpumpd_id`='".$row['stc_status_down_list_equipment_number']."'
             ");
-            foreach($stc_call_eqnumberqry as $stc_call_eqnumberrow){
-               $eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
+            if(mysqli_num_rows($stc_call_eqnumberqry)>0){
+               foreach($stc_call_eqnumberqry as $stc_call_eqnumberrow){
+                  $eq_number=$stc_call_eqnumberrow['stc_cpumpd_equipment_number'];
+               }
             }
 
             $stc_call_supqry=mysqli_query($this->stc_dbs, "
@@ -938,8 +942,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                WHERE
                    `stc_cust_pro_supervisor_id`='".$row['stc_status_down_list_created_by']."'
             ");
-            foreach($stc_call_supqry as $stc_call_suprow){
-               $sup_det=$stc_call_suprow['stc_cust_pro_supervisor_fullname'].'<br>'.$stc_call_suprow['stc_cust_pro_supervisor_contact'];
+            if(mysqli_num_rows($stc_call_supqry)>0){
+               foreach($stc_call_supqry as $stc_call_suprow){
+                  $sup_det=$stc_call_suprow['stc_cust_pro_supervisor_fullname'].'<br>'.$stc_call_suprow['stc_cust_pro_supervisor_contact'];
+               }
             }
             $p_title=$row['stc_cust_project_title'];
             if((strpos($p_title,"(GTO")>0) || (strpos($p_title,"(WOG")>0) || (strpos($p_title,"(STO")>0)){
@@ -1088,12 +1094,16 @@ class ragnarReportsViewRequiReports extends tesseract{
             `stc_cust_super_requisition_list_items_reqqty`,
             `stc_cust_super_requisition_list_items_approved_qty`,
             `stc_cust_super_requisition_items_finalqty`,
-            `stc_cust_super_requisition_list_items_status`
+            `stc_cust_super_requisition_list_items_status`,
+            `stc_cust_pro_supervisor_fullname`,
+            `stc_cust_pro_supervisor_contact`
          FROM `stc_cust_super_requisition_list_items`
          LEFT JOIN `stc_cust_super_requisition_list` 
          ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
          LEFT JOIN `stc_status_down_list` 
          ON `stc_status_down_list_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_sdlid`
+         LEFT JOIN `stc_cust_pro_supervisor` 
+         ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id`
          WHERE 
             `stc_cust_super_requisition_list_sdlid`='".mysqli_real_escape_string($this->stc_dbs, $sdl_id)."'
          ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
@@ -1109,6 +1119,8 @@ class ragnarReportsViewRequiReports extends tesseract{
             $reqno=$requisitionrow['reqlistid'];
             $sublocation=$requisitionrow['stc_status_down_list_sub_location'];            
             $reqdate=date('d-m-Y', strtotime($requisitionrow['stc_req_date']));
+            $SupName=$requisitionrow['stc_cust_pro_supervisor_fullname'];            
+            $SupContact=$requisitionrow['stc_cust_pro_supervisor_contact'];            
 				if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
 					$rqitemstts='ALLOW';
 				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
@@ -1193,6 +1205,8 @@ class ragnarReportsViewRequiReports extends tesseract{
          'reqno'=> $reqno,
          'reqdate'=> $reqdate,
          'sublocation'=> $sublocation,
+         'SupName'=> $SupName,
+         'SupContact'=>$SupContact,
       );
       return $out_ivar;
    }
@@ -3916,6 +3930,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
          ".$sdl_joiner."
          WHERE DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $from)."'
          AND '".mysqli_real_escape_string($this->stc_dbs, $to)."' ".$filter_query."
+         ORDER BY DATE(R.`stc_cust_super_requisition_list_date`) DESC
       ";
       $odin_get_mrdqry=mysqli_query($this->stc_dbs, $query);
       if(mysqli_num_rows($odin_get_mrdqry)>0){

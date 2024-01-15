@@ -1758,6 +1758,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         $('.reqnumber').html('<b>Requisition Number : '+data.reqno+'</b>');
                         $('.reqdate').html('<b>Requisition Date : '+data.reqdate+'</b>');
                         $('.sublocation').html('<b>'+data.sublocation+'</b>');
+                        $('.SupName').html('<b>Supervisor Name : '+data.SupName+'</b>');
+                        $('.SupContact').html('<b>Supervisor Contact : '+data.SupContact+'</b>');
                     }
                 });
             });
@@ -2623,20 +2625,27 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     <div class="main-card mb-3 card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-4 col-sm-4 col-xl-4 mb-4">
+                                <div class="col-md-3 col-sm-12 col-xl-3 mb-4">
                                     <p class="card-title">Status Down List</p>
                                     <span class="downlistno"></span><br>
                                     <span class="downlistdate"></span>
                                 </div>
-                                <div class="col-md-4 col-sm-4 col-xl-4 mb-4">
+                                <div class="col-md-3 col-sm-12 col-xl-3 mb-4">
                                     <p class="card-title">Material Requisition</p>
                                     <span class="reqnumber"></span><br>
                                     <span class="reqdate"></span>
                                 </div>
-                                <div class="col-md-4 col-sm-4 col-xl-4 mb-4">
+                                <div class="col-md-3 col-sm-12 col-xl-3 mb-4">
                                     <p class="card-title">Department</p>
                                     <span class="sublocation"></span>
                                 </div>
+                                <div class="col-md-3 col-sm-12 col-xl-3 mb-4">
+                                    <p class="card-title">Supervisor Details</p>
+                                    <span class="SupName"></span>
+                                    <span class="SupContact"></span>
+                                </div>
+                                
+
                                 <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
                                     <h5 class="card-title">Material List</h5>
                                     <div class="position-relative form-group" style="overflow-x:auto;">
