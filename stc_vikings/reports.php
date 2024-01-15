@@ -447,7 +447,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <select
                                               id="stc-mrd-tojob"
                                               class="custom-select stc-mrd-tojob"
-                                              name="stccustomer"
+                                              name="stc-mrd-tojob"
                                             ><option value="NA">Select</option>
                                             <option value="1">Project</option>
                                             <option value="2">Service</option>
@@ -457,27 +457,27 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
-                                              for="name"
+                                              for="stc-mrd-customer"
                                               >Customer Name
                                             </h5>
                                             <select
                                               id="stc-mrd-customer"
                                               class="custom-select stc-select-customer"
-                                              name="stccustomer"
-                                            ><option value="NA">Please Select Customer First</option>
+                                              name="stc-mrd-customer"
+                                            ><option value="NA">Please Select Customer</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
-                                              for="name"
+                                              for="stc-mrd-location"
                                               >Location
                                             </h5>
                                             <select
                                               id="stc-mrd-location"
                                               class="custom-select stc-mrd-lcoation"
-                                              name="stccustomer"
+                                              name="stc-mrd-location"
                                             ><option value="NA">Please Select Customer First</option>
                                             </select>
                                         </div>
@@ -485,27 +485,27 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
-                                              for="name"
+                                              for="stc-mrd-dept"
                                               >Department
                                             </h5>
                                             <select
                                               id="stc-mrd-dept"
                                               class="custom-select stc-mrd-dept"
-                                              name="stccustomer"
-                                            ><option value="NA">Please Select Customer First</option>
+                                              name="stc-mrd-dept"
+                                            ><option value="NA">Please Select Location First</option>
                                             </select>
                                         </div>
                                     </div>            
                                     <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
-                                              for="name"
+                                              for="stc-mrd-tomaterial"
                                               >Type of Material
                                             </h5>
                                             <select
                                               id="stc-mrd-tomaterial"
                                               class="custom-select stc-mrd-tomaterial"
-                                              name="stccustomer"
+                                              name="stc-mrd-tomaterial"
                                             ><option value="NA">Select</option>
                                             <option>Tools</option>
                                             <option>PPE</option>
