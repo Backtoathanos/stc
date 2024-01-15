@@ -194,14 +194,42 @@ class pirates_project extends tesseract{
 				`stc_cust_project_details_remarks`,
 				`stc_cust_project_details_po_number`,
 				`stc_cust_project_details_po_value`
-			FROM
-				`stc_cust_project_details`
-			INNER JOIN 
-				`stc_cust_project` ON `stc_cust_project_id` = `stc_cust_project_details_pro_title_id`
+			FROM `stc_cust_project_details`
+			INNER JOIN `stc_cust_project` 
+			ON `stc_cust_project_id` = `stc_cust_project_details_pro_title_id`
 			WHERE
 				`stc_cust_project_details_pro_title_id`='".mysqli_real_escape_string($this->stc_dbs, $project_id)."'
 		");
 		$blackpearl=((mysqli_num_rows($blackpearl_pd_qry)>0) ? mysqli_fetch_assoc($blackpearl_pd_qry) : 'NA');
+		return $blackpearl;
+	}
+
+	// call connected supervisor for project
+	public function stc_call_connected_supervisor($project_id){
+		$blackpearl='';
+		$blackpearl_pd_qry=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_category`
+			FROM `stc_cust_pro_attend_supervise`
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id` = `stc_cust_pro_attend_supervise_super_id`
+			WHERE `stc_cust_pro_attend_supervise_pro_id` = '".mysqli_real_escape_string($this->stc_dbs, $project_id)."'
+			ORDER BY `stc_cust_pro_supervisor_fullname` ASC
+		");
+		if(mysqli_num_rows($blackpearl_pd_qry)>0){
+			$slno=0;
+			foreach($blackpearl_pd_qry as $blackpearl_pd_row){
+				$slno++;
+				$blackpearl.='
+					<tr>
+						<td class="text-center">'.$slno.'</td>
+						<td>'.$blackpearl_pd_row['stc_cust_pro_supervisor_fullname'].'</td>
+						<td class="text-center">'.$blackpearl_pd_row['stc_cust_pro_supervisor_category'].'</td>
+					</tr>
+				';
+			}
+		}else{
+			$blackpearl='<tr><td>Supervisor not found.</td></tr>';
+		}
 		return $blackpearl;
 	}
 
@@ -1128,6 +1156,90 @@ class pirates_project extends tesseract{
 			$blackpearl = "no";
 		}
 		return $blackpearl;
+	}
+
+	// call project collaborated
+	public function stc_project_collaborated($id){		
+		$blackpearl='';
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_cust_project_collaborate_id`,
+				`stc_cust_project_collaborate_managerid`,
+				`stc_cust_project_collaborate_teamid`,
+				`stc_cust_project_collaborate_projectid`,
+				`stc_cust_project_collaborate_status`,
+				`stc_cust_project_collaborate_created_date`,
+				`stc_agents_name`
+			FROM `stc_cust_project_collaborate`
+			LEFT JOIN `stc_agents`
+			ON `stc_cust_project_collaborate_teamid`=`stc_agents_id`
+			WHERE
+				`stc_cust_project_collaborate_projectid`='".mysqli_real_escape_string($this->stc_dbs, $id)."'
+		");
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			foreach($blackpearl_qry as $blackpearl_row){
+				$status=$blackpearl_row['stc_cust_project_collaborate_status']==1 ? "Active" : "in-active";
+				$blackpearl.='
+					<tr>
+						<td class="text-center">'.date('d-m-Y', strtotime($blackpearl_row['stc_cust_project_collaborate_created_date'])).'</td>
+						<td>'.$blackpearl_row['stc_agents_name'].'</td>
+						<td class="text-center">'.$status.'</td>
+						<td class="text-center"><a href="javascript:void(0)" class="btn btn-danger" '.$blackpearl_row['stc_cust_project_collaborate_id'].'><i class="fa fa-remove"></i></a></td>
+					<tr>
+				';
+			}
+		}else{
+			$blackpearl.='
+				<tr>
+					<td colspan="4" class="text-center">No record found.</td>
+				<tr>
+			';
+		}
+		return $blackpearl;
+	}
+
+	// save project collaborate
+	public function stc_project_collaborate_save($project_id, $email){
+		$blackpearl='';
+		$status="success";
+		$message="Project collaborated successfully.";
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_cqry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_agents_id`
+			FROM
+				`stc_agents`
+			WHERE
+				`stc_agents_email`='".mysqli_real_escape_string($this->stc_dbs, $email)."'
+		");
+		if(mysqli_num_rows($blackpearl_cqry)>0){
+			$result=mysqli_fetch_assoc($blackpearl_cqry);
+			$team_id=$result['stc_agents_id'];
+			$blackpearl_iqry=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_project_collaborate`(
+					`stc_cust_project_collaborate_managerid`,
+					`stc_cust_project_collaborate_teamid`,
+					`stc_cust_project_collaborate_projectid`,
+					`stc_cust_project_collaborate_status`,
+					`stc_cust_project_collaborate_created_date`
+				)VALUES(
+					'".$_SESSION['stc_agent_id']."',
+					'".mysqli_real_escape_string($this->stc_dbs, $team_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $project_id)."',
+					'1',
+					'".mysqli_real_escape_string($this->stc_dbs, $date)."'
+				)
+			");
+		}else{
+			$status="invalid";
+			$message="Invalid email. Manager not found with this email. Please try registered email.";
+		}
+		$blackpearl_arr=array(
+			'status' => $status,
+			'message' => $message
+		);
+		return $blackpearl_arr;
 	}
 }
 
@@ -2805,6 +2917,90 @@ class pirates_supervisor extends tesseract{
 		}
 		return $optimusprime;
 	}
+
+	// call user collaborated
+	public function stc_user_collaborated($user_id){		
+		$blackpearl='';
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_cust_pro_supervisor_collaborate_id`,
+				`stc_cust_pro_supervisor_collaborate_managerid`,
+				`stc_cust_pro_supervisor_collaborate_teamid`,
+				`stc_cust_pro_supervisor_collaborate_userid`,
+				`stc_cust_pro_supervisor_collaborate_status`,
+				`stc_cust_pro_supervisor_collaborate_created_date`,
+				`stc_agents_name`
+			FROM `stc_cust_pro_supervisor_collaborate`
+			LEFT JOIN `stc_agents`
+			ON `stc_cust_pro_supervisor_collaborate_teamid`=`stc_agents_id`
+			WHERE
+				`stc_cust_pro_supervisor_collaborate_userid`='".mysqli_real_escape_string($this->stc_dbs, $user_id)."'
+		");
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			foreach($blackpearl_qry as $blackpearl_row){
+				$status=$blackpearl_row['stc_cust_pro_supervisor_collaborate_status']==1 ? "Active" : "in-active";
+				$blackpearl.='
+					<tr>
+						<td class="text-center">'.date('d-m-Y', strtotime($blackpearl_row['stc_cust_pro_supervisor_collaborate_created_date'])).'</td>
+						<td>'.$blackpearl_row['stc_agents_name'].'</td>
+						<td class="text-center">'.$status.'</td>
+						<td class="text-center"><a href="javascript:void(0)" class="btn btn-danger" '.$blackpearl_row['stc_cust_pro_supervisor_collaborate_id'].'><i class="fa fa-remove"></i></a></td>
+					<tr>
+				';
+			}
+		}else{
+			$blackpearl.='
+				<tr>
+					<td colspan="4" class="text-center">No record found.</td>
+				<tr>
+			';
+		}
+		return $blackpearl;
+	}
+
+	// save project collaborate
+	public function stc_user_collaborate_save($user_id, $email){
+		$blackpearl='';
+		$status="success";
+		$message="User collaborated successfully.";
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_cqry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_agents_id`
+			FROM
+				`stc_agents`
+			WHERE
+				`stc_agents_email`='".mysqli_real_escape_string($this->stc_dbs, $email)."'
+		");
+		if(mysqli_num_rows($blackpearl_cqry)>0){
+			$result=mysqli_fetch_assoc($blackpearl_cqry);
+			$team_id=$result['stc_agents_id'];
+			$blackpearl_iqry=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_pro_supervisor_collaborate`(
+					`stc_cust_pro_supervisor_collaborate_managerid`,
+					`stc_cust_pro_supervisor_collaborate_teamid`,
+					`stc_cust_pro_supervisor_collaborate_userid`,
+					`stc_cust_pro_supervisor_collaborate_status`,
+					`stc_cust_pro_supervisor_collaborate_created_date`
+				)VALUES(
+					'".$_SESSION['stc_agent_id']."',
+					'".mysqli_real_escape_string($this->stc_dbs, $team_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $user_id)."',
+					'1',
+					'".mysqli_real_escape_string($this->stc_dbs, $date)."'
+				)
+			");
+		}else{
+			$status="invalid";
+			$message="Invalid email. Manager not found with this email. Please try registered email.";
+		}
+		$blackpearl_arr=array(
+			'status' => $status,
+			'message' => $message
+		);
+		return $blackpearl_arr;
+	}
 }
 
 /*---------------------------------------------Project Objects section-------------------------------------------------*/
@@ -2953,6 +3149,15 @@ if(isset($_POST['stc_ag_rproject_retrive'])){
 	$project_id=$_POST['project_id'];
 	$objcrproj=new pirates_project();
 	$opobjcrproj=$objcrproj->stc_call_project_details($project_id);
+	echo json_encode($opobjcrproj);
+	// echo $opobjcrproj;
+}
+
+// retrieve connected supervisor for project
+if(isset($_POST['stc_ag_rsupervisorproject_retrive'])){
+	$project_id=$_POST['project_id'];
+	$objcrproj=new pirates_project();
+	$opobjcrproj=$objcrproj->stc_call_connected_supervisor($project_id);
 	echo json_encode($opobjcrproj);
 	// echo $opobjcrproj;
 }
@@ -3163,6 +3368,37 @@ if(isset($_POST['stc_ag_department_show_save'])){
 		$opobjcrproj = 'Login';
 	}else{
 		$opobjcrproj=$objcrproj->stc_department_show_update($loc, $dept, $jobtid);
+	}
+	// echo $opobjcrproj;
+	echo json_encode($opobjcrproj);
+}
+
+// call collaborate project
+if(isset($_POST['stc_collaborate_project_call'])){
+	$id=$_POST['id'];
+
+	$objcrproj=new pirates_project();
+	$opobjcrproj='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$opobjcrproj = 'Login';
+	}else{
+		$opobjcrproj=$objcrproj->stc_project_collaborated($id);
+	}
+	// echo $opobjcrproj;
+	echo json_encode($opobjcrproj);
+}
+
+// call collaborate project
+if(isset($_POST['stc_collaborate_project_save'])){
+	$project_id=$_POST['project_id'];
+	$email=$_POST['email'];
+
+	$objcrproj=new pirates_project();
+	$opobjcrproj='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$opobjcrproj = 'empty';
+	}else{
+		$opobjcrproj=$objcrproj->stc_project_collaborate_save($project_id, $email);
 	}
 	// echo $opobjcrproj;
 	echo json_encode($opobjcrproj);
@@ -3989,4 +4225,34 @@ if(isset($_POST['save_procurment_tracker_payment_update'])){
 	echo $out;
 }
 
+// call collaborate user
+if(isset($_POST['stc_collaborate_user_call'])){
+	$user_id=$_POST['user_id'];
+
+	$objcrproj=new pirates_supervisor();
+	$opobjcrproj='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$opobjcrproj = 'Login';
+	}else{
+		$opobjcrproj=$objcrproj->stc_user_collaborated($user_id);
+	}
+	// echo $opobjcrproj;
+	echo json_encode($opobjcrproj);
+}
+
+// call collaborate user
+if(isset($_POST['stc_collaborate_user_save'])){
+	$user_id=$_POST['user_id'];
+	$email=$_POST['email'];
+
+	$objcrproj=new pirates_supervisor();
+	$opobjcrproj='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$opobjcrproj = 'empty';
+	}else{
+		$opobjcrproj=$objcrproj->stc_user_collaborate_save($user_id, $email);
+	}
+	// echo $opobjcrproj;
+	echo json_encode($opobjcrproj);
+}
 ?>

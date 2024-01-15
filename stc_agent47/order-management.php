@@ -156,7 +156,9 @@ include_once("../MCU/db.php");
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <input type="text" id="myInput" placeholder="Search here" class="form-control">
-                                                            <table class="mb-0 table table-hover table-bordered table-responsive" id="stc-requis-table">
+                                                        </div>
+                                                        <div class="col-md-12" style="overflow-x:auto;">
+                                                            <table class="mb-0 table table-hover table-bordered" id="stc-requis-table">
                                                                 <thead>
                                                                     <th class="text-center">Sl No</th>
                                                                     <th class="text-center">Requisition Date</th>
