@@ -558,7 +558,7 @@ class transformers extends tesseract{
 										<a href="javascript:void(0)" class="btn btn-info update-status-si" style="background-color: #00f9b4;" data-id="'.$row['stc_status_down_list_id'].'" title="Job down" actiontype="1"><i class="fa fa-thumbs-down"></i></a>
 								</div>
 						';
-					}else if($row['stc_status_down_list_status']==3 || $row['stc_status_down_list_status']==2){
+					}else if($row['stc_status_down_list_status']==3 || $row['stc_status_down_list_status']==2 || $row['stc_status_down_list_status']==1){
 						$actionsec='
 								<div class="col-sm-12 col-md-12">
 									<a href="javascript:void(0)" class="btn bg-danger text-white stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" title="Edit Status Down List" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
