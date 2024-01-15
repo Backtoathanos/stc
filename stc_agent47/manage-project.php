@@ -232,10 +232,11 @@ include_once("../MCU/db.php");
                                                                 `stc_cust_project_address`,
                                                                 `stc_cust_project_responsive_person`,
                                                                 `stc_cust_project_status`
-                                                            FROM 
-                                                                `stc_cust_project` 
-                                                            WHERE 
-                                                                `stc_cust_project_createdby`='".$_SESSION['stc_agent_id']."'
+                                                            FROM `stc_cust_project` 
+                                                            LEFT JOIN `stc_cust_project_collaborate`
+                                                            ON `stc_cust_project_collaborate_projectid`=`stc_cust_project_id`
+                                                            WHERE `stc_cust_project_createdby`='".$_SESSION['stc_agent_id']."'
+                                                            OR `stc_cust_project_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
                                                             ORDER BY `stc_cust_project_title` ASC
                                                         ");
                                                         
@@ -279,32 +280,23 @@ include_once("../MCU/db.php");
                                                                     </a>
                                                                 ';
                                                             }
-                                                            // echo '
-                                                            //     <tr>
-                                                            //         <td>'.$get_project_row['stc_cust_project_id'].'<br>'.date('d-m-Y', strtotime($get_project_row['stc_cust_project_date'])).'</td>
-                                                            //         <td>
-                                                            //             '.$get_project_row['stc_cust_project_title'].'<br>
-                                                            //             '.$get_project_row['stc_cust_project_refr'].'
-                                                            //             <input type="hidden" id="stc-ag-edittitle'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_title'].'">
-                                                            //             <input type="hidden" id="stc-ag-editrefre'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_refr'].'">
-                                                            //         </td>
-                                                            //         <td>
-                                                            //             '.$get_project_row['stc_cust_project_address'].'                       
-                                                            //             <input type="hidden" id="stc-ag-editaddress'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_address'].'">
-                                                            //         </td>
-                                                            //         <td>'.$get_project_row['stc_cust_project_responsive_person'].'</td>
-                                                            //         <td>'.$status.'</td>
-                                                            //         <td align="center">
-                                                            //             <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-edit-ret" style="font-size: 25px;color: #cc7676;">
-                                                            //                 <i class="fas fa-edit"></i>
-                                                            //             </a>
-                                                            //             <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" class="stc-project-show-ret" style="font-size: 25px;color: #cc7676;">
-                                                            //                 <i class="fas fa-eye"></i>
-                                                            //             </a>
-                                                            //             '.$indust.'
-                                                            //         </td>
-                                                            //     </tr>
-                                                            // ';
+                                                            $sharedinfo='Your project.';
+                                                            $get_projectc_qry=mysqli_query($con, "
+                                                                SELECT `stc_agents_name`
+                                                                FROM `stc_cust_project_collaborate`
+                                                                LEFT JOIN `stc_agents`
+                                                                ON `stc_agents_id`=`stc_cust_project_collaborate_managerid`
+                                                                WHERE `stc_cust_project_collaborate_projectid`='".$get_project_row['stc_cust_project_id']."'
+                                                                AND `stc_cust_project_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
+                                                                AND `stc_cust_project_collaborate_status`=1
+                                                            ");
+                                                            if(mysqli_num_rows($get_projectc_qry)>0){
+                                                                $manager='';
+                                                                foreach($get_projectc_qry as $get_projectc_row){
+                                                                    $manager=$get_projectc_row['stc_agents_name'];
+                                                                }
+                                                                $sharedinfo='<b>'.$manager.'</b> shared this Project with you.';
+                                                            }
                                                             $blacknwhitestyle='style="-webkit-filter: grayscale(100%);"';
                                                             if($get_project_row['stc_cust_project_status']=='1'){
                                                                 $blacknwhitestyle='';
@@ -321,12 +313,15 @@ include_once("../MCU/db.php");
                                                                             <input type="hidden" id="stc-ag-editaddress'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_address'].'">
                                                                             <h3 style="font-size: 0.75rem;">
                                                                                 '.$get_project_row['stc_cust_project_address'].'<br>
-                                                                                '.$get_project_row['stc_cust_project_responsive_person'].'
+                                                                                '.$get_project_row['stc_cust_project_responsive_person'].'<br>
+                                                                                '.$sharedinfo.'
 
                                                                             </h3>
                                                                             <div class="icon-block">
                                                                                 <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Edit Project" class="stc-project-edit-ret" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-edit"></i></a>
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "View Connected Supervisor" class="stc-project-show-consup" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-user"></i></a>
                                                                                 <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "View Project Details" class="stc-project-show-ret" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-eye"></i></a>
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Collaborate" class="stc-project-collaborate" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-handshake-o"></i></a>
                                                                                 <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Add Project Details" class="add-project-details-btn" style="font-size: 25px;color: #cc7676;" data-toggle="modal" data-target=".bd-addprojectdetails-modal-lg"> <i class="fas fa-file"></i></a>
                                                                                 '.$indust.'
                                                                             </div>
@@ -933,6 +928,26 @@ include_once("../MCU/db.php");
                     }
                 });
             });
+            
+            // call modal
+            $('body').delegate('.stc-project-show-consup', 'click', function(e){
+                e.preventDefault();
+                var project_id=$(this).attr("id");
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_ag_rsupervisorproject_retrive:1,
+                        project_id:project_id
+                    },
+                    dataType    : "JSON",
+                    success     : function(res_data){
+                        // console.log(res_data);
+                        $('.stc-ag-connectedsupervisor').html(res_data);
+                        $('.bd-connproject-modal-lg').modal("show");
+                    }
+                });
+            });
 
             // edit project
             $('body').delegate('.stc-project-edit-ret', 'click', function(e){
@@ -1414,6 +1429,64 @@ include_once("../MCU/db.php");
                 $('.stc-ag-project-id').val(value);
 
             });
+        });
+    </script>
+    
+    <script>
+        $(document).ready(function(){
+            // call collaborate project
+            function stc_cust_project_collaborated(id){
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_collaborate_project_call:1,
+                        id:id
+                    },
+                    dataType    : "JSON",
+                    success     : function(res_data){
+                        // console.log(res_data);
+                        $('.stc-collaborated-managers-details').html(res_data);
+                    }
+                });
+            }
+
+            $('.stc-project-collaboratebtn').on('click', function(){
+                var project_id=$('.collaborate-project-id').val();
+                var email=$('.stc-project-collaborate-email').val();
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_collaborate_project_save:1,
+                        project_id:project_id,
+                        email:email
+                    },
+                    dataType    : "JSON",
+                    success     : function(res_data){
+                        // console.log(res_data);
+                        if(res_data['status']=="success"){
+                            alert(res_data['message']);
+                            stc_cust_project_collaborated(project_id);
+                            $('.stc-project-collaborate-email').val('');
+                        }else if(res_data['status']=="invalid"){
+                            alert(res_data['message']);
+                        }else if(res_data=="empty"){
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+
+            // save ahu details
+            $('.stc-project-collaborate').click(function(e){
+                e.preventDefault();
+                var id = $(this).attr("id");
+                $('.collaborate-project-id').val(id);
+                $('.bd-collaborate-modal-lg').modal('show');
+                stc_cust_project_collaborated(id);
+            });
+
         });
     </script>
 </body>
@@ -1944,6 +2017,48 @@ include_once("../MCU/db.php");
         </div>
     </div>
 </div>
+<div class="modal fade bd-connproject-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Supervisors connected with project</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <div class="position-relative form-group">
+                                            <table class="table table-hover table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <td class="text-center">Sl No</td>
+                                                        <td class="text-center">Users Name</td>
+                                                        <td class="text-center">Category</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="stc-ag-connectedsupervisor">
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="modal fade bd-projectedit-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -2095,6 +2210,60 @@ include_once("../MCU/db.php");
                                                 </tr>
                                             </thead>
                                             <tbody class="stc-project-pump-details-table">
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-collaborate-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Project Collaborate with others</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title" for="collaborate-email">Email</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="email" id="collaborate-email" class="form-control stc-project-collaborate-email" placeholder="Enter email address.">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <div class="position-relative form-group">
+                                            <input type="hidden" class="collaborate-project-id">
+                                            <a href="javascript:void(0)" class="form-control btn btn-primary stc-project-collaboratebtn">Collaborate</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12" style="width: auto;overflow-x: auto; white-space: nowrap;">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">Date</th>
+                                                    <th class="text-center">Managers</th>
+                                                    <th class="text-center">Status</th>
+                                                    <th class="text-center">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="stc-collaborated-managers-details">
                                                 
                                             </tbody>
                                         </table>

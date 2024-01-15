@@ -222,7 +222,11 @@ include_once("../MCU/db.php");
                                                                             FROM `stc_cust_pro_supervisor`
                                                                             INNER JOIN `stc_agents` 
                                                                             ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` 
-                                                                            WHERE `stc_agents_id`='".$_SESSION["stc_agent_id"]."'
+                                                                            LEFT JOIN `stc_cust_pro_supervisor_collaborate`
+                                                                            ON `stc_cust_pro_supervisor_collaborate_userid`=`stc_cust_pro_supervisor_id`
+                                                                            WHERE `stc_agents_id`='".$_SESSION['stc_agent_id']."'
+                                                                            OR `stc_cust_pro_supervisor_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
+                                                                            GROUP BY `stc_cust_pro_supervisor_collaborate_teamid`,`stc_cust_pro_supervisor_fullname` ASC
                                                                         ");
                                                                         foreach($showsubsupqry as $supsubrow){
                                                                             $sitename='';
@@ -241,6 +245,23 @@ include_once("../MCU/db.php");
                                                                             if(strlen($address)>33){
                                                                                 $address=substr($address, 0,33);
                                                                                 $address=$address.'...';
+                                                                            }
+                                                                            $sharedinfo='Your user.';
+                                                                            $get_userc_qry=mysqli_query($con, "
+                                                                                SELECT `stc_agents_name`
+                                                                                FROM `stc_cust_pro_supervisor_collaborate`
+                                                                                LEFT JOIN `stc_agents`
+                                                                                ON `stc_agents_id`=`stc_cust_pro_supervisor_collaborate_managerid`
+                                                                                WHERE `stc_cust_pro_supervisor_collaborate_userid`='".$supsubrow['stc_cust_pro_supervisor_id']."'
+                                                                                AND `stc_cust_pro_supervisor_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
+                                                                                AND `stc_cust_pro_supervisor_collaborate_status`=1
+                                                                            ");
+                                                                            if(mysqli_num_rows($get_userc_qry)>0){
+                                                                                $manager='';
+                                                                                foreach($get_userc_qry as $get_userc_row){
+                                                                                    $manager=$get_userc_row['stc_agents_name'];
+                                                                                }
+                                                                                $sharedinfo='<b>'.$manager.'</b> shared this User with you.';
                                                                             }
                                                                             $blacknwhitestyle='style="-webkit-filter: grayscale(100%);"';
                                                                             if($supsubrow['stc_cust_pro_supervisor_status']=='1'){
@@ -261,12 +282,13 @@ include_once("../MCU/db.php");
                                                                                                 '.$address.'<br>
                                                                                                 +91-'.$supsubrow['stc_cust_pro_supervisor_contact'].'<br>
                                                                                                 +91-'.$supsubrow['stc_cust_pro_supervisor_whatsapp'].'<br>
+                                                                                                '.$sharedinfo.'<br>
 
                                                                                             </h3>
                                                                                             <div class="icon-block">
                                                                                                 <a href="#" class="stc-user-edit" title="Edit" data-toggle="modal" data-target=".bd-edituser-modal-lg" id="'.$supsubrow['stc_cust_pro_supervisor_id'].'"><i class="fas fa-edit"></i></a>
                                                                                                 <a href="#" class="stc-user-view" title="View" data-toggle="modal" data-target=".bd-showuser-modal-lg" id="'.$supsubrow['stc_cust_pro_supervisor_id'].'"> <i class="fas fa-eye"></i></a>
-                                                                                                <a href="#" class="stc-user-collaborate" title="Collaborate"> <i class="fas fa-handshake-o"></i></a>
+                                                                                                <a href="#" class="stc-user-collaborate" title="Collaborate" data-toggle="modal" data-target=".bd-showcollaborateuser-modal-lg" id="'.$supsubrow['stc_cust_pro_supervisor_id'].'"> <i class="fas fa-handshake-o"></i></a>
                                                                                                 <a 
                                                                                                     href="#" 
                                                                                                     class="stc-user-mail" 
@@ -311,10 +333,17 @@ include_once("../MCU/db.php");
                                                                             FROM `stc_cust_project` 
                                                                             INNER JOIN `stc_agent_requested_customer` 
                                                                             ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
-                                                                            WHERE `stc_agent_requested_customer_agent_id`='".$_SESSION['stc_agent_id']."'
+                                                                            LEFT JOIN `stc_cust_project_collaborate` 
+                                                                            ON `stc_cust_project_collaborate_projectid`=`stc_cust_project_id`
+                                                                            WHERE `stc_cust_project_createdby`='".$_SESSION['stc_agent_id']."'
+                                                                            OR `stc_cust_project_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
                                                                         ");
-                                                                        foreach($proseleqry as $proselrow){
-                                                                            echo '<option value="'.$proselrow['stc_cust_project_id'].'">'.$proselrow['stc_cust_project_title'].'</option>';
+                                                                        if(mysqli_num_rows($proseleqry)>0){
+                                                                            foreach($proseleqry as $proselrow){
+                                                                                echo '<option value="'.$proselrow['stc_cust_project_id'].'">'.$proselrow['stc_cust_project_title'].'</option>';
+                                                                            }
+                                                                        }else{
+                                                                            echo '<option value="NA">Project not found.</option>';
                                                                         }
                                                                     ?>
                                                                 </select>
@@ -328,7 +357,10 @@ include_once("../MCU/db.php");
                                                                         $proseleqry=mysqli_query($con, "
                                                                             SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` 
                                                                             FROM `stc_cust_pro_supervisor` 
+                                                                            LEFT JOIN `stc_cust_user_collaborate` 
+                                                                            ON `stc_cust_user_collaborate_userid`=`stc_cust_pro_supervisor_id`
                                                                             WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'
+                                                                            OR `stc_cust_user_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
                                                                             ORDER BY `stc_cust_pro_supervisor_fullname` ASC
                                                                         ");
                                                                         if(mysqli_num_rows($proseleqry)>0){
@@ -547,6 +579,57 @@ include_once("../MCU/db.php");
                 });
             });
             
+            // call project
+            function stc_cust_user_collaborated(user_id){
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_collaborate_user_call:1,
+                        user_id:user_id
+                    },
+                    dataType    : "JSON",
+                    success     : function(res_data){
+                        // console.log(res_data);
+                        $('.stc-collaborated-managers-details').html(res_data);
+                    }
+                });
+            }
+
+            // call shared supervisor
+            $('.stc-user-collaborate').on('click', function(){
+                var user_id = $(this).attr('id');
+                stc_cust_user_collaborated(user_id);
+                $('.collaborate-user-id').val(user_id);
+            });            
+
+            $('.stc-user-collaboratebtn').on('click', function(){
+                var user_id=$('.collaborate-user-id').val();
+                var email=$('.stc-user-collaborate-email').val();
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_collaborate_user_save:1,
+                        user_id:user_id,
+                        email:email
+                    },
+                    dataType    : "JSON",
+                    success     : function(res_data){
+                        // console.log(res_data);
+                        if(res_data['status']=="success"){
+                            alert(res_data['message']);
+                            stc_cust_user_collaborated(user_id);
+                            $('.stc-user-collaborate-email').val('');
+                        }else if(res_data['status']=="invalid"){
+                            alert(res_data['message']);
+                        }else if(res_data=="empty"){
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+
             $('.stc-project-alot-cust').on('submit', function(e){
                 e.preventDefault();
                 $.ajax({
@@ -1106,6 +1189,59 @@ include_once("../MCU/db.php");
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-showcollaborateuser-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Collaborate User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <h5 class="card-title" for="collaborate-email">Email</h5>
+                        <div class="position-relative form-group">
+                            <input type="email" id="collaborate-email" class="form-control stc-user-collaborate-email" placeholder="Enter email address.">
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="position-relative form-group">
+                            <input type="hidden" class="collaborate-user-id">
+                            <a href="javascript:void(0)" class="form-control btn btn-primary stc-user-collaboratebtn">Collaborate</a>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 col-xl-12" style="width: auto;overflow-x: auto; white-space: nowrap;">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">Date</th>
+                                    <th class="text-center">Managers</th>
+                                    <th class="text-center">Status</th>
+                                    <th class="text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="stc-collaborated-managers-details">
+                                <tr>
+                                    <td class="text-center">15-01-2024</td>
+                                    <td>Sk Safikul islam</td>
+                                    <td class="text-center">Active</td>
+                                    <td class="text-center"><a href="javascript:void(0)" class="btn btn-danger"><i class="fa fa-remove"></i></a></td>
+                                </tr>
+                                <tr></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
