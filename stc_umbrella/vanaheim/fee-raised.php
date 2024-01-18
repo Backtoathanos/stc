@@ -270,6 +270,9 @@ class Yggdrasil extends tesseract{
 
 	// search school fee
 	public function stc_search_school_fee($search){
+		$searcharr = explode("-", $search);
+		$year = substr($search, 0, 4);
+		$month = substr($search, 5, 2);
 		$odin='
 			<table class="table table-bordered table-hover">
 				<thead>
@@ -301,14 +304,12 @@ class Yggdrasil extends tesseract{
 		$odin_get_req_qry=mysqli_query($this->stc_dbs, "
 			SELECT
 				`stc_school_fee_id`,
-			    `stc_school_fee_which_school`,
-			    `stc_school_fee_date`
-			FROM
-			    `stc_school_fee`
-			WHERE 
-				MONTH(`stc_school_fee_date`)='".mysqli_real_escape_string($this->stc_dbs, $search)."' 
-			AND
-				`stc_school_fee_created_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_school_user_id'])."'
+				`stc_school_fee_which_school`,
+				`stc_school_fee_date`
+			FROM `stc_school_fee`
+			WHERE MONTH(`stc_school_fee_date`)='".mysqli_real_escape_string($this->stc_dbs, $month)."' 
+			AND YEAR(`stc_school_fee_date`)='".mysqli_real_escape_string($this->stc_dbs, $year)."' 
+			AND `stc_school_fee_created_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_school_user_id'])."'
 			ORDER BY DATE(`stc_school_fee_date`) DESC
 		");
 		if(mysqli_num_rows($odin_get_req_qry)>0){
@@ -592,7 +593,7 @@ if(isset($_POST['stc_call_fee'])){
 
 // search request
 if(isset($_POST['stc_search_school_fee'])){
-	$search=date('m', strtotime($_POST['search']));
+	$search=$_POST['search'];
 	$valkyrie=new Yggdrasil();
 	$lokiheck=$valkyrie->stc_search_school_fee($search);
 	echo $lokiheck;
