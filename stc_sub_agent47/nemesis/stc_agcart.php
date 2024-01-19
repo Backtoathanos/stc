@@ -178,6 +178,15 @@ class witcher_supervisor extends tesseract{
 	public function stc_super_list_add($sup_site, $sdlno){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
+		$priority=0;
+		foreach($_SESSION['stc_agent_sup_dailylist_cart_sess'] as $getitems){
+			if($getitems['priority']==2){
+				$priority=$getitems['priority'];
+				break;
+			}
+		}
+		
+		$status=$priority==2 ? 2 : 1;
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_cust_super_requisition_list`(
 				`stc_cust_super_requisition_list_date`, 
@@ -191,7 +200,7 @@ class witcher_supervisor extends tesseract{
 				'".$sdlno."',
 				'".$_SESSION['stc_agent_sub_id']."',
 				'".$sup_site."',
-				'1',
+				'".$status."',
 				'0'
 			)
 		");
@@ -220,14 +229,16 @@ class witcher_supervisor extends tesseract{
 					`stc_cust_super_requisition_list_items_reqqty`, 
 					`stc_cust_super_requisition_list_items_approved_qty`, 
 					`stc_cust_super_requisition_items_type`,
+					`stc_cust_super_requisition_items_priority`,
 					`stc_cust_super_requisition_list_items_status`
 				) VALUES (
 					'".$getorderid['orderid']."',
 					'".mysqli_real_escape_string($this->stc_dbs, $getitems['items_title'])."',
 					'".mysqli_real_escape_string($this->stc_dbs, $getitems['items_unit'])."',
 					'".mysqli_real_escape_string($this->stc_dbs, $getitems['items_quantity'])."',
-					'0',
+					'".mysqli_real_escape_string($this->stc_dbs, $getitems['items_quantity'])."',
 					'".mysqli_real_escape_string($this->stc_dbs, $getitems['items_type'])."',
+					'".mysqli_real_escape_string($this->stc_dbs, $getitems['priority'])."',
 					'1'
 				)
 			");
@@ -238,72 +249,222 @@ class witcher_supervisor extends tesseract{
 
 	public function stc_search_requisitions($supreqfromdate, $supreqtodate){ 
 		$requisition_table='
-			<table class="mb-0 table table-hover">
-    	    	<thead>
-    	    	    <th style="width:10%;">Req No.</th>
-    	    	    <th style="width:10%;">Req Date.</th>
-    	    	    <th style="width:50%;">Req Site Name.</th>
-    	    	    <th>Action</th>
-    	    	</thead>
-    	    	<tbody>
+			<table class="mb-0 table table-hover table-bordered">
+				<thead>
+				    <th class="text-center">Req No.</th>
+				    <th class="text-center">Req Date.</th>
+				    <th class="text-center">Req Site Name.</th>
+				    <th class="text-center">Material Desc</th>
+				    <th class="text-center">Unit</th>
+				    <th class="text-center">Order Qty</th>
+				    <th class="text-center">Approved Qty</th>
+				    <th class="text-center">Dispatched Qty</th>
+				    <th class="text-center">Recieved Qty</th>
+				    <th class="text-center">Balance Qty</th>
+				    <th class="text-center">Consumed Qty</th>
+				    <th class="text-center">Status</th>
+				    <th class="text-center">Priority</th>
+				    <th class="text-center">Add Recieving</th>
+				</thead>
+				<tbody>
 		';
-
-		$requisition_qry=mysqli_query($this->stc_dbs, "
-			SELECT 
-				`stc_cust_super_requisition_list_id`,
-				DATE(`stc_cust_super_requisition_list_date`) as req_date,
+		$requisitioni_qry=mysqli_query($this->stc_dbs, "
+			SELECT
+				L.`stc_cust_super_requisition_list_id` as list_id,
+				L.`stc_cust_super_requisition_list_date`,
 				`stc_cust_project_title`,
-				`stc_cust_super_requisition_list_status`
-			FROM `stc_cust_super_requisition_list` 
-			INNER JOIN `stc_cust_project` 
-			ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
+				`stc_cust_super_requisition_list_items_title`,
+				`stc_cust_super_requisition_list_items_unit`,
+				`stc_cust_super_requisition_list_items_reqqty`,
+				`stc_cust_super_requisition_list_items_approved_qty`,
+				`stc_cust_super_requisition_items_finalqty`,
+				`stc_cust_super_requisition_items_type`,
+				`stc_cust_super_requisition_items_priority`,
+				`stc_cust_super_requisition_list_items_status`,
+				`stc_cust_super_requisition_items_priority`,
+				I.`stc_cust_super_requisition_list_id` as list_item_id
+			FROM `stc_cust_super_requisition_list_items` I
+			LEFT JOIN `stc_cust_super_requisition_list` L
+			ON L.`stc_cust_super_requisition_list_id`= I.`stc_cust_super_requisition_list_items_req_id`
+			LEFT JOIN `stc_cust_project` P
+			ON P.`stc_cust_project_id`= L.`stc_cust_super_requisition_list_project_id`
 			WHERE (
 				DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $supreqfromdate)."'
 				AND '".mysqli_real_escape_string($this->stc_dbs, $supreqtodate)."'
 			) AND `stc_cust_super_requisition_list_super_id`='".$_SESSION['stc_agent_sub_id']."'
-			LIMIT 0,30
+			ORDER BY `stc_cust_super_requisition_items_priority` DESC, TIMESTAMP(`stc_cust_super_requisition_list_date`) DESC
 		");
-
-		if(mysqli_num_rows($requisition_qry)>0){
-			foreach($requisition_qry as $reqrow){
-				$primerowstatus="";
-				if($reqrow['stc_cust_super_requisition_list_status']=="1"){
-					$primerowstatus="PROCESS";
-				}elseif($reqrow['stc_cust_super_requisition_list_status']=="2"){
-					$primerowstatus="PASSED";
-				}elseif($reqrow['stc_cust_super_requisition_list_status']=="3"){
-					$primerowstatus="CLEARED";
+		if(mysqli_num_rows($requisitioni_qry)>0){
+			foreach($requisitioni_qry as $requisitioni_row){
+				$reqstaus='';
+				if($requisitioni_row['stc_cust_super_requisition_list_items_status']==1){
+					$reqstaus='ALLOW';
+				}elseif($requisitioni_row['stc_cust_super_requisition_list_items_status']==2){
+					$reqstaus='ALLOW';
 				}else{
-					$primerowstatus="ACCEPTED";
+					$reqstaus='NOT ALLOW';
 				}
-				$requisition_table.="
-					<tr>
-						<td>STC/R/A/S/".substr("0000{$reqrow['stc_cust_super_requisition_list_id']}", -5)."</td>
-						<td style='width: 20%'>".date('d-M-Y', strtotime($reqrow['req_date']))."</td>
-						<td>".$reqrow['stc_cust_project_title']."</td>
-						<td>".$primerowstatus."</td>
-						<td><a href='#' style='font-size: 25px;font-weight: bold;color: black;' class='ag-show-requisition-items-hit' id='".$reqrow['stc_cust_super_requisition_list_id']."'><i class='fas fa-eye'></i></a></td>
+
+				$priority = $requisitioni_row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
+				$getdispatchedtransformers=mysqli_query($this->stc_dbs, "
+					SELECT 
+						SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+					FROM `stc_cust_super_requisition_list_items_rec` 
+					WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$requisitioni_row['list_item_id']."'
+				");
+				$recievingqty=0;
+				$sumbalanceqty=0;
+				$dispatchedgqty=0;
+				foreach($getdispatchedtransformers as $decqtyrow){
+					$dispatchedgqty+=$decqtyrow['dispatched_qty'];
+				}
+
+				$getrecivedtransformers=mysqli_query($this->stc_dbs, "
+					SELECT 
+						SUM(`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`) AS received_qty
+					FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
+					WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$requisitioni_row['list_item_id']."'
+				");
+				$recievingqty=0;
+				$sumbalanceqty=0;
+				foreach($getrecivedtransformers as $recqtyrow){
+					$recievingqty+=$recqtyrow['received_qty'];
+				}
+
+				$getconsrecivedtransformers=mysqli_query($this->stc_dbs, "
+					SELECT 
+						SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
+					FROM `stc_cust_super_list_items_consumption_items` 
+					WHERE `stc_cust_super_list_items_consumption_items_name`='".$requisitioni_row['list_item_id']."'
+				");
+				$consrecievingqty=0;
+				foreach($getconsrecivedtransformers as $consrecqtyrow){
+					$consrecievingqty+=$consrecqtyrow['consumable_qty'];
+				}
+
+				$sumbalanceqty=$requisitioni_row['stc_cust_super_requisition_items_finalqty'] - $recievingqty;
+				$action='#';
+				if(
+					(
+						number_format($requisitioni_row['stc_cust_super_requisition_items_finalqty'], 2)>0
+					) 
+					&& 
+					(
+						number_format($dispatchedgqty, 2)>0
+					)
+					&& 
+					(
+						number_format($sumbalanceqty, 2)!=0
+					)
+				){
+					$action='
+						<a 
+							href="#" 
+							stc-req-item-id="'.$requisitioni_row['list_item_id'].'"
+							stc-req-id="'.$requisitioni_row['list_id'].'"
+							class="btn btn-info btn-sm stc-sup-requisition-rece-modal-btn">	 
+							Recieving
+						</a>
+					';
+				}
+				$bgcolor=$requisitioni_row['stc_cust_super_requisition_items_priority']=="2" ? 'style="background:#ffa5a5;color:black"' : "";
+				$requisition_table.='
+					<tr '.$bgcolor.'>
+						<td class="text-center">'.$requisitioni_row['list_id'].'</td>
+						<td class="text-center">'.date('d-m-Y', strtotime($requisitioni_row['stc_cust_super_requisition_list_date'])).'</td>
+						<td>'.$requisitioni_row['stc_cust_project_title'].'</td>
+						<td>'.$requisitioni_row['stc_cust_super_requisition_list_items_title'].'</td>
+						<td>'.$requisitioni_row['stc_cust_super_requisition_list_items_unit'].'</td>
+						<td class="text-right">'.number_format($requisitioni_row['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+						<td class="text-right">'.number_format($requisitioni_row['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+						<td class="text-right">'.number_format($dispatchedgqty, 2).'</td>
+						<td class="text-right">'.number_format($recievingqty, 2).'</td>
+						<td class="text-right">'.number_format($sumbalanceqty, 2).'</td>
+						<td class="text-right">'.number_format($recievingqty, 2).'</td>
+						<td>'.$reqstaus.'</td>
+						<td>'.$priority.'</td>
+						<td class="text-center">'.$action.'</td>
 					</tr>
-					<tr>
-						<td colspan='6'>
-							<div style='display:none;' id='togdiv".$reqrow['stc_cust_super_requisition_list_id']."'>
-								Loading...
-							</div>
-						</td>
-					</tr>
-				";
+				';
 			}
 		}else{
 			$requisition_table.='
 				<tr>
-					<td colspan="4" align="center">No Requisition Found!!!</td>
+					<td colspan="8">No record found.</td>
 				</tr>
 			';
 		}
 		$requisition_table.='
-    	    	</tbody>
+				</tbody>
 			</table>
 		';
+		// $requisition_table.='
+		// 	<table class="mb-0 table table-hover">
+    	//     	<thead>
+    	//     	    <th style="width:10%;">Req No.</th>
+    	//     	    <th style="width:10%;">Req Date.</th>
+    	//     	    <th style="width:50%;">Req Site Name.</th>
+    	//     	    <th>Action</th>
+    	//     	</thead>
+    	//     	<tbody>
+		// ';
+
+		// $requisition_qry=mysqli_query($this->stc_dbs, "
+		// 	SELECT 
+		// 		`stc_cust_super_requisition_list_id`,
+		// 		DATE(`stc_cust_super_requisition_list_date`) as req_date,
+		// 		`stc_cust_project_title`,
+		// 		`stc_cust_super_requisition_list_status`
+		// 	FROM `stc_cust_super_requisition_list` 
+		// 	INNER JOIN `stc_cust_project` 
+		// 	ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
+		// 	WHERE (
+		// 		DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $supreqfromdate)."'
+		// 		AND '".mysqli_real_escape_string($this->stc_dbs, $supreqtodate)."'
+		// 	) AND `stc_cust_super_requisition_list_super_id`='".$_SESSION['stc_agent_sub_id']."'
+		// 	LIMIT 0,30
+		// ");
+
+		// if(mysqli_num_rows($requisition_qry)>0){
+		// 	foreach($requisition_qry as $reqrow){
+		// 		$primerowstatus="";
+		// 		if($reqrow['stc_cust_super_requisition_list_status']=="1"){
+		// 			$primerowstatus="PROCESS";
+		// 		}elseif($reqrow['stc_cust_super_requisition_list_status']=="2"){
+		// 			$primerowstatus="PASSED";
+		// 		}elseif($reqrow['stc_cust_super_requisition_list_status']=="3"){
+		// 			$primerowstatus="CLEARED";
+		// 		}else{
+		// 			$primerowstatus="ACCEPTED";
+		// 		}
+		// 		$requisition_table.="
+		// 			<tr>
+		// 				<td>STC/R/A/S/".substr("0000{$reqrow['stc_cust_super_requisition_list_id']}", -5)."</td>
+		// 				<td style='width: 20%'>".date('d-M-Y', strtotime($reqrow['req_date']))."</td>
+		// 				<td>".$reqrow['stc_cust_project_title']."</td>
+		// 				<td>".$primerowstatus."</td>
+		// 				<td><a href='#' style='font-size: 25px;font-weight: bold;color: black;' class='ag-show-requisition-items-hit' id='".$reqrow['stc_cust_super_requisition_list_id']."'><i class='fas fa-eye'></i></a></td>
+		// 			</tr>
+		// 			<tr>
+		// 				<td colspan='6'>
+		// 					<div style='display:none;' id='togdiv".$reqrow['stc_cust_super_requisition_list_id']."'>
+		// 						Loading...
+		// 					</div>
+		// 				</td>
+		// 			</tr>
+		// 		";
+		// 	}
+		// }else{
+		// 	$requisition_table.='
+		// 		<tr>
+		// 			<td colspan="4" align="center">No Requisition Found!!!</td>
+		// 		</tr>
+		// 	';
+		// }
+		// $requisition_table.='
+    	//     	</tbody>
+		// 	</table>
+		// ';
 		return $requisition_table;
 	}
 
@@ -311,7 +472,7 @@ class witcher_supervisor extends tesseract{
 		$sl=0;
 		$subcat='';
 		$countqty=0;
-		$transformers='
+		$transformers.='
 			<table class="mb-0 table table-hover table-bordered">
 				<thead>
 				    <th>Sl No</th>
@@ -324,6 +485,7 @@ class witcher_supervisor extends tesseract{
 				    <th>Balance Qty</th>
 				    <th>Consumed Qty</th>
 				    <th>Status</th>
+				    <th>Priority</th>
 				    <th>Add Recieving</th>
 				</thead>
 				<tbody>
@@ -335,7 +497,8 @@ class witcher_supervisor extends tesseract{
 				`stc_cust_super_requisition_list_items_unit`,
 				`stc_cust_super_requisition_list_items_reqqty`,
 				`stc_cust_super_requisition_items_finalqty`,
-				`stc_cust_super_requisition_list_items_status`
+				`stc_cust_super_requisition_list_items_status`,
+				`stc_cust_super_requisition_items_priority`
 			FROM `stc_cust_super_requisition_list_items` 
 			WHERE `stc_cust_super_requisition_list_items_req_id`='".$odid."'
 		");
@@ -350,6 +513,8 @@ class witcher_supervisor extends tesseract{
 				}else{
 					$reqstaus='NOT ALLOW';
 				}
+
+				$priority = $firstrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
 				$getdispatchedtransformers=mysqli_query($this->stc_dbs, "
 					SELECT 
 						SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
@@ -412,6 +577,7 @@ class witcher_supervisor extends tesseract{
 							<td>'.number_format($sumbalanceqty, 2).'</td>
 							<td>'.number_format($recievingqty, 2).'</td>
 							<td>'.$reqstaus.'</td>
+							<td>'.$priority.'</td>
 							<td>
 								<a 
 									href="#" 
@@ -436,6 +602,7 @@ class witcher_supervisor extends tesseract{
 							<td>'.number_format($sumbalanceqty, 2).'</td>
 							<td>'.number_format($recievingqty, 2).'</td>
 							<td>'.$reqstaus.'</td>
+							<td>'.$priority.'</td>
 							<td>#</td>
 						</tr>
 					';
@@ -641,6 +808,7 @@ if(isset($_POST['stc-sup-hit'])){
 				     'items_title'				=>     $_POST["stc-sup-desc"],  
 				     'items_quantity'       	=>     $_POST["stc-sup-qty"],
 				     'items_unit'				=>     $_POST["stc-sup-unit"],
+				     'priority'					=>     $_POST["stc-sup-priority"],
 				     'items_type'				=>     $_POST["stc-sup-type"]
 				);  
 				$_SESSION["stc_agent_sup_dailylist_cart_sess"][] = $item_array;  
@@ -651,6 +819,7 @@ if(isset($_POST['stc-sup-hit'])){
 				     'items_title'				=>     $_POST["stc-sup-desc"],  
 				     'items_quantity'       	=>     $_POST["stc-sup-qty"],
 				     'items_unit'				=>     $_POST["stc-sup-unit"],
+				     'priority'					=>     $_POST["stc-sup-priority"],
 				     'items_type'				=>     $_POST["stc-sup-type"]
 			);   
 			$_SESSION["stc_agent_sup_dailylist_cart_sess"][] = $item_array;  
@@ -661,13 +830,14 @@ if(isset($_POST['stc-sup-hit'])){
 
 if(isset($_POST['show_Dailylist'])){
 	$out='
-		<table class="mb-0 table table-hover table-responsive">
+		<table class="mb-0 table table-hover">
 			<thead>
 				<th>Sl No</th>
-				<th>Items Description</th>
-				<th>Items Qty</th>
-				<th>Items Unit</th>
-				<th>Items Type</th>
+				<th>Item Description</th>
+				<th>Item Qty</th>
+				<th>Item Unit</th>
+				<th>Item Type</th>
+				<th>Priority</th>
 				<th>Action</th>
 			</thead>
 			<tbody>
@@ -676,6 +846,7 @@ if(isset($_POST['show_Dailylist'])){
 	if(!empty($_SESSION["stc_agent_sup_dailylist_cart_sess"])){
 		foreach($_SESSION["stc_agent_sup_dailylist_cart_sess"] as $listrow){
 			$slno++;
+			$priority = $listrow['priority'] == 2 ? "Urgent" : "Normal";
 			$out.='
 				<tr>
 					<td>'.$slno.'</td>
@@ -683,6 +854,7 @@ if(isset($_POST['show_Dailylist'])){
 					<td>'.number_format($listrow['items_quantity'], 2).'</td>
 					<td>'.$listrow['items_unit'].'</td>
 					<td>'.$listrow['items_type'].'</td>
+					<td>'.$priority.'</td>
 					<td>
 						<a href="#" class="btn btn-success removlistitems" id="'.$listrow['items_title'].'">
 							<i class="fas fa-trash"></i>
@@ -693,7 +865,7 @@ if(isset($_POST['show_Dailylist'])){
 		}
 		$out.='
 			<tr>
-				<td colspan="5">
+				<td colspan="7">
 					<a class="btn btn-success stc-save-requisition">Save</a>
 				</td>
 			</tr>

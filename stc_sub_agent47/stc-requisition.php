@@ -126,7 +126,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="row">
                                         <div class="col-md-12 col-xl-12"> 
                                             <div class="main-card mb-3 card">
-                                                <div class="card-body stc-requisition-search-result">
+                                                <div class="card-body stc-requisition-search-result" style="overflow-x: auto;">
                                                 </div>
                                             </div>
                                         </div>
@@ -144,22 +144,22 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <h5 class="card-title">Create My Requisition</h5>
                                                     <form class="stc-sup-form-create" novalidate>
                                                         <div class="form-row">
-                                                            <div class="col-md-6 mb-3">
-                                                                <label for="validationCustom01">Items Desc</label>
+                                                            <div class="col-md-4 mb-3">
+                                                                <label for="validationCustom01">Item Desc</label>
                                                                 <input type="text" class="form-control" name="stc-sup-desc" placeholder="Enter item name" required>
                                                                 <div class="valid-feedback">
                                                                     Looks good!
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-2 mb-3">
-                                                                <label for="validationCustom02">Items Qty</label>
+                                                                <label for="validationCustom02">Item Qty</label>
                                                                 <input type="number" class="form-control" name="stc-sup-qty" placeholder="Enter Quantity" required>
                                                                 <div class="valid-feedback">
                                                                     Looks good!
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-2 mb-3">
-                                                                <label for="validationCustomUsername">Enter Items Unit</label>
+                                                                <label for="validationCustomUsername">Item Unit</label>
                                                                 <select class="form-control" name="stc-sup-unit">
                                                                     <option value="BAG">BAG</option>
                                                                     <option value="BOTTLE">BOTTLE</option>
@@ -185,13 +185,23 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                                 </select>
                                                             </div>
                                                             <div class="col-md-2 mb-3">
-                                                                <label for="validationCustomUsername">Enter Items Type</label>
+                                                                <label for="validationCustomUsername">Item Type</label>
                                                                 <select class="form-control" name="stc-sup-type">
                                                                     <option value="Consumable">CONSUMABLE</option>
                                                                     <option value="PPE">PPE</option>
                                                                     <option value="Supply">SUPPPLY</option>
                                                                     <option value="Tools & Tackles">TOOLS & TACKLES</option>
                                                                 </select>
+                                                            </div>
+                                                            <div class="col-md-2 mb-3">
+                                                                <label for="validationCustom02">Priority</label>
+                                                                <select class="form-control" name="stc-sup-priority">
+                                                                    <option value="1">Normal</option>
+                                                                    <option value="2">Urgent</option>
+                                                                </select>
+                                                                <div class="valid-feedback">
+                                                                    Looks good!
+                                                                </div>
                                                             </div>
                                                         </div>
                                                         <input type="hidden" name="stc-sup-hit">
@@ -229,7 +239,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             </div>
                                         </div>
                                         <div class="col-md-12 col-xl-12">
-                                            <div class="main-card card stc-sup-call-list-items">
+                                            <div class="main-card card stc-sup-call-list-items" style="overflow-x:auto;">
                                             </div>
                                         </div>
                                     </div>
@@ -295,10 +305,24 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     },
                     success : function(reequisitionresult){
                         // console.log(response);
-                        $('.stc-requisition-search-result').html(reequisitionresult);
+                        $('.stc-requisition-search-result').html('<input type="text" class="form-control stc-requisition-search" placeholder="Search here...">'+reequisitionresult);
                     }
                 });
             });
+
+            $('body').delegate('.stc-requisition-search', 'keyup', function(e){
+                var searchText = $(this).val().toLowerCase(); // Convert to lowercase for case-insensitive comparison
+                filterTable(searchText);
+            });
+
+            // Function to filter the table based on the input text
+            function filterTable(searchText) {
+                $('.stc-requisition-search-result > table > tbody tr').each(function () {
+                    var rowText = $(this).text().toLowerCase();
+                    // Toggle the visibility of the row based on whether it contains the search text
+                    $(this).toggle(rowText.includes(searchText));
+                });
+            }
 
             // call listed items from requisition
             $('body').delegate('.ag-show-requisition-items-hit', 'click', function(e){
