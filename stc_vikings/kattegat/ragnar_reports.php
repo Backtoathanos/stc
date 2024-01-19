@@ -3921,6 +3921,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
             I.`stc_cust_super_requisition_list_items_approved_qty`,
             I.`stc_cust_super_requisition_items_finalqty`,
             I.`stc_cust_super_requisition_items_type`,
+            I.`stc_cust_super_requisition_items_priority`,
             `stc_cust_project_cust_id`  
          FROM `stc_cust_super_requisition_list_items` I
          LEFT JOIN `stc_cust_super_requisition_list` R
@@ -3930,7 +3931,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
          ".$sdl_joiner."
          WHERE DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $from)."'
          AND '".mysqli_real_escape_string($this->stc_dbs, $to)."' ".$filter_query."
-         ORDER BY DATE(R.`stc_cust_super_requisition_list_date`) DESC
+         ORDER BY `stc_cust_super_requisition_items_priority` DESC, DATE(R.`stc_cust_super_requisition_list_date`) DESC
       ";
       $odin_get_mrdqry=mysqli_query($this->stc_dbs, $query);
       if(mysqli_num_rows($odin_get_mrdqry)>0){
@@ -3984,8 +3985,9 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
             
             $stcpendingqty=$odin_get_mrdrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
             $stockqty=$stcrecievedqty - $stcconsumedqty;
+            $bgcolor=$odin_get_mrdrow['stc_cust_super_requisition_items_finalqty']==2 ? 'style="background:#ffa5a5;color:black"' : "";
             $odin.='
-               <tr>
+               <tr '.$bgcolor.'>
                   <td>'.$pno.'</td>
                   <td class="text-center">'.date('d-m-Y h:i:s a', strtotime($odin_get_mrdrow['stc_cust_super_requisition_list_date'])).'</td>
                   <td>'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_title'].'</td>

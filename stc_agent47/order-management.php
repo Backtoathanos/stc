@@ -191,14 +191,18 @@ include_once("../MCU/db.php");
                                                                                 `stc_cust_super_requisition_list_items_status`,
                                                                                 `stc_cust_super_requisition_items_finalqty`
                                                                             FROM `stc_cust_super_requisition_list_items`
-                                                                            LEFT JOIN `stc_cust_super_requisition_list` 
+                                                                            INNER JOIN `stc_cust_super_requisition_list` 
                                                                             ON `stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_req_id`
-                                                                            LEFT JOIN `stc_cust_pro_supervisor` 
+                                                                            INNER JOIN `stc_cust_pro_supervisor` 
                                                                             ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id`
-                                                                            LEFT JOIN `stc_cust_project` 
+                                                                            INNER JOIN `stc_cust_project` 
                                                                             ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
-                                                                            WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'
-                                                                            AND stc_cust_super_requisition_list_status<2
+                                                                            LEFT JOIN `stc_cust_project_collaborate` 
+                                                                            ON `stc_cust_project_id`=`stc_cust_project_collaborate_projectid`
+                                                                            WHERE (
+                                                                                `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."' OR 
+                                                                                `stc_cust_project_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
+                                                                            )AND stc_cust_super_requisition_list_status<2
                                                                             ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
                                                                         ");
                                                                         $sl=0;

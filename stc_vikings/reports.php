@@ -27,6 +27,13 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     <link href="./main.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
     <style>
+        #header-fixed {
+            position: fixed;
+            top: 14%;
+            display: none;
+            background-color: white;
+        }
+
         tr:nth-child(even) {
           background-color: #AC92EC;
         }
@@ -1320,6 +1327,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     <script type="text/javascript" src="./assets/scripts/jarvis.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/floatthead/2.2.3/jquery.floatThead.min.js"></script>
     <script>
         $(document).ready(function(){
             $('.hidden-ledger-excel-section').hide();
@@ -1516,6 +1524,22 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         });
     </script>
     <script>
+        
+        $(document).ready(function() {
+            $(window).bind("scroll", function() {
+                var offset = $(this).scrollTop();
+                if(offset>800){
+                    $("#stc-reports-mrd-view thead").css('position', 'sticky');
+                    $("#stc-reports-mrd-view thead").css('background', 'white');
+                    $("#stc-reports-mrd-view thead").css('top', '8%');
+                }else{
+                    $("#stc-reports-mrd-view thead").css('position', 'relative');
+                    $("#stc-reports-mrd-view thead").removeProp('background');
+                    $("#stc-reports-mrd-view thead").removeProp('top');
+                }
+            });
+        });
+
 
         // function statusFunction() {
         //     var input, filter, table, tr, td, i, txtValue;
