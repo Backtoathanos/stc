@@ -507,12 +507,26 @@ class transformers extends tesseract{
 							<td>'.$list_date.'</td>
 					';
 				}
+				$viewmrd='';
+				$sdl_id=$row['stc_status_down_list_id'];
+				$reqcheck_qry=mysqli_query($this->stc_dbs, "
+					SELECT
+						`stc_cust_super_requisition_list_id`
+					FROM
+						`stc_cust_super_requisition_list`
+					WHERE
+						`stc_cust_super_requisition_list_sdlid`='$sdl_id'
+				");
+				if(mysqli_num_rows($reqcheck_qry)>0){
+					$viewmrd='<a href="javascript:void(0)" id="'.$row['stc_status_down_list_id'].'" class="btn bg-success text-white mb-3 stc-std-view-req-show" data-toggle="modal" data-target=".bd-viewreq-std-modal" title="View Requisiton"><i class="pe-7s-look"></i></a>';
+				}
 
 				$actionsec='';
 				if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
 					if($row['stc_status_down_list_status']==1){
 						$actionsec='
 							<a href="stc-requisition.php?sdl='.$row['stc_status_down_list_id'].'&status=add" class="btn bg-success text-white mb-3" title="Add Requisiton"><i class="pe-7s-note2"></i></a>
+							'.$viewmrd.'
 							<a href="javascript:void(0)" class="btn bg-danger text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" title="Edit Status Down List" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
 							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
 								<option status="NA">SELECT STATUS</option>
@@ -530,6 +544,7 @@ class transformers extends tesseract{
 								<option status="3">WORK-IN-PROGRESS</option>
 								<option status="4">WORK-DONE</option>
 							</select>
+							'.$viewmrd.'
 						';
 					}elseif($row['stc_status_down_list_status']==3){
 						$actionsec='
@@ -539,6 +554,7 @@ class transformers extends tesseract{
 								<option status="2">DOWN</option>
 								<option status="4">WORK-DONE</option>
 							</select>
+							'.$viewmrd.'
 							<a href="#" class="stc-add-to-pending btn btn-danger" style="font-size:10px;margin-top:4px;" title="Add Pending Reason" id="'.$row['stc_status_down_list_id'].'">Add Pending Reason</a>
 						';
 					}else{
@@ -557,11 +573,17 @@ class transformers extends tesseract{
 								<div class="col-sm-12 col-md-12">
 										<a href="javascript:void(0)" class="btn btn-info update-status-si" style="background-color: #00f9b4;" data-id="'.$row['stc_status_down_list_id'].'" title="Job down" actiontype="1"><i class="fa fa-thumbs-down"></i></a>
 								</div>
+								<div class="col-sm-12 col-md-12">
+									'.$viewmrd.'		
+								</div>
 						';
 					}else if($row['stc_status_down_list_status']==3 || $row['stc_status_down_list_status']==2 || $row['stc_status_down_list_status']==1){
 						$actionsec='
 								<div class="col-sm-12 col-md-12">
 									<a href="javascript:void(0)" class="btn bg-danger text-white stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" title="Edit Status Down List" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
+								</div>
+								<div class="col-sm-12 col-md-12">
+									'.$viewmrd.'		
 								</div>
 						';
 					}else{
@@ -819,6 +841,143 @@ class transformers extends tesseract{
 		}
 		return $optimusprime;		
 	}
+
+	// /call material list
+	public function stc_call_std_material($sdl_id){
+		$ivar='';
+		$slno=0;
+		$reqno=0;
+		$reqdate='';
+		$downlistdate='';
+		$sublocation='';
+		$ivarquery=mysqli_query($this->stc_dbs, "
+		   SELECT DISTINCT
+			  `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
+			  DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
+			  `stc_status_down_list_sub_location`,
+			  `stc_status_down_list_date`,
+			  `stc_cust_super_requisition_list_items_req_id`,
+			  `stc_cust_super_requisition_list_items_title`,
+			  `stc_cust_super_requisition_list_items_unit`,
+			  `stc_cust_super_requisition_list_items_reqqty`,
+			  `stc_cust_super_requisition_list_items_approved_qty`,
+			  `stc_cust_super_requisition_items_finalqty`,
+			  `stc_cust_super_requisition_list_items_status`,
+			  `stc_cust_pro_supervisor_fullname`,
+			  `stc_cust_pro_supervisor_contact`
+		   FROM `stc_cust_super_requisition_list_items`
+		   LEFT JOIN `stc_cust_super_requisition_list` 
+		   ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+		   LEFT JOIN `stc_status_down_list` 
+		   ON `stc_status_down_list_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_sdlid`
+		   LEFT JOIN `stc_cust_pro_supervisor` 
+		   ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id`
+		   WHERE 
+			  `stc_cust_super_requisition_list_sdlid`='".mysqli_real_escape_string($this->stc_dbs, $sdl_id)."'
+		   ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
+		");
+		if(mysqli_num_rows($ivarquery)>0){
+			  foreach($ivarquery as$requisitionrow){
+				  $slno++;
+				  $rqitemstts='';
+				  $stcdispatchedqty=0;
+				  $stcrecievedqty=0;
+				  $stcpendingqty=0;      
+			  $downlistdate=date('d-m-Y', strtotime($requisitionrow['stc_status_down_list_date']));
+			  $reqno=$requisitionrow['reqlistid'];
+			  $sublocation=$requisitionrow['stc_status_down_list_sub_location'];            
+			  $reqdate=date('d-m-Y', strtotime($requisitionrow['stc_req_date']));
+			  $SupName=$requisitionrow['stc_cust_pro_supervisor_fullname'];            
+			  $SupContact=$requisitionrow['stc_cust_pro_supervisor_contact'];            
+				  if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
+					  $rqitemstts='ALLOW';
+				  }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
+					  $rqitemstts='DIRECT';
+				  }else{
+					  $rqitemstts='NOT ALLOW';
+				  }
+				  $stcdecqtyqry=mysqli_query($this->stc_dbs, "
+					  SELECT 
+						  `stc_cust_super_requisition_list_items_rec_recqty`
+					  FROM `stc_cust_super_requisition_list_items_rec` 
+					  WHERE 
+						  `stc_cust_super_requisition_list_items_rec_list_id`='".$requisitionrow['stc_cust_super_requisition_list_items_req_id']."' 
+					  AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$requisitionrow['reqlistid']."'  
+				  ");
+				  foreach($stcdecqtyqry as $dispatchedrow){
+					  $stcdispatchedqty+=$dispatchedrow['stc_cust_super_requisition_list_items_rec_recqty'];
+				  }
+  
+				  $stcrecqtyqry=mysqli_query($this->stc_dbs, "
+					  SELECT 
+						  `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+					  FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
+					  WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$requisitionrow['reqlistid']."'  
+				  ");
+				  foreach($stcrecqtyqry as $recievedrow){
+					  $stcrecievedqty+=$recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
+				  }
+  
+				  $stcconsumedqty=0;
+				  $stcconsrecqtyqry=mysqli_query($this->stc_dbs, "
+					  SELECT 
+						  SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
+					  FROM `stc_cust_super_list_items_consumption_items` 
+					  WHERE `stc_cust_super_list_items_consumption_items_name`='".$requisitionrow['reqlistid']."'  
+				  ");
+				  foreach($stcconsrecqtyqry as $consumedrow){
+					  $stcconsumedqty+=$consumedrow['consumable_qty'];
+				  }
+  
+				  $stcpendingqty=$requisitionrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
+				  if($stcpendingqty>0){
+					  $stcpendingqty='
+						  <p class="form-control" style="
+							  background: #ffd81a;
+							  color: red;
+						  ">
+							  '.number_format($stcpendingqty, 2).'
+						  </p>
+					  ';
+				  }else{
+					  $stcpendingqty=number_format($stcpendingqty, 2);
+				  }
+				  $ivar.='
+						  <tr>
+							  <td>'.$slno.'</td>
+							  <td>'.$requisitionrow['stc_req_date'].'</td>
+							  <td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
+							  <td>'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
+							  <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+							  <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+							  <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+							  <td align="right">'.number_format($stcdispatchedqty, 2).'</td>
+							  <td align="right">'.number_format($stcrecievedqty, 2).'</td>
+							  <td align="right">'.$stcpendingqty.'</td>
+							  <td align="right">'.number_format($stcconsumedqty, 2).'</td>
+							  <td>'.$rqitemstts.'</td>
+						  </tr>
+				  ';
+			  }
+		  }else{
+			  $ivar.='
+					  <tr>
+						  <td colspan="10">No requisition found!!!</td>
+					  </tr>
+			  ';
+		  }
+		$out_ivar = array(
+		   'data'=> $ivar,
+		   'Downlist'=> $sdl_id,
+		   'downlistdate'=>$downlistdate,
+		   'reqno'=> $reqno,
+		   'reqdate'=> $reqdate,
+		   'sublocation'=> $sublocation,
+		   'SupName'=> $SupName,
+		   'SupContact'=>$SupContact,
+		);
+		return $out_ivar;
+	 }
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -1048,4 +1207,12 @@ if(isset($_POST['stc_jobcomplete_update_hit'])){
 	}
 	echo json_encode($out_sdl_status);
 }
+
+// call material  sdl
+if(isset($_POST['stc_sdl_material_call'])){
+	$sdl_id=$_POST['sdl_id'];
+	$bjornecustomer=new transformers();   
+	$outbjornecustomer=$bjornecustomer->stc_call_std_material($sdl_id);
+	echo json_encode($outbjornecustomer);
+ }
 ?>
