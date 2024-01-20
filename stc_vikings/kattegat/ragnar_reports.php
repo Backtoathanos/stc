@@ -1095,6 +1095,7 @@ class ragnarReportsViewRequiReports extends tesseract{
             `stc_cust_super_requisition_list_items_approved_qty`,
             `stc_cust_super_requisition_items_finalqty`,
             `stc_cust_super_requisition_list_items_status`,
+            `stc_cust_super_requisition_items_priority`,
             `stc_cust_pro_supervisor_fullname`,
             `stc_cust_pro_supervisor_contact`
          FROM `stc_cust_super_requisition_list_items`
@@ -1187,6 +1188,7 @@ class ragnarReportsViewRequiReports extends tesseract{
 							<td align="right">'.number_format($stcrecievedqty, 2).'</td>
 							<td align="right">'.$stcpendingqty.'</td>
 							<td align="right">'.number_format($stcconsumedqty, 2).'</td>
+							<td>'.$requisitionrow['stc_cust_super_requisition_items_priority'].'</td>
 							<td>'.$rqitemstts.'</td>
 						</tr>
 				';
