@@ -2690,6 +2690,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                     <th>Recieved</th>
                                                     <th>Pending</th>
                                                     <th>Consumed</th>
+                                                    <th>Priority</th>
                                                     <th>Status</th>
                                                 </tr>
                                             </thead>
