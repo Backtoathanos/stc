@@ -427,6 +427,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 type="date"
                                                 id="stc-mrd-from"
                                                 class="custom-select stc-mrd-from"
+                                                value="<?php echo date('Y-m-d', strtotime('- 15 days', strtotime(date('d-m-Y'))));?>"
                                                 name="stc-mrd-from"
                                             >
                                         </div>
@@ -441,6 +442,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 type="date"
                                                 id="stc-mrd-to"
                                                 class="custom-select stc-mrd-to"
+                                                value="<?php echo date('Y-m-d');?>"
                                                 name="stc-mrd-to"
                                             >
                                         </div>
@@ -541,19 +543,20 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                           <table class="mb-0 table table-bordered" id="stc-reports-mrd-view">
                                             <thead>
                                             <tr>
-                                                <th>P.No</th>
-                                                <th>Date & Time</th>
-                                                <th>Item Description</th>
-                                                <th>Unit</th>
-                                                <th>Qty</th>
-                                                <th>Manager Appr. Qty</th>
-                                                <th>E-Proc Appr. Qty</th>
-                                                <th>Dispatch Quantity</th>
+                                                <th class="text-center">P.No</th>
+                                                <th class="text-center">Date & Time</th>
+                                                <th class="text-center">Item Description</th>
+                                                <th class="text-center">Unit</th>
+                                                <th class="text-center">Qty</th>
+                                                <th class="text-center">Manager Appr. Qty</th>
+                                                <th class="text-center">E-Proc Appr. Qty</th>
+                                                <th class="text-center">Dispatch Quantity</th>
                                                 <!-- <th>Dispatch Date & Time</th> -->
-                                                <th>Recieved Qty <br>Date & Time</th>
-                                                <th>Pending Qty</th>
-                                                <th>Consumable Qty</th>
-                                                <th>Stock Qty</th>
+                                                <th class="text-center">Recieved Qty <br>Date & Time</th>
+                                                <th class="text-center">Pending Qty</th>
+                                                <th class="text-center">Consumable Qty</th>
+                                                <th class="text-center">Stock Qty</th>
+                                                <th class="text-center">Priority</th>
                                             </tr>
                                             </thead>
                                             <tbody class="stc-reports-mrd-view">
