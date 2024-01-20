@@ -3931,13 +3931,13 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
          ".$sdl_joiner."
          WHERE DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $from)."'
          AND '".mysqli_real_escape_string($this->stc_dbs, $to)."' ".$filter_query."
-         ORDER BY `stc_cust_super_requisition_items_priority` DESC, DATE(R.`stc_cust_super_requisition_list_date`) DESC
+         ORDER BY DATE(R.`stc_cust_super_requisition_list_date`) DESC, R.`stc_cust_super_requisition_list_sdlid` DESC
       ";
       $odin_get_mrdqry=mysqli_query($this->stc_dbs, $query);
       if(mysqli_num_rows($odin_get_mrdqry)>0){
          foreach($odin_get_mrdqry as $odin_get_mrdrow){
             $pno='';
-            if($location!="NA"){
+            if($odin_get_mrdrow['stc_cust_super_requisition_list_sdlid']>0){
                $pno=$odin_get_mrdrow['stc_cust_super_requisition_list_sdlid'];
             }
             $stcdispatchedqty=0;
@@ -3982,12 +3982,12 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
 				foreach($stcconsrecqtyqry as $consumedrow){
 					$stcconsumedqty+=$consumedrow['consumable_qty']==null ? 0 : $consumedrow['consumable_qty'];
 				}
-            
             $stcpendingqty=$odin_get_mrdrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
             $stockqty=$stcrecievedqty - $stcconsumedqty;
-            $bgcolor=$odin_get_mrdrow['stc_cust_super_requisition_items_finalqty']==2 ? 'style="background:#ffa5a5;color:black"' : "";
+            $bgcolor=$odin_get_mrdrow['stc_cust_super_requisition_items_priority']==2 ? 'style="background:#ffa5a5;color:black"' : "";
+            $materialpriority=$odin_get_mrdrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
             $odin.='
-               <tr '.$bgcolor.'>
+               <tr>
                   <td>'.$pno.'</td>
                   <td class="text-center">'.date('d-m-Y h:i:s a', strtotime($odin_get_mrdrow['stc_cust_super_requisition_list_date'])).'</td>
                   <td>'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_title'].'</td>
@@ -4000,6 +4000,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
                   <td class="text-right">'.number_format($stcpendingqty, 2).'</td>
                   <td class="text-right">'.number_format($stcconsumedqty, 2).'</td>
                   <td class="text-right">'.number_format($stockqty, 2).'</td>
+                  <td class="text-center" '.$bgcolor.'>'.$materialpriority.'</td>
                </tr>
             ';
          }
