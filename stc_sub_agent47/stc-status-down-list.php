@@ -795,6 +795,31 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     }
                 });
             });
+
+            
+
+            $('body').delegate('.stc-std-view-req-show', 'click', function(e){
+                var sdl_id=$(this).attr("id");
+                $.ajax({
+                    url         : "nemesis/stc_std.php",
+                    method      : "POST",
+                    data        : {
+                        stc_sdl_material_call:1,
+                        sdl_id:sdl_id
+                    },
+                    dataType    : "JSON",
+                    success     : function(data){
+                        $('.show-material-list-sdl').html(data.data);
+                        $('.downlistno').html('<b>SDL Number : '+data.Downlist+'</b>');
+                        $('.downlistdate').html('<b>SDL Date : '+data.downlistdate+'</b>');
+                        $('.reqnumber').html('<b>Requisition Number : '+data.reqno+'</b>');
+                        $('.reqdate').html('<b>Requisition Date : '+data.reqdate+'</b>');
+                        $('.sublocation').html('<b>'+data.sublocation+'</b>');
+                        $('.SupName').html('<b>Supervisor Name : '+data.SupName+'</b>');
+                        $('.SupContact').html('<b>Supervisor Contact : '+data.SupContact+'</b>');
+                    }
+                });
+            });
             
         });
     </script>
@@ -1201,6 +1226,81 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <a href="#" class="form-control btn btn-success stc-agent-sup-std-save">Submit</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-viewreq-std-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Material Requisition Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-3 col-sm-12 col-xl-3 mb-4">
+                                        <p class="card-title">Status Down List</p>
+                                        <span class="downlistno"></span><br>
+                                        <span class="downlistdate"></span>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3 mb-4">
+                                        <p class="card-title">Material Requisition</p>
+                                        <span class="reqnumber"></span><br>
+                                        <span class="reqdate"></span>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3 mb-4">
+                                        <p class="card-title">Department</p>
+                                        <span class="sublocation"></span>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3 mb-4">
+                                        <p class="card-title">Supervisor Details</p>
+                                        <span class="SupName"></span>
+                                        <span class="SupContact"></span>
+                                    </div>
+                                
+
+                                    <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                        <h5 class="card-title">Material List</h5>
+                                        <div class="position-relative form-group" style="overflow-x:auto;">
+                                            <table class="table table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Date</th>
+                                                        <th>Item Desc</th>
+                                                        <th>Unit</th>
+                                                        <th>Purchase Requisition</th>
+                                                        <th>Manager Approve</th>
+                                                        <th>Proc Apprv</th>
+                                                        <th>Dispatch</th>
+                                                        <th>Recieved</th>
+                                                        <th>Pending</th>
+                                                        <th>Consumed</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="show-material-list-sdl">
+                                                    
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
