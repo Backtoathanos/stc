@@ -1175,6 +1175,7 @@ class ragnarReportsViewRequiReports extends tesseract{
 				}else{
 					$stcpendingqty=number_format($stcpendingqty, 2);
 				}
+            $priority=$requisitionrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
 				$ivar.='
 						<tr>
 							<td>'.$slno.'</td>
@@ -1188,7 +1189,7 @@ class ragnarReportsViewRequiReports extends tesseract{
 							<td align="right">'.number_format($stcrecievedqty, 2).'</td>
 							<td align="right">'.$stcpendingqty.'</td>
 							<td align="right">'.number_format($stcconsumedqty, 2).'</td>
-							<td>'.$requisitionrow['stc_cust_super_requisition_items_priority'].'</td>
+							<td>'.$priority.'</td>
 							<td>'.$rqitemstts.'</td>
 						</tr>
 				';
@@ -3969,7 +3970,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
             $stcrecievedqty=0;
             if(mysqli_num_rows($stcrecqry)>0){
                foreach($stcrecqry as $recievedrow){
-                  $stcrecieveddate=date('d-m-Y h:i:s a', strtotime($recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_date']));
+                  $stcrecieveddate=date('d-m-Y', strtotime($recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_date']));
                   $stcrecievedqty+=$recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
                }
             }
@@ -3991,7 +3992,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
             $odin.='
                <tr>
                   <td>'.$pno.'</td>
-                  <td class="text-center">'.date('d-m-Y h:i:s a', strtotime($odin_get_mrdrow['stc_cust_super_requisition_list_date'])).'</td>
+                  <td class="text-center">'.date('d-m-Y', strtotime($odin_get_mrdrow['stc_cust_super_requisition_list_date'])).'</td>
                   <td>'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_title'].'</td>
                   <td class="text-center">'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_unit'].'</td>
                   <td class="text-right">'.number_format($odin_get_mrdrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
