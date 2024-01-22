@@ -34,25 +34,16 @@ class transformers extends tesseract{
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			SELECT 
 			    `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`,
-			    `stc_cust_super_requisition_list_items_title`
-			FROM 
-				`stc_cust_super_requisition_rec_items_fr_supervisor` 
-			INNER JOIN 
-				`stc_cust_super_requisition_list_items` 
-			ON 
-				`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid` 
-			INNER JOIN 
-				`stc_cust_super_requisition_list` 
-			ON 
-				`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_req_id`
-            WHERE 
-            	`stc_cust_super_requisition_list_super_id`='".$_SESSION['stc_agent_sub_id']."' 
-            AND 
-            	`stc_cust_super_requisition_list_project_id`='".$site_id."'
-			ORDER BY 
-				`stc_cust_super_requisition_list_items_title` 
-			ASC
-
+			    `stc_cust_super_requisition_list_items_title`,
+			    `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+			FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
+			INNER JOIN `stc_cust_super_requisition_list_items` 
+			ON `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid` 
+			INNER JOIN `stc_cust_super_requisition_list` 
+			ON `stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_req_id`
+            WHERE `stc_cust_super_requisition_list_super_id`='".$_SESSION['stc_agent_sub_id']."' 
+            AND `stc_cust_super_requisition_list_project_id`='".$site_id."'
+			ORDER BY `stc_cust_super_requisition_list_items_title` ASC
 		");
 		$optimusprime='<option value="NA" selected>Select Item</option>';
 		$do_action=mysqli_num_rows($optimusprimequery);
@@ -60,9 +51,22 @@ class transformers extends tesseract{
 			$optimusprime = "<option value='NA' selected>No Item Found !!</option>";
 		}else{
 			foreach ($optimusprimequery as $row) {
-				$optimusprime.='
-					<option value="'.$row["stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid"].'">'.$row["stc_cust_super_requisition_list_items_title"].'</option>		               	
-		    	';				
+				$sqlqry=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_list_items_consumption_items_qty`
+					FROM `stc_cust_super_list_items_consumption_items`
+					WHERE `stc_cust_super_list_items_consumption_items_name`='".$row["stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid"]."'
+				");
+				$qty=0;
+				if(mysqli_num_rows($sqlqry)>0){
+					foreach($sqlqry as $sqlrow){
+						$qty=$sqlrow['stc_cust_super_list_items_consumption_items_qty'];
+					}
+				}
+				if($row['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty']>$qty){
+					$optimusprime.='
+						<option value="'.$row["stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid"].'">'.$row["stc_cust_super_requisition_list_items_title"].'</option>		               	
+					';	
+				}			
 			}			
 		}
 		return $optimusprime;
@@ -272,7 +276,7 @@ if(isset($_POST['call_consumption'])){
 					<td align="right">'.number_format($listrow['items_quantity'], 2).'</td>
 					<td>'.$listrow['items_unit'].'</td>
 					<td>
-						<a href="#" class="btn btn-success removlistitems" id="'.$listrow['items_title'].'">
+						<a href="#" class="btn btn-success removlistitems" id="'.$listrow['items_id'].'">
 							<i class="fas fa-trash"></i>
 						</a>
 					</td>
@@ -323,8 +327,7 @@ if(isset($_POST['stc-sup-hit'])){
 			foreach($_SESSION["stc_agent_sup_dailyconsumpt_cart_sess"] as $keys => $values) {  
 				if($_SESSION["stc_agent_sup_dailyconsumpt_cart_sess"][$keys]['items_id'] == $_POST["stc-sup-desc"]) {  
 					$is_available++;  
-					$_SESSION["stc_agent_sup_dailyconsumpt_cart_sess"][$keys]['stc-sup-qty'] = $_SESSION["stc_agent_sup_dailyconsumpt_cart_sess"][$keys]['items_quantity'] + $_POST["stc-sup-qty"];  
-					echo "List Item Quantity Increased!!!";
+					echo "Already Added!!!";
 				}  
 			}  
 			if($is_available < 1) {  
@@ -353,7 +356,9 @@ if(isset($_POST['stc-sup-hit'])){
 // delete consumtpiton item
 if(isset($_POST['delete_Dailylist'])){
 	$prod_id=$_POST['del_item'];
-	foreach($_SESSION["stc_agent_sup_dailyconsumpt_cart_sess"] as $keys => $values){  
+	$item_desc='';
+	foreach($_SESSION["stc_agent_sup_dailyconsumpt_cart_sess"] as $keys => $values){ 
+		$item_desc=$values["items_id"]; 
 		if($values["items_id"] == $prod_id){  
 			unset($_SESSION["stc_agent_sup_dailyconsumpt_cart_sess"][$keys]);  
 			echo "Item Removed!!!";  

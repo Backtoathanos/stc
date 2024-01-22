@@ -262,6 +262,7 @@ class witcher_supervisor extends tesseract{
 				    <th class="text-center">Recieved Qty</th>
 				    <th class="text-center">Balance Qty</th>
 				    <th class="text-center">Consumed Qty</th>
+				    <th class="text-center">Stock Qty</th>
 				    <th class="text-center">Status</th>
 				    <th class="text-center">Priority</th>
 				    <th class="text-center">Add Recieving</th>
@@ -368,6 +369,7 @@ class witcher_supervisor extends tesseract{
 					';
 				}
 				$bgcolor=$requisitioni_row['stc_cust_super_requisition_items_priority']=="2" ? 'style="background:#ffa5a5;color:black"' : "";
+				$stockqty=$recievingqty - $consrecievingqty;
 				$requisition_table.='
 					<tr '.$bgcolor.'>
 						<td class="text-center">'.$requisitioni_row['list_id'].'</td>
@@ -380,7 +382,8 @@ class witcher_supervisor extends tesseract{
 						<td class="text-right">'.number_format($dispatchedgqty, 2).'</td>
 						<td class="text-right">'.number_format($recievingqty, 2).'</td>
 						<td class="text-right">'.number_format($sumbalanceqty, 2).'</td>
-						<td class="text-right">'.number_format($recievingqty, 2).'</td>
+						<td class="text-right">'.number_format($consrecievingqty, 2).'</td>
+						<td class="text-right">'.number_format($stockqty, 2).'</td>
 						<td>'.$reqstaus.'</td>
 						<td>'.$priority.'</td>
 						<td class="text-center">'.$action.'</td>
