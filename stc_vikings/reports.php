@@ -544,7 +544,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <thead>
                                             <tr>
                                                 <th class="text-center">P.No</th>
-                                                <th class="text-center">Date & Time</th>
+                                                <th class="text-center">Date</th>
                                                 <th class="text-center">Item Description</th>
                                                 <th class="text-center">Unit</th>
                                                 <th class="text-center">Qty</th>
@@ -552,7 +552,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <th class="text-center">E-Proc Appr. Qty</th>
                                                 <th class="text-center">Dispatch Quantity</th>
                                                 <!-- <th>Dispatch Date & Time</th> -->
-                                                <th class="text-center">Recieved Qty <br>Date & Time</th>
+                                                <th class="text-center">Recieved Date</th>
                                                 <th class="text-center">Pending Qty</th>
                                                 <th class="text-center">Consumable Qty</th>
                                                 <th class="text-center">Stock Qty</th>
