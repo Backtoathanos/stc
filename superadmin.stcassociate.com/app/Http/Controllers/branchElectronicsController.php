@@ -8,7 +8,7 @@ use App\BranchElectronics;
 class branchElectronicsController extends Controller
 {
     public function show(){
-        $data['page_title']="Product";
+        $data['page_title']="STC Electronics";
         return view('pages.branchelectronics', $data);
     }
 

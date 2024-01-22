@@ -20,6 +20,7 @@ use App\Http\Controllers\RackController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\branchElectronicsController;
+use App\Http\Controllers\branchSiteController;
 use App\Http\Controllers\SchoolController;
 
 /*
@@ -207,6 +208,13 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/branch/electronicsbranch/getSP', [branchElectronicsController::class, 'getSP']);
     Route::post('/branch/electronicsbranch/edit', [branchElectronicsController::class, 'update']);    
     Route::get('/branch/electronicsbranch/delete', [branchElectronicsController::class, 'delete']);
+
+    Route::get('/branch/sitebranch', [branchSiteController::class, 'show']);  
+    Route::get('/branch/sitebranch/list', [branchSiteController::class, 'list']);  
+    Route::post('/branch/sitebranch/getSP', [branchSiteController::class, 'getSP']);
+    Route::post('/branch/sitebranch/edit', [branchSiteController::class, 'update']);    
+    Route::get('/branch/sitebranch/delete', [branchSiteController::class, 'delete']);  
+    Route::get('/branch/sitebranch/getusers', [branchSiteController::class, 'getusers']);
 
     
     Route::get('/branch/school', [SchoolController::class, 'show']);    
