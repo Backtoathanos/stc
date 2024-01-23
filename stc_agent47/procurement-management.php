@@ -54,26 +54,26 @@ include_once("../MCU/db.php");
                             </div>
                         </div>            
                         <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-0" data-toggle="tab" href="#check-order">
                                     <span>Create Order <b><i class="pe-7s-look"></i></b></span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="nav-item">
-                                <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#sup-requis">
-                                    <span>Create Requisition <b><i class="pe-7s-look"></i></b></span>
+                                <a role="tab" class="nav-link show active" id="tab-1" data-toggle="tab" href="#sup-requis">
+                                    <span>Requisition <b><i class="pe-7s-look"></i></b></span>
                                 </a>
                             </li>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane tabs-animation fade " id="check-order" role="tabpanel">
+                            <!-- <div class="tab-pane tabs-animation fade " id="check-order" role="tabpanel">
                                 <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                                     <li class="nav-item">
                                         <a role="tab" class="nav-link" id="tab-0" data-toggle="tab" href="#order">
                                             <span>Order <b><i class="pe-7s-sheet"></i></b></span>
                                         </a>
                                     </li>
-                                    <li class="nav-item">
+                                    <li class="nav-item active">
                                         <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#order-cart">
                                             <span>Cart <b><i class="pe-7s-cart"></i></b></span>
                                         </a>
@@ -162,11 +162,11 @@ include_once("../MCU/db.php");
                                          order cart empty..
                                     </div>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="tab-pane tabs-animation fade show active" id="sup-requis" role="tabpanel">
                                 <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                                     <li class="nav-item">
-                                        <a role="tab" class="nav-link" id="tab-0" data-toggle="tab" href="#requisition">
+                                        <a role="tab" class="nav-link active show" id="tab-0" data-toggle="tab" href="#requisition">
                                             <span>Requisition <b><i class="pe-7s-look"></i></b></span>
                                         </a>
                                     </li>
@@ -177,7 +177,7 @@ include_once("../MCU/db.php");
                                     </li>
                                 </ul>
                                 <div class="tab-content">
-                                    <div class="tab-pane tabs-animation fade " id="requisition" role="tabpanel">
+                                    <div class="tab-pane tabs-animation fade show active" id="requisition" role="tabpanel">
                                         <div class="row">
                                             <div class="col-md-12">
                                                 <div class="main-card mb-3 card">
@@ -185,31 +185,48 @@ include_once("../MCU/db.php");
                                                         <form class="#">
                                                             <div class="row">
                                                                 <div class="col-md-12">
-                                                                    <table class="mb-0 table table-hover table-responsive">
+                                                                    <input type="text" class="form-control searc-pro-table" placeholder="Search here..">
+                                                                </div>
+                                                                <div class="col-md-12" style="overflow-x:auto;">
+                                                                    <table class="mb-0 table table-hover table-bordered stc-pro-req-table">
                                                                         <thead>
-                                                                            <th>Requisition ID</th>
-                                                                            <th>Requisition Date</th>
-                                                                            <th>Requisition From</th>
-                                                                            <th>Requisition For</th>
-                                                                            <th>Requisition Status</th>
-                                                                            <th>View</th>
+                                                                            <th class="text-center">Requisition ID</th>
+                                                                            <th class="text-center">Requisition Date</th>
+                                                                            <th class="text-center">Requisition From</th>
+                                                                            <th class="text-center">Requisition For</th>
+                                                                            <th class="text-center">Item Description</th>
+                                                                            <th class="text-center">Unit</th>
+                                                                            <th class="text-center">Requis Qty</th>
+                                                                            <th class="text-center">Requis Approved Qty</th>
+                                                                            <th class="text-center">Requis Remains Qty</th>
+                                                                            <th class="text-center">Requisition Status</th>
+                                                                            <th class="text-center">Priority</th>
+                                                                            <th class="text-center">Action</th>
                                                                         </thead>
                                                                         <tbody>
                                                                             <?php 
                                                                                 $requissuperqry=mysqli_query($con, "
-                                                                                    SELECT 
-                                                                                        `stc_cust_super_requisition_list_id`,
-                                                                                        `stc_cust_super_requisition_list_date`,
+                                                                                    SELECT
+                                                                                        I.`stc_cust_super_requisition_list_id` as list_item_id,
+                                                                                        L.`stc_cust_super_requisition_list_id` as list_id,
+                                                                                        L.`stc_cust_super_requisition_list_date`,
                                                                                         `stc_cust_project_title`,
                                                                                         `stc_cust_pro_supervisor_fullname`,
-                                                                                        `stc_cust_super_requisition_list_status`
-                                                                                    FROM `stc_cust_super_requisition_list`
-                                                                                    INNER JOIN `stc_cust_pro_supervisor` 
-                                                                                    ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id`
-                                                                                    INNER JOIN `stc_cust_project` 
-                                                                                    ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
-                                                                                    WHERE `stc_cust_super_requisition_list_status`='2'
-                                                                                    ORDER BY `stc_cust_super_requisition_list_id` DESC
+                                                                                        `stc_cust_super_requisition_list_items_title`,
+                                                                                        `stc_cust_super_requisition_list_items_unit`,
+                                                                                        `stc_cust_super_requisition_list_items_approved_qty`,
+                                                                                        `stc_cust_super_requisition_items_finalqty`,
+                                                                                        `stc_cust_super_requisition_list_status`,
+                                                                                        `stc_cust_super_requisition_items_priority`
+                                                                                    FROM `stc_cust_super_requisition_list_items` I
+                                                                                    INNER JOIN `stc_cust_super_requisition_list` L
+                                                                                    ON `stc_cust_super_requisition_list_items_req_id`=L.`stc_cust_super_requisition_list_id`
+                                                                                    INNER JOIN `stc_cust_pro_supervisor`
+                                                                                    ON `stc_cust_pro_supervisor_id`=L.`stc_cust_super_requisition_list_super_id`
+                                                                                    INNER JOIN `stc_cust_project`
+                                                                                    ON `stc_cust_project_id`=L.`stc_cust_super_requisition_list_project_id`
+                                                                                    WHERE L.`stc_cust_super_requisition_list_status`='2' 
+                                                                                    ORDER BY TIMESTAMP(`stc_cust_super_requisition_list_date`) DESC                                                                                   
                                                                                 ");
                                                                                 if(mysqli_num_rows($requissuperqry)!=0){
                                                                                     foreach($requissuperqry as $requisrow){
@@ -221,37 +238,47 @@ include_once("../MCU/db.php");
                                                                                         }else{
                                                                                             $reqstatus="ACCEPTED";
                                                                                         }
+
+                                                                                        $recqtyoperations=mysqli_query($con, "
+                                                                                            SELECT `stc_cust_super_requisition_list_items_rec_recqty` FROM `stc_cust_super_requisition_list_items_rec` 
+                                                                                            WHERE `stc_cust_super_requisition_list_items_rec_list_id`='".$requisrow['list_id']."'
+                                                                                            AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$requisrow['list_item_id']."'
+                                                                                        ");
+
+                                                                                        $recoprqty=0;
+                                                                                        foreach($recqtyoperations as $recoprrow){
+                                                                                            $recoprqty+=$recoprrow['stc_cust_super_requisition_list_items_rec_recqty'];
+                                                                                        }
+                                                                                        $priority=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
+                                                                                        $bgcolor=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ff9e9e;'" : "";
                                                                                         echo '
                                                                                             <tr>
-                                                                                                <td>'.$requisrow['stc_cust_super_requisition_list_id'].'</td>
-                                                                                                <td>'.$requisrow['stc_cust_super_requisition_list_date'].'</td>
-                                                                                                <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
-                                                                                                <td>'.$requisrow['stc_cust_project_title'].'</td>
-                                                                                                <td>'.$reqstatus.'</td>
-                                                                                                <td><a href="#" style="font-size: 25px;font-weight: bold;color: black;" class="ag-req-show-grid" id="'.$requisrow['stc_cust_super_requisition_list_id'].'"><i class="fas fa-eye"></i></a></td>
-                                                                                            </tr>
-                                                                                            <tr>
-                                                                                            <td colspan="6">
-                                                                                                <div style="display:none;"" id="togreqdiv'.$requisrow['stc_cust_super_requisition_list_id'].'">
-                                                                                                    Loading...
-                                                                                                </div>
-                                                                                            </td>
-                                                                                        </tr>
-                                                                                        ';
-                                                                                    }
-                                                                                }else{
-                                                                                        echo '
-                                                                                            <tr>
-                                                                                                <td colspan="6">
-                                                                                                    <b>No Requisition Found!!!</b>
+                                                                                                <td class="text-center">'.$requisrow['list_id'].'</td>
+                                                                                                <td class="text-center">'.date('d-m-Y', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'</td>
+                                                                                                <td class="text-center">'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
+                                                                                                <td class="text-center">'.$requisrow['stc_cust_project_title'].'</td>
+                                                                                                <td>'.$requisrow['stc_cust_super_requisition_list_items_title'].'</td>
+                                                                                                <td class="text-center">'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
+                                                                                                <td class="text-right">'.number_format($requisrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+                                                                                                <td>
+                                                                                                    <input type="number" class="form-control stc-sup-appr-qty'.$requisrow['list_item_id'].'"
+                                                                                                    value="'.$requisrow['stc_cust_super_requisition_list_items_approved_qty'].'">
+                                                                                                </td>
+                                                                                                <td class="text-right">'.number_format($recoprqty, 2).'</td>
+                                                                                                <td class="text-center">'.$reqstatus.'</td>
+                                                                                                <td class="text-center" '.$bgcolor.'>'.$priority.'</td>
+                                                                                                <td class="text-center">
+                                                                                                    <a class="btn btn-success form-control add_to_accept_cart" id="'.$requisrow['list_item_id'].'" req-id="'.$requisrow['list_id'].'" style="font-size: 20px;"><i class="fas fa-check-circle"></i></a>
+                                                                                                    <a class="btn btn-danger form-control removerequisitionwithitems" id="'.$requisrow['list_item_id'].'" req-id="'.$requisrow['list_id'].'" style="font-size: 20px;"><i class="fas fa-trash"></i></a>
                                                                                                 </td>
                                                                                             </tr>
                                                                                         ';
+                                                                                    }
                                                                                 }
                                                                             ?>
-                                                                        </tbody>                                                                   
-                                                                    </table>
-                                                                </div>
+                                                                        </tbody>
+                                                                        </table>
+                                                                    </div>
                                                             </div>
                                                         </form>
                                                     </div>
@@ -260,18 +287,31 @@ include_once("../MCU/db.php");
                                         </div>
                                     </div>
                                     <div class="tab-pane tabs-animation fade " id="requisition-cart" role="tabpanel">
-                                        <table class="mb-0 table table-hover">
-                                            <thead>
-                                                <th>Requisition ID</th>
-                                                <th>Requisition From</th>
-                                                <th>Requisition For</th>
-                                                <th>Requisition Items Requisition Request Qty & Approved Qty & Unit </th>
-                                                <th>Action</th>
-                                            </thead>
-                                            <tbody class="stc-requisition-cart-approval-reload">
-                                                
-                                            </tbody>
-                                        </table>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="main-card mb-3 card">
+                                                <div class="card-body"><h5 class="card-title">Supervisor Requisition</h5>
+                                                    <form class="#">
+                                                        <div class="row">
+                                                            <div class="col-md-12" style="overflow-x:auto;">
+                                                                <table class="mb-0 table table-hover table-bordered">
+                                                                    <thead>
+                                                                        <th class="text-center">Requisition ID</th>
+                                                                        <th class="text-center">Requisition From</th>
+                                                                        <th class="text-center">Requisition For</th>
+                                                                        <th class="text-center">Requisition Items Details </th>
+                                                                        <th class="text-center">Action</th>
+                                                                    </thead>
+                                                                    <tbody class="stc-requisition-cart-approval-reload">
+                                                                        
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -339,11 +379,12 @@ include_once("../MCU/db.php");
 
             $('body').delegate('.add_to_accept_cart', 'click', function(e){
                 e.preventDefault();
+                $(this).closest("td").html("#");
                 $(this).css('color','red');
                 var item_id=$(this).attr("id");
                 var item_req_id=$(this).attr("req-id");
                 var itemqty=$('.stc-sup-appr-qty'+item_id).val();
-                var itemstatus=$('.stc-sup-items-status'+item_id).val();
+                var itemstatus=1;
                 $.ajax({
                     url : "nemesis/stc_procurement.php",
                     method : "POST",
@@ -357,6 +398,7 @@ include_once("../MCU/db.php");
                     success : function(requisition){
                         // console.log(requisition);
                         alert(requisition);
+                        call_requisition_appr_cart();
                     }
                 });
             });
@@ -412,6 +454,47 @@ include_once("../MCU/db.php");
                         // console.log(requisition);
                         alert(requisition);
                         window.location.reload();
+                    }
+                });
+            });
+
+            $('body').delegate('.removerequisitionwithitems', 'click', function(e){
+                e.preventDefault();
+                var req_id=$(this).attr('req-id');
+                var req_item_id=$(this).attr('id');
+                if(confirm("Are you sure want to delete this requisition?")){
+                    $(this).closest('tr').remove();
+                    $.ajax({
+                        url : "nemesis/stc_procurement.php",
+                        method : "POST",
+                        data : {
+                            remove_requisition:1,
+                            req_id:req_id,
+                            req_item_id:req_item_id
+                        },
+                        success : function(requisition){
+                            // console.log(requisition);
+                            alert(requisition);
+                        }
+                    });
+                }
+            });
+
+            
+
+            $('.searc-pro-table').keyup(function() {
+                // Get the value from the search input
+                var searchText = $(this).val().toLowerCase();
+
+                // Loop through each table row
+                $('.stc-pro-req-table tbody tr').each(function() {
+                    var rowData = $(this).text().toLowerCase();
+
+                    // Show or hide the row based on whether the search text is found
+                    if (rowData.indexOf(searchText) === -1) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
                     }
                 });
             });
