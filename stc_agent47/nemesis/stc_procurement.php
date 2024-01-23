@@ -353,7 +353,7 @@ class procurement extends tesseract{
 		$trans_checkreqqry=mysqli_query($this->stc_dbs, "
 			SELECT `stc_cust_super_requisition_list_items_req_id` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
 		");
-		if(mysqli_num_rows($trans_checkreqqry)==1){
+		// if(mysqli_num_rows($trans_checkreqqry)==1){
 			mysqli_query($this->stc_dbs, "
 				DELETE FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_item_id)."'
 			");
@@ -361,12 +361,12 @@ class procurement extends tesseract{
 				DELETE FROM `stc_cust_super_requisition_list` WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
 			");
 			$transformers="Requisition removed.";
-		}else{
-			mysqli_query($this->stc_dbs, "
-				DELETE FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_item_id)."'
-			");
-			$transformers="Requisition item removed.";
-		}
+		// }else{
+		// 	mysqli_query($this->stc_dbs, "
+		// 		DELETE FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_item_id)."'
+		// 	");
+		// 	$transformers="Requisition item removed.";
+		// }
 		return $transformers;
 	}
 }
