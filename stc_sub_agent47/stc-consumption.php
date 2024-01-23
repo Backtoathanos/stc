@@ -108,8 +108,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="col-md-12 col-xl-12"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
-                                            <h5>Sub Location :</h5><br>
-                                            <input type="text" class="form-control stc-consump-sub-location" placeholder="Enter Sub Location">
+                                            <h5>Department :</h5><br>
+                                            <input type="text" class="form-control stc-consump-sub-location" placeholder="Enter Department">
                                         </div>
                                     </div>
                                 </div>

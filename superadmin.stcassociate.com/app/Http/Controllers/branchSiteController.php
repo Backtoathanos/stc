@@ -83,7 +83,7 @@ class branchSiteController extends Controller
             
             $url = $server.'/usercredentials.php?user_id='.$encryption.'&user_type='.$user_type;
             $actionData = '
-                <a href="javascript:void(0)" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete-modal" onclick=$("#delete_id").val("'.$id.'")><i class="fas fa-trash" title="Delete"></i></a>
+                <a href="javascript:void(0)" class="btn btn-danger btn-sm sdl-remove" data-toggle="modal" data-target="#delete-modal" onclick=$("#delete_id").val("'.$id.'")><i class="fas fa-trash" title="Delete"></i></a>
                 <a href="'.$url.'" target="_blank" class="btn btn-success btn-sm"><i class="fas fa-arrow-right" title="Go"></i></a>
             '; 
 

@@ -136,6 +136,19 @@ class procurement extends tesseract{
 			");
 			foreach($requisquery as $reqqryrow){
 				$itemssec='';
+				$insidetable='
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<td class="text-center text-success bg-dark">Sl No</td>
+								<td class="text-center text-success bg-dark">Requisition Items</td>
+								<td class="text-center text-success bg-dark">Requisition Request Qty</td>
+								<td class="text-center text-success bg-dark">Requisition Approved Qty</td>
+								<td class="text-center text-success bg-dark">Unit</td>
+							</tr>
+						</thead>
+						<tbody>
+				';
 				$reqitemqry=mysqli_query($this->stc_dbs, "
 					SELECT 
 						`stc_cust_super_requisition_list_id`,
@@ -148,27 +161,52 @@ class procurement extends tesseract{
 				");
 
 				$findalqty=0;
-				foreach($reqitemqry as $reqitemrow){
-					foreach(@$_SESSION["stc_supervisor_req_final_cart_req_item_sess"] as $keys => $values){  
-					    if(@$_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['list_id'] == $reqqryrow['stc_cust_super_requisition_list_id'] && $_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['list_line_id'] == $reqitemrow['stc_cust_super_requisition_list_id']){  
-					        $findalqty=$_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['product_quantity'];
-				    	}  
-				  	}  
+				$slno=0;
+				foreach($_SESSION["stc_supervisor_req_final_cart_req_item_sess"] as $reqitemsessrow){
+					// foreach(@$_SESSION["stc_supervisor_req_final_cart_req_item_sess"] as $keys => $values){  
+					//     if(@$_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['list_id'] == $reqqryrow['stc_cust_super_requisition_list_id'] && $_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['list_line_id'] == $reqitemrow['stc_cust_super_requisition_list_id']){  
+					//         $findalqty=$_SESSION["stc_supervisor_req_final_cart_req_item_sess"][$keys]['product_quantity'];
+				    // 	}  
+				  	// }  
 
-					$itemssec.='<p>
-							'.$reqitemrow['stc_cust_super_requisition_list_items_title'].' : 
-							'.number_format($reqitemrow['stc_cust_super_requisition_list_items_approved_qty'], 2).' : 
-							'.number_format($findalqty, 2).' : 
-							'.$reqitemrow['stc_cust_super_requisition_list_items_unit'].'
-					</p><br>';
+					// $itemssec.='<p>
+					// 		'.$reqitemrow['stc_cust_super_requisition_list_items_title'].' : 
+					// 		'.number_format($reqitemrow['stc_cust_super_requisition_list_items_approved_qty'], 2).' : 
+					// 		'.number_format($findalqty, 2).' : 
+					// 		'.$reqitemrow['stc_cust_super_requisition_list_items_unit'].'
+					// </p><br>';
+					$title='';
+					$req_qty=0;
+					$req_unit='';
+					foreach($reqitemqry as $reqitemrow){
+						if($reqitemrow['stc_cust_super_requisition_list_id']==$reqitemsessrow['list_line_id']){
+							$slno++;
+							$title=$reqitemrow['stc_cust_super_requisition_list_items_title'];
+							$req_qty=$reqitemrow['stc_cust_super_requisition_list_items_approved_qty'];
+							$req_unit=$reqitemrow['stc_cust_super_requisition_list_items_unit'];
+							$insidetable.='
+								<tr>
+									<td class="text-center">'.$slno.'</td>
+									<td class="text-left">'.$title.'</td>
+									<td class="text-right">'.number_format($req_qty, 2).'</td>
+									<td class="text-right">'.number_format($reqitemsessrow['product_quantity'], 2).'</td>
+									<td class="text-center">'.$req_unit.'</td>
+								</tr>
+							';
+						}
+					}
 				}
+				$insidetable.='
+						</tbody>
+					</table>
+				';		
 
 				$transformers.='
 					<tr>
-						<td>'.$reqqryrow['stc_cust_super_requisition_list_id'].'</td>
-						<td>'.$reqqryrow['stc_agents_name'].'</td>
-						<td>'.$reqqryrow['stc_cust_project_title'].'</td>
-						<td>'.$itemssec.'</td>
+						<td class="text-center">'.$reqqryrow['stc_cust_super_requisition_list_id'].'</td>
+						<td class="text-center">'.$reqqryrow['stc_agents_name'].'</td>
+						<td class="text-center">'.$reqqryrow['stc_cust_project_title'].'</td>
+						<td>'.$insidetable.'</td>
 						<td>
 							<a href="#" class="btn btn-success removreqitems" id="'.$reqqryrow['stc_cust_super_requisition_list_id'].'">
 								<i class="fas fa-trash"></i>
@@ -176,7 +214,7 @@ class procurement extends tesseract{
 						</td>
 					</tr>
 				';
-			}			
+			}	
 		}
 		$transformers.='
 			<tr>
@@ -308,6 +346,29 @@ class procurement extends tesseract{
 		}
 		return $transformers;
 	}
+
+	// remvoe requisition
+	public function stc_requisition_remove($req_id, $req_item_id){
+		$transformers="";
+		$trans_checkreqqry=mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_super_requisition_list_items_req_id` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
+		");
+		if(mysqli_num_rows($trans_checkreqqry)==1){
+			mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_item_id)."'
+			");
+			mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_super_requisition_list` WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
+			");
+			$transformers="Requisition removed.";
+		}else{
+			mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_item_id)."'
+			");
+			$transformers="Requisition item removed.";
+		}
+		return $transformers;
+	}
 }
 
 /*------------------------------------------------------------------------------------------------*/
@@ -361,29 +422,29 @@ if(isset($_POST['go_for_req_sess'])){
 	}else{
 		echo "Invalid Quantity.";
 	}
-}
+// }
 
 // add to requistion combiner cart
-if(isset($_POST['requisition_combined'])){
+// if(isset($_POST['requisition_combined'])){
 	if(isset($_SESSION["stc_supervisor_req_final_cart_req_sess"])) {  
 		$is_available = 0;  
 		foreach($_SESSION["stc_supervisor_req_final_cart_req_sess"] as $keys => $values) {  
-			if($_SESSION["stc_supervisor_req_final_cart_req_sess"][$keys]['req_id'] == $_POST["odid"]) {  
+			if($_SESSION["stc_supervisor_req_final_cart_req_sess"][$keys]['req_id'] == $_POST["item_req_id"]) {  
 			    $is_available++;
-			    echo "Requisition already added in a list!!!";
+			    // echo "Requisition already added in a list!!!";
 			    break;
 			}  
 		}  
 	    if($is_available < 1) {  
 	    	$item_array = array(  
-	    	     'req_id'             		=>     $_POST["odid"]
+	    	     'req_id'             		=>     $_POST["item_req_id"]
 	    	);  
 	    	$_SESSION["stc_supervisor_req_final_cart_req_sess"][] = $item_array;  
 	    	echo "Item Added to Requisition Cart!!!";
 	    }  
 	}else{
 		$item_array = array(
-	    	     'req_id'             		=>     $_POST["odid"]
+	    	     'req_id'             		=>     $_POST["item_req_id"]
 		);
 		$_SESSION["stc_supervisor_req_final_cart_req_sess"][] = $item_array;  
 	    echo "Requisition Cart Created & Item Added to Requisition Cart!!!";
@@ -398,7 +459,7 @@ if(isset($_POST['call_reuisition_appr_cart_call'])){
 		$outrequisapr=$requisapr->stc_requis_apr_call();
 		$reqapprtale=$outrequisapr;
 	}else{
-		$reqapprtale="Requisition approval cart is empty. :(";
+		$reqapprtale="<tr><td colspan='5' class='text-center'>Requisition approval cart is empty. :(</td></tr>";
 	}
 
 	echo $reqapprtale;
@@ -436,5 +497,15 @@ if(isset($_POST['place_req_sess_act'])){
 		$out=$outobjrequipl;
 	}
 	echo $out;
+}
+
+// placed requisition to the stc
+if(isset($_POST['remove_requisition'])){
+	$req_id=$_POST['req_id'];
+	$req_item_id=$_POST['req_item_id'];
+	$out='';
+	$objrequipl=new procurement();
+	$outobjrequipl=$objrequipl->stc_requisition_remove($req_id, $req_item_id);
+	echo $outobjrequipl;
 }
 ?>

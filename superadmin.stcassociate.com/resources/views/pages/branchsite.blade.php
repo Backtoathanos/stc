@@ -219,6 +219,16 @@
             }
         });
       });
+      
+      $('body').delegate('.sdl-remove','click', function(){
+        var row = $(this).closest('tr');
+
+        // Get the index of the row among its siblings
+        var rowIndex = row.index();
+        console.log(rowIndex);
+        $('#sdl-remove-row').remove();
+        $('.delete-sdl-btn').after('<input type="hidden" id="sdl-remove-row" value="' + rowIndex + '">');
+      });
 
       // delete function
       $('.delete-sdl-btn').on('click', function(e){
@@ -238,7 +248,9 @@
                   $('#example1').DataTable().destroy();
                 }
                 dataTableAct="active";
-                getstatusdownlist(dataTableAct);
+                // getstatusdownlist(dataTableAct);
+                var tr_rowid=$('#sdl-remove-row').val();
+                $('#example1 tbody tr:eq('+ tr_rowid +')').remove();
                 $('.close-btn').click();
               }else{
                 swalSuccess('error', response.message);

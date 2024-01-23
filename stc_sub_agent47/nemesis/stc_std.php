@@ -944,6 +944,7 @@ class transformers extends tesseract{
 					  $stcpendingqty=number_format($stcpendingqty, 2);
 				  }
 				  $priority=$requisitionrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
+				  $stockqty=$stcrecievedqty - $stcconsumedqty;
 				  $ivar.='
 						  <tr>
 							  <td>'.$slno.'</td>
@@ -957,6 +958,7 @@ class transformers extends tesseract{
 							  <td align="right">'.number_format($stcrecievedqty, 2).'</td>
 							  <td align="right">'.$stcpendingqty.'</td>
 							  <td align="right">'.number_format($stcconsumedqty, 2).'</td>
+							  <td class="text-right">'.number_format($stockqty, 2).'</td>
 							  <td>'.$priority.'</td>
 							  <td>'.$rqitemstts.'</td>
 						  </tr>

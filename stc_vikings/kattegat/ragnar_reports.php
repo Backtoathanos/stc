@@ -3980,7 +3980,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
 					SELECT 
 						SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
 					FROM `stc_cust_super_list_items_consumption_items` 
-					WHERE `stc_cust_super_list_items_consumption_items_name`='".mysqli_real_escape_string($this->stc_dbs, $odin_get_mrdrow['stc_cust_super_requisition_list_items_title'])."'  
+					WHERE `stc_cust_super_list_items_consumption_items_name`='".mysqli_real_escape_string($this->stc_dbs, $odin_get_mrdrow['req_item_id'])."'  
 				");
 				foreach($stcconsrecqtyqry as $consumedrow){
 					$stcconsumedqty+=$consumedrow['consumable_qty']==null ? 0 : $consumedrow['consumable_qty'];
