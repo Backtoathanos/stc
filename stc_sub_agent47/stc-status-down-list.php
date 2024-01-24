@@ -1291,6 +1291,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <th>Recieved</th>
                                                         <th>Pending</th>
                                                         <th>Consumed</th>
+                                                        <th>Stock</th>
                                                         <th>Priority</th>
                                                         <th>Status</th>
                                                     </tr>
