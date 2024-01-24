@@ -3991,7 +3991,8 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
             $materialpriority=$odin_get_mrdrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
             $odin.='
                <tr>
-                  <td>'.$pno.'</td>
+                  <td class="text-center">'.$pno.'</td>
+                  <td class="text-center">'.$odin_get_mrdrow['req_id'].'</td>
                   <td class="text-center">'.date('d-m-Y', strtotime($odin_get_mrdrow['stc_cust_super_requisition_list_date'])).'</td>
                   <td>'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_title'].'</td>
                   <td class="text-center">'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_unit'].'</td>
