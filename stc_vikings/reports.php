@@ -544,6 +544,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <thead>
                                             <tr>
                                                 <th class="text-center">P.No</th>
+                                                <th class="text-center">Req No.</th>
                                                 <th class="text-center">Date</th>
                                                 <th class="text-center">Item Description</th>
                                                 <th class="text-center">Unit</th>
