@@ -1923,7 +1923,8 @@ class pirates_supervisor extends tesseract{
 			    `stc_cust_super_requisition_list_items_reqqty`,
 			    `stc_cust_super_requisition_list_items_approved_qty`,
 			    `stc_cust_super_requisition_items_finalqty`,
-			    `stc_cust_super_requisition_list_items_status`
+			    `stc_cust_super_requisition_list_items_status`,
+				`stc_cust_super_requisition_items_priority`
 			FROM `stc_cust_super_requisition_list_items`
 			INNER JOIN `stc_cust_super_requisition_list` 
 			ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
@@ -1997,20 +1998,25 @@ class pirates_supervisor extends tesseract{
 				}else{
 					$stcpendingqty=number_format($stcpendingqty, 2);
 				}
+				$priority=$requisitionrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
+				$bgcolor=$requisitionrow['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ff9e9e;'" : "Normal";
+				$stock=$stcrecievedqty - $stcconsumedqty;
 				$optimusprime.='
 						<tr>
 							<td>'.$slno.'</td>
-							<td>'.$requisitionrow['stc_req_date'].'</td>
+							<td class="text-center">'.date('d-m-Y', strtotime($requisitionrow['stc_req_date'])).'</td>
 							<td>'.$requisitionrow['stc_cust_super_requisition_list_items_req_id'].'</td>
 							<td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
-							<td>'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
-							<td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
-							<td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
-							<td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
-							<td align="right">'.number_format($stcdispatchedqty, 2).'</td>
-							<td align="right">'.number_format($stcrecievedqty, 2).'</td>
-							<td align="right">'.$stcpendingqty.'</td>
-							<td align="right">'.number_format($stcconsumedqty, 2).'</td>
+							<td class="text-center">'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
+							<td class="text-right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+							<td class="text-right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+							<td class="text-right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+							<td class="text-right">'.number_format($stcdispatchedqty, 2).'</td>
+							<td class="text-right">'.number_format($stcrecievedqty, 2).'</td>
+							<td class="text-right">'.$stcpendingqty.'</td>
+							<td class="text-right">'.number_format($stcconsumedqty, 2).'</td>
+							<td class="text-right">'.number_format($stock, 2).'</td>
+							<td '.$bgcolor.' class="text-center">'.$priority.'</td>
 							<td>'.$rqitemstts.'</td>
 						</tr>
 				';
