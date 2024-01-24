@@ -3823,19 +3823,21 @@ if(isset($_POST['js_pending_reports_req'])){
 		<table class="mb-0 table table-bordered table-hover" id="stc-reports-pending-view">
 			<thead>
 			<tr>
-			    <th>#</th>
-			    <th>Date</th>
-			    <th>PR No</th>
-			    <th>Item Desc</th>
-			    <th>Unit</th>
-			    <th>PR Qty</th>
-			    <th>GM Apprv Qty</th>
-			    <th>Proc Apprv Qty</th>
-			    <th>Dispatch Qty</th>
-			    <th>Recieved Qty</th>
-			    <th>Pending Qty</th>
-			    <th>Consumed Qty</th>
-			    <th>Status</th>
+			    <th class="text-center">#</th>
+			    <th class="text-center">Date</th>
+			    <th class="text-center">PR No</th>
+			    <th class="text-center">Item Desc</th>
+			    <th class="text-center">Unit</th>
+			    <th class="text-center">PR Qty</th>
+			    <th class="text-center">GM Apprv Qty</th>
+			    <th class="text-center">Proc Apprv Qty</th>
+			    <th class="text-center">Dispatch Qty</th>
+			    <th class="text-center">Recieved Qty</th>
+			    <th class="text-center">Pending Qty</th>
+			    <th class="text-center">Consumed Qty</th>
+			    <th class="text-center">Stock</th>
+			    <th class="text-center">Priority</th>
+			    <th class="text-center">Status</th>
 			</tr>
 			</thead>
 			<tbody>
