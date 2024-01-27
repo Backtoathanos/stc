@@ -198,6 +198,11 @@ class ragnarProduct extends tesseract{
 		        								'.$filterrow["stc_product_gst"].'%
 		        							</span>
 		        							<span class="p-qty" >'.$stcqty.' '.$filterrow["stc_product_unit"].'</span>
+		        							<span>
+												<a href="javascript:void(0)" id="'.$filterrow["stc_product_id"].'" class="btn btn-success view-purchase-mod-btn"  data-toggle="modal" data-target="#view-products-purchase-modal"><i class="fas fa-eye"></i> Purchase</a>
+												<a href="javascript:void(0)" id="'.$filterrow["stc_product_id"].'" class="btn btn-success view-sale-mod-btn"  data-toggle="modal" data-target="#view-products-sale-modal"><i class="fas fa-eye"></i> Sale</a>
+											</span>
+
 		        						</div>
 		        						<div class="a-size">Available on Rack : <span class="size">'.$filterrow["stc_rack_name"].'</span></div>
 		        					</div>

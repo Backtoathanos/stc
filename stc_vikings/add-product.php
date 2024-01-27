@@ -47,7 +47,7 @@ include("kattegat/role_check.php");
                                     <span>View All Products</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-3" data-toggle="tab" href="#tab-content-3">
                                     <span>View Product Purchase</span>
                                 </a>
@@ -56,7 +56,7 @@ include("kattegat/role_check.php");
                                 <a role="tab" class="nav-link" id="tab-4" data-toggle="tab" href="#tab-content-4">
                                     <span>View Product Sale</span>
                                 </a>
-                            </li>
+                            </li> -->
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane tabs-animation fade  " id="tab-content-1" role="tabpanel">
@@ -555,7 +555,121 @@ include("kattegat/role_check.php");
                 }
               });
           });
+          // $('.view-purchase-mod-btn').on('click', function(e){
+          $('body').delegate('.view-purchase-mod-btn', 'click', function(e){
+              var productbyid = $(this).attr('id');
+              $.ajax({
+                url : "kattegat/ragnar_product.php",
+                method : "post",
+                data : {
+                  jsfilterprobypoidout:1,
+                  jsfilterprobyid:productbyid
+                },
+                dataType : 'JSON',
+                success : function(data){
+                  // console.log(data);
+                  $('.purchase-view-modal-div').html(data);
+                }
+              });
+          });
+          // $('.view-sale-mod-btn').on('click', function(e){
+          $('body').delegate('.view-sale-mod-btn', 'click', function(e){
+              var productbyid = $(this).attr('id');
+              $.ajax({
+                url : "kattegat/ragnar_product.php",
+                method : "post",
+                data : {
+                  jsfilterprobysoidout:1,
+                  jsfilterprobyid:productbyid
+                },
+                dataType : 'JSON',
+                success : function(data){
+                  // console.log(data);
+                  $('.sale-view-modal-div').html(data);
+                }
+              });
+          });
+          
         });
     </script>
 </body>
 </html>
+<!-- modals -->
+<div class="modal fade view-products-purchase-modal" id="view-products-purchase-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">View Purchase</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-h5="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">View Purchase</h3>
+          </div>
+          <!-- /.card-header -->
+          <!-- form start -->
+          <form class="pms-adjustment-form">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                  <div class="card-border mb-3 card card-body border-success purchase-view-modal-div">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- modals -->
+<div class="modal fade view-products-sale-modal" id="view-products-sale-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">View Sale</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-h5="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="card card-primary">
+          <div class="card-header">
+            <h3 class="card-title">View Sale</h3>
+          </div>
+          <!-- /.card-header -->
+          <!-- form start -->
+          <form class="pms-adjustment-form">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                  <div class="card-border mb-3 card card-body border-success sale-view-modal-div">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- /.card-body -->
+            <div class="card-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
