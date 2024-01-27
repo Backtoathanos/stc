@@ -125,7 +125,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <div class="card mb-3 widget-content">
                                         <div class="main-card mb-3 card">
                                             <div class="card-body"><h5 class="card-title">Pending Items Reports</h5>
-                                                <div class="table-responsive stc-reports-pending-view">
+                                                <div class="stc-reports-pending-view">
                                                     <table class="mb-0 table">
                                                         <thead>
                                                         <tr>
@@ -252,6 +252,19 @@ if(isset($_SESSION["stc_agent_id"])){
     </script>
     <script>
         $(document).ready(function(){
+            $(window).bind("scroll", function() {
+                var offset = $(this).scrollTop();
+                if(offset>500){
+                    $("#stc-reports-pending-view thead").css('position', 'sticky');
+                    $("#stc-reports-pending-view thead").css('background', 'white');
+                    $("#stc-reports-pending-view thead").css('top', '8%');
+                }else{
+                    $("#stc-reports-pending-view thead").css('position', 'relative');
+                    $("#stc-reports-pending-view thead").removeProp('background');
+                    $("#stc-reports-pending-view thead").removeProp('top');
+                }
+            });
+
             $('.hidden-excel-section').hide();
             // on select super visor site call
             $('body').delegate('.stc-agents-pending-items-rep-super-select', 'change', function(e){
