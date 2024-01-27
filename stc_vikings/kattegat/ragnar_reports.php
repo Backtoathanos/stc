@@ -3938,11 +3938,21 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
       ";
       $odin_get_mrdqry=mysqli_query($this->stc_dbs, $query);
       if(mysqli_num_rows($odin_get_mrdqry)>0){
+         $prev_pno='';
+         $prev_check=0;
          foreach($odin_get_mrdqry as $odin_get_mrdrow){
             $pno='';
             if($odin_get_mrdrow['stc_cust_super_requisition_list_sdlid']>0){
                $pno=$odin_get_mrdrow['stc_cust_super_requisition_list_sdlid'];
+               // $prev_pno=$odin_get_mrdrow['stc_cust_super_requisition_list_sdlid']!=$prev_pno ? $odin_get_mrdrow['stc_cust_super_requisition_list_sdlid'] : $prev_pno;
+               if($prev_check==$pno && $pno!=0){
+                  $prev_pno++;
+               }else{
+                  $prev_check=$pno;
+                  $prev_pno=10;
+               }
             }
+            $prev_pno=$prev_pno==0 ? "" : $prev_pno;
             $stcdispatchedqty=0;
             $stcdecqtyqry=mysqli_query($this->stc_dbs, "
 					SELECT 
@@ -3993,6 +4003,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
                <tr>
                   <td class="text-center">'.$pno.'</td>
                   <td class="text-center">'.$odin_get_mrdrow['req_id'].'</td>
+                  <td class="text-center">'.$prev_pno.'</td>
                   <td class="text-center">'.date('d-m-Y', strtotime($odin_get_mrdrow['stc_cust_super_requisition_list_date'])).'</td>
                   <td>'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_title'].'</td>
                   <td class="text-center">'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_unit'].'</td>
