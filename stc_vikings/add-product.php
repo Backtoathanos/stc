@@ -596,7 +596,7 @@ include("kattegat/role_check.php");
 </html>
 <!-- modals -->
 <div class="modal fade view-products-purchase-modal" id="view-products-purchase-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">View Purchase</h4>
@@ -636,7 +636,7 @@ include("kattegat/role_check.php");
 
 <!-- modals -->
 <div class="modal fade view-products-sale-modal" id="view-products-sale-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">View Sale</h4>

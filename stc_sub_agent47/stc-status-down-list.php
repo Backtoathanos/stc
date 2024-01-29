@@ -119,7 +119,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="col-md-12 col-xl-12"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
-                                            <div class="card mb-3 widget-content stc-std-search-result tabledata-responsvie">
+                                            <div class="card mb-3 widget-content stc-std-search-result tabledata-responsvie" style="overflow-x: auto;">
                                             </div>
                                         </div>
                                     </div>
@@ -613,6 +613,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             }
 
             function std_list_call(location_id){
+                $('.stc-std-search-result').html("Loading..");
                 $.ajax({
                     url         : "nemesis/stc_std.php",
                     method      : "POST",
@@ -797,7 +798,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             });
 
             
-
             $('body').delegate('.stc-std-view-req-show', 'click', function(e){
                 var sdl_id=$(this).attr("id");
                 $.ajax({
@@ -811,6 +811,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     success     : function(data){
                         $('.show-material-list-sdl').html(data.data);
                         $('.downlistno').html('<b>SDL Number : '+data.Downlist+'</b>');
+                        $('.requis-save-btn').prop('id',data.Downlist);
                         $('.downlistdate').html('<b>SDL Date : '+data.downlistdate+'</b>');
                         $('.reqnumber').html('<b>Requisition Number : '+data.reqno+'</b>');
                         $('.reqdate').html('<b>Requisition Date : '+data.reqdate+'</b>');
@@ -819,6 +820,68 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('.SupContact').html('<b>Supervisor Contact : '+data.SupContact+'</b>');
                     }
                 });
+            });
+
+            
+            $('body').delegate('.update-to-proc', 'click', function(e){
+                var req_id=$(this).attr("reqid");
+                var item_id=$(this).attr("id");
+                var appr_qty=$(this).closest('tr').find('.stc-approvqty').val();
+                if(appr_qty>0){
+                    $(this).closest('td').html("#");
+                    $.ajax({
+                        url         : "nemesis/stc_std.php",
+                        method      : "POST",
+                        data        : {
+                            stc_req_material_pass:1,
+                            req_id:req_id,
+                            item_id:item_id,
+                            appr_qty:appr_qty
+                        },
+                        dataType    : "JSON",
+                        success     : function(data){
+                            alert(data);
+                        }
+                    });
+                }else{
+                    alert("Invalid quantity.");
+                }
+            });
+
+            $('body').delegate('.requis-save-btn', 'click', function(e){
+                var sdl_id=$(this).attr("id");
+                $.ajax({
+                    url         : "nemesis/stc_std.php",
+                    method      : "POST",
+                    data        : {
+                        stc_sdl_material_requpdate:1,
+                        sdl_id:sdl_id
+                    },
+                    dataType    : "JSON",
+                    success     : function(data){
+                        alert("Thankyou!!! Requisition placed successfully.");
+                        window.location.reload();
+                    }
+                });
+            });
+
+            $('body').delegate('.remove-to-proc', 'click', function(e){
+                var item_id=$(this).attr("id");
+                if(confirm("Are you sure want to remove this item?")){
+                    $(this).closest('tr').remove();
+                    $.ajax({
+                        url         : "nemesis/stc_std.php",
+                        method      : "POST",
+                        data        : {
+                            stc_sdl_material_reqremove:1,
+                            item_id:item_id
+                        },
+                        dataType    : "JSON",
+                        success     : function(data){
+                            alert("Item removed successfully.");
+                        }
+                    });
+                }
             });
             
         });
@@ -1239,7 +1302,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 </div>
 
 <div class="modal fade bd-viewreq-std-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">Material Requisition Details</h5>
@@ -1294,6 +1357,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <th>Stock</th>
                                                         <th>Priority</th>
                                                         <th>Status</th>
+                                                        <th>Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="show-material-list-sdl">
@@ -1302,6 +1366,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             </table>
                                         </div>
                                     </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                        <button class="btn btn-success requis-save-btn form-control">Save</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1309,7 +1376,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary mrd-btn" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
