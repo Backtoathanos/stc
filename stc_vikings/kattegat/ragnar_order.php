@@ -650,14 +650,14 @@ class ragnarRequisitionView extends tesseract{
 	// call all agents order records
 	public function stc_call_ag_requisition(){
 		$ivar='
-			<table class="table table-hover form-group call-order">
+			<table class="table table-hover table-bordered form-group call-order">
 				<thead>
-					<th>Requisition For</th>
-					<th>Requisition ID<br>Requisition Date</th>
-					<th>Requisition Sitename</th>
-					<th>Requisition Accepted By</th>
-					<th>Requisition Status</th>
-					<th>View</th>
+					<th class="text-center">Requisition For</th>
+					<th class="text-center">Parent Requisition ID<br>Parent Requisition Date</th>
+					<th class="text-center">Requisition Sitename</th>
+					<th class="text-center">Requisition Accepted By</th>
+					<th class="text-center">Requisition Status</th>
+					<th class="text-center">Action</th>
 				</thead>
 				<tbody>
 		';
@@ -666,6 +666,7 @@ class ragnarRequisitionView extends tesseract{
 				`stc_requisition_combiner_id`,
 				`stc_requisition_combiner_date`,
 			    `stc_requisition_combiner_refrence`,
+				`stc_cust_super_requisition_list_id`,
 			    `stc_agents_name`,
                 `stc_customer_name`,
 				`stc_requisition_combiner_status`
@@ -686,24 +687,34 @@ class ragnarRequisitionView extends tesseract{
 			foreach($ivarfilterquery as $requisrow){
 				$reqcomstatus='';
 				if($requisrow['stc_requisition_combiner_status']==1){$reqcomstatus="PROCESS";}else{$reqcomstatus="ACCEPTED";}
+				$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
+				$chursql=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_items_priority` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$requisrow['stc_cust_super_requisition_list_id']."' AND `stc_cust_super_requisition_items_priority`=2
+				");
+				if(mysqli_num_rows($chursql)==0){
+					$badgeurgent="";
+				}
 				$ivar.= '
 					<tr>
-						<td>'.$requisrow['stc_customer_name'].'</td>
-						<td>
+						<td class="text-center">'.$requisrow['stc_customer_name'].'</td>
+						<td class="text-center">
 							'.$requisrow['stc_requisition_combiner_id'].'<br>
 							'.date('d-m-Y', strtotime($requisrow['stc_requisition_combiner_date'])).'
 						</td>
 						<td>'.$requisrow['stc_requisition_combiner_refrence'].'</td>
-						<td>'.$requisrow['stc_agents_name'].'</td>
-						<td>'.$reqcomstatus.'</td>
-						<td>
-							<a href="#" class="stc-call-for-select-merchant-req" id="'.$requisrow["stc_requisition_combiner_id"].'" style="font-size: 25px;color: black;">
+						<td class="text-center">'.$requisrow['stc_agents_name'].'</td>
+						<td class="text-center">'.$reqcomstatus.$badgeurgent.'</td>
+						<td class="text-center">
+							<a href="#" class="stc-call-for-select-merchant-req" title="Add product and merchant." id="'.$requisrow["stc_requisition_combiner_id"].'" style="font-size: 25px;color: black;">
 								<i class="fa fa-ship" aria-hidden="true"></i>
 							</a>
-							<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" style="font-size: 25px;color: black;">
+							<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="Process requisitions." style="font-size: 25px;color: black;">
 								<i class="fa fa-pen-square" aria-hidden="true"></i>
 							</a>
-							<a href="stc-requisition-combiner-fshow.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" style="font-size: 25px;color: black;">
+							<a href="stc-requisition-combiner-fshow.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="P.M Requisition" style="font-size: 25px;color: black;">
+								<i class="fa fa-print" aria-hidden="true"></i>
+							</a>
+							<a href="stc-requisition-combiner-dcprintpreview.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="DC Receiving Requisition" style="font-size: 25px;color: black;">
 								<i class="fa fa-print" aria-hidden="true"></i>
 							</a>
 						</td>
@@ -749,14 +760,14 @@ class ragnarRequisitionView extends tesseract{
 	// filter combiner requisition by all
 	public function stc_getrequisition_by_multiple_inp($bjornefilterreqbegdate, $bjornefilterreqenddate, $bjornefilterreqcustomerid, $bjornefilterreqnumber, $bjornefilterreqsitename, $bjornefilterreqmaterials, $bjornebegval, $bjorneendval){
 		$ivar='
-			<table class="table table-hover form-group call-order">
+			<table class="table table-hover table-bordered form-group call-order">
 				<thead>
-					<th>Requisition For</th>
-					<th>Requisition ID<br>Requisition Date</th>
-					<th>Requisition Sitename</th>
-					<th>Requisition Accepted By</th>
-					<th>Requisition Status</th>
-					<th>View</th>
+					<th class="text-center">Requisition For</th>
+					<th class="text-center">Parent Requisition ID<br>Parent Requisition Date</th>
+					<th class="text-center">Requisition Sitename</th>
+					<th class="text-center">Requisition Accepted By</th>
+					<th class="text-center">Requisition Status</th>
+					<th class="text-center">Action</th>
 				</thead>
 				<tbody>
 		';
@@ -799,6 +810,7 @@ class ragnarRequisitionView extends tesseract{
 				`stc_requisition_combiner_id`,
 				`stc_requisition_combiner_date`,
 			    `stc_requisition_combiner_refrence`,
+				`stc_cust_super_requisition_list_id`,
 			    `stc_agents_name`,
 		        `stc_customer_name`,
 				`stc_requisition_combiner_status`
@@ -825,24 +837,34 @@ class ragnarRequisitionView extends tesseract{
 				$loopcount++;
 				$reqcomstatus='';
 				if($requisrow['stc_requisition_combiner_status']==1){$reqcomstatus="PROCESS";}else{$reqcomstatus="ACCEPTED";}
+				$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
+				$chursql=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_items_priority` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$requisrow['stc_cust_super_requisition_list_id']."' AND `stc_cust_super_requisition_items_priority`=2
+				");
+				if(mysqli_num_rows($chursql)==0){
+					$badgeurgent="";
+				}
 				$ivar.= '
 					<tr>
-						<td>'.$requisrow['stc_customer_name'].'</td>
-						<td>
+						<td class="text-center">'.$requisrow['stc_customer_name'].'</td>
+						<td class="text-center">
 							'.$requisrow['stc_requisition_combiner_id'].'<br>
 							'.date('d-m-Y', strtotime($requisrow['stc_requisition_combiner_date'])).'
 						</td>
 						<td>'.$requisrow['stc_requisition_combiner_refrence'].'</td>
-						<td>'.$requisrow['stc_agents_name'].'</td>
-						<td>'.$reqcomstatus.'</td>
-						<td>
-							<a href="#" class="stc-call-for-select-merchant-req" id="'.$requisrow["stc_requisition_combiner_id"].'" style="font-size: 25px;color: black;">
+						<td class="text-center">'.$requisrow['stc_agents_name'].'</td>
+						<td class="text-center">'.$reqcomstatus.$badgeurgent.'</td>
+						<td class="text-center">
+							<a href="#" class="stc-call-for-select-merchant-req" title="Add product and merchant." id="'.$requisrow["stc_requisition_combiner_id"].'" style="font-size: 25px;color: black;">
 								<i class="fa fa-ship" aria-hidden="true"></i>
 							</a>
-							<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" style="font-size: 25px;color: black;">
+							<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'"  title="Process requisitions." style="font-size: 25px;color: black;">
 								<i class="fa fa-pen-square" aria-hidden="true"></i>
 							</a>
-							<a href="stc-requisition-combiner-fshow.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" style="font-size: 25px;color: black;">
+							<a href="stc-requisition-combiner-fshow.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="P.M Requisition" style="font-size: 25px;color: black;">
+								<i class="fa fa-print" aria-hidden="true"></i>
+							</a>
+							<a href="stc-requisition-combiner-dcprintpreview.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="DC Receiving Requisition" style="font-size: 25px;color: black;">
 								<i class="fa fa-print" aria-hidden="true"></i>
 							</a>
 						</td>
@@ -894,12 +916,12 @@ class ragnarRequisitionView extends tesseract{
 		$ivar='
 			<table class="table table-hover form-group call-order">
 				<thead>
-					<th>Requisition For</th>
-					<th>Requisition ID<br>Requisition Date</th>
-					<th>Requisition Sitename</th>
-					<th>Requisition Accepted By</th>
-					<th>Requisition Status</th>
-					<th>View</th>
+					<th class="text-center">Requisition For</th>
+					<th class="text-center">Requisition ID<br>Requisition Date</th>
+					<th class="text-center">Requisition Sitename</th>
+					<th class="text-center">Requisition Accepted By</th>
+					<th class="text-center">Requisition Status</th>
+					<th class="text-center">Action</th>
 				</thead>
 				<tbody>
 		';
@@ -1839,12 +1861,12 @@ class ragnarRequisitionPertView extends tesseract{
 		$lokiout='
 			<table class="table table-hover table-bordered table-responsive">
 				<thead>
-					<th>Requisition ID<br>Requisition Date</th>
-					<th>Requisition From</th>
-					<th>Requisition For</th>
-					<th>Requisition Accepted By</th>
-					<th>Requisition Status</th>
-					<th>View</th>
+					<th class="text-center">Requisition ID<br>Requisition Date</th>
+					<th class="text-center">Requisition From</th>
+					<th class="text-center">Requisition For</th>
+					<th class="text-center">Requisition Accepted By</th>
+					<th class="text-center">Requisition Status</th>
+					<th class="text-center">Action</th>
 				</thead>
 				<tbody>
 		';
@@ -1927,12 +1949,12 @@ class ragnarRequisitionPertView extends tesseract{
 		$ivar='
 			<table class="table table-hover form-group call-order">
 				<thead>
-					<th>Requisition ID<br>Requisition Date</th>
-					<th>Requisition From</th>
-					<th>Requisition For</th>
-					<th>Requisition Accepted By</th>
-					<th>Requisition Status</th>
-					<th>View</th>
+					<th class="text-center">Requisition ID<br>Requisition Date</th>
+					<th class="text-center">Requisition From</th>
+					<th class="text-center">Requisition For</th>
+					<th class="text-center">Requisition Accepted By</th>
+					<th class="text-center">Requisition Status</th>
+					<th class="text-center">Action</th>
 				</thead>
 				<tbody>
 		';
