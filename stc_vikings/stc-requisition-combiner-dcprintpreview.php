@@ -304,18 +304,20 @@ if(isset($_GET['requi_id'])){
                               `stc_cust_super_requisition_list_id`,
                               `stc_cust_super_requisition_list_items_title`,
                               `stc_cust_super_requisition_list_items_unit`,
-                              `stc_cust_super_requisition_list_items_approved_qty`
+                              `stc_cust_super_requisition_list_items_approved_qty`,
+                              `stc_cust_super_requisition_items_priority`
                             FROM `stc_cust_super_requisition_list_items`
                             WHERE `stc_cust_super_requisition_list_items_req_id`='".$reqprrow['stc_cust_super_requisition_list_id']."'
                         ");
                         foreach($currentrequisition as $row){
                             $sl++;
+                            $priority=$row['stc_cust_super_requisition_list_items_title']==2 ? "Urgent" : "";
                             ?>
                             <tr>
                               <td class="no"><?php echo $sl;?></td>
                               <td class="text-left">
                                 <h6>
-                                  <?php echo nl2br($row['stc_cust_super_requisition_list_items_title']);?>
+                                  <?php echo nl2br($row['stc_cust_super_requisition_list_items_title']).' '.$priority;?>
                                 </h6>
                               </td>
                               <td class="unit"><?php echo $row['stc_cust_super_requisition_list_items_unit'];?></td>

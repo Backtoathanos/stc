@@ -558,12 +558,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           });
         }
 
-        // show orders
-        $('body').delegate('.stc_view_requist', 'click', function(e){
-          e.preventDefault();
-          $('.stc-req-view').fadeOut(500);
-          $('.stc-req-add').toggle(500);
-          var stc_order_id = $(this).attr("id");
+        function call_pert_requisition(stc_order_id){
           $.ajax({
             url       : "kattegat/ragnar_order.php",
             method    : 'POST',
@@ -575,6 +570,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             success:function(req){
               // console.log(req);
               $('#order-req-nos').val('STC/A/'+req['order_number']);
+              $('#order-req-nos').after('<input type="hidden" value="'+stc_order_id+'" id="call-requisition-det">');
               $('#ag-challan-req').val(req['real_order_number']);
               $('#ag-req-date').val(req['order_date']);
               $('#cust_name_req').val(req['customer_name']);
@@ -588,6 +584,14 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
               $('#stc-req-requis-id').val(req['requis_id']);
             }
           });
+        }
+        // show orders
+        $('body').delegate('.stc_view_requist', 'click', function(e){
+          e.preventDefault();
+          $('.stc-req-view').fadeOut(500);
+          $('.stc-req-add').toggle(500);
+          var stc_order_id = $(this).attr("id");
+          call_pert_requisition(stc_order_id);
         });
 
         var repid=0;
@@ -787,9 +791,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           e.preventDefault();
           repid2=$(this).attr("id");
           repitemid2=$(this).attr("list-id");
+          orderqty=$(this).attr("orderqty");
           $('.res-product-Modal-cash-close').modal("show");
           $('#stc-req-list-id-rep2').val(repid2);
           $('#stc-req-list-item-id-rep2').val(repitemid2);
+          $('#stc-req-list-item-id-rep2').after('<input type="hidden" id="stc-req-list-item-id-orderqty" value="'+orderqty+'">');
         });
 
         // save dispatch quantity
@@ -798,25 +804,32 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           var req_id=$('#stc-req-list-id-rep2').val();
           var req_item_id=$('#stc-req-list-item-id-rep2').val();
           var dispatch_qnty=$('#stcdispatchedqty').val();
-          $.ajax({
-            url       : "kattegat/ragnar_order.php",
-            method    :'POST',
-            data      : {
-              stc_dispatch_hit:1,
-              stc_req_id:req_id,
-              stc_req_item_id:req_item_id,
-              stc_dispatch_qty:dispatch_qnty
-            },
-            success   : function(response_dis){
-              var response=response_dis.trim();
-              if(response=="Item dispatched successfully."){
-                alert(response_dis);
-                $('.res-product-Modal-cash-close').modal("hide");
-              }else{
-                alert(response_dis);
+          var orderqty=$('#stc-req-list-item-id-orderqty').val();
+          if(orderqty>=dispatch_qnty){
+            $.ajax({
+              url       : "kattegat/ragnar_order.php",
+              method    :'POST',
+              data      : {
+                stc_dispatch_hit:1,
+                stc_req_id:req_id,
+                stc_req_item_id:req_item_id,
+                stc_dispatch_qty:dispatch_qnty
+              },
+              success   : function(response_dis){
+                var response=response_dis.trim();
+                if(response=="Item dispatched successfully."){
+                  alert(response_dis);
+                  // call-requisition-det
+                  call_pert_requisition(req_id);
+                  $('.res-product-Modal-cash-close').modal("hide");
+                }else{
+                  alert(response_dis);
+                }
               }
-            }
-          })
+            });
+          }else{
+            alert("Invalid quantity.");
+          }
         });
       });
     </script>
