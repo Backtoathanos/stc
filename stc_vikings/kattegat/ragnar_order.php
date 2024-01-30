@@ -1099,6 +1099,7 @@ class ragnarRequisitionView extends tesseract{
 					`stc_cust_super_requisition_list_items_title`,
 					`stc_cust_super_requisition_list_items_unit`,
 					`stc_cust_super_requisition_list_items_approved_qty`,
+					`stc_cust_super_requisition_items_priority`,
 					`stc_cust_super_requisition_items_type`
 				FROM `stc_cust_super_requisition_list_items`
 				WHERE `stc_cust_super_requisition_list_items_req_id`='".$ivarsiterow['stc_cust_super_requisition_list_id']."'
@@ -1166,10 +1167,15 @@ class ragnarRequisitionView extends tesseract{
 					}
 					
 				}
+				$badgeurgent="";
+				if($ivarreqitemrow['stc_cust_super_requisition_items_priority']==2){
+					$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
+				}
 				$ivar.='
 						<tr>
 							<td class="no">'.$sl.'</td>
 							<td class="text-left">
+							'.$badgeurgent.'
 								<input 
 									type="text" 
 									class="form-control stc-update-requis-material-name stc-update-requis-material-name-hit" 
@@ -1859,7 +1865,7 @@ class ragnarRequisitionPertView extends tesseract{
 	// call perticular 
 	public function stc_show_requisition_list($url_param){
 		$lokiout='
-			<table class="table table-hover table-bordered table-responsive">
+			<table class="table table-hover table-bordered">
 				<thead>
 					<th class="text-center">Requisition ID<br>Requisition Date</th>
 					<th class="text-center">Requisition From</th>
@@ -1905,17 +1911,24 @@ class ragnarRequisitionPertView extends tesseract{
 				}else{
 				    $reqstatus="ACCEPTED";
 				}
+				$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
+				$chursql=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_items_priority` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$requisrow['stc_cust_super_requisition_list_id']."' AND `stc_cust_super_requisition_items_priority`=2
+				");
+				if(mysqli_num_rows($chursql)==0){
+					$badgeurgent="";
+				}
 				$lokiout.= '
 					<tr>
-						 <td>
+						 <td class="text-center">
 						 	'.$requisrow['stc_cust_super_requisition_list_id'].'<br>
 						 	'.date('d-m-Y', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'
 						 </td>
-						 <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
+						 <td class="text-center">'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
 						 <td>'.$requisrow['stc_cust_project_title'].'</td>
-						 <td>'.$requisrow['stc_agents_name'].'</td>
-						 <td>'.$reqstatus.'</td>
-						 <td>
+						 <td class="text-center">'.$requisrow['stc_agents_name'].'</td>
+						 <td class="text-center">'.$reqstatus.$badgeurgent.'</td>
+						 <td class="text-center">
 						 	<a 
 						 		class="stc_view_requist" 
 						 		href="#" 
@@ -1947,7 +1960,7 @@ class ragnarRequisitionPertView extends tesseract{
 	// filter requiition by all
 	public function stc_getpertrequisition_by_multiple_inp($bjornefilterreqbegdate, $bjornefilterreqenddate, $bjornefilterreqcustomerid, $bjornefilterreqnumber, $bjornefilterreqsitename, $bjornefilterreqmaterials, $bjornefilterrequrl_param){
 		$ivar='
-			<table class="table table-hover form-group call-order">
+			<table class="table table-hover table-bordered form-group call-order">
 				<thead>
 					<th class="text-center">Requisition ID<br>Requisition Date</th>
 					<th class="text-center">Requisition From</th>
@@ -2037,17 +2050,24 @@ class ragnarRequisitionPertView extends tesseract{
 				}else{
 				    $reqstatus="ACCEPTED";
 				}
+				$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
+				$chursql=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_items_priority` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$requisrow['stc_cust_super_requisition_list_id']."' AND `stc_cust_super_requisition_items_priority`=2
+				");
+				if(mysqli_num_rows($chursql)==0){
+					$badgeurgent="";
+				}
 				$ivar.= '
 					<tr>
-						 <td>
+						 <td class="text-center">
 						 	'.$requisrow['stc_cust_super_requisition_list_id'].'<br>
 						 	'.date('d-m-Y', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'
 						 </td>
-						 <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
+						 <td class="text-center">'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
 						 <td>'.$requisrow['stc_cust_project_title'].'</td>
-						 <td>'.$requisrow['stc_agents_name'].'</td>
-						 <td>'.$reqstatus.'</td>
-						 <td>
+						 <td class="text-center">'.$requisrow['stc_agents_name'].'</td>
+						 <td class="text-center">'.$reqstatus.$badgeurgent.'</td>
+						 <td class="text-center">
 						 	<a 
 						 		class="stc_view_requist" 
 						 		href="#" 
@@ -2120,12 +2140,13 @@ class ragnarRequisitionPertView extends tesseract{
 					`stc_cust_super_requisition_list_items_title`,
 				    `stc_cust_super_requisition_list_items_unit`,
 				    `stc_cust_super_requisition_list_items_approved_qty`,
+				    `stc_cust_super_requisition_items_priority`,
 				    `stc_cust_super_requisition_list_items_status`
 				FROM `stc_cust_super_requisition_list_items` 
 				WHERE `stc_cust_super_requisition_list_items_req_id`='".$stc_agorder_id."'
 			");
 			$order_line_items .= '  
-					<table class="table table-hover table-bordered table-responsive">
+					<table class="table table-hover table-bordered">
 						<thead>
 						  <tr>
 						    <th class="text-center" scope="col">#</th>
@@ -2135,13 +2156,14 @@ class ragnarRequisitionPertView extends tesseract{
 						    <th class="text-center" scope="col">Approved Qty</th> 
 						    <th class="text-center" scope="col">GST Qty</th>  
 						    <th class="text-center" scope="col">Dispatched Qty</th> 
-						    <th class="text-center" scope="col">Status</th>  
+						    <th class="text-center" scope="col">Status</th>   
+						    <th class="text-center" scope="col">Priority</th>  
 						    <th class="text-center" scope="col">Action</th>
 						  </tr>
 						</thead>
 						<tbody>
 			';  
-			if(!empty($nested_check_loki)){ 
+			if(mysqli_num_rows($nested_check_loki)>0){ 
 				$slno= 0;				
 				foreach($nested_check_loki as $dispatchrow){
 					$slno++;
@@ -2199,13 +2221,21 @@ class ragnarRequisitionPertView extends tesseract{
 					}
 					if(mysqli_num_rows($lokirecqtycheckqry)>0){
 						foreach($lokirecqtycheckqry as $requistitemrow){
+							$checkqty=$dispatchrow["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
+							$actiondeliver='<a class="req-product-Modal" title="Dispatch by inventory" id="'.$dispatchrow["stc_cust_super_requisition_list_id"].'" list-id="'.$dispatchrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
+								<a class="req-product-Modal-cash-close" title="Dispatch by direct" id="'.$dispatchrow["stc_cust_super_requisition_list_id"].'" list-id="'.$dispatchrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
+							$actiondeliver=$dispatchrow["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver : ""; 
+							$priority=$dispatchrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
+							$bgcolor=$dispatchrow['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ffb0b0;'" : "";
 							$order_line_items .= '
 								<tr>
 									<td>'.$slno.'</td>
 									<td>
-										> '.$dispatchrow["stc_cust_super_requisition_list_items_title"].'<br>
-										> '.$apprpd_name.'<br>
-										> '.$requistitemrow["stc_product_name"].'
+										<ul>
+											<li> '.$dispatchrow["stc_cust_super_requisition_list_items_title"].'</li>
+											<li> '.$apprpd_name.'</li>
+											<li> '.$requistitemrow["stc_product_name"].'</li>
+										</ul>
 									</td>
 									<td class="text-center">'.$dispatchrow["stc_cust_super_requisition_list_items_unit"].'</td>
 								    <td align="right">'.number_format($dispatchrow["stc_cust_super_requisition_list_items_approved_qty"], 2).'</td>
@@ -2213,10 +2243,10 @@ class ragnarRequisitionPertView extends tesseract{
 									<td align="right">'.number_format($dispatchedgqty, 2).'</td>
 									<td align="right">'.number_format($dispatchedgqty, 2).'</td>
 									<td>'.$status.'</td>
-									<td colspan="3">
+									<td class="text-center" '.$bgcolor.'>'.$priority.'</td>
+									<td colspan="3" class="text-center">
 										<h4>
-											<a class="req-product-Modal" id="'.$dispatchrow["stc_cust_super_requisition_list_id"].'" list-id="'.$dispatchrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
-											<a class="req-product-Modal-cash-close" id="'.$dispatchrow["stc_cust_super_requisition_list_id"].'" list-id="'.$dispatchrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-file"></i></a>
+											'.$actiondeliver.'
 										</h4>
 									</td>
 								</tr>

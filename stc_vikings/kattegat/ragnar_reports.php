@@ -1117,7 +1117,7 @@ class ragnarReportsViewRequiReports extends tesseract{
 				$stcrecievedqty=0;
 				$stcpendingqty=0;      
             $downlistdate=date('d-m-Y', strtotime($requisitionrow['stc_status_down_list_date']));
-            $reqno=$requisitionrow['reqlistid'];
+            $reqno=$requisitionrow['stc_cust_super_requisition_list_items_req_id'];
             $sublocation=$requisitionrow['stc_status_down_list_sub_location'];            
             $reqdate=date('d-m-Y', strtotime($requisitionrow['stc_req_date']));
             $SupName=$requisitionrow['stc_cust_pro_supervisor_fullname'];            
