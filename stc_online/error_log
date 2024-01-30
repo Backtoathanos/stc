@@ -56,3 +56,8 @@
 [27-Dec-2023 00:00:39 UTC] PHP Notice:  Undefined index: product in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 290
 [27-Dec-2023 19:21:07 UTC] PHP Notice:  Undefined index: product in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 290
 [28-Dec-2023 04:45:22 UTC] PHP Notice:  Undefined index: product in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 290
+[29-Jan-2024 20:07:49 UTC] PHP Notice:  Undefined index: product in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 290
+[29-Jan-2024 23:23:27 UTC] PHP Notice:  Undefined index: product in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 290
+[30-Jan-2024 11:51:47 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/singlepeices.php on line 313
+[30-Jan-2024 08:14:43 UTC] PHP Notice:  Undefined index: product in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 290
+[30-Jan-2024 15:11:50 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_online/products.php on line 313
