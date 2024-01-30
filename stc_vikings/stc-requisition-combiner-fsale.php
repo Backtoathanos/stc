@@ -792,6 +792,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           repid2=$(this).attr("id");
           repitemid2=$(this).attr("list-id");
           orderqty=$(this).attr("orderqty");
+          $('#stcdispatchedqty').val('');
           $('.res-product-Modal-cash-close').modal("show");
           $('#stc-req-list-id-rep2').val(repid2);
           $('#stc-req-list-item-id-rep2').val(repitemid2);
@@ -819,8 +820,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var response=response_dis.trim();
                 if(response=="Item dispatched successfully."){
                   alert(response_dis);
-                  // call-requisition-det
-                  call_pert_requisition(req_id);
+                  // call_pert_requisition(req_id);
                   $('.res-product-Modal-cash-close').modal("hide");
                 }else{
                   alert(response_dis);
