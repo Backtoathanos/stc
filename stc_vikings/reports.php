@@ -1693,10 +1693,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var validated=1;
                 $('.message-alert').remove();
 
-                if(target_date==""){
-                    $('.std-sdl-target-date').after('<p class="message-alert">Select target date.</p>');
-                    validated=0;
-                }
+                // if(target_date==""){
+                //     $('.std-sdl-target-date').after('<p class="message-alert">Select target date.</p>');
+                //     validated=0;
+                // }
 
                 if(remarks==""){
                     $('.stc-sdl-remarks').after('<p class="message-alert">Enter remarks.</p>');
