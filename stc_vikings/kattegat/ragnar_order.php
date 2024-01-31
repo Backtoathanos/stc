@@ -652,12 +652,14 @@ class ragnarRequisitionView extends tesseract{
 		$ivar='
 			<table class="table table-hover table-bordered form-group call-order">
 				<thead>
-					<th class="text-center">Requisition For</th>
-					<th class="text-center">Parent Requisition ID<br>Parent Requisition Date</th>
-					<th class="text-center">Requisition Sitename</th>
-					<th class="text-center">Requisition Accepted By</th>
-					<th class="text-center">Requisition Status</th>
-					<th class="text-center">Action</th>
+					<tr>
+						<th class="text-center">Requisition For</th>
+						<th class="text-center">Parent Requisition ID<br>Parent Requisition Date</th>
+						<th class="text-center">Requisition Sitename</th>
+						<th class="text-center">Requisition Accepted By</th>
+						<th class="text-center">Requisition Status</th>
+						<th class="text-center">Action</th>
+					</tr>
 				</thead>
 				<tbody>
 		';
@@ -666,7 +668,6 @@ class ragnarRequisitionView extends tesseract{
 				`stc_requisition_combiner_id`,
 				`stc_requisition_combiner_date`,
 			    `stc_requisition_combiner_refrence`,
-				`stc_cust_super_requisition_list_id`,
 			    `stc_agents_name`,
                 `stc_customer_name`,
 				`stc_requisition_combiner_status`
@@ -689,7 +690,11 @@ class ragnarRequisitionView extends tesseract{
 				if($requisrow['stc_requisition_combiner_status']==1){$reqcomstatus="PROCESS";}else{$reqcomstatus="ACCEPTED";}
 				$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
 				$chursql=mysqli_query($this->stc_dbs, "
-					SELECT `stc_cust_super_requisition_items_priority` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$requisrow['stc_cust_super_requisition_list_id']."' AND `stc_cust_super_requisition_items_priority`=2
+					SELECT DISTINCT `stc_cust_super_requisition_list_id`
+					FROM `stc_cust_super_requisition_list_items`
+					INNER JOIN `stc_requisition_combiner_req`
+					ON `stc_cust_super_requisition_list_items_req_id`=`stc_requisition_combiner_req_requisition_id`
+					WHERE `stc_requisition_combiner_req_comb_id`='".$requisrow['stc_requisition_combiner_id']."' AND `stc_cust_super_requisition_items_priority`=2
 				");
 				if(mysqli_num_rows($chursql)==0){
 					$badgeurgent="";
@@ -762,12 +767,14 @@ class ragnarRequisitionView extends tesseract{
 		$ivar='
 			<table class="table table-hover table-bordered form-group call-order">
 				<thead>
-					<th class="text-center">Requisition For</th>
-					<th class="text-center">Parent Requisition ID<br>Parent Requisition Date</th>
-					<th class="text-center">Requisition Sitename</th>
-					<th class="text-center">Requisition Accepted By</th>
-					<th class="text-center">Requisition Status</th>
-					<th class="text-center">Action</th>
+					<tr>
+						<th class="text-center">Requisition For</th>
+						<th class="text-center">Parent Requisition ID<br>Parent Requisition Date</th>
+						<th class="text-center">Requisition Sitename</th>
+						<th class="text-center">Requisition Accepted By</th>
+						<th class="text-center">Requisition Status</th>
+						<th class="text-center">Action</th>
+					</tr>
 				</thead>
 				<tbody>
 		';
@@ -810,7 +817,6 @@ class ragnarRequisitionView extends tesseract{
 				`stc_requisition_combiner_id`,
 				`stc_requisition_combiner_date`,
 			    `stc_requisition_combiner_refrence`,
-				`stc_cust_super_requisition_list_id`,
 			    `stc_agents_name`,
 		        `stc_customer_name`,
 				`stc_requisition_combiner_status`
@@ -839,7 +845,11 @@ class ragnarRequisitionView extends tesseract{
 				if($requisrow['stc_requisition_combiner_status']==1){$reqcomstatus="PROCESS";}else{$reqcomstatus="ACCEPTED";}
 				$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
 				$chursql=mysqli_query($this->stc_dbs, "
-					SELECT `stc_cust_super_requisition_items_priority` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$requisrow['stc_cust_super_requisition_list_id']."' AND `stc_cust_super_requisition_items_priority`=2
+					SELECT DISTINCT `stc_cust_super_requisition_list_id`
+					FROM `stc_cust_super_requisition_list_items`
+					INNER JOIN `stc_requisition_combiner_req`
+					ON `stc_cust_super_requisition_list_items_req_id`=`stc_requisition_combiner_req_requisition_id`
+					WHERE `stc_requisition_combiner_req_comb_id`='".$requisrow['stc_requisition_combiner_id']."' AND `stc_cust_super_requisition_items_priority`=2
 				");
 				if(mysqli_num_rows($chursql)==0){
 					$badgeurgent="";

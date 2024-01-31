@@ -311,7 +311,7 @@ if(isset($_GET['requi_id'])){
                         ");
                         foreach($currentrequisition as $row){
                             $sl++;
-                            $priority=$row['stc_cust_super_requisition_list_items_title']==2 ? "Urgent" : "";
+                            $priority=$row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "";
                             ?>
                             <tr>
                               <td class="no"><?php echo $sl;?></td>
