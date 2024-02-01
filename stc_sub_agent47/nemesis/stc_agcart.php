@@ -847,7 +847,7 @@ if(isset($_POST['show_Dailylist'])){
 	';
 	$slno=0;
 	if(!empty($_SESSION["stc_agent_sup_dailylist_cart_sess"])){
-		foreach($_SESSION["stc_agent_sup_dailylist_cart_sess"] as $listrow){
+		foreach($_SESSION["stc_agent_sup_dailylist_cart_sess"] as $key=>$listrow){
 			$slno++;
 			$priority = $listrow['priority'] == 2 ? "Urgent" : "Normal";
 			$out.='
@@ -859,7 +859,7 @@ if(isset($_POST['show_Dailylist'])){
 					<td>'.$listrow['items_type'].'</td>
 					<td>'.$priority.'</td>
 					<td>
-						<a href="#" class="btn btn-success removlistitems" id="'.$listrow['items_title'].'">
+						<a href="#" class="btn btn-success removlistitems" id="'.$key.'">
 							<i class="fas fa-trash"></i>
 						</a>
 					</td>
@@ -891,7 +891,7 @@ if(isset($_POST['show_Dailylist'])){
 if(isset($_POST['delete_Dailylist'])){
 	$prod_id=$_POST['del_item'];
 	foreach($_SESSION["stc_agent_sup_dailylist_cart_sess"] as $keys => $values){  
-		if($values["items_title"] == $prod_id){  
+		if($keys == $prod_id){  
 			unset($_SESSION["stc_agent_sup_dailylist_cart_sess"][$keys]);  
 			echo "Item Removed!!!";  
 		}  
