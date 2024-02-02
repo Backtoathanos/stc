@@ -796,6 +796,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           $('.res-product-Modal-cash-close').modal("show");
           $('#stc-req-list-id-rep2').val(repid2);
           $('#stc-req-list-item-id-rep2').val(repitemid2);
+          $('#stc-req-list-item-id-orderqty').remove();
           $('#stc-req-list-item-id-rep2').after('<input type="hidden" id="stc-req-list-item-id-orderqty" value="'+orderqty+'">');
         });
 
