@@ -805,8 +805,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           e.preventDefault();
           var req_id=$('#stc-req-list-id-rep2').val();
           var req_item_id=$('#stc-req-list-item-id-rep2').val();
-          var dispatch_qnty=$('#stcdispatchedqty').val();
-          var orderqty=$('#stc-req-list-item-id-orderqty').val();
+          var dispatch_qnty=parseInt($('#stcdispatchedqty').val(), 10);
+          var orderqty=parseInt($('#stc-req-list-item-id-orderqty').val(), 10);
           if(dispatch_qnty>orderqty){
             alert("Invalid quantity.");
           }else{
