@@ -2122,6 +2122,180 @@ class ragnarGRNAdd extends tesseract{
 		return $odin;
 	}
 }
+
+// add po adhoc class
+class ragnarPurchaseAdhoc extends tesseract{
+
+	// save po adhoc
+	public function stc_po_adhoc_save($itemname, $quantity, $unit, $rack, $condition, $source, $destination, $remarks){	
+		$odin='';
+		$date=date("Y-m-d H:i:s");		
+		$lokipo=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_purchase_product_adhoc`(
+				`stc_purchase_product_adhoc_itemdesc`,
+				`stc_purchase_product_adhoc_qty`,
+				`stc_purchase_product_adhoc_unit`,
+				`stc_purchase_product_adhoc_rackid`,
+				`stc_purchase_product_adhoc_condition`,
+				`stc_purchase_product_adhoc_source`,
+				`stc_purchase_product_adhoc_destination`,
+				`stc_purchase_product_adhoc_status`,
+				`stc_purchase_product_adhoc_remarks`,
+				`stc_purchase_product_adhoc_created_by`,
+				`stc_purchase_product_adhoc_created_date`
+			)VALUES(
+				'".mysqli_real_escape_string($this->stc_dbs, $itemname)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $quantity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $unit)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $rack)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $condition)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $source)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $destination)."',
+				'1',
+				'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
+				'".$_SESSION['stc_empl_id']."',
+				'".$date."'
+			)
+		");
+		if($lokipo){
+			$odin="success";
+		}else{
+			$odin="failed";
+		}
+		return $odin;
+	}
+
+	// call po adhoc
+	public function stc_call_poadhoc(){
+		$odin='';
+		$odinqry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_purchase_product_adhoc_id`,
+				`stc_purchase_product_adhoc_productid`,
+				`stc_purchase_product_adhoc_itemdesc`,
+				`stc_purchase_product_adhoc_qty`,
+				`stc_purchase_product_adhoc_unit`,
+				`stc_rack_name`,
+				`stc_purchase_product_adhoc_condition`,
+				`stc_purchase_product_adhoc_source`,
+				`stc_purchase_product_adhoc_destination`,
+				`stc_purchase_product_adhoc_recievedby`,
+				`stc_purchase_product_adhoc_status`,
+				`stc_purchase_product_adhoc_remarks`,
+				`stc_user_name`,
+				`stc_purchase_product_adhoc_created_date`,
+				`stc_purchase_product_adhoc_updated_by`,
+				`stc_purchase_product_adhoc_updated_date`
+			FROM `stc_purchase_product_adhoc`
+			LEFT JOIN `stc_rack`
+			ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
+			LEFT JOIN `stc_user`
+			ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
+			ORDER BY TIMESTAMP(`stc_purchase_product_adhoc_created_date`) DESC
+			LIMIT 0, 20
+		");
+		if(mysqli_num_rows($odinqry)>0){
+			$slno=0;
+			$status=array(1 => 'Stock', 2 => 'Dispatched');
+			foreach($odinqry as $odinrow){
+				$slno++;
+				$productog="";
+				$delivered=0;
+				$sql_qry=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
+					FROM `stc_cust_super_requisition_list_items_rec` 
+					WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$odinrow['stc_purchase_product_adhoc_id']."'
+				");
+				if(mysqli_num_rows($sql_qry)>0){
+					foreach($sql_qry as $sql_row){
+						$delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+					}
+				}
+				$stock=$odinrow['stc_purchase_product_adhoc_qty'] - $delivered;;
+				$odin.="
+					<tr>
+						<td class='text-center'>".$slno."</td>
+						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
+						<td>".$productog."</td>
+						<td>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</td>
+						<td class='text-center'>".$odinrow['stc_rack_name']."</td>
+						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
+						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
+						<td class='text-right'>".number_format($stock, 2)."</td>
+						<td class='text-center'>
+							<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
+						</td>
+						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_source']."</td>
+						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_destination']."</td>
+						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_condition']."</td>
+						<td class='text-center'></td>
+						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_recievedby']."</td>
+						<td class='text-center'>".$odinrow['stc_user_name']."</td>
+						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
+						<td class='text-center'>".$odinrow['stc_user_name']."</td>
+						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_updated_date']))."</td>
+						<td class='text-center'>".$status[$odinrow['stc_purchase_product_adhoc_status']]."</td>
+						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_remarks']."</td>
+						<td class='text-center'>
+							<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card' 
+							></i></a>
+							<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o' 
+							></i></a>
+							<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash' 
+							></i></a>
+						</td>
+					</tr>
+				";
+			}
+		}else{
+			$odin="
+				<tr>
+					<td>No record found.</td>
+				</tr>
+			";
+		}
+		return $odin;
+	}
+
+	public function stc_poadhoc_rec_save($adhoc_id, $receiving){
+		$odin='';
+		$odinqry=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_purchase_product_adhoc` 
+			SET `stc_purchase_product_adhoc_recievedby`='".mysqli_real_escape_string($this->stc_dbs, $receiving)."'
+			WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+		");
+		if($odinqry){
+			$odin='success';
+		}else{
+			$odin='failed';
+		}
+		return $odin;
+	}
+
+	
+	public function stc_poadhoc_delete($adhoc_id){
+		$odin='';
+		$checkqry=mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
+			FROM `stc_cust_super_requisition_list_items_rec` 
+			WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+		");
+		if(mysqli_num_rows($checkqry)==0){
+			$odinqry=mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_purchase_product_adhoc` 
+				WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+			");
+			if($odinqry){
+				$odin='success';
+			}else{
+				$odin='failed';
+			}
+		}else{
+			$odin='invalid';
+		}
+		return $odin;
+	}
+}
 #<------------------------------------------------------------------------------------------------------>
 #<--------------------------------------Object sections of Purchase class------------------------------->
 #<------------------------------------------------------------------------------------------------------>
@@ -2840,4 +3014,50 @@ if(isset($_POST['stc_stocking_send_hit'])){
 	$outbjornestocking=$bjornestocking->stc_stocking_send($refr_id, $item_for);
 	echo $outbjornestocking;
 }
+
+#<--------------------------------------Object sections of Po adhoc class------------------------------->
+// save po
+if(isset($_POST['stc_po_adhoc_save'])){
+	$itemname=$_POST['itemname'];
+	$quantity=$_POST['quantity'];
+	$unit=$_POST['unit'];
+	$rack=$_POST['rack'];
+	$condition=$_POST['condition'];
+	$source=$_POST['source'];
+	$destination=$_POST['destination'];
+	$remarks=$_POST['remarks'];
+
+	if($rack=="NA"){
+		echo "Please Select Rack!!!";
+	}else{
+		$objloki=new ragnarPurchaseAdhoc();
+		$objlokiout=$objloki->stc_po_adhoc_save($itemname, $quantity, $unit, $rack, $condition, $source, $destination, $remarks);
+		echo json_encode($objlokiout);
+		// echo $objlokiout;
+	}		
+}
+
+// call po adhoc
+if(isset($_POST['stc_call_poadhoc'])){
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_call_poadhoc();
+	echo $outbjornestocking;
+}
+
+// receiving saved
+if(isset($_POST['stc_po_adhocrec_save'])){
+	$adhoc_id=$_POST['adhoc_id'];
+	$receiving=$_POST['receiving'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_rec_save($adhoc_id, $receiving);
+	echo $outbjornestocking;
+}
+
+if(isset($_POST['stc_po_adhoc_delete'])){
+	$adhoc_id=$_POST['adhoc_id'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_delete($adhoc_id);
+	echo $outbjornestocking;
+}
+
 ?>
