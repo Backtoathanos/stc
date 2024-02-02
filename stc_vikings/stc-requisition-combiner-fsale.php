@@ -807,7 +807,9 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           var req_item_id=$('#stc-req-list-item-id-rep2').val();
           var dispatch_qnty=$('#stcdispatchedqty').val();
           var orderqty=$('#stc-req-list-item-id-orderqty').val();
-          if(orderqty>=dispatch_qnty){
+          if(dispatch_qnty>orderqty){
+            alert("Invalid quantity.");
+          }else{
             $.ajax({
               url       : "kattegat/ragnar_order.php",
               method    :'POST',
@@ -828,8 +830,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 }
               }
             });
-          }else{
-            alert("Invalid quantity.");
           }
         });
       });
