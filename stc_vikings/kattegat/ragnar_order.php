@@ -2745,22 +2745,36 @@ class ragnarRequisitionPertAdd extends tesseract{
 		return $loki;
 	}
 
-	public function stc_ag_req_direct($stc_req_id, $stc_req_item_id, $dispatch_qty){
+	public function stc_ag_req_direct($stc_req_id, $stc_req_item_id, $dispatch_qty, $poadhocitem){
 		$loki='';
 		$gamorarecgoqry=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_cust_super_requisition_list_items_rec`(
 				`stc_cust_super_requisition_list_items_rec_list_id`, 
 				`stc_cust_super_requisition_list_items_rec_list_item_id`, 
 				`stc_cust_super_requisition_list_items_rec_list_pd_id`, 
-				`stc_cust_super_requisition_list_items_rec_recqty`
+				`stc_cust_super_requisition_list_items_rec_list_poaid`,
+				`stc_cust_super_requisition_list_items_rec_recqty`, 
+				`stc_cust_super_requisition_list_items_rec_date`
 			) VALUES (
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_req_item_id)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."',
 				'0',
-				'".mysqli_real_escape_string($this->stc_dbs, $dispatch_qty)."'
+				'".mysqli_real_escape_string($this->stc_dbs, $poadhocitem)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $dispatch_qty)."',
+				NOW()
 			)
 		");
 		if($gamorarecgoqry){
+			$updateqry=mysqli_query($this->stc_dbs, "
+				UPDATE `stc_purchase_product_adhoc`
+				SET `stc_purchase_product_adhoc_status` = '2'
+				WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $poadhocitem)."'
+				AND `stc_purchase_product_adhoc_qty`<=(
+					SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`)
+					FROM `stc_cust_super_requisition_list_items_rec`
+					WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`=`stc_purchase_product_adhoc_id`
+				)
+			");
 			$gamoraupdateqry=mysqli_query($this->stc_dbs, "
 				UPDATE
 					`stc_cust_super_requisition_list_items`
@@ -3452,8 +3466,9 @@ if(isset($_POST['stc_dispatch_hit'])){
 	$dispatch_qty=$_POST['stc_dispatch_qty'];
 	$stc_req_id=$_POST['stc_req_id'];
 	$stc_req_item_id=$_POST['stc_req_item_id'];
+	$poadhocitem=$_POST['poadhocitem'];
 	$raven=new ragnarRequisitionPertAdd();
-	$outraven=$raven->stc_ag_req_direct($stc_req_id, $stc_req_item_id, $dispatch_qty);
+	$outraven=$raven->stc_ag_req_direct($stc_req_id, $stc_req_item_id, $dispatch_qty, $poadhocitem);
 	// echo json_encode($outraven);
 	echo $outraven;
 }

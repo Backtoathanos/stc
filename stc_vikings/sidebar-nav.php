@@ -136,6 +136,12 @@
                                     </a>
                                 </li>
                                 <li>
+                                    <a href="purchase-product-adhoc.php?page=purchase&subpage=purchaseorderadhoc" class="purchaseorderadhoc">
+                                        <i class="metismenu-icon"></i>
+                                        Purchase Order Adhoc
+                                    </a>
+                                </li>
+                                <li>
                                     <a href="purchase-payments.php?page=purchase&subpage=purchaseorderpayments" class="purchaseorderpayments">
                                         <i class="metismenu-icon"></i>
                                         Purchase Order Payments
