@@ -807,7 +807,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           var req_item_id=$('#stc-req-list-item-id-rep2').val();
           var dispatch_qnty=parseInt($('#stcdispatchedqty').val(), 10);
           var orderqty=parseInt($('#stc-req-list-item-id-orderqty').val(), 10);
-          if(dispatch_qnty>orderqty){
+          var poadhocitem=$('#poadhocitem').val();
+          var balanced_qty=parseInt($('#poadhocitem option:selected').attr('qty'));
+          if((dispatch_qnty>orderqty)){
+            alert("Invalid quantity.");
+          }else if((dispatch_qnty>balanced_qty)){
             alert("Invalid quantity.");
           }else{
             $.ajax({
@@ -817,7 +821,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 stc_dispatch_hit:1,
                 stc_req_id:req_id,
                 stc_req_item_id:req_item_id,
-                stc_dispatch_qty:dispatch_qnty
+                stc_dispatch_qty:dispatch_qnty,
+                poadhocitem:poadhocitem
               },
               success   : function(response_dis){
                 var response=response_dis.trim();
@@ -831,6 +836,12 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
               }
             });
           }
+        });
+
+        $('body').delegate('.poadhocitem', 'change', function(e){
+          e.preventDefault();
+          var qty=$('#poadhocitem option:selected').attr('qty');
+          $('.stcdispatchedqty').val(qty);
         });
       });
     </script>
@@ -950,7 +961,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
 </div>
 
 <div class="modal fade bd-example-modal-lg res-product-Modal-cash-close" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-md">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">Dispatch Product</h4>
@@ -966,7 +977,44 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
               </div>
             </div>
             <div class="row">
-              <div class="col-12">
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <h5 for="poadhocitem">
+                    Item
+                  </h5>
+                  <select
+                    class="form-control poadhocitem"
+                    id="poadhocitem"
+                  >
+                    <?php 
+                      include_once("../MCU/db.php");
+                      $sqlqry=mysqli_query($con, "
+                        SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_itemdesc`, `stc_purchase_product_adhoc_qty`  
+                        FROM `stc_purchase_product_adhoc`
+                        WHERE `stc_purchase_product_adhoc_status`=1
+                      ");
+                      if(mysqli_num_rows($sqlqry)>0){
+                        echo '<option value="NA">Select</option>';
+                        foreach($sqlqry as $sqlrow){
+                          $poadid=$sqlrow['stc_purchase_product_adhoc_id'];
+                          $checsql=mysqli_query($con, "
+                            SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`) as recqty
+                            FROM `stc_cust_super_requisition_list_items_rec`
+                            WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$poadid."'
+                          ");
+                          $result=mysqli_num_rows($checsql)>0 ? mysqli_fetch_assoc($checsql) : 0;
+                          $rec_qty=$result!=0 ? $result['recqty'] : 0;
+                          $balanced_qty=$sqlrow['stc_purchase_product_adhoc_qty'] - $rec_qty;
+                          echo '<option value="'.$sqlrow['stc_purchase_product_adhoc_id'].'" qty="'.$balanced_qty.'">'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</option>';
+                        }
+                      }else{
+                        echo '<option value="NA">No record found.</option>';
+                      }
+                    ?>
+                  </select>
+                </div>
+              </div>
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
                 <div class="card-border mb-3 card card-body border-success">
                   <h5>
                     Dispatched Quantity
