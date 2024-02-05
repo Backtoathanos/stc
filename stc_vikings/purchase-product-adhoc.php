@@ -232,27 +232,18 @@ include("kattegat/role_check.php");
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
                                       <form action="" class="stc-view-product-form">
-                                          <table class="table table-hover ">
+                                          <table class="table table-hover table-bordered">
                                             <thead>
                                               <tr>
-                                                <th scope="col">From/<br>To</th>
-                                                <th scope="col" width="30%">By Item Desc</th>
-                                                <th scope="col" width="15%">By Source/Destination (Location) </th>
-                                                <th scope="col" width="15%">By Invoice Number</th>
-                                                <th scope="col" width="15%">By Status</th>
+                                                <th scope="col" class="text-center">By Item Desc</th>
+                                                <th scope="col" class="text-center">By Source/Destination (Location) </th>
+                                                <th scope="col" class="text-center">By Rack</th>
+                                                <th scope="col" class="text-center">By Status</th>
+                                                <th scope="col" class="text-center">Action</th>
                                               </tr>
                                             </thead>
                                             <tbody>
                                               <tr>
-                                                <td>
-                                                    <?php 
-                                                      $date = date("d-m-Y");
-                                                      $newDate = date('Y-m-d', strtotime($date)); 
-                                                      $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
-                                                    ?>   
-                                                  <p><input type="date" value="<?php echo $effectiveDate;?>" class="form-control begdate"></p>
-                                                  <p><input type="date" value="<?php echo $newDate;?>" class="form-control enddate"></p>
-                                                </td>
                                                 <td>
                                                   <input 
                                                     type="text"
@@ -263,8 +254,8 @@ include("kattegat/role_check.php");
                                                 </td>
                                                 <td>
                                                   <input 
-                                                    type="number" 
-                                                    id="stc-po-number-finder-in" 
+                                                    type="text" 
+                                                    id="tc-poa-searchbydourcedestination" 
                                                     class="form-control"
                                                     placeholder="Source/destination (Location)" 
                                                   >
@@ -272,9 +263,8 @@ include("kattegat/role_check.php");
                                                 <td>
                                                   <input 
                                                     type="text" 
-                                                    id="stc-invoice-number-finder-in" 
-                                                    class="form-control"
-                                                    placeholder="Invoice Number" 
+                                                    class="form-control tc-poa-searchbyrack"
+                                                    placeholder="Rack" 
                                                   >
                                                 </td>
                                                 <td>
@@ -282,12 +272,12 @@ include("kattegat/role_check.php");
                                                     class="custom-select form-control stc-po-status-in"
                                                     >
                                                     <option value="NA">Select Status</option>
-                                                    <option value="accepted">Accepted</option>
-                                                    <option value="canceled">Cancel</option>
-                                                    <option value="completed">Completed</option>
-                                                    <option value="granted">Granted</option>
-                                                    <option value="process">Process</option>
+                                                    <option value="0">Stock</option>
+                                                    <option value="1">Dispatched</option>
                                                   </select>
+                                                </td>
+                                                <td>
+                                                  <a class="btn btn-success" href="javascript:void(0)">Find</a>
                                                 </td>
                                               </tr>
                                             </tbody>
