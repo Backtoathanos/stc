@@ -236,9 +236,8 @@ include("kattegat/role_check.php");
                                             <thead>
                                               <tr>
                                                 <th scope="col">From/<br>To</th>
-                                                <th scope="col" width="30%">By Merchant</th>
-                                                <th scope="col" width="15%">By PO Number</th>
-                                                <th scope="col" width="15%">By GRN Number</th>
+                                                <th scope="col" width="30%">By Item Desc</th>
+                                                <th scope="col" width="15%">By Source/Destination (Location) </th>
                                                 <th scope="col" width="15%">By Invoice Number</th>
                                                 <th scope="col" width="15%">By Status</th>
                                               </tr>
@@ -253,31 +252,21 @@ include("kattegat/role_check.php");
                                                     ?>   
                                                   <p><input type="date" value="<?php echo $effectiveDate;?>" class="form-control begdate"></p>
                                                   <p><input type="date" value="<?php echo $newDate;?>" class="form-control enddate"></p>
-                                                  <p><a href="#" id="purchaseproddatefilt">
-                                                    <i style="font-size: 20px;background: #0c0c1b;border-radius: 50%;padding: 5px;margin: 0;color: #77ffd3;float: right;" class="fa fa-arrow-down"></i>
-                                                  </a></p>
                                                 </td>
                                                 <td>
-                                                  <select
-                                                    id="stc-po-merchant-in"
-                                                    class="custom-select form-control stc-select-vendor"
-                                                    name="stcvendor"
-                                                  ></select>
+                                                  <input 
+                                                    type="text"
+                                                    class="form-control stc-poa-searchbyitem"
+                                                    id="stc-poa-searchbyitem"
+                                                    placeholder="Item name" 
+                                                  >
                                                 </td>
                                                 <td>
                                                   <input 
                                                     type="number" 
                                                     id="stc-po-number-finder-in" 
                                                     class="form-control"
-                                                    placeholder="PO Number" 
-                                                  >
-                                                </td>
-                                                <td>
-                                                  <input 
-                                                    type="number" 
-                                                    id="stc-grn-number-finder-in" 
-                                                    class="form-control"
-                                                    placeholder="GRN Number" 
+                                                    placeholder="Source/destination (Location)" 
                                                   >
                                                 </td>
                                                 <td>
@@ -299,19 +288,6 @@ include("kattegat/role_check.php");
                                                     <option value="granted">Granted</option>
                                                     <option value="process">Process</option>
                                                   </select>
-                                                </td>
-                                              </tr>
-                                              <tr>
-                                                <td colspan="6">By Product</td>
-                                              </tr>
-                                              <tr>
-                                                <td colspan="6">
-                                                  <input 
-                                                    type="text" 
-                                                    id="stc-product-name-finder-in" 
-                                                    class="form-control"
-                                                    placeholder="Product Name" 
-                                                  ><button class="mb-2 mr-2 btn btn-info form-control stc-product-finder-hit">Search</button>
                                                 </td>
                                               </tr>
                                             </tbody>
