@@ -232,60 +232,39 @@ include("kattegat/role_check.php");
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
                                       <form action="" class="stc-view-product-form">
-                                          <table class="table table-hover ">
+                                          <table class="table table-hover table-bordered">
                                             <thead>
                                               <tr>
-                                                <th scope="col">From/<br>To</th>
-                                                <th scope="col" width="30%">By Merchant</th>
-                                                <th scope="col" width="15%">By PO Number</th>
-                                                <th scope="col" width="15%">By GRN Number</th>
-                                                <th scope="col" width="15%">By Invoice Number</th>
-                                                <th scope="col" width="15%">By Status</th>
+                                                <th scope="col" class="text-center">By Item Desc</th>
+                                                <th scope="col" class="text-center">By Source/Destination (Location) </th>
+                                                <th scope="col" class="text-center">By Rack</th>
+                                                <th scope="col" class="text-center">By Status</th>
+                                                <th scope="col" class="text-center">Action</th>
                                               </tr>
                                             </thead>
                                             <tbody>
                                               <tr>
                                                 <td>
-                                                    <?php 
-                                                      $date = date("d-m-Y");
-                                                      $newDate = date('Y-m-d', strtotime($date)); 
-                                                      $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
-                                                    ?>   
-                                                  <p><input type="date" value="<?php echo $effectiveDate;?>" class="form-control begdate"></p>
-                                                  <p><input type="date" value="<?php echo $newDate;?>" class="form-control enddate"></p>
-                                                  <p><a href="#" id="purchaseproddatefilt">
-                                                    <i style="font-size: 20px;background: #0c0c1b;border-radius: 50%;padding: 5px;margin: 0;color: #77ffd3;float: right;" class="fa fa-arrow-down"></i>
-                                                  </a></p>
-                                                </td>
-                                                <td>
-                                                  <select
-                                                    id="stc-po-merchant-in"
-                                                    class="custom-select form-control stc-select-vendor"
-                                                    name="stcvendor"
-                                                  ></select>
-                                                </td>
-                                                <td>
                                                   <input 
-                                                    type="number" 
-                                                    id="stc-po-number-finder-in" 
-                                                    class="form-control"
-                                                    placeholder="PO Number" 
-                                                  >
-                                                </td>
-                                                <td>
-                                                  <input 
-                                                    type="number" 
-                                                    id="stc-grn-number-finder-in" 
-                                                    class="form-control"
-                                                    placeholder="GRN Number" 
+                                                    type="text"
+                                                    class="form-control stc-poa-searchbyitem"
+                                                    id="stc-poa-searchbyitem"
+                                                    placeholder="Item name" 
                                                   >
                                                 </td>
                                                 <td>
                                                   <input 
                                                     type="text" 
-                                                    id="stc-invoice-number-finder-in" 
+                                                    id="tc-poa-searchbydourcedestination" 
                                                     class="form-control"
-                                                    placeholder="Invoice Number" 
+                                                    placeholder="Source/destination (Location)" 
+                                                  >
+                                                </td>
+                                                <td>
+                                                  <input 
+                                                    type="text" 
+                                                    class="form-control tc-poa-searchbyrack"
+                                                    placeholder="Rack" 
                                                   >
                                                 </td>
                                                 <td>
@@ -293,25 +272,12 @@ include("kattegat/role_check.php");
                                                     class="custom-select form-control stc-po-status-in"
                                                     >
                                                     <option value="NA">Select Status</option>
-                                                    <option value="accepted">Accepted</option>
-                                                    <option value="canceled">Cancel</option>
-                                                    <option value="completed">Completed</option>
-                                                    <option value="granted">Granted</option>
-                                                    <option value="process">Process</option>
+                                                    <option value="0">Stock</option>
+                                                    <option value="1">Dispatched</option>
                                                   </select>
                                                 </td>
-                                              </tr>
-                                              <tr>
-                                                <td colspan="6">By Product</td>
-                                              </tr>
-                                              <tr>
-                                                <td colspan="6">
-                                                  <input 
-                                                    type="text" 
-                                                    id="stc-product-name-finder-in" 
-                                                    class="form-control"
-                                                    placeholder="Product Name" 
-                                                  ><button class="mb-2 mr-2 btn btn-info form-control stc-product-finder-hit">Search</button>
+                                                <td>
+                                                  <a class="btn btn-success" href="javascript:void(0)">Find</a>
                                                 </td>
                                               </tr>
                                             </tbody>
