@@ -699,14 +699,15 @@ class ragnarReportsViewRequiReports extends tesseract{
             '3' => 'LOCATION',
             '6' => 'EQUIPMENT DETAILS',
             '11' => 'REASON ATTRIBUTE',
-            '12' => 'STATUS',
-            '13' => 'DELAY',
-            '14' => 'FRC REPORTS',
-            '15' => 'JOB DONE DETAILS',
-            '16' => 'ANY COMMENT',
-            '17' => 'TARGET DATE',
-            '18' => 'REMARKS',
-            '19' => 'ACTION'
+            '13' => 'STATUS',
+            '14' => 'DELAY',
+            '15' => 'PENDING DETAILS',
+            '16' => 'FRC REPORTS',
+            '17' => 'JOB DONE DETAILS',
+            '18' => 'ANY COMMENT',
+            '19' => 'TARGET DATE',
+            '20' => 'REMARKS',
+            '21' => 'ACTION'
          );
          
          $data_fields="";
@@ -830,6 +831,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th style="width:4%" class="text-center">MATERIAL</th>
                      <th style="width:1%" class="text-center">STATUS</th>
                      <th style="width:1%" class="text-center">DELAY</th>
+                     <th style="width:1%" class="text-center">PENDING DETAILS</th>
                      <th style="width:3%" class="text-center">FRC REPORTS</th>
                      <th style="width:3%" class="text-center">JOB DONE DETAILS</th>
                      <th style="width:3%" class="text-center">ANY COMMENTS</th>
@@ -905,19 +907,19 @@ class ragnarReportsViewRequiReports extends tesseract{
             $eq_type='';
             $eq_number='';
             $sup_det='';
-            $stc_call_eqtypeqry=mysqli_query($this->stc_dbs, "
-               SELECT
-                   `stc_cpumpd_equipment_type`
-               FROM
-                   `stc_customer_pump_details`
-               WHERE
-                   `stc_cpumpd_id`='".$row['stc_status_down_list_equipment_type']."'
-            ");
-            if(mysqli_num_rows($stc_call_eqtypeqry)>0){
-               foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
-                  $eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
-               }
-            }
+            // $stc_call_eqtypeqry=mysqli_query($this->stc_dbs, "
+            //    SELECT
+            //        `stc_cpumpd_equipment_type`
+            //    FROM
+            //        `stc_customer_pump_details`
+            //    WHERE
+            //        `stc_cpumpd_id`='".$row['stc_status_down_list_equipment_type']."'
+            // ");
+            // if(mysqli_num_rows($stc_call_eqtypeqry)>0){
+            //    foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
+            //       $eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
+            //    }
+            // }
 
             $stc_call_eqnumberqry=mysqli_query($this->stc_dbs, "
                SELECT
@@ -990,6 +992,8 @@ class ragnarReportsViewRequiReports extends tesseract{
                $material_view='#';
             }
 
+            $penddet_value = $row['stc_status_down_list_jobpending_details'];
+            $penddet = strlen($penddet_value)>25 ? substr($penddet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$penddet_value.'">Read more</a>' : $penddet_value;
             $frcrdet_value = $row['stc_status_down_list_failurerootcost'];
             $frcrdet = strlen($frcrdet_value)>25 ? substr($frcrdet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$frcrdet_value.'">Read more</a>' : $frcrdet_value;
             $ftargetdate=$row['stc_status_down_list_ftarget_date']=="" ? "" : date('d-m-Y H:i a', strtotime($row['stc_status_down_list_ftarget_date']));
@@ -1021,6 +1025,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="sl-hide text-center">'.$material_view.'</td>
                   <td class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>
+                  <td>
+                     <span class="jobdonedet-view">'.$penddet.'</span>
+                     <span class="jobdonedet-print" style="display:none;">'.$penddet_value.'</span>
+                  </td>
                   <td>
                      <span class="jobdonedet-view">'.$frcrdet.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$frcrdet_value.'</span>
