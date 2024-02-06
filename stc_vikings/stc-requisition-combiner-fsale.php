@@ -814,27 +814,31 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           }else if((dispatch_qnty>balanced_qty)){
             alert("Invalid quantity.");
           }else{
-            $.ajax({
-              url       : "kattegat/ragnar_order.php",
-              method    :'POST',
-              data      : {
-                stc_dispatch_hit:1,
-                stc_req_id:req_id,
-                stc_req_item_id:req_item_id,
-                stc_dispatch_qty:dispatch_qnty,
-                poadhocitem:poadhocitem
-              },
-              success   : function(response_dis){
-                var response=response_dis.trim();
-                if(response=="Item dispatched successfully."){
-                  alert(response_dis);
-                  // call_pert_requisition(req_id);
-                  $('.res-product-Modal-cash-close').modal("hide");
-                }else{
-                  alert(response_dis);
+            if(orderqty!=0){
+              $.ajax({
+                url       : "kattegat/ragnar_order.php",
+                method    :'POST',
+                data      : {
+                  stc_dispatch_hit:1,
+                  stc_req_id:req_id,
+                  stc_req_item_id:req_item_id,
+                  stc_dispatch_qty:dispatch_qnty,
+                  poadhocitem:poadhocitem
+                },
+                success   : function(response_dis){
+                  var response=response_dis.trim();
+                  if(response=="Item dispatched successfully."){
+                    alert(response_dis);
+                    // call_pert_requisition(req_id);
+                    $('.res-product-Modal-cash-close').modal("hide");
+                  }else{
+                    alert(response_dis);
+                  }
                 }
-              }
-            });
+              });
+            }else{
+              alert("Item not found.");
+            }
           }
         });
 
