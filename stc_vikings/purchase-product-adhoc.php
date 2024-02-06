@@ -277,7 +277,7 @@ include("kattegat/role_check.php");
                                                   </select>
                                                 </td>
                                                 <td>
-                                                  <a class="btn btn-success" href="javascript:void(0)">Find</a>
+                                                  <a class="btn btn-success stc-adhocpo-find" href="javascript:void(0)">Find</a>
                                                 </td>
                                               </tr>
                                             </tbody>
@@ -487,13 +487,28 @@ include("kattegat/role_check.php");
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function(){
+          $('body').delegate('.stc-adhocpo-find', 'click', function(e){
+            e.preventDefault();
+            var itemname=$('#stc-poa-searchbyitem').val();
+            var sourcedestination=$('#tc-poa-searchbydourcedestination').val();
+            var byrack=$('.tc-poa-searchbyrack').val();
+            var status=$('.stc-po-status-in').val();
+            stc_call_poadhoc(itemname, sourcedestination, byrack, status); 
+          });
+
           // call merchant for purchase
-          stc_call_poadhoc();
-          function stc_call_poadhoc(){
+          // stc_call_poadhoc('', '', '', '');
+          function stc_call_poadhoc(itemname, sourcedestination, byrack, status){
             $.ajax({
               url       : "kattegat/ragnar_purchase.php",
               method    : "post",
-              data      : {stc_call_poadhoc:1},
+              data      : {
+                stc_call_poadhoc:1,
+                itemname: itemname, 
+                sourcedestination: sourcedestination, 
+                byrack: byrack, 
+                status: status
+              },
               success   : function(data){
                 // console.log(data);
                 $('.stc-call-view-poadhoc-row').html(data);

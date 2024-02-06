@@ -2166,8 +2166,24 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}
 
 	// call po adhoc
-	public function stc_call_poadhoc(){
+	public function stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status){
 		$odin='';
+		$filter='';
+		if($itemname!=""){
+			$filter.="AND `stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."'";
+		}
+		if($sourcedestination!=""){
+			$filter.="
+				AND (`stc_purchase_product_adhoc_source` regexp '".mysqli_real_escape_string($this->stc_dbs, $sourcedestination)."'
+				OR `stc_purchase_product_adhoc_destination` regexp '".mysqli_real_escape_string($this->stc_dbs, $sourcedestination)."')
+			";
+		}
+		if($byrack!=""){
+			$filter.="AND `stc_rack_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $byrack)."'";
+		}
+		if($status!="NA"){
+			$filter.="AND `stc_purchase_product_adhoc_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."'";
+		}
 		$odinqry=mysqli_query($this->stc_dbs, "
 			SELECT
 				`stc_purchase_product_adhoc_id`,
@@ -2191,8 +2207,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 			ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
 			LEFT JOIN `stc_user`
 			ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
+			WHERE `stc_purchase_product_adhoc_qty`>0 ".$filter."
 			ORDER BY TIMESTAMP(`stc_purchase_product_adhoc_created_date`) DESC
-			LIMIT 0, 20
 		");
 		if(mysqli_num_rows($odinqry)>0){
 			$slno=0;
@@ -3039,8 +3055,12 @@ if(isset($_POST['stc_po_adhoc_save'])){
 
 // call po adhoc
 if(isset($_POST['stc_call_poadhoc'])){
+	$itemname=$_POST['itemname'];
+	$sourcedestination=$_POST['sourcedestination'];
+	$byrack=$_POST['byrack'];
+	$status=$_POST['status'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_call_poadhoc();
+	$outbjornestocking=$bjornestocking->stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status);
 	echo $outbjornestocking;
 }
 
