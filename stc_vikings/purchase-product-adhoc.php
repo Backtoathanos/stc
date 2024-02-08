@@ -272,8 +272,8 @@ include("kattegat/role_check.php");
                                                     class="custom-select form-control stc-po-status-in"
                                                     >
                                                     <option value="NA">Select Status</option>
-                                                    <option value="0">Stock</option>
-                                                    <option value="1">Dispatched</option>
+                                                    <option value="1">Stock</option>
+                                                    <option value="2">Dispatched</option>
                                                   </select>
                                                 </td>
                                                 <td>
