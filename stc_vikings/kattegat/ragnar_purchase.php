@@ -2126,7 +2126,7 @@ class ragnarGRNAdd extends tesseract{
 // add po adhoc class
 class ragnarPurchaseAdhoc extends tesseract{
 
-	// save po adhoc
+	// save po adhoc trigger
 	public function stc_po_adhoc_save($itemname, $quantity, $unit, $rack, $condition, $source, $destination, $remarks){	
 		$odin='';
 		$date=date("Y-m-d H:i:s");		
@@ -2273,6 +2273,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		return $odin;
 	}
 
+	// received po adhoc save trigger
 	public function stc_poadhoc_rec_save($adhoc_id, $receiving){
 		$odin='';
 		$odinqry=mysqli_query($this->stc_dbs, "
@@ -2288,7 +2289,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		return $odin;
 	}
 
-	
+	// delete for po adhoc delete trigger
 	public function stc_poadhoc_delete($adhoc_id){
 		$odin='';
 		$checkqry=mysqli_query($this->stc_dbs, "
@@ -3075,6 +3076,7 @@ if(isset($_POST['stc_po_adhocrec_save'])){
 	echo $outbjornestocking;
 }
 
+// delete po adhoc
 if(isset($_POST['stc_po_adhoc_delete'])){
 	$adhoc_id=$_POST['adhoc_id'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
