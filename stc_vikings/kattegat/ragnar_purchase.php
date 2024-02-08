@@ -3045,6 +3045,8 @@ if(isset($_POST['stc_po_adhoc_save'])){
 
 	if($rack=="NA"){
 		echo "Please Select Rack!!!";
+	}else if(empty($_SESSION['stc_empl_id'])){
+		echo "Please Login";
 	}else{
 		$objloki=new ragnarPurchaseAdhoc();
 		$objlokiout=$objloki->stc_po_adhoc_save($itemname, $quantity, $unit, $rack, $condition, $source, $destination, $remarks);
