@@ -282,6 +282,8 @@ if(isset($_GET['requi_id'])){
                               `stc_cust_super_requisition_list_items_approved_qty`,
                               `stc_cust_super_requisition_items_priority`
                             FROM `stc_cust_super_requisition_list_items`
+                            INNER JOIN `stc_cust_super_requisition_list_items_rec`
+                            ON `stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_rec_list_item_id`
                             WHERE `stc_cust_super_requisition_list_items_req_id`='".$_GET['requi_id']."'
                         ");
                         foreach($currentrequisition as $row){
