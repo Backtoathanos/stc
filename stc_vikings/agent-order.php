@@ -1422,7 +1422,7 @@ include("kattegat/role_check.php");
             </div>
             <div class="row">
               <div class="col-12">
-                <div class="card-border mb-3 card card-body border-success stc-req-item-show">
+                <div class="card-border mb-3 card card-body border-success stc-req-item-show" style="overflow-x:auto;">
                 </div>
               </div>
             </div>
