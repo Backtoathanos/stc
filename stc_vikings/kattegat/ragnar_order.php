@@ -1940,11 +1940,17 @@ class ragnarRequisitionPertView extends tesseract{
 						 <td class="text-center">'.$reqstatus.$badgeurgent.'</td>
 						 <td class="text-center">
 						 	<a 
-						 		class="stc_view_requist" 
+						 		class="stc_view_requist btn btn-primary" 
 						 		href="#" 
 						 		id="'.$requisrow["stc_cust_super_requisition_list_id"].'" 
 						 		style="font-size: 25px;color: black;"
 							><i class="fa fa-eye" aria-hidden="true"></i>
+						 	</a>
+						 	<a 
+						 		class="btn btn-success" 
+						 		href="stc-print-preview-directchallan.php?requi_id='.$requisrow["stc_cust_super_requisition_list_id"].'" 
+						 		style="font-size: 25px;color: black;"
+							><i class="fa fa-print" aria-hidden="true"></i>
 						 	</a>
 						 </td>
 					</tr>
