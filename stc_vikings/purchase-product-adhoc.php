@@ -395,7 +395,7 @@ include("kattegat/role_check.php");
                 if(response=="success"){
                   alert("Purchase Order Adhoc saved successfully.");
                   $(".stc-add-poadhoc-product-form")[0].reset();
-                  stc_call_poadhoc();
+                  $('.stc-adhocpo-find').click();
                 }else{
                   alert("Something went wrong please check and try again.");
                 }
@@ -426,7 +426,7 @@ include("kattegat/role_check.php");
                 if(response=="success"){
                   alert("Purchase Order Adhoc receiving saved successfully.");
                   $('#stcpoadhocreceivedby').val("");
-                  stc_call_poadhoc();
+                  $('.stc-adhocpo-find').click();
                 }else{
                   alert("Something went wrong please check and try again.");
                 }
@@ -449,7 +449,7 @@ include("kattegat/role_check.php");
                   if(response=="success"){
                     alert("Purchase Order Adhoc deleted successfully.");
                     $('#stcpoadhocreceivedby').val("");
-                    stc_call_poadhoc();
+                    $('.stc-adhocpo-find').click();
                   }else if(response=="invalid"){
                     alert("Item cannot delete, Either its already sold or some of quantity sold.");
                   }else{
