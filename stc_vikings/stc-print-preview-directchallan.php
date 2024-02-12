@@ -279,7 +279,7 @@ if(isset($_GET['requi_id'])){
                               `stc_cust_super_requisition_list_id`,
                               `stc_cust_super_requisition_list_items_title`,
                               `stc_cust_super_requisition_list_items_unit`,
-                              `stc_cust_super_requisition_list_items_approved_qty`,
+                              `stc_cust_super_requisition_list_items_rec_recqty`,
                               `stc_cust_super_requisition_items_priority`
                             FROM `stc_cust_super_requisition_list_items`
                             INNER JOIN `stc_cust_super_requisition_list_items_rec`
@@ -298,7 +298,7 @@ if(isset($_GET['requi_id'])){
                                 </h6>
                               </td>
                               <td class="unit"><?php echo $row['stc_cust_super_requisition_list_items_unit'];?></td>
-                              <td class="qty"><?php echo number_format($row['stc_cust_super_requisition_list_items_approved_qty'], 2);?></td>
+                              <td class="qty"><?php echo number_format($row['stc_cust_super_requisition_list_items_rec_recqty'], 2);?></td>
                               <td class="text-center"></td>
                               <td class="text-center"></td>
                             </tr>
