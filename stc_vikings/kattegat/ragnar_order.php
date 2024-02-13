@@ -1877,25 +1877,43 @@ class ragnarRequisitionPertView extends tesseract{
 		$lokiout='
 			<table class="table table-hover table-bordered">
 				<thead>
-					<th class="text-center">Requisition ID<br>Requisition Date</th>
-					<th class="text-center">Requisition From</th>
-					<th class="text-center">Requisition For</th>
-					<th class="text-center">Requisition Accepted By</th>
-					<th class="text-center">Requisition Status</th>
-					<th class="text-center">Action</th>
+					<tr>
+						<th class="text-center">ID<br>Date</th>
+						<th class="text-center">From</th>
+						<th class="text-center">For</th>
+						<th class="text-center">Accepted By</th>
+						<th class="text-center" style="width: 20%;">Items Desc</th>
+						<th class="text-center">Unit</th>
+						<th class="text-center">Ordered Qty</th> 
+						<th class="text-center">Approved Qty</th> 
+						<th class="text-center">GST Qty</th>  
+						<th class="text-center">Dispatched Qty</th> 
+						<th class="text-center">Status</th>   
+						<th class="text-center">Priority</th>  
+						<th class="text-center">Action</th>
+					</tr>
 				</thead>
 				<tbody>
 		';
 		$reqstatus='';
 		$requissuperqry=mysqli_query($this->stc_dbs, "
 			SELECT 
-				`stc_cust_super_requisition_list_id`,
+				L.`stc_cust_super_requisition_list_id` as list_id,
 				`stc_cust_super_requisition_list_date`,
 				`stc_cust_project_title`,
 				`stc_cust_pro_supervisor_fullname`,
 				`stc_agents_name`,
-				`stc_cust_super_requisition_list_status`
-			FROM `stc_cust_super_requisition_list`
+				`stc_cust_super_requisition_list_status`,
+				I.`stc_cust_super_requisition_list_id` as list_item_id,
+				I.`stc_cust_super_requisition_list_items_req_id`,
+				I.`stc_cust_super_requisition_list_items_title`,
+				I.`stc_cust_super_requisition_list_items_unit`,
+				I.`stc_cust_super_requisition_list_items_approved_qty`,
+				I.`stc_cust_super_requisition_items_priority`,
+				I.`stc_cust_super_requisition_list_items_status`
+			FROM `stc_cust_super_requisition_list_items` I
+			INNER JOIN `stc_cust_super_requisition_list` L 
+			ON I.`stc_cust_super_requisition_list_items_req_id`=L.`stc_cust_super_requisition_list_id`
 			INNER JOIN `stc_cust_pro_supervisor` 
 			ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id`
 			INNER JOIN `stc_cust_project` 
@@ -1903,12 +1921,12 @@ class ragnarRequisitionPertView extends tesseract{
 			INNER JOIN `stc_agents` 
 			ON `stc_agents_id`=`stc_cust_pro_supervisor_created_by`
 			INNER JOIN `stc_requisition_combiner_req`
-			ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list_id`
+			ON `stc_requisition_combiner_req_requisition_id`=L.`stc_cust_super_requisition_list_id`
 			INNER JOIN `stc_requisition_combiner`
 			ON `stc_requisition_combiner_req_comb_id`=`stc_requisition_combiner_id`
 			WHERE `stc_cust_super_requisition_list_status`!='1'
 			AND `stc_requisition_combiner_id`='".mysqli_real_escape_string($this->stc_dbs, $url_param)."'
-			ORDER BY `stc_cust_super_requisition_list_id` DESC
+			ORDER BY L.`stc_cust_super_requisition_list_id` DESC
 		");
 		if(mysqli_num_rows($requissuperqry)!=0){
 			foreach($requissuperqry as $requisrow){
@@ -1923,36 +1941,68 @@ class ragnarRequisitionPertView extends tesseract{
 				}
 				$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
 				$chursql=mysqli_query($this->stc_dbs, "
-					SELECT `stc_cust_super_requisition_items_priority` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$requisrow['stc_cust_super_requisition_list_id']."' AND `stc_cust_super_requisition_items_priority`=2
+					SELECT `stc_cust_super_requisition_items_priority` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$requisrow['list_id']."' AND `stc_cust_super_requisition_items_priority`=2
 				");
 				if(mysqli_num_rows($chursql)==0){
 					$badgeurgent="";
 				}
+				$status='';
+				if($requisrow["stc_cust_super_requisition_list_items_status"]==1){
+					$status='By GST';
+				}else{
+					$status='By Normal';
+				}
+				$getdispatchedtransformers=mysqli_query($this->stc_dbs, "
+					SELECT 
+						SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+					FROM `stc_cust_super_requisition_list_items_rec` 
+					WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$requisrow['list_item_id']."'
+				");
+				$dispatchedgqty=0;
+				foreach($getdispatchedtransformers as $decqtyrow){
+					$dispatchedgqty+=$decqtyrow['dispatched_qty'];
+				}
+
+				$lokigetappritemqry=mysqli_query($this->stc_dbs, "
+					SELECT 
+						`stc_product_name`,
+						SUM(`stc_cust_super_requisition_list_purchaser_qty`) as stc_appr_qty 
+					FROM `stc_cust_super_requisition_list_purchaser` 
+					INNER JOIN `stc_product` 
+					ON `stc_product_id`=`stc_cust_super_requisition_list_purchaser_pd_id` 
+					WHERE `stc_cust_super_requisition_list_purchaser_list_item_id`='".$requisrow['list_id']."'
+				");
+				$apprpd_name='';
+				$apprpd_qty=0;
+				foreach($lokigetappritemqry as $lokigetappritemrow){
+					$apprpd_name=$lokigetappritemrow['stc_product_name'];
+					$apprpd_qty=$lokigetappritemrow['stc_appr_qty'];
+				}
+				$checkqty=$requisrow["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
+				$actiondeliver='<a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
+				<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
+				$actiondeliver=$requisrow["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver : "";
+				$priority=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
+				$bgcolor=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ffb0b0;'" : "";
+				
 				$lokiout.= '
 					<tr>
 						 <td class="text-center">
-						 	'.$requisrow['stc_cust_super_requisition_list_id'].'<br>
+						 	'.$requisrow['list_id'].'<br>
 						 	'.date('d-m-Y', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'
 						 </td>
 						 <td class="text-center">'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
 						 <td>'.$requisrow['stc_cust_project_title'].'</td>
 						 <td class="text-center">'.$requisrow['stc_agents_name'].'</td>
-						 <td class="text-center">'.$reqstatus.$badgeurgent.'</td>
-						 <td class="text-center">
-						 	<a 
-						 		class="stc_view_requist btn btn-primary" 
-						 		href="#" 
-						 		id="'.$requisrow["stc_cust_super_requisition_list_id"].'" 
-						 		style="font-size: 25px;color: black;"
-							><i class="fa fa-eye" aria-hidden="true"></i>
-						 	</a>
-						 	<a 
-						 		class="btn btn-success" 
-						 		href="stc-print-preview-directchallan.php?requi_id='.$requisrow["stc_cust_super_requisition_list_id"].'" 
-						 		style="font-size: 25px;color: black;"
-							><i class="fa fa-print" aria-hidden="true"></i>
-						 	</a>
-						 </td>
+						 <td>'.$requisrow['stc_cust_super_requisition_list_items_title'].'</td>
+						 <td class="text-center">'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
+						 <td class="text-right">'.number_format($requisrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+						 <td class="text-right">'.number_format($apprpd_qty, 2).'</td>
+						 <td align="right">'.number_format($dispatchedgqty, 2).'</td>
+						 <td align="right">'.number_format($dispatchedgqty, 2).'</td>
+						 <td>'.$status.'</td>
+						 <td class="text-center" '.$bgcolor.'>'.$priority.'</td>
+						 <td>'.$actiondeliver.'</td>
 					</tr>
 				';
 			}
