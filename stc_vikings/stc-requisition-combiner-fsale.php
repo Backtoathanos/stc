@@ -49,221 +49,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     <div class="tab-content">
                         <div class="tab-pane tabs-animation fade show active" id="tab-content-1" role="tabpanel">
                             <div class="row">
-                                <div class="col-md-12">
-                                    <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="description" align="center"
-                                        >Requisitions
-                                        </h5>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                              <div style="display: none;" class="col-xl-12 col-lg-12 col-md-12 col-sm-12 stc-req-add">
-                                <div class="card-border mb-3 card card-body border-success">
-                                  <div class="row">
-                                    <div class="col-12">
-                                      <h2 class="tm-block-title d-inline-block">Requisition Point</h2> 
-                                        <a 
-                                          id="stc_req_uppp" 
-                                          href="#"
-                                          style="font-size: 25px;border-radius: 100%;background: yellow;padding: 10px;color: black;position: relative;left: 20%;"
-                                        ><i class="fas fa-arrow-up"></i>
-                                        </a>
-                                    </div>
-                                  </div>
-                                  <form action="" class="stc-add-po-product-form">
-                                    <div class="row stc-agent-requistion-row">
-                                      <div class="col-xl-6 col-md-6 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success">
-                                          <h5
-                                            for="name"
-                                            >Order Number
-                                          </h5>
-                                          <input
-                                            id="order-req-nos"
-                                            name="stcmername"
-                                            type="text"
-                                            placeholder="Requisition Number"
-                                            class="form-control validate"
-                                            disabled
-                                          />
-                                          <input type="hidden" id="ag-challan-req">
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-6 col-md-6 col-sm-12">
-                                        <div class="card-border mb-3 card card-body border-success">
-                                          <h5
-                                            for=""
-                                            >Order Date
-                                          </h5>
-                                          <input
-                                            id="ag-req-date"
-                                            name="ag-req-date"
-                                            type="text"
-                                            class="form-control validate"
-                                            data-large-mode="true"
-                                            disabled
-                                          />
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-12 col-md-12 col-sm-12">
-                                        <div class="card-border mb-3 card card-body border-success">
-                                          <h5
-                                            for="name"
-                                            >Customer Name
-                                          </h5>
-                                          <input
-                                            id="cust_name_req"
-                                            name="cust_name_req"
-                                            type="text"
-                                            class="form-control validate"
-                                            data-large-mode="true"
-                                            disabled
-                                          />
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                        <div class="page-title-right">
-                                          <div class="card-border mb-3 card card-body border-success">
-                                            <h5>Customer Agent Id</h5>
-                                            <input
-                                              id="ag-req-info"
-                                              name="ag-req-info"
-                                              type="text"
-                                              class="form-control validate"
-                                              data-large-mode="true"
-                                            />
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                        <div class="page-title-right">
-                                          <div class="card-border mb-3 card card-body border-success">
-                                            <h5>Refrence</h5>
-                                            <input
-                                              id="ag-req-refrence"
-                                              name="ag-req-refrence"
-                                              type="text"
-                                              class="form-control validate"
-                                              data-large-mode="true"
-                                              disabled
-                                            />
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                        <div class="page-title-right">
-                                          <div class="card-border mb-3 card card-body border-success">
-                                            <h5>Site</h5>
-                                            <input
-                                              id="req-site-name"
-                                              name="req-site-name"
-                                              type="text"
-                                              class="form-control validate"
-                                              data-large-mode="true"
-                                              disabled
-                                            />
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                        <div class="page-title-right">
-                                          <div class="card-border mb-3 card card-body border-success">
-                                            <h5>Site Address</h5>
-                                            <textarea 
-                                              class="form-control"
-                                              id="site-req-address"
-                                              name="site-req-address"
-                                              rows="1" 
-                                              disabled
-                                            ></textarea>
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                        <div class="page-title-right">
-                                          <div class="card-border mb-3 card card-body border-success">
-                                            <h5>Way Bill No</h5>
-                                            <input
-                                              id="ag-req-way-bill-no"
-                                              name="ag-req-way-bill-no"
-                                              type="text"
-                                              class="form-control validate"
-                                              data-large-mode="true"
-                                              placeholder="Enter Way Boll No"
-                                              value="NA"
-                                            />
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                        <div class="page-title-right">
-                                          <div class="card-border mb-3 card card-body border-success">
-                                            <h5>LR No</h5>
-                                            <input
-                                              id="ag-req-lr-no"
-                                              name="ag-req-lr-no"
-                                              type="text"
-                                              class="form-control validate"
-                                              data-large-mode="true"
-                                              placeholder="Enter LR No"
-                                              value="NA"
-                                            />
-                                          </div>
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                          <div class="card-border mb-3 card card-body border-success">
-                                          <h5
-                                            for=""
-                                            >Notes
-                                          </h5>
-                                          <textarea
-                                            class="form-control validate"
-                                            rows="2"
-                                            id="ag-req-notes"
-                                            placeholder="Notes"
-                                          ></textarea>
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                        <div class="card-border mb-3 card card-body border-success">
-                                          <h5
-                                            for=""
-                                            >Terms & Conditions
-                                          </h5>
-                                          <textarea
-                                            class="form-control validate"
-                                            rows="2"
-                                            id="ag-req-tandc"
-                                            placeholder="Terms & Conditions"
-                                          ></textarea>
-                                          <input type="hidden" id="stc-req-proj-id">
-                                          <input type="hidden" id="stc-req-super-id">
-                                          <input type="hidden" id="stc-req-requis-id">
-                                        </div>
-                                      </div>
-
-                                      <!-- line item table -->
-                                      <div class="col-xl-12 col-md-12 col-sm-12 ag-requis-items" style="width: auto;overflow-x: auto; white-space: nowrap;">
-                                      </div>
-                                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                        <div class="card-border mb-3 card card-body border-success">
-                                          <button class="btn btn-primary form-control set-req-to-cleaned">Cleaned</button>
-                                        </div>
-                                      </div>
-                                      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
-                                        <div class="card-border mb-3 card card-body border-success">
-                                          <button class="btn btn-primary form-control save-ag-req-challan">Save Challan</button>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </form>
-                                </div>
-                              </div>
-                            </div>
-                            <div class="row">
                               <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 stc-req-view">
                                 <div class="tm-bg-primary-dark tm-block tm-block-h-auto" style="overflow-x: auto; white-space: nowrap;">
                                   <div class="row">
@@ -280,59 +65,13 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <table class="table table-hover table-bordered trow">
                                               <thead>
                                                 <tr>
-                                                  <th scope="col">From/<br>To</th>
-                                                  <th scope="col" width="20%">By Customer</th>
-                                                  <th scope="col" width="20%">By Requisition Number</th>
-                                                  <th scope="col" width="20%">By Agents</th>
-                                                  <th scope="col" width="20%">By Status</th>
+                                                  <th scope="col">Search</th>
                                                 </tr>
                                               </thead>
                                               <tbody>
                                                 <tr>
                                                   <td>
-                                                      <?php
-                                                        $date = date("d-m-Y");
-                                                        $newDate = date('Y-m-d', strtotime($date)); 
-                                                        $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
-                                                      ?>   
-                                                    <p><input type="date" value="<?php echo $effectiveDate;?>" class="form-control reqbegdate"></p>
-                                                    <p><input type="date" value="<?php echo $newDate;?>" class="form-control reqenddate"></p>
-                                                    <p><a href="#" id="purchaseproddatefilt">
-                                                      <i style="font-size: 20px;background: #0c0c1b;border-radius: 50%;padding: 5px;margin: 0;color: #77ffd3;float: right;" class="fa fa-arrow-down"></i>
-                                                    </a></p>
-                                                  </td>
-                                                  <td>
-                                                    <select
-                                                      id="stc-requisition-customer-in"
-                                                      class="custom-select form-control stc-select-customer"
-                                                      name="stcvendor"
-                                                    >
-                                                    </select>
-                                                  </td>
-                                                  <td>
-                                                    <input 
-                                                      type="number" 
-                                                      id="stc-requisition-number-finder" 
-                                                      class="form-control"
-                                                      placeholder="Requisition Number" 
-                                                    >
-                                                  </td>
-                                                  <td>
-                                                    <input 
-                                                      type="text" 
-                                                      id="stc-requisition-agents-finder" 
-                                                      class="form-control"
-                                                      placeholder="By Agent" 
-                                                    >
-                                                  </td>
-                                                  <td>
-                                                    <select 
-                                                      class="custom-select form-control stc-requisition-status-in"
-                                                      >
-                                                      <option value="NA">Select Status</option>
-                                                      <option value="1">PROCESS</option>
-                                                      <option value="2">ACCEPTED</option>
-                                                    </select>
+                                                    <input type="text" class="form-control" id="searchInput" placeholder="Search here..">
                                                   </td>
                                                 </tr>
                                               </tbody>
@@ -429,6 +168,13 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     </script>
     <script>      
       $(document).ready(function(){
+        $("#searchInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $(".stc-view-ag-requisition-form table tbody tr").filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+        });
+
         // call customer for sale
         stc_call_customer();
         function stc_call_customer(){
