@@ -702,24 +702,30 @@ class ragnarRequisitionView extends tesseract{
 				$ivar.= '
 					<tr>
 						<td class="text-center">'.$requisrow['stc_customer_name'].'</td>
-						<td class="text-center">
-							'.$requisrow['stc_requisition_combiner_id'].'<br>
-							'.date('d-m-Y', strtotime($requisrow['stc_requisition_combiner_date'])).'
-						</td>
-						<td>'.$requisrow['stc_requisition_combiner_refrence'].'</td>
-						<td class="text-center">'.$requisrow['stc_agents_name'].'</td>
-						<td class="text-center">'.$reqcomstatus.$badgeurgent.'</td>
-						<td class="text-center">
-							<a href="#" class="stc-call-for-select-merchant-req" title="Add product and merchant." id="'.$requisrow["stc_requisition_combiner_id"].'" style="font-size: 25px;color: black;">
-								<i class="fa fa-ship" aria-hidden="true"></i>
+						<td class="text-center">							
+							<a href="#" class="stc-call-for-select-merchant-req" title="Add product and merchant." id="'.$requisrow["stc_requisition_combiner_id"].'" style="color: black;">
+								'.$requisrow['stc_requisition_combiner_id'].'<br>
+								'.date('d-m-Y', strtotime($requisrow['stc_requisition_combiner_date'])).'
 							</a>
-							<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="Process requisitions." style="font-size: 25px;color: black;">
+						</td>
+						<td>						
+							<a target="_blank" href="stc-requisition-combiner-fsale.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="Process requisitions." style="font-size: 15px;color: black;">
+								'.$requisrow['stc_requisition_combiner_refrence'].'	
 								<i class="fa fa-pen-square" aria-hidden="true"></i>
 							</a>
+						</td>
+						<td class="text-center">
+							'.$requisrow['stc_agents_name'].'
+						</td>
+						<td class="text-center">'.$reqcomstatus.$badgeurgent.'</td>
+						<td class="text-center">
 							<a href="stc-requisition-combiner-fshow.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="P.M Requisition" style="font-size: 25px;color: black;">
 								<i class="fa fa-print" aria-hidden="true"></i>
 							</a>
 							<a href="stc-requisition-combiner-dcprintpreview.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="DC Receiving Requisition" style="font-size: 25px;color: black;">
+								<i class="fa fa-print" aria-hidden="true"></i>
+							</a>
+							<a href="stc-print-preview-directchallan.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="Delivery Challan" style="font-size: 25px;color: black;">
 								<i class="fa fa-print" aria-hidden="true"></i>
 							</a>
 						</td>

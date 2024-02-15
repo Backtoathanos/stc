@@ -16,17 +16,19 @@ if(isset($_GET['requi_id'])){
 
     include "../MCU/db.php";
     $checkpurchaseorder=mysqli_query($con, "
-        SELECT
-            `stc_cust_super_requisition_list_id`,
-            `stc_cust_super_requisition_list_date`,
-            `stc_cust_project_title`
-        FROM `stc_cust_super_requisition_list`
-        INNER JOIN `stc_cust_project`
-        ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
-        WHERE `stc_cust_super_requisition_list_id`='".$_GET['requi_id']."'
+      SELECT
+          `stc_requisition_combiner_id`,
+          `stc_requisition_combiner_date`,
+          `stc_requisition_combiner_refrence`
+      FROM `stc_requisition_combiner`
+      INNER JOIN `stc_requisition_combiner_req`
+      ON `stc_requisition_combiner_req_comb_id`=`stc_requisition_combiner_id`
+      INNER JOIN `stc_cust_super_requisition_list`
+      ON `stc_cust_super_requisition_list_id`=`stc_requisition_combiner_req_requisition_id`
+      WHERE `stc_requisition_combiner_id`='".$_GET['requi_id']."'
     ");
     $get_stc_purchase_product=mysqli_fetch_assoc($checkpurchaseorder);
-    $get_purchase_product_date=$get_stc_purchase_product['stc_cust_super_requisition_list_date'];
+    $get_purchase_product_date=$get_stc_purchase_product['stc_requisition_combiner_date'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -244,7 +246,7 @@ if(isset($_GET['requi_id'])){
           <div>
             <h4 align="left">P.M No : STC/DC/<?php echo $str; ?></h4>
             <h4 align="left">P.M Date : <?php echo date('d-m-Y',strtotime($get_purchase_product_date)); ?></h4>
-            <h4 align="left">Site Name : <?php echo $get_stc_purchase_product['stc_cust_project_title']; ?></h4>
+            <h4 align="left">Site Name : <?php echo $get_stc_purchase_product['stc_requisition_combiner_refrence']; ?></h4>
           </div>
         </div>
         <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
@@ -275,20 +277,32 @@ if(isset($_GET['requi_id'])){
                         $totalgst=0;
                         $mtype='';
                         $currentrequisition=mysqli_query($con, "
-                          SELECT 
+                          SELECT DISTINCT
                               `stc_cust_super_requisition_list_id`,
                               `stc_cust_super_requisition_list_items_title`,
                               `stc_cust_super_requisition_list_items_unit`,
-                              `stc_cust_super_requisition_list_items_rec_recqty`,
                               `stc_cust_super_requisition_items_priority`
                             FROM `stc_cust_super_requisition_list_items`
-                            INNER JOIN `stc_cust_super_requisition_list_items_rec`
-                            ON `stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_rec_list_item_id`
-                            WHERE `stc_cust_super_requisition_list_items_req_id`='".$_GET['requi_id']."'
+                            INNER JOIN `stc_requisition_combiner_req`
+                            ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list_items_req_id`
+                            WHERE `stc_requisition_combiner_req_comb_id`='".$_GET['requi_id']."'
                         ");
                         foreach($currentrequisition as $row){
                             $sl++;
                             $priority=$row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "";
+
+                            $dispatchqty=0;
+                            $recqry=mysqli_query($con, "
+                              SELECT `stc_cust_super_requisition_list_items_rec_recqty`
+                              FROM `stc_cust_super_requisition_list_items_rec`
+                              WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$row['stc_cust_super_requisition_list_id']."'
+                              AND `stc_cust_super_requisition_list_items_rec_recqty`!=0
+                            ");
+                            if(mysqli_num_rows($recqry)>0){
+                              $response_rec=mysqli_fetch_assoc($recqry);
+                              $dispatchqty=$response_rec['stc_cust_super_requisition_list_items_rec_recqty'];
+                            }
+                            if($dispatchqty>0){
                             ?>
                             <tr>
                               <td class="no"><?php echo $sl;?></td>
@@ -298,12 +312,12 @@ if(isset($_GET['requi_id'])){
                                 </h6>
                               </td>
                               <td class="unit"><?php echo $row['stc_cust_super_requisition_list_items_unit'];?></td>
-                              <td class="qty"><?php echo number_format($row['stc_cust_super_requisition_list_items_rec_recqty'], 2);?></td>
+                              <td class="qty"><?php echo number_format($dispatchqty, 2);?></td>
                               <td class="text-center"></td>
                               <td class="text-center"></td>
                             </tr>
                             <?php
-                              
+                            }
                         }
                     ?>
                   </table>
