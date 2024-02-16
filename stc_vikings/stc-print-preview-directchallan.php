@@ -223,6 +223,9 @@ if(isset($_GET['requi_id'])){
 
   <body>
     <div class="text-right hidden-print">
+        <input type="date" class="btn begdate" value="<?php echo date('Y-m-d'); ?>">
+        <input type="date" class="btn enddate" value="<?php echo date('Y-m-d'); ?>">
+      <a class="btn btn-info filterbydate"><i class="fas fa-print"></i> Update</a>
       <button id="printInvoice" class="btn btn-info"><i class="fas fa-print"></i> Print</button>
       <!-- <button class="btn btn-info"><i class="fas fa-file-pdf-o"></i> Export as PDF</button> -->
     </div>
@@ -276,6 +279,14 @@ if(isset($_GET['requi_id'])){
                         $total=0;
                         $totalgst=0;
                         $mtype='';
+                        $datefilter='';
+                        if(isset($_GET['begdate']) && isset($_GET['enddate'])){
+                          $begdate=date('Y-m-d', strtotime($_GET['begdate']));
+                          $enddate=date('Y-m-d', strtotime($_GET['enddate']));
+                          $datefilter="
+                            AND DATE(`stc_cust_super_requisition_list_items_rec_date`) BETWEEN '".$begdate."' AND '".$enddate."'
+                          ";
+                        }
                         $currentrequisition=mysqli_query($con, "
                           SELECT DISTINCT
                               `stc_cust_super_requisition_list_id`,
@@ -296,6 +307,7 @@ if(isset($_GET['requi_id'])){
                               FROM `stc_cust_super_requisition_list_items_rec`
                               WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$row['stc_cust_super_requisition_list_id']."'
                               AND `stc_cust_super_requisition_list_items_rec_recqty`!=0
+                              ".$datefilter."
                             ");
                             if(mysqli_num_rows($recqry)>0){
                               $response_rec=mysqli_fetch_assoc($recqry);
@@ -336,6 +348,13 @@ if(isset($_GET['requi_id'])){
                 window.print();
                 return true;
             }
+        });
+
+        $('.filterbydate').on('click', function(){
+          var begdate=$('.begdate').val();
+          var enddate=$('.enddate').val();
+          var req_id="<?php echo $_GET['requi_id'];?>";
+          window.location.href="stc-print-preview-directchallan.php?requi_id=" + req_id + "&begdate=" + begdate + "&enddate=" + enddate;
         });
       });
     </script>
