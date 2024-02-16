@@ -288,21 +288,21 @@ if(isset($_GET['requi_id'])){
                             WHERE `stc_requisition_combiner_req_comb_id`='".$_GET['requi_id']."'
                         ");
                         foreach($currentrequisition as $row){
-                            $sl++;
                             $priority=$row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "";
 
                             $dispatchqty=0;
                             $recqry=mysqli_query($con, "
-                              SELECT `stc_cust_super_requisition_list_items_rec_recqty`
+                              SELECT sum(`stc_cust_super_requisition_list_items_rec_recqty`) as qty
                               FROM `stc_cust_super_requisition_list_items_rec`
                               WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$row['stc_cust_super_requisition_list_id']."'
                               AND `stc_cust_super_requisition_list_items_rec_recqty`!=0
                             ");
                             if(mysqli_num_rows($recqry)>0){
                               $response_rec=mysqli_fetch_assoc($recqry);
-                              $dispatchqty=$response_rec['stc_cust_super_requisition_list_items_rec_recqty'];
+                              $dispatchqty=$response_rec['qty'];
                             }
                             if($dispatchqty>0){
+                              $sl++;
                             ?>
                             <tr>
                               <td class="no"><?php echo $sl;?></td>
