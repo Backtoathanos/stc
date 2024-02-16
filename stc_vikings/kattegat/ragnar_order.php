@@ -846,7 +846,6 @@ class ragnarRequisitionView extends tesseract{
 
 		if(mysqli_num_rows($ivarfilterquery)!=0){
 			foreach($ivarfilterquery as $requisrow){
-				$loopcount++;
 				$reqcomstatus='';
 				if($requisrow['stc_requisition_combiner_status']==1){$reqcomstatus="PROCESS";}else{$reqcomstatus="ACCEPTED";}
 				$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
@@ -863,32 +862,35 @@ class ragnarRequisitionView extends tesseract{
 				$ivar.= '
 					<tr>
 						<td class="text-center">'.$requisrow['stc_customer_name'].'</td>
-						<td class="text-center">
-							'.$requisrow['stc_requisition_combiner_id'].'<br>
-							'.date('d-m-Y', strtotime($requisrow['stc_requisition_combiner_date'])).'
-						</td>
-						<td>'.$requisrow['stc_requisition_combiner_refrence'].'</td>
-						<td class="text-center">'.$requisrow['stc_agents_name'].'</td>
-						<td class="text-center">'.$reqcomstatus.$badgeurgent.'</td>
-						<td class="text-center">
-							<a href="#" class="stc-call-for-select-merchant-req" title="Add product and merchant." id="'.$requisrow["stc_requisition_combiner_id"].'" style="font-size: 25px;color: black;">
-								<i class="fa fa-ship" aria-hidden="true"></i>
+						<td class="text-center">							
+							<a href="#" class="stc-call-for-select-merchant-req" title="Add product and merchant." id="'.$requisrow["stc_requisition_combiner_id"].'" style="color: black;">
+								'.$requisrow['stc_requisition_combiner_id'].'<br>
+								'.date('d-m-Y', strtotime($requisrow['stc_requisition_combiner_date'])).'
 							</a>
-							<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'"  title="Process requisitions." style="font-size: 25px;color: black;">
+						</td>
+						<td>						
+							<a target="_blank" href="stc-requisition-combiner-fsale.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="Process requisitions." style="font-size: 15px;color: black;">
+								'.$requisrow['stc_requisition_combiner_refrence'].'	
 								<i class="fa fa-pen-square" aria-hidden="true"></i>
 							</a>
+						</td>
+						<td class="text-center">
+							'.$requisrow['stc_agents_name'].'
+						</td>
+						<td class="text-center">'.$reqcomstatus.$badgeurgent.'</td>
+						<td class="text-center">
 							<a href="stc-requisition-combiner-fshow.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="P.M Requisition" style="font-size: 25px;color: black;">
 								<i class="fa fa-print" aria-hidden="true"></i>
 							</a>
 							<a href="stc-requisition-combiner-dcprintpreview.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="DC Receiving Requisition" style="font-size: 25px;color: black;">
 								<i class="fa fa-print" aria-hidden="true"></i>
 							</a>
+							<a href="stc-print-preview-directchallan.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="Delivery Challan" style="font-size: 25px;color: black;">
+								<i class="fa fa-print" aria-hidden="true"></i>
+							</a>
 						</td>
 					</tr>
 				';
-				if($loopcount==20){
-					break;
-				}
 			}
 		}else{
     	        $ivar.= '
@@ -902,19 +904,19 @@ class ragnarRequisitionView extends tesseract{
 		$ivar.= '
 			<tr>
 				<td>
-					'.$bjornebegval.' to '.$bjorneendval.'
+					0 to 15
 					<button type="button" class="btn btn-primary begbuttoninvsearch" style="float:right;">
 						<i class="fas fa-arrow-left"></i>
 					</button>
 					<input type="hidden" class="begvalueinput" value="0">
-					<input type="hidden" class="begvalueinputsearch" value="'.$bjornebegval.'">
+					<input type="hidden" class="begvalueinputsearch" value="0">
 				</td>
 				<td colspan="9">
 					<button type="button" class="btn btn-primary endbuttoninvsearch">
 						<i class="fas fa-arrow-right"></i>
 					</button>
 					<input type="hidden" class="endvalueinput" value="20">
-					<input type="hidden" class="endvalueinputsearch" value="'.$bjorneendval.'">
+					<input type="hidden" class="endvalueinputsearch" value="20">
 				</td>
 			</tr>
 		';
