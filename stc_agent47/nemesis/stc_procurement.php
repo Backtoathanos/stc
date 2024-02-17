@@ -422,10 +422,6 @@ if(isset($_POST['go_for_req_sess'])){
 	}else{
 		echo "Invalid Quantity.";
 	}
-// }
-
-// add to requistion combiner cart
-// if(isset($_POST['requisition_combined'])){
 	if(isset($_SESSION["stc_supervisor_req_final_cart_req_sess"])) {  
 		$is_available = 0;  
 		foreach($_SESSION["stc_supervisor_req_final_cart_req_sess"] as $keys => $values) {  
@@ -489,6 +485,8 @@ if(isset($_POST['place_req_sess_act'])){
 	$outobjrequipl=$objrequipl->stc_requisitionto_cart($cust_order_refr);
 	if($outobjrequipl=="no"){
 		$out="Please recheck your requisition & try again.";
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$out="Please check ";
 	}elseif($outobjrequipl=="yes"){
 		$out="Thankyou for your requisition #TeamSTC will start working on it soon.";
 		unset($_SESSION["stc_supervisor_req_final_cart_req_sess"]);
