@@ -1254,7 +1254,7 @@ if(empty(@$_SESSION['stc_trading_user_id'])){
           $('.stc-purchase-payment-for').val(purchase_id);
           $('.stc-purchase-payment-hidden-value').val(purchase_value);
           $('#stc-purchase-payment-hidden-value').val(purchase_value);
-          $('.stc-purchase-payment-model').modal('show');
+          //$('.stc-purchase-payment-model').modal('show');
         });
 
         // set payment
@@ -1280,7 +1280,7 @@ if(empty(@$_SESSION['stc_trading_user_id'])){
               var response=response_payment.trim();
               if(response=="Payment Done!!!"){
                 alert(response_payment);
-                $('.stc-purchase-payment-model').modal('hide');
+                // $('.stc-purchase-payment-model').modal('hide');
               }else{
                 alert(response_payment);
               }
@@ -1352,7 +1352,7 @@ if(empty(@$_SESSION['stc_trading_user_id'])){
       </div>
       <div class="modal-footer">
         <input type="hidden" class="stc-hidden-invoice-id">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
       </div>
     </div>
   </div>

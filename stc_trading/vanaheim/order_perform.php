@@ -324,7 +324,7 @@ class aetherPurchase extends tesseract{
        						<a class="stc_print_purchase_items" id="'.$row["stc_trading_purchase_id"].'" href="#" style="font-size: 25px;color: black;">
        							<i class="fa fa-print" aria-hidden="true"></i>
        						</a> <br>
-       						<a class="stc_print_payment" id="'.$row["stc_trading_purchase_id"].'" pay-val="'.$total.'" href="#" style="font-size: 25px;color: black;">
+       						<a class="stc_print_payment" id="'.$row["stc_trading_purchase_id"].'" data-bs-toggle="modal" data-bs-target=".stc-purchase-payment-model" pay-val="'.$total.'" href="#" style="font-size: 25px;color: black;">
        							Pay
        						</a> 
        					</td>
