@@ -21,7 +21,18 @@ class AuthController extends Controller
     public function auth_login_admin(Request $request){
         // dd($request->all());
         $remember = !empty($request->remember) ? true : false;
-        if(Auth::attempt(['email'=>$request->userid, 'password'=>$request->password], $remember)){
+        $credentials = [
+            'password' => $request->password,
+        ];
+
+        // Check if the input is an email or contact
+        if (filter_var($request->userid, FILTER_VALIDATE_EMAIL)) {
+            $credentials['email'] = $request->userid;
+        } else {
+            $credentials['contact'] = $request->userid;
+        }
+        
+        if (Auth::attempt($credentials, $remember)) {
             return redirect('dashboard');
             // return view('pages.dashboard');
         }else{
