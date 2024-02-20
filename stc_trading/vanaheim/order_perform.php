@@ -212,7 +212,7 @@ class aetherPurchase extends tesseract{
                  AND '".mysqli_real_escape_string($this->stc_dbs, $endDate)."'
             )
 			ORDER BY DATE(`stc_trading_purchase_date`) 
-			DESC LIMIT 0,20
+			DESC LIMIT
 		");
 		$odin='
 			<table class="table table-hover table-bordered ">
