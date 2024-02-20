@@ -1248,13 +1248,13 @@ if(empty(@$_SESSION['stc_trading_user_id'])){
 
         // toggle payment model
         $('body').delegate('.stc_print_payment', 'click', function(e){
-          // e.preventDefault();
+          e.preventDefault();
           var purchase_id = $(this).attr('id');
           var purchase_value = $(this).attr('pay-val');
           $('.stc-purchase-payment-for').val(purchase_id);
           $('.stc-purchase-payment-hidden-value').val(purchase_value);
           $('#stc-purchase-payment-hidden-value').val(purchase_value);
-          //$('.stc-purchase-payment-model').modal('show');
+          $('.stc-purchase-payment-model').modal('show');
         });
 
         // set payment
