@@ -594,7 +594,7 @@ class aetherPurchase extends tesseract{
 			$basic=$item_rate;
 			$gstamount = $basic-($basic*(100/(100+$item_gst)));
 			$saleprice=$basic - $gstamount;
-
+			
 			$odin_addqry=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_trading_purchase_items`(
 					`stc_trading_purchase_items_purchase_id`,
