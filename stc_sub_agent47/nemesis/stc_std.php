@@ -362,6 +362,7 @@ class transformers extends tesseract{
 				<th class="text-center">MATERIAL DESCRIPTION</th>
 				<th class="text-center">TARGET DATE</th>
 				<th class="text-center">PENDING REASON</th>
+				<th class="text-center">PROGRESS REPORT</th>
 			';
 			$head_hidden3='		
 				<th class="text-center">ACTION</th>
@@ -452,7 +453,8 @@ class transformers extends tesseract{
 				`stc_cust_pro_supervisor_fullname`,
 				`stc_status_down_list_failurerootcost`,
 				`stc_status_down_list_fremarks`,
-				`stc_status_down_list_ftarget_date`
+				`stc_status_down_list_ftarget_date`,
+				`stc_status_down_list_wipstatus`
 			FROM `stc_status_down_list` 
 			LEFT JOIN `stc_cust_project` 
 			ON `stc_cust_project_id`=`stc_status_down_list_location` 
@@ -667,6 +669,7 @@ class transformers extends tesseract{
 						<td>'.$row['stc_status_down_list_material_desc'].'</td>
 						<td>'.$tar_date.'</td>
 						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
+						<td>'.$row['stc_status_down_list_wipstatus'].'</td>
 					';
 					$hidden3='	
 						<td class="text-center">
