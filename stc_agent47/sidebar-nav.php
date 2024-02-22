@@ -34,77 +34,61 @@
             <ul class="vertical-nav-menu">
                 <li class="app-sidebar__heading">Dashboards</li>
                 <li>
-                    <a href="dashboard.php" class="mm-active">
+                    <a href="dashboard.php?page=home" class="home">
                         <i class="metismenu-icon pe-7s-home"></i>
                         Home
                     </a>
                 </li>
                 <li>
-                    <a href="stc-product.php" class="mm-active">
+                    <a href="stc-product.php?page=product" class="product">
                         <i class="metismenu-icon pe-7s-box2"></i>
                         Products
                     </a>
                 </li>
                 <li>
-                    <a href="#" class="mm-active">
-                        <i class="metismenu-icon pe-7s-diamond"></i>
-                        Project
-                        <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                    <a href="manage-project.php?page=projectmanagement" class="projectmanagement">
+                        <i class="metismenu-icon pe-7s-news-paper"></i>
+                        Project Management
                     </a>
-                    <ul>
-                        <li>
-                            <a href="manage-project.php">
-                                <i class="metismenu-icon"></i>
-                                Project Management
-                            </a>
-                        </li>
-                        <li>
-                            <a href="manage-user.php">
-                                <i class="metismenu-icon"></i>
-                                User Management
-                            </a>
-                        </li>
-                        <li>
-                            <a href="order-management.php">
-                                <i class="metismenu-icon"></i>
-                                Order Management
-                            </a>
-                        </li>
-                        <li>
-                            <a href="stc-std.php">
-                                <i class="metismenu-icon"></i>
-                                Status Down List
-                            </a>
-                        </li>
-                        <?php 
-                            if($_SESSION['stc_agent_role']==2){
-                                echo '
-
-                        <li>
-                            <a href="procurement-management.php">
-                                <i class="metismenu-icon"></i>
-                                Procurement
-                            </a>
-                        </li>
-                                ';
-                            }
-                        ?>
-                    </ul>
                 </li>
                 <li>
-                    <a href="safety.php" class="mm-active">
+                    <a href="manage-user.php?page=usermanagement" class="usermanagement">
+                        <i class="metismenu-icon pe-7s-user"></i>
+                        User Management
+                    </a>
+                </li>
+                <li>
+                    <a href="order-management.php?page=ordermanagement" class="ordermanagement">
+                        <i class="metismenu-icon pe-7s-cart"></i>
+                        Order Management
+                    </a>
+                </li>
+                <li>
+                    <a href="stc-std.php?page=statusdownlist" class="statusdownlist">
+                        <i class="metismenu-icon pe-7s-switch"></i>
+                        Status Down List
+                    </a>
+                </li>
+                <li>
+                    <a href="safety.php?page=safety" class="safety">
                         <i class="metismenu-icon pe-7s-id"></i>
                         Safety
                     </a>
                 </li>
                 <li>
-                    <a href="procurement-tracker.php" class="mm-active">
+                    <a href="procurement-tracker.php?page=procurementtracker" class="procurementtracker">
                         <i class="metismenu-icon pe-7s-pin"></i>
                         Procurement Tracker
                     </a>
                 </li>
                 <li>
-                    <a href="stc-supervisor-balance-reports.php" class="mm-active">
+                    <a href="item-tracker.php?page=itemtracker" class="itemtracker">
+                        <i class="metismenu-icon pe-7s-map-marker"></i>
+                        Item Tracker
+                    </a>
+                </li>
+                <li>
+                    <a href="stc-supervisor-balance-reports.php?page=reports" class="reports">
                         <i class="metismenu-icon pe-7s-note2"></i>
                         Reports
                     </a>
