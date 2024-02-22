@@ -556,6 +556,7 @@ class transformers extends tesseract{
 							</select>
 							'.$viewmrd.'
 							<a href="#" class="stc-add-to-pending btn btn-danger" style="font-size:10px;margin-top:4px;" title="Add Pending Reason" id="'.$row['stc_status_down_list_id'].'">Add Pending Reason</a>
+							<a href="#" class="stc-add-to-progressreport btn btn-primary" style="font-size:10px;margin-top:4px;" title="Add progress report" id="'.$row['stc_status_down_list_id'].'">Add Progress Report</a>
 						';
 					}else{
 						$actionsec='#';
@@ -786,9 +787,12 @@ class transformers extends tesseract{
 	// save job pending
 	public function stc_sdl_jobpending_save($sld_id, $jobpendingdetails){
 		$optimusprime='';
-		$date=date("d/m/Y H:i:s");
-		$time = date('h:i A', strtotime($date));
-		$newDateTime=date("d/m/Y").' '.$time;
+		
+		$currentDateTime = date("Y-m-d H:i:s"); // Get current date and time in the default format
+		// Extract date and time separately
+		$date = date("d/m/Y", strtotime($currentDateTime)); // Convert to the desired date format
+		$time = date('h:i A', strtotime($currentDateTime)); // Convert to the desired time format
+		$newDateTime = $date . ' ' . $time; // Combine date and time
 		$optimusprime_qry=mysqli_query($this->stc_dbs, "
 			SELECT 
 				`stc_status_down_list_jobpending_details` 
@@ -801,7 +805,8 @@ class transformers extends tesseract{
 		foreach($optimusprime_qry as $optimusprime_row){
 			$pendingcall=$optimusprime_row['stc_status_down_list_jobpending_details'];
 		}
-		$pending=$pendingcall.', '.$newDateTime.' - '.$jobpendingdetails;
+		$pendingcall = $pendingcall!='' ? $pendingcall.=", " : $pendingcall;
+		$progressreport=$pendingcall.$newDateTime.' - '.$jobpendingdetails;
 		$optimusprime_updateqry=mysqli_query($this->stc_dbs, "
 			UPDATE 
 				`stc_status_down_list` 
@@ -816,6 +821,46 @@ class transformers extends tesseract{
 			$optimusprime='Hmmm!!! Somethig went wrong on updating pending reason.';
 		}
 		return $optimusprime;		
+	}
+	
+	// save job pending
+	public function stc_sdl_progressreport_save($sld_id, $progressreport){
+		$optimusprime='';
+		$currentDateTime = date("Y-m-d H:i:s"); // Get current date and time in the default format
+
+		// Extract date and time separately
+		$date = date("d/m/Y", strtotime($currentDateTime)); // Convert to the desired date format
+		$time = date('h:i A', strtotime($currentDateTime)); // Convert to the desired time format
+
+		$newDateTime = $date . ' ' . $time; // Combine date and time
+		$optimusprime_qry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_status_down_list_wipstatus` 
+			FROM 
+				`stc_status_down_list`
+			WHERE 
+				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
+		");
+		$progressreportcall='';
+		foreach($optimusprime_qry as $optimusprime_row){
+			$progressreportcall=$optimusprime_row['stc_status_down_list_wipstatus'];
+		}
+		$progressreportcall = $progressreportcall!='' ? $progressreportcall.=", " : $progressreportcall;
+		$progressreport=$progressreportcall.$newDateTime.' - '.$progressreport;
+		$optimusprime_updateqry=mysqli_query($this->stc_dbs, "
+			UPDATE 
+				`stc_status_down_list` 
+			SET 
+				`stc_status_down_list_wipstatus`='".mysqli_real_escape_string($this->stc_dbs, $progressreport)."' 
+			WHERE 
+				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
+		");
+		if($optimusprime_updateqry){
+			$optimusprime='Progress Report Saved!!!';
+		}else{
+			$optimusprime='Hmmm!!! Somethig went wrong on updating progress report.';
+		}
+		return $optimusprime;
 	}
 
 	// update for complete or pending via site incharge
@@ -1268,6 +1313,15 @@ if(isset($_POST['stc_jobpending_save_hit'])){
 	$jobpendingdetails=$_POST['jobpendingdetails'];
 	$sdl_status=new transformers();
 	$out_sdl_status=$sdl_status->stc_sdl_jobpending_save($sld_id, $jobpendingdetails);
+	echo $out_sdl_status;
+}
+
+// save progress report
+if(isset($_POST['stc_progressreport_save_hit'])){
+	$sld_id=$_POST['sdl_id'];
+	$progressreport=$_POST['progressreport'];
+	$sdl_status=new transformers();
+	$out_sdl_status=$sdl_status->stc_sdl_progressreport_save($sld_id, $progressreport);
 	echo $out_sdl_status;
 }
 

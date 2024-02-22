@@ -715,24 +715,62 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 $('.bd-std-jobpendingdetails-modal-lg').modal('show');
             });
 
+            var progresssdl_id='';
+            // call modal pending
+            $('body').delegate('.stc-add-to-progressreport', 'click', function(e){
+                e.preventDefault();
+                progresssdl_id=$(this).attr("id");
+                $('.bd-std-jobprogresssreport-modal-lg').modal('show');
+            });
+
             // save pending modal show
             $('body').delegate('.stc-cust-ag-jobpendingdetails-save', 'click', function(e){
                 e.preventDefault();
                 var jobpendingdetails=$(".stc-cust-ag-jobpendingdetails").val();
-                $.ajax({
-                    url         : "nemesis/stc_std.php",
-                    method      : "POST",
-                    data        : {
-                        stc_jobpending_save_hit:1,
-                        jobpendingdetails:jobpendingdetails,
-                        sdl_id:pendsdl_id
-                    },
-                    success     : function(response_sdl){
-                        alert(response_sdl);
-                        $('.bd-std-jobpendingdetails-modal-lg').modal('hide');
-                        $(".stc-cust-ag-jobpendingdetails").val('');
-                    }
-                });
+                if(jobpendingdetails!=""){
+                    $.ajax({
+                        url         : "nemesis/stc_std.php",
+                        method      : "POST",
+                        data        : {
+                            stc_jobpending_save_hit:1,
+                            jobpendingdetails:jobpendingdetails,
+                            sdl_id:pendsdl_id
+                        },
+                        success     : function(response_sdl){
+                            alert(response_sdl);
+                            $('.bd-std-jobpendingdetails-modal-lg').modal('hide');
+                            $(".stc-cust-ag-jobpendingdetails").val('');
+                        }
+                    });
+                }else{
+                    $('.pending-alert').remove();
+                    $(".stc-cust-ag-jobpendingdetails").after('<p class="pending-alert" style="color:red;">Enter pending details.</p>');
+                }
+            });
+
+            // save progress modal show
+            $('body').delegate('.stc-cust-ag-jobprogressreport-save', 'click', function(e){
+                e.preventDefault();
+                var progressreport=$(".stc-cust-ag-jobprogressreport").val();
+                if(progressreport!=""){
+                    $.ajax({
+                        url         : "nemesis/stc_std.php",
+                        method      : "POST",
+                        data        : {
+                            stc_progressreport_save_hit:1,
+                            progressreport:progressreport,
+                            sdl_id:progresssdl_id
+                        },
+                        success     : function(response_sdl){
+                            alert(response_sdl);
+                            $('.bd-std-jobprogresssreport-modal-lg').modal('hide');
+                            $(".stc-cust-ag-jobprogressreport").val('');
+                        }
+                    });
+                }else{
+                    $('.progress-alert').remove();
+                    $(".stc-cust-ag-jobprogressreport").after('<p class="progress-alert" style="color:red;">Enter progress report.</p>');
+                }
             });
 
             // show hide tools requisition
@@ -953,6 +991,42 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <button class="form-control btn btn-success stc-cust-ag-jobpendingdetails-save">Save</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-std-jobprogresssreport-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Progress Report</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title" align="center">Progress Report</h5>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <textarea class="form-control stc-cust-ag-jobprogressreport" placeholder="Enter Progress Report"></textarea>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <button class="form-control btn btn-success stc-cust-ag-jobprogressreport-save">Save</button>
                                     </div>
                                 </div>
                             </div>
