@@ -2121,6 +2121,7 @@ class pirates_supervisor extends tesseract{
 						<th class="text-center DOWNPERIOD">DOWN PERIOD</th>
 						<th class="text-center WORKSTATUS">WORK STATUS</th>
 						<th class="text-center PENDINGREASON">PENDING REASON</th>
+						<th class="text-center PROGRESSREPORT">PROGRESS REPORT</th>
 						<th class="text-center JOBDONEDETAILS">JOB DONE DETAILS</th>
 						<th class="text-center REMARKS">REMARKS</th>
 						<th class="text-center CREATEDDETAILS">CREATOR NAME & CONTACT NUMBER</th>
@@ -2194,7 +2195,8 @@ class pirates_supervisor extends tesseract{
 				`stc_status_down_list_updated_by`,
 				`stc_status_down_list_updated_date`,
 				`stc_status_down_list_status_updated_by`,
-				`stc_status_down_list_status_updated_on`
+				`stc_status_down_list_status_updated_on`,
+				`stc_status_down_list_wipstatus`
 			FROM `stc_status_down_list` 
 			LEFT JOIN `stc_cust_project` 
 			ON `stc_cust_project_id`=`stc_status_down_list_location` 
@@ -2416,6 +2418,7 @@ class pirates_supervisor extends tesseract{
 						<td class="DOWNPERIOD">'.$dperiod.' Days</td>
 						<td class="WORKSTATUS text-center" '.$statusbgcolor.'>'.$status.'</td>
 						<td class="PENDINGREASON">'.$row['stc_status_down_list_jobpending_details'].'</td>
+						<td class="PROGRESSREPORT">'.$row['stc_status_down_list_wipstatus'].'</td>
 						<td class="JOBDONEDETAILS">'.$row['stc_status_down_list_jobdone_details'].'<br>'.$updatejobdetails.'
 						<td class="REMARKS">'.$row['stc_status_down_list_remarks'].'</td>
 						<td class="CREATEDDETAILS">'.$row['stc_status_down_list_creator_details'].'</td>

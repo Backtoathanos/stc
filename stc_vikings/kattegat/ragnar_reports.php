@@ -544,7 +544,8 @@ class ragnarReportsViewRequiReports extends tesseract{
             `stc_status_down_list_ftarget_date`,
             `stc_status_down_list_status`,
             `stc_status_down_list_failurerootcost`,
-            `stc_status_down_list_created_by`
+            `stc_status_down_list_created_by`,
+				`stc_status_down_list_wipstatus`
          FROM `stc_status_down_list` 
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
@@ -832,6 +833,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th style="width:1%" class="text-center">STATUS</th>
                      <th style="width:1%" class="text-center">DELAY</th>
                      <th style="width:1%" class="text-center">PENDING DETAILS</th>
+                     <th style="width:1%" class="text-center">PROGRESS REPORT</th>
                      <th style="width:3%" class="text-center">FRC REPORTS</th>
                      <th style="width:3%" class="text-center">JOB DONE DETAILS</th>
                      <th style="width:3%" class="text-center">ANY COMMENTS</th>
@@ -993,18 +995,20 @@ class ragnarReportsViewRequiReports extends tesseract{
             }
 
             $penddet_value = $row['stc_status_down_list_jobpending_details'];
-            $penddet = strlen($penddet_value)>25 ? substr($penddet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$penddet_value.'">Read more</a>' : $penddet_value;
+            $penddet = strlen($penddet_value)>25 ? substr($penddet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" label="Pending Details" data="'.$penddet_value.'">Read more</a>' : $penddet_value;
+            $progrdet_value = $row['stc_status_down_list_wipstatus'];
+            $progrdet = strlen($progrdet_value)>25 ? substr($progrdet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" label="Progress Report" data="'.$progrdet_value.'">Read more</a>' : $progrdet_value;
             $frcrdet_value = $row['stc_status_down_list_failurerootcost'];
-            $frcrdet = strlen($frcrdet_value)>25 ? substr($frcrdet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$frcrdet_value.'">Read more</a>' : $frcrdet_value;
+            $frcrdet = strlen($frcrdet_value)>25 ? substr($frcrdet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" label="Failure Root Cause" data="'.$frcrdet_value.'">Read more</a>' : $frcrdet_value;
             $ftargetdate=$row['stc_status_down_list_ftarget_date']=="" ? "" : date('d-m-Y H:i a', strtotime($row['stc_status_down_list_ftarget_date']));
             $anycomm_value = $row['stc_status_down_list_remarks'];
-            $anycomdet = strlen($anycomm_value)>25 ? substr($anycomm_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$anycomm_value.'">Read more</a>' : $anycomm_value;
+            $anycomdet = strlen($anycomm_value)>25 ? substr($anycomm_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" label="Any Comment" data="'.$anycomm_value.'">Read more</a>' : $anycomm_value;
             $reason_value = $row['stc_status_down_list_reason'];
-            $reasondet = strlen($reason_value)>25 ? substr($reason_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$reason_value.'">Read more</a>' : $reason_value;
+            $reasondet = strlen($reason_value)>25 ? substr($reason_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" label="Reason" data="'.$reason_value.'">Read more</a>' : $reason_value;
             $jobdonedet_value = $row['stc_status_down_list_jobdone_details'];
-            $jobdonedet = strlen($jobdonedet_value)>25 ? substr($jobdonedet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$jobdonedet_value.'">Read more</a>' : $jobdonedet_value;
+            $jobdonedet = strlen($jobdonedet_value)>25 ? substr($jobdonedet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" label="Job Done Details" data="'.$jobdonedet_value.'">Read more</a>' : $jobdonedet_value;
             $finalremarks_value = $row['stc_status_down_list_fremarks'];
-            $finalremarks = strlen($finalremarks_value)>25 ? substr($finalremarks_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" data="'.$finalremarks_value.'">Read more</a>' : $finalremarks_value;
+            $finalremarks = strlen($finalremarks_value)>25 ? substr($finalremarks_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" label="Remarks" data="'.$finalremarks_value.'">Read more</a>' : $finalremarks_value;
             $finalremarks_value = $row['stc_status_down_list_fremarks'];
             $ivar.='
                <tr>
@@ -1028,6 +1032,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td>
                      <span class="jobdonedet-view">'.$penddet.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$penddet_value.'</span>
+                  </td>
+                  <td>
+                     <span class="jobdonedet-view">'.$progrdet.'</span>
+                     <span class="jobdonedet-print" style="display:none;">'.$progrdet_value.'</span>
                   </td>
                   <td>
                      <span class="jobdonedet-view">'.$frcrdet.'</span>

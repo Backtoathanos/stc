@@ -1667,9 +1667,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             $('body').delegate('.show-jobdonedetails', 'click', function(e){
                 e.preventDefault();
                 var jobdonedet = $(this).attr("data");
+                var reportlabel=$(this).attr("label");
+                $('.title-barreport').html(reportlabel);
                 $('.jobdonedet_para').html(jobdonedet);
                 $('.show-jobdonedetailsmodal').modal('show');
-                $(this).remove();
             });
 
             // find std 
@@ -2580,7 +2581,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">Job Done Details</h4>
+        <h4 class="modal-title title-barreport">Job Done Details</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
