@@ -63,6 +63,19 @@
                         Order Management
                     </a>
                 </li>
+                <?php 
+                    if($_SESSION['stc_agent_role']==2){
+                        echo '
+                            <li>
+                                <a href="procurement-management.php?page=procurementmanagement" class="procurementmanagement">
+                                    <i class="metismenu-icon pe-7s-cart"></i>
+                                    Procurement
+                                </a>
+                            </li>
+                        ';
+                    }
+                ?>
+                
                 <li>
                     <a href="stc-std.php?page=statusdownlist" class="statusdownlist">
                         <i class="metismenu-icon pe-7s-switch"></i>
