@@ -1271,6 +1271,7 @@ class pirates_project extends tesseract{
 			SELECT
 			    `stc_item_tracker_id`,
 			    `stc_item_tracker_user_id`,
+			    `stc_cust_pro_supervisor_fullname`,
 			    `stc_item_tracker_toppe`,
 			    `stc_item_tracker_qty`,
 			    `stc_item_tracker_unit`,
@@ -1279,25 +1280,48 @@ class pirates_project extends tesseract{
 			    `stc_item_tracker_remarks`,
 			    `stc_item_tracker_createdby`,
 			    `stc_item_tracker_created_date`
-			FROM
-			    `stc_item_tracker`
+			FROM `stc_item_tracker`
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_item_tracker_user_id`
 		";
 		$blackpearl_result=mysqli_query($this->stc_dbs, $blackpearl_query);
 
 		if(mysqli_num_rows($blackpearl_result)>0){
 			foreach($blackpearl_result as $blackpearl_row){
+				$validity=$blackpearl_row['stc_item_tracker_validity']==1 ? $blackpearl_row['stc_item_tracker_validity'].' month' : $blackpearl_row['stc_item_tracker_validity']." months";
+				$validityMonths = $blackpearl_row['stc_item_tracker_validity'];
+				$issuedate = new DateTime($blackpearl_row['stc_item_tracker_issuedate']);
+				$nextissuedate = $issuedate->add(new DateInterval("P{$validityMonths}M"));
+				$nextissuedateFormatted = $nextissuedate->format('d-m-Y');
+
+				$loc_qry=mysqli_query($this->stc_dbs, "
+					SELECT DISTINCT `stc_cust_project_title`
+					FROM `stc_cust_pro_attend_supervise`
+					LEFT JOIN `stc_cust_project`
+					ON `stc_cust_pro_attend_supervise_pro_id`=`stc_cust_project_id`
+					WHERE `stc_cust_pro_attend_supervise_super_id`='".$blackpearl_row['stc_item_tracker_user_id']."'
+				");
+				$location="";
+				foreach($loc_qry as $loc_row){
+					$location=$loc_row['stc_cust_project_title'].'<br>';
+				}
+
 				$blackpearl.="
 					<tr>
 						<td>".$blackpearl_row['stc_item_tracker_id']."</td>
-						<td>".$blackpearl_row['stc_item_tracker_user_id']."</td>
+						<td>".$blackpearl_row['stc_cust_pro_supervisor_fullname']."</td>
 						<td>".$blackpearl_row['stc_item_tracker_toppe']."</td>
-						<td>".$blackpearl_row['stc_item_tracker_qty']."</td>
-						<td>".$blackpearl_row['stc_item_tracker_unit']."</td>
-						<td>".$blackpearl_row['stc_item_tracker_issuedate']."</td>
-						<td>".$blackpearl_row['stc_item_tracker_validity']."</td>
+						<td>".$location."</td>
+						<td class='text-right'>".number_format($blackpearl_row['stc_item_tracker_qty'], 2)."</td>
+						<td class='text-center'>".$blackpearl_row['stc_item_tracker_unit']."</td>
+						<td class='text-center'>".date('d-m-Y', strtotime($blackpearl_row['stc_item_tracker_issuedate']))."</td>
+						<td class='text-center'>".$validity."</td>
+						<td class='text-center'>".$nextissuedateFormatted."</td>
 						<td>".$blackpearl_row['stc_item_tracker_remarks']."</td>
 					</tr>
 				";
+				
+				// <td class='text-center'><a href='javascript:void(0)' id='".$blackpearl_row['stc_item_tracker_id']."' class='btn btn-primary'><i class='fas fa-edit'></i></a></td>
 			}
 		}else{
 			$blackpearl.="

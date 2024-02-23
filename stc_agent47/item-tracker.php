@@ -74,11 +74,14 @@ if(isset($_SESSION["stc_agent_id"])){
                                         <div class="main-card mb-3 card">
                                             <div class="card-body">
                                                 <div class="row">
-                                                    <div class="col-md-12">
-                                                        <a href="javascript:void(0)" class="btn btn-primary" data-toggle="modal" data-target=".bd-ppetracker-modal-lg">Add PPE Tracker</a>
+                                                    <div class="col-md-2">
+                                                        <a href="javascript:void(0)" class="btn btn-primary form-control" data-toggle="modal" data-target=".bd-ppetracker-modal-lg">Add PPE Tracker</a>
+                                                    </div>
+                                                    <div class="col-md-10">
+                                                        <input type="text" id="searchInput" class="form-control" placeholder="Type to search...">
                                                     </div>
                                                     <div class="col-md-12">
-                                                        <table class="table table-stripped table-responsive table-bordered table-hover">
+                                                        <table class="table table-stripped table-bordered table-hover">
                                                             <thead>
                                                                 <tr>
                                                                     <th class="text-center">ID</th>
@@ -88,11 +91,10 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                     <th class="text-center">Quantity</th>
                                                                     <th class="text-center">Unit</th>
                                                                     <th class="text-center">Date of Issue</th>
-                                                                    <th class="text-center">Next Issue Date</th>
                                                                     <th class="text-center">Duration</th>
-                                                                    <th class="text-center">New Purchase</th>
+                                                                    <th class="text-center">Next Issue Date</th>
                                                                     <th class="text-center">Remarks</th>
-                                                                    <th class="text-center">Action</th>
+                                                                    <!-- <th class="text-center">Action</th> -->
                                                                 </tr>
                                                             </thead>
                                                             <tbody class="item-tracker-show"></tbody>
@@ -158,6 +160,21 @@ if(isset($_SESSION["stc_agent_id"])){
                     }
                 });
             }
+
+            $('#searchInput').on('input', function () {
+                // Get the search value
+                var searchTerm = $(this).val().toLowerCase();
+
+                // Filter the table rows based on the search value
+                $('.item-tracker-show tr').each(function () {
+                    // Get the text content of each cell in the row
+                    var rowText = $(this).text().toLowerCase();
+
+                    // Show or hide the row based on whether it matches the search term
+                    $(this).toggle(rowText.includes(searchTerm));
+                });
+            });
+
             // save dispatch
             $('body').delegate('.it-save', 'click', function(e){
                 e.preventDefault();
@@ -188,7 +205,7 @@ if(isset($_SESSION["stc_agent_id"])){
                             $('.it-save').parent().parent().parent().find('input').val('');
                             $('.it-save').parent().parent().parent().find('textarea').val('');
                             $('.it-save').parent().parent().parent().find('select').val('NA');
-                            // item_tracker_call();
+                            item_tracker_call();
                         }else if(obj_response=="reload"){
                             window.location.reload();
                         }else if(obj_response=="no"){
