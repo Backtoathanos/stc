@@ -58,14 +58,25 @@ include_once("../MCU/db.php");
                                 <a role="tab" class="nav-link" id="tab-0" data-toggle="tab" href="#check-order">
                                     <span>Create Order <b><i class="pe-7s-look"></i></b></span>
                                 </a>
-                            </li> -->
+                            </li>
                             <li class="nav-item">
                                 <a role="tab" class="nav-link show active" id="tab-1" data-toggle="tab" href="#sup-requis">
                                     <span>Requisition <b><i class="pe-7s-look"></i></b></span>
                                 </a>
+                            </li> -->
+                            
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link active show" id="tab-0" data-toggle="tab" href="#requisition">
+                                    <span>Requisition <b><i class="pe-7s-look"></i></b></span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#requisition-cart">
+                                    <span>Cart <b><i class="pe-7s-cart"></i></b></span>
+                                </a>
                             </li>
                         </ul>
-                        <div class="tab-content">
+                        <!-- <div class="tab-content"> -->
                             <!-- <div class="tab-pane tabs-animation fade " id="check-order" role="tabpanel">
                                 <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                                     <li class="nav-item">
@@ -163,8 +174,8 @@ include_once("../MCU/db.php");
                                     </div>
                                 </div>
                             </div> -->
-                            <div class="tab-pane tabs-animation fade show active" id="sup-requis" role="tabpanel">
-                                <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+                            <!-- <div class="tab-pane tabs-animation fade show active" id="sup-requis" role="tabpanel"> -->
+                                <!-- <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                                     <li class="nav-item">
                                         <a role="tab" class="nav-link active show" id="tab-0" data-toggle="tab" href="#requisition">
                                             <span>Requisition <b><i class="pe-7s-look"></i></b></span>
@@ -175,7 +186,7 @@ include_once("../MCU/db.php");
                                             <span>Cart <b><i class="pe-7s-cart"></i></b></span>
                                         </a>
                                     </li>
-                                </ul>
+                                </ul> -->
                                 <div class="tab-content">
                                     <div class="tab-pane tabs-animation fade show active" id="requisition" role="tabpanel">
                                         <div class="row">
@@ -314,8 +325,8 @@ include_once("../MCU/db.php");
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
+                            <!-- </div> -->
+                        <!-- </div> -->
                     </div>
                 </div>
         </div>
