@@ -81,7 +81,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                         <table class="table table-stripped table-responsive table-bordered table-hover">
                                                             <thead>
                                                                 <tr>
-                                                                    <th class="text-center">Unique no.</th>
+                                                                    <th class="text-center">ID</th>
                                                                     <th class="text-center">Employee Name</th>
                                                                     <th class="text-center">Type of PPE</th>
                                                                     <th class="text-center">Location</th>
@@ -95,7 +95,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                     <th class="text-center">Action</th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody class="procurment-tracker-data-field"></tbody>
+                                                            <tbody class="item-tracker-show"></tbody>
                                                         </table>
                                                     </div>
                                                 </div>
@@ -145,341 +145,50 @@ if(isset($_SESSION["stc_agent_id"])){
     </script>
     <script>
         $(document).ready(function(e){
-
-            var by_location = "";
-            var by_maker = "";
-            var by_item = "";
-            // for create procurement  tracker
-            $('.create-procurment-tracker').on('submit', function(e){
-                e.preventDefault();
-                $.ajax({
-                    url         : "nemesis/stc_project.php",
-                    method      : "POST",
-                    data        : new FormData(this),
-                    contentType : false,
-                    processData : false,
-                    // dataType    : "JSON",
-                    success     : function(response) {
-                        // console.log(response);
-                        var argument=response.trim();
-                        if (argument == "yes") {
-                          alert("Procurement Tracker Created!!!");
-                          $(".create-procurment-tracker")[0].reset();
-                          procurement_tracker_call(begdate, enddate);
-                        } else if (argument == "no") {
-                          alert("Hmmm!!! Something went wrong, Procurment Tracker not created!!!");
-                        } else if (argument == "logout") {
-                          window.location.reload();
-                        } else if(argument=="empty"){
-                          alert("Do not empty any field!!!");
-                        }
-                    }
-                });
-            });
-
-            $('body').delegate('.stc-proc-search-btn', 'click', function(e){
-                e.preventDefault();
-                by_location = $('.stc-proc-location-search').val();
-                by_maker = $('.stc-proc-buyer-maker-search').val();
-                by_item = $('.stc-proc-item-name-search').val();
-                procurement_tracker_call(by_location, by_maker, by_item);
-            });
-            // for procuremrnt tracker
-            // procurement_tracker_call(by_location, by_maker, by_item);
-            function procurement_tracker_call(by_location, by_maker, by_item){
+            item_tracker_call();
+            function item_tracker_call(){
                 $.ajax({
                     url : "nemesis/stc_project.php",
                     method : "POST",
                     data : {
-                        get_procurment_tracker:1,
-                        by_location:by_location,
-                        by_maker:by_maker,
-                        by_item:by_item
+                        call_item_tracker:1
                     },
                     success : function(response){
-                        // console.log(response);
-                        $('.procurment-tracker-data-field').html(response);
+                        $('.item-tracker-show').html(response);
                     }
                 });
             }
-
-            // for update procurement tracker
-            $('body').delegate('.stc-tra-addmod', 'click', function(e){
+            // save dispatch
+            $('body').delegate('.it-save', 'click', function(e){
                 e.preventDefault();
-                var add_pro_id=$(this).attr('id');
-                $('#stc-hidden-procurement-tracker-id').val(add_pro_id);
-                stc_perticular_procurment_tracker_call(add_pro_id);
-                procurement_tracker_call(by_location, by_maker, by_item);
-                $('.bd-procurementdetails-modal-lg').modal('show');
-            });
-
-            // for delete procurement tracker 
-            $('body').delegate('.stc-tra-deletemod', 'click', function(e){
-                e.preventDefault();
-                var delete_pro_id=$(this).attr('id');
+                var user_id = $('.it-emp-name').val();
+                var ppe_type = $('.it-ppe-type').val();
+                var qty = $('.it-qty').val();
+                var unit = $('.it-unit').val();
+                var issue_date = $('.it-issue-date').val();
+                var validity = $('.it-validity').val();
+                var remarks = $('.it-remarks').val();
                 $.ajax({
                     url : "nemesis/stc_project.php",
                     method : "POST",
                     data : {
-                        delete_procurment_tracker:1,
-                        delete_pro_id:delete_pro_id
-                    },
-                    success : function(response){
-                        // console.log(response);
-                        var obj_response=response.trim();
-                        if(obj_response=="yes"){
-                            alert("Record deleted successfully!!!");
-                            procurement_tracker_call(by_location, by_maker, by_item);
-                        }else if(obj_response=="no"){
-                            alert("Something went wrong. Record not deleted");
-                        }
-                    }
-                });
-            });
-
-            // call perticular data
-            function stc_perticular_procurment_tracker_call(add_pro_id){
-                $.ajax({
-                    url : "nemesis/stc_project.php",
-                    method : "POST",
-                    data : {
-                        get_procurment_tracker_perticular:1,
-                        add_pro_id:add_pro_id
-                    },
-                    dataType : "JSON",
-                    success : function(response){
-                        // console.log(response);
-                        $('#stc-pro-tra-po-qnty').val(response['stc_cust_procurement_tracker_po_qnty']);
-                        $('#stc-pro-tra-buyer-maker').val(response['stc_cust_procurement_tracker_buyer']);
-                        $('#stc-pro-tra-wo-no-po-no').val(response['stc_cust_procurement_tracker_po_no']);
-                        $('#stc-pro-tra-po-date').val(response['stc_cust_procurement_tracker_po_date']);
-                        $('#stc-pro-tra-po-basic-value').val(response['stc_cust_procurement_tracker_basicamt']);
-                        $('#stc-pro-tra-gst').val(response['stc_cust_procurement_tracker_gst']);
-                        $('#stc-pro-tra-tds-approval').val(response['stc_cust_procurement_tracker_approval_date']);
-                        $('#stc-pro-tra-mfg-clearance-approval').val(response['stc_cust_procurement_tracker_mfg_clearancedate']);
-                        $('#stc-pro-tra-mfg-lead-time').val(response['stc_cust_procurement_tracker_mfg_leadtime']);
-                        $('#stc-pro-tra-oem-dealer-location').val(response['stc_cust_procurement_tracker_location']);
-                        $('#stc-pro-tra-transit-time').val(response['stc_cust_procurement_tracker_transittime']);
-                        $('#stc-pro-tra-plan').val(response['stc_cust_procurement_tracker_deleverytimeplan']);
-                        $('#stc-pro-tra-actual-forecasted').val(response['stc_cust_procurement_tracker_delivered_actual']);
-                        $('#stc-pro-tra-transportaion-charge').val(response['stc_cust_procurement_tracker_transport_charge']);
-                        $('#stc-pro-tra-mreadiness-status').val(response['stc_cust_procurement_tracker_material_readiness_status']);
-                        $('#stc-pro-tra-remarks').val(response['stc_cust_procurement_tracker_remartks']);
-
-                    }
-                });
-            }
-
-            // update on change
-            $('body').delegate('.stc-pro-tra-update-field', 'focusout', function(e){
-                e.preventDefault();
-                stc_perticular_procurment_tracker_update();
-                $('.record-popup').remove();
-                $(this).after("<span class='record-popup'>Record saved.</span>");
-            });
-
-            // update perticular data
-            function stc_perticular_procurment_tracker_update(){
-                var pro_id=$('#stc-hidden-procurement-tracker-id').val();
-
-                var po_qnty=$('#stc-pro-tra-po-qnty').val();
-                var buyer=$('#stc-pro-tra-buyer-maker').val();
-                var po_no_id=$('#stc-pro-tra-wo-no-po-no').val();
-                var po_no_date=$('#stc-pro-tra-po-date').val();
-                var amount=$('#stc-pro-tra-po-basic-value').val();
-                var gst=$('#stc-pro-tra-gst').val();
-                var approval=$('#stc-pro-tra-tds-approval').val();
-                var mfgclear=$('#stc-pro-tra-mfg-clearance-approval').val();
-                var leadtime=$('#stc-pro-tra-mfg-lead-time').val();
-                var dealer_loca=$('#stc-pro-tra-oem-dealer-location').val();
-                var transittime=$('#stc-pro-tra-transit-time').val();
-                var plan=$('#stc-pro-tra-plan').val();
-                var actual=$('#stc-pro-tra-actual-forecasted').val();
-                var mreadiness=$('#stc-pro-tra-mreadiness-status').val();
-                var remarks=$('#stc-pro-tra-remarks').val();
-                var transport_charge=$('#stc-pro-tra-transportaion-charge').val();
-
-                $.ajax({
-                    url : "nemesis/stc_project.php",
-                    method : "POST",
-                    data : {
-                        update_procurment_tracker:1,
-                        pro_id:pro_id,
-                        po_qnty:po_qnty,
-                        buyer:buyer,
-                        po_no_id:po_no_id,
-                        po_no_date:po_no_date,
-                        amount:amount,
-                        gst:gst,
-                        approval:approval,
-                        mfgclear:mfgclear,
-                        leadtime:leadtime,
-                        dealer_loca:dealer_loca,
-                        transittime:transittime,
-                        plan:plan,
-                        actual:actual,
-                        transport_charge:transport_charge,
-                        mreadiness:mreadiness,
+                        save_item_tracker:1,
+                        user_id:user_id,
+                        ppe_type:ppe_type,
+                        qty:qty,
+                        unit:unit,
+                        issue_date:issue_date,
+                        validity:validity,
                         remarks:remarks
                     },
                     success : function(response){
-                        // console.log(response);
-                        response=response.trim();
-                        if(response=="no"){
-                            alert("Hmmm something went wrong, Record not saved");
-                        }else{
-                            var pro_id = $('#stc-hidden-procurement-tracker-id').val();
-                            stc_perticular_procurment_tracker_call(pro_id);   
-                        }
-                    }
-                });
-            }
-
-            // payment modal show
-            $('body').delegate('.stc-tra-paymod', 'click', function(e){
-                e.preventDefault();
-                var proc_id=$(this).attr("id");
-                $('#stc-hidden-procurement-tracker-payment-id').val(proc_id);
-                $('.bd-procurementpayment-modal-lg').modal('show');
-            });
-
-            // save procurement tracker payment
-            $('body').delegate('.stc-pro-tra-pay-save', 'click', function(e){
-                e.preventDefault();
-                var proc_id = $('#stc-hidden-procurement-tracker-payment-id').val();
-                var pay_date = $('.stc-pro-tra-pay-payment-date').val();
-                var pay_type = $('.stc-pro-tra-pay-payment-type').val();
-                var pay_amount = $('.stc-pro-tra-pay-amount').val();
-                $.ajax({
-                    url : "nemesis/stc_project.php",
-                    method : "POST",
-                    data : {
-                        save_procurment_tracker_payment:1,
-                        proc_id:proc_id,
-                        pay_date:pay_date,
-                        pay_type:pay_type,
-                        pay_amount:pay_amount
-                    },
-                    success : function(response){
-                        // console.log(response);
-                        var obj_response=response.trim();
-                        if(obj_response=="yes"){
-                            alert("Record saved successfully!!!");
-                            procurement_tracker_call(by_location, by_maker, by_item);
-                            $('.bd-procurementpayment-modal-lg').modal('hide');
-                            $('.bd-procurementpayment-modal-lg input').val('');
-                        }else if(obj_response=="empty"){
-                            alert("Do not let any field empty.");
-                        }else if(obj_response=="reload"){
-                            window.location.reload();
-                        }else if(obj_response=="no"){
-                            alert("Something went wrong. Record not saved");
-                        }
-                    }
-                });
-            });
-
-            // recieving modal show
-            $('body').delegate('.stc-tra-recievemod', 'click', function(e){
-                e.preventDefault();
-                var proc_id=$(this).attr("id");
-                $('#stc-hidden-procurement-tracker-receiving-id').val(proc_id);
-                $('.bd-procurementreceiving-modal-lg').modal('show');
-            });
-
-            // receiving save
-            $('body').delegate('.stc-pro-tra-receiving-save', 'click', function(e){
-                e.preventDefault();
-                var proc_id = $('#stc-hidden-procurement-tracker-receiving-id').val();
-                var rec_quantity = $('.stc-pro-tra-receiving-quantity').val();
-                var rec_storein = $('.stc-pro-tra-receiving-storein').val();
-                $.ajax({
-                    url : "nemesis/stc_project.php",
-                    method : "POST",
-                    data : {
-                        save_procurment_tracker_receiving:1,
-                        proc_id:proc_id,
-                        rec_quantity:rec_quantity,
-                        rec_storein:rec_storein
-                    },
-                    success : function(response){
-                        // console.log(response);
-                        var obj_response=response.trim();
-                        if(obj_response=="yes"){
-                            alert("Record saved successfully!!!");
-                            procurement_tracker_call(by_location, by_maker, by_item);
-                            $('.bd-procurementreceiving-modal-lg').modal('hide');
-                            $('.bd-procurementreceiving-modal-lg input').val('');
-                        }else if(obj_response=="empty"){
-                            alert("Do not let any field empty.");
-                        }else if(obj_response=="reload"){
-                            window.location.reload();
-                        }else if(obj_response=="no"){
-                            alert("Something went wrong. Record not saved");
-                        }
-                    }
-                });
-            });
-
-            // dispatch modal show
-            $('body').delegate('.stc-tra-dispatchmod', 'click', function(e){
-                e.preventDefault();
-                var proc_id=$(this).attr("id");
-                $('#stc-hidden-procurement-tracker-dispatch-id').val(proc_id);
-                $('.bd-procurementdispatch-modal-lg').modal('show');
-            });
-
-            // save dispatch
-            $('body').delegate('.stc-pro-tra-dispatch-save', 'click', function(e){
-                e.preventDefault();
-                var proc_id = $('#stc-hidden-procurement-tracker-dispatch-id').val();
-                var dec_quantity = $('.stc-pro-tra-dispatch-quantity').val();
-                var des_challanno = $('.stc-pro-tra-dispatch-challanno').val();
-                $.ajax({
-                    url : "nemesis/stc_project.php",
-                    method : "POST",
-                    data : {
-                        save_procurment_tracker_dispatch:1,
-                        proc_id:proc_id,
-                        dec_quantity:dec_quantity,
-                        des_challanno:des_challanno
-                    },
-                    success : function(response){
-                        // console.log(response);
-                        var obj_response=response.trim();
-                        if(obj_response=="yes"){
-                            alert("Record saved successfully!!!");
-                            procurement_tracker_call(by_location, by_maker, by_item);
-                            $('.bd-procurementdispatch-modal-lg').modal('hide');
-                            $('.bd-procurementdispatch-modal-lg input').val('');
-                        }else if(obj_response=="empty"){
-                            alert("Do not let any field empty.");
-                        }else if(obj_response=="reload"){
-                            window.location.reload();
-                        }else if(obj_response=="no"){
-                            alert("Something went wrong. Record not saved");
-                        }
-                    }
-                });
-            });
-
-            // save dispatch
-            $('body').delegate('.acutal-payment-dateset', 'click', function(e){
-                e.preventDefault();
-                var pay_id = $(this).attr("id");
-                $.ajax({
-                    url : "nemesis/stc_project.php",
-                    method : "POST",
-                    data : {
-                        save_procurment_tracker_payment_update:1,
-                        pay_id:pay_id
-                    },
-                    success : function(response){
-                        console.log(response);
                         var obj_response=response.trim();
                         if(obj_response=="yes"){
                             alert("Record updated successfully!!!");
-                            procurement_tracker_call(by_location, by_maker, by_item);
+                            $('.it-save').parent().parent().parent().find('input').val('');
+                            $('.it-save').parent().parent().parent().find('textarea').val('');
+                            $('.it-save').parent().parent().parent().find('select').val('NA');
+                            // item_tracker_call();
                         }else if(obj_response=="reload"){
                             window.location.reload();
                         }else if(obj_response=="no"){
@@ -507,54 +216,91 @@ if(isset($_SESSION["stc_agent_id"])){
                     <div class="col-md-12 col-sm-12 col-xl-12">
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <h5>Location/Site Name :</h5><br>
-                                                        <div class="card mb-3 widget-content">
-                                                            <select class="form-control stc-proc-location-search">
-                                                                <?php 
-                                                                    include_once("../MCU/db.php");
-                                                                    echo '<option value="0" selected>Please select Sitename!!!</option>';
-                                                                    $stcagentspendreportssup=mysqli_query($con, "
-                                                                        SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
-                                                                        FROM `stc_cust_project`
-                                                                        INNER JOIN `stc_cust_procurement_tracker`
-                                                                        ON `stc_cust_project_id`=`stc_cust_procurement_tracker_project_id`
-                                                                        WHERE `stc_cust_procurement_tracker_created_by`='".$_SESSION['stc_agent_id']."'
-                                                                        ORDER BY `stc_cust_project_title` ASC
-                                                                    ");
-
-                                                                    
-                                                                    if(!empty(mysqli_num_rows($stcagentspendreportssup))){
-                                                                        foreach($stcagentspendreportssup as $pendrepcheckrow){
-                                                                            echo '<option align="left" value="'.$pendrepcheckrow['stc_cust_project_id'].'">'.$pendrepcheckrow['stc_cust_project_title'].'</option>';
-                                                                        }
-                                                                    }else{
-                                                                        echo '<option value="0">No Site found!!!</option>';
-                                                                    }
-                                                                ?>
-                                                            </select> 
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <h5>Buyer/ Maker :</h5><br>
-                                                        <div class="card mb-3 widget-content">
-                                                            <input type="text" class="form-control stc-proc-buyer-maker-search" placeholder="Search By Buy/ Maker">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-6">
-                                                        <h5>Item Name :</h5><br>
-                                                        <div class="card mb-3 widget-content">
-                                                            <input type="text" class="form-control stc-proc-item-name-search" placeholder="Search By Item Name">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-12">
-                                                        <div class="card mb-3 widget-content">
-                                                            <button class="form-control btn btn-success stc-proc-search-btn">Find</button>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5>Employee Name</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <select class="form-control it-emp-name">
+                                                <?php 
+                                                    include_once("../MCU/db.php");
+                                                    echo '<option value="NA" selected>Please select employee</option>';
+                                                    $proseleqry=mysqli_query($con, "
+                                                        SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` 
+                                                        FROM `stc_cust_pro_supervisor` 
+                                                        LEFT JOIN `stc_cust_pro_supervisor_collaborate` 
+                                                        ON `stc_cust_pro_supervisor_collaborate_userid`=`stc_cust_pro_supervisor_id`
+                                                        WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'
+                                                        OR `stc_cust_pro_supervisor_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
+                                                        ORDER BY `stc_cust_pro_supervisor_fullname` ASC
+                                                    ");
+                                                    if(mysqli_num_rows($proseleqry)>0){
+                                                        foreach($proseleqry as $proselrow){
+                                                            echo '<option value="'.$proselrow['stc_cust_pro_supervisor_id'].'">'.$proselrow['stc_cust_pro_supervisor_fullname'].'</option>';
+                                                        }
+                                                    }else{
+                                                        echo '<option value="NA">No User Found!!!</option>';
+                                                    }
+                                                ?>
+                                            </select> 
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Type of PPE</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <select class="form-control it-ppe-type">
+                                                <option value="NA">Select</option>
+                                                <option>Safety Shoes</option>
+                                                <option>Safety Jacket</option>
+                                                <option>Safety Belt</option>
+                                                <option>Safety Helmet</option>
+                                                <option>Hand Gloves</option>
+                                                <option>Leg Guard</option>
+                                                <option>Safety Goggles</option>
+                                                <option>Ear Plug</option>
+                                                <option>Nose Mask</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Quantity</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <input type="number" class="form-control it-qty" placeholder="Enter quantity">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Unit</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <select class="form-control it-unit">
+                                                <option value="NA">Select</option>
+                                                <option>Nos</option>
+                                                <option>Pair</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Date of Issue</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <input type="date" class="form-control it-issue-date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Validity</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <input type="number" class="form-control it-validity" placeholder="Enter validity in months">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <h5>Remarks</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <textarea class="form-control it-remarks" placeholder="Enter remarks"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="card mb-3 widget-content">
+                                            <button class="form-control btn btn-success it-save">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
