@@ -79,17 +79,20 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <option value="NA">Select</option>
                                                     <?php
                                                         include_once("../MCU/db.php");
-                                                        $dept_qry=mysqli_query($con, "
+                                                        $query="
                                                             SELECT DISTINCT `stc_status_down_list_plocation`
-                                                            FROM `stc_cust_project` 
-                                                            LEFT JOIN `stc_status_down_list`
-                                                            ON `stc_status_down_list_location`=`stc_cust_project_id`
-                                                            LEFT JOIN `stc_cust_project_collaborate`
-                                                            ON `stc_cust_project_collaborate_projectid`=`stc_cust_project_id`
-                                                            WHERE `stc_cust_project_createdby`='".$_SESSION['stc_agent_id']."'
-                                                            OR `stc_cust_project_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
-                                                            ORDER BY `stc_cust_project_title` ASC
-                                                        ");
+                                                            FROM `stc_status_down_list`
+                                                            LEFT JOIN `stc_cust_pro_supervisor` 
+                                                            ON `stc_cust_pro_supervisor_id` = `stc_cust_pro_supervisor_id`
+                                                            LEFT JOIN `stc_cust_pro_supervisor_collaborate` 
+                                                            ON `stc_cust_pro_supervisor_collaborate_userid` = `stc_status_down_list_created_by`
+                                                            WHERE (`stc_cust_pro_supervisor_collaborate_teamid` = '".$_SESSION['stc_agent_id']."' 
+                                                            OR `stc_cust_pro_supervisor_created_by` = '".$_SESSION['stc_agent_id']."') 
+                                                            AND `stc_status_down_list_plocation` <> '' 
+                                                            AND `stc_status_down_list_plocation` <> 'Select'
+                                                            ORDER BY `stc_status_down_list_plocation` ASC
+                                                        ";
+                                                        $dept_qry=mysqli_query($con, $query);
                                                         foreach($dept_qry as $dept_row){
                                                             echo '<option>'.$dept_row['stc_status_down_list_plocation'].'</option>';
                                                         }
