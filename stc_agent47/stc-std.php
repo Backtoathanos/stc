@@ -83,7 +83,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                             SELECT DISTINCT `stc_status_down_list_plocation`
                                                             FROM `stc_status_down_list`
                                                             LEFT JOIN `stc_cust_pro_supervisor` 
-                                                            ON `stc_cust_pro_supervisor_id` = `stc_cust_pro_supervisor_id`
+                                                            ON `stc_cust_pro_supervisor_id` = `stc_status_down_list_created_by`
                                                             LEFT JOIN `stc_cust_pro_supervisor_collaborate` 
                                                             ON `stc_cust_pro_supervisor_collaborate_userid` = `stc_status_down_list_created_by`
                                                             WHERE (`stc_cust_pro_supervisor_collaborate_teamid` = '".$_SESSION['stc_agent_id']."' 
