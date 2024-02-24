@@ -809,7 +809,7 @@ class transformers extends tesseract{
 			$pendingcall=$optimusprime_row['stc_status_down_list_jobpending_details'];
 		}
 		$pendingcall = $pendingcall!='' ? $pendingcall.=", " : $pendingcall;
-		$progressreport=$pendingcall.$newDateTime.' - '.$jobpendingdetails;
+		$pending=$pendingcall.$newDateTime.' - '.$jobpendingdetails;
 		$optimusprime_updateqry=mysqli_query($this->stc_dbs, "
 			UPDATE 
 				`stc_status_down_list` 
