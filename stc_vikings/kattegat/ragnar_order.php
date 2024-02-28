@@ -1802,6 +1802,186 @@ class ragnarRequisitionView extends tesseract{
 		}
 		return $odin;
 	}
+
+	// call requisition by list
+	public function stc_getrequisitionlist($req_begdate, $req_enddate, $req_customer, $req_reqnumber, $req_sitenmae, $req_materialtype){
+		$ivar='
+			<table class="table table-bordered table-hover table-responsive">
+				<thead>
+					<tr>
+						<th class="text-center">#</th>
+						<th class="text-center">Requisition Id</th>
+						<th class="text-center">Date</th>
+						<th class="text-center">Reference</th>
+						<th class="text-center">Location</th>
+						<th class="text-center">Items Desc</th>
+						<th class="text-center">Unit</th>
+						<th class="text-center">Ordered Qty</th> 
+						<th class="text-center">Approved Qty</th> 
+						<th class="text-center">GST Qty</th>  
+						<th class="text-center">Dispatched Qty</th> 
+						<th class="text-center">Status</th>   
+						<th class="text-center">Priority</th>  
+						<th class="text-center">Action</th>
+					</tr>
+				</thead>
+				<tbody>
+		';
+		// $array = array(
+		// 	"bycat" => $req_begdate,
+		// 	"bysubcat" => $req_enddate,
+		// 	"byname" => $bjornefilternameout,
+		// 	"byname" => $req_customer,
+		// 	"byname" => $req_reqnumber,
+		// 	"byname" => $req_sitenmae,
+		// 	"byname" => $req_materialtype
+		// );
+		// $category='';
+		// $subcategory='';
+		// $productname='';
+		// foreach($array as $key => $value){
+		// 	if($array['bycat']!="NA"){
+		// 		$category="
+		// 			AND `stc_product_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $array['bycat'])."'
+		// 		";
+		// 	}
+
+		// 	if($array['bysubcat']!="NA"){
+		// 		$subcategory="
+		// 			AND `stc_product_sub_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $array['bysubcat'])."'
+		// 		";
+		// 	}
+
+		// 	if(!empty($array['byname'])){
+		// 		$productname="
+		// 			AND (`stc_product_name` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byname'])."'
+		// 			OR 
+		// 			`stc_product_desc` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byname'])."')
+		// 		";
+		// 	}
+		// }
+		$ivar_qry=mysqli_query($this->stc_dbs, "
+			SELECT
+				I.`stc_cust_super_requisition_list_id` as item_id,
+				`stc_cust_project_title`,
+				`stc_cust_super_requisition_list_items_req_id`,
+				L.`stc_cust_super_requisition_list_id` as list_id,
+				L.`stc_cust_super_requisition_list_date`,
+				`stc_requisition_combiner_date`,
+				`stc_requisition_combiner_refrence`,
+				`stc_cust_super_requisition_list_items_title`,
+				`stc_cust_super_requisition_list_items_unit`,
+				`stc_cust_super_requisition_list_items_reqqty`,
+				`stc_cust_super_requisition_list_items_approved_qty`,
+				`stc_cust_super_requisition_items_finalqty`,
+				`stc_cust_super_requisition_items_type`,
+				`stc_cust_super_requisition_items_priority`,
+				`stc_cust_super_requisition_list_items_status`,
+				`stc_cust_super_requisition_list_status`
+			FROM `stc_cust_super_requisition_list_items` I
+			INNER JOIN `stc_cust_super_requisition_list` L
+			ON I.`stc_cust_super_requisition_list_id`=L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_cust_project`
+			ON L.`stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
+			INNER JOIN `stc_requisition_combiner_req`
+			ON L.`stc_cust_super_requisition_list_id`=`stc_requisition_combiner_req_requisition_id`
+			INNER JOIN `stc_requisition_combiner`
+			ON `stc_requisition_combiner_req_comb_id`=`stc_requisition_combiner_id`
+			WHERE DATE(`stc_cust_super_requisition_list_date`) 
+			BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $req_begdate)."' 
+			AND '".mysqli_real_escape_string($this->stc_dbs, $req_enddate)."'
+		");
+		if(mysqli_num_rows($ivar_qry)>0){
+			$slno=0;
+			foreach($ivar_qry as $ivar_row){
+				$slno++;
+				if($ivar_row['stc_cust_super_requisition_list_status']==1){
+				    $reqstatus="PROCESS";
+				}elseif($ivar_row['stc_cust_super_requisition_list_status']==2){
+				    $reqstatus="PASSED";
+				}elseif($ivar_row['stc_cust_super_requisition_list_status']==3){
+				    $reqstatus="COMPLETED";
+				}else{
+				    $reqstatus="ACCEPTED";
+				}
+				$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
+				$chursql=mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_items_priority` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$ivar_row['list_id']."' AND `stc_cust_super_requisition_items_priority`=2
+				");
+				if(mysqli_num_rows($chursql)==0){
+					$badgeurgent="";
+				}
+				$status='';
+				if($ivar_row["stc_cust_super_requisition_list_items_status"]==1){
+					$status='By GST';
+				}else{
+					$status='By Normal';
+				}
+				$getdispatchedtransformers=mysqli_query($this->stc_dbs, "
+					SELECT 
+						SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+					FROM `stc_cust_super_requisition_list_items_rec` 
+					WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$ivar_row['item_id']."'
+				");
+				$dispatchedgqty=0;
+				foreach($getdispatchedtransformers as $decqtyrow){
+					$dispatchedgqty+=$decqtyrow['dispatched_qty'];
+				}
+
+				$lokigetappritemqry=mysqli_query($this->stc_dbs, "
+					SELECT 
+						`stc_product_name`,
+						SUM(`stc_cust_super_requisition_list_purchaser_qty`) as stc_appr_qty 
+					FROM `stc_cust_super_requisition_list_purchaser` 
+					INNER JOIN `stc_product` 
+					ON `stc_product_id`=`stc_cust_super_requisition_list_purchaser_pd_id` 
+					WHERE `stc_cust_super_requisition_list_purchaser_list_item_id`='".$ivar_row['list_id']."'
+				");
+				$apprpd_name='';
+				$apprpd_qty=0;
+				foreach($lokigetappritemqry as $lokigetappritemrow){
+					$apprpd_name=$lokigetappritemrow['stc_product_name'];
+					$apprpd_qty=$lokigetappritemrow['stc_appr_qty'];
+				}
+				$checkqty=$ivar_row["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
+				$actiondeliver='<a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$ivar_row['item_id'].'" list-id="'.$ivar_row["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
+				<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$ivar_row['item_id'].'" list-id="'.$ivar_row["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
+				$actiondeliver=$ivar_row["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver : "";
+				$priority=$ivar_row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
+				$bgcolor=$ivar_row['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ffb0b0;'" : "";
+				
+				$ivar.='
+					<tr>
+						<td>'.$slno.'</td>
+						<td class="text-center">'.$ivar_row['list_id'].'</td>
+						<td class="text-center">'.date('d-m-Y', strtotime($ivar_row['stc_requisition_combiner_date'])).'</td>
+						<td class="text-center">'.$ivar_row['stc_requisition_combiner_refrence'].'</td>
+						<td class="text-center">'.$ivar_row['stc_cust_project_title'].'</td>
+						<td>'.$ivar_row['stc_cust_super_requisition_list_items_title'].'</td>
+						<td class="text-center">'.$ivar_row['stc_cust_super_requisition_list_items_unit'].'</td>
+						<td class="text-right">'.number_format($ivar_row['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+						<td class="text-right">'.number_format($apprpd_qty, 2).'</td>
+						<td align="right">'.number_format($dispatchedgqty, 2).'</td>
+						<td align="right">'.number_format($dispatchedgqty, 2).'</td>
+						<td>'.$status.'</td>
+						<td class="text-center" '.$bgcolor.'>'.$priority.'</td>
+						<td>'.$actiondeliver.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$ivar.='
+				<tr>
+					<td>Record not found.</td>
+				</tr>
+			';
+		}
+		$ivar .= '	
+				</tbody>		
+			</table>
+		';
+		return $ivar;
+	}
 }
 
 // add requisition combiner class
@@ -3550,5 +3730,20 @@ if(isset($_POST['stc_call_rit_items_req'])){
 	echo json_encode($bjorneout);
 	// echo $bjorneout;
 	// print_r($bjorneout);
+}
+
+#<-----------------Object section of requisitions list Class------------------->
+// search by same
+if(isset($_POST['stc_rquisition_bylist_find'])){
+	$req_begdate=date('Y-m-d', strtotime($_POST['req_begdate']));
+	$req_enddate=date('Y-m-d', strtotime($_POST['req_enddate']));
+	$req_customer=$_POST['req_customer'];
+	$req_reqnumber=$_POST['req_reqnumber'];
+	$req_sitenmae=$_POST['req_sitenmae'];
+	$req_materialtype=$_POST['req_materialtype'];
+	$out='';
+	$objpdres=new ragnarRequisitionView();	
+	$opobjpdres=$objpdres->stc_getrequisitionlist($req_begdate, $req_enddate, $req_customer, $req_reqnumber, $req_sitenmae, $req_materialtype);
+	echo $opobjpdres;
 }
 ?>
