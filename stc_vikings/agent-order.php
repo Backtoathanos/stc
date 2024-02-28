@@ -53,6 +53,11 @@ include("kattegat/role_check.php");
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-5" data-toggle="tab" href="#tab-content-5">
+                                    <span>Check Requisition By List</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a role="tab" class="nav-link active" id="tab-3" data-toggle="tab" href="#tab-content-3">
                                     <span>Process Requisition</span>
                                 </a>
@@ -448,6 +453,104 @@ include("kattegat/role_check.php");
                                                 <tr>
                                                   <td>
                                                     Loading.....
+                                                  </td>
+                                                </tr>
+                                              </table>
+                                          </form>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div> 
+                                </div>
+                            </div>
+                            <div class="tab-pane tabs-animation fade" id="tab-content-5" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="description" align="center"
+                                            >Check Requisition By List
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                    <div class="card-border mb-3 card card-body border-success" style="overflow-x: auto; white-space: nowrap;">
+                                      <div class="row stc-view-product-row">
+                                        <div class="col-xl-12 col-lg-12 col-md-12">
+                                          <form action="" class="stc-view-product-form">
+                                              <table class="table table-hover ">
+                                                <thead>
+                                                  <tr>
+                                                    <th scope="col">From/<br>To</th>
+                                                    <th scope="col" width="20%">Customer</th>
+                                                    <th scope="col" width="20%">Requisition Number</th>
+                                                    <th scope="col" width="20%">Sitename</th>
+                                                    <th scope="col" width="20%">Material Type</th>
+                                                    <th scope="col" width="20%">Action</th>
+                                                  </tr>
+                                                </thead>
+                                                <tbody>
+                                                  <tr>
+                                                    <td>
+                                                        <?php
+                                                          $date = date("d-m-Y");
+                                                          $newDate = date('Y-m-d', strtotime($date)); 
+                                                          $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
+                                                        ?>   
+                                                      <p><input type="date" value="<?php echo $effectiveDate;?>" class="form-control reqlistbegdate"></p>
+                                                      <p><input type="date" value="<?php echo $newDate;?>" class="form-control reqlistenddate"></p>
+                                                    </td>
+                                                    <td>
+                                                      <select
+                                                        id="stc-requisitionlist-customer-in"
+                                                        class="custom-select form-control stc-select-customer"
+                                                        name="stcvendor"
+                                                      >
+                                                      </select>
+                                                    </td>
+                                                    <td>
+                                                      <input 
+                                                        type="number" 
+                                                        id="stc-requisitionlist-number-finder" 
+                                                        class="form-control"
+                                                        placeholder="Requisition Number" 
+                                                      >
+                                                    </td>
+                                                    <td>
+                                                      <input 
+                                                        type="text" 
+                                                        id="stc-requisitionlist-sitename-finder" 
+                                                        class="form-control"
+                                                        placeholder="By Sitename" 
+                                                      >
+                                                    </td>
+                                                    <td>
+                                                      <select class="form-control" id="stc-requisitionlist-materialtype">
+                                                          <option value="NA">SELECT</option>
+                                                          <option value="Consumable">CONSUMABLE</option>
+                                                          <option value="PPE">PPE</option>
+                                                          <option value="Supply">SUPPPLY</option>
+                                                          <option value="Tools & Tackles">TOOLS & TACKLES</option>
+                                                      </select>
+                                                    </td>
+                                                    <td>
+                                                      <a href="javascript:void(0)" class="btn btn-success form-control stc-req-list-find">Find</a>
+                                                    </td>
+                                                  </tr>
+                                                </tbody>
+                                              </table>
+                                          </form>
+                                        </div>
+                                      </div>
+                                      <div class="row stc-view-purchase-row">
+                                        <div class="col-xl-12 col-lg-12 col-md-12">
+                                          <form action="" class="stc-view-ag-requisitionbylist-form" style="overflow-x:auto;width: 1520px;">
+                                              <table class="table table-hover ">
+                                                <tr>
+                                                  <td>
+                                                    Search here.....
                                                   </td>
                                                 </tr>
                                               </table>
@@ -1401,6 +1504,50 @@ include("kattegat/role_check.php");
               $('.stc-call-rit-items').html(response_rit);
             }
           });
+        });
+      });
+    </script>
+    <script>
+      $(document).ready(function(){
+        $('body').delegate('.stc-req-list-find', 'click', function(){
+          var req_begdate = $('.reqlistbegdate').val();
+          var req_enddate = $('.reqlistenddate').val();
+          var req_customer = $('#stc-requisitionlist-customer-in').val();
+          var req_reqnumber = $('#stc-requisitionlist-number-finder').val();
+          var req_sitenmae = $('#stc-requisitionlist-sitename-finder').val();
+          var req_materialtype = $('#stc-requisitionlist-materialtype').val();
+          var validation=1;
+          $('.req-alert-text').remove();
+
+          if(req_begdate==''){
+            $('.reqenddate').closest('td').find('p:eq(1)').after("<p class='req-alert-text' style='color:red;'>Date required</p>");
+            validation=0;
+          }
+
+          if(req_materialtype=='NA'){
+            $('#stc-requisitionlist-materialtype').after("<p class='req-alert-text' style='color:red;'>Material type required</p>");
+            validation=0;
+          }
+          if(validation==1){
+            $.ajax({
+              url       : "kattegat/ragnar_order.php",
+              method    : "POST",
+              data      : {
+                stc_rquisition_bylist_find:1,
+                req_begdate:req_begdate,
+                req_enddate:req_enddate,
+                req_customer:req_customer,
+                req_reqnumber:req_reqnumber,
+                req_sitenmae:req_sitenmae,
+                req_materialtype:req_materialtype
+              },
+              success   : function(response){
+                $('.stc-view-ag-requisitionbylist-form').html(response);
+              }
+            });
+          }else{
+            alert("Please fill required fields.");
+          }
         });
       });
     </script>

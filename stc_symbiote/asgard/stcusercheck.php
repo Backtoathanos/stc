@@ -294,36 +294,37 @@ class user_call extends tesseract{
 	// privilege save
 	public function stc_user_privilege($user_id, $roles_val){
 		$odin='';
+		$odin_userrolecheck_qry=mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_user_role` WHERE `stc_user_role_uid`='".mysqli_real_escape_string($this->stc_dbs, $user_id)."'
+		");
 		foreach($roles_val as $role_val_row){
-			$odin_userrolecheck_qry=mysqli_query($this->stc_dbs, "
-				SELECT 
-					`stc_user_role_id` 
-				FROM 
-					`stc_user_role`
-				WHERE 
-					`stc_user_role_privilege_id`='".mysqli_real_escape_string($this->stc_dbs, $role_val_row)."'
-				AND 
-					`stc_user_role_uid`='".mysqli_real_escape_string($this->stc_dbs, $user_id)."'
+			$odin_userroleset_qry=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_user_role`(
+				    `stc_user_role_uid`,
+					`stc_user_role_privilege_id`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $user_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $role_val_row)."'
+				)
 			");
-			if(mysqli_num_rows($odin_userrolecheck_qry)>0){
-				$odin="Hmmm!!! I think user is overloaded.";
-				break;
+			if($odin_userroleset_qry){
+				$odin="Role granted successfully.";
 			}else{
-				$odin_userroleset_qry=mysqli_query($this->stc_dbs, "
-					INSERT INTO `stc_user_role`(
-					    `stc_user_role_uid`,
-					    `stc_user_role_privilege_id`
-					) VALUES (
-						'".mysqli_real_escape_string($this->stc_dbs, $user_id)."',
-						'".mysqli_real_escape_string($this->stc_dbs, $role_val_row)."'
-					)
-				");
-				if($odin_userroleset_qry){
-					$odin="Role granted successfully.";
-				}else{
-					$odin="Hmm!!! Something went wrong on granting user.";
-				}
+				$odin="Hmm!!! Something went wrong on granting user.";
 			}
+		}
+		return $odin;
+	}
+
+	// call privillage
+	public function stc_user_privilege_get($uid){
+		$odin=array();
+		$odin_userrolecheck_qry=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_user_role`
+			WHERE `stc_user_role_uid`='".mysqli_real_escape_string($this->stc_dbs, $uid)."'
+		");
+		foreach($odin_userrolecheck_qry as $row){
+			$odin[]=$row;
 		}
 		return $odin;
 	}
@@ -670,6 +671,14 @@ if(isset($_POST['stc_roles_privilege'])){
 	$thor=new user_call();
 	$thorout=$thor->stc_user_privilege($user_id, $roles_val);
 	echo $thorout;
+}
+
+// user role save on table
+if(isset($_POST['stc_roles_privilege_get'])){
+	$uid=$_POST['uid'];
+	$thor=new user_call();
+	$thorout=$thor->stc_user_privilege_get($uid);
+	echo json_encode($thorout);
 }
 
 #<------------------Object electronics user Section-------------------->

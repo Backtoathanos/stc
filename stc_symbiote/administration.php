@@ -263,7 +263,7 @@ if(empty(@$_SESSION['stc_admin_info_id'])){
                 </form>
               </div>
             </div>
-            <div class="row stc-view-purchase-row" style="width: 79.3em;overflow-x: auto; white-space: nowrap;">
+            <div class="row stc-view-purchase-row" style="overflow-x: auto; white-space: nowrap;">
               <div class="col-xl-12 col-lg-12 col-md-12">
                 <form action="" class="stc-call-view-user-row">
                     <table class="table table-hover ">
@@ -401,7 +401,22 @@ if(empty(@$_SESSION['stc_admin_info_id'])){
           e.preventDefault();
           var uid=$(this).attr('id');
           $('.stc-role-for').val(uid);
-          $('.res-user-role-Modal').modal('show');
+          $.ajax({
+              url     : "asgard/stcusercheck.php",
+              method  : "POST",
+              data    : {
+                stc_roles_privilege_get:1,
+                uid:uid
+              },
+              dataType : "JSON",
+              success : function(roles_res){
+                for(var i=0;i<roles_res.length;i++){
+                  $('input[type="checkbox"].role-pre-val[value="' + roles_res[i].stc_user_role_privilege_id + '"]').prop('checked', true);
+                }
+                $('.res-user-role-Modal').modal('show');
+              }
+            });
+         
         });
 
         // user role hit
@@ -621,6 +636,16 @@ if(empty(@$_SESSION['stc_admin_info_id'])){
                             View<input type="checkbox" class="role-pre-val" value="401">
                             Create<input type="checkbox" class="role-pre-val" value="402">
                             Edit<input type="checkbox" class="role-pre-val" value="403">
+                        </li>
+                        <li>
+                            <a href="purchase-product.php">
+                                <i class="metismenu-icon"></i>
+                                Purchase Order Adhoc
+                            </a>
+                            <br>
+                            View<input type="checkbox" class="role-pre-val" value="407">
+                            Create<input type="checkbox" class="role-pre-val" value="408">
+                            Edit<input type="checkbox" class="role-pre-val" value="409">
                         </li>
                         <li>
                             <a href="purchase-payments.php">

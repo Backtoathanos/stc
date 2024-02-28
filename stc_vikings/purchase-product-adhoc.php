@@ -4,7 +4,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
 }else{ 
     header("Location:index.html"); 
 } 
-$page_code=401;
+$page_code=407;
 include("kattegat/role_check.php");
 ?> 
 <!doctype html>
@@ -55,15 +55,21 @@ include("kattegat/role_check.php");
                     <div class="app-main__inner"> 
                         <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                             <li class="nav-item">
-                                <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#tab-content-2">
+                                <a role="tab" class="nav-link active" id="tab-2" data-toggle="tab" href="#tab-content-2">
                                     <span>View All Purchase Order Adhoc</span>
                                 </a>
                             </li>
+                            <?php
+                              if(array_search(408, $checkrole_array)>0){
+                            ?>
                             <li class="nav-item">
-                                <a role="tab" class="nav-link active" id="tab-1" data-toggle="tab" href="#tab-content-1">
+                                <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#tab-content-1">
                                     <span>Create New Purchase Order Adhoc</span>
                                 </a>
                             </li>
+                            <?php
+                              }
+                            ?>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane tabs-animation fade show active" id="tab-content-1" role="tabpanel">
