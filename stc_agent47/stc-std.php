@@ -97,19 +97,6 @@ if(isset($_SESSION["stc_agent_id"])){
                                                             echo '<option>'.$dept_row['stc_status_down_list_plocation'].'</option>';
                                                         }
                                                     ?>
-                                                    <!-- <option>TATA Steel - Jamshedpur</option>
-                                                    <option>TATA Steel - KPO</option>
-                                                    <option>MTMH</option>
-                                                    <option>CRM BARA</option>
-                                                    <option>MANIPAL</option>
-                                                    <option>P&M MALL</option>
-                                                    <option>TATA CUMMINS</option>
-                                                    <option>XLRI</option>
-                                                    <option>RAIPUR AIIMS</option>
-                                                    <option>NML</option>
-                                                    <option>RSP</option>
-                                                    <option>IGH HOSPITAL</option>
-                                                    <option>NEELACHAL ISPAT</option> -->
                                                 </select> 
                                             </div>
                                         </div>

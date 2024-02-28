@@ -2918,28 +2918,17 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 				`stc_sub_cat_name`,
 				`stc_cust_super_requisition_list_purchaser_qty`,
 				`stc_cust_super_requisition_items_type`
-			FROM
-				`stc_cust_super_requisition_list_purchaser`
-			INNER JOIN 
-				`stc_product` 
-			ON 
-				`stc_product_id` =`stc_cust_super_requisition_list_purchaser_pd_id` 
-			INNER JOIN 
-				`stc_category` 
-			ON 
-				`stc_product_cat_id` =`stc_cat_id` 
-			INNER JOIN 
-				`stc_sub_category` 
-			ON 
-				`stc_product_sub_cat_id` =`stc_sub_cat_id` 
-			INNER JOIN 
-				`stc_cust_super_requisition_list_items` 
-			ON 
-				`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` =`stc_cust_super_requisition_list_purchaser_list_item_id`
-			INNER JOIN 
-				`stc_cust_super_requisition_list` 
-			ON 
-				`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` = `stc_cust_super_requisition_list_items_req_id` 
+			FROM `stc_cust_super_requisition_list_purchaser`
+			INNER JOIN `stc_product` 
+			ON `stc_product_id` =`stc_cust_super_requisition_list_purchaser_pd_id` 
+			INNER JOIN `stc_category` 
+			ON `stc_product_cat_id` =`stc_cat_id` 
+			INNER JOIN `stc_sub_category` 
+			ON `stc_product_sub_cat_id` =`stc_sub_cat_id` 
+			INNER JOIN `stc_cust_super_requisition_list_items` 
+			ON `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` =`stc_cust_super_requisition_list_purchaser_list_item_id`
+			INNER JOIN `stc_cust_super_requisition_list` 
+			ON `stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` = `stc_cust_super_requisition_list_items_req_id` 
 			WHERE (
 				DATE(`stc_cust_super_requisition_list_date`) 
 				BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $rit_begdate)."' 
@@ -2988,15 +2977,17 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	    	}else{
 	    		$subcatname=$fetch_row['product_sub_category'];
 	    	}
-	    	$odin.='
-	    			<tr>
-	    				<td class="text-center">'.$fetch_row['product_id'].'</td>
-	    				<td class="text-left">'.strtoupper($fetch_row['product_type']).'</td>
-	    				<td class="text-left">'.$fetch_row['product_category'].'</td>
-	    				<td class="text-left">'.$subcatname.' '.$fetch_row['product_name'].'</td>
-	    				<td class="text-right">'.number_format($fetch_row['product_qnty'], 2).'</td>
-	    			</tr>
-	    	';
+			if($fetch_row['product_qnty']>0){
+				$odin.='
+						<tr>
+							<td class="text-center">'.$fetch_row['product_id'].'</td>
+							<td class="text-left">'.strtoupper($fetch_row['product_type']).'</td>
+							<td class="text-left">'.$fetch_row['product_category'].'</td>
+							<td class="text-left">'.$subcatname.' '.$fetch_row['product_name'].'</td>
+							<td class="text-right">'.number_format($fetch_row['product_qnty'], 2).'</td>
+						</tr>
+				';
+			}
 	    }
 	    $odin.='
 	    		</tbody>
