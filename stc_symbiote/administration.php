@@ -401,6 +401,7 @@ if(empty(@$_SESSION['stc_admin_info_id'])){
           e.preventDefault();
           var uid=$(this).attr('id');
           $('.stc-role-for').val(uid);
+          $(".stc-role-for").prop('checked', false);
           $.ajax({
               url     : "asgard/stcusercheck.php",
               method  : "POST",
