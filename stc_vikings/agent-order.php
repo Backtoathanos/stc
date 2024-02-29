@@ -497,7 +497,7 @@ include("kattegat/role_check.php");
                                                         <?php
                                                           $date = date("d-m-Y");
                                                           $newDate = date('Y-m-d', strtotime($date)); 
-                                                          $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
+                                                          $effectiveDate = date('Y-m-d', strtotime("-15 days", strtotime($date)));
                                                         ?>   
                                                       <p><input type="date" value="<?php echo $effectiveDate;?>" class="form-control reqlistbegdate"></p>
                                                       <p><input type="date" value="<?php echo $newDate;?>" class="form-control reqlistenddate"></p>
@@ -1517,6 +1517,8 @@ include("kattegat/role_check.php");
           var req_sitenmae = $('#stc-requisitionlist-sitename-finder').val();
           var req_materialtype = $('#stc-requisitionlist-materialtype').val();
           var validation=1;
+          $(this).attr('disabled');
+          $('.stc-view-ag-requisitionbylist-form').html("<p style='color:red;'>Working on it, Please wait...</p>");
           $('.req-alert-text').remove();
 
           if(req_begdate==''){
@@ -1543,13 +1545,86 @@ include("kattegat/role_check.php");
               },
               success   : function(response){
                 $('.stc-view-ag-requisitionbylist-form').html(response);
+                $('.stc-req-list-find').removeAttr('disabled');
               }
             });
           }else{
             alert("Please fill required fields.");
           }
         });
-      });
+
+        $('body').delegate('.stc-req-item-static-search', "keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $(".stc-reqbyitem-table tbody tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
+
+        $('body').delegate('.poadhocitem', 'change', function(e){
+          e.preventDefault();
+          var qty=$('#poadhocitem option:selected').attr('qty');
+          var unit=$('#poadhocitem option:selected').attr('unit');
+          $('.stcbalancedqty').val(qty);
+          $('.stcbalancedqtyunit').val(unit);
+        });
+
+        var repid2=0;
+        var repitemid2=0;
+        $('body').delegate('.req-product-Modal-cash-close', 'click', function(e){
+          e.preventDefault();
+          repid2=$(this).attr("id");
+          repitemid2=$(this).attr("list-id");
+          orderqty=$(this).attr("orderqty");
+          $('#stcdispatchedqty').val('');
+          $('.res-product-Modal-cash-close').modal("show");
+          $('#stc-req-list-id-rep2').val(repid2);
+          $('#stc-req-list-item-id-rep2').val(repitemid2);
+          $('#stc-req-list-item-id-orderqty').remove();
+          $('#stc-req-list-item-id-rep2').after('<input type="hidden" id="stc-req-list-item-id-orderqty" value="'+orderqty+'">');
+        });
+
+        // save dispatch quantity
+        $('body').delegate('.stcdispatchedbtn', 'click', function(e){
+          e.preventDefault();
+          var req_id=$('#stc-req-list-id-rep2').val();
+          var req_item_id=$('#stc-req-list-item-id-rep2').val();
+          var dispatch_qnty=parseInt($('#stcdispatchedqty').val(), 10);
+          var orderqty=parseInt($('#stc-req-list-item-id-orderqty').val(), 10);
+          var poadhocitem=$('#poadhocitem').val();
+          var balanced_qty=parseInt($('#stcbalancedqty').val());
+          if((dispatch_qnty>orderqty)){
+            alert("Invalid quantity.");
+          }else if((dispatch_qnty>balanced_qty)){
+            alert("Invalid quantity.");
+          }else{
+            if(orderqty!=0){
+              $.ajax({
+                url       : "kattegat/ragnar_order.php",
+                method    :'POST',
+                data      : {
+                  stc_dispatch_hit:1,
+                  stc_req_id:req_id,
+                  stc_req_item_id:req_item_id,
+                  stc_dispatch_qty:dispatch_qnty,
+                  poadhocitem:poadhocitem
+                },
+                success   : function(response_dis){
+                  var response=response_dis.trim();
+                  if(response=="Item dispatched successfully."){
+                    alert(response_dis);
+                    $('#'+req_id).hide();
+                    $('.res-product-Modal-cash-close').modal("hide");
+                  }else{
+                    alert(response_dis);
+                  }
+                }
+              });
+            }else{
+              alert("Item not found.");
+            }
+          }
+        });
+    });
     </script>
 </body>
 </html>
@@ -1679,6 +1754,122 @@ include("kattegat/role_check.php");
           </div>
           <div class="col-12">
             <div class="row stc-req-product-show">                  
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- dispatch direct modal -->
+<div class="modal fade bd-example-modal-lg res-product-Modal-cash-close" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Dispatch Product</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <div class="row">
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <input type="hidden" id="stc-req-list-item-id-rep2" value="0";>
+                <input type="hidden" id="stc-req-list-id-rep2" value="0";>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <h5 for="poadhocitem">
+                    Item
+                  </h5>
+                  <select
+                    class="form-control poadhocitem"
+                    id="poadhocitem"
+                  >
+                    <?php 
+                      include_once("../MCU/db.php");
+                      $sqlqry=mysqli_query($con, "
+                        SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_itemdesc`, `stc_purchase_product_adhoc_qty`, `stc_purchase_product_adhoc_unit` 
+                        FROM `stc_purchase_product_adhoc`
+                        WHERE `stc_purchase_product_adhoc_status`=1
+                      ");
+                      if(mysqli_num_rows($sqlqry)>0){
+                        echo '<option value="NA">Select</option>';
+                        foreach($sqlqry as $sqlrow){
+                          $poadid=$sqlrow['stc_purchase_product_adhoc_id'];
+                          $checsql=mysqli_query($con, "
+                            SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`) as recqty
+                            FROM `stc_cust_super_requisition_list_items_rec`
+                            WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$poadid."'
+                          ");
+                          $result=mysqli_num_rows($checsql)>0 ? mysqli_fetch_assoc($checsql) : 0;
+                          $rec_qty=$result!=0 ? $result['recqty'] : 0;
+                          $balanced_qty=$sqlrow['stc_purchase_product_adhoc_qty'] - $rec_qty;
+                          echo '<option value="'.$sqlrow['stc_purchase_product_adhoc_id'].'" qty="'.$balanced_qty.'"  unit="'.$sqlrow['stc_purchase_product_adhoc_unit'].'">'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</option>';
+                        }
+                      }else{
+                        echo '<option value="NA">No record found.</option>';
+                      }
+                    ?>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <h5>
+                    Balanced Quantity
+                  </h5>
+                  <input
+                    id="stcbalancedqty"
+                    name="stcbalancedqty"
+                    type="text"
+                    placeholder="Blanced Quantity"
+                    class="form-control validate stcbalancedqty"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <h5>
+                    Unit
+                  </h5>
+                  <input
+                    id="stcbalancedqtyunit"
+                    name="stcbalancedqtyunit"
+                    type="text"
+                    placeholder="Unit"
+                    class="form-control validate stcbalancedqtyunit"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <h5>
+                    Dispatched Quantity
+                  </h5>
+                  <input
+                    id="stcdispatchedqty"
+                    name="stcdispatchedqty"
+                    type="text"
+                    placeholder="Enter Dispatched Quantity"
+                    class="form-control validate stcdispatchedqty"
+                  />
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <button type="submit" class="form-control btn btn-success stcdispatchedbtn">Save</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
