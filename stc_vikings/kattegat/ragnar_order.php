@@ -1806,7 +1806,8 @@ class ragnarRequisitionView extends tesseract{
 	// call requisition by list
 	public function stc_getrequisitionlist($req_begdate, $req_enddate, $req_customer, $req_reqnumber, $req_sitenmae, $req_materialtype){
 		$ivar='
-			<table class="table table-bordered table-hover table-responsive">
+			<input type"text" class="form-control stc-req-item-static-search" placeholder="Search here">
+			<table class="table table-bordered table-hover table-responsive stc-reqbyitem-table">
 				<thead>
 					<tr>
 						<th class="text-center">#</th>
@@ -1814,6 +1815,8 @@ class ragnarRequisitionView extends tesseract{
 						<th class="text-center">Date</th>
 						<th class="text-center">Reference</th>
 						<th class="text-center">Location</th>
+						<th class="text-center">From</th>
+						<th class="text-center">Accepted By</th>
 						<th class="text-center">Items Desc</th>
 						<th class="text-center">Unit</th>
 						<th class="text-center">Ordered Qty</th> 
@@ -1827,40 +1830,33 @@ class ragnarRequisitionView extends tesseract{
 				</thead>
 				<tbody>
 		';
-		// $array = array(
-		// 	"bycat" => $req_begdate,
-		// 	"bysubcat" => $req_enddate,
-		// 	"byname" => $bjornefilternameout,
-		// 	"byname" => $req_customer,
-		// 	"byname" => $req_reqnumber,
-		// 	"byname" => $req_sitenmae,
-		// 	"byname" => $req_materialtype
-		// );
-		// $category='';
-		// $subcategory='';
-		// $productname='';
-		// foreach($array as $key => $value){
-		// 	if($array['bycat']!="NA"){
-		// 		$category="
-		// 			AND `stc_product_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $array['bycat'])."'
-		// 		";
-		// 	}
+		$filter='';
+		
+		if($req_customer!="NA"){
+			$filter.="
+				AND `stc_cust_project_cust_id`='".mysqli_real_escape_string($this->stc_dbs, $req_customer)."'
+			";
+		}
 
-		// 	if($array['bysubcat']!="NA"){
-		// 		$subcategory="
-		// 			AND `stc_product_sub_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $array['bysubcat'])."'
-		// 		";
-		// 	}
+		if($req_materialtype!="NA"){
+			$filter.="
+				AND `stc_cust_super_requisition_items_type`='".mysqli_real_escape_string($this->stc_dbs, $req_materialtype)."'
+			";
+		}
 
-		// 	if(!empty($array['byname'])){
-		// 		$productname="
-		// 			AND (`stc_product_name` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byname'])."'
-		// 			OR 
-		// 			`stc_product_desc` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byname'])."')
-		// 		";
-		// 	}
-		// }
-		$ivar_qry=mysqli_query($this->stc_dbs, "
+		if($req_reqnumber!=""){
+			$filter.="
+				AND `stc_cust_super_requisition_list_items_req_id` regexp '".mysqli_real_escape_string($this->stc_dbs, $req_reqnumber)."'
+			";
+		}
+
+		if($req_sitenmae!=""){
+			$filter.="
+				AND `stc_cust_project_title` regexp '".mysqli_real_escape_string($this->stc_dbs, $req_sitenmae)."'
+			";
+		}
+		
+		$query="
 			SELECT
 				I.`stc_cust_super_requisition_list_id` as item_id,
 				`stc_cust_project_title`,
@@ -1877,20 +1873,29 @@ class ragnarRequisitionView extends tesseract{
 				`stc_cust_super_requisition_items_type`,
 				`stc_cust_super_requisition_items_priority`,
 				`stc_cust_super_requisition_list_items_status`,
-				`stc_cust_super_requisition_list_status`
+				`stc_cust_super_requisition_list_status`,
+				`stc_cust_pro_supervisor_contact`,
+				`stc_cust_pro_supervisor_fullname`,
+				`stc_agents_name`
 			FROM `stc_cust_super_requisition_list_items` I
 			INNER JOIN `stc_cust_super_requisition_list` L
-			ON I.`stc_cust_super_requisition_list_id`=L.`stc_cust_super_requisition_list_id`
+			ON I.`stc_cust_super_requisition_list_items_req_id`=L.`stc_cust_super_requisition_list_id`
 			INNER JOIN `stc_cust_project`
 			ON L.`stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
 			INNER JOIN `stc_requisition_combiner_req`
 			ON L.`stc_cust_super_requisition_list_id`=`stc_requisition_combiner_req_requisition_id`
 			INNER JOIN `stc_requisition_combiner`
 			ON `stc_requisition_combiner_req_comb_id`=`stc_requisition_combiner_id`
+			INNER JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_super_requisition_list_super_id`=`stc_cust_pro_supervisor_id`
+			INNER JOIN `stc_agents`
+			ON `stc_agents_id`=`stc_cust_pro_supervisor_created_by`
 			WHERE DATE(`stc_cust_super_requisition_list_date`) 
 			BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $req_begdate)."' 
 			AND '".mysqli_real_escape_string($this->stc_dbs, $req_enddate)."'
-		");
+			".$filter."
+		";
+		$ivar_qry=mysqli_query($this->stc_dbs, $query);
 		if(mysqli_num_rows($ivar_qry)>0){
 			$slno=0;
 			foreach($ivar_qry as $ivar_row){
@@ -1944,7 +1949,7 @@ class ragnarRequisitionView extends tesseract{
 					$apprpd_qty=$lokigetappritemrow['stc_appr_qty'];
 				}
 				$checkqty=$ivar_row["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
-				$actiondeliver='<a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$ivar_row['item_id'].'" list-id="'.$ivar_row["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
+				$actiondeliver='
 				<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$ivar_row['item_id'].'" list-id="'.$ivar_row["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
 				$actiondeliver=$ivar_row["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver : "";
 				$priority=$ivar_row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
@@ -1957,6 +1962,8 @@ class ragnarRequisitionView extends tesseract{
 						<td class="text-center">'.date('d-m-Y', strtotime($ivar_row['stc_requisition_combiner_date'])).'</td>
 						<td class="text-center">'.$ivar_row['stc_requisition_combiner_refrence'].'</td>
 						<td class="text-center">'.$ivar_row['stc_cust_project_title'].'</td>
+						<td class="text-center">'.$ivar_row['stc_cust_pro_supervisor_fullname'].' <br>('.$ivar_row['stc_cust_pro_supervisor_contact'].')</td>
+						<td class="text-center">'.$ivar_row['stc_agents_name'].'</td>
 						<td>'.$ivar_row['stc_cust_super_requisition_list_items_title'].'</td>
 						<td class="text-center">'.$ivar_row['stc_cust_super_requisition_list_items_unit'].'</td>
 						<td class="text-right">'.number_format($ivar_row['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
@@ -1976,7 +1983,7 @@ class ragnarRequisitionView extends tesseract{
 				</tr>
 			';
 		}
-		$ivar .= '	
+		$ivar .= '
 				</tbody>		
 			</table>
 		';
