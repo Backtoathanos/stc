@@ -42,11 +42,11 @@ include("kattegat/role_check.php");
             <div class="app-main__outer">
                     <div class="app-main__inner"> 
                         <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#tab-content-1">
                                     <span>Check Order</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#tab-content-2">
                                     <span>Check Requisition</span>
@@ -1614,6 +1614,8 @@ include("kattegat/role_check.php");
                     alert(response_dis);
                     $('#'+req_id).hide();
                     $('.res-product-Modal-cash-close').modal("hide");
+                    $('#stcdispatchedqty').val('');
+                    $('#poadhocitem').val("NA");
                   }else{
                     alert(response_dis);
                   }
