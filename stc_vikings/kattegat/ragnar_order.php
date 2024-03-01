@@ -1952,7 +1952,7 @@ class ragnarRequisitionView extends tesseract{
 				}
 				$checkqty=$ivar_row["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
 				$actiondeliver='
-				<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$ivar_row['item_id'].'" list-id="'.$ivar_row["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
+				<a class="req-product-Modal-cash-close" data-toggle="modal" data-target=".res-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$ivar_row['item_id'].'" list-id="'.$ivar_row["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
 				$actiondeliver=$ivar_row["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver : "";
 				$priority=$ivar_row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
 				$bgcolor=$ivar_row['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ffb0b0;'" : "";

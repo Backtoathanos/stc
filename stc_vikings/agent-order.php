@@ -1576,7 +1576,7 @@ include("kattegat/role_check.php");
           repitemid2=$(this).attr("list-id");
           orderqty=$(this).attr("orderqty");
           $('#stcdispatchedqty').val('');
-          $('.res-product-Modal-cash-close').modal("show");
+          // $('.res-product-Modal-cash-close').modal("show");
           $('#stc-req-list-id-rep2').val(repid2);
           $('#stc-req-list-item-id-rep2').val(repitemid2);
           $('#stc-req-list-item-id-orderqty').remove();
@@ -1626,7 +1626,36 @@ include("kattegat/role_check.php");
             }
           }
         });
-    });
+
+        
+        // Cache the select element for better performance
+        var $select = $('#poadhocitem');
+
+        // Cache the input element
+        var $searchInput = $('#searchInput');
+
+        // Get all options
+        var $options = $select.find('option');
+
+        // Handle input keyup event
+        $searchInput.on('keyup', function() {
+            var filter = $searchInput.val().toUpperCase();
+
+            // Clear the select options
+            $select.empty();
+
+            // Loop through all options
+            $options.each(function() {
+                var text = $(this).text().toUpperCase();
+
+                // Show/hide options based on the search filter
+                if (text.indexOf(filter) > -1) {
+                    $select.append($(this).clone()); // Append matching options
+                }
+            });
+            $('.poadhocitem').change();
+        });
+      });
     </script>
 </body>
 </html>
@@ -1790,6 +1819,7 @@ include("kattegat/role_check.php");
                   <h5 for="poadhocitem">
                     Item
                   </h5>
+                  <input type="text" id="searchInput" class="form-control" placeholder="Search item">
                   <select
                     class="form-control poadhocitem"
                     id="poadhocitem"
@@ -1832,7 +1862,7 @@ include("kattegat/role_check.php");
                     id="stcbalancedqty"
                     name="stcbalancedqty"
                     type="text"
-                    placeholder="Blanced Quantity"
+                    placeholder="Balanced Quantity"
                     class="form-control validate stcbalancedqty"
                     disabled
                   />
