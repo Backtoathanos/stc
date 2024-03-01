@@ -1286,7 +1286,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Material Requisition :</h5><br>
+                                <h5>Material Required :</h5><br>
                                 <textarea class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-material-desc" placeholder="Material Description"></textarea>
                             </div>
                         </div>
