@@ -609,7 +609,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         // Handle input keyup event
         $('body').delegate('#searchInput', 'keyup', function(e){
             var filter = $(this).val().toUpperCase();
-            console.log(filter);
             // Clear the select options
             $select.empty();
 

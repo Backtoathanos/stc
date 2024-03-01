@@ -628,10 +628,7 @@ class pirates_project extends tesseract{
 				`stc_status_down_list_job_type_title`,
 				`stc_status_down_list_job_type_sub_title`,
 				`stc_status_down_list_job_type_created_by`
-			FROM
-				`stc_status_down_list_job_type`		
-			WHERE
-				`stc_status_down_list_job_type_created_by`='".mysqli_real_escape_string($this->stc_dbs, @$_SESSION['stc_agent_id'])."'
+			FROM `stc_status_down_list_job_type`	
 			ORDER BY `stc_status_down_list_job_type_title` ASC
 		");
 		if(mysqli_num_rows($blackpearl_checkqry)>0){

@@ -1286,7 +1286,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Material Requisition :</h5><br>
+                                <h5>Material Required :</h5><br>
                                 <textarea class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-material-desc" placeholder="Material Description"></textarea>
                             </div>
                         </div>
@@ -1294,8 +1294,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Manpower Request :</h5><br>
-                                <input type="text" class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-manpower-req" placeholder="Manpower Request" required>
+                                <h5>Manpower Required :</h5><br>
+                                <input type="text" class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-manpower-req" placeholder="Manpower Required" required>
                             </div>
                         </div>
                     </div>
@@ -1310,7 +1310,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <h5>Tools Requisitions : <button class="btn btn-primary tools-req-oper-option" operation="show">Show/Hide</button></h5>
+                                <h5>Tools Required : <button class="btn btn-primary tools-req-oper-option" operation="show">Show/Hide</button></h5>
                                 <p class="stc-std-tools-req-item-show"></p>                                             
                                 <div class="show-tools-req-section row">
                                 <?php 
@@ -1322,7 +1322,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     }
                                 ?>
                                     <div class="col-sm-12 col-md-12">
-                                        <button class="btn btn-success stc-agent-sup-std-tools-req-btn">Save Tool Requisitions.</button>  
+                                        <button class="btn btn-success stc-agent-sup-std-tools-req-btn">Save Tool Required.</button>  
                                     </div>
                                 </div>
                             </div>
