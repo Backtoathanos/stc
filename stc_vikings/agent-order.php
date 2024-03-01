@@ -42,11 +42,11 @@ include("kattegat/role_check.php");
             <div class="app-main__outer">
                     <div class="app-main__inner"> 
                         <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
-                            <li class="nav-item">
+                            <!-- <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#tab-content-1">
                                     <span>Check Order</span>
                                 </a>
-                            </li>
+                            </li> -->
                             <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#tab-content-2">
                                     <span>Check Requisition</span>
@@ -1576,7 +1576,7 @@ include("kattegat/role_check.php");
           repitemid2=$(this).attr("list-id");
           orderqty=$(this).attr("orderqty");
           $('#stcdispatchedqty').val('');
-          $('.res-product-Modal-cash-close').modal("show");
+          // $('.res-product-Modal-cash-close').modal("show");
           $('#stc-req-list-id-rep2').val(repid2);
           $('#stc-req-list-item-id-rep2').val(repitemid2);
           $('#stc-req-list-item-id-orderqty').remove();
@@ -1614,6 +1614,8 @@ include("kattegat/role_check.php");
                     alert(response_dis);
                     $('#'+req_id).hide();
                     $('.res-product-Modal-cash-close').modal("hide");
+                    $('#stcdispatchedqty').val('');
+                    $('#poadhocitem').val("NA");
                   }else{
                     alert(response_dis);
                   }
@@ -1624,7 +1626,36 @@ include("kattegat/role_check.php");
             }
           }
         });
-    });
+
+        
+        // Cache the select element for better performance
+        var $select = $('#poadhocitem');
+
+        // Cache the input element
+        var $searchInput = $('#searchInput');
+
+        // Get all options
+        var $options = $select.find('option');
+
+        // Handle input keyup event
+        $searchInput.on('keyup', function() {
+            var filter = $searchInput.val().toUpperCase();
+
+            // Clear the select options
+            $select.empty();
+
+            // Loop through all options
+            $options.each(function() {
+                var text = $(this).text().toUpperCase();
+
+                // Show/hide options based on the search filter
+                if (text.indexOf(filter) > -1) {
+                    $select.append($(this).clone()); // Append matching options
+                }
+            });
+            $('.poadhocitem').change();
+        });
+      });
     </script>
 </body>
 </html>
@@ -1788,6 +1819,7 @@ include("kattegat/role_check.php");
                   <h5 for="poadhocitem">
                     Item
                   </h5>
+                  <input type="text" id="searchInput" class="form-control" placeholder="Search item">
                   <select
                     class="form-control poadhocitem"
                     id="poadhocitem"
@@ -1830,7 +1862,7 @@ include("kattegat/role_check.php");
                     id="stcbalancedqty"
                     name="stcbalancedqty"
                     type="text"
-                    placeholder="Blanced Quantity"
+                    placeholder="Balanced Quantity"
                     class="form-control validate stcbalancedqty"
                     disabled
                   />

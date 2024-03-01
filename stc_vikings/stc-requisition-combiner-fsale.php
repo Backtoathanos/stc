@@ -591,7 +591,38 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         $('body').delegate('.poadhocitem', 'change', function(e){
           e.preventDefault();
           var qty=$('#poadhocitem option:selected').attr('qty');
-          $('.stcdispatchedqty').val(qty);
+          var unit=$('#poadhocitem option:selected').attr('unit');
+          $('.stcbalancedqty').val(qty);
+          $('.stcbalancedqtyunit').val(unit);
+        });
+        
+        
+        // Cache the select element for better performance
+        var $select = $('#poadhocitem');
+
+        // Cache the input element
+        var $searchInput = $('#searchInput');
+
+        // Get all options
+        var $options = $select.find('option');
+
+        // Handle input keyup event
+        $searchInput.on('keyup', function() {
+            var filter = $searchInput.val().toUpperCase();
+
+            // Clear the select options
+            $select.empty();
+
+            // Loop through all options
+            $options.each(function() {
+                var text = $(this).text().toUpperCase();
+
+                // Show/hide options based on the search filter
+                if (text.indexOf(filter) > -1) {
+                    $select.append($(this).clone()); // Append matching options
+                }
+            });
+            $('.poadhocitem').change();
         });
       });
     </script>
@@ -732,6 +763,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                   <h5 for="poadhocitem">
                     Item
                   </h5>
+                  <input type="text" id="searchInput" class="form-control" placeholder="Search item">
                   <select
                     class="form-control poadhocitem"
                     id="poadhocitem"
@@ -739,7 +771,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     <?php 
                       include_once("../MCU/db.php");
                       $sqlqry=mysqli_query($con, "
-                        SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_itemdesc`, `stc_purchase_product_adhoc_qty`  
+                        SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_itemdesc`, `stc_purchase_product_adhoc_qty`, `stc_purchase_product_adhoc_unit` 
                         FROM `stc_purchase_product_adhoc`
                         WHERE `stc_purchase_product_adhoc_status`=1
                       ");
@@ -755,13 +787,44 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                           $result=mysqli_num_rows($checsql)>0 ? mysqli_fetch_assoc($checsql) : 0;
                           $rec_qty=$result!=0 ? $result['recqty'] : 0;
                           $balanced_qty=$sqlrow['stc_purchase_product_adhoc_qty'] - $rec_qty;
-                          echo '<option value="'.$sqlrow['stc_purchase_product_adhoc_id'].'" qty="'.$balanced_qty.'">'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</option>';
+                          echo '<option value="'.$sqlrow['stc_purchase_product_adhoc_id'].'" qty="'.$balanced_qty.'"  unit="'.$sqlrow['stc_purchase_product_adhoc_unit'].'">'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</option>';
                         }
                       }else{
                         echo '<option value="NA">No record found.</option>';
                       }
                     ?>
                   </select>
+                </div>
+              </div>
+
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <h5>
+                    Balanced Quantity
+                  </h5>
+                  <input
+                    id="stcbalancedqty"
+                    name="stcbalancedqty"
+                    type="text"
+                    placeholder="Balanced Quantity"
+                    class="form-control validate stcbalancedqty"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <h5>
+                    Unit
+                  </h5>
+                  <input
+                    id="stcbalancedqtyunit"
+                    name="stcbalancedqtyunit"
+                    type="text"
+                    placeholder="Unit"
+                    class="form-control validate stcbalancedqtyunit"
+                    disabled
+                  />
                 </div>
               </div>
               <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">

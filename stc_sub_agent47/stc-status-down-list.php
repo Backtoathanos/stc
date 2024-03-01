@@ -1348,6 +1348,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
+                    <?php
+                        }
+                    ?>
                     <div class="col-md-12 col-xl-12 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
@@ -1356,9 +1359,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
-                    <?php
-                        }
-                    ?>
                     <div class="col-md-12 col-xl-12"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">

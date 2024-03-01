@@ -1811,8 +1811,8 @@ class ragnarRequisitionView extends tesseract{
 				<thead>
 					<tr>
 						<th class="text-center">#</th>
-						<th class="text-center">Requisition Id</th>
-						<th class="text-center">Date</th>
+						<th class="text-center">Parent Requisition Id & Date</th>
+						<th class="text-center">Requisition Id & Date</th>
 						<th class="text-center">Reference</th>
 						<th class="text-center">Location</th>
 						<th class="text-center">From</th>
@@ -1860,6 +1860,8 @@ class ragnarRequisitionView extends tesseract{
 			SELECT
 				I.`stc_cust_super_requisition_list_id` as item_id,
 				`stc_cust_project_title`,
+				`stc_requisition_combiner_id`,
+				`stc_requisition_combiner_date`,
 				`stc_cust_super_requisition_list_items_req_id`,
 				L.`stc_cust_super_requisition_list_id` as list_id,
 				L.`stc_cust_super_requisition_list_date`,
@@ -1950,7 +1952,7 @@ class ragnarRequisitionView extends tesseract{
 				}
 				$checkqty=$ivar_row["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
 				$actiondeliver='
-				<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$ivar_row['item_id'].'" list-id="'.$ivar_row["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
+				<a class="req-product-Modal-cash-close" data-toggle="modal" data-target=".res-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$ivar_row['item_id'].'" list-id="'.$ivar_row["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
 				$actiondeliver=$ivar_row["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver : "";
 				$priority=$ivar_row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
 				$bgcolor=$ivar_row['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ffb0b0;'" : "";
@@ -1958,8 +1960,8 @@ class ragnarRequisitionView extends tesseract{
 				$ivar.='
 					<tr>
 						<td>'.$slno.'</td>
-						<td class="text-center">'.$ivar_row['list_id'].'</td>
-						<td class="text-center">'.date('d-m-Y', strtotime($ivar_row['stc_requisition_combiner_date'])).'</td>
+						<td class="text-center"><a href="#" class="stc-call-for-select-merchant-req" title="Add product and merchant." id="'.$ivar_row['stc_requisition_combiner_id'].'" style="color: black;">'.$ivar_row['stc_requisition_combiner_id'].' <br>'.date('d-m-Y', strtotime($ivar_row['stc_requisition_combiner_date'])).'</a></td>
+						<td class="text-center">'.$ivar_row['list_id'].'<br>'.date('d-m-Y', strtotime($ivar_row['stc_requisition_combiner_date'])).'</td>
 						<td class="text-center">'.$ivar_row['stc_requisition_combiner_refrence'].'</td>
 						<td class="text-center">'.$ivar_row['stc_cust_project_title'].'</td>
 						<td class="text-center">'.$ivar_row['stc_cust_pro_supervisor_fullname'].' <br>('.$ivar_row['stc_cust_pro_supervisor_contact'].')</td>
@@ -1972,7 +1974,18 @@ class ragnarRequisitionView extends tesseract{
 						<td align="right">'.number_format($dispatchedgqty, 2).'</td>
 						<td>'.$status.'</td>
 						<td class="text-center" '.$bgcolor.'>'.$priority.'</td>
-						<td>'.$actiondeliver.'</td>
+						<td>
+							'.$actiondeliver.'
+							<a href="stc-requisition-combiner-fshow.php?requi_id='.$ivar_row['stc_requisition_combiner_id'].'" title="P.M Requisition" style="font-size: 25px;color: black;">
+								<i class="fa fa-print" aria-hidden="true"></i>
+							</a>
+							<a href="stc-requisition-combiner-dcprintpreview.php?requi_id='.$ivar_row['stc_requisition_combiner_id'].'" title="DC Receiving Requisition" style="font-size: 25px;color: black;">
+								<i class="fa fa-print" aria-hidden="true"></i>
+							</a>
+							<a href="stc-print-preview-directchallan.php?requi_id='.$ivar_row['stc_requisition_combiner_id'].'" title="Delivery Challan" style="font-size: 25px;color: black;">
+								<i class="fa fa-print" aria-hidden="true"></i>
+							</a>	
+						</td>
 					</tr>
 				';
 			}
