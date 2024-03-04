@@ -63,9 +63,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         .stc-datatable-filter-ul{
             background: #fbfbfb;
             position: fixed;
-            top:8%;
-            left:80%;
+            top:10%;
+            left:88%;
             z-index: 90;
+            width: 195px;
             list-style-type: none;
         }
 
@@ -1216,7 +1217,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-xl-12 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body" >
+                                        <div class="card-border mb-3 card card-body">
                                             <!-- <a href="javascript:void(0)" class="btn btn-success form-control print-btn-sdl">Print</a> -->
                                             <div class="stc-show-std-details">
                                                 <table class="table table-bordered">
@@ -1536,11 +1537,22 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 if(offset>800){
                     $("#stc-reports-mrd-view thead").css('position', 'sticky');
                     $("#stc-reports-mrd-view thead").css('background', 'white');
-                    $("#stc-reports-mrd-view thead").css('top', '8%');
+                    $("#stc-reports-mrd-view thead").css('top', '12%');
+                    
+                    $("#stc-show-std-details-table thead").css('position', 'sticky');
+                    $("#stc-show-std-details-table thead").css('background', 'white');
+                    $("#stc-show-std-details-table thead").css('top', '8%');
+                    $('.stc-datatable-filter-ul').show();
                 }else{
                     $("#stc-reports-mrd-view thead").css('position', 'relative');
                     $("#stc-reports-mrd-view thead").removeProp('background');
                     $("#stc-reports-mrd-view thead").removeProp('top');
+
+                    
+                    $("#stc-show-std-details-table thead").css('position', 'relative');
+                    $("#stc-show-std-details-table thead").removeProp('background');
+                    $("#stc-show-std-details-table thead").removeProp('top');
+                    $('.stc-datatable-filter-ul').hide();
                 }
             });
         });
@@ -1581,7 +1593,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             var screenwidth=$(window).width();
             var finalwidth=screenwidth - (screenwidth * 0.20);
             var percent=finalwidth/screenwidth * 100;
-            $('.stc-show-std-details').width(finalwidth);
+            // $('.stc-show-std-details').width(finalwidth);
             
             $('body').delegate('.std-filter-department', 'change', function(){
                 var values = $(this).val();
@@ -1614,8 +1626,9 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             });
 
             var filter = 0;
-            stc_call_std(filter);
-            function stc_call_std(filter){
+            var pagination=0;
+            stc_call_std(filter, pagination);
+            function stc_call_std(filter, pagination){
                 var datefrom    =   $(".std-filter-date-from").val();
                 var dateto      =   $(".std-filter-date-to").val();
                 var location    =   $(".std-filter-location").val();
@@ -1625,36 +1638,46 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var filter      =   filter;
                 var validated   =   1;
                 var message     =   "";
-                if(datefrom!='' && dateto==''){
+                if((datefrom!='' && dateto=='') || (dateto!='' && datefrom=='')){
                     message ="please fill both date.";
                     validated=0;
-                }else if(dateto!='' && datefrom==''){
-                    message ="please fill both date.";
-                    validated=0;
+                }                
+                if(filter>0){
+                    $('.filter-message-box').remove();
+                    if(datefrom =="" && dateto == "" && location == "NA" && department == "NA" && typeofjob == "NA" && status == "NA"){
+                        validated=0;
+                        message="Minimum 1 field required for search!!!";
+                        $(".std-filter-date-from").after("<p class='filter-message-box' style='color:red'>Select From date.</p>");
+                        $(".std-filter-date-to").after("<p class='filter-message-box' style='color:red'>Select To date.</p>");
+                        $(".std-filter-location").after("<p class='filter-message-box' style='color:red'>Select Location.</p>");
+                        $(".std-filter-department").after("<p class='filter-message-box' style='color:red'>Select Department.</p>");
+                        $(".std-filter-typeofjob").after("<p class='filter-message-box' style='color:red'>Select Type of Job.</p>");
+                        $(".std-filter-status").after("<p class='filter-message-box' style='color:red'>Select Status.</p>");
+                    }
                 }
                 if(validated==1){
-                    $('.stc-show-std-details').html("Please wait...");
+                    $('.btn-close').click();
+                    $('.modal-backdrop.fade.show').removeClass('modal-backdrop fade show');
                     $.ajax({
                         url     : "kattegat/ragnar_reports.php",
                         method  : "POST",
                         data    : {
-                        Stc_std_details:1,
-                        datefrom:datefrom,
-                        dateto:dateto,
-                        location:location,
-                        department:department,
-                        typeofjob:typeofjob,
-                        status:status,
-                        filter:filter
+                            Stc_std_details:1,
+                            datefrom:datefrom,
+                            dateto:dateto,
+                            location:location,
+                            department:department,
+                            typeofjob:typeofjob,
+                            status:status,
+                            pagination:pagination,
+                            filter:filter
                         },
                         success : function(data){
                             // console.log(data);
                             $('.stc-show-std-details').html(data);
-                            $('.bd-stdfilter-modal-lg').modal('hide');
-                            $('.modal-backdrop.fade.show').removeClass('modal-backdrop fade show');
                         }
                     });
-                }else{
+                }else{    
                     alert(message);
                 }
             }
@@ -1677,7 +1700,30 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             $('body').delegate('.std-filter-find-btn', 'click', function(e){
                 e.preventDefault();
                 var filter = 1;
-                stc_call_std(filter);
+                var pagination=0;
+                $('.stc-show-std-details').html("Please wait...");
+                stc_call_std(filter, pagination);
+            });
+
+            // find std with pagination
+            $('body').delegate('.std-filter-find-pagination', 'click', function(e){
+                e.preventDefault();
+                var filter = 0;
+                var datefrom    =   $(".std-filter-date-from").val();
+                var dateto      =   $(".std-filter-date-to").val();
+                var location    =   $(".std-filter-location").val();
+                var department  =   $(".std-filter-department").val();
+                var typeofjob   =   $(".std-filter-typeofjob").val();
+                var status      =   $(".std-filter-status").val();
+                if(datefrom =="" && dateto == "" && location == "NA" && department == "NA" && typeofjob == "NA" && status == "NA"){
+                    filter=0;
+                }else{
+                    filter=1;
+                }
+                var pagination = $(this).attr("data");
+                $('.std-filter-find-pagination').remove();
+                $('.stc-show-std-details').html("Please wait...");
+                stc_call_std(filter, pagination);
             });
             
             $('body').delegate('.stc-edit-report', 'click', function(e){
@@ -1718,7 +1764,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                             if(data.trim()=="updated"){
                                 alert("Record updated.");
                                 $('.sdlurbtn-close').click();
-                                stc_call_std(0);
+                                stc_call_std(0, 0);
                             }
                         }
                     });

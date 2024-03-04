@@ -486,7 +486,7 @@ class ragnarReportsViewRequiReports extends tesseract{
    }
 
    // call std
-   public function stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $filter){
+   public function stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $pagination, $filter){
       $ivar='';
       $query_filter = '';
       if($filter == 1){
@@ -550,7 +550,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
          WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' ".$query_filter."         
-         ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
+         ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC LIMIT ".$pagination.", 20
       ";
       $ivarqry=mysqli_query($this->stc_dbs, $query);
 
@@ -726,49 +726,55 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-center">PENDING</td>                  
                   <td class="text-center">FILTER</td>
                </tr>
-               <tr style="background-color:white;">
-                  <td class="text-center" rowspan="5">DAILY DCP ACTIVITY(within 48hr)</td>
-                  <td class="text-center">BREAKDOWN MAINTENANCE</td>
-                  <td class="text-right" style="background-color: #00f9b4;">'.$bmplanningday.'</td>
-                  <td class="text-right" style="background-color: #f6f900;">'.$bmprogress48.'</td>
-                  <td class="text-right" style="background-color: #82f900;">'.$bmjobdone48.'</td>
-                  <td class="text-right" style="background-color: #ff4545;">'.$bmpendingday.'</td>
-                  <td class="text-center" rowspan="10">
-                     <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
-                     <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
-                     '.$data_fields.'
-                     </ul>
+         ';
+         if($filter==0){
+            $ivar.='
+                  <tr style="background-color:white;">
+                     <td class="text-center" rowspan="5">DAILY DCP ACTIVITY(within 48hr)</td>
+                     <td class="text-center">BREAKDOWN MAINTENANCE</td>
+                     <td class="text-right" style="background-color: #00f9b4;">'.$bmplanningday.'</td>
+                     <td class="text-right" style="background-color: #f6f900;">'.$bmprogress48.'</td>
+                     <td class="text-right" style="background-color: #82f900;">'.$bmjobdone48.'</td>
+                     <td class="text-right" style="background-color: #ff4545;">'.$bmpendingday.'</td>
+                     <td class="text-center" rowspan="10">
+                        <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
+                        <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
+                        '.$data_fields.'
+                        </ul>
 
-                  </td>
-               </tr>
-               <tr style="background-color:white;">
-                  <td class="text-center">CALL ATTEND</td>
-                  <td class="text-right" style="background-color: #00f9b4;">'.$cplanningday.'</td>
-                  <td class="text-right" style="background-color: #f6f900;">'.$cprogress48.'</td>
-                  <td class="text-right" style="background-color: #82f900;">'.$cjobdone48.'</td>
-                  <td class="text-right" style="background-color: #ff4545;">'.$cpendingday.'</td>
-               </tr>
-               <tr style="background-color:white;">
-                  <td class="text-center">DAILY JOB ACTIVITY</td>
-                  <td class="text-right" style="background-color: #00f9b4;">'.$djaplanningday.'</td>
-                  <td class="text-right" style="background-color: #f6f900;">'.$djaprogress48.'</td>
-                  <td class="text-right" style="background-color: #82f900;">'.$djajobdone48.'</td>
-                  <td class="text-right" style="background-color: #ff4545;">'.$djapendingday.'</td>
-               </tr>
-               <tr style="background-color:white;border-bottom: 3px solid black;">
-                  <td class="text-center">PREVENTIVE MAINTENANCE</td>
-                  <td class="text-right" style="background-color: #00f9b4;">'.$pmplanningday.'</td>
-                  <td class="text-right" style="background-color: #f6f900;">'.$pmprogress48.'</td>
-                  <td class="text-right" style="background-color: #82f900;">'.$pmjobdone48.'</td>
-                  <td class="text-right" style="background-color: #ff4545;">'.$pmpendingday.'</td>
-               </tr>
-               <tr style="background-color:white;border-bottom: 3px solid black;">
-                  <td class="text-center">TOTAL</td>
-                  <td class="text-right"><b>'.$totalp.'</b></td>
-                  <td class="text-right"><b>'.$totalwp.'</b></td>
-                  <td class="text-right"><b>'.$totalwd.'</b></td>
-                  <td class="text-right"><b>'.$totalpending.'</b></td>
-               </tr>
+                     </td>
+                  </tr>
+                  <tr style="background-color:white;">
+                     <td class="text-center">CALL ATTEND</td>
+                     <td class="text-right" style="background-color: #00f9b4;">'.$cplanningday.'</td>
+                     <td class="text-right" style="background-color: #f6f900;">'.$cprogress48.'</td>
+                     <td class="text-right" style="background-color: #82f900;">'.$cjobdone48.'</td>
+                     <td class="text-right" style="background-color: #ff4545;">'.$cpendingday.'</td>
+                  </tr>
+                  <tr style="background-color:white;">
+                     <td class="text-center">DAILY JOB ACTIVITY</td>
+                     <td class="text-right" style="background-color: #00f9b4;">'.$djaplanningday.'</td>
+                     <td class="text-right" style="background-color: #f6f900;">'.$djaprogress48.'</td>
+                     <td class="text-right" style="background-color: #82f900;">'.$djajobdone48.'</td>
+                     <td class="text-right" style="background-color: #ff4545;">'.$djapendingday.'</td>
+                  </tr>
+                  <tr style="background-color:white;border-bottom: 3px solid black;">
+                     <td class="text-center">PREVENTIVE MAINTENANCE</td>
+                     <td class="text-right" style="background-color: #00f9b4;">'.$pmplanningday.'</td>
+                     <td class="text-right" style="background-color: #f6f900;">'.$pmprogress48.'</td>
+                     <td class="text-right" style="background-color: #82f900;">'.$pmjobdone48.'</td>
+                     <td class="text-right" style="background-color: #ff4545;">'.$pmpendingday.'</td>
+                  </tr>
+                  <tr style="background-color:white;border-bottom: 3px solid black;">
+                     <td class="text-center">TOTAL</td>
+                     <td class="text-right"><b>'.$totalp.'</b></td>
+                     <td class="text-right"><b>'.$totalwp.'</b></td>
+                     <td class="text-right"><b>'.$totalwd.'</b></td>
+                     <td class="text-right"><b>'.$totalpending.'</b></td>
+                  </tr>
+            ';
+         }
+         $ivar.='
                <tr style="background-color:white;">
                   <td class="text-center" rowspan="5">TOTAL DCP ACTIVITY (All time)</td>
                   <td class="text-center">BREAKDOWN MAINTENANCE</td>
@@ -805,6 +811,8 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-right"><strong>'.$atotalwd.'</strong></td>
                   <td class="text-right"><strong>'.$atotalpending.'</strong></td>
                </tr>
+         ';
+         $ivar.='
             </table>
          ';
       }
@@ -815,7 +823,7 @@ class ragnarReportsViewRequiReports extends tesseract{
             <button class="mb-2 mr-2 btn btn-success btn-block stc-sdl-exportexcel-hit" data-type="excel">
             <i class="fa fa-file-excel-o"></i> Export Excel
             </button>
-            <table class="table table-bordered table-responsive" id="stc-show-std-details-table">
+            <table class="table table-bordered" id="stc-show-std-details-table">
                <thead>
                   <tr>
                      <th style="width:2%" class="text-center SLNO sl-hide">SL NO</th>
@@ -1058,6 +1066,25 @@ class ragnarReportsViewRequiReports extends tesseract{
                </tr>
             ';
          }
+         $pagination+=20;
+         $begpag=$pagination-20;
+         $querycount ="
+            SELECT 
+               `stc_status_down_list_id`
+            FROM `stc_status_down_list` 
+            LEFT JOIN `stc_cust_project` 
+            ON `stc_cust_project_id`=`stc_status_down_list_location` 
+            WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' ".$query_filter."         
+            ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
+         ";
+         $ivarqrycount=mysqli_query($this->stc_dbs, $querycount);
+
+         $ivar.='
+            <tr class="std-filter-find-pagination-tr">
+               <td colspan="2">Showing result '.$begpag.'-'.$pagination.'  out of '.mysqli_num_rows($ivarqrycount).'</td>
+               <td colspan="6"><a class="form-control btn btn-success std-filter-find-pagination" data="'.$pagination.'" >Show more</a></td>
+            </tr>
+         ';
       }else{
          $ivar.='
             <tr>
@@ -4084,9 +4111,10 @@ if(isset($_POST['Stc_std_details'])){
    $department    =  $_POST['department'];
    $typeofjob     =  $_POST['typeofjob'];
    $status        =  $_POST['status'];
+   $pagination        =  $_POST['pagination'];
    $filter        =  $_POST['filter'];
    $bjornecustomer=new ragnarReportsViewRequiReports();   
-   $outbjornecustomer=$bjornecustomer->stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $filter);
+   $outbjornecustomer=$bjornecustomer->stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $pagination, $filter);
    echo $outbjornecustomer;
 }
 
