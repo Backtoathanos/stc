@@ -736,13 +736,6 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <td class="text-right" style="background-color: #f6f900;">'.$bmprogress48.'</td>
                      <td class="text-right" style="background-color: #82f900;">'.$bmjobdone48.'</td>
                      <td class="text-right" style="background-color: #ff4545;">'.$bmpendingday.'</td>
-                     <td class="text-center" rowspan="10">
-                        <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
-                        <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
-                        '.$data_fields.'
-                        </ul>
-
-                     </td>
                   </tr>
                   <tr style="background-color:white;">
                      <td class="text-center">CALL ATTEND</td>
@@ -782,6 +775,13 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-right" style="background-color: #f6f900;">'.$bmprogress.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$bmjobdone.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$abmpendingday.'</td>
+                  <td class="text-center" rowspan="10">
+                     <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
+                     <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
+                     '.$data_fields.'
+                     </ul>
+
+                  </td>
                </tr>
                <tr style="background-color:white;">
                   <td class="text-center">CALL ATTEND</td>
