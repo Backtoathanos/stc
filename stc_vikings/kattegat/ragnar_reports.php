@@ -757,9 +757,9 @@ class ragnarReportsViewRequiReports extends tesseract{
             if(mysqli_num_rows($ivarpreqry)>0){
                $result=mysqli_fetch_assoc($ivarpreqry);
                $totalp48 = $result['bmplanning48'] + $result['cplanning48'] + $result['djaplanning48'] + $result['pmplanning48'];
-               $totalwp48 = $result['bmpendingjon48'] + $result['cpendingjon48'] + $result['djapendingjon48'] + $result['pmpendingjon48'];
-               $totalwd48 = $result['bmprogress48'] + $result['cprogress48'] + $result['djaprogress48'] + $result['pmprogress48'];
-               $totalpending48 = $result['bmjobdone48'] + $result['cjobdone48'] + $result['djajobdone48'] + $result['pmjobdone48'];
+               $totalpending48 = $result['bmpendingjon48'] + $result['cpendingjon48'] + $result['djapendingjon48'] + $result['pmpendingjon48'];
+               $totalwp48 = $result['bmprogress48'] + $result['cprogress48'] + $result['djaprogress48'] + $result['pmprogress48'];
+               $totalwd48 = $result['bmjobdone48'] + $result['cjobdone48'] + $result['djajobdone48'] + $result['pmjobdone48'];
                $ivar.='
                      <tr style="background-color:white;">
                         <td class="text-center" rowspan="5">DAILY DCP ACTIVITY(within 48hr)</td>
@@ -834,9 +834,9 @@ class ragnarReportsViewRequiReports extends tesseract{
             if(mysqli_num_rows($ivarpreqry)>0){
                $result=mysqli_fetch_assoc($ivarpreqry);
                $totalp48 = $result['bmplanning48'] + $result['cplanning48'] + $result['djaplanning48'] + $result['pmplanning48'];
-               $totalwp48 = $result['bmpendingjon48'] + $result['cpendingjon48'] + $result['djapendingjon48'] + $result['pmpendingjon48'];
-               $totalwd48 = $result['bmprogress48'] + $result['cprogress48'] + $result['djaprogress48'] + $result['pmprogress48'];
-               $totalpending48 = $result['bmjobdone48'] + $result['cjobdone48'] + $result['djajobdone48'] + $result['pmjobdone48'];
+               $totalpending48 = $result['bmpendingjon48'] + $result['cpendingjon48'] + $result['djapendingjon48'] + $result['pmpendingjon48'];
+               $totalwp48 = $result['bmprogress48'] + $result['cprogress48'] + $result['djaprogress48'] + $result['pmprogress48'];
+               $totalwd48 = $result['bmjobdone48'] + $result['cjobdone48'] + $result['djajobdone48'] + $result['pmjobdone48'];
                $ivar.='
                      <tr style="background-color:white;">
                         <td class="text-center" rowspan="5">DAILY DCP ACTIVITY(within 48hr)</td>
