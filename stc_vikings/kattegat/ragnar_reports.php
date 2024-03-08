@@ -564,7 +564,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          FROM `stc_status_down_list` 
          LEFT JOIN `stc_cust_project` 
          ON `stc_cust_project_id`=`stc_status_down_list_location` 
-         WHERE `stc_status_down_list_status`<>5 
+         WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' 
          ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
       ");
       $sitename="";
@@ -595,6 +595,7 @@ class ragnarReportsViewRequiReports extends tesseract{
       $progress48=0;
       $pendingjon48=0;
 
+      $outputcheck = '';
       if(mysqli_num_rows($ivarpreqry)>0){
          $currenthr=date("Y/m/d");
          foreach($ivarpreqry as $prerow){
@@ -728,167 +729,160 @@ class ragnarReportsViewRequiReports extends tesseract{
                </tr>
          ';
          if($filter==1){
-            $ivarpreqry=mysqli_query($this->stc_dbs, "
+            $filteredqry="
                SELECT 
-                  `stc_cust_project_title`,
-                  `stc_status_down_list_status`,
-                  `stc_status_down_list_date`,
-                  `stc_status_down_list_rect_date`,
-                  `stc_status_down_list_jobtype`
-               FROM `stc_status_down_list` 
-               LEFT JOIN `stc_cust_project` 
-               ON `stc_cust_project_id`=`stc_status_down_list_location` 
-               WHERE `stc_status_down_list_status`<>5 ".$query_filter."
-               ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
-            ");
-            foreach($ivarpreqry as $prerow){
-               $today = date("Y/m/d") ; 
-               $startTimeStamp = strtotime(date('Y/m/d', strtotime($prerow['stc_status_down_list_date'])));
-               $endTimeStamp = strtotime($today);
-   
-               $timeDiff = abs($endTimeStamp - $startTimeStamp);
-   
-               $dperiod = $timeDiff/86400;
-               
-               if($prerow['stc_status_down_list_jobtype']=="BREAKDOWN MAINTENANCE"){
-                  if($prerow['stc_status_down_list_status']==1){
-                     $bmplanning48++;
-                  }else if($prerow['stc_status_down_list_status']==2){
-                     $bmpendingjon48++;
-                  }else if($prerow['stc_status_down_list_status']==3){
-                     $bmprogress48++;
-                  }else if($prerow['stc_status_down_list_status']==4){
-                     $bmjobdone48++;
-                  }
-               }else if($prerow['stc_status_down_list_jobtype']=="CALL ATTEND"){
-                  if($prerow['stc_status_down_list_status']==1){
-                     $cplanning48++;
-                  }else if($prerow['stc_status_down_list_status']==2){
-                     $cpendingjon48++;
-                  }else if($prerow['stc_status_down_list_status']==3){
-                     $cprogress48++;
-                  }else if($prerow['stc_status_down_list_status']==4){
-                     $cjobdone48++;
-                  }
-               }else if($prerow['stc_status_down_list_jobtype']=="DAILY JOB ACTIVITY"){
-                  if($prerow['stc_status_down_list_status']==1){
-                     $djaplanning48++;
-                  }else if($prerow['stc_status_down_list_status']==2){
-                     $djapendingjon48++;
-                  }else if($prerow['stc_status_down_list_status']==3){
-                     $djaprogress48++;
-                  }else if($prerow['stc_status_down_list_status']==4){
-                     $djajobdone48++;
-                  }
-               }else if($prerow['stc_status_down_list_jobtype']=="PREVENTIVE MAINTENANCE"){
-                  if($prerow['stc_status_down_list_status']==1){
-                     $pmplanning48++;
-                  }else if($prerow['stc_status_down_list_status']==2){
-                     $pmpendingjon48++;
-                  }else if($prerow['stc_status_down_list_status']==3){
-                     $pmprogress48++;
-                  }else if($prerow['stc_status_down_list_status']==4){
-                     $pmjobdone48++;
-                  }
-               }
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'BREAKDOWN MAINTENANCE' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `bmplanning48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'BREAKDOWN MAINTENANCE' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `bmpendingjon48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'BREAKDOWN MAINTENANCE' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `bmprogress48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'BREAKDOWN MAINTENANCE' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `bmjobdone48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'CALL ATTEND' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `cplanning48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'CALL ATTEND' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `cpendingjon48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'CALL ATTEND' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `cprogress48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'CALL ATTEND' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `cjobdone48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'DAILY JOB ACTIVITY' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `djaplanning48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'DAILY JOB ACTIVITY' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `djapendingjon48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'DAILY JOB ACTIVITY' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `djaprogress48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'DAILY JOB ACTIVITY' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `djajobdone48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `pmplanning48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `pmpendingjon48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `pmprogress48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `pmjobdone48`
+                  FROM `stc_status_down_list` 
+                  LEFT JOIN `stc_cust_project` 
+                  ON `stc_cust_project_id`=`stc_status_down_list_location` 
+                  WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' ".$query_filter."
+                  ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
+            ";
+            $ivarpreqry=mysqli_query($this->stc_dbs, $filteredqry);
+            if(mysqli_num_rows($ivarpreqry)>0){
+               $result=mysqli_fetch_assoc($ivarpreqry);
+               $totalp48 = $result['bmplanning48'] + $result['cplanning48'] + $result['djaplanning48'] + $result['pmplanning48'];
+               $totalwp48 = $result['bmpendingjon48'] + $result['cpendingjon48'] + $result['djapendingjon48'] + $result['pmpendingjon48'];
+               $totalwd48 = $result['bmprogress48'] + $result['cprogress48'] + $result['djaprogress48'] + $result['pmprogress48'];
+               $totalpending48 = $result['bmjobdone48'] + $result['cjobdone48'] + $result['djajobdone48'] + $result['pmjobdone48'];
+               $ivar.='
+                     <tr style="background-color:white;">
+                        <td class="text-center" rowspan="5">DAILY DCP ACTIVITY(within 48hr)</td>
+                        <td class="text-center">BREAKDOWN MAINTENANCE</td>
+                        <td class="text-right" style="background-color: #00f9b4;">'.$result['bmplanning48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['bmpendingjon48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['bmprogress48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['bmjobdone48'].'</td>
+                        <td class="text-center" rowspan="10">
+                           <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
+                           <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
+                           '.$data_fields.'
+                           </ul>
+      
+                        </td>
+                     </tr>
+                     <tr style="background-color:white;">
+                        <td class="text-center">CALL ATTEND</td>
+                        <td class="text-right" style="background-color: #00f9b4;">'.$result['cplanning48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['cpendingjon48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['cprogress48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['cjobdone48'].'</td>
+                     </tr>
+                     <tr style="background-color:white;">
+                        <td class="text-center">DAILY JOB ACTIVITY</td>
+                        <td class="text-right" style="background-color: #00f9b4;">'.$result['djaplanning48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['djapendingjon48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['djaprogress48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['djajobdone48'].'</td>
+                     </tr>
+                     <tr style="background-color:white;border-bottom: 3px solid black;">
+                        <td class="text-center">PREVENTIVE MAINTENANCE</td>
+                        <td class="text-right" style="background-color: #00f9b4;">'.$result['pmplanning48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['pmpendingjon48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['pmprogress48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['pmjobdone48'].'</td>
+                     </tr>
+                     <tr style="background-color:white;border-bottom: 3px solid black;">
+                        <td class="text-center">TOTAL</td>
+                        <td class="text-right"><b>'.$totalp48.'</b></td>
+                        <td class="text-right"><b>'.$totalwp48.'</b></td>
+                        <td class="text-right"><b>'.$totalwd48.'</b></td>
+                        <td class="text-right"><b>'.$totalpending48.'</b></td>
+                     </tr>
+               ';
             }
-            
-            $totalp48=$bmplanningday + $cplanningday + $djaplanningday + $pmplanningday;
-            $totalwp48=$bmprogress48 + $cprogress48 + $djaprogress48 + $pmprogress48;
-            $totalwd48=$bmjobdone48 + $cjobdone48 + $djajobdone48 + $pmjobdone48;
-            $totalpending48=$bmpendingday + $cpendingday + $djapendingday + $pmpendingday;
-            $ivar.='
-                  <tr style="background-color:white;">
-                     <td class="text-center" rowspan="5">Filtered Result</td>
-                     <td class="text-center">BREAKDOWN MAINTENANCE</td>
-                     <td class="text-right" style="background-color: #00f9b4;">'.$bmplanningday.'</td>
-                     <td class="text-right" style="background-color: #f6f900;">'.$bmprogress48.'</td>
-                     <td class="text-right" style="background-color: #82f900;">'.$bmjobdone48.'</td>
-                     <td class="text-right" style="background-color: #ff4545;">'.$bmpendingday.'</td>
-                     <td class="text-center" rowspan="10">
-                        <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
-                        <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
-                        '.$data_fields.'
-                        </ul>
-   
-                     </td>
-                  </tr>
-                  <tr style="background-color:white;">
-                     <td class="text-center">CALL ATTEND</td>
-                     <td class="text-right" style="background-color: #00f9b4;">'.$cplanningday.'</td>
-                     <td class="text-right" style="background-color: #f6f900;">'.$cprogress48.'</td>
-                     <td class="text-right" style="background-color: #82f900;">'.$cjobdone48.'</td>
-                     <td class="text-right" style="background-color: #ff4545;">'.$cpendingday.'</td>
-                  </tr>
-                  <tr style="background-color:white;">
-                     <td class="text-center">DAILY JOB ACTIVITY</td>
-                     <td class="text-right" style="background-color: #00f9b4;">'.$djaplanningday.'</td>
-                     <td class="text-right" style="background-color: #f6f900;">'.$djaprogress48.'</td>
-                     <td class="text-right" style="background-color: #82f900;">'.$djajobdone48.'</td>
-                     <td class="text-right" style="background-color: #ff4545;">'.$djapendingday.'</td>
-                  </tr>
-                  <tr style="background-color:white;border-bottom: 3px solid black;">
-                     <td class="text-center">PREVENTIVE MAINTENANCE</td>
-                     <td class="text-right" style="background-color: #00f9b4;">'.$pmplanningday.'</td>
-                     <td class="text-right" style="background-color: #f6f900;">'.$pmprogress48.'</td>
-                     <td class="text-right" style="background-color: #82f900;">'.$pmjobdone48.'</td>
-                     <td class="text-right" style="background-color: #ff4545;">'.$pmpendingday.'</td>
-                  </tr>
-                  <tr style="background-color:white;border-bottom: 3px solid black;">
-                     <td class="text-center">TOTAL</td>
-                     <td class="text-right"><b>'.$totalp48.'</b></td>
-                     <td class="text-right"><b>'.$totalwp48.'</b></td>
-                     <td class="text-right"><b>'.$totalwd48.'</b></td>
-                     <td class="text-right"><b>'.$totalpending48.'</b></td>
-                  </tr>
-            ';
          }
          if($filter==0){
-            $ivar.='
-                  <tr style="background-color:white;">
-                     <td class="text-center" rowspan="5">DAILY DCP ACTIVITY(within 48hr)</td>
-                     <td class="text-center">BREAKDOWN MAINTENANCE</td>
-                     <td class="text-right" style="background-color: #00f9b4;">'.$bmplanningday.'</td>
-                     <td class="text-right" style="background-color: #f6f900;">'.$bmprogress48.'</td>
-                     <td class="text-right" style="background-color: #82f900;">'.$bmjobdone48.'</td>
-                     <td class="text-right" style="background-color: #ff4545;">'.$bmpendingday.'</td>
-                     <td class="text-center" rowspan="10">
-                        <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
-                        <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
-                        '.$data_fields.'
-                        </ul>
-   
-                     </td>
-                  </tr>
-                  <tr style="background-color:white;">
-                     <td class="text-center">CALL ATTEND</td>
-                     <td class="text-right" style="background-color: #00f9b4;">'.$cplanningday.'</td>
-                     <td class="text-right" style="background-color: #f6f900;">'.$cprogress48.'</td>
-                     <td class="text-right" style="background-color: #82f900;">'.$cjobdone48.'</td>
-                     <td class="text-right" style="background-color: #ff4545;">'.$cpendingday.'</td>
-                  </tr>
-                  <tr style="background-color:white;">
-                     <td class="text-center">DAILY JOB ACTIVITY</td>
-                     <td class="text-right" style="background-color: #00f9b4;">'.$djaplanningday.'</td>
-                     <td class="text-right" style="background-color: #f6f900;">'.$djaprogress48.'</td>
-                     <td class="text-right" style="background-color: #82f900;">'.$djajobdone48.'</td>
-                     <td class="text-right" style="background-color: #ff4545;">'.$djapendingday.'</td>
-                  </tr>
-                  <tr style="background-color:white;border-bottom: 3px solid black;">
-                     <td class="text-center">PREVENTIVE MAINTENANCE</td>
-                     <td class="text-right" style="background-color: #00f9b4;">'.$pmplanningday.'</td>
-                     <td class="text-right" style="background-color: #f6f900;">'.$pmprogress48.'</td>
-                     <td class="text-right" style="background-color: #82f900;">'.$pmjobdone48.'</td>
-                     <td class="text-right" style="background-color: #ff4545;">'.$pmpendingday.'</td>
-                  </tr>
-                  <tr style="background-color:white;border-bottom: 3px solid black;">
-                     <td class="text-center">TOTAL</td>
-                     <td class="text-right"><b>'.$totalp.'</b></td>
-                     <td class="text-right"><b>'.$totalwp.'</b></td>
-                     <td class="text-right"><b>'.$totalwd.'</b></td>
-                     <td class="text-right"><b>'.$totalpending.'</b></td>
-                  </tr>
-            ';
+            $filteredqry="
+               SELECT 
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'BREAKDOWN MAINTENANCE' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `bmplanning48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'BREAKDOWN MAINTENANCE' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `bmpendingjon48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'BREAKDOWN MAINTENANCE' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `bmprogress48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'BREAKDOWN MAINTENANCE' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `bmjobdone48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'CALL ATTEND' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `cplanning48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'CALL ATTEND' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `cpendingjon48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'CALL ATTEND' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `cprogress48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'CALL ATTEND' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `cjobdone48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'DAILY JOB ACTIVITY' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `djaplanning48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'DAILY JOB ACTIVITY' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `djapendingjon48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'DAILY JOB ACTIVITY' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `djaprogress48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'DAILY JOB ACTIVITY' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `djajobdone48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `pmplanning48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `pmpendingjon48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `pmprogress48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `pmjobdone48`
+               FROM `stc_status_down_list` 
+               LEFT JOIN `stc_cust_project` ON `stc_cust_project_id`=`stc_status_down_list_location` 
+               WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' AND `stc_status_down_list_status`<>6 AND `stc_status_down_list_status`<>5 AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
+            ";
+            $ivarpreqry=mysqli_query($this->stc_dbs, $filteredqry);
+            if(mysqli_num_rows($ivarpreqry)>0){
+               $result=mysqli_fetch_assoc($ivarpreqry);
+               $totalp48 = $result['bmplanning48'] + $result['cplanning48'] + $result['djaplanning48'] + $result['pmplanning48'];
+               $totalwp48 = $result['bmpendingjon48'] + $result['cpendingjon48'] + $result['djapendingjon48'] + $result['pmpendingjon48'];
+               $totalwd48 = $result['bmprogress48'] + $result['cprogress48'] + $result['djaprogress48'] + $result['pmprogress48'];
+               $totalpending48 = $result['bmjobdone48'] + $result['cjobdone48'] + $result['djajobdone48'] + $result['pmjobdone48'];
+               $ivar.='
+                     <tr style="background-color:white;">
+                        <td class="text-center" rowspan="5">DAILY DCP ACTIVITY(within 48hr)</td>
+                        <td class="text-center">BREAKDOWN MAINTENANCE</td>
+                        <td class="text-right" style="background-color: #00f9b4;">'.$result['bmplanning48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['bmpendingjon48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['bmprogress48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['bmjobdone48'].'</td>
+                        <td class="text-center" rowspan="10">
+                           <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
+                           <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
+                           '.$data_fields.'
+                           </ul>
+      
+                        </td>
+                     </tr>
+                     <tr style="background-color:white;">
+                        <td class="text-center">CALL ATTEND</td>
+                        <td class="text-right" style="background-color: #00f9b4;">'.$result['cplanning48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['cpendingjon48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['cprogress48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['cjobdone48'].'</td>
+                     </tr>
+                     <tr style="background-color:white;">
+                        <td class="text-center">DAILY JOB ACTIVITY</td>
+                        <td class="text-right" style="background-color: #00f9b4;">'.$result['djaplanning48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['djapendingjon48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['djaprogress48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['djajobdone48'].'</td>
+                     </tr>
+                     <tr style="background-color:white;border-bottom: 3px solid black;">
+                        <td class="text-center">PREVENTIVE MAINTENANCE</td>
+                        <td class="text-right" style="background-color: #00f9b4;">'.$result['pmplanning48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['pmpendingjon48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['pmprogress48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['pmjobdone48'].'</td>
+                     </tr>
+                     <tr style="background-color:white;border-bottom: 3px solid black;">
+                        <td class="text-center">TOTAL</td>
+                        <td class="text-right"><b>'.$totalp48.'</b></td>
+                        <td class="text-right"><b>'.$totalwp48.'</b></td>
+                        <td class="text-right"><b>'.$totalwd48.'</b></td>
+                        <td class="text-right"><b>'.$totalpending48.'</b></td>
+                     </tr>
+               ';
+            }
          }
          $ivar.='
                <tr style="background-color:white;">
