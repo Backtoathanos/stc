@@ -1704,7 +1704,28 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 $('.stc-show-std-details').html("Please wait...");
                 stc_call_std(filter, pagination);
             });
-
+            
+            // find std with pagination
+            $('body').delegate('.std-filter-find-paginationprev', 'click', function(e){
+                e.preventDefault();
+                var filter = 0;
+                var datefrom    =   $(".std-filter-date-from").val();
+                var dateto      =   $(".std-filter-date-to").val();
+                var location    =   $(".std-filter-location").val();
+                var department  =   $(".std-filter-department").val();
+                var typeofjob   =   $(".std-filter-typeofjob").val();
+                var status      =   $(".std-filter-status").val();
+                if(datefrom =="" && dateto == "" && location == "NA" && department == "NA" && typeofjob == "NA" && status == "NA"){
+                    filter=0;
+                }else{
+                    filter=1;
+                }
+                var pagination = $(this).attr("data");
+                pagination=pagination!=0 ? pagination-20 : pagination;
+                $('.std-filter-find-pagination').remove();
+                $('.stc-show-std-details').html("Please wait...");
+                stc_call_std(filter, pagination);
+            });
             // find std with pagination
             $('body').delegate('.std-filter-find-pagination', 'click', function(e){
                 e.preventDefault();

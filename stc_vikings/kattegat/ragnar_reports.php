@@ -968,7 +968,9 @@ class ragnarReportsViewRequiReports extends tesseract{
                </thead>
                <tbody>
          ';
+         $rowcount=$pagination;
          foreach($ivarqry as $row){
+            $rowcount++;
             
             $list_date=(date('Y', strtotime($row['stc_status_down_list_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_date'])) : 'NA';
             $rec_date=(date('Y', strtotime($row['stc_status_down_list_rect_date']))>1970) ? date('d-m-Y', strtotime($row['stc_status_down_list_rect_date'])) : 'NA';
@@ -1194,11 +1196,13 @@ class ragnarReportsViewRequiReports extends tesseract{
             ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
          ";
          $ivarqrycount=mysqli_query($this->stc_dbs, $querycount);
-
          $ivar.='
             <tr class="std-filter-find-pagination-tr">
-               <td colspan="2">Showing result '.$begpag.'-'.$pagination.'  out of '.mysqli_num_rows($ivarqrycount).'</td>
-               <td colspan="6"><a class="form-control btn btn-success std-filter-find-pagination" data="'.$pagination.'" >Show more</a></td>
+               <td colspan="4">Showing result '.$begpag.'-'.$rowcount.' out of '.mysqli_num_rows($ivarqrycount).'</td>
+               <td colspan="2">
+                  <a class="btn btn-success std-filter-find-paginationprev" data="'.$begpag.'" >Prev</a>
+                  <a class="btn btn-success std-filter-find-pagination" data="'.$pagination.'" >Next</a>
+               </td>
             </tr>
          ';
       }else{
