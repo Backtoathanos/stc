@@ -765,9 +765,9 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <td class="text-center" rowspan="5">DAILY DCP ACTIVITY(within 48hr)</td>
                         <td class="text-center">BREAKDOWN MAINTENANCE</td>
                         <td class="text-right" style="background-color: #00f9b4;">'.$result['bmplanning48'].'</td>
-                        <td class="text-right" style="background-color: #f6f900;">'.$result['bmpendingjon48'].'</td>
-                        <td class="text-right" style="background-color: #82f900;">'.$result['bmprogress48'].'</td>
-                        <td class="text-right" style="background-color: #ff4545;">'.$result['bmjobdone48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['bmprogress48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['bmjobdone48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['bmpendingjon48'].'</td>
                         <td class="text-center" rowspan="10">
                            <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
                            <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
@@ -779,23 +779,23 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <tr style="background-color:white;">
                         <td class="text-center">CALL ATTEND</td>
                         <td class="text-right" style="background-color: #00f9b4;">'.$result['cplanning48'].'</td>
-                        <td class="text-right" style="background-color: #f6f900;">'.$result['cpendingjon48'].'</td>
-                        <td class="text-right" style="background-color: #82f900;">'.$result['cprogress48'].'</td>
-                        <td class="text-right" style="background-color: #ff4545;">'.$result['cjobdone48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['cprogress48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['cjobdone48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['cpendingjon48'].'</td>
                      </tr>
                      <tr style="background-color:white;">
                         <td class="text-center">DAILY JOB ACTIVITY</td>
                         <td class="text-right" style="background-color: #00f9b4;">'.$result['djaplanning48'].'</td>
-                        <td class="text-right" style="background-color: #f6f900;">'.$result['djapendingjon48'].'</td>
-                        <td class="text-right" style="background-color: #82f900;">'.$result['djaprogress48'].'</td>
-                        <td class="text-right" style="background-color: #ff4545;">'.$result['djajobdone48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['djaprogress48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['djajobdone48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['djapendingjon48'].'</td>
                      </tr>
                      <tr style="background-color:white;border-bottom: 3px solid black;">
                         <td class="text-center">PREVENTIVE MAINTENANCE</td>
                         <td class="text-right" style="background-color: #00f9b4;">'.$result['pmplanning48'].'</td>
-                        <td class="text-right" style="background-color: #f6f900;">'.$result['pmpendingjon48'].'</td>
-                        <td class="text-right" style="background-color: #82f900;">'.$result['pmprogress48'].'</td>
-                        <td class="text-right" style="background-color: #ff4545;">'.$result['pmjobdone48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['pmprogress48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['pmjobdone48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['pmpendingjon48'].'</td>
                      </tr>
                      <tr style="background-color:white;border-bottom: 3px solid black;">
                         <td class="text-center">TOTAL</td>
