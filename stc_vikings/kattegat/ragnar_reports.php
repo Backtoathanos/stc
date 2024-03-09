@@ -510,7 +510,7 @@ class ragnarReportsViewRequiReports extends tesseract{
             $query_filter.="AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."'";
          }
       }else{
-         $query_filter='AND `stc_status_down_list_status`<>6 AND `stc_status_down_list_status`<>5 AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR';
+         $query_filter='AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR';
       }
       $query ="
          SELECT 
@@ -828,7 +828,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `pmjobdone48`
                FROM `stc_status_down_list` 
                LEFT JOIN `stc_cust_project` ON `stc_cust_project_id`=`stc_status_down_list_location` 
-               WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' AND `stc_status_down_list_status`<>6 AND `stc_status_down_list_status`<>5 AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
+               WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
             ";
             $ivarpreqry=mysqli_query($this->stc_dbs, $filteredqry);
             if(mysqli_num_rows($ivarpreqry)>0){
