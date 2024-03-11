@@ -560,7 +560,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           }else if((dispatch_qnty>balanced_qty)){
             alert("Invalid quantity.");
           }else{
-            if(orderqty!=0){
+            if(orderqty!="0.00"){
               $.ajax({
                 url       : "kattegat/ragnar_order.php",
                 method    :'POST',
