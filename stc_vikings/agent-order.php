@@ -1613,7 +1613,6 @@ include("kattegat/role_check.php");
                   if(response=="Item dispatched successfully."){
                     alert(response_dis);
                     $('#'+req_id).hide();
-                    $('.res-product-Modal-cash-close').modal("hide");
                     $('#stcdispatchedqty').val('');
                     $('#poadhocitem').val("NA");
                   }else{
