@@ -708,8 +708,9 @@ class ragnarReportsViewRequiReports extends tesseract{
             '17' => 'JOB DONE DETAILS',
             '18' => 'ANY COMMENT',
             '19' => 'TARGET DATE',
-            '20' => 'REMARKS',
-            '21' => 'ACTION'
+            '20' => 'SAFETY',
+            '21' => 'REMARKS',
+            '22' => 'ACTION'
          );
          
          $data_fields="";
@@ -762,7 +763,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                $totalwd48 = $result['bmjobdone48'] + $result['cjobdone48'] + $result['djajobdone48'] + $result['pmjobdone48'];
                $ivar.='
                      <tr style="background-color:white;">
-                        <td class="text-center" rowspan="5">DAILY DCP ACTIVITY(within 48hr)</td>
+                        <td class="text-center" rowspan="5">Filtered Result</td>
                         <td class="text-center">BREAKDOWN MAINTENANCE</td>
                         <td class="text-right" style="background-color: #00f9b4;">'.$result['bmplanning48'].'</td>
                         <td class="text-right" style="background-color: #f6f900;">'.$result['bmprogress48'].'</td>
@@ -956,6 +957,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th style="width:3%" class="text-center">JOB DONE DETAILS</th>
                      <th style="width:3%" class="text-center">ANY COMMENTS</th>
                      <th style="width:3%" class="text-center">TARGET DATE</th>
+                     <th style="width:3%" class="text-center">SAFETY</th>
                      <th style="width:3%" class="text-center">REMARKS</th>
                      <th style="width:3%" class="text-center sl-hide excel-hide">ACTION</th>
                   </tr>
@@ -1113,6 +1115,10 @@ class ragnarReportsViewRequiReports extends tesseract{
             if(mysqli_num_rows($stc_materquery)==0){
                $material_view='#';
             }
+            $safety_inc='';
+            $safetyqry=mysqli_query($this->stc_dbs, "
+
+            ");
 
             $penddet_value = $row['stc_status_down_list_jobpending_details'];
             $penddet = strlen($penddet_value)>25 ? substr($penddet_value, 0, 25).'...<a href="javascript:void(0)" class="show-jobdonedetails" label="Pending Details" data="'.$penddet_value.'">Read more</a>' : $penddet_value;
@@ -1170,6 +1176,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <span class="jobdonedet-print" style="display:none;">'.$anycomm_value.'</span>
                   </td>
                   <td class="text-center">'.$ftargetdate.'</td>
+                  <td class="text-center">'.$safety_inc.'</td>
                   <td>
                      <span class="jobdonedet-view">'.$finalremarks.'</span>
                      <span class="jobdonedet-print" style="display:none;">'.$finalremarks_value.'</span>
