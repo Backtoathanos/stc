@@ -1119,7 +1119,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                $material_view='#';
             }
             $safety_inc="";
-            $safetygetmgrqry=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_id` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id`='".$row['stc_cust_pro_supervisor_created_by']."'");
+            $safetygetmgrqry=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_id` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_created_by`='".$row['stc_cust_pro_supervisor_created_by']."'");
             if(mysqli_num_rows($safetygetmgrqry)>0){
                foreach($safetygetmgrqry as $safetygetmgrrow){
                   $qryfilter="AND DATE(`stc_safetytbm_date`)='".date('Y-m-d', strtotime($row['stc_status_down_list_date']))."'";
