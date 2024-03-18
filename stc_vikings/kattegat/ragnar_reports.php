@@ -1137,7 +1137,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   ";
                   $gettbtqry=mysqli_query($this->stc_dbs, $safetytbmquery);
                   foreach($gettbtqry as $gettbtrow){
-                     $tbtout='<a clss="btn btn-success" href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$gettbtrow['stc_safetytbm_id'].'">'.$gettbtrow['stc_safetytbm_id'].'</a>';
+                     $tbtout='<a clss="btn btn-success" action="_blank" href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$gettbtrow['stc_safetytbm_id'].'">'.$gettbtrow['stc_safetytbm_id'].'</a>';
                      $safety_inc.=$safety_inc=='' ? $tbtout : ', '.$tbtout;
                   }
                }
