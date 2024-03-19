@@ -532,44 +532,58 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 });
             }
 
+            
+            var url = document.location.href;
+            var qs = url.substring(url.indexOf('?') + 1).split('&');
+            for(var i = 0, result = {}; i < qs.length; i++){
+                qs[i] = qs[i].split('=');
+                result[qs[i][0]] = decodeURIComponent(qs[i][1]);
+            }
+            
+            var sdlno=result.sdl==undefined ? "0" : result.sdl;
+
             // $('.bd-tbt-box-meeting-modal-lg').modal('show');
             $('body').delegate('.add-tbt-box-meeting-modal', 'click', function(e){
                 e.preventDefault();
-                $.ajax({
-                    url         : "nemesis/stc_safety.php",
-                    method      : "POST",
-                    data        : {stc_safety_addtbm:1},
-                    success     : function(response_tbm){
-                        var response=response_tbm.trim();
-                        if(response=="same"){
-                            alert("Can not add new tool box meeting at same day, you can only edit & delete on same day.");
-                        }else{
-                            call_tbm();
-                            $('.bd-tbt-box-meeting-modal-lg').modal('show');
-                            $('.stc-tbm-no').val(response);
-                            call_tbm_fields();
+                if(confirm("TBM will create automatically. Are you sure want to create TBM? ")){
+                    $.ajax({
+                        url         : "nemesis/stc_safety.php",
+                        method      : "POST",
+                        data        : {stc_safety_addtbm:1, sdlno:sdlno},
+                        success     : function(response_tbm){
+                            var response=response_tbm.trim();
+                            if(response=="same"){
+                                alert("Can not add new tool box meeting at same day, you can only edit & delete on same day.");
+                            }else{
+                                call_tbm();
+                                $('.bd-tbt-box-meeting-modal-lg').modal('show');
+                                $('.stc-tbm-no').val(response);
+                                call_tbm_fields();
+                            }
                         }
-                    }
-                });
+                    });
+                }
             });
 
             // delete tbm row
             $('body').delegate('.stc-safetytbm-delete', 'click', function(e){
                 e.preventDefault();
                 var tbm_id=$(this).attr("id");
-                $.ajax({
-                    url         : "nemesis/stc_safety.php",
-                    method      : "POST",
-                    data        : {stc_safety_deletetbm:1,tbm_id:tbm_id},
-                    success     : function(response_tbm){
-                        var response=response_tbm.trim();
-                        if(response=="success"){
-                            call_tbm();
-                        }else{
-                            alert("Something went wrong, please check and try again.");
+                if(confirm("Are you sure want to delete this TBM? ")){
+                    $.ajax({
+                        url         : "nemesis/stc_safety.php",
+                        method      : "POST",
+                        data        : {stc_safety_deletetbm:1,tbm_id:tbm_id},
+                        success     : function(response_tbm){
+                            var response=response_tbm.trim();
+                            if(response=="success"){
+                                call_tbm();
+                            }else{
+                                alert("Something went wrong, please check and try again.");
+                            }
                         }
-                    }
-                });
+                    });
+                }
             });
 
             // update
@@ -617,7 +631,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         stc_suggesionsio:stc_suggesionsio,
                         stc_entryname:stc_entryname,
                         stc_desgination:stc_desgination,
-                        stc_gatepass:stc_gatepass
+                        stc_gatepass:stc_gatepass,
+                        sdlno:sdlno
                     },
                     success     : function(response_tbm){
                         // console.log(response_tbm);

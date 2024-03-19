@@ -68,7 +68,7 @@ class witcher_supervisor extends tesseract{
 		return $optimusprime;
 	}
 
-	public function stc_hit_tbm_call_no(){
+	public function stc_hit_tbm_call_no($sdlno){
 		$optimusprime='';
 		$date=date("Y-m-d");
 		$optimusprimechecquery=mysqli_query($this->stc_dbs, "
@@ -84,9 +84,11 @@ class witcher_supervisor extends tesseract{
 			$optimusprimequery=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_safetytbm`(
 					`stc_safetytbm_date`, 
+					`stc_safetytbm_std_id`, 
 					`stc_safetytbm_created_by`
 				) VALUES (
 					'".$date."',
+					'".$sdlno."',
 					'".$_SESSION['stc_agent_sub_id']."'
 				)
 			");
@@ -164,7 +166,7 @@ class witcher_supervisor extends tesseract{
 	}
 
 	// update tbm
-	public function stc_update_tbm($stc_tbm_no, $stc_date, $stc_time, $stc_place, $stc_agendaofmeeting, $stc_pointtone, $stc_pointtwo, $stc_pointthree, $stc_pointfour, $stc_pointfive, $stc_pointsix, $stc_suggesionsio, $stc_entryname, $stc_desgination, $stc_gatepass){
+	public function stc_update_tbm($stc_tbm_no, $stc_date, $stc_time, $stc_place, $stc_agendaofmeeting, $stc_pointtone, $stc_pointtwo, $stc_pointthree, $stc_pointfour, $stc_pointfive, $stc_pointsix, $stc_suggesionsio, $stc_entryname, $stc_desgination, $stc_gatepass, $sdlno){
 		$optimusprime='';
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			UPDATE
@@ -183,6 +185,7 @@ class witcher_supervisor extends tesseract{
 			    `stc_safetytbm_entry_name` 		= '".mysqli_real_escape_string($this->stc_dbs, $stc_entryname)."',
 			    `stc_safetytbm_designation` 	= '".mysqli_real_escape_string($this->stc_dbs, $stc_desgination)."',
 			    `stc_safetytbm_gatepass_no` 	= '".mysqli_real_escape_string($this->stc_dbs, $stc_gatepass)."',
+			    `stc_safetytbm_std_id` 			= '".mysqli_real_escape_string($this->stc_dbs, $sdlno)."',
 			    `stc_safetytbm_remarks` 		= '".mysqli_real_escape_string($this->stc_dbs, $stc_suggesionsio)."'
 			WHERE
 			    `stc_safetytbm_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_tbm_no)."'
@@ -1472,8 +1475,9 @@ class witcher_toollist extends tesseract{
 /*-----------------------------------------------------------------------------------*/
 // add id to tbm
 if(isset($_POST['stc_safety_addtbm'])){
+	$sdlno=$_POST['sdlno'];
 	$objsearchreq=new witcher_supervisor();
-	$opobjsearchreq=$objsearchreq->stc_hit_tbm_call_no();
+	$opobjsearchreq=$objsearchreq->stc_hit_tbm_call_no($sdlno);
 	echo $opobjsearchreq;
 }
 
@@ -1517,8 +1521,9 @@ if(isset($_POST['stc_safety_updatetbm'])){
 	$stc_entryname=$_POST['stc_entryname'];
 	$stc_desgination=$_POST['stc_desgination'];
 	$stc_gatepass=$_POST['stc_gatepass'];
+	$sdlno=$_POST['sdlno'];
 	$objsearchreq=new witcher_supervisor();
-	$opobjsearchreq=$objsearchreq->stc_update_tbm($stc_tbm_no, $stc_date, $stc_time, $stc_place, $stc_agendaofmeeting, $stc_pointtone, $stc_pointtwo, $stc_pointthree, $stc_pointfour, $stc_pointfive, $stc_pointsix, $stc_suggesionsio, $stc_entryname, $stc_desgination, $stc_gatepass);
+	$opobjsearchreq=$objsearchreq->stc_update_tbm($stc_tbm_no, $stc_date, $stc_time, $stc_place, $stc_agendaofmeeting, $stc_pointtone, $stc_pointtwo, $stc_pointthree, $stc_pointfour, $stc_pointfive, $stc_pointsix, $stc_suggesionsio, $stc_entryname, $stc_desgination, $stc_gatepass, $sdlno);
 	echo $opobjsearchreq;
 }
 
