@@ -1119,27 +1119,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                $material_view='#';
             }
             $safety_inc="";
-            $safetygetmgrqry=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_id` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_created_by`='".$row['stc_cust_pro_supervisor_created_by']."'");
+            $safetygetmgrqry=mysqli_query($this->stc_dbs, "SELECT `stc_safetytbm_id` FROM `stc_safetytbm` WHERE `stc_safetytbm_std_id`='".$row['stc_status_down_list_id']."'");
             if(mysqli_num_rows($safetygetmgrqry)>0){
                foreach($safetygetmgrqry as $safetygetmgrrow){
-                  $qryfilter="AND DATE(`stc_safetytbm_date`)='".date('Y-m-d', strtotime($row['stc_status_down_list_date']))."'";
-                  if($row['stc_status_down_list_status']>3){
-                     $qryfilter="
-                        AND DATE(`stc_safetytbm_date`) BETWEEN '".date('Y-m-d', strtotime($row['stc_status_down_list_date']))."'
-                        AND '".date('Y-m-d', strtotime($row['stc_status_down_list_rect_date']))."'
-                     ";
-                  }
-                  $safetytbmquery="
-                     SELECT `stc_safetytbm_id` 
-                     FROM `stc_safetytbm` 
-                     WHERE `stc_safetytbm_created_by`='".$safetygetmgrrow['stc_cust_pro_supervisor_id']."'
-                     ".$qryfilter."
-                  ";
-                  $gettbtqry=mysqli_query($this->stc_dbs, $safetytbmquery);
-                  foreach($gettbtqry as $gettbtrow){
-                     $tbtout='<a clss="btn btn-success" action="_blank" href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$gettbtrow['stc_safetytbm_id'].'">'.$gettbtrow['stc_safetytbm_id'].'</a>';
-                     $safety_inc.=$safety_inc=='' ? $tbtout : ', '.$tbtout;
-                  }
+                  $tbtout='<a class="btn btn-success" target="_blank" title="Click to view TBM" href="../stc_agent47/safety-tbm-print-preview.php?tbm_no='.$safetygetmgrrow['stc_safetytbm_id'].'">'.$safetygetmgrrow['stc_safetytbm_id'].'</a>';
+                  $safety_inc.=$safety_inc=='' ? $tbtout : ', '.$tbtout;
                }
             }
 
