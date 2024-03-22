@@ -464,7 +464,39 @@ include("kattegat/role_check.php");
                 }
               });
             }          
-          });   
+          });  
+          
+          $('body').delegate('.edit-itemname', 'click', function(e){
+            var item_name=$(this).html();
+            var item_id=$(this).attr("id");
+            $('#edit-pro-id').remove();
+            $('#stcpoadhoceitemname').val(item_name);
+            $('#stc-poadhocedit-id').val(item_id);
+          });
+          
+          $('body').delegate('.stc-poadhoc-edititemname', 'click', function(e){
+            var adhoc_id=$('#stc-poadhocedit-id').val();
+            var adhoc_name=$('#stcpoadhoceitemname').val();
+            $.ajax({
+              url     : "kattegat/ragnar_purchase.php",
+              method  : "POST",
+              data    : {
+                stc_po_adhoc_update:1,
+                adhoc_id:adhoc_id,
+                adhoc_name:adhoc_name
+              },
+              success : function(response_items){
+                var response=response_items.trim();
+                if(response=="success"){
+                  alert("Item Name Updated Successfully.");
+                  $('#stcpoadhoceitemname').val("");
+                  $('.stc-adhocpo-find').click();
+                }else{
+                  alert("Something went wrong please check and try again.");
+                }
+              }
+            });  
+          });  
         });
     </script>
 </body>
@@ -498,6 +530,49 @@ include("kattegat/role_check.php");
                 <div class="col-xl-12 col-md-12 col-sm-12">
                   <div class="card-border mb-3 card card-body border-success">
                     <button type="button"  data-dismiss="modal" class="btn btn-success stc-poadhoc-received-hit">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div class="row">
+                <div class="col-xl-6 col-md-6 col-sm-6">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-modal-editproductname" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-s ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Item Name</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5
+                      for=""
+                      >Item Name
+                    </h5>
+                    <input type="hidden" id="stc-poadhocedit-id">
+                    <input
+                      id="stcpoadhoceitemname"
+                      type="text"
+                      placeholder="Edit Item Name"
+                      class="form-control validate"
+                    />
+                  </div>
+                </div>
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <button type="button"  data-dismiss="modal" class="btn btn-success stc-poadhoc-edititemname">Save</button>
                   </div>
                 </div>
               </div>
