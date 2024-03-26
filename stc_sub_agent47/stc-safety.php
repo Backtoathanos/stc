@@ -419,6 +419,22 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 }
             });  
             
+            $('body').delegate('.stc-tbm-gentrysupengname', 'change', function(e){
+                var value = $(this).val();
+                $('#stc-tbtm-gentrysupengname').val(value);
+            });
+            
+            $('body').delegate('.stc-tbm-checklistitem', 'change', function(e){
+                var value = $(this).val();
+                $('#stc-tbtm-ppe-checklistempname').val(value);
+                $('.checklistcb').prop('checked', true);
+            });
+            
+            $('body').delegate('.stc-tbm-resresponsibility', 'change', function(e){
+                var value = $(this).val();
+                $('#stc-tbtm-res-responsiblity').val(value);
+            });            
+
             // call tbm
             call_tbm();
             function call_tbm(){
@@ -769,6 +785,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         if(response=="success"){
                             alert("Record added.");
                             call_tbm_fields();
+                            $('#stc-tbtm-gentryworkpermit-no').val('');
+                            $('#stc-tbtm-gentryshift').val('');
+                            $('#stc-tbtm-gentrytime').val('');
+                            $('#stc-tbtm-gentrysupengname').val('');
                         }else{
                             alert("Something went wrong, please check and try again.");
                         }
@@ -799,6 +819,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         if(response=="success"){
                             alert("Record added.");
                             call_tbm_fields();
+                            $('#stc-tbtm-res-targetdate').val('');
+                            $('#stc-tbtm-res-responsiblity').val('');
+                            $('#stc-tbtm-res-item').val('');
                         }else{
                             alert("Something went wrong, please check and try again.");
                         }
@@ -871,6 +894,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 });
                 return filter;
             }
+
 
         });
     </script>
@@ -2159,54 +2183,77 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <input type="text" class="form-control" id="stc-tbtm-place" placeholder="Enter Place">
                                         </div>
                                     </div>
-                                    <div class="col-md-3 col-sm-12 col-xl-3">
-                                        <h5 class="card-title">Work permit no</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-gentryworkpermit-no" placeholder="Enter Work permit no">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 col-sm-12 col-xl-2">
-                                        <h5 class="card-title">Shift</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-gentryshift" placeholder="Enter Shift">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 col-sm-12 col-xl-2">
-                                        <h5 class="card-title">Time</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="time" class="form-control" id="stc-tbtm-gentrytime">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-sm-12 col-xl-3">
-                                        <h5 class="card-title">Supervisor/Engineers Name</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-gentrysupengname" placeholder="Enter Supervisor/Engineers Name">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 col-sm-12 col-xl-2">
-                                        <h5 class="card-title">.</h5>
-                                        <div class="position-relative form-group">
-                                            <a href="#" class="btn btn-success form-control stc-tbtm-gentryadd">Add</a>
-                                        </div>
-                                    </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
-                                        <table class="table table-bordered table-responsive">
-                                            <thead>
-                                                <tr>
-                                                    <th class="text-center">Sl no.</th>
-                                                    <th class="text-center">Work permit no.</th>
-                                                    <th class="text-center">Shift</th>
-                                                    <th class="text-center">Time</th>
-                                                    <th class="text-center">Supervisor /Engineer name</th>
-                                                    <th class="text-center">Signature</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="stc-safety-gentry-show-table">
-                                                <tr>
-                                                    <td colspan="6">Empty record</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                        <div class="row">
+                                            <div class="col-md-3 col-sm-12 col-xl-3">
+                                                <h5 class="card-title">Work permit no</h5>
+                                                <div class="position-relative form-group">
+                                                    <input type="text" class="form-control" id="stc-tbtm-gentryworkpermit-no" placeholder="Enter Work permit no">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-sm-12 col-xl-2">
+                                                <h5 class="card-title">Shift</h5>
+                                                <div class="position-relative form-group">
+                                                    <input type="text" class="form-control" id="stc-tbtm-gentryshift" placeholder="Enter Shift">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-sm-12 col-xl-2">
+                                                <h5 class="card-title">Time</h5>
+                                                <div class="position-relative form-group">
+                                                    <input type="time" class="form-control" id="stc-tbtm-gentrytime">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-12 col-xl-3">
+                                                <h5 class="card-title">Supervisor/Engineers Name</h5>
+                                                <div class="position-relative form-group">
+                                                    <input type="text" class="form-control" id="stc-tbtm-gentrysupengname" placeholder="Enter Supervisor/Engineers Name">
+                                                    <select class="form-control stc-tbm-gentrysupengname">
+                                                        <?php 
+                                                            include_once("../MCU/db.php");
+                                                            $result=mysqli_query($con, "
+                                                                SELECT DISTINCT `stc_safetytbm_gateentry_supeng_name`
+                                                                FROM `stc_safetytbm_gateentry` 
+                                                                LEFT JOIN `stc_safetytbm` 
+                                                                ON `stc_safetytbm_id`=`stc_safetytbm_gateentry_tbmid`
+                                                                WHERE `stc_safetytbm_created_by`='".$_SESSION['stc_agent_sub_id']."'
+                                                                AND `stc_safetytbm_gateentry_supeng_name`<>''
+                                                                ORDER BY `stc_safetytbm_gateentry_supeng_name` ASC
+                                                            ");
+                                                            if(mysqli_num_rows($result)>0){
+                                                                foreach($result as $resultrow){
+                                                                    echo '<option>'.$resultrow['stc_safetytbm_gateentry_supeng_name'].'</option>';
+                                                                }
+                                                            }
+                                                        ?>                                                        
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 col-sm-12 col-xl-2">
+                                                <h5 class="card-title">.</h5>
+                                                <div class="position-relative form-group">
+                                                    <a href="#" class="btn btn-success form-control stc-tbtm-gentryadd">Add</a>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-sm-12 col-xl-12">
+                                                <table class="table table-bordered table-responsive">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Sl no.</th>
+                                                            <th class="text-center">Work permit no.</th>
+                                                            <th class="text-center">Shift</th>
+                                                            <th class="text-center">Time</th>
+                                                            <th class="text-center">Supervisor /Engineer name</th>
+                                                            <th class="text-center">Signature</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-gentry-show-table">
+                                                        <tr>
+                                                            <td colspan="6">Empty record</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">Agenda of the meeting/ बैठक की कॅरिय सूचि : *</h5>
@@ -2214,41 +2261,41 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <textarea class="form-control" id="stc-tbtm-agendaofmeet" placeholder="Enter agenda of the meeting"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">List of topics: (Strike out (X) the topic that has not been discussed./ विषय की सूचि : ( जिस विषय की चर्चा नहीं हुई है उसे काट ( X ) दें ! : *</h5>
                                     </div>                                    
-                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">1. Review and discuss the topic of the previous meeting/ पिछले मीटिंग के विषय का रिव्यु करें तथा उसकी चर्चा करें :</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control" id="stc-tbtm-pointtone" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">2. Ask the employee about the near miss incident or accident of the past day and note down/ कर्मचारी से बीतें दिन के नियर मिस घटना या दुर्घटना के बारे में पूछें तथा नोट करें : *</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control" id="stc-tbtm-pointtwo" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">3. Inform the employee about Green Strip, Red Strip, Orange Strip and Safety Alert Circular: Inform them about hazards and safe working conditions/ कर्मचारी को ग्रीन स्ट्रिप , रेड स्ट्रिप , ऑरेंज स्ट्रिप और सेफ्टी अलर्ट सकयुरलर की जानकारी दें :
                                         उन्हें खतरे तथा कार्यानुसार सुरक्षित स्थिति के बारे में बतायें : *</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control" id="stc-tbtm-pointthree" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">4. Give information about the SOP which is related to that day's work and note down/ SOP जो उस दिन के कार्य से सम्बंधित हो उसके बारे में जानकारी दे तथा नोट करें : *</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control" id="stc-tbtm-pointfour" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">5. Remind employees of their personal responsibilities: proper PPE, housekeeping, tools and tackles, power equipment condition, 6 direction hazards, special requirements like work permit, no drinking, Safe behavior, Team work spirit, No dangerous architecture etc./ कर्मचारी को उनके व्यक्तिगत जिम्मेदारियां की याद दिलाये : उचित पीपीई , हाउसकीपिंग , टूल्स एंड टाकल्स , बिजली उपकरण की स्थिति, ६ दिशा के खतरे, विशेष ज़रूरत जैसे वर्क परमिट , मधपान निषेद ,सुरक्छित वयवहार ,टीम वर्क की भावना , कोई खतरनाक वास्तु इत्यादि : *</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control" id="stc-tbtm-pointfive" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">6. Share security written messages with employees/ सुरक्षा लिखित सन्देश कर्मचारी के साथ साझा करें : *</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control" id="stc-tbtm-pointsix" placeholder="Enter text"></textarea>
@@ -2267,6 +2314,24 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <h5 class="card-title">Responsibility</h5>
                                         <div class="position-relative form-group">
                                             <input type="text" class="form-control" id="stc-tbtm-res-responsiblity" placeholder="Enter Responsibility">
+                                            <select class="form-control stc-tbm-resresponsibility">
+                                                <?php 
+                                                    $result=mysqli_query($con, "
+                                                        SELECT DISTINCT `stc_safetytbm_responsibilities_responsibilities`
+                                                        FROM `stc_safetytbm_responsibilities` 
+                                                        LEFT JOIN `stc_safetytbm` 
+                                                        ON `stc_safetytbm_id`=`stc_safetytbm_responsibilities_tbmid`
+                                                        WHERE `stc_safetytbm_created_by`='".$_SESSION['stc_agent_sub_id']."'
+                                                        AND `stc_safetytbm_responsibilities_responsibilities`<>''
+                                                        ORDER BY `stc_safetytbm_responsibilities_responsibilities` ASC
+                                                    ");
+                                                    if(mysqli_num_rows($result)>0){
+                                                        foreach($result as $resultrow){
+                                                            echo '<option>'.$resultrow['stc_safetytbm_responsibilities_responsibilities'].'</option>';
+                                                        }
+                                                    }
+                                                ?>                                                        
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-12 col-xl-3">
@@ -2305,6 +2370,24 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <h5 class="card-title">Employee's Name</h5>
                                         <div class="position-relative form-group">
                                             <input type="text" class="form-control" id="stc-tbtm-ppe-checklistempname" placeholder="Enter Employees Name">
+                                            <select class="form-control stc-tbm-checklistitem">
+                                                <?php 
+                                                    $result=mysqli_query($con, "
+                                                        SELECT DISTINCT `stc_safetytbm_checklist_empname`
+                                                        FROM `stc_safetytbm_dailyfitppe_checklist` 
+                                                        LEFT JOIN `stc_safetytbm` 
+                                                        ON `stc_safetytbm_id`=`stc_safetytbm_checklist_tbmid`
+                                                        WHERE `stc_safetytbm_created_by`='".$_SESSION['stc_agent_sub_id']."'
+                                                        AND `stc_safetytbm_checklist_empname`<>''
+                                                        ORDER BY `stc_safetytbm_checklist_empname` ASC
+                                                    ");
+                                                    if(mysqli_num_rows($result)>0){
+                                                        foreach($result as $resultrow){
+                                                            echo '<option>'.$resultrow['stc_safetytbm_checklist_empname'].'</option>';
+                                                        }
+                                                    }
+                                                ?>                                                        
+                                            </select>
                                         </div>
                                     </div>                                    
                                     <div class="col-md-7 col-sm-12 col-xl-7">
