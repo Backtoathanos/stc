@@ -2283,7 +2283,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <textarea class="form-control" id="stc-tbtm-pointthree" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">4. Give information about the SOP which is related to that day's work and note down/ SOP जो उस दिन के कार्य से सम्बंधित हो उसके बारे में जानकारी दे तथा नोट करें : *</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control" id="stc-tbtm-pointfour" placeholder="Enter text"></textarea>
