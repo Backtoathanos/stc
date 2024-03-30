@@ -1189,3 +1189,5 @@
 [30-Jan-2024 15:43:04 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 998
 [30-Jan-2024 15:50:57 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 916
 [30-Jan-2024 15:50:57 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 916
+[30-Mar-2024 10:37:51 Asia/Kolkata] PHP Notice:  Undefined index: stc_merchant_invoice_sort in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 234
+[30-Mar-2024 10:37:51 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 234
