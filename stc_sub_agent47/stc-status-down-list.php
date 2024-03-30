@@ -814,25 +814,27 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 e.preventDefault();
                 var data_id = $(this).attr('data-id');
                 var actiontype = $(this).attr('actiontype');
-                $.ajax({
-                    url         : "nemesis/stc_std.php",
-                    method      : "POST",
-                    data        : {
-                        stc_jobcomplete_update_hit:1,
-                        data_id:data_id,
-                        actiontype:actiontype
-                    },
-                    dataType : 'JSON',
-                    success     : function(response_sdl){
-                        if(response_sdl=="logout"){
-                            widnow.location.reload();
-                        }else{
-                            alert(response_sdl);
-                            var location_id=$('#stc-agent-sup-std-location-find').val();
-                            std_list_call(location_id);
+                if(confirm("Are you sure?")){
+                    $.ajax({
+                        url         : "nemesis/stc_std.php",
+                        method      : "POST",
+                        data        : {
+                            stc_jobcomplete_update_hit:1,
+                            data_id:data_id,
+                            actiontype:actiontype
+                        },
+                        dataType : 'JSON',
+                        success     : function(response_sdl){
+                            if(response_sdl=="logout"){
+                                widnow.location.reload();
+                            }else{
+                                alert(response_sdl);
+                                var location_id=$('#stc-agent-sup-std-location-find').val();
+                                std_list_call(location_id);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             });
 
             
