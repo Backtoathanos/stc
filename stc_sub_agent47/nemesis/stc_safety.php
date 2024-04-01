@@ -166,7 +166,7 @@ class witcher_supervisor extends tesseract{
 	}
 
 	// update tbm
-	public function stc_update_tbm($stc_tbm_no, $stc_date, $stc_time, $stc_place, $stc_agendaofmeeting, $stc_pointtone, $stc_pointtwo, $stc_pointthree, $stc_pointfour, $stc_pointfive, $stc_pointsix, $stc_suggesionsio, $stc_entryname, $stc_desgination, $stc_gatepass, $sdlno){
+	public function stc_update_tbm($stc_tbm_no, $stc_date, $stc_time, $stc_place, $stc_loc, $stc_agendaofmeeting, $stc_pointtone, $stc_pointtwo, $stc_pointthree, $stc_pointfour, $stc_pointfive, $stc_pointsix, $stc_suggesionsio, $stc_entryname, $stc_desgination, $stc_gatepass, $sdlno){
 		$optimusprime='';
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			UPDATE
@@ -175,6 +175,7 @@ class witcher_supervisor extends tesseract{
 			    `stc_safetytbm_date` 			= '".mysqli_real_escape_string($this->stc_dbs, $stc_date)."',
 			    `stc_safetytbm_time` 			= '".mysqli_real_escape_string($this->stc_dbs, $stc_time)."',
 			    `stc_safetytbm_place` 			= '".mysqli_real_escape_string($this->stc_dbs, $stc_place)."',
+			    `stc_safetytbm_loc` 			= '".mysqli_real_escape_string($this->stc_dbs, $stc_loc)."',
 			    `stc_safetytbm_agendaofmeet` 	= '".mysqli_real_escape_string($this->stc_dbs, $stc_agendaofmeeting)."',
 			    `stc_safetytbm_ptone` 			= '".mysqli_real_escape_string($this->stc_dbs, $stc_pointtone)."',
 			    `stc_safetytbm_pttwo` 			= '".mysqli_real_escape_string($this->stc_dbs, $stc_pointtwo)."',
@@ -1510,6 +1511,7 @@ if(isset($_POST['stc_safety_updatetbm'])){
 	$stc_date=$_POST['stc_date'];
 	$stc_time=$_POST['stc_time'];
 	$stc_place=$_POST['stc_place'];
+	$stc_loc=$_POST['stc_loc'];
 	$stc_agendaofmeeting=$_POST['stc_agendaofmeeting'];
 	$stc_pointtone=$_POST['stc_pointtone'];
 	$stc_pointtwo=$_POST['stc_pointtwo'];
@@ -1523,7 +1525,7 @@ if(isset($_POST['stc_safety_updatetbm'])){
 	$stc_gatepass=$_POST['stc_gatepass'];
 	$sdlno=$_POST['sdlno'];
 	$objsearchreq=new witcher_supervisor();
-	$opobjsearchreq=$objsearchreq->stc_update_tbm($stc_tbm_no, $stc_date, $stc_time, $stc_place, $stc_agendaofmeeting, $stc_pointtone, $stc_pointtwo, $stc_pointthree, $stc_pointfour, $stc_pointfive, $stc_pointsix, $stc_suggesionsio, $stc_entryname, $stc_desgination, $stc_gatepass, $sdlno);
+	$opobjsearchreq=$objsearchreq->stc_update_tbm($stc_tbm_no, $stc_date, $stc_time, $stc_place, $stc_loc, $stc_agendaofmeeting, $stc_pointtone, $stc_pointtwo, $stc_pointthree, $stc_pointfour, $stc_pointfive, $stc_pointsix, $stc_suggesionsio, $stc_entryname, $stc_desgination, $stc_gatepass, $sdlno);
 	echo $opobjsearchreq;
 }
 
