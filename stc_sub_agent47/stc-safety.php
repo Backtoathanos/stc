@@ -467,6 +467,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-tbtm-date').val(response_tbm.tbm.stc_safetytbm_date);
                         $('#stc-tbtm-time').val(response_tbm.tbm.stc_safetytbm_time);
                         $('#stc-tbtm-place').val(response_tbm.tbm.stc_safetytbm_place);
+                        $('#stc-tbtm-location').val(response_tbm.tbm.stc_safetytbm_loc);
                         $('#stc-tbtm-agendaofmeet').val(response_tbm.tbm.stc_safetytbm_agendaofmeet);
                         $('#stc-tbtm-pointtone').val(response_tbm.tbm.stc_safetytbm_ptone);
                         $('#stc-tbtm-pointtwo').val(response_tbm.tbm.stc_safetytbm_pttwo);
@@ -480,7 +481,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-tbtm-gatepassno').val(response_tbm.tbm.stc_safetytbm_gatepass_no);
                         var tbm_entry=response_tbm.tbm_gateentry;
                         var tbm_entry_out='';
-                        if(tbm_entry.length>0){
+                        if (typeof tbm_entry !== 'undefined' && tbm_entry !== null && tbm_entry.length > 0) {
                             var sl=0;
                             for(var i=0; i<tbm_entry.length; i++){
                                 sl++;
@@ -493,7 +494,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
                         var tbm_responsibilities=response_tbm.tbm_responsibility;
                         var tbm_responsibilities_out='';
-                        if(tbm_responsibilities.length>0){
+                        if (typeof tbm_responsibilities !== 'undefined' && tbm_responsibilities !== null && tbm_responsibilities.length > 0) {
                             var sl=0;
                             for(var i=0; i<tbm_responsibilities.length; i++){
                                 sl++;
@@ -506,7 +507,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
                         var tbm_ppe_checklist=response_tbm.tbm_ppe_checklist;
                         var tbm_ppe_checklist_out='';
-                        if(tbm_ppe_checklist.length>0){
+                        if (typeof tbm_ppe_checklist !== 'undefined' && tbm_ppe_checklist !== null && tbm_ppe_checklist.length > 0) {
                             var sl=0;
                             for(var i=0; i<tbm_ppe_checklist.length; i++){                                
                                 sl++;
@@ -617,6 +618,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var stc_date=$('#stc-tbtm-date').val();
                 var stc_time=$('#stc-tbtm-time').val();
                 var stc_place=$('#stc-tbtm-place').val();
+                var stc_loc=$('#stc-tbtm-location').val();
                 var stc_agendaofmeeting=$('#stc-tbtm-agendaofmeet').val();
                 var stc_pointtone=$('#stc-tbtm-pointtone').val();
                 var stc_pointtwo=$('#stc-tbtm-pointtwo').val();
@@ -637,6 +639,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         stc_date:stc_date,
                         stc_time:stc_time,
                         stc_place:stc_place,
+                        stc_loc:stc_loc,
                         stc_agendaofmeeting:stc_agendaofmeeting,
                         stc_pointtone:stc_pointtone,
                         stc_pointtwo:stc_pointtwo,
@@ -662,103 +665,139 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 });
             }
 
-            $('body').delegate('#stc-tbtm-date', 'focusout', function(e){
+            
+            $('body').delegate('.stc-tbtm-textfields', 'focusout', function(e){
                 e.preventDefault();
                 save_tbm();
                 $('.saved-popup').remove();
                 $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+                setTimeout(function() {
+                    $('.saved-popup').toggle(700);
+                }, 1000);
+            });
+            
+            $('body').delegate('.stc-tbtm-dropdownfields', 'change', function(e){
+                e.preventDefault();
+                save_tbm();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+                setTimeout(function() {
+                    $('.saved-popup').toggle(700);
+                }, 1000);
             });
 
-            $('body').delegate('#stc-tbtm-time', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-date', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            //     setTimeout(function() {
+            //         $('.saved-popup').toggle(700);
+            //     }, 1000);
+            // });
 
-            $('body').delegate('#stc-tbtm-place', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-time', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
 
-            $('body').delegate('#stc-tbtm-agendaofmeet', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-place', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
 
-            $('body').delegate('#stc-tbtm-pointtone', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-location', 'change', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            //     setTimeout(function() {
+            //         $('.saved-popup').toggle(700);
+            //     }, 1000);
 
-            $('body').delegate('#stc-tbtm-pointtwo', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // });
 
-            $('body').delegate('#stc-tbtm-pointthree', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-agendaofmeet', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
 
-            $('body').delegate('#stc-tbtm-pointfour', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-pointtone', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
 
-            $('body').delegate('#stc-tbtm-pointfive', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-pointtwo', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
 
-            $('body').delegate('#stc-tbtm-pointsix', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-pointthree', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
 
-            $('body').delegate('#stc-tbtm-suggestionsio', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-pointfour', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
 
-            $('body').delegate('#stc-tbtm-designation', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-pointfive', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
 
-            $('body').delegate('#stc-tbtm-entryname', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-pointsix', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
 
-            $('body').delegate('#stc-tbtm-gatepassno', 'focusout', function(e){
-                e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            });
+            // $('body').delegate('#stc-tbtm-suggestionsio', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
+
+            // $('body').delegate('#stc-tbtm-designation', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
+
+            // $('body').delegate('#stc-tbtm-entryname', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
+
+            // $('body').delegate('#stc-tbtm-gatepassno', 'focusout', function(e){
+            //     e.preventDefault();
+            //     save_tbm();
+            //     $('.saved-popup').remove();
+            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            // });
 
             // save entry time
             $('body').delegate('.stc-tbtm-gentryadd', 'click', function(e){
@@ -2168,19 +2207,32 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-4 col-sm-12 col-xl-4">
                                         <h5 class="card-title">Date *</h5>
                                         <div class="position-relative form-group">
-                                            <input type="date" class="form-control" id="stc-tbtm-date">
+                                            <input type="date" class="form-control stc-tbtm-textfields" id="stc-tbtm-date">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-12 col-xl-4">
                                         <h5 class="card-title">Time *</h5>
                                         <div class="position-relative form-group">
-                                            <input type="time" class="form-control" id="stc-tbtm-time">
+                                            <input type="time" class="form-control stc-tbtm-textfields" id="stc-tbtm-time">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-12 col-xl-4">
                                         <h5 class="card-title">Place *</h5>
                                         <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-place" placeholder="Enter Place">
+                                            <input type="text" class="form-control stc-tbtm-textfields" id="stc-tbtm-place" placeholder="Enter Place">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Location *</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control stc-tbtm-dropdownfields" id="stc-tbtm-location">
+                                                <option value="">Select</option>
+                                                <option>Tata steel site</option>
+                                                <option>Jusco site</option>
+                                                <option>Mermandli site</option>
+                                                <option>Noamundi site</option>
+                                                <option>Haldia site</option>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
@@ -2258,7 +2310,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">Agenda of the meeting/ बैठक की कॅरिय सूचि : *</h5>
                                         <div class="position-relative form-group">
-                                            <textarea class="form-control" id="stc-tbtm-agendaofmeet" placeholder="Enter agenda of the meeting"></textarea>
+                                            <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-agendaofmeet" placeholder="Enter agenda of the meeting"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
@@ -2267,38 +2319,38 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">1. Review and discuss the topic of the previous meeting/ पिछले मीटिंग के विषय का रिव्यु करें तथा उसकी चर्चा करें :</h5>
                                         <div class="position-relative form-group">
-                                            <textarea class="form-control" id="stc-tbtm-pointtone" placeholder="Enter text"></textarea>
+                                            <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointtone" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">2. Ask the employee about the near miss incident or accident of the past day and note down/ कर्मचारी से बीतें दिन के नियर मिस घटना या दुर्घटना के बारे में पूछें तथा नोट करें : *</h5>
                                         <div class="position-relative form-group">
-                                            <textarea class="form-control" id="stc-tbtm-pointtwo" placeholder="Enter text"></textarea>
+                                            <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointtwo" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">3. Inform the employee about Green Strip, Red Strip, Orange Strip and Safety Alert Circular: Inform them about hazards and safe working conditions/ कर्मचारी को ग्रीन स्ट्रिप , रेड स्ट्रिप , ऑरेंज स्ट्रिप और सेफ्टी अलर्ट सकयुरलर की जानकारी दें :
                                         उन्हें खतरे तथा कार्यानुसार सुरक्षित स्थिति के बारे में बतायें : *</h5>
                                         <div class="position-relative form-group">
-                                            <textarea class="form-control" id="stc-tbtm-pointthree" placeholder="Enter text"></textarea>
+                                            <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointthree" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">4. Give information about the SOP which is related to that day's work and note down/ SOP जो उस दिन के कार्य से सम्बंधित हो उसके बारे में जानकारी दे तथा नोट करें : *</h5>
                                         <div class="position-relative form-group">
-                                            <textarea class="form-control" id="stc-tbtm-pointfour" placeholder="Enter text"></textarea>
+                                            <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointfour" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">5. Remind employees of their personal responsibilities: proper PPE, housekeeping, tools and tackles, power equipment condition, 6 direction hazards, special requirements like work permit, no drinking, Safe behavior, Team work spirit, No dangerous architecture etc./ कर्मचारी को उनके व्यक्तिगत जिम्मेदारियां की याद दिलाये : उचित पीपीई , हाउसकीपिंग , टूल्स एंड टाकल्स , बिजली उपकरण की स्थिति, ६ दिशा के खतरे, विशेष ज़रूरत जैसे वर्क परमिट , मधपान निषेद ,सुरक्छित वयवहार ,टीम वर्क की भावना , कोई खतरनाक वास्तु इत्यादि : *</h5>
                                         <div class="position-relative form-group">
-                                            <textarea class="form-control" id="stc-tbtm-pointfive" placeholder="Enter text"></textarea>
+                                            <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointfive" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
                                         <h5 class="card-title">6. Share security written messages with employees/ सुरक्षा लिखित सन्देश कर्मचारी के साथ साझा करें : *</h5>
                                         <div class="position-relative form-group">
-                                            <textarea class="form-control" id="stc-tbtm-pointsix" placeholder="Enter text"></textarea>
+                                            <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointsix" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
@@ -2307,7 +2359,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-4 col-sm-12 col-xl-4">
                                         <h5 class="card-title">Item</h5>
                                         <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-res-item" placeholder="Enter Item">
+                                            <input type="text" class="form-control stc-tbtm-textfields" id="stc-tbtm-res-item" placeholder="Enter Item">
                                         </div>
                                     </div>
                                     <div class="col-md-3 col-sm-12 col-xl-3">
@@ -2434,19 +2486,19 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">Any Suggestions for SIO/IO: *</h5>
                                         <div class="position-relative form-group">
-                                            <textarea class="form-control" id="stc-tbtm-suggestionsio" placeholder="Enter text"></textarea>
+                                            <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-suggestionsio" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-12 col-xl-4">
                                         <h5 class="card-title">Name. *</h5>
                                         <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-entryname" placeholder="Enter Name.">
+                                            <input type="text" class="form-control stc-tbtm-textfields" id="stc-tbtm-entryname" placeholder="Enter Name.">
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-12 col-xl-4">
                                         <h5 class="card-title">Designation *</h5>
                                         <div class="position-relative form-group">
-                                            <select class="form-control" id="stc-tbtm-designation">
+                                            <select class="form-control stc-tbtm-dropdownfields" id="stc-tbtm-designation">
                                                 <option>Site Incharge</option>
                                                 <option>Manager</option>
                                                 <option selected>Supervisor</option>
@@ -2460,7 +2512,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-4 col-sm-12 col-xl-4">
                                         <h5 class="card-title">GP/P No. *</h5>
                                         <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-gatepassno" placeholder="Enter GP/P No.">
+                                            <input type="text" class="form-control stc-tbtm-textfields" id="stc-tbtm-gatepassno" placeholder="Enter GP/P No.">
                                         </div>
                                     </div>
                                 </div>

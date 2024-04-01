@@ -123,11 +123,24 @@ if(isset($_SESSION["stc_agent_id"])){
                                                 <div class="row">
                                                     <div class="col-md-4">
                                                         <div class="position-relative form-group">
+                                                            <label for="exampleEmail" class="">Location</label>
+                                                            <select class="form-control safety-filter-by-location">
+                                                                <option value="NA">Select</option>
+                                                                <option>Tata steel site</option>
+                                                                <option>Jusco site</option>
+                                                                <option>Mermandli site</option>
+                                                                <option>Noamundi site</option>
+                                                                <option>Haldia site</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="position-relative form-group">
                                                             <label for="exampleEmail" class="">By Month</label>
                                                             <input type="month" class="form-control safety-filter-by-month" value="<?php echo date("Y-m");?>">
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-8">
+                                                    <div class="col-md-4">
                                                         <div class="position-relative form-group">
                                                             <label for="exampleEmail" class="">By Supervisor Name</label>
                                                             <input type="text" class="form-control safety-filter-by-supervisorname" placeholder="Enter Supervisor Name">
@@ -546,20 +559,22 @@ if(isset($_SESSION["stc_agent_id"])){
     </script>
     <script>
         $(document).ready(function(e){
+            var location = '';
             var month = '';
             var supervise_name = '';
             $('body').delegate('.safety-filter-by-search', 'click', function() {
+                location = $('.safety-filter-by-location').val();
                 month = $('.safety-filter-by-month').val();
                 supervise_name=$('.safety-filter-by-supervisorname').val();
                 // call tbm
-                call_tbm(month, supervise_name);
+                call_tbm(location, month, supervise_name);
             });
             
-            function call_tbm(month, supervise_name){
+            function call_tbm(location, month, supervise_name){
                 $.ajax({
                     url         : "nemesis/stc_project.php",
                     method      : "POST",
-                    data        : {stc_safety_calltbm:1, month:month, supervise_name:supervise_name},
+                    data        : {stc_safety_calltbm:1, location:location, month:month, supervise_name:supervise_name},
                     success     : function(response_tbm){
                         // console.log(response_tbm);
                         $('.stc-safety-tbm-res-table').html(response_tbm);
