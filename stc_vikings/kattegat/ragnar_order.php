@@ -3195,6 +3195,96 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	    ';
 		return $odin;
 	}
+
+	// save item tracker 
+	public function stc_item_tracker_save($user_id, $ppe_type, $qty, $unit, $issue_date, $validity, $remarks){
+		$blackpearl='';
+		$date=date("Y-m-d H:i:s");
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_item_tracker`(
+			    `stc_item_tracker_user_id`,
+			    `stc_item_tracker_toppe`,
+			    `stc_item_tracker_qty`,
+			    `stc_item_tracker_unit`,
+			    `stc_item_tracker_issuedate`,
+			    `stc_item_tracker_validity`,
+			    `stc_item_tracker_remarks`,
+			    `stc_item_tracker_createdby`,
+			    `stc_item_tracker_created_date`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $user_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $ppe_type)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $qty)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $unit)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $issue_date)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $validity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."',
+				'".$date."'
+			)
+		");
+		if($blackpearl_qry){
+			$blackpearl="yes";
+		}else{
+			$blackpearl="no";
+		}
+		return $blackpearl;
+	}
+
+	// call procurment tracker 
+	public function stc_item_tracker_call(){
+		$blackpearl='';
+		$blackpearl_query="
+			SELECT
+			    `stc_item_tracker_id`,
+			    `stc_item_tracker_user_id`,
+			    `stc_item_tracker_toppe`,
+			    `stc_item_tracker_qty`,
+			    `stc_item_tracker_unit`,
+			    `stc_item_tracker_issuedate`,
+			    `stc_item_tracker_validity`,
+			    `stc_item_tracker_remarks`,
+			    `stc_item_tracker_createdby`,
+			    `stc_item_tracker_created_date`
+			FROM `stc_item_tracker`
+			ORDER BY TIMESTAMP(`stc_item_tracker_created_date`) DESC
+		";
+		$blackpearl_result=mysqli_query($this->stc_dbs, $blackpearl_query);
+
+		if(mysqli_num_rows($blackpearl_result)>0){
+			foreach($blackpearl_result as $blackpearl_row){
+				$validity=$blackpearl_row['stc_item_tracker_validity']==1 ? $blackpearl_row['stc_item_tracker_validity'].' month' : $blackpearl_row['stc_item_tracker_validity']." months";
+				$validityMonths = $blackpearl_row['stc_item_tracker_validity'];
+				$issuedate = new DateTime($blackpearl_row['stc_item_tracker_issuedate']);
+				$nextissuedate = $issuedate->add(new DateInterval("P{$validityMonths}M"));
+				$nextissuedateFormatted = $nextissuedate->format('d-m-Y');
+
+				$dateofissue=$blackpearl_row['stc_item_tracker_issuedate']==''? '' : date('d-m-Y', strtotime($blackpearl_row['stc_item_tracker_issuedate']));
+				$blackpearl.="
+					<tr>
+						<td>".$blackpearl_row['stc_item_tracker_id']."</td>
+						<td>".$blackpearl_row['stc_item_tracker_user_id']."</td>
+						<td>".$blackpearl_row['stc_item_tracker_toppe']."</td>
+						<td class='text-right'>".number_format($blackpearl_row['stc_item_tracker_qty'], 2)."</td>
+						<td class='text-center'>".$blackpearl_row['stc_item_tracker_unit']."</td>
+						<td class='text-center'>".$dateofissue."</td>
+						<td class='text-center'>".$validity."</td>
+						<td class='text-center'>".$nextissuedateFormatted."</td>
+						<td>".$blackpearl_row['stc_item_tracker_remarks']."</td>
+					</tr>
+				";
+				
+				// <td class='text-center'><a href='javascript:void(0)' id='".$blackpearl_row['stc_item_tracker_id']."' class='btn btn-primary'><i class='fas fa-edit'></i></a></td>
+			}
+		}else{
+			$blackpearl.="
+				<tr>
+					<td colspan='7' class='text-center'> No data found!!</td>
+				</tr>
+			";
+		}
+		return $blackpearl;
+	}
 }
 #<------------------------------------------------------------------------------------------------------>
 #<--------------------------------------Object sections of Order class---------------------------------->
@@ -3765,5 +3855,36 @@ if(isset($_POST['stc_rquisition_bylist_find'])){
 	$objpdres=new ragnarRequisitionView();	
 	$opobjpdres=$objpdres->stc_getrequisitionlist($req_begdate, $req_enddate, $req_customer, $req_reqnumber, $req_sitenmae, $req_materialtype);
 	echo $opobjpdres;
+}
+
+#<-----------------Object section of ppe tracker Class------------------->
+// save procurment tracker payment
+if(isset($_POST['save_item_tracker'])){
+	$user_id=$_POST['user_id'];
+	$ppe_type=$_POST['ppe_type'];
+	$qty=$_POST['qty'];
+	$unit=$_POST['unit'];
+	$issue_date=$_POST['issue_date'];
+	$validity=$_POST['validity'];
+	$remarks=$_POST['remarks'];
+	$out='';
+
+	if($user_id=="" || $ppe_type=="NA" || empty($qty) || empty($issue_date)){
+		$out='empty';
+	}elseif(empty($_SESSION['stc_agent_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new ragnarCallRequisitionItemTrack();
+		$odin_req_out=$odin_req->stc_item_tracker_save($user_id, $ppe_type, $qty, $unit, $issue_date, $validity, $remarks);
+		$out=$odin_req_out;
+	}
+	echo $out;
+}
+
+// call procurment tracker
+if(isset($_POST['call_item_tracker'])){
+	$odin_req=new ragnarCallRequisitionItemTrack();
+	$odin_req_out=$odin_req->stc_item_tracker_call();
+	echo $odin_req_out;
 }
 ?>
