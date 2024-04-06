@@ -1126,7 +1126,7 @@ class pirates_project extends tesseract{
 		}
 		return $blackpearl;
 	}
-
+	
 	// update procurement tracker payment date
 	public function stc_procurement_tracker_payment_update($pay_id){
 		$blackpearl='';

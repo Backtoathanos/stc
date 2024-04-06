@@ -94,12 +94,12 @@
                         Procurement Tracker
                     </a>
                 </li>
-                <li>
+                <!-- <li>
                     <a href="item-tracker.php?page=itemtracker" class="itemtracker">
                         <i class="metismenu-icon pe-7s-map-marker"></i>
                         Item Tracker
                     </a>
-                </li>
+                </li> -->
                 <li>
                     <a href="stc-supervisor-balance-reports.php?page=reports" class="reports">
                         <i class="metismenu-icon pe-7s-note2"></i>

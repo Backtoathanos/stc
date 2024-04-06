@@ -237,28 +237,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <div class="col-md-6">
                                         <h5>Employee Name</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <select class="form-control it-emp-name">
-                                                <?php 
-                                                    include_once("../MCU/db.php");
-                                                    echo '<option value="NA" selected>Please select employee</option>';
-                                                    $proseleqry=mysqli_query($con, "
-                                                        SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` 
-                                                        FROM `stc_cust_pro_supervisor` 
-                                                        LEFT JOIN `stc_cust_pro_supervisor_collaborate` 
-                                                        ON `stc_cust_pro_supervisor_collaborate_userid`=`stc_cust_pro_supervisor_id`
-                                                        WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'
-                                                        OR `stc_cust_pro_supervisor_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
-                                                        ORDER BY `stc_cust_pro_supervisor_fullname` ASC
-                                                    ");
-                                                    if(mysqli_num_rows($proseleqry)>0){
-                                                        foreach($proseleqry as $proselrow){
-                                                            echo '<option value="'.$proselrow['stc_cust_pro_supervisor_id'].'">'.$proselrow['stc_cust_pro_supervisor_fullname'].'</option>';
-                                                        }
-                                                    }else{
-                                                        echo '<option value="NA">No User Found!!!</option>';
-                                                    }
-                                                ?>
-                                            </select> 
+                                            <input type="text" class="form-control it-emp-name" placeholder="Enter employee name">
                                         </div>
                                     </div>
                                     <div class="col-md-6">

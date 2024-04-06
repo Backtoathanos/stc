@@ -4096,12 +4096,17 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
             I.`stc_cust_super_requisition_items_finalqty`,
             I.`stc_cust_super_requisition_items_type`,
             I.`stc_cust_super_requisition_items_priority`,
-            `stc_cust_project_cust_id`  
+            P.`stc_cust_project_cust_id`,
+            P.`stc_cust_project_title`,
+            S.`stc_cust_pro_supervisor_fullname`,
+            S.`stc_cust_pro_supervisor_contact`  
          FROM `stc_cust_super_requisition_list_items` I
          LEFT JOIN `stc_cust_super_requisition_list` R
          ON R.`stc_cust_super_requisition_list_id`=I.`stc_cust_super_requisition_list_items_req_id`
-         LEFT JOIN `stc_cust_project`
+         LEFT JOIN `stc_cust_project` P
          ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
+         LEFT JOIN `stc_cust_pro_supervisor` S
+         ON S.`stc_cust_pro_supervisor_id`=R.`stc_cust_super_requisition_list_super_id`
          ".$sdl_joiner."
          WHERE DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $from)."'
          AND '".mysqli_real_escape_string($this->stc_dbs, $to)."' ".$filter_query."
@@ -4169,9 +4174,10 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
             $stcpendingqty=$odin_get_mrdrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
             $stockqty=$stcrecievedqty - $stcconsumedqty;
             $bgcolor=$odin_get_mrdrow['stc_cust_super_requisition_items_priority']==2 ? 'style="background:#ffa5a5;color:black"' : "";
-            $materialpriority=$odin_get_mrdrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
+            $materialpriority=$odin_get_mrdrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";            
+
             $odin.='
-               <tr>
+               <tr data-toggle="modal" data-target=".stc-mrdmodal-res" class="showmrd-details" reqnumber="'.$odin_get_mrdrow['req_id'].'" reqdate="'.date('d-m-Y', strtotime($odin_get_mrdrow['stc_cust_super_requisition_list_date'])).'" reqraisedby="'.$odin_get_mrdrow['stc_cust_pro_supervisor_fullname'].' - '.$odin_get_mrdrow['stc_cust_pro_supervisor_contact'].'" reqraisedfrom="'.$odin_get_mrdrow['stc_cust_project_title'].'" itemdesc="'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_title'].'" itemqty="'.number_format($odin_get_mrdrow['stc_cust_super_requisition_list_items_reqqty'], 2).'" itemunit="'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_unit'].'" itempriority="'.$materialpriority.'" >
                   <td class="text-center">'.$pno.'</td>
                   <td class="text-center">'.$odin_get_mrdrow['req_id'].'</td>
                   <td class="text-center">'.$prev_pno.'</td>

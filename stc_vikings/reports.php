@@ -2253,6 +2253,25 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 }
             });
 
+            $('body').delegate('.showmrd-details', 'click', function(e){
+                var reqid=$(this).attr('reqnumber');
+                var reqdate=$(this).attr('reqdate');
+                var reqraisedby=$(this).attr('reqraisedby');
+                var reqraisedfrom=$(this).attr('reqraisedfrom');
+                var itemdesc=$(this).attr('itemdesc');
+                var itemqty=$(this).attr('itemqty');
+                var itemunit=$(this).attr('itemunit');
+                var itempriority=$(this).attr('itempriority');
+                $('.reqnumbershow').val(reqid);
+                $('.reqdateshow').val(reqdate);
+                $('.reqraisedbyshow').val(reqraisedby);
+                $('.reqraisedfromshow').val(reqraisedfrom);
+                $('.itemdescshow').val(itemdesc);
+                $('.itemqtyshow').val(itemqty);
+                $('.itemunitshow').val(itemunit);
+                $('.itempriorityshow').val(itempriority);
+            });
+
             var filter_school = {};
             $('.hidden-fee-excel-section').hide();
             
@@ -2778,6 +2797,81 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default sdlurbtn-close" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade bd-example-modal-xl stc-mrdmodal-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Material Requisition Details</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xl-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12 col-xl-6 mb-4">
+                                <h5 class="card-title">Requisition Number</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="reqnumbershow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-xl-6 mb-4">
+                                <h5 class="card-title">Requisition Date</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="reqdateshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Requisition Raised By (User Name)</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="reqraisedbyshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Requisition Raised From (Location)</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="reqraisedfromshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Item Description</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="itemdescshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-xl-6 mb-4">
+                                <h5 class="card-title">Item Quantity</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="itemqtyshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-xl-6 mb-4">
+                                <h5 class="card-title">Item Unit</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="itemunitshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Priority</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="itempriorityshow" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
