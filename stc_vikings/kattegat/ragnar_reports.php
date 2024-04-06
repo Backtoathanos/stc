@@ -4098,7 +4098,8 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
             I.`stc_cust_super_requisition_items_priority`,
             P.`stc_cust_project_cust_id`,
             P.`stc_cust_project_title`,
-            S.`stc_cust_pro_supervisor_fullname`  
+            S.`stc_cust_pro_supervisor_fullname`,
+            S.`stc_cust_pro_supervisor_contact`  
          FROM `stc_cust_super_requisition_list_items` I
          LEFT JOIN `stc_cust_super_requisition_list` R
          ON R.`stc_cust_super_requisition_list_id`=I.`stc_cust_super_requisition_list_items_req_id`
@@ -4176,7 +4177,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
             $materialpriority=$odin_get_mrdrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";            
 
             $odin.='
-               <tr data-toggle="modal" data-target=".stc-mrdmodal-res" class="showmrd-details" reqnumber="'.$odin_get_mrdrow['req_id'].'" reqdate="'.date('d-m-Y', strtotime($odin_get_mrdrow['stc_cust_super_requisition_list_date'])).'" reqraisedby="'.$odin_get_mrdrow['stc_cust_pro_supervisor_fullname'].'" reqraisedfrom="'.$odin_get_mrdrow['stc_cust_project_title'].'" itemdesc="'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_title'].'" itemqty="'.number_format($odin_get_mrdrow['stc_cust_super_requisition_list_items_reqqty'], 2).'" itemunit="'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_unit'].'" itempriority="'.$materialpriority.'" >
+               <tr data-toggle="modal" data-target=".stc-mrdmodal-res" class="showmrd-details" reqnumber="'.$odin_get_mrdrow['req_id'].'" reqdate="'.date('d-m-Y', strtotime($odin_get_mrdrow['stc_cust_super_requisition_list_date'])).'" reqraisedby="'.$odin_get_mrdrow['stc_cust_pro_supervisor_fullname'].' - '.$odin_get_mrdrow['stc_cust_pro_supervisor_contact'].'" reqraisedfrom="'.$odin_get_mrdrow['stc_cust_project_title'].'" itemdesc="'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_title'].'" itemqty="'.number_format($odin_get_mrdrow['stc_cust_super_requisition_list_items_reqqty'], 2).'" itemunit="'.$odin_get_mrdrow['stc_cust_super_requisition_list_items_unit'].'" itempriority="'.$materialpriority.'" >
                   <td class="text-center">'.$pno.'</td>
                   <td class="text-center">'.$odin_get_mrdrow['req_id'].'</td>
                   <td class="text-center">'.$prev_pno.'</td>
