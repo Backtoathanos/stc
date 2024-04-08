@@ -3871,7 +3871,7 @@ if(isset($_POST['save_item_tracker'])){
 
 	if($user_id=="" || $ppe_type=="NA" || empty($qty) || empty($issue_date)){
 		$out='empty';
-	}elseif(empty($_SESSION['stc_agent_id'])){
+	}elseif(empty($_SESSION['stc_empl_id'])){
 		$out='reload';
 	}else{
 		$odin_req=new ragnarCallRequisitionItemTrack();
