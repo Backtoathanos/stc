@@ -2204,6 +2204,19 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <label>* fields are automatic saved when you switch</label>
                                         <input type="hidden" class="stc-tbm-no">
                                     </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">Location *</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control stc-tbtm-dropdownfields" id="stc-tbtm-location">
+                                                <option value="">Select</option>
+                                                <option>Tata steel site</option>
+                                                <option>Jusco site</option>
+                                                <option>Mermandli site</option>
+                                                <option>Noamundi site</option>
+                                                <option>Haldia site</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                     <div class="col-md-4 col-sm-12 col-xl-4">
                                         <h5 class="card-title">Date *</h5>
                                         <div class="position-relative form-group">
@@ -2220,19 +2233,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <h5 class="card-title">Place *</h5>
                                         <div class="position-relative form-group">
                                             <input type="text" class="form-control stc-tbtm-textfields" id="stc-tbtm-place" placeholder="Enter Place">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-12 col-xl-4">
-                                        <h5 class="card-title">Location *</h5>
-                                        <div class="position-relative form-group">
-                                            <select class="form-control stc-tbtm-dropdownfields" id="stc-tbtm-location">
-                                                <option value="">Select</option>
-                                                <option>Tata steel site</option>
-                                                <option>Jusco site</option>
-                                                <option>Mermandli site</option>
-                                                <option>Noamundi site</option>
-                                                <option>Haldia site</option>
-                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
