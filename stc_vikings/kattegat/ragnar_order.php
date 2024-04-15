@@ -3881,7 +3881,7 @@ if(isset($_POST['save_item_tracker'])){
 	$remarks=$_POST['remarks'];
 	$out='';
 
-	if($user_id=="" || $ppe_type=="NA" || empty($qty) || empty($issue_date)){
+	if($user_id=="" || $ppe_type=="" || empty($issue_date)){
 		$out='empty';
 	}elseif(empty($_SESSION['stc_empl_id'])){
 		$out='reload';
