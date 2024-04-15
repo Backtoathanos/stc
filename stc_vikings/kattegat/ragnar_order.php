@@ -3200,29 +3200,39 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	public function stc_item_tracker_save($user_id, $ppe_type, $qty, $unit, $issue_date, $validity, $remarks){
 		$blackpearl='';
 		$date=date("Y-m-d H:i:s");
-		$blackpearl_qry=mysqli_query($this->stc_dbs, "
-			INSERT INTO `stc_item_tracker`(
-			    `stc_item_tracker_user_id`,
-			    `stc_item_tracker_toppe`,
-			    `stc_item_tracker_qty`,
-			    `stc_item_tracker_unit`,
-			    `stc_item_tracker_issuedate`,
-			    `stc_item_tracker_validity`,
-			    `stc_item_tracker_remarks`,
-			    `stc_item_tracker_createdby`,
-			    `stc_item_tracker_created_date`
-			) VALUES (
-				'".mysqli_real_escape_string($this->stc_dbs, $user_id)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $ppe_type)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $qty)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $unit)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $issue_date)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $validity)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
-				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."',
-				'".$date."'
-			)
-		");
+		$ppe_types = $ppe_type;
+		$validities = $validity;
+		$units = $unit;
+
+		for($i = 0; $i < count($ppe_types); $i++) {
+			$ppe_type = mysqli_real_escape_string($this->stc_dbs, $ppe_types[$i]);
+			$validity = mysqli_real_escape_string($this->stc_dbs, $validities[$i]);
+			$unit = mysqli_real_escape_string($this->stc_dbs, $units[$i]);
+
+			$blackpearl_qry = mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_item_tracker`(
+					`stc_item_tracker_user_id`,
+					`stc_item_tracker_toppe`,
+					`stc_item_tracker_qty`,
+					`stc_item_tracker_unit`,
+					`stc_item_tracker_issuedate`,
+					`stc_item_tracker_validity`,
+					`stc_item_tracker_remarks`,
+					`stc_item_tracker_createdby`,
+					`stc_item_tracker_created_date`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $user_id)."',
+					'".$ppe_type."',
+					'1',
+					'".mysqli_real_escape_string($this->stc_dbs, $unit)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $issue_date)."',
+					'".$validity."',
+					'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."',
+					'".$date."'
+				)
+			");
+		}
 		if($blackpearl_qry){
 			$blackpearl="yes";
 		}else{
@@ -3251,8 +3261,10 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		";
 		$blackpearl_result=mysqli_query($this->stc_dbs, $blackpearl_query);
 
+		$slno=0;
 		if(mysqli_num_rows($blackpearl_result)>0){
 			foreach($blackpearl_result as $blackpearl_row){
+				$slno++;
 				$validity=$blackpearl_row['stc_item_tracker_validity']==1 ? $blackpearl_row['stc_item_tracker_validity'].' month' : $blackpearl_row['stc_item_tracker_validity']." months";
 				$validityMonths = $blackpearl_row['stc_item_tracker_validity'];
 				$issuedate = new DateTime($blackpearl_row['stc_item_tracker_issuedate']);
@@ -3262,7 +3274,7 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 				$dateofissue=$blackpearl_row['stc_item_tracker_issuedate']==''? '' : date('d-m-Y', strtotime($blackpearl_row['stc_item_tracker_issuedate']));
 				$blackpearl.="
 					<tr>
-						<td>".$blackpearl_row['stc_item_tracker_id']."</td>
+						<td>".$slno."</td>
 						<td>".$blackpearl_row['stc_item_tracker_user_id']."</td>
 						<td>".$blackpearl_row['stc_item_tracker_toppe']."</td>
 						<td class='text-right'>".number_format($blackpearl_row['stc_item_tracker_qty'], 2)."</td>
