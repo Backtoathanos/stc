@@ -29,6 +29,11 @@ include("kattegat/role_check.php");
     <link href="./main.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
     <style>
+      .checkbox-group label {
+        float: left;
+        position: relative;
+        display: inline-flex;
+      }
       .fade:not(.show) {
         opacity: 10;
       }
@@ -1741,43 +1746,74 @@ include("kattegat/role_check.php");
         $('body').delegate('.it-save', 'click', function(e){
             e.preventDefault();
             var user_id = $('.it-emp-name').val();
-            var ppe_type = $('.it-ppe-type').val();
+            var ppe_type = getCheckedValues('it-ppe-type');//$('.it-ppe-type').val();
             var qty = $('.it-qty').val();
-            var unit = $('.it-unit').val();
+            var unit = getCheckedAttributesunit('it-ppe-type');//$('.it-unit').val();
             var issue_date = $('.it-issue-date').val();
-            var validity = $('.it-validity').val();
+            var validity = getCheckedAttributes('it-ppe-type');//$('.it-validity').val();
             var remarks = $('.it-remarks').val();
-            $.ajax({
-                url : "kattegat/ragnar_order.php",
-                method : "POST",
-                data : {
-                    save_item_tracker:1,
-                    user_id:user_id,
-                    ppe_type:ppe_type,
-                    qty:qty,
-                    unit:unit,
-                    issue_date:issue_date,
-                    validity:validity,
-                    remarks:remarks
-                },
-                success : function(response){
-                    var obj_response=response.trim();
-                    if(obj_response=="yes"){
-                        alert("Record updated successfully!!!");
-                        $('.it-save').parent().parent().parent().find('input').val('');
-                        $('.it-save').parent().parent().parent().find('textarea').val('');
-                        $('.it-save').parent().parent().parent().find('select').val('NA');
-                        item_tracker_call();
-                    }else if(obj_response=="reload"){
-                        window.location.reload();
-                    }else if(obj_response=="empty"){
-                      alert("Please fill complete details.");
-                    }else if(obj_response=="no"){
-                        alert("Something went wrong. Record not updated");
-                    }
-                }
-            });
+            if(ppe_type!=''){
+              $.ajax({
+                  url : "kattegat/ragnar_order.php",
+                  method : "POST",
+                  data : {
+                      save_item_tracker:1,
+                      user_id:user_id,
+                      ppe_type:ppe_type,
+                      qty:qty,
+                      unit:unit,
+                      issue_date:issue_date,
+                      validity:validity,
+                      remarks:remarks
+                  },
+                  success : function(response){
+                      var obj_response=response.trim();
+                      if(obj_response=="yes"){
+                          alert("Record updated successfully!!!");
+                          resetFormFields();
+                          item_tracker_call();
+                          item_tracker_call();
+                      }else if(obj_response=="reload"){
+                          window.location.reload();
+                      }else if(obj_response=="empty"){
+                        alert("Please fill complete details.");
+                      }else if(obj_response=="no"){
+                          alert("Something went wrong. Record not updated");
+                      }
+                  }
+              });
+            }else{
+              alert("Please check Type of PPE.");
+            }
         });
+        
+        function getCheckedValues(class_name){
+            var filter = [];
+            $('.' + class_name + ':checked').each(function(){
+               filter.push($(this).val()); 
+            });
+            return filter;
+        }
+        
+        function getCheckedAttributes(class_name){
+            var filter = [];
+            $('.' + class_name + ':checked').each(function(){
+               filter.push($(this).attr('validity')); 
+            });
+            return filter;
+        }
+        
+        function getCheckedAttributesunit(class_name){
+            var filter = [];
+            $('.' + class_name + ':checked').each(function(){
+               filter.push($(this).attr('unit')); 
+            });
+            return filter;
+        }
+
+        function resetFormFields() {
+            $('.it-save').closest('form').find('input, textarea, select').val('');
+        }
       });
     </script>
 </body>
@@ -2061,46 +2097,29 @@ include("kattegat/role_check.php");
                                     <div class="col-md-6">
                                         <h5>Type of PPE</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <select class="form-control it-ppe-type">
-                                                <option value="NA">Select</option>
-                                                <option>Safety Shoes</option>
-                                                <option>Safety Jacket</option>
-                                                <option>Safety Belt</option>
-                                                <option>Safety Helmet</option>
-                                                <option>Hand Gloves</option>
-                                                <option>Leg Guard</option>
-                                                <option>Safety Goggles</option>
-                                                <option>Ear Plug</option>
-                                                <option>Nose Mask</option>
-                                            </select>
-                                        </div>
+                                          <div class="checkbox-group">
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Pair" validity="12" value="Safety Shoes"> Safety Shoes </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="12" value="Safety Jacket"> Safety Jacket </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="12" value="Safety Belt"> Safety Belt </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="60" value="Safety Helmet"> Safety Helmet </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="3" value="Hand Gloves"> Hand Gloves </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="6" value="Leg Guard"> Leg Guard </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="6" value="Safety Goggles"> Safety Goggles </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="1" value="Ear Plug"> Ear Plug </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="1" value="Nose Mask"> Nose Mask </label>
+                                          </div>
+                                      </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6" style="display:none;">
                                         <h5>Quantity</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <input type="number" class="form-control it-qty" placeholder="Enter quantity" required>
+                                            <input type="number" class="form-control it-qty" placeholder="Enter quantity" value="1">
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <h5>Unit</h5><br>
-                                        <div class="card mb-3 widget-content">
-                                            <select class="form-control it-unit">
-                                                <option value="NA">Select</option>
-                                                <option>Nos</option>
-                                                <option>Pair</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <h5>Date of Issue</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <input type="date" class="form-control it-issue-date" required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <h5>Validity</h5><br>
-                                        <div class="card mb-3 widget-content">
-                                            <input type="number" class="form-control it-validity" placeholder="Enter validity in months" required>
+                                          <input type="date" class="form-control it-issue-date" value="<?php echo date('Y-m-d'); ?>" required>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
