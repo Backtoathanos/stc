@@ -1812,7 +1812,8 @@ include("kattegat/role_check.php");
         }
 
         function resetFormFields() {
-            $('.it-save').closest('form').find('input, textarea, select').val('');
+            $('.formcontrol').find('input, textarea').val('');
+            $('.formcontrol').find('input:checked').prop('checked', false);
         }
       });
     </script>
@@ -2087,7 +2088,7 @@ include("kattegat/role_check.php");
                     <div class="col-md-12 col-sm-12 col-xl-12">
                         <div class="main-card mb-3 card">
                             <div class="card-body">
-                                <div class="row">
+                                <div class="row formcontrol">
                                     <div class="col-md-6">
                                         <h5>Employee Name</h5><br>
                                         <div class="card mb-3 widget-content">
