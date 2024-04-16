@@ -2594,14 +2594,9 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <?php 
                                                     include_once("../MCU/db.php");
                                                     $dept_qry=mysqli_query($con, "
-                                                        SELECT
-                                                            DISTINCT `stc_status_down_list_plocation`
-                                                        FROM
-                                                            `stc_status_down_list`
-                                                        WHERE 
-                                                            `stc_status_down_list_status`<'6'
-                                                        AND 
-                                                            `stc_status_down_list_plocation`<>''
+                                                        SELECT DISTINCT `stc_status_down_list_plocation`
+                                                        FROM `stc_status_down_list`
+                                                        WHERE `stc_status_down_list_plocation`<>''
                                                         ORDER BY `stc_status_down_list_plocation` ASC
                                                     ");
                                                     foreach($dept_qry as $dept_row){
