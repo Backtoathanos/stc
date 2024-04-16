@@ -34,7 +34,7 @@
             <ul class="vertical-nav-menu">
                 <li class="app-sidebar__heading">Dashboards</li>
                 <li>
-                    <a href="dashboard.php" class="mm-active">
+                    <a href="dashboard.php?page=dashboard" class="dashboard">
                         <i class="metismenu-icon pe-7s-home"></i>
                         Home
                     </a>
@@ -43,7 +43,7 @@
                     if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
                         echo '
                             <li>
-                                <a href="stc-product.php" class="mm-active">
+                                <a href="stc-product.php?page=product" class="product">
                                     <i class="metismenu-icon pe-7s-box2"></i>
                                     Products
                                 </a>
@@ -54,13 +54,13 @@
                     if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge" || $_SESSION['stc_agent_sub_category']=="Safety Supervisor"){
                         echo '
                             <li>
-                                <a href="stc-requisition.php" class="mm-active">
+                                <a href="stc-requisition.php?page=requisition" class="requisition">
                                     <i class="metismenu-icon pe-7s-note2"></i>
                                     Requisition
                                 </a>
                             </li>
                             <li>
-                                <a href="stc-consumption.php" class="mm-active">
+                                <a href="stc-consumption.php?page=consumption" class="consumption">
                                     <i class="metismenu-icon pe-7s-box1"></i>
                                     Consumption
                                 </a>
@@ -70,7 +70,7 @@
                     if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){
                         echo '
                             <li>
-                                <a href="stc-status-down-list.php" class="mm-active">
+                                <a href="stc-status-down-list.php?page=std" class="std">
                                     <i class="metismenu-icon pe-7s-switch"></i>
                                     Status Down List
                                 </a>
@@ -80,7 +80,7 @@
                     if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Safety Supervisor"){
                         echo '
                             <li>
-                                <a href="stc-safety.php" class="mm-active">
+                                <a href="stc-safety.php?page=safety" class="safety">
                                     <i class="metismenu-icon pe-7s-id"></i>
                                     Safety
                                 </a>
