@@ -1619,8 +1619,10 @@ include("kattegat/role_check.php");
           e.preventDefault();
           var qty=$('#poadhocitem option:selected').attr('qty');
           var unit=$('#poadhocitem option:selected').attr('unit');
+          var rack=$('#poadhocitem option:selected').attr('rack');
           $('.stcbalancedqty').val(qty);
           $('.stcbalancedqtyunit').val(unit);
+          $('.stcbalancedqtyrack').val(rack);
         });
 
         var repid2=0;
@@ -1987,8 +1989,9 @@ include("kattegat/role_check.php");
                     <?php 
                       include_once("../MCU/db.php");
                       $sqlqry=mysqli_query($con, "
-                        SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_itemdesc`, `stc_purchase_product_adhoc_qty`, `stc_purchase_product_adhoc_unit` 
+                        SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_itemdesc`, `stc_purchase_product_adhoc_qty`, `stc_purchase_product_adhoc_unit`, `stc_rack_name` 
                         FROM `stc_purchase_product_adhoc`
+                        LEFT JOIN `stc_rack` ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
                         WHERE `stc_purchase_product_adhoc_status`=1
                       ");
                       if(mysqli_num_rows($sqlqry)>0){
@@ -2003,7 +2006,7 @@ include("kattegat/role_check.php");
                           $result=mysqli_num_rows($checsql)>0 ? mysqli_fetch_assoc($checsql) : 0;
                           $rec_qty=$result!=0 ? $result['recqty'] : 0;
                           $balanced_qty=$sqlrow['stc_purchase_product_adhoc_qty'] - $rec_qty;
-                          echo '<option value="'.$sqlrow['stc_purchase_product_adhoc_id'].'" qty="'.$balanced_qty.'"  unit="'.$sqlrow['stc_purchase_product_adhoc_unit'].'">'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</option>';
+                          echo '<option value="'.$sqlrow['stc_purchase_product_adhoc_id'].'" qty="'.$balanced_qty.'" rack="'.$sqlrow['stc_rack_name'].'" unit="'.$sqlrow['stc_purchase_product_adhoc_unit'].'">'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</option>';
                         }
                       }else{
                         echo '<option value="NA">No record found.</option>';
@@ -2013,7 +2016,7 @@ include("kattegat/role_check.php");
                 </div>
               </div>
 
-              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+              <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
                 <div class="card-border mb-3 card card-body border-success">
                   <h5>
                     Balanced Quantity
@@ -2028,7 +2031,7 @@ include("kattegat/role_check.php");
                   />
                 </div>
               </div>
-              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+              <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
                 <div class="card-border mb-3 card card-body border-success">
                   <h5>
                     Unit
@@ -2039,6 +2042,21 @@ include("kattegat/role_check.php");
                     type="text"
                     placeholder="Unit"
                     class="form-control validate stcbalancedqtyunit"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="col-xl-4 col-lg-4 col-md-4 col-sm-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <h5>
+                    Rack
+                  </h5>
+                  <input
+                    id="stcbalancedqtyrack"
+                    name="stcbalancedqtyrack"
+                    type="text"
+                    placeholder="Rack"
+                    class="form-control validate stcbalancedqtyrack"
                     disabled
                   />
                 </div>
