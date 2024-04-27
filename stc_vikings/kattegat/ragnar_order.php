@@ -3009,6 +3009,7 @@ class ragnarRequisitionPertAdd extends tesseract{
 		return $loki;
 	}
 
+	// iinsert data into recieving table to dispatch show
 	public function stc_ag_req_direct($stc_req_id, $stc_req_item_id, $dispatch_qty, $poadhocitem){
 		$loki='';
 		$gamorarecgoqry=mysqli_query($this->stc_dbs, "
