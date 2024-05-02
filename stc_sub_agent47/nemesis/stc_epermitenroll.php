@@ -41,9 +41,15 @@ class transformers extends tesseract{
 		if($do_action == 0){
 			$optimusprime .= "<tr><td colspan='8' class='text-center'>No records found.</td></tr>";
 		}else{
-            $slno=0;
-			foreach ($optimusprimequery as $row) {
+            $slno = 0;
+            $todayDate = date('d-m-Y');
+            $countPEntry = 0;
+
+            foreach ($optimusprimequery as $row) {
                 $slno++;
+                if ($todayDate == date('d-m-Y', strtotime($row['created_date']))) {
+                    $countPEntry++;
+                }
 				$optimusprime .= "
                     <tr>
                         <td class='text-center'>".$slno."</td>
@@ -60,7 +66,11 @@ class transformers extends tesseract{
                 </tbody>
             </table>
         ';
-		return $optimusprime;
+        $optimusprimearray = array(
+            'optimusprime' => $optimusprime,
+            'totalpentry' => $countPEntry
+        );
+		return $optimusprimearray;
 	}
 
     // save permit enrollment
@@ -76,6 +86,72 @@ class transformers extends tesseract{
         }
         return $optimusprime;
     }
+
+    public function stc_save_totalpermitenr($totalpermitenr, $location, $dept, $remarks){
+        $optimusprime = "";
+        $qry="
+        INSERT INTO `stc_totalpermitenrollment`(`totalpermitenr`, `location`, `dep_id`, `remarks`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $totalpermitenr)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."', '".mysqli_real_escape_string($this->stc_dbs, $remarks)."', NOW(), '".$_SESSION['stc_agent_sub_id']."')
+    ";
+        $optimusprimequery=mysqli_query($this->stc_dbs, $qry);
+        if($optimusprimequery){
+            $optimusprime="Success";
+        }else{
+            $optimusprime="Failed";
+        }
+        return $optimusprime;
+    }
+
+    // call total epermit enrollment
+	public function stc_call_totalpermitenr(){
+        $date=date('Y-m-d');
+        $slno = 0;
+        $counter=0;
+        $remarks='';
+        $query="
+            SELECT `id`, `totalpermitenr`, `remarks`, `created_date`, `created_by` 
+            FROM `stc_totalpermitenrollment`
+            WHERE `created_by`='".$_SESSION['stc_agent_sub_id']."' AND DATE(`created_date`)='".$date."'
+            ORDER BY `id` ASC
+        ";
+		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
+		$optimusprime='
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th class="text-center">SL NO</th>
+                        <th class="text-center">DATE</th>
+                        <th class="text-center">TOTAL E-PERMIT ENROLLMENT</th>
+                    </tr>
+                </thead>
+                <tbody>
+        ';
+		$do_action=mysqli_num_rows($optimusprimequery);
+		if($do_action == 0){
+			$optimusprime .= "<tr><td colspan='3' class='text-center'>No records found.</td></tr>";
+		}else{
+            foreach ($optimusprimequery as $row) {
+                $slno++;
+                $counter+=$row['totalpermitenr'];
+                $remarks=$row['remarks'];
+				$optimusprime .= "
+                    <tr>
+                        <td class='text-center'>".$slno."</td>
+                        <td class='text-center'>".date('d-m-Y H:i:s a', strtotime($row['created_date']))."</td>
+                        <td class='text-center'>".$row['totalpermitenr']."</td>
+                    </tr>";			
+			}
+		}
+        $optimusprime.='
+                </tbody>
+            </table>
+        ';
+        $optimusprimearr = array(
+            'optimusprime' => $optimusprime,
+            'remarks' => $remarks,
+            'totalpenrollment' => $counter
+        );
+		return $optimusprimearr;
+	}
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -87,7 +163,7 @@ if(isset($_POST['show_epermitenroll'])){
     $enddate=date('Y-m-d', strtotime($_POST['enddate']));
 	$metabots=new transformers();
 	$opmetabots=$metabots->stc_call_epermitenroll($begdate, $enddate);
-	echo $opmetabots;
+	echo json_encode($opmetabots);
 }
 
 // save permit enrollment
@@ -108,5 +184,31 @@ if(isset($_POST['save_permitenr'])){
         $out=$opmetabots;
     }
     echo json_encode($out);
+}
+
+// save permit enrollment
+if(isset($_POST['save_totalpermitenr'])){
+    $totalpermitenr=$_POST['totalpermitenr'];
+    $location=$_POST['location'];
+    $dept=$_POST['dept'];
+    $remarks=$_POST['remarks'];
+    $out='';
+    if($totalpermitenr=="NA"){
+        $out="empty";
+    }else if(!isset($_SESSION['stc_agent_sub_id'])){
+        $out="login";
+    }else{
+        $metabots=new transformers();
+        $opmetabots=$metabots->stc_save_totalpermitenr($totalpermitenr, $location, $dept, $remarks);
+        $out=$opmetabots;
+    }
+    echo json_encode($out);
+}
+
+
+if(isset($_POST['show_totalepermitenroll'])){
+	$metabots=new transformers();
+	$opmetabots=$metabots->stc_call_totalpermitenr();
+	echo json_encode($opmetabots);
 }
 ?>

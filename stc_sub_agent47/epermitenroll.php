@@ -112,7 +112,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                                     <a class="btn btn-primary stc-sup-req-search"><i class="fa fa-search"></i> Search</a>
                                                                 </div>
                                                             </div>
-                                                            <div class="col-md-12 mb-3">
+                                                            <div class="col-md-4 mb-3">
+                                                                <a href="javascript:void(0)" class="form-control btn bg-primary text-white mb-3" data-toggle="modal" data-target=".bd-create-summepermitenrollment-modal">Summary E-Permit Enrollment</a>
                                                                 <a href="javascript:void(0)" class="form-control btn bg-success text-white mb-3" data-toggle="modal" data-target=".bd-create-epermitenrollment-modal">Add E-Permit Enrollment</a>
                                                             </div>
                                                         </div>
@@ -260,6 +261,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     success : function(response){
                         // console.log(response);
                         $('#stc-agent-sup-std-sublocation').html(response);
+                        $('#stc-agent-sup-std-sublocation1').html(response);
                     }
                 });
             }
@@ -267,6 +269,11 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('#stc-agent-sup-std-sublocation', 'change', function(e){
                 e.preventDefault();
                 load_dept('', '');
+            });
+
+            $('body').delegate('#stc-agent-sup-std-sublocation1', 'change', function(e){
+                e.preventDefault();
+                load_dept1('', '');
             });
 
             function load_dept(operation, value){
@@ -279,9 +286,20 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     success : function(response){
                         // console.log(response);
                         $('#stc-agent-sup-std-dept').html(response);
-                        if(operation=="dept"){
-                            $('#stc-agent-sup-std-dept option[data-id='+value+']').prop('selected', true);
-                        }
+                    }
+                });
+            }
+
+            function load_dept1(operation, value){
+                var loca_id = $('#stc-agent-sup-std-sublocation1').val();
+                $.ajax({
+                    url     : "nemesis/stc_std.php",
+                    method  : "POST",
+                    data    : {call_department:1,loca_id:loca_id},
+                    dataType  : "JSON",
+                    success : function(response){
+                        // console.log(response);
+                        $('#stc-agent-sup-std-dept1').html(response);
                     }
                 });
             }
@@ -292,6 +310,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 show_epermitenroll(begdate, enddate);
             });
 
+            var totalpentry=0;
+            var totalnonenrollment=0;
             // show requistion cart items
             show_epermitenroll('', '');
             function show_epermitenroll(begdate, enddate){
@@ -299,43 +319,104 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     url     : "nemesis/stc_epermitenroll.php",
                     method  : "POST",
                     data    : {show_epermitenroll:1, begdate:begdate, enddate:enddate},
+                    dataType : "JSON",
                     success : function(response){
                         // console.log(response);
-                        $('.stc-epermitenrollment-result').html(response);
+                        $('.stc-epermitenrollment-result').html(response['optimusprime']);
+                        $('.totalpentry').html(response['totalpentry']);
+                        show_totalepermitenroll(response['totalpentry']);
+
+                        // save permit enrollment
+                        $('body').delegate('.stc-permitenr-save', 'click', function(e){
+                            e.preventDefault();
+                            var location=$('.stc-permitenr-location').val();
+                            var selectedOption = $('.stc-permitenr-dept').find('option:selected');
+                            var dept = selectedOption.data('id');
+                            var name=$('.stc-permitenr-name').val();
+                            var gpno=$('.stc-permitenr-gpno').val();
+                            var shift=$('.stc-permitenr-shift').val();
+                            $.ajax({
+                                url : "nemesis/stc_epermitenroll.php",
+                                method : "POST",
+                                data : {
+                                    save_permitenr:1,
+                                    location:location,
+                                    dept:dept,
+                                    name:name,
+                                    gpno:gpno,
+                                    shift:shift
+                                },
+                                dataType : "JSON",
+                                success : function(response){
+                                    if(response.trim()=="Success"){
+                                        alert("E-Permit Enrollment Saved Successfully.");
+                                        show_epermitenroll('', '');
+                                        show_totalepermitenroll();
+                                        $('.stc-permitenr-name').val('');
+                                        $('.stc-permitenr-gpno').val('');
+                                        $('.stc-permitenr-shift').val('NA');
+                                    }else if(response.trim()=="failed"){
+                                        alert("E-Permit Enrollment Not Saved.");
+                                    }else if(response.trim()=="empty"){
+                                        alert("Please enter all fields.");
+                                    }else if(response.trim()=="login"){
+                                        widnow.location.reload();
+                                    }
+                                }
+                            });
+                        });
+
+                        function show_totalepermitenroll(totalpentry){
+                            $.ajax({
+                                url     : "nemesis/stc_epermitenroll.php",
+                                method  : "POST",
+                                data    : {show_totalepermitenroll:1},
+                                dataType : "JSON",
+                                success : function(response){
+                                    // console.log(response);
+                                    $('.stc-totalepermitenrollment-result').html(response['optimusprime']);
+                                    $('.totalpenrollment').html(response['totalpenrollment']);
+                                    $('.totalenrollremarks').html(response['remarks']);
+                                    var penrollment=response['totalpenrollment']==undefined ? 0 : response['totalpenrollment'];
+                                    totalnonenrollment=totalpentry-penrollment;
+                                    if(totalnonenrollment<totalpentry){
+                                        $('.totalnonpenrollment').html(totalnonenrollment);
+                                        $('.totalnonpenrollment').removeClass("text-success");
+                                        $('.totalnonpenrollment').addClass("text-danger");
+                                    }
+                                    
+                                }
+                            });
+                        }
+                        
                     }
                 });
             }
 
-            // save permit enrollment
-            $('body').delegate('.stc-permitenr-save', 'click', function(e){
-                e.preventDefault();
-                var location=$('.stc-permitenr-location').val();
-                var selectedOption = $('.stc-permitenr-dept').find('option:selected');
+            $('body').delegate('.stc-totalpermitenr-save', 'click', function(e){
+                var totalpermitenr=$('.stc-totalpermitenr').val();
+                var location=$('.stc-permitenr-location1').val();
+                var selectedOption = $('.stc-permitenr-dept1').find('option:selected');
                 var dept = selectedOption.data('id');
-                var name=$('.stc-permitenr-name').val();
-                var gpno=$('.stc-permitenr-gpno').val();
-                var shift=$('.stc-permitenr-shift').val();
+                var remarks=$('.stc-totalpermitenr-remarks').val();
                 $.ajax({
                     url : "nemesis/stc_epermitenroll.php",
                     method : "POST",
                     data : {
-                        save_permitenr:1,
+                        save_totalpermitenr:1,
+                        totalpermitenr:totalpermitenr,
                         location:location,
                         dept:dept,
-                        name:name,
-                        gpno:gpno,
-                        shift:shift
+                        remarks:remarks
                     },
                     dataType : "JSON",
                     success : function(response){
                         if(response.trim()=="Success"){
-                            alert("E-Permit Enrollment Saved Successfully.");
-                            show_epermitenroll('', '');
-                            $('.stc-permitenr-name').val('');
-                            $('.stc-permitenr-gpno').val('');
-                            $('.stc-permitenr-shift').val('NA');
+                            alert("Total E-Permit Enrollment Saved Successfully.");
+                            $('.stc-totalpermitenr').val('');
+                            $('.stc-sup-req-search').click();
                         }else if(response.trim()=="failed"){
-                            alert("E-Permit Enrollment Not Saved.");
+                            alert("Total E-Permit Enrollment Not Saved.");
                         }else if(response.trim()=="empty"){
                             alert("Please enter all fields.");
                         }else if(response.trim()=="login"){
@@ -344,6 +425,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     }
                 });
             });
+            
         });
     </script>
 </body>
@@ -425,6 +507,113 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <a href="javascript:void(0)" class="btn btn-success stc-permitenr-save">Save</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-create-summepermitenrollment-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-modal="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Summary E-Permit Enrollment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 col-xl-6"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Location : </h5><br>
+                                <select class="btn btn-success form-control text-left stc-permitenr-location1" id="stc-agent-sup-std-sublocation1">
+                                    <option>TATA Steel - Jamshedpur</option>
+                                    <option>TATA Steel - KPO</option>
+                                    <option>MTMH</option>
+                                    <option>CRM BARA</option>
+                                    <option>MANIPAL</option>
+                                    <option>P&M MALL</option>
+                                    <option>TATA CUMMINS</option>
+                                    <option>XLRI</option>
+                                    <option>RAIPUR AIIMS</option>
+                                    <option>NML</option>
+                                    <option>RSP</option>
+                                    <option>IGH HOSPITAL</option>
+                                    <option>NEELACHAL ISPAT</option>
+                                </select> 
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-xl-6"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Department : </h5><br>
+                                <select class="btn btn-success form-control stc-agent-sup-std-sub-location text-left stc-permitenr-dept1" id="stc-agent-sup-std-dept1"><option>Please select location first!!!</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xl-12"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Total E-Permit Enrollment : </h5><br>
+                                <input type="number" class="form-control stc-totalpermitenr" placeholder="Enter Total E-Permit Enrollment"/>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xl-12"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>Remarks : (For Non-Enrollement)</h5><br>
+                                <textarea class="form-control stc-totalpermitenr-remarks" placeholder="Enter remarks"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xl-12"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <a href="javascript:void(0)" class="btn btn-success stc-totalpermitenr-save">Save</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xl-12"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <table class='table table-bordered table-hover'>
+                                    <thead>
+                                        <th>Label</th>
+                                        <th>Quantity</th>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Total Plant Entry</td>
+                                            <td><span class="text-success totalpentry"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total E-Permit Enrollment</td>
+                                            <td><span class="text-success totalpenrollment"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Total Non-Enrollement</td>
+                                            <td><span class="text-success totalnonpenrollment"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Remarks</td>
+                                            <td><span class="text-danger totalenrollremarks">Pending for Appporval</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xl-12"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body stc-totalepermitenrollment-result">
                             </div>
                         </div>
                     </div>
