@@ -92,6 +92,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                           $effectiveDate = date('Y-m-d', strtotime("-7 days", strtotime($date)));
                                                         ?>   
                                                         <div class="form-row">
+                                                            <div class="col-md-4 mb-3">                                                                
+                                                                <?php if(($_SESSION['stc_agent_sub_category']=="Site Incharge") && ($_SESSION['stc_agent_sub_category']=="Supervisor")){ ?>
+                                                                <a href="javascript:void(0)" class="form-control btn bg-primary text-white mb-3" data-toggle="modal" data-target=".bd-create-summepermitenrollment-modal">Summary E-Permit Enrollment</a>
+                                                                <?php } ?>
+                                                                <a href="javascript:void(0)" class="form-control btn bg-success text-white mb-3" data-toggle="modal" data-target=".bd-create-epermitenrollment-modal">Add E-Permit Enrollment</a>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-row">
                                                             <div class="col-md-4 mb-3">
                                                                 <label for="validationCustom01">From</label>
                                                                 <input type="date" class="form-control" id="stc-sup-req-beg-date" value="<?php echo $effectiveDate;?>" required>
@@ -111,10 +119,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                                 <div class="input-group">
                                                                     <a class="btn btn-primary stc-sup-req-search"><i class="fa fa-search"></i> Search</a>
                                                                 </div>
-                                                            </div>
-                                                            <div class="col-md-4 mb-3">
-                                                                <a href="javascript:void(0)" class="form-control btn bg-primary text-white mb-3" data-toggle="modal" data-target=".bd-create-summepermitenrollment-modal">Summary E-Permit Enrollment</a>
-                                                                <a href="javascript:void(0)" class="form-control btn bg-success text-white mb-3" data-toggle="modal" data-target=".bd-create-epermitenrollment-modal">Add E-Permit Enrollment</a>
                                                             </div>
                                                         </div>
                                                     </form> 
