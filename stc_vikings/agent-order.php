@@ -77,6 +77,11 @@ include("kattegat/role_check.php");
                                     <span>PPE Track </span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-7" data-toggle="tab" href="#tab-content-7">
+                                    <span>Tools Track </span>
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane tabs-animation fade" id="tab-content-1" role="tabpanel">
@@ -733,6 +738,52 @@ include("kattegat/role_check.php");
                                                         </tr>
                                                     </thead>
                                                     <tbody class="item-tracker-show"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                      </div>
+                                  </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane tabs-animation fade" id="tab-content-7" role="tabpanel">
+                                <div class="row">
+                                  <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                      <div class="card-border mb-3 card card-body border-success" style="overflow-x: auto; white-space: nowrap;">
+                                        <div class="row">
+                                            <div class="col-xl-12 col-lg-12 col-md-12">
+                                                <div class="card-border mb-3 card card-body border-success">
+                                                    <h5
+                                                      for="description" align="center"
+                                                    >Tools Track
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <a href="javascript:void(0)" class="btn btn-primary form-control" data-toggle="modal" data-target=".bd-toolstracker-modal-lg">Add Tools Tracker</a>
+                                            </div>
+                                            <div class="col-md-10">
+                                                <input type="text" id="toolssearchInput" class="form-control" placeholder="Type to search...">
+                                            </div>
+                                            <div class="col-md-12">
+                                                <table class="table table-stripped table-bordered table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">SL NO</th>
+                                                            <th class="text-center">UNIQUE ID</th>
+                                                            <th class="text-center">ITEM DESCRIPTION</th>
+                                                            <th class="text-center">MACHINE SR.NO</th>
+                                                            <th class="text-center">MAKE</th>
+                                                            <th class="text-center">TYPE</th>
+                                                            <th class="text-center">PURCHASE DETAILS</th>
+                                                            <th class="text-center">WARRANTY</th>
+                                                            <th class="text-center">TAX INVOICE NO.</th>
+                                                            <th class="text-center">TAX INVOICE DATE.</th>
+                                                            <th class="text-center">ACTION</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="tools-tracker-show"></tbody>
                                                 </table>
                                             </div>
                                         </div>
@@ -2097,6 +2148,80 @@ include("kattegat/role_check.php");
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLongTitle">PPE Tracker</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row formcontrol">
+                                    <div class="col-md-6">
+                                        <h5>Employee Name</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <input type="text" class="form-control it-emp-name" placeholder="Enter employee name" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Type of PPE</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <div class="checkbox-group">
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Pair" validity="12" value="Safety Shoes"> Safety Shoes </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="12" value="Safety Jacket"> Safety Jacket </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="12" value="Safety Belt"> Safety Belt </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="60" value="Safety Helmet"> Safety Helmet </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="3" value="Hand Gloves"> Hand Gloves </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="6" value="Leg Guard"> Leg Guard </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="6" value="Safety Goggles"> Safety Goggles </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="1" value="Ear Plug"> Ear Plug </label>
+                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="1" value="Nose Mask"> Nose Mask </label>
+                                          </div>
+                                      </div>
+                                    </div>
+                                    <div class="col-md-6" style="display:none;">
+                                        <h5>Quantity</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <input type="number" class="form-control it-qty" placeholder="Enter quantity" value="1">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <h5>Date of Issue</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="date" class="form-control it-issue-date" value="<?php echo date('Y-m-d'); ?>" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <h5>Remarks</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <textarea class="form-control it-remarks" placeholder="Enter remarks"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="card mb-3 widget-content">
+                                            <button class="form-control btn btn-success it-save">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tools track -->
+<div class="modal fade bd-toolstracker-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Tools Track</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

@@ -76,6 +76,14 @@
                                 </a>
                             </li>
                         ';
+                        echo '
+                            <li>
+                                <a href="epermitenroll.php?page=epermitenroll" class="epermitenroll">
+                                    <i class="metismenu-icon pe-7s-switch"></i>
+                                    E-Permit Enrollment
+                                </a>
+                            </li>
+                        ';
                     }
                     if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Safety Supervisor"){
                         echo '
