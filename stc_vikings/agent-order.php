@@ -1696,10 +1696,10 @@ include("kattegat/role_check.php");
           e.preventDefault();
           var req_id=$('#stc-req-list-id-rep2').val();
           var req_item_id=$('#stc-req-list-item-id-rep2').val();
-          var dispatch_qnty=parseInt($('#stcdispatchedqty').val(), 10);
-          var orderqty=parseInt($('#stc-req-list-item-id-orderqty').val(), 10);
+          var dispatch_qnty=parseFloat($('#stcdispatchedqty').val());
+          var orderqty=parseFloat($('#stc-req-list-item-id-orderqty').val());
           var poadhocitem=$('#poadhocitem').val();
-          var balanced_qty=parseInt($('#stcbalancedqty').val());
+          var balanced_qty=parseFloat($('#stcbalancedqty').val());
           if((dispatch_qnty>orderqty)){
             alert("Invalid quantity.");
           }else if((dispatch_qnty>balanced_qty)){
