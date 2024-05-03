@@ -330,46 +330,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('.totalpentry').html(response['totalpentry']);
                         show_totalepermitenroll(response['totalpentry']);
 
-                        // save permit enrollment
-                        $('body').delegate('.stc-permitenr-save', 'click', function(e){
-                            e.preventDefault();
-                            var location=$('.stc-permitenr-location').val();
-                            var selectedOption = $('.stc-permitenr-dept').find('option:selected');
-                            var dept = selectedOption.data('id');
-                            var name=$('.stc-permitenr-name').val();
-                            var gpno=$('.stc-permitenr-gpno').val();
-                            var shift=$('.stc-permitenr-shift').val();
-                            $.ajax({
-                                url : "nemesis/stc_epermitenroll.php",
-                                method : "POST",
-                                data : {
-                                    save_permitenr:1,
-                                    location:location,
-                                    dept:dept,
-                                    name:name,
-                                    gpno:gpno,
-                                    shift:shift
-                                },
-                                dataType : "JSON",
-                                success : function(response){
-                                    if(response.trim()=="Success"){
-                                        alert("E-Permit Enrollment Saved Successfully.");
-                                        show_epermitenroll('', '');
-                                        show_totalepermitenroll();
-                                        $('.stc-permitenr-name').val('');
-                                        $('.stc-permitenr-gpno').val('');
-                                        $('.stc-permitenr-shift').val('NA');
-                                    }else if(response.trim()=="failed"){
-                                        alert("E-Permit Enrollment Not Saved.");
-                                    }else if(response.trim()=="empty"){
-                                        alert("Please enter all fields.");
-                                    }else if(response.trim()=="login"){
-                                        widnow.location.reload();
-                                    }
-                                }
-                            });
-                        });
-
                         function show_totalepermitenroll(totalpentry){
                             $.ajax({
                                 url     : "nemesis/stc_epermitenroll.php",
@@ -396,6 +356,47 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     }
                 });
             }
+
+            // save permit enrollment
+            $('body').delegate('.stc-permitenr-save', 'click', function(e){
+                e.preventDefault();
+                $('.stc-permitenr-save').prop('disabled', true);
+                var location=$('.stc-permitenr-location').val();
+                var selectedOption = $('.stc-permitenr-dept').find('option:selected');
+                var dept = selectedOption.data('id');
+                var name=$('.stc-permitenr-name').val();
+                var gpno=$('.stc-permitenr-gpno').val();
+                var shift=$('.stc-permitenr-shift').val();
+                $.ajax({
+                    url : "nemesis/stc_epermitenroll.php",
+                    method : "POST",
+                    data : {
+                        save_permitenr:1,
+                        location:location,
+                        dept:dept,
+                        name:name,
+                        gpno:gpno,
+                        shift:shift
+                    },
+                    dataType : "JSON",
+                    success : function(response){
+                        if(response.trim()=="Success"){
+                            alert("E-Permit Enrollment Saved Successfully.");
+                            show_epermitenroll('', '');
+                            $('.stc-permitenr-name').val('');
+                            $('.stc-permitenr-gpno').val('');
+                            $('.stc-permitenr-shift').val('NA');
+                            $('.stc-permitenr-save').prop('disabled', false);
+                        }else if(response.trim()=="failed"){
+                            alert("E-Permit Enrollment Not Saved.");
+                        }else if(response.trim()=="empty"){
+                            alert("Please enter all fields.");
+                        }else if(response.trim()=="login"){
+                            widnow.location.reload();
+                        }
+                    }
+                });
+            });
 
             $('body').delegate('.stc-totalpermitenr-save', 'click', function(e){
                 var totalpermitenr=$('.stc-totalpermitenr').val();
