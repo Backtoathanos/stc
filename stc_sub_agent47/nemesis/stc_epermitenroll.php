@@ -17,7 +17,10 @@ class transformers extends tesseract{
             FROM `stc_epermit_enrollment`
             LEFT JOIN `stc_status_down_list_department`
             ON `dep_id`=`stc_status_down_list_department_loc_id` 
-            WHERE `created_by`='".$_SESSION['stc_agent_sub_id']."'
+            LEFT JOIN `stc_cust_pro_supervisor`
+            ON `stc_cust_pro_supervisor_id`=`created_by`
+            LEFT JOIN `stc_agents`
+            ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` 
             ".$date_filter."
             ORDER BY `id` DESC
         ";
