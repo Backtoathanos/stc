@@ -1332,7 +1332,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
     <script type="text/javascript" src="./assets/scripts/jarvis.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <script src="//cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
+    <script src="./assets/scripts/jquery.table2excel.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/floatthead/2.2.3/jquery.floatThead.min.js"></script>
     <script>
         $(document).ready(function(){
