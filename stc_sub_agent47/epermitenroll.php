@@ -93,7 +93,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         ?>   
                                                         <div class="form-row">
                                                             <div class="col-md-4 mb-3">                                                                
-                                                                <?php if(($_SESSION['stc_agent_sub_category']=="Site Incharge") && ($_SESSION['stc_agent_sub_category']=="Supervisor")){ ?>
+                                                                <?php if(($_SESSION['stc_agent_sub_category']=="Site Incharge") || ($_SESSION['stc_agent_sub_category']=="Supervisor")){ ?>
                                                                 <a href="javascript:void(0)" class="form-control btn bg-primary text-white mb-3" data-toggle="modal" data-target=".bd-create-summepermitenrollment-modal">Summary E-Permit Enrollment</a>
                                                                 <?php } ?>
                                                                 <a href="javascript:void(0)" class="form-control btn bg-success text-white mb-3" data-toggle="modal" data-target=".bd-create-epermitenrollment-modal">Add E-Permit Enrollment</a>
