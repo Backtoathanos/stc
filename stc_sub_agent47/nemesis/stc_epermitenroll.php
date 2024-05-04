@@ -8,21 +8,13 @@ include "../../MCU/obdb.php";
 class transformers extends tesseract{
 	// call sitename
 	public function stc_call_epermitenroll($begdate, $enddate){
-        $date_filter='AND (DATE(`created_date`) BETWEEN "'.$begdate.'" AND "'. $enddate.'" )';
+        $date_filter='WHERE DATE(`created_date`)="'.$enddate.'"';
+        $countPEntry = 0;
         if($begdate==''){
             $date_filter='';
         }
         $query="
-            SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by` 
-            FROM `stc_epermit_enrollment`
-            LEFT JOIN `stc_status_down_list_department`
-            ON `dep_id`=`stc_status_down_list_department_loc_id` 
-            LEFT JOIN `stc_cust_pro_supervisor`
-            ON `stc_cust_pro_supervisor_id`=`created_by`
-            LEFT JOIN `stc_agents`
-            ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` 
-            ".$date_filter."
-            ORDER BY `id` DESC
+            SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by` FROM `stc_epermit_enrollment`LEFT JOIN `stc_status_down_list_department`ON `dep_id`=`stc_status_down_list_department_loc_id` LEFT JOIN `stc_cust_pro_supervisor`ON `stc_cust_pro_supervisor_id`=`created_by`LEFT JOIN `stc_agents`ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` ".$date_filter."ORDER BY `id` DESC
         ";
 		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
 		$optimusprime='
@@ -46,7 +38,6 @@ class transformers extends tesseract{
 		}else{
             $slno = 0;
             $todayDate = date('d-m-Y');
-            $countPEntry = 0;
 
             foreach ($optimusprimequery as $row) {
                 $slno++;
