@@ -100,7 +100,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                             </div>
                                                         </div>
                                                         <div class="form-row">
-                                                            <div class="col-md-4 mb-3">
+                                                            <div class="col-md-4 mb-3" style="display: none;">
                                                                 <label for="validationCustom01">From</label>
                                                                 <input type="date" class="form-control" id="stc-sup-req-beg-date" value="<?php echo $effectiveDate;?>" required>
                                                                 <div class="valid-feedback">
