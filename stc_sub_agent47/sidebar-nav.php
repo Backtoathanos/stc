@@ -79,7 +79,7 @@
                         echo '
                             <li>
                                 <a href="epermitenroll.php?page=epermitenroll" class="epermitenroll">
-                                    <i class="metismenu-icon pe-7s-switch"></i>
+                                    <i class="metismenu-icon pe-7s-add-user"></i>
                                     E-Permit Enrollment
                                 </a>
                             </li>
