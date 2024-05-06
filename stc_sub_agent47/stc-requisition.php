@@ -413,12 +413,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             });
 
             // show model on click reciveing for recieving purposes
-            var js_super_rec_value;
-            var js_super_rec_item_value;
+            var js_super_rec_value='';
+            var js_super_rec_item_value='';
+            var js_stc_super_rec_qnty_cqty='';
             $('body').delegate('.stc-sup-requisition-rece-modal-btn', 'click', function(e){
                 e.preventDefault();
                 js_super_rec_value=$(this).attr("stc-req-id");
                 js_super_rec_item_value=$(this).attr("stc-req-item-id");
+                js_stc_super_rec_qnty_cqty=$(this).attr("stc-req-item-checkqty");
                 $('#stc-sup-requisition-rece-modal').modal('show');
             });
             
@@ -426,8 +428,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.stc-super-own-qnty-rec-btn', 'click',function(e){
                 e.preventDefault();
                 var js_stc_super_rec_qnty_text=$('.stc-super-own-qnty-rec-text').val();
-                var js_stc_super_rec_qnty_cqty=$('.stc-requisition-search').find('table th:eq(5)').html();
-                console.log(js_stc_super_rec_qnty_cqty);
                 $.ajax({
                     url      : "nemesis/stc_agcart.php",
                     method   : "POST",
