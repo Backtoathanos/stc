@@ -94,6 +94,12 @@
                         Procurement Tracker
                     </a>
                 </li>
+                <li>
+                    <a href="epermitenroll.php?page=epermitenroll" class="epermitenroll">
+                        <i class="metismenu-icon pe-7s-add-user"></i>
+                        E-Permit Enrollment
+                    </a>
+                </li>
                 <!-- <li>
                     <a href="item-tracker.php?page=itemtracker" class="itemtracker">
                         <i class="metismenu-icon pe-7s-map-marker"></i>
