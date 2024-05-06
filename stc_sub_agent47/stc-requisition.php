@@ -426,7 +426,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.stc-super-own-qnty-rec-btn', 'click',function(e){
                 e.preventDefault();
                 var js_stc_super_rec_qnty_text=$('.stc-super-own-qnty-rec-text').val();
-                var js_stc_super_rec_qnty_cqty=$('.stc-requisition-search').find('th:eq(5)').html();
+                var js_stc_super_rec_qnty_cqty=$('.stc-requisition-search').find('table th:eq(5)').html();
+                console.log(js_stc_super_rec_qnty_cqty);
                 $.ajax({
                     url      : "nemesis/stc_agcart.php",
                     method   : "POST",
