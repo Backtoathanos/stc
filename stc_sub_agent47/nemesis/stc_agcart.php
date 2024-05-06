@@ -642,7 +642,7 @@ class witcher_supervisor extends tesseract{
 			$stcinitvalue+=$qry['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
 		}
 		$totalqnty=$stcinitvalue + $stc_rec_qty;
-		if($totalqnty>=$stc_req_item_cqty){
+		if($totalqnty>$stc_req_item_cqty){
 			$returnrecieve="Item is already recieved.";
 		}else{
 			$stccheckrecqry=mysqli_query($this->stc_dbs, "
