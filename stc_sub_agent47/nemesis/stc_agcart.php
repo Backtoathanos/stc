@@ -362,7 +362,7 @@ class witcher_supervisor extends tesseract{
 						<a 
 							href="#" 
 							stc-req-item-id="'.$requisitioni_row['list_item_id'].'"
-							stc-req-item-checkqty="'.$firstrow['stc_cust_super_requisition_items_finalqty'].'"
+							stc-req-item-checkqty="'.$requisitioni_row['stc_cust_super_requisition_items_finalqty'].'"
 							stc-req-id="'.$requisitioni_row['list_id'].'"
 							class="btn btn-info btn-sm stc-sup-requisition-rece-modal-btn">	 
 							Recieving
