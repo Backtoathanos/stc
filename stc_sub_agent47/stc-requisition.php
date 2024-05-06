@@ -444,6 +444,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         if(rec_response=="yes"){
                             alert("Recieving Confirmed!!! Thankyou.");
                             $('#stc-sup-requisition-rece-modal').modal('hide');
+                            $('.stc-sup-req-search').click();
                         }else{
                             alert(rec_response);
                         }
