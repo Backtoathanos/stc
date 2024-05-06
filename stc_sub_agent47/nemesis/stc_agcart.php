@@ -625,7 +625,7 @@ class witcher_supervisor extends tesseract{
 		return $transformers;
 	}
 
-	public function stc_supervisor_list_rec_items_hit($stc_req_id, $stc_req_item_id, $stc_rec_qty){
+	public function stc_supervisor_list_rec_items_hit($stc_req_id, $stc_req_item_id, $stc_rec_qty, $stc_req_item_cqty){
 		$returnrecieve='';
 		$stcinitvalue=0;
 		$stcsuporderqty=0;
@@ -641,8 +641,9 @@ class witcher_supervisor extends tesseract{
 		foreach($stcceckqntyqry as $qry){
 			$stcinitvalue+=$qry['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
 		}
-		if($stc_rec_qty<=$stcinitvalue){
-			$returnrecieve="This item is already recieved.";
+		$totalqnty=$stcinitvalue + $stc_rec_qty;
+		if($totalqnty>=$stc_req_item_cqty){
+			$returnrecieve="Item is already recieved.";
 		}else{
 			$stccheckrecqry=mysqli_query($this->stc_dbs, "
 				SELECT 
@@ -949,9 +950,10 @@ if(isset($_POST['stc_rec_qntyhit'])){
 	$stc_rec_qty=$_POST['stc_super_rec_qnty_text'];
 	$stc_req_id=$_POST['super_rec_value'];
 	$stc_req_item_id=$_POST['super_rec_item_value'];
+	$stc_req_item_cqty=$_POST['js_stc_super_rec_qnty_cqty'];
 	$objloki=new witcher_supervisor();
 	if(!empty($_SESSION["stc_agent_sub_id"])){
-		$opobjloki=$objloki->stc_supervisor_list_rec_items_hit($stc_req_id, $stc_req_item_id, $stc_rec_qty);
+		$opobjloki=$objloki->stc_supervisor_list_rec_items_hit($stc_req_id, $stc_req_item_id, $stc_rec_qty, $stc_req_item_cqty);
 		echo $opobjloki;
 	}else{
 		echo "exit";
