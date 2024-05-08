@@ -86,42 +86,158 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 <div class="card-body">
                                                     <h5 class="card-title">View E-Permit Enrollment</h5>
                                                     <form class="needs-validation" novalidate>
-                                                        <?php
-                                                          $date = date("d-m-Y");
-                                                          $newDate = date('Y-m-d', strtotime($date)); 
-                                                          $effectiveDate = date('Y-m-d', strtotime("-7 days", strtotime($date)));
-                                                        ?>
                                                         <div class="form-row">
-                                                            <div class="col-md-4 mb-3" style="display: none;">
-                                                                <label for="validationCustom01">From</label>
-                                                                <input type="date" class="form-control" id="stc-sup-req-beg-date" value="<?php echo $effectiveDate;?>" required>
-                                                                <div class="valid-feedback">
-                                                                    Looks good!
-                                                                </div>
+                                                            <div class="col-md-12 mb-3">
+                                                                <input type="date" value='<?php echo date('Y-m-d');?>' class='datefilter form-control'>
+                                                                <a href="javascript:void(0)" class="datefilterbtn btn btn-primary">Find</a>
                                                             </div>
-                                                            <div class="col-md-4 mb-3">
-                                                                <label for="validationCustom01">To</label>
-                                                                <input type="date" class="form-control" id="stc-sup-req-end-date" value="<?php echo $newDate;?>" required>
-                                                                <div class="valid-feedback">
-                                                                    Looks good!
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-4 mb-3">
-                                                                <label for="validationCustomUsername">Search</label>
-                                                                <div class="input-group">
-                                                                    <a class="btn btn-primary stc-sup-req-search"><i class="fa fa-search"></i> Search</a>
-                                                                </div>
+                                                            <div class="col-md-12 mb-3">
+                                                                <table class="table table-bordered table-hover">
+                                                                    <thead>
+                                                                        <tr>
+                                                                            <th colspan="15" class="text-center">E-Permit Enrolment Record</th>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <?php 
+
+                                                                                $showdate=date('d-m-Y');
+                                                                                $shiftAtotal='';
+                                                                                $shiftBtotal='';
+                                                                                $shiftCtotal='';
+                                                                                $shiftEtotal='';
+                                                                                $shiftAdata='';
+                                                                                $shiftBdata='';
+                                                                                $shiftCdata='';
+                                                                                $shiftEdata='';
+                                                                                $totalplantentry=0;
+                                                                                $shifttdata='';
+                                                                                include_once("../MCU/db.php");
+                                                                                $filter=' WHERE DATE(`created_date`)="'.date('Y-m-d').'"';
+                                                                                $filter2=' AND DATE(`created_date`)="'.date('Y-m-d').'"';
+                                                                                if(isset($_GET['search_date'])){
+                                                                                    $filter=' WHERE DATE(`created_date`)="'.$_GET['search_date'].'"';
+                                                                                    $filter2=' AND DATE(`created_date`)="'.$_GET['search_date'].'"';
+                                                                                    $showdate=date('d-m-Y', strtotime($_GET['search_date']));
+                                                                                }
+                                                                                echo '<th class="text-center">Date</th>';
+                                                                                echo '<th class="text-center">'.$showdate.'</th>';
+                                                                                $sql=mysqli_query($con, "SELECT `dep_id`, `shift`, `stc_status_down_list_department_dept` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_loc_id` ".$filter." ORDER BY `stc_status_down_list_department_dept` ASC");
+                                                                                $TotalShiftAcounter=0;
+                                                                                $TotalShiftBcounter=0;
+                                                                                $TotalShiftCcounter=0;
+                                                                                $TotalShiftEcounter=0;
+                                                                                $Totalepermitcounter=0;
+                                                                                $deptepermitcounter='';
+                                                                                $departments = array();
+                                                                                $departmentsid = array();
+                                                                                $Remarks='';
+                                                                                $deptnonenrollmentcounter='';
+                                                                                if(mysqli_num_rows($sql)>0){
+                                                                                    foreach($sql as $row){
+                                                                                        if (!in_array($row['stc_status_down_list_department_dept'], $departments)) {
+                                                                                            $departments[] = $row['stc_status_down_list_department_dept'];
+                                                                                            $departmentsid[] = $row['dep_id'];
+                                                                                        }
+                                                                                    }
+                                                                                    foreach($departments as $key=>$department) {
+                                                                                        $Remarks='';
+                                                                                        $ShiftAcounter=0;
+                                                                                        $ShiftBcounter=0;
+                                                                                        $ShiftCcounter=0;
+                                                                                        $ShiftEcounter=0;
+                                                                                        echo '<th rowspan="2">' . $department . '</th>';
+                                                                                        $dept_id=$departmentsid[$key];
+                                                                                        $sql2=mysqli_query($con, "SELECT `id`, `shift` FROM `stc_epermit_enrollment` WHERE `dep_id`='".$dept_id."' ".$filter2."");
+                                                                                        foreach($sql2 as $row2){
+                                                                                            if($row2['shift']=="A"){ $totalplantentry++;$ShiftAcounter++;$TotalShiftAcounter++; }
+                                                                                            if($row2['shift']=="B"){ $totalplantentry++;$ShiftBcounter++;$TotalShiftBcounter++; }
+                                                                                            if($row2['shift']=="C"){ $totalplantentry++;$ShiftCcounter++;$TotalShiftCcounter++; }
+                                                                                            if($row2['shift']=="E (General)"){ $totalplantentry++;$ShiftEcounter++;$TotalShiftEcounter++; }
+                                                                                        }
+                                                                                        $sql3=mysqli_query($con, "SELECT `id`, `totalpermitenr`, `dep_id`, `remarks` FROM `stc_totalpermitenrollment` WHERE `dep_id`='".$dept_id."' ".$filter2."");
+                                                                                        $Epermitcounter=0;
+                                                                                        $rema='';
+                                                                                        if(mysqli_num_rows($sql3)>0){
+                                                                                            foreach($sql3 as $row3){
+                                                                                                $Epermitcounter++;
+                                                                                                $Totalepermitcounter++;
+                                                                                                $rema=$row3['remarks'];
+                                                                                            }
+                                                                                            if($Epermitcounter==0){
+                                                                                                $deptepermitcounter.='<td>0</td>';
+                                                                                            }else{
+                                                                                                $deptepermitcounter.='<td>'.$Epermitcounter.'</td>';
+                                                                                                $Remarks.=$rema;
+                                                                                            }
+                                                                                        }
+
+                                                                                        $shiftAdata.='<td>'.$ShiftAcounter.'</td>';
+                                                                                        $shiftBdata.='<td>'.$ShiftBcounter.'</td>';
+                                                                                        $shiftCdata.='<td>'.$ShiftCcounter.'</td>';
+                                                                                        $shiftEdata.='<td>'.$ShiftEcounter.'</td>';
+                                                                                        $total = $ShiftAcounter + $ShiftBcounter + $ShiftCcounter + $ShiftEcounter;
+                                                                                        $shifttdata.='<td>'.$total.'</td>';
+                                                                                        $totalnonenrollment=$total - $Epermitcounter;
+                                                                                        $deptnonenrollmentcounter.='<td>'.$totalnonenrollment.'</td>';
+                                                                                    }
+                                                                                    $shiftAtotal='<td>'.$TotalShiftAcounter.'</td>';
+                                                                                    $shiftBtotal='<td>'.$TotalShiftBcounter.'</td>';
+                                                                                    $shiftCtotal='<td>'.$TotalShiftCcounter.'</td>';
+                                                                                    $shiftEtotal='<td>'.$TotalShiftEcounter.'</td>';
+                                                                                }
+                                                                            ?>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <th class="text-center">Shift</td>
+                                                                            <th class="text-center">Manpower Entry in TSL</th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td>1st (A)</td>
+                                                                            <?php echo $shiftAtotal;?>
+                                                                            <?php echo $shiftAtotal;?>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>General (E)</td>
+                                                                            <?php echo $shiftEtotal;?>
+                                                                            <?php echo $shiftEtotal;?>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>2nd (B)</td>
+                                                                            <?php echo $shiftBtotal;?>
+                                                                            <?php echo $shiftBtotal;?>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>3rd (C)</td>
+                                                                            <?php echo $shiftCtotal;?>
+                                                                            <?php echo $shiftCtotal;?>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Total Entry In Plant</td>
+                                                                            <td><?php echo $totalplantentry;?></td>
+                                                                            <?php echo $shifttdata;?>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>E-Permit Enrolment</td>
+                                                                            <td><?php echo $Totalepermitcounter;?></td>
+                                                                            <?php echo $deptepermitcounter;?>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Non Enrolment</td>
+                                                                            <td><?php echo $totalplantentry-$Totalepermitcounter;?></td>
+                                                                            <?php echo $deptnonenrollmentcounter;?>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td>Remarks</td>
+                                                                            <td></td>
+                                                                            <td><?php echo $Remarks;?></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                    </table>
                                                             </div>
                                                         </div>
                                                     </form> 
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12 col-xl-12"> 
-                                            <div class="main-card mb-3 card">
-                                                <div class="card-body stc-epermitenrollment-result" style="overflow-x: auto;">
                                                 </div>
                                             </div>
                                         </div>
@@ -153,200 +269,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     window.location.href="stc-product.php?pd_name="+pd_title;
                 }
             });    
-        });
-    </script>
-    <script>
-        $(document).ready(function(){
-            var url = document.location.href;
-            var qs = url.substring(url.indexOf('?') + 1).split('&');
-            for(var i = 0, result = {}; i < qs.length; i++){
-                qs[i] = qs[i].split('=');
-                result[qs[i][0]] = decodeURIComponent(qs[i][1]);
-            }
-
-            var locationarr = [];
-            var departmentarr = [];
-            // call site name vaia supervisor
-            call_location();
-            function call_location(){
-                $.ajax({
-                    url     : "nemesis/stc_std.php",
-                    method  : "POST",
-                    data    : {call_location:1},
-                    dataType  : "JSON",
-                    success : function(response){
-                        // console.log(response);
-                        $('#stc-agent-sup-std-sublocation').html(response);
-                        $('#stc-agent-sup-std-sublocation1').html(response);
-                    }
-                });
-            }
-
-            $('body').delegate('#stc-agent-sup-std-sublocation', 'change', function(e){
-                e.preventDefault();
-                load_dept('', '');
-            });
-
-            $('body').delegate('#stc-agent-sup-std-sublocation1', 'change', function(e){
-                e.preventDefault();
-                load_dept1('', '');
-            });
-
-            function load_dept(operation, value){
-                var loca_id = $('#stc-agent-sup-std-sublocation').val();
-                $.ajax({
-                    url     : "nemesis/stc_std.php",
-                    method  : "POST",
-                    data    : {call_department:1,loca_id:loca_id},
-                    dataType  : "JSON",
-                    success : function(response){
-                        // console.log(response);
-                        $('#stc-agent-sup-std-dept').html(response);
-                    }
-                });
-            }
-
-            function load_dept1(operation, value){
-                var loca_id = $('#stc-agent-sup-std-sublocation1').val();
-                $.ajax({
-                    url     : "nemesis/stc_std.php",
-                    method  : "POST",
-                    data    : {call_department:1,loca_id:loca_id},
-                    dataType  : "JSON",
-                    success : function(response){
-                        // console.log(response);
-                        $('#stc-agent-sup-std-dept1').html(response);
-                    }
-                });
-            }
-            
-            $('body').delegate('.stc-sup-req-search', 'click', function(e){
-                var begdate=$('#stc-sup-req-beg-date').val();
-                var enddate=$('#stc-sup-req-end-date').val();
-                show_epermitenroll(begdate, enddate);
-            });
-
-            var totalpentry=0;
-            var totalnonenrollment=0;
-            // show requistion cart items
-            show_epermitenroll('', '');
-            function show_epermitenroll(begdate, enddate){
-                $.ajax({
-                    url     : "nemesis/stc_epermitenroll.php",
-                    method  : "POST",
-                    data    : {show_epermitenroll:1, begdate:begdate, enddate:enddate},
-                    dataType : "JSON",
-                    success : function(response){
-                        // console.log(response);
-                        $('.stc-epermitenrollment-result').html(response['optimusprime']);
-                        $('.totalpentry').html(response['totalpentry']);
-                        show_totalepermitenroll(response['totalpentry']);
-
-                        function show_totalepermitenroll(totalpentry){
-                            $.ajax({
-                                url     : "nemesis/stc_epermitenroll.php",
-                                method  : "POST",
-                                data    : {show_totalepermitenroll:1},
-                                dataType : "JSON",
-                                success : function(response){
-                                    // console.log(response);
-                                    $('.stc-totalepermitenrollment-result').html(response['optimusprime']);
-                                    $('.totalpenrollment').html(response['totalpenrollment']);
-                                    $('.totalenrollremarks').html(response['remarks']);
-                                    var penrollment=response['totalpenrollment']==undefined ? 0 : response['totalpenrollment'];
-                                    totalnonenrollment=totalpentry-penrollment;
-                                    if(totalnonenrollment<totalpentry){
-                                        $('.totalnonpenrollment').html(totalnonenrollment);
-                                        $('.totalnonpenrollment').removeClass("text-success");
-                                        $('.totalnonpenrollment').addClass("text-danger");
-                                    }
-                                    
-                                }
-                            });
-                        }
-                        
-                    }
-                });
-            }
-
-            // save permit enrollment
-            $('body').delegate('.stc-permitenr-save', 'click', function(e){
-                e.preventDefault();
-                var location=$('.stc-permitenr-location').val();
-                var selectedOption = $('.stc-permitenr-dept').find('option:selected');
-                var dept = selectedOption.data('id');
-                var name=$('.stc-permitenr-name').val();
-                var gpno=$('.stc-permitenr-gpno').val();
-                var shift=$('.stc-permitenr-shift').val();
-                if(location=='Select' || dept!='NA' || dept!=0){
-                    alert("Please Select all fields.");
-                }else{
-                    $('.stc-permitenr-save').prop('disabled', true);
-                    $.ajax({
-                        url : "nemesis/stc_epermitenroll.php",
-                        method : "POST",
-                        data : {
-                            save_permitenr:1,
-                            location:location,
-                            dept:dept,
-                            name:name,
-                            gpno:gpno,
-                            shift:shift
-                        },
-                        dataType : "JSON",
-                        success : function(response){
-                            if(response.trim()=="Success"){
-                                alert("E-Permit Enrollment Saved Successfully.");
-                                show_epermitenroll('', '');
-                                $('.stc-permitenr-name').val('');
-                                $('.stc-permitenr-gpno').val('');
-                                $('.stc-permitenr-shift').val('NA');
-                                $('.stc-permitenr-save').prop('disabled', false);
-                            }else if(response.trim()=="failed"){
-                                alert("E-Permit Enrollment Not Saved.");
-                            }else if(response.trim()=="empty"){
-                                alert("Please enter all fields.");
-                            }else if(response.trim()=="login"){
-                                widnow.location.reload();
-                            }
-                        }
-                    });                    
+            $('body').delegate('.datefilterbtn', 'click', function(e){
+                var pd_title=$('.datefilter').val();
+                if(pd_title!=""){
+                    window.location.href="epermitenroll.php?page=epermitenroll&search_date="+pd_title;
                 }
-            });
-
-            $('body').delegate('.stc-totalpermitenr-save', 'click', function(e){
-                var totalpermitenr=$('.stc-totalpermitenr').val();
-                var location=$('.stc-permitenr-location1').val();
-                var selectedOption = $('.stc-permitenr-dept1').find('option:selected');
-                var dept = selectedOption.data('id');
-                var remarks=$('.stc-totalpermitenr-remarks').val();
-                $.ajax({
-                    url : "nemesis/stc_epermitenroll.php",
-                    method : "POST",
-                    data : {
-                        save_totalpermitenr:1,
-                        totalpermitenr:totalpermitenr,
-                        location:location,
-                        dept:dept,
-                        remarks:remarks
-                    },
-                    dataType : "JSON",
-                    success : function(response){
-                        if(response.trim()=="Success"){
-                            alert("Total E-Permit Enrollment Saved Successfully.");
-                            $('.stc-totalpermitenr').val('');
-                            $('.stc-sup-req-search').click();
-                        }else if(response.trim()=="failed"){
-                            alert("Total E-Permit Enrollment Not Saved.");
-                        }else if(response.trim()=="empty"){
-                            alert("Please enter all fields.");
-                        }else if(response.trim()=="login"){
-                            widnow.location.reload();
-                        }
-                    }
-                });
-            });
-            
+            });    
         });
     </script>
 </body>
