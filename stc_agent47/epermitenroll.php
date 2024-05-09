@@ -89,7 +89,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                         <div class="form-row">
                                                             <div class="col-md-12 mb-3">
                                                             <?php
-                                                                $showdate=date('d-m-Y');
+                                                                $showdate=date('Y-m-d');
                                                                 if(isset($_GET['search_date'])){
                                                                     $showdate=date('Y-m-d', strtotime($_GET['search_date']));
                                                                 }
