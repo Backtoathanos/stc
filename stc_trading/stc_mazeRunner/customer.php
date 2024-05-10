@@ -1007,10 +1007,9 @@ if(empty(@$_SESSION['stc_trading_user_id'])){
         });
       });
 
-      // show customer
-      $('body').delegate('#customersearch', 'click', function(e){
-        e.preventDefault();
-        var search=$('#tags').val();
+
+      show_customer('');
+      function show_customer(search){
         $.ajax({
           url       : "../vanaheim/customer-done.php",
           method    : 'POST',
@@ -1024,6 +1023,12 @@ if(empty(@$_SESSION['stc_trading_user_id'])){
               $('.stc-silent-show-customer').html(data);
           }
         });
+      }
+      // show customer
+      $('body').delegate('#customersearch', 'click', function(e){
+        e.preventDefault();
+        var search=$('#tags').val();
+        show_customer(search);
       });
 
       // call modal

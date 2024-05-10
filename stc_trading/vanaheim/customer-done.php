@@ -57,6 +57,20 @@ class aetherCustomer extends tesseract{
 
 	// stc call silent purchase
 	public function stc_call_customer($search){
+		$filter='';
+		if($search!=''){
+			$search="
+				WHERE 
+					`stc_trading_customer_title` 	REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
+					`stc_trading_customer_address` 	REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
+					`stc_trading_customer_cont_no` 	REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
+					`stc_trading_customer_pincode` 	REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
+					`stc_trading_customer_remarks` 	REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
+					`stc_city_name` 				REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
+					`stc_state_name` 				REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
+					`stc_trading_user_name` 		REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."'
+			";
+		}
 		$check_loki=mysqli_query($this->stc_dbs, "
 			SELECT
 				`stc_trading_customer_id`,
@@ -77,18 +91,9 @@ class aetherCustomer extends tesseract{
 			ON `stc_state_id` = `stc_trading_customer_state_id`
 			INNER JOIN `stc_trading_user` 
 			ON `stc_trading_user_created_by` = `stc_trading_customer_createdby`
-			WHERE 
-				`stc_trading_customer_title` 	REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
-				`stc_trading_customer_address` 	REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
-				`stc_trading_customer_cont_no` 	REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
-				`stc_trading_customer_pincode` 	REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
-				`stc_trading_customer_remarks` 	REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
-				`stc_city_name` 				REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
-				`stc_state_name` 				REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
-				`stc_trading_user_name` 		REGEXP 	'".mysqli_real_escape_string($this->stc_dbs, $search)."'
-			ORDER BY 
-				`stc_trading_customer_title` 
-			DESC LIMIT 0,15
+			".$search."
+			ORDER BY  `stc_trading_customer_title` 
+			ASC
 		");
 		$odin='';
 		$do_action=mysqli_num_rows($check_loki);
