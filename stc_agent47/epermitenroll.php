@@ -170,9 +170,9 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                                 $rema=$row3['remarks'];
                                                                                             }
                                                                                             if($Epermitcounter==0){
-                                                                                                $deptepermitcounter.='<td>0</td>';
+                                                                                                $deptepermitcounter.='<td style="font-weight:bold">0</td>';
                                                                                             }else{
-                                                                                                $deptepermitcounter.='<td>'.$Epermitcounter.'</td>';
+                                                                                                $deptepermitcounter.='<td style="font-weight:bold">'.$Epermitcounter.'</td>';
                                                                                                 $Remarks.=$rema;
                                                                                             }
                                                                                         }
@@ -186,9 +186,9 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                         $shiftCdata.='<td>'.$ShiftCcounter.'</td>';
                                                                                         $shiftEdata.='<td>'.$ShiftEcounter.'</td>';
                                                                                         $total = $ShiftAcounter + $ShiftBcounter + $ShiftCcounter + $ShiftEcounter;
-                                                                                        $shifttdata.='<td>'.$total.'</td>';
+                                                                                        $shifttdata.='<td style="font-weight:bold">'.$total.'</td>';
                                                                                         $totalnonenrollment=$total - $Epermitcounter;
-                                                                                        $deptnonenrollmentcounter.='<td>'.$totalnonenrollment.'</td>';
+                                                                                        $deptnonenrollmentcounter.='<td style="font-weight:bold">'.$totalnonenrollment.'</td>';
                                                                                     }
                                                                                     $shiftAtotal='<td>'.$TotalShiftAcounter.'</td>';
                                                                                     $shiftBtotal='<td>'.$TotalShiftBcounter.'</td>';
@@ -224,22 +224,22 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                             <?php echo $shiftCdata;?>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td>Total Entry In Plant</td>
-                                                                            <td><?php echo $totalplantentry;?></td>
+                                                                            <td style="font-weight:bold">Total Entry In Plant</td>
+                                                                            <td style="font-weight:bold"><?php echo $totalplantentry;?></td>
                                                                             <?php echo $shifttdata;?>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td>E-Permit Enrolment</td>
-                                                                            <td><?php echo $Totalepermitcounter;?></td>
+                                                                            <td style="font-weight:bold">Total E-Permit Enrolment</td>
+                                                                            <td style="font-weight:bold"><?php echo $Totalepermitcounter;?></td>
                                                                             <?php echo $deptepermitcounter;?>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td>Non Enrolment</td>
-                                                                            <td><?php echo $totalplantentry-$Totalepermitcounter;?></td>
+                                                                            <td style="font-weight:bold">Total Non Enrolment</td>
+                                                                            <td style="font-weight:bold"><?php echo $totalplantentry-$Totalepermitcounter;?></td>
                                                                             <?php echo $deptnonenrollmentcounter;?>
                                                                         </tr>
                                                                         <tr>
-                                                                            <td>Remarks</td>
+                                                                            <td style="font-weight:bold">Remarks</td>
                                                                             <td></td>
                                                                             <td><?php echo $Remarks;?></td>
                                                                         </tr>
