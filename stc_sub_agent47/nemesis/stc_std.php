@@ -45,7 +45,7 @@ class transformers extends tesseract{
 		$optimusprime = "<option value='NA'>Select</option>";
 		$do_action=mysqli_num_rows($optimusprimequery);
 		if($do_action == 0){
-			$optimusprime = "empty";
+			$optimusprime = "<option data-id='0'>No Deparmtent Found.</option>";
 		}else{
 			foreach ($optimusprimequery as $row) {
 				$optimusprime.='<option data-id="'.$row['stc_cust_project_id'].'">'.$row['stc_status_down_list_department_dept'].'</option>';		
