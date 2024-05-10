@@ -71,15 +71,30 @@ class transformers extends tesseract{
     public function stc_save_epermitenroll($location, $dept, $name, $gpno, $shift){
         $optimusprime = "";
         $currentDateTime = date("Y-m-d H:i:s");
-        $optimusprimequery=mysqli_query($this->stc_dbs, "
-            INSERT INTO `stc_epermit_enrollment`(`location`, `dep_id`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."', UCASE('".mysqli_real_escape_string($this->stc_dbs, $name)."'), UCASE('".mysqli_real_escape_string($this->stc_dbs, $gpno)."'), '".mysqli_real_escape_string($this->stc_dbs, $shift)."', '".$currentDateTime."', '".$_SESSION['stc_agent_sub_id']."')
-		");
-        if($optimusprimequery){
-            $optimusprime="Success";
-        }else{
-            $optimusprime="Failed";
+        $eightHoursAgo = date("Y-m-d H:i:s", strtotime('-8 hours'));
+
+        // Check if a similar record exists within the last 8 hours
+        $duplicateCheckQuery = "SELECT COUNT(*) as count FROM `stc_epermit_enrollment` WHERE `emp_name` = UCASE('".mysqli_real_escape_string($this->stc_dbs, $name)."') AND `gpno` = UCASE('".mysqli_real_escape_string($this->stc_dbs, $gpno)."') AND `created_date` >= '$eightHoursAgo'";
+        $duplicateCheckResult = mysqli_query($this->stc_dbs, $duplicateCheckQuery);
+        $row = mysqli_fetch_assoc($duplicateCheckResult);
+        $duplicateCount = $row['count'];
+
+        if ($duplicateCount > 0) {
+            $optimusprime = "Duplicate";
+        } else {
+            // No duplicate found, proceed with insertion
+            $insertQuery = "INSERT INTO `stc_epermit_enrollment`(`location`, `dep_id`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."', UCASE('".mysqli_real_escape_string($this->stc_dbs, $name)."'), UCASE('".mysqli_real_escape_string($this->stc_dbs, $gpno)."'), '".mysqli_real_escape_string($this->stc_dbs, $shift)."', '".$currentDateTime."', '".$_SESSION['stc_agent_sub_id']."')";
+
+            $insertResult = mysqli_query($this->stc_dbs, $insertQuery);
+            if ($insertResult) {
+                $optimusprime = "Success";
+            } else {
+                $optimusprime = "failed";
+            }
         }
+
         return $optimusprime;
+
     }
 
     public function stc_save_totalpermitenr($totalpermitenr, $location, $dept, $remarks){

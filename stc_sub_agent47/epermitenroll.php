@@ -312,12 +312,19 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     $('.stc-permitenr-gpno').val('');
                                     $('.stc-permitenr-shift').val('NA');
                                     $('.stc-permitenr-save').prop('disabled', false);
+                                }else if(response.trim()=="Duplicate"){
+                                    alert("Duplicate record found within the last 8 hours");
+                                    $('.stc-permitenr-save').prop('disabled', false);
                                 }else if(response.trim()=="failed"){
                                     alert("E-Permit Enrollment Not Saved.");
+                                    $('.stc-permitenr-save').prop('disabled', false);
                                 }else if(response.trim()=="empty"){
                                     alert("Please enter all fields.");
+                                    $('.stc-permitenr-save').prop('disabled', false);
                                 }else if(response.trim()=="login"){
                                     widnow.location.reload();
+                                }else{
+                                    $('.stc-permitenr-save').prop('disabled', false);
                                 }
                             }
                         });                    
@@ -390,19 +397,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             <div class="card-body">
                                 <h5>Location : </h5><br>
                                 <select class="btn btn-success form-control text-left stc-permitenr-location" id="stc-agent-sup-std-sublocation">
-                                    <option>TATA Steel - Jamshedpur</option>
-                                    <option>TATA Steel - KPO</option>
-                                    <option>MTMH</option>
-                                    <option>CRM BARA</option>
-                                    <option>MANIPAL</option>
-                                    <option>P&M MALL</option>
-                                    <option>TATA CUMMINS</option>
-                                    <option>XLRI</option>
-                                    <option>RAIPUR AIIMS</option>
-                                    <option>NML</option>
-                                    <option>RSP</option>
-                                    <option>IGH HOSPITAL</option>
-                                    <option>NEELACHAL ISPAT</option>
                                 </select> 
                             </div>
                         </div>
