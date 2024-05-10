@@ -70,8 +70,9 @@ class transformers extends tesseract{
     // save permit enrollment
     public function stc_save_epermitenroll($location, $dept, $name, $gpno, $shift){
         $optimusprime = "";
+        $currentDateTime = date("Y-m-d H:i:s");
         $optimusprimequery=mysqli_query($this->stc_dbs, "
-            INSERT INTO `stc_epermit_enrollment`(`location`, `dep_id`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."', UCASE('".mysqli_real_escape_string($this->stc_dbs, $name)."'), UCASE('".mysqli_real_escape_string($this->stc_dbs, $gpno)."'), '".mysqli_real_escape_string($this->stc_dbs, $shift)."', NOW(), '".$_SESSION['stc_agent_sub_id']."')
+            INSERT INTO `stc_epermit_enrollment`(`location`, `dep_id`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."', UCASE('".mysqli_real_escape_string($this->stc_dbs, $name)."'), UCASE('".mysqli_real_escape_string($this->stc_dbs, $gpno)."'), '".mysqli_real_escape_string($this->stc_dbs, $shift)."', '".$currentDateTime."', '".$_SESSION['stc_agent_sub_id']."')
 		");
         if($optimusprimequery){
             $optimusprime="Success";
@@ -83,8 +84,9 @@ class transformers extends tesseract{
 
     public function stc_save_totalpermitenr($totalpermitenr, $location, $dept, $remarks){
         $optimusprime = "";
+        $currentDateTime = date("Y-m-d H:i:s");
         $qry="
-            INSERT INTO `stc_totalpermitenrollment`(`totalpermitenr`, `location`, `dep_id`, `remarks`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $totalpermitenr)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."', '".mysqli_real_escape_string($this->stc_dbs, $remarks)."', NOW(), '".$_SESSION['stc_agent_sub_id']."')
+            INSERT INTO `stc_totalpermitenrollment`(`totalpermitenr`, `location`, `dep_id`, `remarks`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $totalpermitenr)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."', '".mysqli_real_escape_string($this->stc_dbs, $remarks)."', '".$currentDateTime."', '".$_SESSION['stc_agent_sub_id']."')
         ";
         $optimusprimequery=mysqli_query($this->stc_dbs, $qry);
         if($optimusprimequery){
