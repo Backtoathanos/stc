@@ -175,6 +175,8 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                                 $deptepermitcounter.='<td style="font-weight:bold">'.$Epermitcounter.'</td>';
                                                                                                 $Remarks.=$rema;
                                                                                             }
+                                                                                        }else{
+                                                                                            $deptepermitcounter.='<td style="font-weight:bold">0</td>';
                                                                                         }
                                                                                         $TotalShiftAcounter+=$ShiftAcounter;
                                                                                         $TotalShiftBcounter+=$ShiftBcounter;
