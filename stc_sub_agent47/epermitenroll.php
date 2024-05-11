@@ -375,8 +375,31 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     alert("Please Select Departments.");
                 }
             });
+
+            $('body').delegate('.stc-epermitenrollment-result-table th', 'click', function(e){
+                var table = $(this).parents('table').eq(0);
+                var rows = table.find('tbody > tr:eq(0)').toArray().sort(comparer($(this).index()));
+                this.asc = !this.asc;
+                if (!this.asc){ rows = rows.reverse(); }
+                for (var i = 0; i < rows.length; i++){ table.append(rows[i]); }
+            });
+            
+            // Function to compare values for sorting
+            function comparer(index) {
+                return function(a, b) {
+                    var valA = getCellValue(a, index);
+                    var valB = getCellValue(b, index);
+                    return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB);
+                };
+            }
+            
+            // Function to get cell value for comparison
+            function getCellValue(row, index){ 
+                return $(row).children('td').eq(index).text();
+            }
             
         });
+        
     </script>
 </body>
 </html>

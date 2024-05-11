@@ -26,16 +26,16 @@ class transformers extends tesseract{
         ";
 		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
 		$optimusprime='
-            <table class="table table-bordered">
+            <table class="table table-bordered stc-epermitenrollment-result-table">
                 <thead>
                     <tr>
-                        <th class="text-center">SL NO</th>
-                        <th class="text-center">DATE</th>
-                        <th class="text-center">LOCATION</th>
-                        <th class="text-center">DEPARTMENT</th>
-                        <th class="text-center">EMPLOYEE NAME</th>
-                        <th class="text-center">GP NO</th>
-                        <th class="text-center">SHIFT</th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">SL NO<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">DATE<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">LOCATION<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">DEPARTMENT<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">EMPLOYEE NAME<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">GP NO<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">SHIFT<i class="fa fa-sort"></i></a></th>
                     </tr>
                 </thead>
                 <tbody>
