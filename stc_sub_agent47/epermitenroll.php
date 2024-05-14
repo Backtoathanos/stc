@@ -94,7 +94,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <div class="form-row">
                                                             <div class="col-md-4 mb-3">                                                                
                                                                 <?php if(($_SESSION['stc_agent_sub_category']=="Site Incharge") || ($_SESSION['stc_agent_sub_category']=="Supervisor")){ ?>
-                                                                <a href="javascript:void(0)" class="form-control btn bg-primary text-white mb-3" data-toggle="modal" data-target=".bd-create-summepermitenrollment-modal">Summary E-Permit Enrollment</a>
+                                                                <a href="javascript:void(0)" class="form-control btn bg-primary text-white mb-3" data-toggle="modal" data-target=".bd-create-summepermitenrollment-modal">Proceed to E-Permit Enrollment</a>
                                                                 <?php } ?>
                                                                 <a href="javascript:void(0)" class="form-control btn bg-success text-white mb-3" data-toggle="modal" data-target=".bd-create-epermitenrollment-modal">Add E-Permit Enrollment</a>
                                                             </div>
@@ -203,7 +203,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             function load_dept(operation, value){
                 var loca_id = $('#stc-agent-sup-std-sublocation').val();
                 $.ajax({
-                    url     : "nemesis/stc_std.php",
+                    url     : "nemesis/stc_epermitenroll.php",
                     method  : "POST",
                     data    : {call_department:1,loca_id:loca_id},
                     dataType  : "JSON",
@@ -217,7 +217,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             function load_dept1(operation, value){
                 var loca_id = $('#stc-agent-sup-std-sublocation1').val();
                 $.ajax({
-                    url     : "nemesis/stc_std.php",
+                    url     : "nemesis/stc_epermitenroll.php",
                     method  : "POST",
                     data    : {call_department:1,loca_id:loca_id},
                     dataType  : "JSON",
@@ -375,8 +375,31 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     alert("Please Select Departments.");
                 }
             });
+
+            $('body').delegate('.stc-epermitenrollment-result-table th', 'click', function(e){
+                var table = $(this).parents('table').eq(0);
+                var rows = table.find('tbody > tr:eq(0)').toArray().sort(comparer($(this).index()));
+                this.asc = !this.asc;
+                if (!this.asc){ rows = rows.reverse(); }
+                for (var i = 0; i < rows.length; i++){ table.append(rows[i]); }
+            });
+            
+            // Function to compare values for sorting
+            function comparer(index) {
+                return function(a, b) {
+                    var valA = getCellValue(a, index);
+                    var valB = getCellValue(b, index);
+                    return $.isNumeric(valA) && $.isNumeric(valB) ? valA - valB : valA.toString().localeCompare(valB);
+                };
+            }
+            
+            // Function to get cell value for comparison
+            function getCellValue(row, index){ 
+                return $(row).children('td').eq(index).text();
+            }
             
         });
+        
     </script>
 </body>
 </html>
@@ -459,7 +482,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Summary E-Permit Enrollment</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Proceed to E-Permit Enrollment</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>

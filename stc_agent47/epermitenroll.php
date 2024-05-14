@@ -127,7 +127,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                 }
                                                                                 echo '<th class="text-center">Date</th>';
                                                                                 echo '<th class="text-center">'.$showdate.'</th>';
-                                                                                $sql=mysqli_query($con, "SELECT `dep_id`, `shift`, `stc_status_down_list_department_dept` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_loc_id` ".$filter." ORDER BY `stc_status_down_list_department_dept` ASC");
+                                                                                $sql=mysqli_query($con, "SELECT `dep_id`, `shift`, `stc_status_down_list_department_dept` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` ".$filter." ORDER BY `stc_status_down_list_department_dept` ASC");
                                                                                 $TotalShiftAcounter=0;
                                                                                 $TotalShiftBcounter=0;
                                                                                 $TotalShiftCcounter=0;

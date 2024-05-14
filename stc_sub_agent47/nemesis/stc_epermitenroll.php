@@ -6,28 +6,60 @@ include "../../MCU/obdb.php";
 /*------------------------------------------For Agents--------------------------------------------*/
 /*------------------------------------------------------------------------------------------------*/
 class transformers extends tesseract{
+    // call location department	
+	public function stc_call_deptloc($loca_id){
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT  `stc_status_down_list_department_dept`, `stc_status_down_list_department_id`
+			FROM `stc_cust_pro_attend_supervise`
+			INNER JOIN `stc_cust_project` 
+			ON `stc_cust_project_id`=`stc_cust_pro_attend_supervise_pro_id` 
+			INNER JOIN `stc_status_down_list_department` 
+			ON `stc_cust_project_id`=`stc_status_down_list_department_loc_id` 			
+			WHERE `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $loca_id)."'
+			AND `stc_cust_pro_attend_supervise_super_id`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
+		");
+		$optimusprime = "<option value='NA'>Select</option>";
+		$do_action=mysqli_num_rows($optimusprimequery);
+		if($do_action == 0){
+			$optimusprime = "<option data-id='0'>No Deparmtent Found.</option>";
+		}else{
+			foreach ($optimusprimequery as $row) {
+				$optimusprime.='<option data-id="'.$row['stc_status_down_list_department_id'].'">'.$row['stc_status_down_list_department_dept'].'</option>';		
+			}			
+		}
+		return $optimusprime;
+	}
 	// call sitename
 	public function stc_call_epermitenroll($begdate, $enddate){
-        $date_filter='WHERE DATE(`created_date`)="'.$enddate.'"';
+        $filter='WHERE DATE(`created_date`)="'.$enddate.'"';
         $countPEntry = 0;
-        if($begdate==''){
-            $date_filter='';
+        if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
+            if($enddate==''){
+                $enddate=DATE('Y-m-d');
+                $filter='WHERE DATE(`created_date`)="'.$enddate.'"';
+            }
+        }else{
+            if($enddate==''){
+                $filter='WHERE DATE(`created_date`)="'.$enddate.'" AND `created_by`="'.$_SESSION['stc_agent_sub_id'].'"';
+            }else{
+                $filter.=' AND `created_by`="'.$_SESSION['stc_agent_sub_id'].'"';
+            }
         }
         $query="
-            SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by` FROM `stc_epermit_enrollment`LEFT JOIN `stc_status_down_list_department`ON `dep_id`=`stc_status_down_list_department_loc_id` LEFT JOIN `stc_cust_pro_supervisor`ON `stc_cust_pro_supervisor_id`=`created_by`LEFT JOIN `stc_agents`ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` ".$date_filter."ORDER BY `id` DESC
+            SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`created_by`LEFT JOIN `stc_agents` ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` ".$filter." ORDER BY `emp_name` ASC
         ";
 		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
 		$optimusprime='
-            <table class="table table-bordered">
+            <table class="table table-bordered stc-epermitenrollment-result-table">
                 <thead>
                     <tr>
-                        <th class="text-center">SL NO</th>
-                        <th class="text-center">DATE</th>
-                        <th class="text-center">LOCATION</th>
-                        <th class="text-center">DEPARTMENT</th>
-                        <th class="text-center">EMPLOYEE NAME</th>
-                        <th class="text-center">GP NO</th>
-                        <th class="text-center">SHIFT</th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">SL NO<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">DATE<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">LOCATION<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">DEPARTMENT<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">EMPLOYEE NAME<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">GP NO<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">SHIFT<i class="fa fa-sort"></i></a></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -54,7 +86,7 @@ class transformers extends tesseract{
                         <td class='text-center'>".$row['gpno']."</td>
                         <td class='text-center'>".$row['shift']."</td>
                     </tr>";			
-			}			
+			}
 		}
         $optimusprime.='
                 </tbody>
@@ -161,13 +193,21 @@ class transformers extends tesseract{
             'remarks' => $remarks,
             'totalpenrollment' => $counter
         );
-		return $optimusprimearr;
+		return $optimusprime;
 	}
 }
 
 /*-----------------------------------------------------------------------------------*/
 /*---------------------------------For Order items-----------------------------------*/
 /*-----------------------------------------------------------------------------------*/
+// call departemnt
+if(isset($_POST['call_department'])){
+	$loca_id=$_POST['loca_id'];
+	$metabots=new transformers();
+	$opmetabots=$metabots->stc_call_deptloc($loca_id);
+	echo json_encode($opmetabots);
+}
+
 // call sitename
 if(isset($_POST['show_epermitenroll'])){
     $begdate=date('Y-m-d', strtotime($_POST['begdate']));
