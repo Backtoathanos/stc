@@ -67,6 +67,7 @@ class Yggdrasil extends tesseract{
 				`stc_expenses_company`=1
 			ORDER BY DATE(`stc_expenses_date`) DESC
 		");
+		$totalexpense=0;
 		if(mysqli_num_rows($odin_get_req_qry)>0){
 			foreach($odin_get_req_qry as $req_row){
 				$odin.='
@@ -78,11 +79,12 @@ class Yggdrasil extends tesseract{
 						<td class="text-center">'.$req_row['stc_trading_user_name'].'</td>
 					</tr>
 				';
+				$totalexpense+=$req_row['stc_expenses_amount'];
 			}
 			$odin.='
 				<tr>
 					<td colspan="3" class="text-right">Total : </td>
-					<td class="text-right">'.number_format($req_row['stc_expenses_amount'], 2).'</td>
+					<td class="text-right">'.number_format($totalexpense, 2).'</td>
 					<td class="text-right"></td>
 				</tr>
 			';
