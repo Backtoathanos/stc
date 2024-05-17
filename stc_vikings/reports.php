@@ -170,6 +170,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     <span>School Attendance</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-13" data-toggle="tab" href="#tab-content-13">
+                                    <span>E-Permit</span>
+                                </a>
+                            </li>
                             ';
                                 }
                             ?>
@@ -1322,6 +1327,48 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <!-- E-Permit -->
+                            <div class="tab-pane tabs-animation fade" id="tab-content-13" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="description" align="center"
+                                              >View E-Permit Attendance
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div><div class="row">                                  
+                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <input type="month" class="form-control stc-epermit-month" value="<?php echo date('Y-m') ?>">
+                                        </div>
+                                    </div>                                   
+                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <a href="#" class="form-control btn btn-primary stc-epermit-att-find">Find</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                          <table class="mb-0 table table-bordered" id="stc-reports-epermit-view">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">SL No.</th>
+                                                <th class="text-center">Date</th>
+                                                <th class="text-center">Total Entry In Plant</th>
+                                                <th class="text-center">E-Permit Enrollment</th>
+                                                <th class="text-center">Non Enrollment</th>
+                                                <th class="text-center">Remarks</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="stc-reports-epermit-view">
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>  
                 </div>
@@ -2177,6 +2224,25 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     }
                 });
             });
+
+            // call attendance
+            $('body').delegate('.stc-epermit-att-find', 'click', function(e){
+                e.preventDefault();
+                var stc_epermit_month = $('.stc-epermit-month').val();
+                $.ajax({
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "post",
+                    data    : {
+                        stc_find_epermit_attendance:1,
+                        stc_epermit_month:stc_epermit_month
+                    },
+                    success : function(response_sandp){
+                        // console.log(response_sandp);
+                        $('.stc-reports-epermit-view').html(response_sandp);
+                    }
+                });
+            });
+            
         });
     </script>
     <!-- mrd -->    

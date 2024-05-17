@@ -4206,6 +4206,88 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
       return $odin;
    }
 }
+
+class ragnarReportsViewEPermitAttReports extends tesseract{
+   // call attendance
+   public function stc_epermit_call_attendance($stc_epermit_month){
+      $cmonth=date('F', strtotime($stc_epermit_month));
+      $month=date('m', strtotime($stc_epermit_month));
+      $year=date('Y', strtotime($stc_epermit_month));
+      $date_array=array(
+         'January' => 31,
+         'February' => 28,
+         'March' => 31,
+         'April' => 30,
+         'May' => 31,
+         'June' => 30,
+         'July' => 31,
+         'August' => 31,
+         'September' => 30,
+         'October' => 31,
+         'November' => 30,
+         'December' => 31
+      );
+      $att_date='';
+      $day_count=0;
+      foreach($date_array as $key => $date_row){
+         if($cmonth==$key){
+            if ($year % 400 == 0)
+               $day_count=29;
+            else
+               $day_count=$date_row;
+         }
+      }
+
+      $ivar='';
+      $ivar_sqlquery=mysqli_query($this->stc_dbs, "
+         SELECT DATE(created_date) as date, COUNT(emp_name) as total_employees
+         FROM stc_epermit_enrollment
+         WHERE MONTH(created_date) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND YEAR(created_date) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+         GROUP BY DATE(created_date)
+         ORDER BY DATE(created_date) DESC;
+      ");
+      if(mysqli_num_rows($ivar_sqlquery)>0){
+         $slno=0;
+         $total_attendance=0;
+         foreach($ivar_sqlquery as $ivar_sqlrow){
+            $slno++;
+            $totalempermit=0;
+            $remarks = '';
+            $ivar_getattqry=mysqli_query($this->stc_dbs, "
+               SELECT SUM(`totalpermitenr`) as totalpermitenrs, GROUP_CONCAT(`remarks` SEPARATOR ', ') AS remarks FROM `stc_totalpermitenrollment` WHERE DATE(`created_date`)='".$ivar_sqlrow['date']."'
+            ");
+            foreach($ivar_getattqry as $ivar_getattrow){
+               $totalempermit = $ivar_getattrow['totalpermitenrs'];
+               $remarks = $ivar_getattrow['remarks'];
+            }
+            $totalepermit = $ivar_sqlrow['total_employees'] - $totalempermit;
+
+            $totalepermitStyle = $totalepermit < 0 ? 'style="color: red;"' : '';
+            $displayTotalepermit = abs($totalepermit);
+
+
+            $ivar .= '
+               <tr>
+                  <td class="text-center">' . $slno . '</td>
+                  <td>' . date('d-m-Y', strtotime($ivar_sqlrow['date'])) . '</td>
+                  <td class="text-center">' . round($ivar_sqlrow['total_employees'], 2) . '</td>
+                  <td class="text-center">' . round($totalempermit, 2) . '</td>
+                  <td class="text-center" ' . $totalepermitStyle . '>' . round($displayTotalepermit, 2) . '</td>
+                  <td class="text-center">' . $remarks . '</td>
+               </tr>
+            ';
+
+         }
+      }else{
+         $ivar.='
+            <tr>
+               <td class="text-center" colspan="3">No record found.</td>
+            </tr>
+         ';
+      }
+      return $ivar;
+   }
+}
 #<--------------------------------------------------------------------------------------------------------->
 #<--------------------------------------Object sections of reports class----------------------------------->
 #<--------------------------------------------------------------------------------------------------------->
@@ -4514,6 +4596,17 @@ if(isset($_POST['stc_mrd_call_mrd'])){
    $bjorneschoolfee=new ragnarReportsViewMaterialRequisitionDetails();
 
    $out=$bjorneschoolfee->stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $tomaterial);
+   echo $out;
+}
+#<----------------------------Object sections of epermit reports class--------------------------------->
+// call school fee
+if(isset($_POST['stc_find_epermit_attendance'])){
+   $out='';
+   $stc_epermit_month=$_POST['stc_epermit_month'];
+
+   $bjorneschoolfee=new ragnarReportsViewEPermitAttReports();
+
+   $out=$bjorneschoolfee->stc_epermit_call_attendance($stc_epermit_month);
    echo $out;
 }
 ?>
