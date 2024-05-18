@@ -168,3 +168,5 @@
 [28-Dec-2023 03:56:51 UTC] PHP Notice:  Undefined index: stc_electro_user_for in /home/c2484kn1eg0y/public_html/stc_maze/stc_mazeRunner/purchase-sale.php on line 10
 [30-Jan-2024 12:02:28 Asia/Kolkata] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_maze/stc_mazeRunner/dashboard.php on line 357
 [30-Jan-2024 12:02:28 Asia/Kolkata] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_maze/stc_mazeRunner/dashboard.php on line 372
+[08-May-2024 04:02:33 UTC] PHP Notice:  Undefined index: stc_electro_user_for in /home/c2484kn1eg0y/public_html/stc_maze/stc_mazeRunner/silent-invoice-print-preview.php on line 10
+[08-May-2024 04:02:33 UTC] PHP Notice:  Undefined index: stc_electro_user_for in /home/c2484kn1eg0y/public_html/stc_maze/stc_mazeRunner/silent-invoice-print-preview.php on line 10
