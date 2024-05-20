@@ -165,8 +165,8 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                         $rema='';
                                                                                         if(mysqli_num_rows($sql3)>0){
                                                                                             foreach($sql3 as $row3){
-                                                                                                $Epermitcounter++;
-                                                                                                $Totalepermitcounter++;
+                                                                                                $Epermitcounter+=$row3['totalpermitenr'];
+                                                                                                $Totalepermitcounter+=$row3['totalpermitenr'];
                                                                                                 $rema=$row3['remarks'];
                                                                                             }
                                                                                             if($Epermitcounter==0){
