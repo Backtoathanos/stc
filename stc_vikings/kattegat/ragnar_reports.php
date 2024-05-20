@@ -4273,7 +4273,8 @@ class ragnarReportsViewEPermitAttReports extends tesseract{
                   <td class="text-center">' . round($ivar_sqlrow['total_employees'], 2) . '</td>
                   <td class="text-center">' . round($totalempermit, 2) . '</td>
                   <td class="text-center" ' . $totalepermitStyle . '>' . round($displayTotalepermit, 2) . '</td>
-                  <td class="text-center">' . $remarks . '</td>
+                  <td class="text-center" style=" width: 25%; scroll-behavior: unset;">' . $remarks . '</td>
+                  <td class="text-center"><a href="javascript:void(0)" class="btn btn-primary">View</a></td>
                </tr>
             ';
 

@@ -1360,6 +1360,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <th class="text-center">E-Permit Enrollment</th>
                                                 <th class="text-center">Non Enrollment</th>
                                                 <th class="text-center">Remarks</th>
+                                                <th class="text-center">Action</th>
                                             </tr>
                                             </thead>
                                             <tbody class="stc-reports-epermit-view">
@@ -2724,7 +2725,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     </div>
 </div>
 
-<div class="modal fade show-jobdonedetailsmodal stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal fade show-jobdonedetailsmodal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header">
@@ -2745,7 +2746,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
   </div>
 </div>
 
-<div class="modal fade update-sdlreportmodal stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal fade update-sdlreportmodal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
@@ -2789,7 +2790,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
   </div>
 </div>
 
-<div class="modal fade bd-stdmaterial-modal-lg stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+<div class="modal fade bd-stdmaterial-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
