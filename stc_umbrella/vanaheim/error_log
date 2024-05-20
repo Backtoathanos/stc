@@ -16,3 +16,33 @@
 [30-Jan-2024 11:19:11 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
 [30-Jan-2024 12:05:35 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
 [30-Jan-2024 12:45:53 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[03-May-2024 13:18:37 Asia/Kolkata] PHP Notice:  Undefined index: stc_school_user_id in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/fee-raised.php on line 312
+[04-May-2024 10:21:18 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[04-May-2024 10:21:18 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[06-May-2024 10:30:42 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[06-May-2024 10:30:42 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[06-May-2024 10:30:44 Asia/Kolkata] PHP Notice:  Undefined index: class_id in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1794
+[06-May-2024 10:30:44 Asia/Kolkata] PHP Notice:  Undefined index: student_id in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1795
+[06-May-2024 10:30:44 Asia/Kolkata] PHP Notice:  Undefined index: sub_id in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1796
+[06-May-2024 10:30:44 Asia/Kolkata] PHP Notice:  Undefined index: attendance in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1797
+[06-May-2024 10:30:51 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[07-May-2024 10:22:47 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[07-May-2024 10:22:48 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[07-May-2024 10:23:01 Asia/Kolkata] PHP Notice:  Undefined index: class_id in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1794
+[07-May-2024 10:23:01 Asia/Kolkata] PHP Notice:  Undefined index: student_id in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1795
+[07-May-2024 10:23:01 Asia/Kolkata] PHP Notice:  Undefined index: sub_id in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1796
+[07-May-2024 10:23:01 Asia/Kolkata] PHP Notice:  Undefined index: attendance in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1797
+[07-May-2024 10:23:07 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[09-May-2024 10:20:41 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[09-May-2024 10:20:41 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[11-May-2024 10:28:29 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[11-May-2024 10:28:29 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[14-May-2024 10:23:41 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[14-May-2024 10:23:41 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[15-May-2024 10:27:44 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[15-May-2024 10:27:44 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
+[15-May-2024 10:27:46 Asia/Kolkata] PHP Notice:  Undefined index: class_id in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1794
+[15-May-2024 10:27:46 Asia/Kolkata] PHP Notice:  Undefined index: student_id in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1795
+[15-May-2024 10:27:46 Asia/Kolkata] PHP Notice:  Undefined index: sub_id in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1796
+[15-May-2024 10:27:46 Asia/Kolkata] PHP Notice:  Undefined index: attendance in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 1797
+[15-May-2024 10:27:52 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_umbrella/vanaheim/school-management.php on line 940
