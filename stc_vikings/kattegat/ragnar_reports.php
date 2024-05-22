@@ -4333,7 +4333,7 @@ class ragnarReportsViewEPermitAttReports extends tesseract{
             }
          }
          foreach($departments as $key=>$department) {
-            $Remarks='';
+            $RemarksData='';
             $ShiftAcounter=0;
             $ShiftBcounter=0;
             $ShiftCcounter=0;
@@ -4360,11 +4360,12 @@ class ragnarReportsViewEPermitAttReports extends tesseract{
                      $deptepermitcounter.='<td style="font-weight:bold">0</td>';
                }else{
                      $deptepermitcounter.='<td style="font-weight:bold">'.$Epermitcounter.'</td>';
-                     $Remarks.=$rema;
+                     $RemarksData.=$rema;
                }
             }else{
                $deptepermitcounter.='<td style="font-weight:bold">0</td>';
             }
+            $Remarks.='<td>'.$RemarksData.'</td>';
             $TotalShiftAcounter+=$ShiftAcounter;
             $TotalShiftBcounter+=$ShiftBcounter;
             $TotalShiftCcounter+=$ShiftCcounter;
@@ -4431,7 +4432,7 @@ class ragnarReportsViewEPermitAttReports extends tesseract{
                   <tr>
                      <td style="font-weight:bold">Remarks</td>
                      <td></td>
-                     <td>'.$Remarks.'</td>
+                     '.$Remarks.'
                   </tr>
          </tbody>
       ';
