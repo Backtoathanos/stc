@@ -4274,7 +4274,7 @@ class ragnarReportsViewEPermitAttReports extends tesseract{
                   <td class="text-center">' . round($totalempermit, 2) . '</td>
                   <td class="text-center" ' . $totalepermitStyle . '>' . round($displayTotalepermit, 2) . '</td>
                   <td class="text-center" style=" width: 25%; scroll-behavior: unset;">' . $remarks . '</td>
-                  <td class="text-center"><a href="javascript:void(0)" class="btn btn-primary">View</a></td>
+                  <td class="text-center"><a href="javascript:void(0)" class="btn btn-primary stc-epermit-att-show" date="'.date('Y-m-d', strtotime($ivar_sqlrow['date'])).'" data-toggle="modal" data-target=".bd-epermitfilter-modal-lg">View</a></td>
                </tr>
             ';
 
@@ -4286,6 +4286,155 @@ class ragnarReportsViewEPermitAttReports extends tesseract{
             </tr>
          ';
       }
+      return $ivar;
+   }
+
+   // call attendance details
+   public function stc_epermit_call_attendance_details($stc_epermit_month){
+      $ivar='
+         <thead>
+            <tr>
+               <th colspan="15" class="text-center">E-Permit Enrolment Record</th>
+            </tr>
+            <tr>
+      ';
+
+      $showdate=date('d-m-Y');
+      $shiftAtotal='';
+      $shiftBtotal='';
+      $shiftCtotal='';
+      $shiftEtotal='';
+      $shiftAdata='';
+      $shiftBdata='';
+      $shiftCdata='';
+      $shiftEdata='';
+      $totalplantentry=0;
+      $shifttdata='';
+      $filter=' WHERE DATE(`created_date`)="'.$stc_epermit_month.'" AND `dep_id`<>0';
+      $filter2=' AND DATE(`created_date`)="'.$stc_epermit_month.'"';
+      $ivar.='<th class="text-center">Date</th>';
+      $ivar.='<th class="text-center">'.date('d-m-Y', strtotime($stc_epermit_month)).'</th>';
+      $sql=mysqli_query($this->stc_dbs, "SELECT `dep_id`, `shift`, `stc_status_down_list_department_dept` FROM `stc_epermit_enrollment` LEFT JOIN  `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` WHERE DATE(`created_date`)='".$stc_epermit_month."' AND `dep_id`<>0 ORDER BY `stc_status_down_list_department_dept` ASC");
+      $TotalShiftAcounter=0;
+      $TotalShiftBcounter=0;
+      $TotalShiftCcounter=0;
+      $TotalShiftEcounter=0;
+      $Totalepermitcounter=0;
+      $deptepermitcounter='';
+      $departments = array();
+      $departmentsid = array();
+      $Remarks='';
+      $deptnonenrollmentcounter='';
+      if(mysqli_num_rows($sql)>0){
+         foreach($sql as $row){
+            if (!in_array($row['stc_status_down_list_department_dept'], $departments)) {
+               $departments[] = $row['stc_status_down_list_department_dept'];
+               $departmentsid[] = $row['dep_id'];
+            }
+         }
+         foreach($departments as $key=>$department) {
+            $Remarks='';
+            $ShiftAcounter=0;
+            $ShiftBcounter=0;
+            $ShiftCcounter=0;
+            $ShiftEcounter=0;
+            $ivar.= '<th rowspan="2">' . $department . '</th>';
+            $dept_id=$departmentsid[$key];
+            $sql2=mysqli_query($this->stc_dbs, "SELECT `id`, `shift`, `emp_name`, `created_date` FROM `stc_epermit_enrollment` WHERE `dep_id`='".$dept_id."' AND DATE(`created_date`)='".$stc_epermit_month."'");
+            foreach($sql2 as $row2){
+               if($row2['shift']=="A"){ $totalplantentry++;$ShiftAcounter++; }
+               if($row2['shift']=="B"){ $totalplantentry++;$ShiftBcounter++; }
+               if($row2['shift']=="C"){ $totalplantentry++;$ShiftCcounter++; }
+               if($row2['shift']=="E (General)"){ $totalplantentry++;$ShiftEcounter++; }
+            }
+            $sql3=mysqli_query($this->stc_dbs, "SELECT `id`, `totalpermitenr`, `dep_id`, `remarks` FROM `stc_totalpermitenrollment` WHERE `dep_id`='".$dept_id."' ".$filter2."");
+            $Epermitcounter=0;
+            $rema='';
+            if(mysqli_num_rows($sql3)>0){
+               foreach($sql3 as $row3){
+                     $Epermitcounter+=$row3['totalpermitenr'];
+                     $Totalepermitcounter+=$row3['totalpermitenr'];
+                     $rema=$row3['remarks'];
+               }
+               if($Epermitcounter==0){
+                     $deptepermitcounter.='<td style="font-weight:bold">0</td>';
+               }else{
+                     $deptepermitcounter.='<td style="font-weight:bold">'.$Epermitcounter.'</td>';
+                     $Remarks.=$rema;
+               }
+            }else{
+               $deptepermitcounter.='<td style="font-weight:bold">0</td>';
+            }
+            $TotalShiftAcounter+=$ShiftAcounter;
+            $TotalShiftBcounter+=$ShiftBcounter;
+            $TotalShiftCcounter+=$ShiftCcounter;
+            $TotalShiftEcounter+=$ShiftEcounter;
+
+            $shiftAdata.='<td>'.$ShiftAcounter.'</td>';
+            $shiftBdata.='<td>'.$ShiftBcounter.'</td>';
+            $shiftCdata.='<td>'.$ShiftCcounter.'</td>';
+            $shiftEdata.='<td>'.$ShiftEcounter.'</td>';
+            $total = $ShiftAcounter + $ShiftBcounter + $ShiftCcounter + $ShiftEcounter;
+            $shifttdata.='<td style="font-weight:bold">'.$total.'</td>';
+            $totalnonenrollment=$total - $Epermitcounter;
+            $deptnonenrollmentcounter.='<td style="font-weight:bold">'.$totalnonenrollment.'</td>';
+         }
+         $shiftAtotal='<td>'.$TotalShiftAcounter.'</td>';
+         $shiftBtotal='<td>'.$TotalShiftBcounter.'</td>';
+         $shiftCtotal='<td>'.$TotalShiftCcounter.'</td>';
+         $shiftEtotal='<td>'.$TotalShiftEcounter.'</td>';
+      }
+      $totalnonenrollment=$totalplantentry-$Totalepermitcounter;
+      $ivar.='
+               </tr>
+               <tr>
+                  <th class="text-center">Shift</th>
+                  <th class="text-center">Manpower Entry in TSL</th>
+               </tr>
+         </thead>
+         <tbody>
+                  <tr>
+                     <td>1st (A)</td>
+                     '.$shiftAtotal.'
+                     '.$shiftAdata.'
+                  </tr>
+                  <tr>
+                     <td>General (E)</td>
+                     '.$shiftEtotal.'
+                     '.$shiftEdata.'
+                  </tr>
+                  <tr>
+                     <td>2nd (B)</td>
+                     '.$shiftBtotal.'
+                     '.$shiftBdata.'
+                  </tr>
+                  <tr>
+                     <td>3rd (C)</td>
+                     '.$shiftCtotal.'
+                     '.$shiftCdata.'
+                  </tr>
+                  <tr>
+                     <td style="font-weight:bold">Total Entry In Plant</td>
+                     <td style="font-weight:bold">'.$totalplantentry.'</td>
+                     '.$shifttdata.'
+                  </tr>
+                  <tr>
+                     <td style="font-weight:bold">Total E-Permit Enrolment</td>
+                     <td style="font-weight:bold">'.$Totalepermitcounter.'</td>
+                     '.$deptepermitcounter.'
+                  </tr>
+                  <tr>
+                     <td style="font-weight:bold">Total Non Enrolment</td>
+                     <td style="font-weight:bold">'.$totalnonenrollment.'</td>
+                     '.$deptnonenrollmentcounter.'
+                  </tr>
+                  <tr>
+                     <td style="font-weight:bold">Remarks</td>
+                     <td></td>
+                     <td>'.$Remarks.'</td>
+                  </tr>
+         </tbody>
+      ';
       return $ivar;
    }
 }
@@ -4608,6 +4757,16 @@ if(isset($_POST['stc_find_epermit_attendance'])){
    $bjorneschoolfee=new ragnarReportsViewEPermitAttReports();
 
    $out=$bjorneschoolfee->stc_epermit_call_attendance($stc_epermit_month);
+   echo $out;
+}
+// call school fee
+if(isset($_POST['stc_find_epermit_attendance_details'])){
+   $out='';
+   $stc_epermit_month=$_POST['stc_epermit_month'];
+
+   $bjorneschoolfee=new ragnarReportsViewEPermitAttReports();
+
+   $out=$bjorneschoolfee->stc_epermit_call_attendance_details($stc_epermit_month);
    echo $out;
 }
 ?>

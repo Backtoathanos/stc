@@ -200,7 +200,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                             ?>
                                                                         </tr>
                                                                         <tr>
-                                                                            <th class="text-center">Shift</td>
+                                                                            <th class="text-center">Shift</th>
                                                                             <th class="text-center">Manpower Entry in TSL</th>
                                                                         </tr>
                                                                     </thead>
@@ -246,7 +246,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                             <td><?php echo $Remarks;?></td>
                                                                         </tr>
                                                                     </tbody>
-                                                                    </table>
+                                                                </table>
                                                             </div>
                                                         </div>
                                                     </form> 
