@@ -2243,6 +2243,23 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     }
                 });
             });
+
+            // call attendance
+            $('body').delegate('.stc-epermit-att-show', 'click', function(e){
+                var stc_epermit_month = $(this).attr('date');
+                $.ajax({
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "post",
+                    data    : {
+                        stc_find_epermit_attendance_details:1,
+                        stc_epermit_month:stc_epermit_month
+                    },
+                    success : function(response_sandp){
+                        // console.log(response_sandp);
+                        $('.show-attendance-epermitdetails').html(response_sandp);
+                    }
+                });
+            });
             
         });
     </script>
@@ -2924,6 +2941,37 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                 <div class="position-relative form-group">
                                     <input type="text" class="itempriorityshow" disabled>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade bd-epermitfilter-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">E-Permit Attendance</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xl-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                
+                                <table class="table table-bordered table-hover show-attendance-epermitdetails">
+                                </table>
                             </div>
                         </div>
                     </div>
