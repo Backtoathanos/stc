@@ -146,7 +146,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                         }
                                                                                     }
                                                                                     foreach($departments as $key=>$department) {
-                                                                                        $Remarks='';
+                                                                                        $RemarksData='';
                                                                                         $ShiftAcounter=0;
                                                                                         $ShiftBcounter=0;
                                                                                         $ShiftCcounter=0;
@@ -173,11 +173,12 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                                 $deptepermitcounter.='<td style="font-weight:bold">0</td>';
                                                                                             }else{
                                                                                                 $deptepermitcounter.='<td style="font-weight:bold">'.$Epermitcounter.'</td>';
-                                                                                                $Remarks.=$rema;
+                                                                                                $RemarksData.=$rema;
                                                                                             }
                                                                                         }else{
                                                                                             $deptepermitcounter.='<td style="font-weight:bold">0</td>';
                                                                                         }
+                                                                                        $Remarks.='<td>'.$RemarksData.'</td>';
                                                                                         $TotalShiftAcounter+=$ShiftAcounter;
                                                                                         $TotalShiftBcounter+=$ShiftBcounter;
                                                                                         $TotalShiftCcounter+=$ShiftCcounter;
@@ -243,7 +244,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                         <tr>
                                                                             <td style="font-weight:bold">Remarks</td>
                                                                             <td></td>
-                                                                            <td><?php echo $Remarks;?></td>
+                                                                            <?php echo $Remarks;?>
                                                                         </tr>
                                                                     </tbody>
                                                                 </table>
