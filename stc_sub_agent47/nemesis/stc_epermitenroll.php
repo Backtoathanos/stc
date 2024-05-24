@@ -31,7 +31,7 @@ class transformers extends tesseract{
 	}
 	// call sitename
 	public function stc_call_epermitenroll($begdate, $enddate){
-        $filter='WHERE DATE(`created_date`)="'.$enddate.'"';
+        $filter='WHERE DATE(`created_date`)="'.$enddate.'" AND `stc_status_down_list_department_id`="SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id` =`stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='.$_SESSION['stc_agent_sub_id'].'"';
         $countPEntry = 0;
         if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
             if($enddate==''){
