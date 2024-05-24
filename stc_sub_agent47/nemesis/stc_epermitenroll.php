@@ -96,7 +96,7 @@ class transformers extends tesseract{
             'optimusprime' => $optimusprime,
             'totalpentry' => $countPEntry
         );
-		return $query;
+		return $optimusprimearray;
 	}
 
     // save permit enrollment
