@@ -3229,7 +3229,7 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 					'".mysqli_real_escape_string($this->stc_dbs, $issue_date)."',
 					'".$validity."',
 					'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id'])."',
+					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."',
 					'".$date."'
 				)
 			");
@@ -3296,6 +3296,121 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 				</tr>
 			";
 		}
+		return $blackpearl;
+	}
+
+	// save tool track
+	public function stc_tool_tracker_save($unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks){
+		$date=date("Y-m-d H:i:s");
+	
+		// Check for duplicate unique ID
+		$duplicate_check_qry = mysqli_query($this->stc_dbs, "
+			SELECT `unique_id` FROM `stc_tooldetails` WHERE `unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $unique)."'
+		");
+		// If a duplicate is found, set $blackpearl to "duplicate"
+		if(mysqli_num_rows($duplicate_check_qry) > 0) {
+			$blackpearl = "duplicate";
+		} else {
+			$query="
+				INSERT INTO `stc_tooldetails`(
+					`unique_id`,
+					`itemdescription`,
+					`machinesrno`,
+					`make`,
+					`tooltype`,
+					`purchase_details`,
+					`warranty`,
+					`taxinvono`,
+					`taxinvodate`,
+					`remarks`,
+					`created_by`,
+					`created_date`
+				)VALUES(
+					'".mysqli_real_escape_string($this->stc_dbs, $unique)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $itemdescription)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $machineslno)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $make)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $type)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $warranty)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $purdetails)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $tinnumber)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $tindate)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."',
+					'".$date."'
+				)
+			";
+			$blackpearl_qry = mysqli_query($this->stc_dbs, $query);
+	
+			// If the INSERT query is successful, set $blackpearl to "yes"
+			if($blackpearl_qry) {
+				$blackpearl = "yes";
+			} else {
+				// If the INSERT query fails, set $blackpearl to "no"
+				$blackpearl = "no";
+			}
+		}
+	
+		return $blackpearl;
+	}
+
+	// show tool track
+	public function stc_tool_tracker_get($search){
+		$filter=" WHERE `unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `itemdescription` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `machinesrno` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `make` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `tooltype` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `purchase_details` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `taxinvono` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' ";
+		$search=$search==''?'':$filter;
+	
+		// Check for duplicate unique ID
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_tooldetails` LEFT JOIN `stc_user` ON `stc_tooldetails`.`created_by`=`stc_user`.`stc_user_id` ".$search."
+		");
+		$blackpearl=[];
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$blackpearl[] = $blackpearl_row;
+			}
+		}
+	
+		return $blackpearl;
+	}
+
+	// for edit
+	public function stc_tool_tracker_edit($itt_id, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks){
+		$blackpearl='';
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "UPDATE `stc_tooldetails` SET `unique_id`='".mysqli_real_escape_string($this->stc_dbs, $unique)."', `itemdescription`='".mysqli_real_escape_string($this->stc_dbs, $itemdescription)."', `machinesrno`='".mysqli_real_escape_string($this->stc_dbs, $machineslno)."', `make`='".mysqli_real_escape_string($this->stc_dbs, $make)."', `tooltype`='".mysqli_real_escape_string($this->stc_dbs, $type)."', `warranty`='".mysqli_real_escape_string($this->stc_dbs, $warranty)."', `purchase_details`='".mysqli_real_escape_string($this->stc_dbs, $purdetails)."', `taxinvono`='".mysqli_real_escape_string($this->stc_dbs, $tinnumber)."', `taxinvodate`='".mysqli_real_escape_string($this->stc_dbs, $tindate)."', `remarks`='".mysqli_real_escape_string($this->stc_dbs, $remarks)."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $itt_id)."'");
+		if($blackpearl_qry){
+			$blackpearl="yes";
+		}else{
+			$blackpearl="no";
+		}
+		return $blackpearl;
+	}
+
+	// save tracking
+	public function stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id){
+		$blackpearl='';
+		$date1=date("Y-m-d H:i:s");
+		$blackpearl_qry=mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track(`toolsdetails_id`, `issuedby`, `location`, `issueddate`, `receivedby`, `handoverto`, `created_date`, `created_by`) VALUES('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '".mysqli_real_escape_string($this->stc_dbs, $handoverto)."', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."')");
+		if($blackpearl_qry){
+			$blackpearl='yes';
+		}else{
+			$blackpearl='no';
+		}
+		return $blackpearl;
+	}
+
+	// show tool track
+	public function stc_tool_trackertrack_get($itt_id){	
+		// Check for duplicate unique ID
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_tooldetails_track` tt LEFT JOIN `stc_tooldetails` t ON t.`id`=tt.`toolsdetails_id` WHERE tt.`toolsdetails_id`='".mysqli_real_escape_string($this->stc_dbs, $itt_id)."'
+		");
+		$blackpearl=[];
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$blackpearl[] = $blackpearl_row;
+			}
+		}
+	
 		return $blackpearl;
 	}
 }
@@ -3645,13 +3760,13 @@ if(isset($_POST['stc_reqqnty_appro'])){
 	$pd_id=$_POST['pd_id'];
 	$objapprqnty=new ragnarRequisitionView();
 	$outobjapprqnty=$objapprqnty->stc_approved_quantity($req_id, $appr_qty);
-// 	if($outobjapprqnty=="Approved successfully."){
-// 		$objapprpo=new ragnarRequisitionView();
-// 		$outobjapprpo=$objapprpo->stc_approved_for_po($pd_id, $req_id, $appr_qty);
-// 		$out=$outobjapprpo;
-// 	}else{
-// 		$out=$outobjapprqnty;
-// 	}
+	// if($outobjapprqnty=="Approved successfully."){
+		// $objapprpo=new ragnarRequisitionView();
+		// $outobjapprpo=$objapprpo->stc_approved_for_po($pd_id, $req_id, $appr_qty);
+		// $out=$outobjapprpo;
+	// }else{
+		// $out=$outobjapprqnty;
+	// }
 	echo $outobjapprqnty;
 }
 
@@ -3899,5 +4014,69 @@ if(isset($_POST['call_item_tracker'])){
 	$odin_req=new ragnarCallRequisitionItemTrack();
 	$odin_req_out=$odin_req->stc_item_tracker_call();
 	echo $odin_req_out;
+}
+
+#<-----------------Object section of tool tracker Class------------------->
+// save procurment tracker payment
+if(isset($_POST['save_tool_tracker'])){
+	$itt_id=$_POST['itt_id'];
+	$unique=$_POST['unique'];
+	$itemdescription=$_POST['itemdescription'];
+	$machineslno=$_POST['machineslno'];
+	$make=$_POST['make'];
+	$type=$_POST['type'];
+	$warranty=$_POST['warranty'];
+	$purdetails=$_POST['purdetails'];
+	$tinnumber=$_POST['tinnumber'];
+	$tindate=$_POST['tindate'];
+	$remarks=$_POST['remarks'];
+	$operation=$_POST['operation'];
+	$out='';
+	if(empty($_SESSION['stc_empl_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new ragnarCallRequisitionItemTrack();
+		if($operation=="yes"){
+			$out=$odin_req->stc_tool_tracker_edit($itt_id, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks);
+		}else{
+			$out=$odin_req->stc_tool_tracker_save($unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks);
+		}
+	}
+	echo $out;
+}
+
+// call tools tracker
+if(isset($_POST['call_tools_tracker'])){
+	$search=isset($_POST['search']) ? $_POST['search'] : '';
+	$odin_req=new ragnarCallRequisitionItemTrack();
+	$odin_req_out=$odin_req->stc_tool_tracker_get($search);
+	echo json_encode($odin_req_out);
+}
+
+// savce tools tracker
+if(isset($_POST['save_tool_trackertrack'])){
+	$issuedby=$_POST['issuedby'];
+	$location=$_POST['location'];
+	$date=$_POST['date'];
+	$receivedby=$_POST['receivedby'];
+	$handoverto=$_POST['handoverto'];
+	$itt_id=$_POST['itt_id'];
+	$out='';
+	if(empty($_SESSION['stc_empl_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new ragnarCallRequisitionItemTrack();
+		$out=$odin_req->stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id);
+	}
+	echo $out;
+}
+
+
+// call tools tracking tracker
+if(isset($_POST['call_tool_trackertrack'])){
+	$itt_id=$_POST['itt_id'];
+	$odin_req=new ragnarCallRequisitionItemTrack();
+	$odin_req_out=$odin_req->stc_tool_trackertrack_get($itt_id);
+	echo json_encode($odin_req_out);
 }
 ?>

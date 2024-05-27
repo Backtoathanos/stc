@@ -761,10 +761,10 @@ include("kattegat/role_check.php");
                                         </div>
                                         <div class="row">
                                             <div class="col-md-2">
-                                                <a href="javascript:void(0)" class="btn btn-primary form-control" data-toggle="modal" data-target=".bd-toolstracker-modal-lg">Add Tools Tracker</a>
+                                                <a href="javascript:void(0)" class="btn btn-primary form-control itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg">Add Tools</a>
                                             </div>
                                             <div class="col-md-10">
-                                                <input type="text" id="toolssearchInput" class="form-control" placeholder="Type to search...">
+                                                <input type="text" id="itt-toolssearchInput" class="form-control" placeholder="Type to search...">
                                             </div>
                                             <div class="col-md-12">
                                                 <table class="table table-stripped table-bordered table-hover">
@@ -780,6 +780,9 @@ include("kattegat/role_check.php");
                                                             <th class="text-center">WARRANTY</th>
                                                             <th class="text-center">TAX INVOICE NO.</th>
                                                             <th class="text-center">TAX INVOICE DATE.</th>
+                                                            <th class="text-center">REMAKRS</th>
+                                                            <th class="text-center">CREATED DATE</th>
+                                                            <th class="text-center">CREATED BY</th>
                                                             <th class="text-center">ACTION</th>
                                                         </tr>
                                                     </thead>
@@ -1825,7 +1828,6 @@ include("kattegat/role_check.php");
                           alert("Record updated successfully!!!");
                           resetFormFields();
                           item_tracker_call();
-                          item_tracker_call();
                       }else if(obj_response=="reload"){
                           window.location.reload();
                       }else if(obj_response=="empty"){
@@ -1868,6 +1870,222 @@ include("kattegat/role_check.php");
             $('.formcontrol').find('input, textarea').val('');
             $('.formcontrol').find('input:checked').prop('checked', false);
         }
+        
+        call_tools_tracker('');
+        $('body').delegate('#itt-toolssearchInput', 'focusout', function(e){
+          var search=$(this).val();
+          console.log(search);
+          call_tools_tracker(search);
+        });
+        // call tools tracker
+        function call_tools_tracker(search){
+            $.ajax({
+                url : "kattegat/ragnar_order.php",
+                method : "POST",
+                data : {
+                    call_tools_tracker:1,
+                    search:search
+                },
+                dataType : "JSON",
+                success : function(response){
+                  var data='';
+                  // Check if response is valid
+                  if (response.length > 0) {
+                      // Loop through the JSON data
+                      var slno=0;
+                      for (var i = 0; i < response.length; i++) {
+                        slno++;
+                        data+='<tr><td>' + slno + '</td><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].machinesrno + '</td><td>' + response[i].make + '</td><td>' + response[i].tooltype + '</td><td>' + response[i].purchase_details + '</td><td>' + response[i].warranty + '</td><td>' + response[i].taxinvono + '</td><td>' + response[i].taxinvodate + '</td><td>' + response[i].remarks + '</td><td>' + response[i].created_date + '</td><td>' + response[i].stc_user_name + '</td><td><a href="javascript:void(0)" class="btn btn-primary itt-edit-toolsdetails" id="' + response[i].id + '"  data-toggle="modal" data-target=".bd-toolstracker-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-primary itt-toolstracking" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertracker-modal-lg"><i class="fa fa-plus"></i></a><a href="javascript:void(0)" class="btn btn-primary itt-toolstrackingshow" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertrackershow-modal-lg"><i class="fa fa-shipping-fast"></i></a></td></tr>';
+                      }
+                  } else {
+                    data="<td>No data found.</td>";
+                  }
+                  $('.tools-tracker-show').html(data);
+                }
+            });
+        }
+
+        // for edit tools tracker
+        $('body').delegate('.itt-edit-toolsdetails', 'click', function(e){
+          $('.itt-save').removeAttr("operation");
+          $('.itt-save').attr("operation", "yes");
+          var ittid=$(this).attr('id');
+          var unique=$(this).closest('tr').find('td:eq(1)').html();
+          var itemdescription=$(this).closest('tr').find('td:eq(2)').html();
+          var machineslno=$(this).closest('tr').find('td:eq(3)').html();
+          var make=$(this).closest('tr').find('td:eq(4)').html();
+          var type=$(this).closest('tr').find('td:eq(5)').html();
+          var purdetails=$(this).closest('tr').find('td:eq(6)').html();
+          var warranty=$(this).closest('tr').find('td:eq(7)').html();
+          var tinnumber=$(this).closest('tr').find('td:eq(8)').html();
+          var tindate=$(this).closest('tr').find('td:eq(9)').html();
+          var remarks=$(this).closest('tr').find('td:eq(10)').html();
+          $('#itt-id').remove();
+          $('.itt-unique-id').before('<input type="hidden" id="itt-id" value="' + ittid + '">');
+          $('.itt-unique-id').val(unique);
+          $('.itt-itemdescription').val(itemdescription);
+          $('.itt-machinesrno').val(machineslno);
+          $('.itt-make').val(make);
+          $('.itt-type').val(type);
+          $('.itt-warranty').val(warranty);
+          $('.itt-purdetails').val(purdetails);
+          $('.itt-tinnumber').val(tinnumber);
+          $('.itt-tindate').val(tindate);
+          $('.itt-remarks').val(remarks);
+        });
+
+        
+        $('body').delegate('.itt-create', 'click', function(e){
+          $('.itt-save').removeAttr("operation");
+          $('.itt-save').attr("operation", "no");
+          resetFormFields();
+        });
+
+        // save dispatch
+        $('body').delegate('.itt-save', 'click', function(e){
+            e.preventDefault();
+            var itt_id=0;
+            var unique = $('.itt-unique-id').val();
+            var itemdescription = $('.itt-itemdescription').val();
+            var machineslno = $('.itt-machinesrno').val();
+            var make = $('.itt-make').val();
+            var type = $('.itt-type').val();
+            var warranty = $('.itt-warranty').val();
+            var purdetails = $('.itt-purdetails').val();
+            var tinnumber = $('.itt-tinnumber').val();
+            var tindate = $('.itt-tindate').val();
+            var remarks = $('.itt-remarks').val();
+            if(unique!='' && itemdescription!=''){              
+                var operation = $(this).attr('operation'); // Get the operation type
+                if(operation=="yes"){
+                  itt_id=$('#itt-id').val();
+                }
+                var data = {
+                    save_tool_tracker: 1,
+                    unique: unique,
+                    itemdescription: itemdescription,
+                    machineslno: machineslno,
+                    make: make,
+                    type: type,
+                    warranty: warranty,
+                    purdetails: purdetails,
+                    tinnumber: tinnumber,
+                    tindate: tindate,
+                    remarks: remarks,
+                    operation: operation,
+                    itt_id : itt_id
+                };
+                $.ajax({
+                    url : "kattegat/ragnar_order.php",
+                    method : "POST",
+                    data : data,
+                    success : function(response){
+                        var obj_response=response.trim();
+                        if(obj_response=="yes"){
+                            alert("Record updated successfully!!!");
+                            if(operation=="no"){
+                              resetFormFields();
+                            } 
+                            call_tools_tracker();    
+                        }else if(obj_response=="duplicate"){
+                          alert("This tool is already in records.");
+                        }else if(obj_response=="reload"){
+                            window.location.reload();
+                        }else if(obj_response=="empty"){
+                          alert("Please fill complete details.");
+                        }else if(obj_response=="no"){
+                            alert("Something went wrong. Record not updated");
+                        }
+                    }
+                });
+            }else{
+              alert("Please check Type of PPE.");
+            }
+        });
+
+        // for edit tools tracker
+        $('body').delegate('.itt-toolstracking', 'click', function(e){
+          $('#ittt-id').remove();
+          var ittid=$(this).attr('id');
+          $('.ittt-unique-idtracking').before('<input type="hidden" id="ittt-id" value="' + ittid + '">');
+          var unique=$(this).closest('tr').find('td:eq(1)').html();
+          var itemdescription=$(this).closest('tr').find('td:eq(2)').html();
+          $('.ittt-unique-idtracking').val(unique);
+          $('.ittt-itemdescriptiontracking').val(itemdescription);
+        });
+
+        // call tools tracker
+        $('body').delegate('.itt-toolstrackingshow', 'click', function(e){
+          var itt_id=$(this).attr('id');
+            $.ajax({
+                url : "kattegat/ragnar_order.php",
+                method : "POST",
+                data : {
+                  call_tool_trackertrack:1,
+                  itt_id:itt_id
+                },
+                dataType : "JSON",
+                success : function(response){
+                  var data='';
+                  // Check if response is valid
+                  if (response.length > 0) {
+                      // Loop through the JSON data
+                      var slno=0;
+                      for (var i = 0; i < response.length; i++) {
+                        slno++;
+                        data+='<tr><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].issuedby + '</td><td>' + response[i].location + '</td><td>' + response[i].issueddate + '</td><td>' + response[i].receivedby + '</td><td>' + response[i].handoverto + '</td></tr>';
+                      }
+                  } else {
+                    data="<td>No data found.</td>";
+                  }
+                  $('.itt-showtrackingdetails').html(data);
+                }
+            });
+        });
+
+        // save dispatch
+        $('body').delegate('.ittt-save', 'click', function(e){
+            e.preventDefault();
+            var itt_id=$('#ittt-id').val();
+            var issuedby = $('.ittt-issuedby').val();
+            var location = $('.ittt-location').val();
+            var date = $('.ittt-date').val();
+            var receivedby = $('.ittt-receivedby').val();
+            var handoverto = $('.ittt-handoverto').val();
+            if(issuedby!='' && location!=''){      
+                var data = {
+                    save_tool_trackertrack: 1,
+                    issuedby: issuedby,
+                    location: location,
+                    date: date,
+                    receivedby: receivedby,
+                    handoverto: handoverto,
+                    itt_id : itt_id
+                };
+                $.ajax({
+                    url : "kattegat/ragnar_order.php",
+                    method : "POST",
+                    data : data,
+                    success : function(response){
+                        var obj_response=response.trim();
+                        if(obj_response=="yes"){
+                            alert("Record updated successfully!!!");
+                        }else if(obj_response=="duplicate"){
+                          alert("This tool is already in records.");
+                        }else if(obj_response=="reload"){
+                            window.location.reload();
+                        }else if(obj_response=="empty"){
+                          alert("Please fill complete details.");
+                        }else if(obj_response=="no"){
+                            alert("Something went wrong. Record not updated");
+                        }
+                    }
+                });
+            }else{
+              alert("Please check Type of PPE.");
+            }
+        });
+
       });
     </script>
 </body>
@@ -2216,7 +2434,7 @@ include("kattegat/role_check.php");
     </div>
 </div>
 
-<!-- Tools track -->
+<!-- Tools details -->
 <div class="modal fade bd-toolstracker-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -2232,49 +2450,192 @@ include("kattegat/role_check.php");
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <div class="row formcontrol">
-                                    <div class="col-md-6">
-                                        <h5>Employee Name</h5><br>
+                                    <div class="col-md-4">
+                                        <h5>Unique Id</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <input type="text" class="form-control it-emp-name" placeholder="Enter employee name" required>
+                                            <input type="text" class="form-control itt-unique-id" placeholder="Enter unique id" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>Item Description</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <textarea class="form-control itt-itemdescription" placeholder="Enter Item Description"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5>Machine SR No</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="text" class="form-control itt-machinesrno" placeholder="Enter Machine SR No" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5>Make</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="text" class="form-control itt-make" placeholder="Enter Make" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5>Type</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="text" class="form-control itt-type" placeholder="Enter Type" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h5>Warranty</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="text" class="form-control itt-warranty" placeholder="Enter Warranty" required>
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <h5>Type of PPE</h5><br>
+                                        <h5>Purchase Details</h5><br>
                                         <div class="card mb-3 widget-content">
-                                          <div class="checkbox-group">
-                                              <label><input type="checkbox" class="it-ppe-type" unit="Pair" validity="12" value="Safety Shoes"> Safety Shoes </label>
-                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="12" value="Safety Jacket"> Safety Jacket </label>
-                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="12" value="Safety Belt"> Safety Belt </label>
-                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="60" value="Safety Helmet"> Safety Helmet </label>
-                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="3" value="Hand Gloves"> Hand Gloves </label>
-                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="6" value="Leg Guard"> Leg Guard </label>
-                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="6" value="Safety Goggles"> Safety Goggles </label>
-                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="1" value="Ear Plug"> Ear Plug </label>
-                                              <label><input type="checkbox" class="it-ppe-type" unit="Nos" validity="1" value="Nose Mask"> Nose Mask </label>
-                                          </div>
-                                      </div>
-                                    </div>
-                                    <div class="col-md-6" style="display:none;">
-                                        <h5>Quantity</h5><br>
-                                        <div class="card mb-3 widget-content">
-                                            <input type="number" class="form-control it-qty" placeholder="Enter quantity" value="1">
+                                          <input type="text" class="form-control itt-purdetails" placeholder="Enter Purchase Details" required>
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
-                                        <h5>Date of Issue</h5><br>
+                                    <div class="col-md-3">
+                                        <h5>Tax Invoice Number</h5><br>
                                         <div class="card mb-3 widget-content">
-                                          <input type="date" class="form-control it-issue-date" value="<?php echo date('Y-m-d'); ?>" required>
+                                          <input type="text" class="form-control itt-tinnumber" placeholder="Enter Invoice Number" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>Tax Invoice Date</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="date" class="form-control itt-tindate" value="<?php echo date('Y-m-d'); ?>"  required>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <h5>Remarks</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <textarea class="form-control it-remarks" placeholder="Enter remarks"></textarea>
+                                            <textarea class="form-control itt-remarks" placeholder="Enter remarks"></textarea>
                                         </div>
                                     </div>
                                     <div class="col-md-12">
                                         <div class="card mb-3 widget-content">
-                                            <button class="form-control btn btn-success it-save">Save</button>
+                                            <button class="form-control btn btn-success itt-save">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tools details tracking -->
+<div class="modal fade bd-toolstrackertracker-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Tools Track</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row formcontrol">
+                                    <div class="col-md-4">
+                                        <h5>Unique Id</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <input type="text" class="form-control ittt-unique-idtracking" placeholder="Enter unique id" disabled>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5>Item Description</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <textarea class="form-control ittt-itemdescriptiontracking" placeholder="Enter Item Description" disabled></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>Issued By</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="text" class="form-control ittt-issuedby" placeholder="Enter Issued By">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>Location</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="text" class="form-control ittt-location" placeholder="Enter Location">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>Date</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="text" class="form-control ittt-date" placeholder="Enter Date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>Received By</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="text" class="form-control ittt-receivedby" placeholder="Enter Received By">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <h5>Handover To</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                          <input type="text" class="form-control ittt-handoverto" placeholder="Enter Handover To">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="card mb-3 widget-content">
+                                            <button class="form-control btn btn-success ittt-save">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tools details tracking show -->
+<div class="modal fade bd-toolstrackertrackershow-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Tools Track</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row form control">
+                                    <div class="col-md-12">
+                                        <div class="card mb-3 widget-content">
+                                            <table class="table table-bordered">
+                                              <thead>
+                                                <tr>
+                                                  <th class="text-center">UNIQUE ID</th>
+                                                  <th class="text-center">ITEM DESCRIPTION</th>
+                                                  <th class="text-center">ISSUED BY</th>
+                                                  <th class="text-center">LOCATION</th>
+                                                  <th class="text-center">DATE</th>
+                                                  <th class="text-center">RECEIVED BY</th>
+                                                  <th class="text-center">HANDOVER TO</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody class="itt-showtrackingdetails"></tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
