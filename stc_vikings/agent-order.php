@@ -748,7 +748,7 @@ include("kattegat/role_check.php");
                             <div class="tab-pane tabs-animation fade" id="tab-content-7" role="tabpanel">
                                 <div class="row">
                                   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-                                      <div class="card-border mb-3 card card-body border-success" style="overflow-x: auto; white-space: nowrap;">
+                                      <div class="card-border mb-3 card card-body border-success" style="overflow-x: auto; ">
                                         <div class="row">
                                             <div class="col-xl-12 col-lg-12 col-md-12">
                                                 <div class="card-border mb-3 card card-body border-success">
