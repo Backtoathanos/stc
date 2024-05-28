@@ -2571,7 +2571,7 @@ include("kattegat/role_check.php");
                                     <div class="col-md-3">
                                         <h5>Date</h5><br>
                                         <div class="card mb-3 widget-content">
-                                          <input type="text" class="form-control ittt-date" placeholder="Enter Date">
+                                          <input type="date" class="form-control ittt-date" placeholder="Enter Date">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
