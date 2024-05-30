@@ -35,13 +35,14 @@
       <div class="container-fluid">
         <div class="row mb-2">
           <div class="col-sm-6">
-            <h1 class="m-0">School Monthly Closing</h1>
+            <h1 class="m-0">School Fee</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
               <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
               <li class="breadcrumb-item"><a href="#">Branch</a></li>
-              <li class="breadcrumb-item active"><a href="#">{{!empty($page_title) ? $page_title : ''}}</a></li>
+              <li class="breadcrumb-item"><a href="#">{{!empty($page_title) ? $page_title : ''}}</a></li>
+              <li class="breadcrumb-item active"><a href="#">Fee</a></li>
             </ol>
           </div><!-- /.col -->
         </div><!-- /.row -->
@@ -66,26 +67,58 @@
                 <div class="card-body">
                   <table id="example1" class="table table-bordered table-striped">
                     <thead>
-                      <tr>
-                        <th class="text-center">Id</th>
-                        <th class="text-center">Date</th>
-                        <th class="text-center">School</th>
-                        <th class="text-center">Closing Value</th>
-                        <th class="text-center">Created By</th>
-                        <th class="text-center">Action</th>
-                      </tr>
+                        <tr>
+                            <th class="text-center"><b>Id</b></th>
+                            <th class="text-center"><b>Date</b></th>
+                            <th class="text-center"><b>School</b></th>
+                            <th class="text-center"><b>Monthly Fee</b></th>
+                            <th class="text-center"><b>Admission Fee</b></th>
+                            <th class="text-center"><b>Books</b></th>
+                            <th class="text-center"><b>Transportation</b></th>
+                            <th class="text-center"><b>Donation</b></th>
+                            <th class="text-center"><b>Day Boarding</b></th>
+                            <th class="text-center"><b>Neat</b></th>
+                            <th class="text-center"><b>Others</b></th>
+                            <th class="text-center"><b>Cashback</b></th>
+                            <th class="text-center"><b>D Staff Salary</b></th>
+                            <th class="text-center"><b>Teachers Salary</b></th>
+                            <th class="text-center"><b>Vehicle Fuels</b></th>
+                            <th class="text-center"><b>Vehicle Maintenance</b></th>
+                            <th class="text-center"><b>Electricity</b></th>
+                            <th class="text-center"><b>Canteen</b></th>
+                            <th class="text-center"><b>Other Expenses</b></th>
+                            <th class="text-center"><b>Remarks</b></th>
+                            <th class="text-center"><b>Created By</b></th>
+                            <th class="text-center"><b>Action</b></th>
+                        </tr>
                     </thead>
                     <tbody>
                     </tbody>
                     <tfoot>
-                      <tr>
-                        <th class="text-center">Id</th>
-                        <th class="text-center">Date</th>
-                        <th class="text-center">School</th>
-                        <th class="text-center">Closing Value</th>
-                        <th class="text-center">Created By</th>
-                        <th class="text-center">Action</th>
-                      </tr>
+                        <tr>
+                            <th class="text-center"><b>Id</b></th>
+                            <th class="text-center"><b>Date</b></th>
+                            <th class="text-center"><b>School</b></th>
+                            <th class="text-center"><b>Monthly Fee</b></th>
+                            <th class="text-center"><b>Admission Fee</b></th>
+                            <th class="text-center"><b>Books</b></th>
+                            <th class="text-center"><b>Transportation</b></th>
+                            <th class="text-center"><b>Donation</b></th>
+                            <th class="text-center"><b>Day Boarding</b></th>
+                            <th class="text-center"><b>Neat</b></th>
+                            <th class="text-center"><b>Others</b></th>
+                            <th class="text-center"><b>Cashback</b></th>
+                            <th class="text-center"><b>D Staff Salary</b></th>
+                            <th class="text-center"><b>Teachers Salary</b></th>
+                            <th class="text-center"><b>Vehicle Fuels</b></th>
+                            <th class="text-center"><b>Vehicle Maintenance</b></th>
+                            <th class="text-center"><b>Electricity</b></th>
+                            <th class="text-center"><b>Canteen</b></th>
+                            <th class="text-center"><b>Other Expenses</b></th>
+                            <th class="text-center"><b>Remarks</b></th>
+                            <th class="text-center"><b>Created By</b></th>
+                            <th class="text-center"><b>Action</b></th>
+                        </tr>
                     </tfoot>
                   </table>
                 </div>
@@ -131,61 +164,57 @@
           $('#example1').DataTable({
           processing: true,
           serverSide: true,
-          ajax: "{{ url('/branch/school/monthlyclosing/list') }}",
+          ajax: "{{ url('/branch/school/fee/list') }}",
           columns: [
-                { data: 'stc_school_month_closing_id' },
-                { data: 'stc_school_month_closing_date' },
+                { data: 'stc_school_fee_id' },
+                { data: 'stc_school_fee_date' },
                 { data: 'stc_school_fee_which_school' },
-                { data: 'stc_school_month_closing_value' },
+                { data: 'stc_school_fee_monthly_fee' },
+                { data: 'stc_school_fee_admission_fee' },
+                { data: 'stc_school_fee_book_charge' },
+                { data: 'stc_school_fee_transportation' },
+                { data: 'stc_school_fee_donation' },
+                { data: 'stc_school_fee_dayboarding' },
+                { data: 'stc_school_fee_neat' },
+                { data: 'stc_school_fee_dstaffsal' },
+                { data: 'stc_school_fee_teacherssal' },
+                { data: 'stc_school_fee_vehiclefuel' },
+                { data: 'stc_school_fee_vehiclemaintenance' },
+                { data: 'stc_school_fee_electricity' },
+                { data: 'stc_school_fee_canteen' },
+                { data: 'stc_school_fee_others' },
+                { data: 'stc_school_fee_cashback' },
+                { data: 'stc_school_fee_expense' },
+                { data: 'stc_school_fee_remarks' },
                 { data: 'stc_school_user_fullName' },
                 { data: 'actionData' }
           ],
           columnDefs: [
             { "targets": 0, "className": "text-center", width : '4%'},
-            { "targets": 1, "className": "text-center", width : '10%' },
-            { "targets": 2, "className": "text-left", },
+            { "targets": 1, "className": "text-right", width : '10%' },
+            { "targets": 2, "className": "text-center", },
             { "targets": 3, "className": "text-right", },
-            { "targets": 4, "className": "text-center", },
-            { orderable: false, targets: 5 },
+            { "targets": 4, "className": "text-right", },
+            { "targets": 5, "className": "text-right", },
+            { "targets": 6, "className": "text-right", },
+            { "targets": 7, "className": "text-right", },
+            { "targets": 8, "className": "text-right", },
+            { "targets": 9, "className": "text-right", },
+            { "targets": 10, "className": "text-right", },
+            { "targets": 11, "className": "text-right", },
+            { "targets": 12, "className": "text-right", },
+            { "targets": 13, "className": "text-right", },
+            { "targets": 14, "className": "text-right", },
+            { "targets": 15, "className": "text-right", },
+            { "targets": 16, "className": "text-right", },
+            { "targets": 17, "className": "text-right", },
+            { "targets": 18, "className": "text-center", },
+            { "targets": 19, "className": "text-center", },
+            { "targets": 20, "className": "text-center", },
+            { orderable: false, targets: 21 },
           ]
         });
       }
-
-      // display for edit modal
-      $('body').delegate('.edit-modal-btn','click', function(){
-        var edit_id = $(this).attr('id');
-        var value = $('#display-value'+edit_id).attr("value");
-        var date = $('#display-date'+edit_id).attr("date");
-        $('#edit_id').val(edit_id);
-        $('#edit-value').val(value);
-        $('#edit-date').val(date);
-      });
-
-      // save edited data from modal
-      $('body').delegate('.edit-schoolmc-btn','click', function(){
-        var id = $('#edit_id').val();
-        var value = $('#edit-value').val();
-        var date = $('#edit-date').val();
-        $.ajax({
-            type: 'post',
-            data: {
-                id: id,
-                value: value,
-                date: date,
-                _token: "{{ csrf_token() }}"
-            },
-            url: "{{ url('/branch/school/monthlyclosing/edit') }}",
-            success: function(response) {
-              // console.log(response);
-              if(response.success==true){
-                $('.close-btn').click();
-                swalSuccess('success', 'Record updated.');
-              }else{
-                swalSuccess('error', response.message);
-              }
-            }
-        });
-      });
 
       // delete function
       $('.delete-schoolmc-btn').on('click', function(e){
@@ -196,7 +225,7 @@
             data: {
                 id: id,
             },
-            url: "{{ url('/branch/school/monthlyclosing/delete') }}",
+            url: "{{ url('/branch/school/fee/delete') }}",
             success: function(response) {
               if(response.success==true){
 

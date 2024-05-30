@@ -216,9 +216,15 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/sitebranch/delete', [branchSiteController::class, 'delete']);  
     Route::get('/branch/sitebranch/getusers', [branchSiteController::class, 'getusers']);
 
+    // for school monthly fee
+    Route::get('/branch/school/monthlyclosing', [SchoolController::class, 'show']);    
+    Route::get('/branch/school/monthlyclosing/list', [SchoolController::class, 'list']);
+    Route::post('/branch/school/monthlyclosing/edit', [SchoolController::class, 'update']);   
+    Route::get('/branch/school/monthlyclosing/delete', [SchoolController::class, 'delete']);
     
-    Route::get('/branch/school', [SchoolController::class, 'show']);    
-    Route::get('/branch/school/list', [SchoolController::class, 'list']);
-    Route::post('/branch/school/edit', [SchoolController::class, 'update']);   
-    Route::get('/branch/school/delete', [SchoolController::class, 'delete']);
+    
+    Route::get('/branch/school/fee', [SchoolController::class, 'feeshow']);    
+    Route::get('/branch/school/fee/list', [SchoolController::class, 'feelist']);
+    Route::post('/branch/school/fee/edit', [SchoolController::class, 'feeupdate']);   
+    Route::get('/branch/school/fee/delete', [SchoolController::class, 'feedelete']);
 });
