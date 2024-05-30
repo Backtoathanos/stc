@@ -43,7 +43,7 @@
               <li class="nav-item">
                 <a href="{{ url('/branch/electronicsbranch') }}" class="nav-link @if(Request::segment(2) == 'electronicsbranch') active @endif">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>STC Electronics</p>
+                  <p>Electronics</p>
                 </a>
               </li>
               <li class="nav-item">
@@ -59,10 +59,25 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ url('/branch/school') }}" class="nav-link @if(Request::segment(2) == 'schoolbranch') active @endif">
+                <a href="javascript:void(0)" class="nav-link @if(Request::segment(2) == 'school') active @endif">
                   <i class="far fa-circle nav-icon"></i>
-                  <p>School</p>
+                  <p>School
+                  <i class="fas fa-angle-left right"></i></p>
                 </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/school/monthlyclosing') }}" class="nav-link @if(Request::segment(3) == 'monthlyclosing') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Monthly Closing</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/school/fee') }}" class="nav-link @if(Request::segment(3) == 'fee') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Fee</p>
+                    </a>
+                  </li>
+                </ul>
               </li>
               <li class="nav-item">
                 <a href="{{ url('/branch/sitebranch') }}" class="nav-link @if(Request::segment(2) == 'sitebranch') active @endif">
