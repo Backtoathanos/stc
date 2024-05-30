@@ -77,6 +77,12 @@
                       <p>Fee</p>
                     </a>
                   </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/school/canteen') }}" class="nav-link @if(Request::segment(3) == 'canteen') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Canteen</p>
+                    </a>
+                  </li>
                 </ul>
               </li>
               <li class="nav-item">

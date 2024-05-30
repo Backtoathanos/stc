@@ -227,4 +227,10 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/school/fee/list', [SchoolController::class, 'feelist']);
     Route::post('/branch/school/fee/edit', [SchoolController::class, 'feeupdate']);   
     Route::get('/branch/school/fee/delete', [SchoolController::class, 'feedelete']);
+    
+    
+    // Route::get('/branch/school/fee', [SchoolController::class, 'canteenshow']);    
+    // Route::get('/branch/school/fee/list', [SchoolController::class, 'canteenlist']);
+    // Route::post('/branch/school/fee/edit', [SchoolController::class, 'canteenupdate']);   
+    // Route::get('/branch/school/fee/delete', [SchoolController::class, 'canteendelete']);
 });
