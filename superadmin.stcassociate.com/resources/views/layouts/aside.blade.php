@@ -41,24 +41,6 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{ url('/branch/electronicsbranch') }}" class="nav-link @if(Request::segment(2) == 'electronicsbranch') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Electronics</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ url('/users/groceriesbranch') }}" class="nav-link @if(Request::segment(2) == 'groceriesbranch') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Groceries</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ url('/users/managerbranch') }}" class="nav-link @if(Request::segment(2) == 'managerbranch') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Manager</p>
-                </a>
-              </li>
-              <li class="nav-item">
                 <a href="javascript:void(0)" class="nav-link @if(Request::segment(2) == 'school') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>School
@@ -84,30 +66,6 @@
                     </a>
                   </li>
                 </ul>
-              </li>
-              <li class="nav-item">
-                <a href="{{ url('/branch/sitebranch') }}" class="nav-link @if(Request::segment(2) == 'sitebranch') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Site Users</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ url('/users/admin') }}" class="nav-link @if(Request::segment(2) == 'admin') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Super Admin</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ url('/users/tradingbranch') }}" class="nav-link @if(Request::segment(2) == 'tradingbranch') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Trading</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="{{ url('/users/uadminbranch') }}" class="nav-link @if(Request::segment(2) == 'uadminbranch') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>User Administration</p>
-                </a>
               </li>
             </ul>
           </li>
