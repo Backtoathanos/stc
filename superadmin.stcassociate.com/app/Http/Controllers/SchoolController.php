@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Hash;
 use App\BranchSchool;
 use App\BranchSchoolFee;
+use App\BranchSchoolCanteen;
 
 class SchoolController extends Controller
 {
@@ -283,6 +284,113 @@ class SchoolController extends Controller
     // delete through ajax
     function feedelete(Request $request){
         $delete =  BranchSchoolFee::destroy($request->id);
+        if($delete){
+            $response = [
+                'status'=>'ok',
+                'success'=>true,
+                'message'=>'Record deleted succesfully!'
+            ];
+            return $response;
+        }else{
+            $response = [
+                'status'=>'ok',
+                'success'=>false,
+                'message'=>'Record deleted failed!'
+            ];
+            return $response;
+        }
+    } 
+
+    public function canteenshow(){
+        $data['page_title']="School";
+        // $data['getRecord'] = BranchSchool::getSchool();
+        return view('pages.branchschoolcanteen', $data);
+    }
+    
+    // show through ajax
+    function canteenlist(Request $request){
+
+        
+        ## Read value
+        $draw = $request->get('draw');
+        $start = $request->get("start");
+        $rowperpage = $request->get("length"); // Rows display per page
+
+        $columnIndex_arr = $request->get('order');
+        $columnName_arr = $request->get('columns');
+        $order_arr = $request->get('order');
+        $search_arr = $request->get('search');
+
+        $columnIndex = $columnIndex_arr[0]['column']; // Column index
+        $columnName = $columnName_arr[$columnIndex]['data']; // Column name
+        $columnSortOrder = $order_arr[0]['dir']; // asc or desc
+        $searchValue = $search_arr['value']; // Search value
+
+        // Total records
+        $totalRecords = BranchSchoolCanteen::select('count(*) as allcount')->count();
+        $totalRecordswithFilter = BranchSchoolCanteen::select('count(*) as allcount')->where('stc_school_canteen_serve_type', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school.stc_school_user_fullName', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school_canteen.stc_school_canteen_date', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school_canteen.stc_school_canteen_serve_time', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school_canteen.stc_school_canteen_serve_quantity', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school_canteen.stc_school_canteen_remarks', 'like', '%' .$searchValue . '%')
+        ->leftjoin('stc_school','stc_school.stc_school_user_id','=','stc_school_canteen.stc_school_canteen_created_by')->count();
+
+        // Fetch records
+        $records = BranchSchoolCanteen::orderBy($columnName,$columnSortOrder)
+        ->where('stc_school_canteen.stc_school_canteen_serve_type', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school.stc_school_user_fullName', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school_canteen.stc_school_canteen_date', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school_canteen.stc_school_canteen_serve_time', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school_canteen.stc_school_canteen_serve_quantity', 'like', '%' .$searchValue . '%')
+        ->orwhere('stc_school_canteen.stc_school_canteen_remarks', 'like', '%' .$searchValue . '%')
+        ->leftjoin('stc_school','stc_school.stc_school_user_id','=','stc_school_canteen.stc_school_canteen_created_by')
+        ->select('stc_school_canteen.*', 'stc_school.stc_school_user_fullName')
+        ->skip($start)
+        ->take($rowperpage)
+        ->get();
+
+        $data_arr = array();
+        
+        foreach($records as $record){
+            $id = $record->stc_school_canteen_id;
+            $date = $record->stc_school_canteen_date;
+            $stc_school_canteen_serve_type = $record->stc_school_canteen_serve_type;
+            $stc_school_canteen_serve_time = $record->stc_school_canteen_serve_time;
+            $stc_school_canteen_serve_quantity = $record->stc_school_canteen_serve_quantity;
+            $stc_school_canteen_remarks = $record->stc_school_canteen_remarks;
+            $name = $record->stc_school_user_fullName;
+
+            // $stc_product_id = '<span id="display-stc_product_id'.$id.'">'.$id.'</span>';
+            $date = '<span id="display-date'.$id.'" value="'.date('Y-m-d', strtotime($date)).'">'.date('d-m-Y H:i:s', strtotime($date)).'</span>';
+            $actionData = '
+                <a href="javascript:void(0)" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#delete-modal" onclick=$("#delete_id").val("'.$id.'")><i class="fas fa-trash" title="Delete"></i></a>
+            '; 
+            $data_arr[] = array(
+                "stc_school_canteen_id" => $id,
+                "stc_school_canteen_date" => $date,
+                "stc_school_canteen_serve_type" => $stc_school_canteen_serve_type,
+                "stc_school_canteen_serve_time" => $stc_school_canteen_serve_time,
+                "stc_school_canteen_serve_quantity" => number_format($stc_school_canteen_serve_quantity, 2),
+                "stc_school_canteen_remarks" => $stc_school_canteen_remarks,
+                "stc_school_user_fullName" => $name,
+                "actionData" => $actionData
+            );
+        }
+
+        $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordswithFilter,
+            "aaData" => $data_arr
+        );
+
+        return json_encode($response);
+    }
+
+    // delete through ajax
+    function canteendelete(Request $request){
+        $delete =  BranchSchoolCanteen::destroy($request->id);
         if($delete){
             $response = [
                 'status'=>'ok',
