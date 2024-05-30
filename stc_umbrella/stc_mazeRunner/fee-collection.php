@@ -912,6 +912,7 @@ if($_SESSION['stc_school_user_for']>3){
         // save fee to db
         $(document).on('click', '#stcschoolreached', function(e){
           e.preventDefault();
+          $(this).prop('disabled', true);
           var stcwhichschool                =  $('.stcwhichschool').val();
           var stcschoolmonthlyfee           =  $('.stcschoolmonthlyfee').val();
           var stcschooladmissionfee         =  $('.stcschooladmissionfee').val();
@@ -956,15 +957,34 @@ if($_SESSION['stc_school_user_for']>3){
             },
             // dataType: `JSON`,
             success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="Record saved successfully."){
-              alert(data);
-              window.location.reload();
-             }else{
-              $(this).show();
-              alert(data);
-             }
+              // console.log(data);
+              $('.stcwhichschool').val('');
+              $('.stcschoolmonthlyfee').val('');
+              $('.stcschooladmissionfee').val('');
+              $('.stcschoolbooks').val('');
+              $('.stcschooltransporation').val('');
+              $('.stcschooldonation').val('');
+              $('.stcschooldayboarding').val('');
+              $('.stcschoolneatcoll').val('');
+              $('.stcschoolothercharges').val('');
+              $('.stcschoolcashback').val('');
+              $('.stcschooldssalary').val('');
+              $('.stcschooltsalary').val('');
+              $('.stcschoolvfuel').val('');
+              $('.stcschoolvmaint').val('');
+              $('.stcschoolelectricity').val('');
+              $('.stcschoolcanteen').val('');
+              $('.stcschoolexpenses').val('');
+              $('.stcschoolremarks').val('');
+              var response=data.trim();
+              if(response=="Record saved successfully."){
+                $("#stcschoolreached").prop('disabled', false);
+                alert(data);
+                $('#schoolsearch').click();
+              }else{
+                $(this).show();
+                alert(data);
+              }
             }
           });
         });
