@@ -45,106 +45,66 @@ Route::group(['middleware' => 'superadmin'], function(){
     
     // user admin route
     Route::get('/users/admin', [SuperAdminUsersController::class, 'show']);
-
     Route::get('/users/admin/create', [SuperAdminUsersController::class, 'create']);
-
     Route::post('/users/admin/create', [SuperAdminUsersController::class, 'insert']);
-
     Route::get('/users/admin/edit/{id}', [SuperAdminUsersController::class, 'edit']);
-
-    Route::post('/users/admin/edit/{id}', [SuperAdminUsersController::class, 'update']);
-    
+    Route::post('/users/admin/edit/{id}', [SuperAdminUsersController::class, 'update']);    
     Route::get('/users/admin/delete/{id}', [SuperAdminUsersController::class, 'delete']);
 
     // user trading route
     Route::get('/users/tradingusers', [TradingUsersController::class, 'show']);
-
-    Route::get('/users/tradingusers/create', [TradingUsersController::class, 'create']);
-    
+    Route::get('/users/tradingusers/create', [TradingUsersController::class, 'create']);    
     Route::post('/users/tradingusers/create', [TradingUsersController::class, 'insert']);
-
     Route::get('/users/tradingusers/edit/{id}', [TradingUsersController::class, 'edit']);
-
-    Route::post('/users/tradingusers/edit/{id}', [TradingUsersController::class, 'update']);
-    
+    Route::post('/users/tradingusers/edit/{id}', [TradingUsersController::class, 'update']);    
     Route::get('/users/tradingusers/delete/{id}', [TradingUsersController::class, 'delete']);
 
     // user electronics route
     Route::get('/users/electronicsusers', [ElectronicsUsersController::class, 'show']);
-
-    Route::get('/users/electronicsusers/create', [ElectronicsUsersController::class, 'create']);
-    
+    Route::get('/users/electronicsusers/create', [ElectronicsUsersController::class, 'create']);    
     Route::post('/users/electronicsusers/create', [ElectronicsUsersController::class, 'insert']);
-
     Route::get('/users/electronicsusers/edit/{id}', [ElectronicsUsersController::class, 'edit']);
-
-    Route::post('/users/electronicsusers/edit/{id}', [ElectronicsUsersController::class, 'update']);
-    
+    Route::post('/users/electronicsusers/edit/{id}', [ElectronicsUsersController::class, 'update']);    
     Route::get('/users/electronicsusers/delete/{id}', [ElectronicsUsersController::class, 'delete']);
 
     // user electronics route
     Route::get('/users/schoolusers', [SchoolUsersController::class, 'show']);
-
-    Route::get('/users/schoolusers/create', [SchoolUsersController::class, 'create']);
-    
+    Route::get('/users/schoolusers/create', [SchoolUsersController::class, 'create']);    
     Route::post('/users/schoolusers/create', [SchoolUsersController::class, 'insert']);
-
     Route::get('/users/schoolusers/edit/{id}', [SchoolUsersController::class, 'edit']);
-
-    Route::post('/users/schoolusers/edit/{id}', [SchoolUsersController::class, 'update']);
-    
+    Route::post('/users/schoolusers/edit/{id}', [SchoolUsersController::class, 'update']);    
     Route::get('/users/schoolusers/delete/{id}', [SchoolUsersController::class, 'delete']);
     
     // user groceries route
     Route::get('/users/groceriesusers', [GroceriesUsersController::class, 'show']);
-
-    Route::get('/users/groceriesusers/create', [GroceriesUsersController::class, 'create']);
-    
+    Route::get('/users/groceriesusers/create', [GroceriesUsersController::class, 'create']);    
     Route::post('/users/groceriesusers/create', [GroceriesUsersController::class, 'insert']);
-
     Route::get('/users/groceriesusers/edit/{id}', [GroceriesUsersController::class, 'edit']);
-
-    Route::post('/users/groceriesusers/edit/{id}', [GroceriesUsersController::class, 'update']);
-    
+    Route::post('/users/groceriesusers/edit/{id}', [GroceriesUsersController::class, 'update']);    
     Route::get('/users/groceriesusers/delete/{id}', [GroceriesUsersController::class, 'delete']);
     
     // user admin route
     Route::get('/users/uadminusers', [AdminUsersController::class, 'show']);
-
-    Route::get('/users/uadminusers/create', [AdminUsersController::class, 'create']);
-    
+    Route::get('/users/uadminusers/create', [AdminUsersController::class, 'create']);    
     Route::post('/users/uadminusers/create', [AdminUsersController::class, 'insert']);
-
     Route::get('/users/uadminusers/edit/{id}', [AdminUsersController::class, 'edit']);
-
-    Route::post('/users/uadminusers/edit/{id}', [AdminUsersController::class, 'update']);
-    
+    Route::post('/users/uadminusers/edit/{id}', [AdminUsersController::class, 'update']);    
     Route::get('/users/uadminusers/delete/{id}', [AdminUsersController::class, 'delete']);
     
     // user manager route
     Route::get('/users/managerusers', [ManagerUsersController::class, 'show']);
-
-    Route::get('/users/managerusers/create', [ManagerUsersController::class, 'create']);
-    
+    Route::get('/users/managerusers/create', [ManagerUsersController::class, 'create']);    
     Route::post('/users/managerusers/create', [ManagerUsersController::class, 'insert']);
-
     Route::get('/users/managerusers/edit/{id}', [ManagerUsersController::class, 'edit']);
-
-    Route::post('/users/managerusers/edit/{id}', [ManagerUsersController::class, 'update']);
-    
+    Route::post('/users/managerusers/edit/{id}', [ManagerUsersController::class, 'update']);    
     Route::get('/users/managerusers/delete/{id}', [ManagerUsersController::class, 'delete']);
     
     // user site user route
     Route::get('/users/siteusers', [SiteUsersController::class, 'show']);
-
-    Route::get('/users/siteusers/create', [SiteUsersController::class, 'create']);
-    
+    Route::get('/users/siteusers/create', [SiteUsersController::class, 'create']);    
     Route::post('/users/siteusers/create', [SiteUsersController::class, 'insert']);
-
     Route::get('/users/siteusers/edit/{id}', [SiteUsersController::class, 'edit']);
-
-    Route::post('/users/siteusers/edit/{id}', [SiteUsersController::class, 'update']);
-    
+    Route::post('/users/siteusers/edit/{id}', [SiteUsersController::class, 'update']);    
     Route::get('/users/siteusers/delete/{id}', [SiteUsersController::class, 'delete']);
     
     //  city through ajax
@@ -203,12 +163,14 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/master/product/edit', [ProductController::class, 'update']);    
     Route::get('/master/product/delete', [ProductController::class, 'delete']);
 
+    // for electronics branch
     Route::get('/branch/electronicsbranch', [branchElectronicsController::class, 'show']);  
     Route::get('/branch/electronicsbranch/list', [branchElectronicsController::class, 'list']);  
     Route::post('/branch/electronicsbranch/getSP', [branchElectronicsController::class, 'getSP']);
     Route::post('/branch/electronicsbranch/edit', [branchElectronicsController::class, 'update']);    
     Route::get('/branch/electronicsbranch/delete', [branchElectronicsController::class, 'delete']);
 
+    // for site branch
     Route::get('/branch/sitebranch', [branchSiteController::class, 'show']);  
     Route::get('/branch/sitebranch/list', [branchSiteController::class, 'list']);  
     Route::post('/branch/sitebranch/getSP', [branchSiteController::class, 'getSP']);
@@ -216,18 +178,18 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/sitebranch/delete', [branchSiteController::class, 'delete']);  
     Route::get('/branch/sitebranch/getusers', [branchSiteController::class, 'getusers']);
 
-    // for school monthly fee
+    // for school monthly closing
     Route::get('/branch/school/monthlyclosing', [SchoolController::class, 'show']);    
     Route::get('/branch/school/monthlyclosing/list', [SchoolController::class, 'list']);
     Route::post('/branch/school/monthlyclosing/edit', [SchoolController::class, 'update']);   
     Route::get('/branch/school/monthlyclosing/delete', [SchoolController::class, 'delete']);
     
-    
+    // for school fee
     Route::get('/branch/school/fee', [SchoolController::class, 'feeshow']);    
     Route::get('/branch/school/fee/list', [SchoolController::class, 'feelist']); 
     Route::get('/branch/school/fee/delete', [SchoolController::class, 'feedelete']);
     
-    
+    // for school canteen
     Route::get('/branch/school/canteen', [SchoolController::class, 'canteenshow']);    
     Route::get('/branch/school/canteen/list', [SchoolController::class, 'canteenlist']);
     Route::get('/branch/school/canteen/delete', [SchoolController::class, 'canteendelete']);
