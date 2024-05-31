@@ -283,7 +283,8 @@ class ragnarReportsViewMerchantLedger extends tesseract{
                SELECT
                   `stc_merchant_regular_payment_id`,
                   `stc_merchant_regular_payment_date`,
-                  `stc_merchant_regular_payment_amount`
+                  `stc_merchant_regular_payment_amount`,
+                  `stc_merchant_regular_payment_payment_type`
                FROM
                   `stc_merchant_regular_payment`
                WHERE
@@ -294,6 +295,7 @@ class ragnarReportsViewMerchantLedger extends tesseract{
                $pv.=
                   'RP/'.substr("0000{$rppaymentrow['stc_merchant_regular_payment_id']}", -5).'<br>'
                   .date('d-m-Y', strtotime($rppaymentrow['stc_merchant_regular_payment_date'])).'<br>'
+                  .$rppaymentrow['stc_merchant_regular_payment_payment_type']
                ;
                $paidamount.=number_format($rppaymentrow['stc_merchant_regular_payment_amount'], 2).'<br>';
                $paidtotal += $rppaymentrow['stc_merchant_regular_payment_amount'];
@@ -331,7 +333,8 @@ class ragnarReportsViewMerchantLedger extends tesseract{
                SELECT
                   `stc_sale_product_dc_payment_id`,
                    `stc_sale_product_dc_payment_date`,
-                  `stc_sale_product_dc_payment_value`
+                  `stc_sale_product_dc_payment_value`,
+                  `stc_sale_product_dc_payment_pay_type`
                FROM 
                   `stc_sale_product_dc_payment` 
                WHERE 
@@ -342,6 +345,7 @@ class ragnarReportsViewMerchantLedger extends tesseract{
                $pv.=
                   'STC/DC/PV/'.substr("0000{$dcpaymentrow['stc_sale_product_dc_payment_id']}", -5).'<br>'
                   .date('d-m-Y', strtotime($dcpaymentrow['stc_sale_product_dc_payment_date'])).'<br>'
+                  .$dcpaymentrow['stc_sale_product_dc_payment_pay_type']
                ;
                $paidamount.=number_format($dcpaymentrow['stc_sale_product_dc_payment_value'], 2).'<br>';
                $paidtotal += $dcpaymentrow['stc_sale_product_dc_payment_value'];
@@ -352,7 +356,8 @@ class ragnarReportsViewMerchantLedger extends tesseract{
                SELECT
                   `stc_merchant_advance_payment_id`,
                   `stc_merchant_advance_payment_date`,
-                  `stc_merchant_advance_payment_advance_value`
+                  `stc_merchant_advance_payment_advance_value`,
+                  `stc_merchant_advance_payment_payment_type`
                FROM
                   `stc_merchant_advance_payment`
                WHERE
@@ -363,6 +368,7 @@ class ragnarReportsViewMerchantLedger extends tesseract{
                $pv.=
                   'AP/'.substr("0000{$popaymentrow['stc_merchant_advance_payment_id']}", -5).'<br>'
                   .date('d-m-Y', strtotime($popaymentrow['stc_merchant_advance_payment_date'])).'<br>'
+                  .$popaymentrow['stc_merchant_advance_payment_payment_type']
                ;
                $paidamount.=number_format($popaymentrow['stc_merchant_advance_payment_advance_value'], 2).'<br>';
                $paidtotal += $popaymentrow['stc_merchant_advance_payment_advance_value'];
