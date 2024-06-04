@@ -5212,3 +5212,16 @@
 [03-Jun-2024 08:54:19 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 124
 [03-Jun-2024 10:02:32 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 109
 [03-Jun-2024 10:02:32 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 124
+[04-Jun-2024 04:30:21 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 109
+[04-Jun-2024 04:30:21 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 124
+[04-Jun-2024 04:39:58 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 109
+[04-Jun-2024 04:39:58 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 124
+[04-Jun-2024 07:21:17 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 109
+[04-Jun-2024 07:21:17 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 124
+[04-Jun-2024 07:59:46 UTC] PHP Notice:  Undefined index: stc_school_user_for in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/fee-collection.php on line 9
+[04-Jun-2024 07:59:46 UTC] PHP Notice:  Undefined index: stc_school_user_for in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/bar/sidebar.php on line 14
+[04-Jun-2024 07:59:46 UTC] PHP Notice:  Undefined index: stc_school_user_for in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/bar/sidebar.php on line 23
+[04-Jun-2024 07:59:46 UTC] PHP Notice:  Undefined index: stc_school_user_for in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/bar/sidebar.php on line 32
+[04-Jun-2024 07:59:46 UTC] PHP Notice:  Undefined index: stc_school_user_for in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/bar/sidebar.php on line 41
+[04-Jun-2024 07:59:53 UTC] PHP Notice:  Undefined variable: agent_name in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 109
+[04-Jun-2024 07:59:53 UTC] PHP Notice:  Undefined variable: sales in /home/c2484kn1eg0y/public_html/stc_umbrella/stc_mazeRunner/dashboard.php on line 124
