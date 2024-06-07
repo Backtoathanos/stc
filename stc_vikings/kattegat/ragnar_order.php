@@ -1934,7 +1934,7 @@ class ragnarRequisitionView extends tesseract{
 				foreach($getdispatchedtransformers as $decqtyrow){
 					$dispatchedgqty+=$decqtyrow['dispatched_qty'];
 				}
-
+				
 				$lokigetappritemqry=mysqli_query($this->stc_dbs, "
 					SELECT `stc_product_name`, SUM(`stc_cust_super_requisition_list_purchaser_qty`) as stc_appr_qty 
 					FROM `stc_cust_super_requisition_list_purchaser` 
@@ -2176,7 +2176,7 @@ class ragnarRequisitionPertView extends tesseract{
 					FROM `stc_cust_super_requisition_list_purchaser` 
 					INNER JOIN `stc_product` 
 					ON `stc_product_id`=`stc_cust_super_requisition_list_purchaser_pd_id` 
-					WHERE `stc_cust_super_requisition_list_purchaser_list_item_id`='".$requisrow['list_id']."'
+					WHERE `stc_cust_super_requisition_list_purchaser_list_item_id`='".$requisrow['list_item_id']."'
 				");
 				$apprpd_name='';
 				$apprpd_qty=0;
