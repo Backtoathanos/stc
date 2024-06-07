@@ -1936,13 +1936,11 @@ class ragnarRequisitionView extends tesseract{
 				}
 
 				$lokigetappritemqry=mysqli_query($this->stc_dbs, "
-					SELECT 
-						`stc_product_name`,
-						SUM(`stc_cust_super_requisition_list_purchaser_qty`) as stc_appr_qty 
+					SELECT `stc_product_name`, SUM(`stc_cust_super_requisition_list_purchaser_qty`) as stc_appr_qty 
 					FROM `stc_cust_super_requisition_list_purchaser` 
 					INNER JOIN `stc_product` 
 					ON `stc_product_id`=`stc_cust_super_requisition_list_purchaser_pd_id` 
-					WHERE `stc_cust_super_requisition_list_purchaser_list_item_id`='".$ivar_row['list_id']."'
+					WHERE `stc_cust_super_requisition_list_purchaser_list_item_id`='".$ivar_row['item_id']."'
 				");
 				$apprpd_name='';
 				$apprpd_qty=0;
