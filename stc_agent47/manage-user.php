@@ -268,7 +268,7 @@ include_once("../MCU/db.php");
                                                                             $token_url='';
                                                                             $tokenurl='';
                                                                             if($supsubrow['stc_cust_pro_supervisor_token']!=''){
-                                                                                $token_url='https://stcassociate.com/stc_sub_agent47/'.$supsubrow['stc_cust_pro_supervisor_token'];
+                                                                                $token_url='https://stcassociate.com/stc_sub_agent47/reset_password.php?token='.$supsubrow['stc_cust_pro_supervisor_token'];
                                                                                 $tokenurl='<a href="'.$token_url.'" target="_blank">Click here to reset password</a><br>';
                                                                             }
                                                                             $blacknwhitestyle='style="-webkit-filter: grayscale(100%);"';
