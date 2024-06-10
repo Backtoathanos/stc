@@ -66,6 +66,7 @@
                         <th class="text-center">Password</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Category</th>
+                        <th class="text-center">Token</th>
                         <th class="text-center">Created By</th>
                         <th class="text-center">Actions</th>
                       </tr>
@@ -85,6 +86,7 @@
                             <td>{{$value->stc_cust_pro_supervisor_password}}</td>
                             <td class="text-center">{{ ($value->stc_cust_pro_supervisor_status == 1) ? 'Active' : 'In-active'}}</td>
                             <td>{{$value->stc_cust_pro_supervisor_category}}</td>
+                            <td>{{$value->stc_cust_pro_supervisor_token}}</td>
                             <td>{{$value->stc_agents_name}}</td>
                             <td class="text-center">
                                 <a href="{{url('/users/siteusers/delete/'.$value->stc_cust_pro_supervisor_id)}}" class="btn btn-danger btn-sm" ><i class='fas fa-trash'></i></a>
@@ -125,6 +127,7 @@
                         <th class="text-center">Password</th>
                         <th class="text-center">Status</th>
                         <th class="text-center">Category</th>
+                        <th class="text-center">Token</th>
                         <th class="text-center">Created By</th>
                         <th class="text-center">Actions</th>
                       </tr>

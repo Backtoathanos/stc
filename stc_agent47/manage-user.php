@@ -218,7 +218,8 @@ include_once("../MCU/db.php");
                                                                                 `stc_cust_pro_supervisor_email`,
                                                                                 `stc_cust_pro_supervisor_category`,
                                                                                 `stc_cust_pro_supervisor_status`,
-                                                                                `stc_cust_pro_supervisor_password`
+                                                                                `stc_cust_pro_supervisor_password`,
+                                                                                `stc_cust_pro_supervisor_token`
                                                                             FROM `stc_cust_pro_supervisor`
                                                                             INNER JOIN `stc_agents` 
                                                                             ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` 
@@ -263,6 +264,13 @@ include_once("../MCU/db.php");
                                                                                 }
                                                                                 $sharedinfo='<b>'.$manager.'</b> shared this User with you.';
                                                                             }
+                                                                            $token=$supsubrow['stc_cust_pro_supervisor_token'];
+                                                                            $token_url='';
+                                                                            $tokenurl='';
+                                                                            if($supsubrow['stc_cust_pro_supervisor_token']!=''){
+                                                                                $token_url='https://stcassociate.com/stc_sub_agent47/'.$supsubrow['stc_cust_pro_supervisor_token'];
+                                                                                $tokenurl='<a href="'.$token_url.'" target="_blank">Click here to reset password</a><br>';
+                                                                            }
                                                                             $blacknwhitestyle='style="-webkit-filter: grayscale(100%);"';
                                                                             if($supsubrow['stc_cust_pro_supervisor_status']=='1'){
                                                                                 $blacknwhitestyle='';
@@ -282,6 +290,7 @@ include_once("../MCU/db.php");
                                                                                                 '.$address.'<br>
                                                                                                 +91-'.$supsubrow['stc_cust_pro_supervisor_contact'].'<br>
                                                                                                 +91-'.$supsubrow['stc_cust_pro_supervisor_whatsapp'].'<br>
+                                                                                                '.$tokenurl.'
                                                                                                 '.$sharedinfo.'<br>
 
                                                                                             </h3>
