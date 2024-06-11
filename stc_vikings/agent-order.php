@@ -1874,7 +1874,6 @@ include("kattegat/role_check.php");
         call_tools_tracker('');
         $('body').delegate('#itt-toolssearchInput', 'focusout', function(e){
           var search=$(this).val();
-          console.log(search);
           call_tools_tracker(search);
         });
         // call tools tracker
@@ -2580,7 +2579,7 @@ include("kattegat/role_check.php");
                                           <input type="text" class="form-control ittt-receivedby" placeholder="Enter Received By">
                                         </div>
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3" style="display:none;">
                                         <h5>Handover To</h5><br>
                                         <div class="card mb-3 widget-content">
                                           <input type="text" class="form-control ittt-handoverto" placeholder="Enter Handover To">

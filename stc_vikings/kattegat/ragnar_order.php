@@ -3386,8 +3386,20 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	// save tracking
 	public function stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id){
 		$blackpearl='';
-		$date1=date("Y-m-d H:i:s");
-		$blackpearl_qry=mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track(`toolsdetails_id`, `issuedby`, `location`, `issueddate`, `receivedby`, `handoverto`, `created_date`, `created_by`) VALUES('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '".mysqli_real_escape_string($this->stc_dbs, $handoverto)."', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."')");
+		$date1=date("Y-m-d H:i:s");// Check if a record exists for the given toolsdetails_id
+		$check_qry = mysqli_query($this->stc_dbs, "SELECT `id` FROM `stc_tooldetails_track` WHERE `toolsdetails_id` = '".mysqli_real_escape_string($this->stc_dbs, $itt_id)."' ORDER BY TIMESTAMP(`created_date`) DESC LIMIT 1");
+		
+		if (mysqli_num_rows($check_qry) > 0) {
+			// Get the most recent record
+			$record = mysqli_fetch_assoc($check_qry);
+		
+			// Update the handoverto field of the most recent record
+			$update_qry = mysqli_query($this->stc_dbs, "UPDATE stc_tooldetails_track SET handoverto = '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."' WHERE id = '".mysqli_real_escape_string($this->stc_dbs, $record['id'])."'");
+		}
+		
+		// Insert the new record
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, location, issueddate, receivedby, `handoverto`, created_date, created_by) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."')");
+
 		if($blackpearl_qry){
 			$blackpearl='yes';
 		}else{
@@ -3400,7 +3412,7 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	public function stc_tool_trackertrack_get($itt_id){	
 		// Check for duplicate unique ID
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "
-			SELECT * FROM `stc_tooldetails_track` tt LEFT JOIN `stc_tooldetails` t ON t.`id`=tt.`toolsdetails_id` WHERE tt.`toolsdetails_id`='".mysqli_real_escape_string($this->stc_dbs, $itt_id)."'
+			SELECT * FROM `stc_tooldetails_track` tt LEFT JOIN `stc_tooldetails` t ON t.`id`=tt.`toolsdetails_id` WHERE tt.`toolsdetails_id`='".mysqli_real_escape_string($this->stc_dbs, $itt_id)."' ORDER BY TIMESTAMP(tt.`issueddate`) DESC
 		");
 		$blackpearl=[];
 		if(mysqli_num_rows($blackpearl_qry)>0){
