@@ -492,8 +492,11 @@ class ragnarReportsViewRequiReports extends tesseract{
    }
 
    // call std
-   public function stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $pagination, $filter){
+   public function stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $pagination, $filter, $type){
       $ivar='';
+      $paginationfilter="LIMIT ".$pagination.", 20";
+      $exportbtnname='stc-sdl-exportexcel-hit';
+      if($type=='print'){$exportbtnname='stc-sdl-exportexcel-hit2';$paginationfilter='';}
       $query_filter = '';
       if($filter == 1){
          $datefilter='';
@@ -559,7 +562,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          LEFT JOIN `stc_cust_pro_supervisor` 
          ON `stc_status_down_list_created_by`=`stc_cust_pro_supervisor_id` 
          WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' ".$query_filter."         
-         ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC LIMIT ".$pagination.", 20
+         ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC ".$paginationfilter."
       ";
       $ivarqry=mysqli_query($this->stc_dbs, $query);
 
@@ -940,7 +943,7 @@ class ragnarReportsViewRequiReports extends tesseract{
       if(mysqli_num_rows($ivarqry)>0){
          $ivar.='
                      
-            <button class="mb-2 mr-2 btn btn-success btn-block stc-sdl-exportexcel-hit" data-type="excel">
+            <button class="mb-2 mr-2 btn btn-success btn-block '.$exportbtnname.'" data-type="excel">
             <i class="fa fa-file-excel-o"></i> Export Excel
             </button>
             <table class="table table-bordered" id="stc-show-std-details-table">
@@ -1232,6 +1235,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          </table>
       ';
       return $ivar;
+      
    }
 
    // update remarks and target datae from admin
@@ -4484,10 +4488,11 @@ if(isset($_POST['Stc_std_details'])){
    $department    =  $_POST['department'];
    $typeofjob     =  $_POST['typeofjob'];
    $status        =  $_POST['status'];
-   $pagination        =  $_POST['pagination'];
+   $pagination    =  $_POST['pagination'];
    $filter        =  $_POST['filter'];
+   $type        =  $_POST['type'];
    $bjornecustomer=new ragnarReportsViewRequiReports();   
-   $outbjornecustomer=$bjornecustomer->stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $pagination, $filter);
+   $outbjornecustomer=$bjornecustomer->stc_call_std($datefrom, $dateto, $location, $department, $typeofjob, $status, $pagination, $filter, $type);
    echo $outbjornecustomer;
 }
 

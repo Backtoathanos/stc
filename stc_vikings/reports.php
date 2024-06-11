@@ -1248,6 +1248,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                     </tbody>
                                                 </table>
                                             </div>
+                                            <div class="stc-show-std-detailsprint" style="display:none;"></div>
+                                            
                                         </div>
                                     </div>
                                 </div>
@@ -1675,8 +1677,9 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
 
             var filter = 0;
             var pagination=0;
-            stc_call_std(filter, pagination);
-            function stc_call_std(filter, pagination){
+            var type='';
+            stc_call_std(filter, type, pagination);
+            function stc_call_std(filter, type, pagination){
                 var datefrom    =   $(".std-filter-date-from").val();
                 var dateto      =   $(".std-filter-date-to").val();
                 var location    =   $(".std-filter-location").val();
@@ -1718,11 +1721,16 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                             typeofjob:typeofjob,
                             status:status,
                             pagination:pagination,
-                            filter:filter
+                            filter:filter,
+                            type:type
                         },
                         success : function(data){
-                            // console.log(data);
-                            $('.stc-show-std-details').html(data);
+                            if(type==''){
+                                $('.stc-show-std-details').html(data);
+                            }else{
+                                $('.stc-show-std-detailsprint').html(data);
+                                $('.stc-sdl-exportexcel-hit2').click();
+                            }
                         }
                     });
                 }else{    
@@ -1749,8 +1757,9 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 e.preventDefault();
                 var filter = 1;
                 var pagination=0;
+                var type='';
                 $('.stc-show-std-details').html("Please wait...");
-                stc_call_std(filter, pagination);
+                stc_call_std(filter, type, pagination);
             });
             
             // find std with pagination
@@ -1772,7 +1781,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 pagination=pagination!=0 ? pagination-20 : pagination;
                 $('.std-filter-find-pagination').remove();
                 $('.stc-show-std-details').html("Please wait...");
-                stc_call_std(filter, pagination);
+                var type='';
+                stc_call_std(filter, type, pagination);
             });
             // find std with pagination
             $('body').delegate('.std-filter-find-pagination', 'click', function(e){
@@ -1792,7 +1802,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var pagination = $(this).attr("data");
                 $('.std-filter-find-pagination').remove();
                 $('.stc-show-std-details').html("Please wait...");
-                stc_call_std(filter, pagination);
+                var type='';
+                stc_call_std(filter, type, pagination);
             });
             
             $('body').delegate('.stc-edit-report', 'click', function(e){
@@ -1870,7 +1881,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             });
             
             // create excel
-            $('body').delegate('.stc-sdl-exportexcel-hit', 'click', function(e){
+            $('body').delegate('.stc-sdl-exportexcel-hit2', 'click', function(e){
                 e.preventDefault();
                 $('.jobdonedet-view').remove();
                 $('.excel-hide').remove();
@@ -1884,6 +1895,15 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     columns: [0, 1, 2]
                 });
                 $('.std-filter-find-btn').click();
+            });
+            
+            $('body').delegate('.stc-sdl-exportexcel-hit', 'click', function(e){
+                e.preventDefault();                
+                var filter = 1;
+                var pagination=0;
+                var type='print';
+                $('.stc-show-std-details').html("Please wait...");
+                stc_call_std(filter, type, pagination);
             });
 
             $('body').delegate('.stc-sdl-material-show-req', 'click', function(e){
