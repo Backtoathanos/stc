@@ -3241,7 +3241,7 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	}
 
 	// call procurment tracker 
-	public function stc_item_tracker_call(){
+	public function stc_item_tracker_call($search){
 		$blackpearl='';
 		$blackpearl_query="
 			SELECT
@@ -3256,6 +3256,12 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 			    `stc_item_tracker_createdby`,
 			    `stc_item_tracker_created_date`
 			FROM `stc_item_tracker`
+			WHERE 
+				`stc_item_tracker_toppe` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR 
+				`stc_item_tracker_user_id` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR 
+				`stc_item_tracker_issuedate` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR 
+				`stc_item_tracker_validity` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR 
+				`stc_item_tracker_remarks` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."'
 			ORDER BY TIMESTAMP(`stc_item_tracker_created_date`) DESC
 		";
 		$blackpearl_result=mysqli_query($this->stc_dbs, $blackpearl_query);
@@ -4021,8 +4027,9 @@ if(isset($_POST['save_item_tracker'])){
 
 // call procurment tracker
 if(isset($_POST['call_item_tracker'])){
+	$search=$_POST['searchTerm'];
 	$odin_req=new ragnarCallRequisitionItemTrack();
-	$odin_req_out=$odin_req->stc_item_tracker_call();
+	$odin_req_out=$odin_req->stc_item_tracker_call($search);
 	echo $odin_req_out;
 }
 
