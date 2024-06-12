@@ -1770,13 +1770,13 @@ include("kattegat/role_check.php");
 
     <script>
       $(document).ready(function(){
-        item_tracker_call();
-        function item_tracker_call(){
+        function item_tracker_call(searchTerm){
             $.ajax({
                 url : "kattegat/ragnar_order.php",
                 method : "POST",
                 data : {
-                    call_item_tracker:1
+                    call_item_tracker:1,
+                    searchTerm:searchTerm
                 },
                 success : function(response){
                     $('.item-tracker-show').html(response);
@@ -1787,15 +1787,7 @@ include("kattegat/role_check.php");
         $('#searchInput').on('input', function () {
             // Get the search value
             var searchTerm = $(this).val().toLowerCase();
-
-            // Filter the table rows based on the search value
-            $('.item-tracker-show tr').each(function () {
-                // Get the text content of each cell in the row
-                var rowText = $(this).text().toLowerCase();
-
-                // Show or hide the row based on whether it matches the search term
-                $(this).toggle(rowText.includes(searchTerm));
-            });
+            item_tracker_call(searchTerm);
         });
 
         // save dispatch
