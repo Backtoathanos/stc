@@ -577,6 +577,8 @@ if(isset($_POST['save_school_fee_action'])){
 	$valkyrie=new Yggdrasil();
 	if(empty($_SESSION['stc_school_user_id'])){
 		header("Location:../index.html");
+	}else if(empty($stcwhichschool)){
+		$out='empty';
 	}else{
 		$lokiheck=$valkyrie->stc_save_school_fee($stcwhichschool, $stcschoolmonthlyfee, $stcschooladmissionfee, $stcschoolbooks, $stcschooltransporation, $stcschooldonation, $stcschooldayboarding, $stcschoolneatcoll, $stcschooldssalary, $stcschooltsalary, $stcschoolvfuel, $stcschoolvmaint, $stcschoolelectricity, $stcschoolcanteen, $stcschoolothercharges, $stcschoolcashback, $stcschoolexpenses, $stcschoolremarks);
 		$out=$lokiheck;

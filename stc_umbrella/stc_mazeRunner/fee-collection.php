@@ -958,29 +958,30 @@ if($_SESSION['stc_school_user_for']>3){
             // dataType: `JSON`,
             success   : function(data){
               // console.log(data);
-              $('.stcwhichschool').val('');
-              $('.stcschoolmonthlyfee').val('');
-              $('.stcschooladmissionfee').val('');
-              $('.stcschoolbooks').val('');
-              $('.stcschooltransporation').val('');
-              $('.stcschooldonation').val('');
-              $('.stcschooldayboarding').val('');
-              $('.stcschoolneatcoll').val('');
-              $('.stcschoolothercharges').val('');
-              $('.stcschoolcashback').val('');
-              $('.stcschooldssalary').val('');
-              $('.stcschooltsalary').val('');
-              $('.stcschoolvfuel').val('');
-              $('.stcschoolvmaint').val('');
-              $('.stcschoolelectricity').val('');
-              $('.stcschoolcanteen').val('');
-              $('.stcschoolexpenses').val('');
-              $('.stcschoolremarks').val('');
               var response=data.trim();
               if(response=="Record saved successfully."){
+                $('.stcschoolmonthlyfee').val('');
+                $('.stcschooladmissionfee').val('');
+                $('.stcschoolbooks').val('');
+                $('.stcschooltransporation').val('');
+                $('.stcschooldonation').val('');
+                $('.stcschooldayboarding').val('');
+                $('.stcschoolneatcoll').val('');
+                $('.stcschoolothercharges').val('');
+                $('.stcschoolcashback').val('');
+                $('.stcschooldssalary').val('');
+                $('.stcschooltsalary').val('');
+                $('.stcschoolvfuel').val('');
+                $('.stcschoolvmaint').val('');
+                $('.stcschoolelectricity').val('');
+                $('.stcschoolcanteen').val('');
+                $('.stcschoolexpenses').val('');
+                $('.stcschoolremarks').val('');
                 $("#stcschoolreached").prop('disabled', false);
                 alert(data);
                 $('#schoolsearch').click();
+              }else if(response=="empty"){
+                alert("Please select school.");
               }else{
                 $(this).show();
                 alert(data);
