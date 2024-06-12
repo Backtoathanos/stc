@@ -65,6 +65,12 @@
                                     Consumption
                                 </a>
                             </li>
+                            <li>
+                                <a href="stc-toolstrack.php?page=toolstrack" class="toolstrack">
+                                    <i class="metismenu-icon pe-7s-pin"></i>
+                                    Tools Track
+                                </a>
+                            </li>
                         ';
                     }
                     if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){

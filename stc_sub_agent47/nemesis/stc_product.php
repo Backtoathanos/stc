@@ -343,6 +343,80 @@ class prime extends tesseract{
 		';
 		return $transformers;
 	}
+
+	// show tool track
+	public function stc_tool_tracker_get($search){
+		$filter=" WHERE `unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `itemdescription` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `machinesrno` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `make` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `tooltype` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `purchase_details` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `taxinvono` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' ";
+		$search=$search==''?'':$filter;
+	
+		// Check for duplicate unique ID
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_tooldetails` LEFT JOIN `stc_user` ON `stc_tooldetails`.`created_by`=`stc_user`.`stc_user_id` ".$search."
+		");
+		$blackpearl=[];
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$blackpearl[] = $blackpearl_row;
+			}
+		}
+	
+		return $blackpearl;
+	}
+
+	// save tracking
+	public function stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id){
+		$blackpearl='';
+		$date1=date("Y-m-d H:i:s");// Check if a record exists for the given toolsdetails_id
+		$check_qry = mysqli_query($this->stc_dbs, "SELECT `id` FROM `stc_tooldetails_track` WHERE `toolsdetails_id` = '".mysqli_real_escape_string($this->stc_dbs, $itt_id)."' ORDER BY TIMESTAMP(`created_date`) DESC LIMIT 1");
+		
+		if (mysqli_num_rows($check_qry) > 0) {
+			// Get the most recent record
+			$record = mysqli_fetch_assoc($check_qry);
+		
+			// Update the handoverto field of the most recent record
+			$update_qry = mysqli_query($this->stc_dbs, "UPDATE stc_tooldetails_track SET handoverto = '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."' WHERE id = '".mysqli_real_escape_string($this->stc_dbs, $record['id'])."'");
+		}
+		
+		// Insert the new record
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."', 'subagent')");
+
+		if($blackpearl_qry){
+			$blackpearl='yes';
+		}else{
+			$blackpearl='no';
+		}
+		return $blackpearl;
+	}
+
+	// show tool track
+	public function stc_tool_trackertrack_get($itt_id){	
+		// Check for duplicate unique ID
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_tooldetails_track` tt LEFT JOIN `stc_tooldetails` t ON t.`id`=tt.`toolsdetails_id` WHERE tt.`toolsdetails_id`='".mysqli_real_escape_string($this->stc_dbs, $itt_id)."' ORDER BY TIMESTAMP(tt.`issueddate`) DESC
+		");
+		$blackpearl=[];
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			$i=0;
+			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$blackpearl[] = $blackpearl_row;
+				$username='';
+				$created_by=$blackpearl_row['created_by'];
+				if($blackpearl_row['id_type']=="vikings"){
+					$query=mysqli_query($this->stc_dbs, "SELECT `stc_user_name` as name FROM `stc_user` WHERE `stc_user_id`=$created_by");
+					$result=mysqli_fetch_assoc($query);
+					$username=$result['name'];
+				}else if($blackpearl_row['id_type']=="subagent"){
+					$query=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_fullname` as name FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id`=$created_by");
+					$result=mysqli_fetch_assoc($query);
+					$username=$result['name'];
+				}
+				$blackpearl[$i]['name'] = $username;
+				$i++;
+			}
+		}
+	
+		return $blackpearl;
+	}
 }
 // search product
 if(isset($_POST['search_prod_name'])){
@@ -387,6 +461,40 @@ if(isset($_POST['get_orders_pert'])){
 	$megabots=new prime();
 	$outmegabots=$megabots->stc_ag_order_items_call($odid);
 	echo $outmegabots;
+}
+#<-----------------Object section of tool tracker Class------------------->
+// call tools tracker
+if(isset($_POST['call_tools_tracker'])){
+	$search=isset($_POST['search']) ? $_POST['search'] : '';
+	$odin_req=new prime();
+	$odin_req_out=$odin_req->stc_tool_tracker_get($search);
+	echo json_encode($odin_req_out);
+}
+
+// savce tools tracker
+if(isset($_POST['save_tool_trackertrack'])){
+	$issuedby=$_POST['issuedby'];
+	$location=$_POST['location'];
+	$date=$_POST['date'];
+	$receivedby=$_POST['receivedby'];
+	$handoverto=$_POST['handoverto'];
+	$itt_id=$_POST['itt_id'];
+	$out='';
+	if(empty($_SESSION['stc_empl_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new prime();
+		$out=$odin_req->stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id);
+	}
+	echo $out;
+}
+
+// call tools tracking tracker
+if(isset($_POST['call_tool_trackertrack'])){
+	$itt_id=$_POST['itt_id'];
+	$odin_req=new prime();
+	$odin_req_out=$odin_req->stc_tool_trackertrack_get($itt_id);
+	echo json_encode($odin_req_out);
 }
 
 ?>
