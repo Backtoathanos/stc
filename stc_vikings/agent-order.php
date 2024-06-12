@@ -2024,7 +2024,7 @@ include("kattegat/role_check.php");
                       var slno=0;
                       for (var i = 0; i < response.length; i++) {
                         slno++;
-                        data+='<tr><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].issuedby + '</td><td>' + response[i].issueddate + '</td><td>' + response[i].receivedby + '</td><td>' + response[i].location + '</td><td>' + response[i].handoverto + '</td></tr>';
+                        data+='<tr><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].issuedby + '</td><td>' + response[i].issueddate + '</td><td>' + response[i].receivedby + '</td><td>' + response[i].location + '</td><td>' + response[i].handoverto + '</td><td>' + response[i].name + '</td></tr>';
                       }
                   } else {
                     data="<td>No data found.</td>";
@@ -2623,6 +2623,7 @@ include("kattegat/role_check.php");
                                                   <th class="text-center">RECEIVED BY</th>
                                                   <th class="text-center">LOCATION</th>
                                                   <th class="text-center">HANDOVER TO</th>
+                                                  <th class="text-center">CREATED BY</th>
                                                 </tr>
                                               </thead>
                                               <tbody class="itt-showtrackingdetails"></tbody>

@@ -3240,7 +3240,7 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		return $blackpearl;
 	}
 
-	// call procurment tracker 
+	// call ppe tracker 
 	public function stc_item_tracker_call($search){
 		$blackpearl='';
 		$blackpearl_query="
@@ -3404,7 +3404,7 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		}
 		
 		// Insert the new record
-		$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, location, issueddate, receivedby, `handoverto`, created_date, created_by) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."')");
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."', 'vikings')");
 
 		if($blackpearl_qry){
 			$blackpearl='yes';
@@ -3422,8 +3422,22 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		");
 		$blackpearl=[];
 		if(mysqli_num_rows($blackpearl_qry)>0){
+			$i=0;
 			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
 				$blackpearl[] = $blackpearl_row;
+				$username='';
+				$created_by=$blackpearl_row['created_by'];
+				if($blackpearl_row['id_type']=="vikings"){
+					$query=mysqli_query($this->stc_dbs, "SELECT `stc_user_name` as name FROM `stc_user` WHERE `stc_user_id`=$created_by");
+					$result=mysqli_fetch_assoc($query);
+					$username=$result['name'];
+				}else if($blackpearl_row['id_type']=="subagent"){
+					$query=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_fullname` as name FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id`=$created_by");
+					$result=mysqli_fetch_assoc($query);
+					$username=$result['name'];
+				}
+				$blackpearl[$i]['name'] = $username;
+				$i++;
 			}
 		}
 	
