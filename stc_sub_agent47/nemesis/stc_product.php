@@ -378,7 +378,7 @@ class prime extends tesseract{
 		}
 		
 		// Insert the new record
-		$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."', 'subagent')");
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', 'subagent')");
 
 		if($blackpearl_qry){
 			$blackpearl='yes';
@@ -417,7 +417,110 @@ class prime extends tesseract{
 	
 		return $blackpearl;
 	}
+
+	// save equipment details
+	public function stc_equipement_details_save($location, $department, $equipment_type, $model_no, $capacity){
+		$blackpearl = '';
+		$date1 = date("Y-m-d H:i:s");
+
+		// Check if a record exists for the given id in the equipment_details table
+		$check_qry = mysqli_query($this->stc_dbs, "SELECT `id` FROM `equipment_details` WHERE `model_no` = '" . mysqli_real_escape_string($this->stc_dbs, $model_no) . "'");
+
+		if (mysqli_num_rows($check_qry) > 0) {
+			$blackpearl = 'duplicate';
+		}else{
+			// Insert the new record into the equipment_details table
+			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO equipment_details (`location`, `department`, `model_no`, `capacity`, `equipment_type`, `created_by`, `created_date`) VALUES ('" . mysqli_real_escape_string($this->stc_dbs, $location) . "', '" . mysqli_real_escape_string($this->stc_dbs, $department) . "', '" . mysqli_real_escape_string($this->stc_dbs, $model_no) . "', '" . mysqli_real_escape_string($this->stc_dbs, $capacity) . "', '" . mysqli_real_escape_string($this->stc_dbs, $equipment_type) . "', '" . mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id']) . "', '" . mysqli_real_escape_string($this->stc_dbs, $date1) . "')");
+
+			if ($blackpearl_qry) {
+				$blackpearl = 'yes';
+			} else {
+				$blackpearl = 'no';
+			}
+		}
+		return $blackpearl;
+	}
+
+	// show tool track
+	public function stc_equipement_details_get($search){
+		$filter=" WHERE `model_no` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `capacity` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_cust_pro_supervisor_fullname` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_status_down_list_department_dept` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."'";
+		$search=$search==''?'':$filter;
+	
+		// Check for duplicate unique ID
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "
+			SELECT `id`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `model_no`, `capacity`, `equipment_type`, `stc_cust_pro_supervisor_fullname`, `created_date`  FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id`=`equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id`=`equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by`=`stc_cust_pro_supervisor_id` ".$search."
+		");
+		$blackpearl=[];
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$blackpearl[] = $blackpearl_row;
+			}
+		}
+	
+		return $blackpearl;
+	}
+
+	// call location	
+	public function stc_call_locdept(){
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT `stc_status_down_list_department_location`
+			FROM `stc_cust_pro_attend_supervise`
+			INNER JOIN `stc_cust_project` 
+			ON `stc_cust_project_id`=`stc_cust_pro_attend_supervise_pro_id` 
+			INNER JOIN `stc_status_down_list_department` 
+			ON `stc_cust_project_id`=`stc_status_down_list_department_loc_id` 
+			WHERE `stc_cust_pro_attend_supervise_super_id`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."' ORDER BY `stc_status_down_list_department_location` ASC
+		");
+		$optimusprime = "";
+		$do_action=mysqli_num_rows($optimusprimequery);
+		if($do_action == 0){
+			$optimusprime = "empty";
+		}else{
+			$optimusprime.='<option value="NA">Select</option>';	
+			foreach ($optimusprimequery as $row) {
+				$optimusprime.='<option>'.$row['stc_status_down_list_department_location'].'</option>';		
+			}			
+		}
+		return $optimusprime;
+	}
+
+	// call location department	
+	public function stc_call_deptloc($loca_id){
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT  `stc_status_down_list_department_dept`, `stc_status_down_list_department_id`, `stc_cust_project_id`
+			FROM `stc_cust_pro_attend_supervise`
+			INNER JOIN `stc_cust_project` 
+			ON `stc_cust_project_id`=`stc_cust_pro_attend_supervise_pro_id` 
+			INNER JOIN `stc_status_down_list_department` 
+			ON `stc_cust_project_id`=`stc_status_down_list_department_loc_id` 			
+			WHERE `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $loca_id)."'
+			AND `stc_cust_pro_attend_supervise_super_id`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
+		");
+		$optimusprime = "<option value='NA'>Select</option>";
+		$do_action=mysqli_num_rows($optimusprimequery);
+		if($do_action == 0){
+			$optimusprime = "<option value='NA'>No Deparmtent Found.</option>";
+		}else{
+			foreach ($optimusprimequery as $row) {
+				$optimusprime.='<option value="'.$row['stc_status_down_list_department_id'].'" project-id="'.$row['stc_cust_project_id'].'">'.$row['stc_status_down_list_department_dept'].'</option>';		
+			}			
+		}
+		return $optimusprime;
+	}
+
+	// delete equipment details
+	public function stc_delete_equipmentdetails($id){
+		$blackpearl='no';
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "
+			DELETE FROM `equipment_details` WHERE `id`=".mysqli_real_escape_string($this->stc_dbs, $id)."
+		");
+		if($blackpearl_qry){
+			$blackpearl="success";
+		}
+		return $blackpearl;
+	}
 }
+
 // search product
 if(isset($_POST['search_prod_name'])){
 	if(strlen($_POST["search_prod_name"])>=4){	  	
@@ -471,7 +574,7 @@ if(isset($_POST['call_tools_tracker'])){
 	echo json_encode($odin_req_out);
 }
 
-// savce tools tracker
+// save tools tracker
 if(isset($_POST['save_tool_trackertrack'])){
 	$issuedby=$_POST['issuedby'];
 	$location=$_POST['location'];
@@ -480,7 +583,7 @@ if(isset($_POST['save_tool_trackertrack'])){
 	$handoverto=$_POST['handoverto'];
 	$itt_id=$_POST['itt_id'];
 	$out='';
-	if(empty($_SESSION['stc_empl_id'])){
+	if(empty($_SESSION['stc_agent_sub_id'])){
 		$out='reload';
 	}else{
 		$odin_req=new prime();
@@ -496,5 +599,53 @@ if(isset($_POST['call_tool_trackertrack'])){
 	$odin_req_out=$odin_req->stc_tool_trackertrack_get($itt_id);
 	echo json_encode($odin_req_out);
 }
+#<-----------------Object section of equipment details Class------------------->
+// save equipment details
+if (isset($_POST['save_equipementdetails'])) {
+    $location = $_POST['location'];
+    $department = $_POST['department'];
+    $equipment_type = $_POST['equipment_type'];
+    $model_no = $_POST['model_no'];
+    $capacity = $_POST['capacity'];
+    $out = '';
 
+    if (empty($_SESSION['stc_agent_sub_id'])) {
+        $out = 'reload';
+    } else {
+        $odin_req = new prime();
+        $out = $odin_req->stc_equipement_details_save($location, $department, $equipment_type, $model_no, $capacity);
+    }
+    echo $out;
+}
+
+// call equipment details
+if(isset($_POST['call_equipementdetails'])){
+	$search=isset($_POST['search']) ? $_POST['search'] : '';
+	$odin_req=new prime();
+	$odin_req_out=$odin_req->stc_equipement_details_get($search);
+	echo json_encode($odin_req_out);
+}
+
+// call location
+if(isset($_POST['call_location'])){
+	$metabots=new prime();
+	$opmetabots=$metabots->stc_call_locdept();
+	echo json_encode($opmetabots);
+}
+
+// call departemnt
+if(isset($_POST['call_department'])){
+	$loca_id=$_POST['loca_id'];
+	$metabots=new prime();
+	$opmetabots=$metabots->stc_call_deptloc($loca_id);
+	echo json_encode($opmetabots);
+}
+
+// delete equipment details
+if(isset($_POST['delete_equipmentdetails'])){
+	$id=$_POST['id'];
+	$metabots=new prime();
+	$opmetabots=$metabots->stc_delete_equipmentdetails($id);
+	echo json_encode($opmetabots);
+}
 ?>
