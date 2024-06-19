@@ -71,6 +71,12 @@
                                     Tools Track
                                 </a>
                             </li>
+                            <li>
+                                <a href="stc-equipmentdetails.php?page=equipmentdetails" class="equipmentdetails">
+                                    <i class="metismenu-icon pe-7s-plugin"></i>
+                                    Equipment Details
+                                </a>
+                            </li>
                         ';
                     }
                     if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){
