@@ -1404,3 +1404,107 @@
 [04-Jun-2024 15:26:59 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2395
 [04-Jun-2024 15:27:11 Asia/Kolkata] PHP Notice:  Undefined index: stc_sale_order_sess in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2395
 [04-Jun-2024 15:27:11 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2395
+[12-Jun-2024 10:15:49 Asia/Kolkata] PHP Notice:  Undefined index: stc_merchant_invoice_sort in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 234
+[12-Jun-2024 10:15:49 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 234
+[12-Jun-2024 10:15:53 Asia/Kolkata] PHP Notice:  Undefined index: stc_merchant_invoice_sort in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 234
+[12-Jun-2024 10:15:53 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_reports.php on line 234
+[12-Jun-2024 11:08:54 Asia/Kolkata] PHP Notice:  Undefined index: sale_stcfc in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2422
+[12-Jun-2024 11:08:54 Asia/Kolkata] PHP Notice:  Undefined index: sale_stcpf in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2423
+[12-Jun-2024 11:08:54 Asia/Kolkata] PHP Notice:  Undefined index: stc_sale_order_sess in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 396
+[12-Jun-2024 11:08:54 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 396
+[12-Jun-2024 11:08:54 Asia/Kolkata] PHP Warning:  max(): When only one parameter is given, it must be an array in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 435
+[12-Jun-2024 12:16:25 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 12:18:20 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 12:37:32 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 12:38:35 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 12:44:52 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 12:46:22 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 12:51:12 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 12:54:31 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 13:01:20 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 13:01:52 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 13:03:18 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 13:03:42 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 13:04:19 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 13:04:50 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 13:05:56 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 13:06:27 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:09:22 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:09:50 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:24:29 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:27:01 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:27:58 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:29:44 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:31:04 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:32:23 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:33:35 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:40:23 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:47:38 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4030
+[12-Jun-2024 15:53:33 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 15:55:38 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 15:56:51 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 15:58:52 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 15:59:52 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:01:34 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:02:56 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:05:13 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:05:51 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:06:59 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:08:30 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:09:41 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:10:24 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:11:49 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:19:47 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:20:52 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:22:02 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:23:04 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:23:34 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:46:04 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[12-Jun-2024 16:46:58 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[14-Jun-2024 11:53:54 Asia/Kolkata] PHP Notice:  Undefined index: stc_sale_order_sess in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2395
+[14-Jun-2024 11:53:54 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_sale.php on line 2395
+[14-Jun-2024 17:46:39 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[14-Jun-2024 17:48:57 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 3270
+[14-Jun-2024 17:48:57 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 3270
+[14-Jun-2024 17:48:57 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 3270
+[14-Jun-2024 17:48:58 Asia/Kolkata] PHP Warning:  mysqli_num_rows() expects parameter 1 to be mysqli_result, bool given in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 3270
+[14-Jun-2024 17:49:19 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[14-Jun-2024 17:50:47 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[14-Jun-2024 17:51:33 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:29:12 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:30:38 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:33:17 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:33:53 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:35:37 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:36:19 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:37:01 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:38:26 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:39:00 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:40:38 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:44:07 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:54:21 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:55:37 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 15:57:35 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 16:30:17 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 16:31:27 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 16:33:27 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 16:34:19 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 16:35:55 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 16:37:50 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 16:40:09 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 16:51:29 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 16:52:28 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 17:11:57 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 17:12:44 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[15-Jun-2024 17:15:52 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[19-Jun-2024 17:37:26 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[20-Jun-2024 09:45:39 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[20-Jun-2024 09:47:01 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[20-Jun-2024 09:50:50 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[20-Jun-2024 10:00:42 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[20-Jun-2024 10:17:11 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[20-Jun-2024 10:21:07 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[20-Jun-2024 10:24:35 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[20-Jun-2024 10:26:44 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[20-Jun-2024 10:28:45 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044
+[20-Jun-2024 16:09:50 Asia/Kolkata] PHP Notice:  Undefined index: searchTerm in /home/c2484kn1eg0y/public_html/stc_vikings/kattegat/ragnar_order.php on line 4044

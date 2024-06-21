@@ -13838,3 +13838,20 @@
 [30-May-2024 17:57:29 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 256
 [30-May-2024 17:57:29 Asia/Kolkata] PHP Notice:  Undefined index: stc_supervisor_req_final_cart_req_item_sess in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 286
 [30-May-2024 17:57:29 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 286
+[11-Jun-2024 07:58:44 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_project.php on line 2385
+[13-Jun-2024 11:13:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_supervisor_req_final_cart_req_sess in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 256
+[13-Jun-2024 11:13:26 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 256
+[13-Jun-2024 11:13:26 Asia/Kolkata] PHP Notice:  Undefined index: stc_supervisor_req_final_cart_req_item_sess in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 286
+[13-Jun-2024 11:13:26 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 286
+[18-Jun-2024 08:20:11 Asia/Kolkata] PHP Notice:  Undefined index: stc_supervisor_req_final_cart_req_sess in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 256
+[18-Jun-2024 08:20:11 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 256
+[18-Jun-2024 08:20:11 Asia/Kolkata] PHP Notice:  Undefined index: stc_supervisor_req_final_cart_req_item_sess in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 286
+[18-Jun-2024 08:20:11 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 286
+[20-Jun-2024 19:17:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_supervisor_req_final_cart_req_sess in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 256
+[20-Jun-2024 19:17:28 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 256
+[20-Jun-2024 19:17:28 Asia/Kolkata] PHP Notice:  Undefined index: stc_supervisor_req_final_cart_req_item_sess in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 286
+[20-Jun-2024 19:17:28 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 286
+[21-Jun-2024 08:51:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_supervisor_req_final_cart_req_sess in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 256
+[21-Jun-2024 08:51:34 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 256
+[21-Jun-2024 08:51:34 Asia/Kolkata] PHP Notice:  Undefined index: stc_supervisor_req_final_cart_req_item_sess in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 286
+[21-Jun-2024 08:51:34 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/c2484kn1eg0y/public_html/stc_agent47/nemesis/stc_procurement.php on line 286
