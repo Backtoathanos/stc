@@ -441,7 +441,36 @@ class prime extends tesseract{
 		return $blackpearl;
 	}
 
-	// show tool track
+	// update equipment details
+	public function stc_equipement_details_update($id, $equipmenttype, $capacity){
+		$blackpearl = '';
+		$date1 = date("Y-m-d H:i:s");
+		
+		// Insert the new record into the equipment_details table
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "UPDATE `equipment_details` SET `equipment_type`='".mysqli_real_escape_string($this->stc_dbs, $equipmenttype)."', `capacity`='".mysqli_real_escape_string($this->stc_dbs, $capacity)."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+
+		if ($blackpearl_qry) {
+			$blackpearl = 'yes';
+		} else {
+			$blackpearl = 'no';
+		}
+		return $blackpearl;
+	}
+
+	// show equipment details perticular
+	public function stc_get_equipmentdetails($id){
+		$blackpearl = array();		
+		// Insert the new record into the equipment_details table
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details` WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			foreach($blackpearl_qry as $blackpearl_row){
+				$blackpearl[]=$blackpearl_row;
+			}
+		}
+		return $blackpearl;
+	}
+
+	// show equipmentdetails 
 	public function stc_equipement_details_get($search){
 		$filter=" WHERE `model_no` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `capacity` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_cust_pro_supervisor_fullname` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_status_down_list_department_dept` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."'";
 		$search=$search==''?'':$filter;
@@ -616,6 +645,30 @@ if (isset($_POST['save_equipementdetails'])) {
         $out = $odin_req->stc_equipement_details_save($location, $department, $equipment_type, $model_no, $capacity);
     }
     echo $out;
+}
+
+// save equipment details
+if (isset($_POST['update_equipementdetails'])) {
+    $id = $_POST['id'];
+    $equipmenttype = $_POST['equipmenttype'];
+    $capacity = $_POST['capacity'];
+    $out = '';
+
+    if (empty($_SESSION['stc_agent_sub_id'])) {
+        $out = 'reload';
+    } else {
+        $odin_req = new prime();
+        $out = $odin_req->stc_equipement_details_update($id, $equipmenttype, $capacity);
+    }
+    echo $out;
+}
+
+// delete equipment details
+if(isset($_POST['get_equipementdetails'])){
+	$id=$_POST['id'];
+	$metabots=new prime();
+	$opmetabots=$metabots->stc_get_equipmentdetails($id);
+	echo json_encode($opmetabots);
 }
 
 // call equipment details

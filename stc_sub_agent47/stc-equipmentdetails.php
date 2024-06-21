@@ -185,7 +185,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         var slno=0;
                         for (var i = 0; i < response.length; i++) {
                             slno++;
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].model_no + '</td><td>' + response[i].capacity + '</td><td>' + response[i].equipment_type + '</td><td class="text-center">' + response[i].created_date + '</td><td class="text-center">' + response[i].stc_cust_pro_supervisor_fullname + '</td><td><a href="javascript:void(0)" class="btn btn-primary itt-toolstracking" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertracker-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger itt-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].model_no + '</td><td>' + response[i].capacity + '</td><td>' + response[i].equipment_type + '</td><td class="text-center">' + response[i].created_date + '</td><td class="text-center">' + response[i].stc_cust_pro_supervisor_fullname + '</td><td><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";
@@ -242,7 +242,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 }
             });
             
-            $('body').delegate('.itt-delete', 'click', function(e){
+            // to delete 
+            $('body').delegate('.ed-delete', 'click', function(e){
                 e.preventDefault();
                 var id = $(this).attr('id');
                 if (confirm('Are you sure you want to delete this item?')) {
@@ -264,6 +265,63 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 }
             });
 
+            // to edit modal show
+            $('body').delegate('.ed-editequipment', 'click', function(e){
+                var id=$(this).attr('id');
+                $('.ed-equipment-id').remove();
+                $('#equipmenttype').after('<input type="hidden" class="ed-equipment-id" value="' + id + '">');
+                $.ajax({
+                    url         : "nemesis/stc_product.php",
+                    method      : "POST",
+                    data        : {
+                        get_equipementdetails:1,
+                        id:id
+                    },
+                    dataType    : "JSON",
+                    success     : function(response){
+                        $('#equipmenttype').val(response[0].equipment_type);
+                        $('#capacity').val(response[0].capacity);
+                    }
+                });
+            });
+
+            // euipment status update
+            function equipmentupdate(){
+                var id=$('.ed-equipment-id').val();
+                var equipmenttype=$('#equipmenttype').val();
+                var capacity=$('#capacity').val();
+                $.ajax({
+                    url : "nemesis/stc_product.php",
+                    method  : "POST",
+                    data    : {
+                        update_equipementdetails:1,
+                        id:id,
+                        equipmenttype:equipmenttype,
+                        capacity:capacity
+                    },
+                    success : function(response){
+                        call_equipementdetails('');
+                    }
+                });
+            }
+
+            $('body').delegate('.eq-edit-dropdown', 'change', function(e){
+                equipmentupdate();
+                $('.attribute-message-show').remove();
+                $(this).after('<p class="text-success attribute-message-show">Updated.</p>');
+                setTimeout(function() {
+                    $('.attribute-message-show').fadeOut('slow');
+                }, 3000);
+            });
+
+            $('body').delegate('.eq-edit-textbox', 'focusout', function(e){
+                equipmentupdate();
+                $('.attribute-message-show').remove();
+                $(this).after('<p class="text-success attribute-message-show">Updated.</p>');
+                setTimeout(function() {
+                    $('.attribute-message-show').fadeOut('slow');
+                }, 3000);
+            });
         });
     </script>
 </body>
@@ -273,7 +331,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Tools Track</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Equipment Details</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -332,6 +390,56 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-12">
                                         <div class="card mb-3 widget-content">
                                             <button class="form-control btn btn-success ed-save">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-editequipmentdetails-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Equipment Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row formcontrol">
+                                    <div class="col-md-6">
+                                        <h5>Equipment Type</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <select class="form-control ed-equipment-type eq-edit-dropdown" id="equipmenttype">
+                                                <option value="NA">Select</option>
+                                                <option>Air Handling Unit</option>
+                                                <option>Chilled Water Pump</option>
+                                                <option>Condenser Water Pump</option>
+                                                <option>Cooling Tower</option>
+                                                <option>Drinking Water Unit</option>
+                                                <option>Package Air Conditioning</option>
+                                                <option>Primary Drinking Water pump</option>
+                                                <option>Secondary Drinking Water pump</option>
+                                                <option>Unit Input</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Capacity</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <input type="text" class="form-control eq-edit-textbox" id="capacity" placeholder="Enter capacity">
                                         </div>
                                     </div>
                                 </div>

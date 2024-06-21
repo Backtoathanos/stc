@@ -79,15 +79,17 @@
                             </li>
                         ';
                     }
-                    if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){
+                    if($_SESSION['stc_agent_sub_category']=="Safety Supervisor"){
                         echo '
                             <li>
-                                <a href="stc-status-down-list.php?page=std" class="std">
-                                    <i class="metismenu-icon pe-7s-switch"></i>
-                                    Status Down List
+                                <a href="stc-safety.php?page=safety" class="safety">
+                                    <i class="metismenu-icon pe-7s-id"></i>
+                                    Safety
                                 </a>
                             </li>
                         ';
+                    }
+                    if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge" || $_SESSION['stc_agent_sub_category']=="Safety Supervisor"){
                         echo '
                             <li>
                                 <a href="epermitenroll.php?page=epermitenroll" class="epermitenroll">
@@ -95,14 +97,16 @@
                                     E-Permit Enrollment
                                 </a>
                             </li>
-                        ';
-                    }
-                    if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Safety Supervisor"){
-                        echo '
                             <li>
                                 <a href="stc-safety.php?page=safety" class="safety">
                                     <i class="metismenu-icon pe-7s-id"></i>
                                     Safety
+                                </a>
+                            </li>
+                            <li>
+                                <a href="stc-status-down-list.php?page=std" class="std">
+                                    <i class="metismenu-icon pe-7s-switch"></i>
+                                    Status Down List
                                 </a>
                             </li>
                         ';
