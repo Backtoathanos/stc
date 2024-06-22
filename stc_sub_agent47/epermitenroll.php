@@ -376,6 +376,48 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 }
             });
 
+            $('body').delegate('.save-multiple', 'click', function(e){
+                e.preventDefault();
+                var location=$(this).closest('tr').find('td:eq(0)').html();
+                var dept = $(this).attr('dept_id');
+                var name=$(this).closest('tr').find('td:eq(2)').html();
+                var gpno=$(this).closest('tr').find('td:eq(3)').html();
+                var shift=$(this).closest('tr').find('.stc-permitenr-shift').val();
+                if(shift!='NA' ){
+                    $.ajax({
+                        url : "nemesis/stc_epermitenroll.php",
+                        method : "POST",
+                        data : {
+                            save_permitenr:1,
+                            location:location,
+                            dept:dept,
+                            name:name,
+                            gpno:gpno,
+                            shift:shift
+                        },
+                        dataType : "JSON",
+                        success : function(response){
+                            if(response.trim()=="Success"){
+                                alert("E-Permit Enrollment Saved Successfully.");
+                                $(this).closest('tr').remove();
+                            }else if(response.trim()=="Duplicate"){
+                                alert("Duplicate record found within the last 8 hours");
+                                $('.stc-permitenr-save').prop('disabled', false);
+                            }else if(response.trim()=="failed"){
+                                alert("E-Permit Enrollment Not Saved.");
+                                $('.stc-permitenr-save').prop('disabled', false);
+                            }else if(response.trim()=="empty"){
+                                alert("Please enter all fields.");
+                                $('.stc-permitenr-save').prop('disabled', false);
+                            }else if(response.trim()=="login"){
+                                widnow.location.reload();
+                            }
+                        }
+                    }); 
+                }else{
+                    alert("Please Select Shift.");
+                }
+            });
             $('body').delegate('.stc-epermitenrollment-result-table th', 'click', function(e){
                 var table = $(this).parents('table').eq(0);
                 var rows = table.find('tbody > tr:eq(0)').toArray().sort(comparer($(this).index()));
@@ -469,6 +511,42 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <a href="javascript:void(0)" class="btn btn-success stc-permitenr-save">Save</a>
                             </div>
                         </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 col-xl-12"> 
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Location</th>
+                                    <th>Department</th>
+                                    <th>Name</th>
+                                    <th>G.P No</th>
+                                    <th>Shift</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                    include_once("../MCU/db.php");
+                                    $query="
+                                        SELECT distinct
+                                            `location`,
+                                            `dep_id`,
+                                            `stc_status_down_list_department_dept`,
+                                            `emp_name`,
+                                            `gpno`
+                                        FROM `stc_epermit_enrollment`
+                                        LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_loc_id`
+                                        WHERE `created_by` = '".$_SESSION['stc_agent_sub_id']."' ORDER BY `emp_name` ASC
+                                    ";
+                                    $sql=mysqli_query($con, $query);
+                                    foreach($sql as $row){
+                                        echo "<tr><td>".$row['location']."</td><td>".$row['stc_status_down_list_department_dept']."</td><td>".$row['emp_name']."</td><td>".$row['gpno']."</td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' dept_id='".$row['dep_id']."'>Add</a></td></tr>";
+                                    }
+                                ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
