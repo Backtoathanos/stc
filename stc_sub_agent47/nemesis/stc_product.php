@@ -442,12 +442,12 @@ class prime extends tesseract{
 	}
 
 	// update equipment details
-	public function stc_equipement_details_update($id, $equipmenttype, $capacity){
+	public function stc_equipement_details_update($id, $label, $value){
 		$blackpearl = '';
 		$date1 = date("Y-m-d H:i:s");
 		
 		// Insert the new record into the equipment_details table
-		$blackpearl_qry = mysqli_query($this->stc_dbs, "UPDATE `equipment_details` SET `equipment_type`='".mysqli_real_escape_string($this->stc_dbs, $equipmenttype)."', `capacity`='".mysqli_real_escape_string($this->stc_dbs, $capacity)."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "UPDATE `equipment_details` SET ".$label."='".mysqli_real_escape_string($this->stc_dbs, $value)."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
 
 		if ($blackpearl_qry) {
 			$blackpearl = 'yes';
@@ -650,15 +650,15 @@ if (isset($_POST['save_equipementdetails'])) {
 // save equipment details
 if (isset($_POST['update_equipementdetails'])) {
     $id = $_POST['id'];
-    $equipmenttype = $_POST['equipmenttype'];
-    $capacity = $_POST['capacity'];
+    $label = $_POST['label'];
+    $value = $_POST['value'];
     $out = '';
 
     if (empty($_SESSION['stc_agent_sub_id'])) {
         $out = 'reload';
     } else {
         $odin_req = new prime();
-        $out = $odin_req->stc_equipement_details_update($id, $equipmenttype, $capacity);
+        $out = $odin_req->stc_equipement_details_update($id, $label, $value);
     }
     echo $out;
 }

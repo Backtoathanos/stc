@@ -265,6 +265,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 }
             });
 
+            
+            var fields = ['ahu_filter_qty', 'ahu_filter_size', 'ahu_filter_type', 'ahu_make_name', 'ahu_v_belt_qty', 'ahu_v_belt_size', 'bearing_size', 'blower_bearing_size', 'blower_flywheel_size', 'compressor_qty', 'control', 'coupling_size', 'coupling_type', 'current_rating_max', 'delta_t', 'delta_p', 'each_of_capacity', 'equipment_serial_no', 'fan_blade_qty', 'fan_blade_size', 'filter_qty', 'filter_size', 'header_size', 'inlet_pressure', 'inlet_temp', 'make_name', 'max_fuse_rating', 'max_load', 'min_fuse_rating', 'min_load', 'motor_bearing_size', 'motor_capacity', 'motor_current_rating', 'motor_make_name', 'motor_pulley_size', 'motor_rpm', 'motor_voltage_rating', 'outlet_pressure', 'outlet_temp', 'power_factor', 'pump_head', 'pump_make_name', 'refrigerant_type', 'tyre_size', 'v_belt_qty', 'v_belt_size'];
+            var labels = {'ahu_filter_qty': 'AHU Filter Quantity', 'ahu_filter_size': 'AHU Filter Size', 'ahu_filter_type': 'AHU Filter Type', 'ahu_make_name': 'AHU Make Name', 'ahu_v_belt_qty': 'AHU V-Belt Quantity', 'ahu_v_belt_size': 'AHU V-Belt Size', 'bearing_size': 'Bearing Size', 'blower_bearing_size': 'Blower Bearing Size', 'blower_flywheel_size': 'Blower Flywheel Size', 'compressor_qty': 'Compressor Quantity', 'control': 'Control', 'coupling_size': 'Coupling Size', 'coupling_type': 'Coupling Type', 'current_rating_max': 'Current Rating (Max)', 'delta_t': 'Delta T', 'delta_p': 'Delta P', 'each_of_capacity': 'Each of Capacity', 'equipment_serial_no': 'Equipment Serial No.', 'fan_blade_qty': 'Fan Blade Quantity', 'fan_blade_size': 'Fan Blade Size', 'filter_qty': 'Filter Quantity', 'filter_size': 'Filter Size', 'header_size': 'Header Size', 'inlet_pressure': 'Inlet Pressure', 'inlet_temp': 'Inlet Temperature', 'make_name': 'Make Name', 'max_fuse_rating': 'Max. Fuse Rating', 'max_load': 'Max. Load', 'min_fuse_rating': 'Min. Fuse Rating', 'min_load': 'Min. Load', 'motor_bearing_size': 'Motor Bearing Size', 'motor_capacity': 'Motor Capacity', 'motor_current_rating': 'Motor Current Rating', 'motor_make_name': 'Motor Make Name', 'motor_pulley_size': 'Motor Pulley Size', 'motor_rpm': 'Motor RPM', 'motor_voltage_rating': 'Motor Voltage Rating', 'outlet_pressure': 'Outlet Pressure', 'outlet_temp': 'Outlet Temperature', 'power_factor': 'Power Factor', 'pump_head': 'Pump Head', 'pump_make_name': 'Pump Make Name', 'refrigerant_type': 'Refrigerant Type', 'tyre_size': 'Tyre Size', 'v_belt_qty': 'V-Belt Quantity', 'v_belt_size': 'V-Belt Size'};
+
             // to edit modal show
             $('body').delegate('.ed-editequipment', 'click', function(e){
                 var id=$(this).attr('id');
@@ -281,23 +285,24 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     success     : function(response){
                         $('#equipmenttype').val(response[0].equipment_type);
                         $('#capacity').val(response[0].capacity);
+                        $.each(fields, function(index, field) {
+                            $('#' + field).val(response[0][field]);
+                        });
                     }
                 });
             });
 
             // euipment status update
-            function equipmentupdate(){
+            function equipmentupdate(label, value){
                 var id=$('.ed-equipment-id').val();
-                var equipmenttype=$('#equipmenttype').val();
-                var capacity=$('#capacity').val();
                 $.ajax({
                     url : "nemesis/stc_product.php",
                     method  : "POST",
                     data    : {
                         update_equipementdetails:1,
                         id:id,
-                        equipmenttype:equipmenttype,
-                        capacity:capacity
+                        label:label,
+                        value:value
                     },
                     success : function(response){
                         call_equipementdetails('');
@@ -306,7 +311,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             }
 
             $('body').delegate('.eq-edit-dropdown', 'change', function(e){
-                equipmentupdate();
+                var label=$(this).attr('label');
+                var value=$(this).val();
+                equipmentupdate(label, value);
                 $('.attribute-message-show').remove();
                 $(this).after('<p class="text-success attribute-message-show">Updated.</p>');
                 setTimeout(function() {
@@ -315,13 +322,26 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             });
 
             $('body').delegate('.eq-edit-textbox', 'focusout', function(e){
-                equipmentupdate();
+                var label=$(this).attr('label');
+                var value=$(this).val();
+                equipmentupdate(label, value);
                 $('.attribute-message-show').remove();
                 $(this).after('<p class="text-success attribute-message-show">Updated.</p>');
                 setTimeout(function() {
                     $('.attribute-message-show').fadeOut('slow');
                 }, 3000);
             });
+
+            get_fields(fields, labels);
+            function get_fields(fields, labels){
+
+                var formHtml = '';
+                $.each(fields, function(index, field) {
+                    formHtml += '<div class="col-md-3 col-sm-12"><h5>' + labels[field] + '</h5><br>';
+                    formHtml += '<div class="card mb-3 widget-content"><input type="text" class="form-control eq-edit-textbox" label="' + field + '" id="' + field + '" placeholder="Enter ' + labels[field] + '"></div></div>';
+                });
+                $('#capacity').closest('.col-md-6').after(formHtml);
+            }
         });
     </script>
 </body>
@@ -422,7 +442,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-6">
                                         <h5>Equipment Type</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <select class="form-control ed-equipment-type eq-edit-dropdown" id="equipmenttype">
+                                            <select class="form-control ed-equipment-type eq-edit-dropdown" label="equipment_type" id="equipmenttype">
                                                 <option value="NA">Select</option>
                                                 <option>Air Handling Unit</option>
                                                 <option>Chilled Water Pump</option>
@@ -439,7 +459,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-6">
                                         <h5>Capacity</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <input type="text" class="form-control eq-edit-textbox" id="capacity" placeholder="Enter capacity">
+                                            <input type="text" class="form-control eq-edit-textbox" label="capacity" id="capacity" placeholder="Enter capacity">
                                         </div>
                                     </div>
                                 </div>
