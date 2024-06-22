@@ -97,7 +97,7 @@
                             </li>
                         ';
                     }
-                    if($_SESSION['stc_agent_sub_category']!="Supervisor" && $_SESSION['stc_agent_sub_category']!="Site Incharge" && $_SESSION['stc_agent_sub_category']!="Safety Supervisor"){
+                    if($_SESSION['stc_agent_sub_category']=="Technician" || $_SESSION['stc_agent_sub_category']=="Operator" || $_SESSION['stc_agent_sub_category']=="Helper" || $_SESSION['stc_agent_sub_category']=="Electrician" || $_SESSION['stc_agent_sub_category']=="Coordinator"){
                         echo '
                             <li>
                                 <a href="stc-status-down-list.php?page=std" class="std">
