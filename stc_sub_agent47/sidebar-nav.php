@@ -48,11 +48,6 @@
                                     Products
                                 </a>
                             </li>
-                        ';
-                    }
-
-                    if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge" || $_SESSION['stc_agent_sub_category']=="Safety Supervisor"){
-                        echo '
                             <li>
                                 <a href="stc-requisition.php?page=requisition" class="requisition">
                                     <i class="metismenu-icon pe-7s-note2"></i>
