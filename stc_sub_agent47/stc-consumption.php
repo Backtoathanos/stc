@@ -94,6 +94,20 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         </div>
                         <div class="tab-pane tabs-animation fade" id="create-req" role="tabpanel">
                             <div class="row">
+                                <?php 
+                                    include_once("../MCU/db.php");
+                                    $dept='';
+                                    $jdetails='';
+                                    $location='';
+                                    if(isset($_GET['sdl'])){
+                                        $sdl=$_GET['sdl'];
+                                        $sql=mysqli_query($con, "SELECT `stc_status_down_list_id`, `stc_status_down_list_location`, `stc_status_down_list_sub_location`, `stc_status_down_list_reason` FROM `stc_status_down_list` WHERE `stc_status_down_list_id`='".$sdl."'");
+                                        $result=mysqli_fetch_assoc($sql);
+                                        $dept=$result['stc_status_down_list_sub_location'];
+                                        $jdetails=$result['stc_status_down_list_reason'];
+                                        $location=$result['stc_status_down_list_location'];
+                                    }
+                                ?>
                                 <div class="col-md-12 col-xl-12"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
@@ -109,7 +123,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Department :</h5><br>
-                                            <input type="text" class="form-control stc-consump-sub-location" placeholder="Enter Department">
+                                            <input type="text" class="form-control stc-consump-sub-location" placeholder="Enter Department" value="<?php echo $dept; ?>" <?php echo $dept!=''? 'disabled':'' ?>>
                                         </div>
                                     </div>
                                 </div>
@@ -117,7 +131,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
                                             <h5>Job Details :</h5><br>
-                                            <textarea type="text" class="form-control stc-consump-job-details" placeholder="Enter Job Details"></textarea>
+                                            <textarea type="text" class="form-control stc-consump-job-details" placeholder="Enter Job Details" <?php echo $jdetails!=''? 'disabled':'' ?>><?php echo $jdetails; ?></textarea>
                                         </div>
                                     </div>
                                 </div>

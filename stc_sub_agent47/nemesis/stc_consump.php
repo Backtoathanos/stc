@@ -32,10 +32,7 @@ class transformers extends tesseract{
 	public function stc_call_items($site_id){
 		$optimusprime='';
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
-			SELECT 
-			    `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`,
-			    `stc_cust_super_requisition_list_items_title`,
-			    `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+			SELECT `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`, `stc_cust_super_requisition_list_items_title`, `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
 			FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
 			INNER JOIN `stc_cust_super_requisition_list_items` 
 			ON `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid` 
@@ -210,9 +207,7 @@ class transformers extends tesseract{
 		$item_qty=0;
 		$item_desc='';
 		$optimusprimeqry=mysqli_query($this->stc_dbs, "
-			SELECT 
-				`stc_cust_super_requisition_list_items_title`,
-				`stc_cust_super_requisition_list_items_unit` 
+			SELECT `stc_cust_super_requisition_list_items_title`, `stc_cust_super_requisition_list_items_unit` 
 			FROM `stc_cust_super_requisition_list_items` 
 			WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
 		");
@@ -223,8 +218,7 @@ class transformers extends tesseract{
 		}
 
 		$optimusprimerecqry=mysqli_query($this->stc_dbs, "
-			SELECT 
-				`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty` 
+			SELECT `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty` 
 			FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
 			WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
 		");
