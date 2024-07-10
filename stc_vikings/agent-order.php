@@ -2444,7 +2444,7 @@ include("kattegat/role_check.php");
                                     <div class="col-md-4">
                                         <h5>Unique Id</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <input type="text" class="form-control itt-unique-id" placeholder="Enter unique id" required>
+                                            <input type="text" class="form-control itt-unique-id" placeholder="Enter unique id" value="GTT/" required>
                                         </div>
                                     </div>
                                     <div class="col-md-8">

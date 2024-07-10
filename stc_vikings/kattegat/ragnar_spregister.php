@@ -324,14 +324,27 @@ class ragnarSaleRegisterView extends tesseract{
 	// filter sale record from date
 	public function stc_filter_sale_reg_by_date($salebegdate, $saleenddate){
 		$odin='';
+		$saleregister='';
 		$tbasic=0;
 		$tgst=0;
 		$tigst=0;
 		$check_loki=mysqli_query($this->stc_dbs, "
 			SELECT 
+				`stc_sale_product_bill_id`,
 				`stc_sale_product_id`, 
 				`stc_sale_product_dc_keys`, 
-				`stc_customer_state_id`  
+				`stc_customer_state_id`, 
+				`stc_customer_name`,
+				`stc_sale_product_bill_date`,
+				`stc_sale_product_cust_order_no`,
+				`stc_sale_product_cust_order_date`,
+				`stc_sale_product_refrence`,
+				`stc_sale_product_lr_no`,
+				`stc_sale_product_way_bill_no`,
+				`stc_sale_product_dosupply`,
+				`stc_sale_product_posupply`,
+				`stc_sale_product_way_bill_no`,
+				`stc_sale_product_sitename`
 			FROM `stc_sale_product_bill`
 			INNER JOIN `stc_sale_product_bill_no`
 			ON `stc_sale_product_bill_id`=`stc_sale_product_bill_no_bill_id`
@@ -343,21 +356,78 @@ class ragnarSaleRegisterView extends tesseract{
 			BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $salebegdate)."'
 			AND '".mysqli_real_escape_string($this->stc_dbs, $saleenddate)."'
 		");
-
 		foreach($check_loki as $getbillid){
+			$get_purchase_product_date=$getbillid['stc_sale_product_bill_date'];
+			$yearchange = date('Y', strtotime($get_purchase_product_date));
+			$monthchange = date('m', strtotime($get_purchase_product_date));
+			$yearchangevalue = '';
+
+			// Convert year and month to integers
+			$year = intval($yearchange);
+			$month = intval($monthchange);
+
+			// Determine the fiscal year range
+			if ($month > 3) {
+				$startYear = $year % 100;
+				$endYear = ($year + 1) % 100;
+			} else {
+				$startYear = ($year - 1) % 100;
+				$endYear = $year % 100;
+			}
+
+			// Format the year change value
+			$yearchangevalue = sprintf('%02d-%02d', $startYear, $endYear);
 			if($getbillid['stc_customer_state_id']==16){
 				if($getbillid['stc_sale_product_dc_keys']=="directchallaned"){
 					$nestcheckloki=mysqli_query($this->stc_dbs, "
 						SELECT 
-							`stc_sale_product_dc_items_product_qty`, 
-							`stc_sale_product_dc_items_product_sale_rate`,
-							`stc_product_gst` 
-						FROM `stc_sale_product_dc_items`
-						INNER JOIN `stc_product`
-						ON `stc_sale_product_dc_items_product_id`=`stc_product_id`
-						WHERE `stc_sale_product_dc_items_sale_product_id`='".$getbillid['stc_sale_product_id']."'
+							`stc_sale_product_bill_no`,
+                        	`stc_product_id`,
+                        	`stc_sale_product_dc_items_product_id`,
+                        	`stc_product_name`,
+                        	`stc_product_hsncode`,
+                        	`stc_product_unit`,
+                        	`stc_sale_product_dc_items_product_qty`,
+                        	`stc_sale_product_dc_items_product_sale_rate`,
+                        	`stc_product_gst`,
+                        	`stc_sub_cat_name`,
+                        	`stc_product_brand_id`
+                        FROM `stc_sale_product_dc_items` 
+                        INNER JOIN `stc_sale_product`
+                        ON `stc_sale_product_dc_items_sale_product_id`=`stc_sale_product_id`
+                        INNER JOIN `stc_product`
+                        ON `stc_sale_product_dc_items_product_id`=`stc_product_id`
+                        INNER JOIN `stc_sub_category`
+                        ON `stc_product_sub_cat_id`=`stc_sub_cat_id`
+                        INNER JOIN `stc_sale_product_bill_no`
+                        ON `stc_sale_product_id`=`stc_sale_product_bill_no_bill_challan_id`
+                        INNER JOIN `stc_sale_product_bill`
+                        ON `stc_sale_product_bill_no_bill_id`=`stc_sale_product_bill_id`
+                        WHERE `stc_sale_product_bill_id`='".$getbillid['stc_sale_product_bill_id']."'
+                        AND `stc_sale_product_bill_no_bill_series`='1'
+                        ORDER BY `stc_product_desc` ASC
 					");
 					foreach($nestcheckloki as $nestedrow){
+						$brand=' MAKE - ';
+                        $query=mysqli_query($this->stc_dbs, "
+                          SELECT * FROM `stc_brand` WHERE `stc_brand_id`='".$nestedrow['stc_product_brand_id']."'
+                        ");
+                        if(mysqli_num_rows($query)>0){
+                          foreach($query as $brandrow){
+                            if($brandrow['stc_brand_id']==0){
+                              $brand='';
+                            }else{
+                              $brand.=$brandrow['stc_brand_title'];
+                            }
+                            break;
+                          }
+                        }else{
+                          $brand='';
+                        }                            
+                        $pdname=$nestedrow["stc_product_name"].' '.$brand;
+						$amount=$nestedrow['stc_sale_product_dc_items_product_qty'] * $nestedrow['stc_sale_product_dc_items_product_sale_rate'];
+						$halfgst=$nestedrow['stc_product_gst']/2;
+						$saleregister.='<tr><td>STC/'.substr("0000{$nestedrow['stc_sale_product_bill_no']}", -5).'/'.$yearchangevalue.'</td><td>'.date('d-m-Y', strtotime($getbillid['stc_sale_product_bill_date'])).'</td><td>'.$getbillid['stc_customer_name'].'</td><td>'.$getbillid['stc_sale_product_cust_order_no'].'</td><td>'.date('d-m-Y', strtotime($getbillid['stc_sale_product_cust_order_date'])).'</td><td>Any Local Transport</td><td>'.$getbillid['stc_sale_product_dosupply'].'</td><td>'.$getbillid['stc_sale_product_posupply'].'</td><td>'.$getbillid['stc_sale_product_sitename'].'</td><td>'.$getbillid['stc_sale_product_refrence'].'</td><td>'.$getbillid['stc_sale_product_lr_no'].'</td><td>'.$getbillid['stc_sale_product_way_bill_no'].'</td><td>NO</td><td>'.$pdname.'</td><td>'.$nestedrow['stc_product_hsncode'].'</td><td>'.$nestedrow['stc_product_unit'].'</td><td>'.$nestedrow['stc_sale_product_dc_items_product_qty'].'</td><td>'.$nestedrow['stc_sale_product_dc_items_product_sale_rate'].'</td><td>'.number_format($amount, 2).'</td><td>'.$nestedrow['stc_product_gst'].'%</td><td>'.$halfgst.'</td><td>'.number_format($amount, 2).'</td><td>'.$halfgst.'</td><td>'.number_format($amount, 2).'</td><td>0</td><td>0</td><td>0</td></tr>';
 						$tempbasicval=0;
 						$tempbasicval=round($nestedrow['stc_sale_product_dc_items_product_qty'], 2) * round($nestedrow['stc_sale_product_dc_items_product_sale_rate'], 2);
 						$tbasic+=$tempbasicval;
@@ -456,7 +526,8 @@ class ragnarSaleRegisterView extends tesseract{
 		$odin=array(
 			'salebasic' => round($tbasic, 2),
 			'salegst' => round($tgst, 2),
-			'saleigst' => round($tigst, 2)
+			'saleigst' => round($tigst, 2),
+			'saleregister' => $saleregister
 		);
 		return $odin;
 	}

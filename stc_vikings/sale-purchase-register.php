@@ -240,6 +240,47 @@ include("kattegat/role_check.php");
                                         </div>
                                     </div>
                                 </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <table class="table table-hover table-bordered  table-responsive ">
+                                              <thead>
+                                                <tr>
+                                                  <th>Invoice No</th>
+                                                  <th>Invoice Date</th>
+                                                  <th>Customer Name</th>
+                                                  <th>Customer PONo</th>
+                                                  <th>Customer PODate</th>
+                                                  <th>Transportation Mode</th>
+                                                  <th>Place Supply</th>
+                                                  <th>Date Supply</th>
+                                                  <th>Site Name</th>
+                                                  <th>Reference</th>
+                                                  <th>LR No</th>
+                                                  <th>Way BillNo</th>
+                                                  <th>Reverse Charge</th>
+                                                  <th>Item Description</th>
+                                                  <th>HSN</th>
+                                                  <th>Unit</th>
+                                                  <th>Qty</th>
+                                                  <th>Rate</th>
+                                                  <th>Amount</th>
+                                                  <th>Tax %</th>
+                                                  <th>CGST_P</th>
+                                                  <th>CGST_Amt</th>
+                                                  <th>SGST_P</th>
+                                                  <th>SGST_Amt</th>
+                                                  <th>IGST_P</th>
+                                                  <th>IGST_Amt</th>
+                                                  <th>TCS Amt</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody class="stc-sp-register-import"></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>  
@@ -389,6 +430,7 @@ include("kattegat/role_check.php");
                 $('.sb-sgst').html(gst);
                 $('.sb-igst').html(igst);
                 $('.sb-total').html(total);
+                $('.stc-sp-register-import').html(response['saleregister']);
               }
             });
           }); 
@@ -421,6 +463,7 @@ include("kattegat/role_check.php");
                 $('.sb-sgst').html(gst);
                 $('.sb-igst').html(igst);
                 $('.sb-total').html(total);
+                $('.stc-sp-register-import').html(response['saleregister']);
               }
             });
           }); 

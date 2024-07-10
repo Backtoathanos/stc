@@ -31,24 +31,25 @@ if(isset($_GET['pid'])){
     $get_purchase_product_date=$get_stc_purchase_product['stc_sale_product_bill_date'];
     $get_purchase_product_merchant_name=$get_stc_purchase_product['stc_customer_name'];
     $get_purchase_product_notes=$get_stc_purchase_product['stc_sale_product_notes'];
-    $yearchange=date('Y', strtotime($get_purchase_product_date));
-    $monthchange=date('m', strtotime($get_purchase_product_date));
-    $yearchangevalue='';
-    if($yearchange=="2020" && $monthchange>3){
-      $yearchangevalue="20-21";
-    }elseif($yearchange=="2020" && $monthchange<=3){
-      $yearchangevalue="19-20";
-    }elseif($yearchange=="2021" && $monthchange>3){
-      $yearchangevalue="21-22";
-    }elseif($yearchange=="2021" && $monthchange<=3){
-      $yearchangevalue="20-21";
-    }elseif($yearchange=="2022" && $monthchange>3){
-      $yearchangevalue="22-23";
-    }elseif($yearchange=="2022" && $monthchange<=3){
-      $yearchangevalue="21-22";
-    }elseif($yearchange=="2023" && $monthchange>3){
-      $yearchangevalue="23-24";
+    $yearchange = date('Y', strtotime($get_purchase_product_date));
+    $monthchange = date('m', strtotime($get_purchase_product_date));
+    $yearchangevalue = '';
+
+    // Convert year and month to integers
+    $year = intval($yearchange);
+    $month = intval($monthchange);
+
+    // Determine the fiscal year range
+    if ($month > 3) {
+        $startYear = $year % 100;
+        $endYear = ($year + 1) % 100;
+    } else {
+        $startYear = ($year - 1) % 100;
+        $endYear = $year % 100;
     }
+
+    // Format the year change value
+    $yearchangevalue = sprintf('%02d-%02d', $startYear, $endYear);
 ?>
 <!DOCTYPE html>
 <html lang="en">
