@@ -3008,8 +3008,24 @@ class ragnarRequisitionPertAdd extends tesseract{
 	}
 
 	// iinsert data into recieving table to dispatch show
-	public function stc_ag_req_direct($stc_req_id, $stc_req_item_id, $dispatch_qty, $poadhocitem){
+	public function stc_ag_req_direct($stc_req_id, $stc_req_item_id, $stc_tools_id, $dispatch_qty, $poadhocitem){
 		$loki='';
+		if($stc_tools_id!='NA'){
+			$getuser=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_project_title` FROM `stc_cust_super_requisition_list` INNER JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id` INNER JOIN `stc_cust_project` ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id` WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_item_id)."'");
+			if(mysqli_num_rows($getuser)>0){
+				$user_id=0;
+				$username='';
+				$location='';
+				foreach($getuser as $getuserrows){
+					$user_id=$getuserrows['stc_cust_pro_supervisor_id'];
+					$username=$getuserrows['stc_cust_pro_supervisor_fullname'];
+					$location=$getuserrows['stc_cust_project_title'];
+				}
+				$date1=date("Y-m-d H:i:s");
+				$inserttools=mysqli_query($this->stc_dbs, "INSERT INTO `stc_tooldetails_track`(`toolsdetails_id`, `issuedby`, `user_id`, `status`, `location`, `issueddate`, `created_date`, `created_by`, `id_type`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $stc_tools_id)."', '".mysqli_real_escape_string($this->stc_dbs, $username)."', '".mysqli_real_escape_string($this->stc_dbs, $user_id)."', '1', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".$date1."', '".$date1."', '".$_SESSION['stc_empl_id']."', 'vikings')");
+				$loki="Hmmm!!! Something went wrong. Dispatched not done properly.";
+			}
+		}
 		$gamorarecgoqry=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_cust_super_requisition_list_items_rec`(
 				`stc_cust_super_requisition_list_items_rec_list_id`, 
@@ -3392,24 +3408,34 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	// save tracking
 	public function stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id){
 		$blackpearl='';
-		$date1=date("Y-m-d H:i:s");// Check if a record exists for the given toolsdetails_id
-		$check_qry = mysqli_query($this->stc_dbs, "SELECT `id` FROM `stc_tooldetails_track` WHERE `toolsdetails_id` = '".mysqli_real_escape_string($this->stc_dbs, $itt_id)."' ORDER BY TIMESTAMP(`created_date`) DESC LIMIT 1");
-		
-		if (mysqli_num_rows($check_qry) > 0) {
-			// Get the most recent record
-			$record = mysqli_fetch_assoc($check_qry);
-		
-			// Update the handoverto field of the most recent record
-			$update_qry = mysqli_query($this->stc_dbs, "UPDATE stc_tooldetails_track SET handoverto = '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."' WHERE id = '".mysqli_real_escape_string($this->stc_dbs, $record['id'])."'");
-		}
-		
-		// Insert the new record
-		$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."', 'vikings')");
+		$sqlcheck=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_contact`='".mysqli_real_escape_string($this->stc_dbs, $issuedby)."'");
+		if(mysqli_num_rows($sqlcheck)>0){
+			$issedbyname='';
+			foreach($sqlcheck as $sqlcheckrow){
+				$issedbyname=$sqlcheckrow['stc_cust_pro_supervisor_fullname'];
+				$issuedby=$sqlcheckrow['stc_cust_pro_supervisor_id'];
+			}
+			$date1=date("Y-m-d H:i:s");// Check if a record exists for the given toolsdetails_id
+			$check_qry = mysqli_query($this->stc_dbs, "SELECT `id` FROM `stc_tooldetails_track` WHERE `toolsdetails_id` = '".mysqli_real_escape_string($this->stc_dbs, $itt_id)."' ORDER BY TIMESTAMP(`created_date`) DESC LIMIT 1");
+			
+			if (mysqli_num_rows($check_qry) > 0) {
+				// Get the most recent record
+				$record = mysqli_fetch_assoc($check_qry);
+			
+				// Update the handoverto field of the most recent record
+				$update_qry = mysqli_query($this->stc_dbs, "UPDATE stc_tooldetails_track SET handoverto = '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."' WHERE id = '".mysqli_real_escape_string($this->stc_dbs, $record['id'])."'");
+			}
+			
+			// Insert the new record
+			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, user_id, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."', 'vikings')");
 
-		if($blackpearl_qry){
-			$blackpearl='yes';
+			if($blackpearl_qry){
+				$blackpearl='yes';
+			}else{
+				$blackpearl='no';
+			}
 		}else{
-			$blackpearl='no';
+			$blackpearl='notfound';
 		}
 		return $blackpearl;
 	}
@@ -3969,9 +3995,10 @@ if(isset($_POST['stc_dispatch_hit'])){
 	$dispatch_qty=$_POST['stc_dispatch_qty'];
 	$stc_req_id=$_POST['stc_req_id'];
 	$stc_req_item_id=$_POST['stc_req_item_id'];
+	$stc_tools_id=$_POST['stc_tools_id'];
 	$poadhocitem=$_POST['poadhocitem'];
 	$raven=new ragnarRequisitionPertAdd();
-	$outraven=$raven->stc_ag_req_direct($stc_req_id, $stc_req_item_id, $dispatch_qty, $poadhocitem);
+	$outraven=$raven->stc_ag_req_direct($stc_req_id, $stc_req_item_id, $stc_tools_id, $dispatch_qty, $poadhocitem);
 	// echo json_encode($outraven);
 	echo $outraven;
 }

@@ -1699,6 +1699,7 @@ include("kattegat/role_check.php");
           e.preventDefault();
           var req_id=$('#stc-req-list-id-rep2').val();
           var req_item_id=$('#stc-req-list-item-id-rep2').val();
+          var tools_id=$('#poadhoctools').val();
           var dispatch_qnty=parseFloat($('#stcdispatchedqty').val());
           var orderqty=parseFloat($('#stc-req-list-item-id-orderqty').val());
           var poadhocitem=$('#poadhocitem').val();
@@ -1715,6 +1716,7 @@ include("kattegat/role_check.php");
                 data      : {
                   stc_dispatch_hit:1,
                   stc_req_id:req_id,
+                  stc_tools_id:tools_id,
                   stc_req_item_id:req_item_id,
                   stc_dispatch_qty:dispatch_qnty,
                   poadhocitem:poadhocitem
@@ -1764,6 +1766,35 @@ include("kattegat/role_check.php");
                 }
             });
             $('.poadhocitem').change();
+        });
+
+        
+        // Cache the select element for better performance
+        var $select2 = $('#poadhoctools');
+
+        // Cache the input element
+        var $searchInput2 = $('#searchInput2');
+
+        // Get all options
+        var $options2 = $select2.find('option');
+
+        // Handle input keyup event
+        $searchInput2.on('keyup', function() {
+            var filter = $searchInput2.val().toUpperCase();
+
+            // Clear the select options
+            $select2.empty();
+
+            // Loop through all options
+            $options2.each(function() {
+                var text = $(this).text().toUpperCase();
+
+                // Show/hide options based on the search filter
+                if (text.indexOf(filter) > -1) {
+                    $select2.append($(this).clone()); // Append matching options
+                }
+            });
+            $('.poadhoctools').change();
         });
       });
     </script>
@@ -2065,6 +2096,8 @@ include("kattegat/role_check.php");
                           alert("This tool is already in records.");
                         }else if(obj_response=="reload"){
                             window.location.reload();
+                        }else if(obj_response=="notfound"){
+                          alert("Siteuser not found.");
                         }else if(obj_response=="empty"){
                           alert("Please fill complete details.");
                         }else if(obj_response=="no"){
@@ -2073,7 +2106,7 @@ include("kattegat/role_check.php");
                     }
                 });
             }else{
-              alert("Please check Type of PPE.");
+              alert("Please enter user phone number and location.");
             }
         });
 
@@ -2267,6 +2300,32 @@ include("kattegat/role_check.php");
                           $rec_qty=$result!=0 ? $result['recqty'] : 0;
                           $balanced_qty=$sqlrow['stc_purchase_product_adhoc_qty'] - $rec_qty;
                           echo '<option value="'.$sqlrow['stc_purchase_product_adhoc_id'].'" qty="'.$balanced_qty.'" rack="'.$sqlrow['stc_rack_name'].'" unit="'.$sqlrow['stc_purchase_product_adhoc_unit'].'">'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</option>';
+                        }
+                      }else{
+                        echo '<option value="NA">No record found.</option>';
+                      }
+                    ?>
+                  </select>
+                </div>
+              </div>
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <h5 for="poadhoctools">
+                    Tools
+                  </h5>
+                  <input type="text" id="searchInput2" class="form-control" placeholder="Search item">
+                  <select
+                    class="form-control poadhoctools"
+                    id="poadhoctools"
+                  >
+                    <?php 
+                      $sqlqry=mysqli_query($con, "
+                        SELECT `id`, `unique_id`, `itemdescription` FROM `stc_tooldetails`
+                      ");
+                      if(mysqli_num_rows($sqlqry)>0){
+                        echo '<option value="NA">Select</option>';
+                        foreach($sqlqry as $sqlrow){
+                          echo '<option value="'.$sqlrow['id'].'">'.$sqlrow['unique_id'].' : '.$sqlrow['itemdescription'].'</option>';
                         }
                       }else{
                         echo '<option value="NA">No record found.</option>';
@@ -2550,7 +2609,7 @@ include("kattegat/role_check.php");
                                     <div class="col-md-3">
                                         <h5>Issued By</h5><br>
                                         <div class="card mb-3 widget-content">
-                                          <input type="text" class="form-control ittt-issuedby" placeholder="Enter Issued By">
+                                          <input type="number" class="form-control ittt-issuedby" placeholder="Enter users phone number">
                                         </div>
                                     </div>
                                     <div class="col-md-3">
