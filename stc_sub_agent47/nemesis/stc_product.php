@@ -346,12 +346,12 @@ class prime extends tesseract{
 
 	// show tool track
 	public function stc_tool_tracker_get($search){
-		$filter=" WHERE `unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `itemdescription` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `machinesrno` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `make` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `tooltype` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `purchase_details` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `taxinvono` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' ";
+		$filter=" AND (td.`unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR td.`itemdescription` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR td.`machinesrno` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR td.`make` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR td.`tooltype` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."') ";
 		$search=$search==''?'':$filter;
 	
 		// Check for duplicate unique ID
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "
-			SELECT * FROM `stc_tooldetails` LEFT JOIN `stc_user` ON `stc_tooldetails`.`created_by`=`stc_user`.`stc_user_id` ".$search."
+			SELECT tdt.`id` tdt_id, tdt.`user_id`, tdt.`status`, td.`id`, td.`unique_id`, td.`itemdescription`, td.`machinesrno`, td.`make`, td.`tooltype`, td.`remarks` FROM `stc_tooldetails_track` tdt INNER JOIN `stc_tooldetails` td ON tdt.`toolsdetails_id`=td.`id` WHERE tdt.`user_id`='".$_SESSION['stc_agent_sub_id']."' ".$search."
 		");
 		$blackpearl=[];
 		if(mysqli_num_rows($blackpearl_qry)>0){
@@ -366,25 +366,45 @@ class prime extends tesseract{
 	// save tracking
 	public function stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id){
 		$blackpearl='';
-		$date1=date("Y-m-d H:i:s");// Check if a record exists for the given toolsdetails_id
-		$check_qry = mysqli_query($this->stc_dbs, "SELECT `id` FROM `stc_tooldetails_track` WHERE `toolsdetails_id` = '".mysqli_real_escape_string($this->stc_dbs, $itt_id)."' ORDER BY TIMESTAMP(`created_date`) DESC LIMIT 1");
-		
-		if (mysqli_num_rows($check_qry) > 0) {
-			// Get the most recent record
-			$record = mysqli_fetch_assoc($check_qry);
-		
+		$sqlcheck=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_contact`='".mysqli_real_escape_string($this->stc_dbs, $issuedby)."'");
+		if(mysqli_num_rows($sqlcheck)>0){
+			$issedbyname='';
+			foreach($sqlcheck as $sqlcheckrow){
+				$issedbyname=$sqlcheckrow['stc_cust_pro_supervisor_fullname'];
+				$issuedby=$sqlcheckrow['stc_cust_pro_supervisor_id'];
+			}
+			$date1=date("Y-m-d H:i:s");// Check if a record exists for the given toolsdetails_id
+			
 			// Update the handoverto field of the most recent record
-			$update_qry = mysqli_query($this->stc_dbs, "UPDATE stc_tooldetails_track SET handoverto = '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."' WHERE id = '".mysqli_real_escape_string($this->stc_dbs, $record['id'])."'");
-		}
-		
-		// Insert the new record
-		$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', 'subagent')");
+			$update_qry = mysqli_query($this->stc_dbs, "UPDATE stc_tooldetails_track SET handoverto = '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."' WHERE id = '".mysqli_real_escape_string($this->stc_dbs, $itt_id)."'");
+			
+			// Insert the new record
+			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, user_id, status, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."', '".$issuedby."', '0', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', 'subagent')");
 
+			if($blackpearl_qry){
+				$blackpearl='yes';
+			}else{
+				$blackpearl='no';
+			}
+		}else{
+			$blackpearl='notfound';
+		}
+		return $blackpearl;
+	}	
+
+	// show tool track
+	public function stc_equipement_details_recieve($id){	
+		// Check for duplicate unique ID
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "
+			UPDATE `stc_tooldetails_track` SET `status`='1' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'
+		");
+		$blackpearl='';
 		if($blackpearl_qry){
 			$blackpearl='yes';
 		}else{
 			$blackpearl='no';
 		}
+	
 		return $blackpearl;
 	}
 
@@ -659,6 +679,20 @@ if (isset($_POST['update_equipementdetails'])) {
     } else {
         $odin_req = new prime();
         $out = $odin_req->stc_equipement_details_update($id, $label, $value);
+    }
+    echo $out;
+}
+
+// save equipment details
+if (isset($_POST['call_tool_trackertrackrecieve'])) {
+    $id = $_POST['itt_id'];
+    $out = '';
+
+    if (empty($_SESSION['stc_agent_sub_id'])) {
+        $out = 'reload';
+    } else {
+        $odin_req = new prime();
+        $out = $odin_req->stc_equipement_details_recieve($id);
     }
     echo $out;
 }

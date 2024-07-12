@@ -64,13 +64,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <th class="text-center">MACHINE SR.NO</th>
                                                         <th class="text-center">MAKE</th>
                                                         <th class="text-center">TYPE</th>
-                                                        <th class="text-center">PURCHASE DETAILS</th>
-                                                        <th class="text-center">WARRANTY</th>
-                                                        <th class="text-center">TAX INVOICE NO.</th>
-                                                        <th class="text-center">TAX INVOICE DATE.</th>
-                                                        <th class="text-center">REMAKRS</th>
-                                                        <th class="text-center">CREATED DATE</th>
-                                                        <th class="text-center">CREATED BY</th>
+                                                        <th class="text-center">REMARKS</th>
                                                         <th class="text-center">ACTION</th>
                                                     </tr>
                                                 </thead>
@@ -150,7 +144,11 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         var slno=0;
                         for (var i = 0; i < response.length; i++) {
                             slno++;
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].machinesrno + '</td><td>' + response[i].make + '</td><td>' + response[i].tooltype + '</td><td>' + response[i].purchase_details + '</td><td>' + response[i].warranty + '</td><td>' + response[i].taxinvono + '</td><td>' + response[i].taxinvodate + '</td><td>' + response[i].remarks + '</td><td>' + response[i].created_date + '</td><td>' + response[i].stc_user_name + '</td><td><a href="javascript:void(0)" class="btn btn-primary itt-toolstracking" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertracker-modal-lg"><i class="fa fa-plus"></i></a><a href="javascript:void(0)" class="btn btn-primary itt-toolstrackingshow" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertrackershow-modal-lg"><i class="fa fa-shipping-fast"></i></a></td></tr>';
+                            var recieve='';
+                            if(response[i].status==0){
+                                recieve='<a href="javascript:void(0)" class="btn btn-success itt-toolsrecieve" title="Click to recieve" id="' + response[i].tdt_id + '"><i class="fa fa-check"></i></a>';
+                            }
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].machinesrno + '</td><td>' + response[i].make + '</td><td>' + response[i].tooltype + '</td><td>' + response[i].remarks + '</td><td class="text-center">' + recieve + '<a href="javascript:void(0)" class="btn btn-primary itt-toolstracking" title="Click to handover" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertracker-modal-lg"><i class="fa fa-plus"></i></a><a href="javascript:void(0)" class="btn btn-secondary itt-toolstrackingshow" title="Click to show details" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertrackershow-modal-lg"><i class="fa fa-shipping-fast"></i></a></td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";
@@ -298,6 +296,27 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 });
             });
 
+            // call tools tracker
+            $('body').delegate('.itt-toolsrecieve', 'click', function(e){
+                var itt_id=$(this).attr('id');
+                $.ajax({
+                    url : "nemesis/stc_product.php",
+                    method : "POST",
+                    data : {
+                        call_tool_trackertrackrecieve:1,
+                        itt_id:itt_id
+                    },
+                    success : function(response){
+                        if(response.trim()=="yes"){
+                            alert("Tools Recieved.");
+                            call_tools_tracker(search);
+                        }else if(response.trim()=="reload"){
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+
             // save dispatch
             $('body').delegate('.ittt-save', 'click', function(e){
                 e.preventDefault();
@@ -329,6 +348,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             alert("This tool is already in records.");
                             }else if(obj_response=="reload"){
                                 window.location.reload();
+                            }else if(obj_response=="notfound"){
+                            alert("Siteuser not found.");
                             }else if(obj_response=="empty"){
                             alert("Please fill complete details.");
                             }else if(obj_response=="no"){
@@ -375,7 +396,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-4">
                                         <h5>Handover to</h5><br>
                                         <div class="card mb-3 widget-content">
-                                          <input type="text" class="form-control ittt-issuedby" placeholder="Enter Handover to">
+                                          <input type="number" class="form-control ittt-issuedby" placeholder="Enter user phone number">
                                         </div>
                                     </div>
                                     <div class="col-md-4">
