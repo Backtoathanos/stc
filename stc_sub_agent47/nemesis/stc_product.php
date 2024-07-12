@@ -396,7 +396,7 @@ class prime extends tesseract{
 	public function stc_equipement_details_recieve($id){	
 		// Check for duplicate unique ID
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "
-			UPDATE `stc_tooldetails_track` SET `status`='1' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'
+			UPDATE `stc_tooldetails_track` SET `status`='1', `receivedby`='".$_SESSION['stc_agent_sub_name']."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'
 		");
 		$blackpearl='';
 		if($blackpearl_qry){
