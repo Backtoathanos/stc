@@ -561,7 +561,7 @@ class prime extends tesseract{
 	public function stc_delete_equipmentdetails($id){
 		$blackpearl='no';
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "
-			DELETE FROM `equipment_details` WHERE `id`=".mysqli_real_escape_string($this->stc_dbs, $id)."
+			DELETE FROM `equipment_details` WHERE `id`=".mysqli_real_escape_string($this->stc_dbs, $id)." AND `created_by`='".$_SESSION['stc_agent_sub_id']."'
 		");
 		if($blackpearl_qry){
 			$blackpearl="success";
