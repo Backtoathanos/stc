@@ -75,11 +75,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <span>View Requisition</span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a role="tab" class="nav-link show" id="tab-2" data-toggle="tab" href="#create-req">
-                                <span>Create Requisition</span>
-                            </a>
-                        </li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane tabs-animation fade active" id="view-req" role="tabpanel">
@@ -89,6 +84,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <div class="col-md-12 col-xl-12"> 
                                             <div class="main-card mb-3 card">
                                                 <div class="card-body">
+                                                <a href="javascript:void(0)" class="btn btn-primary form-control" data-toggle="modal" data-target=".bd-requisition-modal-lg">Add Requisition</a>
                                                     <h5 class="card-title">View Requisition</h5>
                                                     <form class="needs-validation" novalidate>
                                                         <?php
@@ -120,12 +116,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         </div>
                                                     </form> 
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-12 col-xl-12"> 
-                                            <div class="main-card mb-3 card">
                                                 <div class="card-body stc-requisition-search-result" style="overflow-x: auto;">
                                                 </div>
                                             </div>
@@ -134,118 +124,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 </div>
                             </div>
                         </div>
-                        <div class="tab-pane tabs-animation fade" id="create-req" role="tabpanel">
-                            <div class="row">
-                                <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-12 col-xl-12"> 
-                                            <div class="main-card mb-3 card">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">Create My Requisition</h5>
-                                                    <form class="stc-sup-form-create" novalidate>
-                                                        <div class="form-row">
-                                                            <div class="col-md-4 mb-3">
-                                                                <label for="validationCustom01">Item Desc</label>
-                                                                <input type="text" class="form-control" name="stc-sup-desc" placeholder="Enter item name" required>
-                                                                <div class="valid-feedback">
-                                                                    Looks good!
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-2 mb-3">
-                                                                <label for="validationCustom02">Item Qty</label>
-                                                                <input type="number" class="form-control" name="stc-sup-qty" placeholder="Enter Quantity" required>
-                                                                <div class="valid-feedback">
-                                                                    Looks good!
-                                                                </div>
-                                                            </div>
-                                                            <div class="col-md-2 mb-3">
-                                                                <label for="validationCustomUsername">Item Unit</label>
-                                                                <select class="form-control" name="stc-sup-unit">
-                                                                    <option value="BAG">BAG</option>
-                                                                    <option value="BOTTLE">BOTTLE</option>
-                                                                    <option value="BOX">BOX</option>
-                                                                    <option value="BUNDLE">BUNDLE</option>
-                                                                    <option value="CASE">CASE</option>
-                                                                    <option value="CBM">CBM</option>
-                                                                    <option value="COIL">COIL</option>
-                                                                    <option value="FEET">FEET</option>
-                                                                    <option value="JAR">JAR</option>
-                                                                    <option value="KGS">KGS</option>
-                                                                    <option value="LOT">LOT</option>
-                                                                    <option value="LTR">LTR</option>
-                                                                    <option value="MTR">MTR</option>
-                                                                    <option value="MTS">MTS</option>
-                                                                    <option value="NOS" selected>NOS</option>
-                                                                    <option value="PAIR">PAIR</option>
-                                                                    <option value="PKT">PKT</option>
-                                                                    <option value="ROLL">ROLL</option>
-                                                                    <option value="SET">SET</option>
-                                                                    <option value="SQFT">SQFT</option>
-                                                                    <option value="SQMT">SQMT</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="col-md-2 mb-3">
-                                                                <label for="validationCustomUsername">Item Type</label>
-                                                                <select class="form-control" name="stc-sup-type">
-                                                                    <option value="Consumable">CONSUMABLE</option>
-                                                                    <option value="PPE">PPE</option>
-                                                                    <option value="Supply">SUPPPLY</option>
-                                                                    <option value="Tools & Tackles">TOOLS & TACKLES</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="col-md-2 mb-3">
-                                                                <label for="validationCustom02">Priority</label>
-                                                                <select class="form-control" name="stc-sup-priority">
-                                                                    <option value="1">Normal</option>
-                                                                    <option value="2">Urgent</option>
-                                                                </select>
-                                                                <div class="valid-feedback">
-                                                                    Looks good!
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                        <input type="hidden" name="stc-sup-hit">
-                                                        <button class="btn btn-primary" type="submit">Add</button>
-                                                    </form>
-                                                    
-                                                    <script>
-                                                        // Example starter JavaScript for disabling form submissions if there are invalid fields
-                                                        (function() {
-                                                            'use strict';
-                                                            window.addEventListener('load', function() {
-                                                                // Fetch all the forms we want to apply custom Bootstrap validation styles to
-                                                                var forms = document.getElementsByClassName('needs-validation');
-                                                                // Loop over them and prevent submission
-                                                                var validation = Array.prototype.filter.call(forms, function(form) {
-                                                                    form.addEventListener('submit', function(event) {
-                                                                        if (form.checkValidity() === false) {
-                                                                            event.preventDefault();
-                                                                            event.stopPropagation();
-                                                                        }
-                                                                        form.classList.add('was-validated');
-                                                                    }, false);
-                                                                });
-                                                            }, false);
-                                                        })();
-                                                    </script>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12 col-xl-12"> 
-                                            <div class="card mb-3 widget-content bg-midnight-bloom">
-                                                <select class="btn btn-success form-control load_cust_agents" id="load_cust_sup_site">
-                                                    <option>No Customers Found!!!</option>
-                                                </select> 
-                                            </div>
-                                        </div>
-                                        <div class="col-md-12 col-xl-12">
-                                            <div class="main-card card stc-sup-call-list-items" style="overflow-x:auto;">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> 
                     </div>
                 </div>
             </div>
@@ -455,3 +333,134 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     </script>
 </body>
 </html>
+<div class="modal fade bd-requisition-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Create Requisition</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Create My Requisition</h5>
+                                                <form class="stc-sup-form-create" novalidate>
+                                                    <div class="form-row">
+                                                        <div class="col-md-4 mb-3">
+                                                            <label for="validationCustom01">Item Desc</label>
+                                                            <input type="text" class="form-control" name="stc-sup-desc" placeholder="Enter item name" required>
+                                                            <div class="valid-feedback">
+                                                                Looks good!
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 mb-3">
+                                                            <label for="validationCustom02">Item Qty</label>
+                                                            <input type="number" class="form-control" name="stc-sup-qty" placeholder="Enter Quantity" required>
+                                                            <div class="valid-feedback">
+                                                                Looks good!
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-2 mb-3">
+                                                                <label for="validationCustomUsername">Item Unit</label>
+                                                                <select class="form-control" name="stc-sup-unit">
+                                                                    <option value="BAG">BAG</option>
+                                                                    <option value="BOTTLE">BOTTLE</option>
+                                                                    <option value="BOX">BOX</option>
+                                                                    <option value="BUNDLE">BUNDLE</option>
+                                                                    <option value="CASE">CASE</option>
+                                                                    <option value="CBM">CBM</option>
+                                                                    <option value="COIL">COIL</option>
+                                                                    <option value="FEET">FEET</option>
+                                                                    <option value="JAR">JAR</option>
+                                                                    <option value="KGS">KGS</option>
+                                                                    <option value="LOT">LOT</option>
+                                                                    <option value="LTR">LTR</option>
+                                                                    <option value="MTR">MTR</option>
+                                                                    <option value="MTS">MTS</option>
+                                                                    <option value="NOS" selected>NOS</option>
+                                                                    <option value="PAIR">PAIR</option>
+                                                                    <option value="PKT">PKT</option>
+                                                                    <option value="ROLL">ROLL</option>
+                                                                    <option value="SET">SET</option>
+                                                                    <option value="SQFT">SQFT</option>
+                                                                    <option value="SQMT">SQMT</option>
+                                                                </select>
+                                                        </div>
+                                                        <div class="col-md-2 mb-3">
+                                                            <label for="validationCustomUsername">Item Type</label>
+                                                            <select class="form-control" name="stc-sup-type">
+                                                                <option value="Consumable">CONSUMABLE</option>
+                                                                <option value="PPE">PPE</option>
+                                                                <option value="Supply">SUPPPLY</option>
+                                                                <option value="Tools & Tackles">TOOLS & TACKLES</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-2 mb-3">
+                                                            <label for="validationCustom02">Priority</label>
+                                                            <select class="form-control" name="stc-sup-priority">
+                                                                <option value="1">Normal</option>
+                                                                <option value="2">Urgent</option>
+                                                            </select>
+                                                            <div class="valid-feedback">
+                                                                Looks good!
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <input type="hidden" name="stc-sup-hit">
+                                                    <button class="btn btn-primary" type="submit">Add</button>
+                                                </form>
+                                                
+                                                <script>
+                                                    // Example starter JavaScript for disabling form submissions if there are invalid fields
+                                                    (function() {
+                                                        'use strict';
+                                                        window.addEventListener('load', function() {
+                                                            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                                                            var forms = document.getElementsByClassName('needs-validation');
+                                                            // Loop over them and prevent submission
+                                                            var validation = Array.prototype.filter.call(forms, function(form) {
+                                                                form.addEventListener('submit', function(event) {
+                                                                    if (form.checkValidity() === false) {
+                                                                        event.preventDefault();
+                                                                        event.stopPropagation();
+                                                                    }
+                                                                    form.classList.add('was-validated');
+                                                                }, false);
+                                                            });
+                                                        }, false);
+                                                    })();
+                                                </script>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="card mb-3 widget-content bg-midnight-bloom">
+                                            <select class="btn btn-success form-control load_cust_agents" id="load_cust_sup_site">
+                                                <option>No Customers Found!!!</option>
+                                            </select> 
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-xl-12">
+                                        <div class="main-card card stc-sup-call-list-items" style="overflow-x:auto;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
