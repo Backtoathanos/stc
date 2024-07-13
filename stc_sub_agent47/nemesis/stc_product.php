@@ -376,7 +376,7 @@ class prime extends tesseract{
 			$date1=date("Y-m-d H:i:s");// Check if a record exists for the given toolsdetails_id
 			
 			// Update the handoverto field of the most recent record
-			$update_qry = mysqli_query($this->stc_dbs, "UPDATE stc_tooldetails_track SET handoverto = '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."' WHERE id = '".mysqli_real_escape_string($this->stc_dbs, $itt_id)."'");
+			$update_qry = mysqli_query($this->stc_dbs, "UPDATE stc_tooldetails_track SET handoverto = '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."' WHERE toolsdetails_id = '".mysqli_real_escape_string($this->stc_dbs, $itt_id)."' order by DATE(`created_date`) desc limit 1");
 			
 			// Insert the new record
 			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, user_id, status, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."', '".$issuedby."', '0', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', 'subagent')");
