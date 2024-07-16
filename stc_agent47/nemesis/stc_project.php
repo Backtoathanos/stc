@@ -1350,9 +1350,8 @@ class pirates_supervisor extends tesseract{
 		$blackpearl='';
 		$cptjacksparrowsupercheck=mysqli_query($this->stc_dbs, "
 			SELECT * FROM `stc_cust_pro_supervisor` 
-			WHERE `stc_cust_pro_supervisor_cust_id`='".mysqli_real_escape_string($this->stc_dbs, $sup_cust)."'
-			AND `stc_cust_pro_supervisor_contact`='".mysqli_real_escape_string($this->stc_dbs, $sup_cont)."'
-			AND `stc_cust_pro_supervisor_email`='".mysqli_real_escape_string($this->stc_dbs, $sup_email)."'
+			WHERE `stc_cust_pro_supervisor_contact`='".mysqli_real_escape_string($this->stc_dbs, $sup_cont)."'
+			OR `stc_cust_pro_supervisor_email`='".mysqli_real_escape_string($this->stc_dbs, $sup_email)."'
 		");
 		if(mysqli_num_rows($cptjacksparrowsupercheck)==0){
 			$cptjacksparrowsuper=mysqli_query($this->stc_dbs, "
