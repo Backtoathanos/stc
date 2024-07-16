@@ -3408,12 +3408,13 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	// save tracking
 	public function stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id){
 		$blackpearl='';
+		$user_id=$issuedby;
 		$sqlcheck=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_contact`='".mysqli_real_escape_string($this->stc_dbs, $issuedby)."'");
 		if(mysqli_num_rows($sqlcheck)>0){
 			$issedbyname='';
 			foreach($sqlcheck as $sqlcheckrow){
 				$issedbyname=$sqlcheckrow['stc_cust_pro_supervisor_fullname'];
-				$issuedby=$sqlcheckrow['stc_cust_pro_supervisor_id'];
+				$user_id=$sqlcheckrow['stc_cust_pro_supervisor_id'];
 			}
 			$date1=date("Y-m-d H:i:s");// Check if a record exists for the given toolsdetails_id
 			$check_qry = mysqli_query($this->stc_dbs, "SELECT `id` FROM `stc_tooldetails_track` WHERE `toolsdetails_id` = '".mysqli_real_escape_string($this->stc_dbs, $itt_id)."' ORDER BY TIMESTAMP(`created_date`) DESC LIMIT 1");
@@ -3427,7 +3428,7 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 			}
 			
 			// Insert the new record
-			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, user_id, status, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."', '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."', '0', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."', 'vikings')");
+			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, user_id, status, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."', '".mysqli_real_escape_string($this->stc_dbs, $user_id)."', '0', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."', 'vikings')");
 
 			if($blackpearl_qry){
 				$blackpearl='yes';
