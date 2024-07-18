@@ -1956,7 +1956,7 @@ include("kattegat/role_check.php");
           $('.itt-remarks').val(remarks);
         });
 
-        
+        // create tools tracker 
         $('body').delegate('.itt-create', 'click', function(e){
           $('.itt-save').removeAttr("operation");
           $('.itt-save').attr("operation", "no");

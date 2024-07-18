@@ -731,9 +731,9 @@ include_once("../MCU/db.php");
                                         <div class="main-card mb-3 card">
                                             <div class="card-body"><h5 class="card-title">Show Department</h5>
                                                 <div class="row">
-                                                    <div class="col-sm-12 col-md-6">
+                                                    <div class="col-sm-12 col-md-12">
                                                         <input type="text" class="form-control" id="department-tableInput"  placeholder="Search by choice">
-                                                        <table class="table table-hover table-bordered table-responsive" id="department-table">
+                                                        <table class="table table-hover table-bordered" id="department-table">
                                                             <thead>
                                                                 <tr>
                                                                     <th>Sl No</th>

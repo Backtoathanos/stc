@@ -419,7 +419,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 <option>Package Air Conditioning</option>
                                                 <option>Primary Drinking Water pump</option>
                                                 <option>Secondary Drinking Water pump</option>
-                                                <option>Unit Input</option>
+                                                <option>Chiller Unit</option>
                                             </select>
                                         </div>
                                     </div>
@@ -480,7 +480,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 <option>Package Air Conditioning</option>
                                                 <option>Primary Drinking Water pump</option>
                                                 <option>Secondary Drinking Water pump</option>
-                                                <option>Unit Input</option>
+                                                <option>Chiller Unit</option>
                                             </select>
                                         </div>
                                     </div>
