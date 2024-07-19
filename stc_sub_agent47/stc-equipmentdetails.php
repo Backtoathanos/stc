@@ -64,6 +64,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <th class="text-center">SL NO</th>
                                                         <th class="text-center">LOCATION</th>
                                                         <th class="text-center">DEPARTMENT</th>
+                                                        <th class="text-center">AREA</th>
                                                         <th class="text-center">MODEL NO</th>
                                                         <th class="text-center">CAPACITY</th>
                                                         <th class="text-center">EQUIPMENT TYPE</th>
@@ -185,7 +186,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         var slno=0;
                         for (var i = 0; i < response.length; i++) {
                             slno++;
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].model_no + '</td><td>' + response[i].capacity + '</td><td>' + response[i].equipment_type + '</td><td class="text-center">' + response[i].created_date + '</td><td class="text-center">' + response[i].stc_cust_pro_supervisor_fullname + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].model_no + '</td><td>' + response[i].capacity + '</td><td>' + response[i].equipment_type + '</td><td class="text-center">' + response[i].created_date + '</td><td class="text-center">' + response[i].stc_cust_pro_supervisor_fullname + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";
@@ -200,7 +201,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 e.preventDefault();
                 var location = $('.ed-department').find('option:selected').attr('project-id');
                 var department = $('.ed-department').val();
-                var equipment_type = $('.ed-equipment-type').val();
+                var area = $('.ed-area').val();
+                var equipment_type = $('.ed-equipment-name').val();
                 var model_no = $('.ed-model-no').val();
                 var capacity = $('.ed-capacity').val();
 
@@ -208,6 +210,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     var data = {
                         save_equipementdetails: 1,
                         location: location,
+                        area: area,
                         department: department,
                         equipment_type: equipment_type,
                         model_no: model_no,
@@ -223,7 +226,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             if (obj_response == "yes") {
                                 alert("Record saved successfully!!!");
                                 call_equipementdetails();
-                                $('.ed-equipment-type').val('NA');
+                                $('.ed-equipment-name').val('NA');
                                 $('.ed-model-no').val('');
                                 $('.ed-capacity').val('');
                             } else if (obj_response == "duplicate") {
@@ -407,20 +410,32 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         </div>
                                     </div>
                                     <div class="col-md-6">
+                                        <h5>Area</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <input type="text" class="form-control ed-area" placeholder="Enter area">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Equipment Name</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <select class="form-control ed-equipment-name">
+                                                <option value="NA">Select</option>
+                                                <option data-slno="G001" data-unit="AHU" value="Air Handling Unit" >Air Handling Unit</option>
+                                                <option data-slno="G002" data-unit="CHWP" value="Chilled Water Pump" >Chilled Water Pump</option>
+                                                <option data-slno="G003" data-unit="COWP" value="Condenser Water Pump" >Condenser Water Pump</option>
+                                                <option data-slno="G004" data-unit="CT" value="Cooling Tower" >Cooling Tower</option>
+                                                <option data-slno="G005" data-unit="DWU" value="Drinking Water Unit" >Drinking Water Unit</option>
+                                                <option data-slno="G006" data-unit="PAC" value="Package Air Conditioning" >Package Air Conditioning</option>
+                                                <option data-slno="G007" data-unit="PDWP" value="Primary Drinking Water pump" >Primary Drinking Water pump</option>
+                                                <option data-slno="G008" data-unit="SDWP" value="Secondary Drinking Water pump" >Secondary Drinking Water pump</option>
+                                                <option data-slno="G009" data-unit="CU" value="Chiller Unit" >Chiller Unit</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
                                         <h5>Equipment Type</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <select class="form-control ed-equipment-type">
-                                                <option value="NA">Select</option>
-                                                <option>Air Handling Unit</option>
-                                                <option>Chilled Water Pump</option>
-                                                <option>Condenser Water Pump</option>
-                                                <option>Cooling Tower</option>
-                                                <option>Drinking Water Unit</option>
-                                                <option>Package Air Conditioning</option>
-                                                <option>Primary Drinking Water pump</option>
-                                                <option>Secondary Drinking Water pump</option>
-                                                <option>Chiller Unit</option>
-                                            </select>
+                                            <input type="text" class="form-control ed-equipment-type" placeholder="Enter type">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -467,23 +482,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <div class="row formcontrol">
-                                    <div class="col-md-6">
-                                        <h5>Equipment Type</h5><br>
-                                        <div class="card mb-3 widget-content">
-                                            <select class="form-control ed-equipment-type eq-edit-dropdown" label="equipment_type" id="equipmenttype">
-                                                <option value="NA">Select</option>
-                                                <option>Air Handling Unit</option>
-                                                <option>Chilled Water Pump</option>
-                                                <option>Condenser Water Pump</option>
-                                                <option>Cooling Tower</option>
-                                                <option>Drinking Water Unit</option>
-                                                <option>Package Air Conditioning</option>
-                                                <option>Primary Drinking Water pump</option>
-                                                <option>Secondary Drinking Water pump</option>
-                                                <option>Chiller Unit</option>
-                                            </select>
-                                        </div>
-                                    </div>
                                     <div class="col-md-6">
                                         <h5>Capacity</h5><br>
                                         <div class="card mb-3 widget-content">

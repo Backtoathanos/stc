@@ -439,7 +439,7 @@ class prime extends tesseract{
 	}
 
 	// save equipment details
-	public function stc_equipement_details_save($location, $department, $equipment_type, $model_no, $capacity){
+	public function stc_equipement_details_save($location, $department, $area, $equipment_type, $model_no, $capacity){
 		$blackpearl = '';
 		$date1 = date("Y-m-d H:i:s");
 
@@ -450,7 +450,7 @@ class prime extends tesseract{
 			$blackpearl = 'duplicate';
 		}else{
 			// Insert the new record into the equipment_details table
-			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO equipment_details (`location`, `department`, `model_no`, `capacity`, `equipment_type`, `created_by`, `created_date`) VALUES ('" . mysqli_real_escape_string($this->stc_dbs, $location) . "', '" . mysqli_real_escape_string($this->stc_dbs, $department) . "', '" . mysqli_real_escape_string($this->stc_dbs, $model_no) . "', '" . mysqli_real_escape_string($this->stc_dbs, $capacity) . "', '" . mysqli_real_escape_string($this->stc_dbs, $equipment_type) . "', '" . mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id']) . "', '" . mysqli_real_escape_string($this->stc_dbs, $date1) . "')");
+			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO equipment_details (`location`, `department`, `area`, `model_no`, `capacity`, `equipment_type`, `created_by`, `created_date`) VALUES ('" . mysqli_real_escape_string($this->stc_dbs, $location) . "', '" . mysqli_real_escape_string($this->stc_dbs, $department) . "', '" . mysqli_real_escape_string($this->stc_dbs, $area) . "', '" . mysqli_real_escape_string($this->stc_dbs, $model_no) . "', '" . mysqli_real_escape_string($this->stc_dbs, $capacity) . "', '" . mysqli_real_escape_string($this->stc_dbs, $equipment_type) . "', '" . mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id']) . "', '" . mysqli_real_escape_string($this->stc_dbs, $date1) . "')");
 
 			if ($blackpearl_qry) {
 				$blackpearl = 'yes';
@@ -497,7 +497,7 @@ class prime extends tesseract{
 	
 		// Check for duplicate unique ID
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "
-			SELECT `id`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `model_no`, `capacity`, `equipment_type`, `stc_cust_pro_supervisor_fullname`, `created_date`  FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id`=`equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id`=`equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by`=`stc_cust_pro_supervisor_id` ".$search."
+			SELECT `id`, `area`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `model_no`, `capacity`, `equipment_type`, `stc_cust_pro_supervisor_fullname`, `created_date`  FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id`=`equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id`=`equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by`=`stc_cust_pro_supervisor_id` ".$search." ORDER BY TIMESTAMP(`created_date`) DESC
 		");
 		$blackpearl=[];
 		if(mysqli_num_rows($blackpearl_qry)>0){
@@ -653,6 +653,7 @@ if(isset($_POST['call_tool_trackertrack'])){
 if (isset($_POST['save_equipementdetails'])) {
     $location = $_POST['location'];
     $department = $_POST['department'];
+    $area = $_POST['area'];
     $equipment_type = $_POST['equipment_type'];
     $model_no = $_POST['model_no'];
     $capacity = $_POST['capacity'];
@@ -662,7 +663,7 @@ if (isset($_POST['save_equipementdetails'])) {
         $out = 'reload';
     } else {
         $odin_req = new prime();
-        $out = $odin_req->stc_equipement_details_save($location, $department, $equipment_type, $model_no, $capacity);
+        $out = $odin_req->stc_equipement_details_save($location, $department, $area, $equipment_type, $model_no, $capacity);
     }
     echo $out;
 }
