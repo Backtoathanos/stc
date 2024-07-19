@@ -67,7 +67,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <th class="text-center">AREA</th>
                                                         <th class="text-center">MODEL NO</th>
                                                         <th class="text-center">CAPACITY</th>
-                                                        <th class="text-center">EQUIPMENT TYPE</th>
+                                                        <th class="text-center">EQUIPMENT NAME</th>
+                                                        <th class="text-center">EQUIPMENT NO</th>
                                                         <th class="text-center">CREATED DATE</th>
                                                         <th class="text-center">CREATED BY</th>
                                                         <th class="text-center">ACTION</th>
@@ -186,7 +187,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         var slno=0;
                         for (var i = 0; i < response.length; i++) {
                             slno++;
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].model_no + '</td><td>' + response[i].capacity + '</td><td>' + response[i].equipment_type + '</td><td class="text-center">' + response[i].created_date + '</td><td class="text-center">' + response[i].stc_cust_pro_supervisor_fullname + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].model_no + '</td><td>' + response[i].capacity + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + response[i].created_date + '</td><td class="text-center">' + response[i].stc_cust_pro_supervisor_fullname + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";
@@ -202,17 +203,19 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var location = $('.ed-department').find('option:selected').attr('project-id');
                 var department = $('.ed-department').val();
                 var area = $('.ed-area').val();
-                var equipment_type = $('.ed-equipment-name').val();
+                var equipment_name = $('.ed-equipment-name').val();
+                var equipment_no = $('.ed-equipment-no').val();
                 var model_no = $('.ed-model-no').val();
                 var capacity = $('.ed-capacity').val();
 
-                if ((location != 'NA' || location != undefined) && (department != 'NA' || department != undefined) && equipment_type != 'NA' && model_no != '' && capacity != '') {
+                if ((location != 'NA' || location != undefined) && (department != 'NA' || department != undefined) && equipment_name != 'NA' && model_no != '' && capacity != '') {
                     var data = {
                         save_equipementdetails: 1,
                         location: location,
                         area: area,
                         department: department,
-                        equipment_type: equipment_type,
+                        equipment_name: equipment_name,
+                        equipment_no: equipment_no,
                         model_no: model_no,
                         capacity: capacity
                     };
@@ -227,8 +230,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 alert("Record saved successfully!!!");
                                 call_equipementdetails();
                                 $('.ed-equipment-name').val('NA');
+                                $('.ed-equipment-no').val('');
                                 $('.ed-model-no').val('');
                                 $('.ed-capacity').val('');
+                                $('.ed-area').val('');
                             } else if (obj_response == "duplicate") {
                                 alert("This Equipment is already in records.");
                             } else if (obj_response == "reload") {
@@ -433,9 +438,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <h5>Equipment Type</h5><br>
+                                        <h5>Equipment No</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <input type="text" class="form-control ed-equipment-type" placeholder="Enter type">
+                                            <input type="text" class="form-control ed-equipment-no" placeholder="Enter equipment no">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
