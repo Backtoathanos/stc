@@ -280,7 +280,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             // to edit modal show
             $('body').delegate('.ed-editequipment', 'click', function(e){
                 var id=$(this).attr('id');
-                var equipmenttype=$(this).closest('tr').find('td:eq(5)').html();
+                var equipmenttype=$(this).closest('tr').find('td:eq(6)').html();
                 $('.hide-col').hide();
                 if(equipmenttype=="Air Handling Unit"){$('.AirHandlingUnit').show();}
                 if(equipmenttype=="Chilled Water Pump"){$('.ChilledWaterPump').show();}
@@ -292,7 +292,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 if(equipmenttype=="Secondary Drinking Water pump"){$('.SecondaryDrinkingWaterPump').show();}
                 if(equipmenttype=="Unit Input"){$('.unitInputs').show();}
                 $('.ed-equipment-id').remove();
-                $('#equipmenttype').after('<input type="hidden" class="ed-equipment-id" value="' + id + '">');
+                $('#capacity').before('<input type="hidden" class="ed-equipment-id" value="' + id + '">');
                 $.ajax({
                     url         : "nemesis/stc_product.php",
                     method      : "POST",
@@ -302,7 +302,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     },
                     dataType    : "JSON",
                     success     : function(response){
-                        $('#equipmenttype').val(response[0].equipment_type);
                         $('#capacity').val(response[0].capacity);
                         $.each(fields, function(index, field) {$('#' + field).val(response[0][field]);});
                     }
