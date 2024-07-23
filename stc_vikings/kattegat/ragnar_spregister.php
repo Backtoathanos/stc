@@ -494,6 +494,7 @@ class ragnarSaleRegisterView extends tesseract{
 				}else{
 					$nestcheckloki=mysqli_query($this->stc_dbs, "
                         SELECT 
+						  `stc_sale_product_bill_no`,
                           `stc_product_id`,
                           `stc_sale_product_items_id`,
                           `stc_product_name`,
@@ -663,6 +664,7 @@ class ragnarSaleRegisterView extends tesseract{
 				}else{
 					$nestcheckloki=mysqli_query($this->stc_dbs, "
 						SELECT 
+						  `stc_sale_product_bill_no`,
                           `stc_product_id`,
                           `stc_sale_product_items_id`,
                           `stc_product_name`,
