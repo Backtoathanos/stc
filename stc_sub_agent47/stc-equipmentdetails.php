@@ -65,10 +65,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <th class="text-center">LOCATION</th>
                                                         <th class="text-center">DEPARTMENT</th>
                                                         <th class="text-center">AREA</th>
-                                                        <th class="text-center">MODEL NO</th>
-                                                        <th class="text-center">CAPACITY</th>
                                                         <th class="text-center">EQUIPMENT NAME</th>
                                                         <th class="text-center">EQUIPMENT NO</th>
+                                                        <th class="text-center">MODEL NO</th>
+                                                        <th class="text-center">CAPACITY</th>
                                                         <th class="text-center">CREATED DATE</th>
                                                         <th class="text-center">CREATED BY</th>
                                                         <th class="text-center">ACTION</th>
@@ -187,7 +187,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         var slno=0;
                         for (var i = 0; i < response.length; i++) {
                             slno++;
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].model_no + '</td><td>' + response[i].capacity + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + response[i].created_date + '</td><td class="text-center">' + response[i].stc_cust_pro_supervisor_fullname + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_no + '</td><td>' + response[i].model_no + '</td><td>' + response[i].capacity + '</td><td class="text-center">' + response[i].created_date + '</td><td class="text-center">' + response[i].stc_cust_pro_supervisor_fullname + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";
@@ -204,6 +204,13 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var department = $('.ed-department').val();
                 var area = $('.ed-area').val();
                 var equipment_name = $('.ed-equipment-name').val();
+                // Get the selected option
+                var selectedOption = $('.ed-equipment-name').find(':selected');
+
+                // Get the data attributes
+                var slno = selectedOption.data('slno');
+                var unit = selectedOption.data('unit');
+
                 var equipment_no = $('.ed-equipment-no').val();
                 var model_no = $('.ed-model-no').val();
                 var capacity = $('.ed-capacity').val();
@@ -215,6 +222,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         area: area,
                         department: department,
                         equipment_name: equipment_name,
+                        slno: slno,
+                        unit: unit,
                         equipment_no: equipment_no,
                         model_no: model_no,
                         capacity: capacity
@@ -424,15 +433,22 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <div class="card mb-3 widget-content">
                                             <select class="form-control ed-equipment-name">
                                                 <option value="NA">Select</option>
-                                                <option data-slno="G001" data-unit="AHU" value="Air Handling Unit" >Air Handling Unit</option>
-                                                <option data-slno="G002" data-unit="CHWP" value="Chilled Water Pump" >Chilled Water Pump</option>
-                                                <option data-slno="G003" data-unit="COWP" value="Condenser Water Pump" >Condenser Water Pump</option>
-                                                <option data-slno="G004" data-unit="CT" value="Cooling Tower" >Cooling Tower</option>
-                                                <option data-slno="G005" data-unit="DWU" value="Drinking Water Unit" >Drinking Water Unit</option>
-                                                <option data-slno="G006" data-unit="PAC" value="Package Air Conditioning" >Package Air Conditioning</option>
-                                                <option data-slno="G007" data-unit="PDWP" value="Primary Drinking Water pump" >Primary Drinking Water pump</option>
-                                                <option data-slno="G008" data-unit="SDWP" value="Secondary Drinking Water pump" >Secondary Drinking Water pump</option>
-                                                <option data-slno="G009" data-unit="CU" value="Chiller Unit" >Chiller Unit</option>
+                                                <option data-slno="G008" data-unit="AHU" value="Air Handling Unit" >Air Handling Unit</option>
+                                                <option data-slno="G003" data-unit="CHWP" value="Chilled Water Pump" >Chilled Water Pump</option>
+                                                <option data-slno="G002" data-unit="CNWP" value="Condenser Water Pump" >Condenser Water Pump</option>
+                                                <option data-slno="G007" data-unit="CT" value="Cooling Tower" >Cooling Tower</option>
+                                                <option data-slno="G009" data-unit="PAC" value="Package Air Conditioning" >Package Air Conditioning</option>
+                                                <option data-slno="G005" data-unit="PDWP" value="Primary Drinking Water pump" >Primary Drinking Water pump</option>
+                                                <option data-slno="G006" data-unit="SDWP" value="Secondary Drinking Water pump" >Secondary Drinking Water pump</option>
+                                                <option data-slno="G001" data-unit="CU" value="Chiller Unit" >Chiller Unit</option>
+                                                <option data-slno="G004" data-unit="SCWP">Secondary Chilled Water Pump</option>
+                                                <option data-slno="G0010" data-unit="VRF">VRF</option>
+                                                <option data-slno="G0012" data-unit="FCU">FCU</option>
+                                                <option data-slno="G0013" data-unit="DU">Ductable Unit</option>
+                                                <option data-slno="G0014" data-unit="SAC">Split AC</option>
+                                                <option data-slno="G0015" data-unit="WAC">Window AC</option>
+                                                <option data-slno="G0011" data-unit="VAM">VAM</option>
+
                                             </select>
                                         </div>
                                     </div>

@@ -439,7 +439,7 @@ class prime extends tesseract{
 	}
 
 	// save equipment details
-	public function stc_equipement_details_save($location, $department, $area, $equipment_name, $equipment_no, $model_no, $capacity){
+	public function stc_equipement_details_save($location, $department, $area, $equipment_name, $slno, $unit, $equipment_no, $model_no, $capacity){
 		$blackpearl = '';
 		$date1 = date("Y-m-d H:i:s");
 
@@ -449,8 +449,29 @@ class prime extends tesseract{
 		if (mysqli_num_rows($check_qry) > 0) {
 			$blackpearl = 'duplicate';
 		}else{
+			$prev_unit='';
+			$incrementer=str_pad(1, 3, '0', STR_PAD_LEFT);
+			$check_qry = mysqli_query($this->stc_dbs, "SELECT `unit_no` FROM `equipment_details` WHERE `slno` = '" . mysqli_real_escape_string($this->stc_dbs, $slno) . "' ORDER BY `id` DESC LIMIT 0,1");
+			if(mysqli_num_rows($check_qry) > 0){
+				foreach($check_qry as $check_row){
+					$prev_unit=$check_row['unit_no'];
+					// Extract the integer part from `prev_unit`
+					$unit_number = preg_replace('/[^0-9]/', '', $prev_unit);
+
+					// Increment the integer part by 1
+					$new_number = (int)$unit_number + 1;
+			
+					// Pad the new number with leading zeros
+					$padded_number = str_pad($new_number, 3, '0', STR_PAD_LEFT);
+			
+					// Combine the unit prefix with the padded number
+					$unit = 'G' . $unit . $padded_number;
+				}
+			}else{				
+				$unit='G'.$unit.$incrementer;
+			}
 			// Insert the new record into the equipment_details table
-			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO equipment_details (`location`, `department`, `area`, `model_no`, `capacity`, `equipment_name`, `equipment_no`, `created_by`, `created_date`) VALUES ('" . mysqli_real_escape_string($this->stc_dbs, $location) . "', '" . mysqli_real_escape_string($this->stc_dbs, $department) . "', '" . mysqli_real_escape_string($this->stc_dbs, $area) . "', '" . mysqli_real_escape_string($this->stc_dbs, $model_no) . "', '" . mysqli_real_escape_string($this->stc_dbs, $capacity) . "', '" . mysqli_real_escape_string($this->stc_dbs, $equipment_name) . "', '" . mysqli_real_escape_string($this->stc_dbs, $equipment_no) . "', '" . mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id']) . "', '" . mysqli_real_escape_string($this->stc_dbs, $date1) . "')");
+			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO equipment_details (`location`, `department`, `area`, `model_no`, `capacity`, `equipment_name`, `slno`, `unit_no`, `equipment_no`, `created_by`, `created_date`) VALUES ('" . mysqli_real_escape_string($this->stc_dbs, $location) . "', '" . mysqli_real_escape_string($this->stc_dbs, $department) . "', '" . mysqli_real_escape_string($this->stc_dbs, $area) . "', '" . mysqli_real_escape_string($this->stc_dbs, $model_no) . "', '" . mysqli_real_escape_string($this->stc_dbs, $capacity) . "', '" . mysqli_real_escape_string($this->stc_dbs, $equipment_name) . "', '" . mysqli_real_escape_string($this->stc_dbs, $slno) . "', '" . mysqli_real_escape_string($this->stc_dbs, $unit) . "', '" . mysqli_real_escape_string($this->stc_dbs, $equipment_no) . "', '" . mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id']) . "', '" . mysqli_real_escape_string($this->stc_dbs, $date1) . "')");
 
 			if ($blackpearl_qry) {
 				$blackpearl = 'yes';
@@ -656,6 +677,8 @@ if (isset($_POST['save_equipementdetails'])) {
     $area = $_POST['area'];
     $equipment_name = $_POST['equipment_name'];
     $equipment_no = $_POST['equipment_no'];
+    $slno = $_POST['slno'];
+    $unit = $_POST['unit'];
     $model_no = $_POST['model_no'];
     $capacity = $_POST['capacity'];
     $out = '';
@@ -664,7 +687,7 @@ if (isset($_POST['save_equipementdetails'])) {
         $out = 'reload';
     } else {
         $odin_req = new prime();
-        $out = $odin_req->stc_equipement_details_save($location, $department, $area, $equipment_name, $equipment_no, $model_no, $capacity);
+        $out = $odin_req->stc_equipement_details_save($location, $department, $area, $equipment_name, $slno, $unit, $equipment_no, $model_no, $capacity);
     }
     echo $out;
 }
