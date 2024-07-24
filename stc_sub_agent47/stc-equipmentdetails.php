@@ -289,14 +289,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             // to edit modal show
             $('body').delegate('.ed-editequipment', 'click', function(e){
                 var id=$(this).attr('id');
-                var equipmenttype=$(this).closest('tr').find('td:eq(6)').html();
+                var equipmenttype=$(this).closest('tr').find('td:eq(4)').html();
                 $('.hide-col').hide();
-                if(equipmenttype=="Air Handling Unit"){$('.AirHandlingUnit').show();}
+                if(equipmenttype=="Air Handling Unit" || equipmenttype=="VAM"){$('.AirHandlingUnit').show();}
                 if(equipmenttype=="Chilled Water Pump"){$('.ChilledWaterPump').show();}
                 if(equipmenttype=="Condenser Water Pump"){$('.CondenserWaterPump').show();}
                 if(equipmenttype=="Cooling Tower"){$('.CoolingTower').show();}
                 if(equipmenttype=="Drinking Water Unit"){$('.drinkingWaterUnit').show();}
-                if(equipmenttype=="Package Air Conditioning"){$('.PackageAirConditioning').show();}
+                if(equipmenttype=="Package Air Conditioning" || equipmenttype=="VRF" || equipmenttype=="FCU" || equipmenttype=="Split AC" || equipmenttype=="Window AC" || equipmenttype=="Ductable Unit" ){$('.PackageAirConditioning').show();}
                 if(equipmenttype=="Primary Drinking Water pump"){$('.PrimaryDrinkingWaterPump').show();}
                 if(equipmenttype=="Secondary Drinking Water pump"){$('.SecondaryDrinkingWaterPump').show();}
                 if(equipmenttype=="Unit Input"){$('.unitInputs').show();}
