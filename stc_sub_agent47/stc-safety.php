@@ -2209,6 +2209,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <div class="position-relative form-group">
                                             <select class="form-control stc-tbtm-dropdownfields" id="stc-tbtm-location">
                                                 <option value="">Select</option>
+                                                <option>Tata cummins</option>
                                                 <option>Tata steel site</option>
                                                 <option>Jusco site</option>
                                                 <option>Mermandli site</option>
