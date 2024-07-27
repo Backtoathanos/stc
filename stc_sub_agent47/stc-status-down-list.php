@@ -1154,7 +1154,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Job Varieties:</h5><br>
-                                <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-varities">
+                                <select class="btn btn-success form-control text-left" id="stc-agent-sup-std-job-varities" multiple>
                                     <option value="NA">Please select job type first</option>
                                 </select> 
                             </div>

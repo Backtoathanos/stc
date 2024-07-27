@@ -249,6 +249,7 @@ class transformers extends tesseract{
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
 		if($stc_j_varities!=''){
+			$stc_j_varities = implode(',', $stc_j_varities);
 			$stc_j_varities = "`stc_status_down_list_varities_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_j_varities)."',";
 		}
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
@@ -637,20 +638,25 @@ class transformers extends tesseract{
 
 				$job_type='';
 				$job_varities='';
-				$stc_call_jobtypeqry=mysqli_query($this->stc_dbs, "
-					SELECT
-					    `stc_status_down_list_job_type_title`,
-					    `stc_status_down_list_job_type_sub_title`
-					FROM
-					    `stc_status_down_list_job_type`
-					WHERE
-					    `stc_status_down_list_job_type_id`='".$row['stc_status_down_list_varities_id']."'
-				");
-				foreach($stc_call_jobtypeqry as $stc_call_jobtyperow){
-					$job_type=$stc_call_jobtyperow['stc_status_down_list_job_type_title'];
-					$job_varities=$stc_call_jobtyperow['stc_status_down_list_job_type_sub_title'];
+				if (!empty($row['stc_status_down_list_varities_id'])) {
+					$stc_call_jobtypeqry=mysqli_query($this->stc_dbs, "
+						SELECT `stc_status_down_list_job_type_title`, `stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_id` IN (".$row['stc_status_down_list_varities_id'].")
+					");
+					$job_type_array = [];
+					$job_varities_array = [];
+					foreach($stc_call_jobtypeqry as $stc_call_jobtyperow){
+						// Add job_type to the array if it's not already there
+						if (!in_array($stc_call_jobtyperow['stc_status_down_list_job_type_title'], $job_type_array)) {
+							$job_type_array[] = $stc_call_jobtyperow['stc_status_down_list_job_type_title'];
+						}
+						// Add job_varities to the array if it's not already there
+						if (!in_array($stc_call_jobtyperow['stc_status_down_list_job_type_sub_title'], $job_varities_array)) {
+							$job_varities_array[] = $stc_call_jobtyperow['stc_status_down_list_job_type_sub_title'];
+						}
+					}
+					$job_type = implode(', ', $job_type_array);
+					$job_varities = implode(', ', $job_varities_array);
 				}
-
 				$updator_id=$row['stc_status_down_list_updated_by'];
 				$updater_name='';
 				$updateqry=mysqli_query($this->stc_dbs, "
