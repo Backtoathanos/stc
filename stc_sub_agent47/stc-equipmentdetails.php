@@ -292,7 +292,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var equipmenttype=$(this).closest('tr').find('td:eq(4)').html();
                 $('.hide-col').hide();
                 if(equipmenttype=="Air Handling Unit" || equipmenttype=="VAM"){$('.AirHandlingUnit').show();}
-                if(equipmenttype=="Chilled Water Pump"){$('.ChilledWaterPump').show();}
+                if(equipmenttype=="Chilled Water Pump" || equipmenttype=="Chiller Unit"){$('.ChilledWaterPump').show();}
                 if(equipmenttype=="Condenser Water Pump"){$('.CondenserWaterPump').show();}
                 if(equipmenttype=="Cooling Tower"){$('.CoolingTower').show();}
                 if(equipmenttype=="Drinking Water Unit"){$('.drinkingWaterUnit').show();}
