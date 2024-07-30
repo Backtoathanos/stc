@@ -225,7 +225,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                 <a 
                                                   href="#" 
                                                   class="btn btn-primary btn-block text-uppercase mb-3">
-                                                 Nahi hai bhai!!!
+                                                 No data found.
                                                 </a><br>
                                                 <p>Tips - If you want to search "Copper Pipe" then<br>
                                                 just type : "pipe"</p>
