@@ -284,6 +284,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     },
                     success : function(response){
                         // console.log(response);
+                        if(response.trim()=='logout'){
+                            window.location.reload();
+                        }
                         alert(response);
                         show_Dailylist();
                     }                    

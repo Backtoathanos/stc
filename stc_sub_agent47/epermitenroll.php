@@ -13,7 +13,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Language" content="en">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title>E-Permit Enrollment - STC</title>
+    <title>Daily Attendance - STC</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <meta name="description" content="">
     <meta name="msapplication-tap-highlight" content="no">
@@ -67,12 +67,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             <div class="app-main__outer">
                 <div class="app-main__inner">
                     <div class="app-page-title">
-                        <h3>My E-Permit Enrollment</h3>
+                        <h3>My Daily Attendance</h3>
                     </div>
                     <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                         <li class="nav-item">
                             <a role="tab" class="nav-link show active" id="tab-1" data-toggle="tab" href="#view-req">
-                                <span>View E-Permit Enrollment</span>
+                                <span>View Daily Attendance</span>
                             </a>
                         </li>
                     </ul>
@@ -84,7 +84,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <div class="col-md-12 col-xl-12"> 
                                             <div class="main-card mb-3 card">
                                                 <div class="card-body">
-                                                    <h5 class="card-title">View E-Permit Enrollment</h5>
+                                                    <h5 class="card-title">View Daily Attendance</h5>
                                                     <form class="needs-validation" novalidate>
                                                         <?php
                                                           $date = date("d-m-Y");
@@ -96,7 +96,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                                 <?php if(($_SESSION['stc_agent_sub_category']=="Site Incharge") || ($_SESSION['stc_agent_sub_category']=="Supervisor")){ ?>
                                                                 <a href="javascript:void(0)" class="form-control btn bg-primary text-white mb-3" data-toggle="modal" data-target=".bd-create-summepermitenrollment-modal">Proceed to E-Permit Enrollment</a>
                                                                 <?php } ?>
-                                                                <a href="javascript:void(0)" class="form-control btn bg-success text-white mb-3" data-toggle="modal" data-target=".bd-create-epermitenrollment-modal">Add E-Permit Enrollment</a>
+                                                                <a href="javascript:void(0)" class="form-control btn bg-success text-white mb-3" data-toggle="modal" data-target=".bd-create-epermitenrollment-modal">Add Daily Attendance</a>
                                                             </div>
                                                         </div>
                                                         <div class="form-row">
@@ -282,55 +282,94 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 e.preventDefault();
                 var location=$('.stc-permitenr-location').val();
                 var deptselect = $('.stc-permitenr-dept').val();
-                if(deptselect!='NA' ){
-                    var selectedOption = $('.stc-permitenr-dept').find('option:selected');
-                    var dept = selectedOption.data('id');
-                    var name=$('.stc-permitenr-name').val();
-                    var gpno=$('.stc-permitenr-gpno').val();
-                    var shift=$('.stc-permitenr-shift').val();
-                    if(location=='Select' || dept==0){
-                        alert("Please Select all fields.");
-                    }else{
-                        $('.stc-permitenr-save').prop('disabled', true);
-                        $.ajax({
-                            url : "nemesis/stc_epermitenroll.php",
-                            method : "POST",
-                            data : {
-                                save_permitenr:1,
-                                location:location,
-                                dept:dept,
-                                name:name,
-                                gpno:gpno,
-                                shift:shift
-                            },
-                            dataType : "JSON",
-                            success : function(response){
-                                if(response.trim()=="Success"){
-                                    alert("E-Permit Enrollment Saved Successfully.");
-                                    show_epermitenroll('', '');
-                                    $('.stc-permitenr-name').val('');
-                                    $('.stc-permitenr-gpno').val('');
-                                    $('.stc-permitenr-shift').val('NA');
-                                    $('.stc-permitenr-save').prop('disabled', false);
-                                }else if(response.trim()=="Duplicate"){
-                                    alert("Duplicate record found within the last 8 hours");
-                                    $('.stc-permitenr-save').prop('disabled', false);
-                                }else if(response.trim()=="failed"){
-                                    alert("E-Permit Enrollment Not Saved.");
-                                    $('.stc-permitenr-save').prop('disabled', false);
-                                }else if(response.trim()=="empty"){
-                                    alert("Please enter all fields.");
-                                    $('.stc-permitenr-save').prop('disabled', false);
-                                }else if(response.trim()=="login"){
-                                    widnow.location.reload();
-                                }else{
-                                    $('.stc-permitenr-save').prop('disabled', false);
-                                }
+                var selectedOption = $('.stc-permitenr-dept').find('option:selected');
+                var dept = selectedOption.data('id');
+                var name=$('.stc-permitenr-name').val();
+                var phno=$('.stc-permitenr-phno').val();
+                var email=$('.stc-permitenr-email').val();
+                var uid=$('.stc-permitenr-uid').val();
+                var gpno=$('.stc-permitenr-gpno').val();
+                var shift=$('.stc-permitenr-shift').val();
+                var phonePattern = /^[0-9]{10}$/;
+                var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                var uidClean = uid.replace(/\s+/g, '');
+                var validation = 1;
+                $('.validation-message').remove();
+                if (location == 'Select') {
+                    $('.stc-permitenr-location').after('<p class="validation-message" style="color:red;">Please select Location.</p>');
+                    validation = 0;
+                }
+                if (dept == 0 || dept == '' || dept == undefined) {
+                    $('.stc-permitenr-dept').after('<p class="validation-message" style="color:red;">Please select Department.</p>');
+                    validation = 0;
+                }
+                if (name == '') {
+                    $('.stc-permitenr-name').after('<p class="validation-message" style="color:red;">Please enter valid Name.</p>');
+                    validation = 0;
+                }
+                if (!phonePattern.test(phno)) {
+                    $('.stc-permitenr-phno').after('<p class="validation-message" style="color:red;">Please enter a valid phone number.</p>');
+                    validation = 0;
+                }
+                if (!emailPattern.test(email)) {
+                    $('.stc-permitenr-email').after('<p class="validation-message" style="color:red;">Please enter a valid email address.</p>');
+                    validation = 0;
+                }
+                if (uidClean.length !== 12 || !/^\d+$/.test(uidClean)) {
+                    $('.stc-permitenr-uid').after('<p class="validation-message" style="color:red;">Aadhar No not valid. It must be exactly 12 digits.</p>');
+                    validation = 0;
+                }
+                if (gpno == '') {
+                    $('.stc-permitenr-gpno').after('<p class="validation-message" style="color:red;">Please enter gate pass.</p>');
+                    validation = 0;
+                }
+                if (shift == 'NA') {
+                    $('.stc-permitenr-shift').after('<p class="validation-message" style="color:red;">Please select shift.</p>');
+                    validation = 0;
+                }
+                if(validation==1){
+                    $('.stc-permitenr-save').prop('disabled', true);
+                    $.ajax({
+                        url : "nemesis/stc_epermitenroll.php",
+                        method : "POST",
+                        data : {
+                            save_permitenr:1,
+                            location:location,
+                            dept:dept,
+                            name:name,
+                            phno:phno, 
+                            email:email, 
+                            uid:uid,
+                            gpno:gpno,
+                            shift:shift
+                        },
+                        dataType : "JSON",
+                        success : function(response){
+                            if(response.trim()=="Success"){
+                                alert("Daily Attendance Saved Successfully.");
+                                show_epermitenroll('', '');
+                                $('.stc-permitenr-name').val('');
+                                $('.stc-permitenr-phno').val('');
+                                $('.stc-permitenr-email').val('');
+                                $('.stc-permitenr-uid').val('');
+                                $('.stc-permitenr-gpno').val('');
+                                $('.stc-permitenr-shift').val('NA');
+                                $('.stc-permitenr-save').prop('disabled', false);
+                            }else if(response.trim()=="Duplicate"){
+                                alert("Duplicate record found within the last 8 hours");
+                                $('.stc-permitenr-save').prop('disabled', false);
+                            }else if(response.trim()=="failed"){
+                                alert("Daily Attendance Not Saved.");
+                                $('.stc-permitenr-save').prop('disabled', false);
+                            }else if(response.trim()=="login"){
+                                widnow.location.reload();
+                            }else{
+                                $('.stc-permitenr-save').prop('disabled', false);
                             }
-                        });                    
-                    }
+                        }
+                    });   
                 }else{
-                    alert("Please Select Departments.");
+                    alert("Please complete all details.");
                 }
             });
 
@@ -378,44 +417,49 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
             $('body').delegate('.save-multiple', 'click', function(e){
                 e.preventDefault();
-                var location=$(this).closest('tr').find('td:eq(0)').html();
-                var dept = $(this).attr('dept_id');
+                var user = $(this).attr('user_id');
+                var location = $(this).closest('tr').find('.multilocation option:selected').text();
+
+                var dept=$(this).closest('tr').find('.multidept').val();
                 var name=$(this).closest('tr').find('td:eq(2)').html();
-                var gpno=$(this).closest('tr').find('td:eq(3)').html();
+                var gpno=$(this).closest('tr').find('.multigpno').val();
                 var shift=$(this).closest('tr').find('.stc-permitenr-shift').val();
-                if(shift!='NA' ){
-                    $.ajax({
-                        url : "nemesis/stc_epermitenroll.php",
-                        method : "POST",
-                        data : {
-                            save_permitenr:1,
-                            location:location,
-                            dept:dept,
-                            name:name,
-                            gpno:gpno,
-                            shift:shift
-                        },
-                        dataType : "JSON",
-                        success : function(response){
-                            if(response.trim()=="Success"){
-                                alert("E-Permit Enrollment Saved Successfully.");
-                                $(this).closest('tr').remove();
-                            }else if(response.trim()=="Duplicate"){
-                                alert("Duplicate record found within the last 8 hours");
-                                $('.stc-permitenr-save').prop('disabled', false);
-                            }else if(response.trim()=="failed"){
-                                alert("E-Permit Enrollment Not Saved.");
-                                $('.stc-permitenr-save').prop('disabled', false);
-                            }else if(response.trim()=="empty"){
-                                alert("Please enter all fields.");
-                                $('.stc-permitenr-save').prop('disabled', false);
-                            }else if(response.trim()=="login"){
-                                widnow.location.reload();
+                if(shift!='NA' && dept!='NA' && gpno!=''){
+                    if(confirm("Are you sure?")){
+                        $.ajax({
+                            url : "nemesis/stc_epermitenroll.php",
+                            method : "POST",
+                            data : {
+                                save_permitenr_multi:1,
+                                location:location,
+                                dept:dept,
+                                name:name,
+                                gpno:gpno,
+                                user:user,
+                                shift:shift
+                            },
+                            dataType : "JSON",
+                            success : function(response){
+                                if(response.trim()=="Success"){
+                                    alert("Daily Attendance Saved Successfully.");
+                                    $(this).closest('tr').remove();
+                                }else if(response.trim()=="Duplicate"){
+                                    alert("Duplicate record found within the last 8 hours");
+                                    $('.stc-permitenr-save').prop('disabled', false);
+                                }else if(response.trim()=="failed"){
+                                    alert("Daily Attendance Not Saved.");
+                                    $('.stc-permitenr-save').prop('disabled', false);
+                                }else if(response.trim()=="empty"){
+                                    alert("Please enter all fields.");
+                                    $('.stc-permitenr-save').prop('disabled', false);
+                                }else if(response.trim()=="login"){
+                                    widnow.location.reload();
+                                }
                             }
-                        }
-                    }); 
+                        }); 
+                    }
                 }else{
-                    alert("Please Select Shift.");
+                    alert("Please complete all fields.");
                 }
             });
             $('body').delegate('.stc-epermitenrollment-result-table th', 'click', function(e){
@@ -439,6 +483,28 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             function getCellValue(row, index){ 
                 return $(row).children('td').eq(index).text();
             }
+
+            $('body').delegate('.search-emp', 'keyup', function(e){
+                var search = $(this).val().toLowerCase();
+        
+                $('.search-emp-table tbody tr').each(function() {
+                    var row = $(this);
+                    var rowText = row.text().toLowerCase();
+                    
+                    if (rowText.indexOf(search) !== -1) {
+                        row.show();
+                    } else {
+                        row.hide();
+                    }
+                });
+            });
+
+            $('body').delegate('.multidept', 'change', function(e){
+                var dept_id=$(this).val();
+                if(dept_id!='NA'){
+                    $(this).closest('tr').find('.multilocation').val(dept_id).change();
+                }
+            });
             
         });
         
@@ -450,103 +516,198 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Add E-Permit Enrollment</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Daily Attendance</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">×</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-6 col-xl-6"> 
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <h5>Location : </h5><br>
-                                <select class="btn btn-success form-control text-left stc-permitenr-location" id="stc-agent-sup-std-sublocation">
-                                </select> 
+                <?php if($_SESSION['stc_agent_sub_category']=='Supervisor'){?>
+                <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+                    <li class="nav-item">
+                        <a role="tab" class="nav-link show active" id="tab-1" data-toggle="tab" href="#newemp">
+                            <span>New</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a role="tab" class="nav-link " id="tab-2" data-toggle="tab" href="#existingemp">
+                            <span>Existing</span>
+                        </a>
+                    </li>
+                </ul>
+                <?php }?>
+                <div class="tab-content">
+                    <div class="tab-pane tabs-animation fade active" id="newemp" role="tabpanel">
+                        <div class="row">
+                            <div class="col-md-6 col-xl-6"> 
+                                <div class="main-card mb-3 card">
+                                    <div class="card-body">
+                                        <h5>Location : </h5><br>
+                                        <select class="btn btn-success form-control text-left stc-permitenr-location" id="stc-agent-sup-std-sublocation">
+                                        </select> 
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xl-6"> 
+                                <div class="main-card mb-3 card">
+                                    <div class="card-body">
+                                        <h5>Department : </h5><br>
+                                        <select class="btn btn-success form-control stc-agent-sup-std-sub-location text-left stc-permitenr-dept" id="stc-agent-sup-std-dept"><option>Please select location first!!!</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php if($_SESSION['stc_agent_sub_category']=='Supervisor'){?>
+                            <div class="col-md-6 col-xl-6"> 
+                                <div class="main-card mb-3 card">
+                                    <div class="card-body">
+                                        <h5>Name : </h5><br>
+                                        <input type="text" class="form-control stc-name stc-permitenr-name" placeholder="Enter Name"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xl-6"> 
+                                <div class="main-card mb-3 card">
+                                    <div class="card-body">
+                                        <h5>Phone Number : </h5><br>
+                                        <input type="text" class="form-control stc-permitenr-phno" placeholder="Enter Phone Number"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xl-6"> 
+                                <div class="main-card mb-3 card">
+                                    <div class="card-body">
+                                        <h5>Email : </h5><br>
+                                        <input type="text" class="form-control stc-permitenr-email" placeholder="Enter Email"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xl-6"> 
+                                <div class="main-card mb-3 card">
+                                    <div class="card-body">
+                                        <h5>Aadhar Card : </h5><br>
+                                        <input type="text" class="form-control stc-permitenr-uid" placeholder="Enter Aadhar Card"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php }else{?>
+                            <div class="col-md-6 col-xl-6"> 
+                                <div class="main-card mb-3 card">
+                                    <div class="card-body">
+                                        <h5>Name : </h5><br>
+                                        <input type="text" class="form-control stc-name stc-permitenr-name" value="<?php echo $_SESSION['stc_agent_sub_name'];?>" disabled placeholder="Enter Name"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php }?>
+                            <div class="col-md-6 col-xl-6"> 
+                                <div class="main-card mb-3 card">
+                                    <div class="card-body">
+                                        <h5>G.P No : </h5><br>
+                                        <input type="text" class="form-control stc-permitenr-gpno" placeholder="Enter G.P No"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-xl-6"> 
+                                <div class="main-card mb-3 card">
+                                    <div class="card-body">
+                                        <h5>Shift : </h5><br>
+                                        <select class="btn btn-success form-control stc-permitenr-shift text-left " id="stc-shift">
+                                            <option value="NA">Please select Shift.</option>
+                                            <option>A</option>
+                                            <option>B</option>
+                                            <option>C</option>
+                                            <option>E (General)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-xl-12"> 
+                                <div class="main-card mb-3 card">
+                                    <div class="card-body">
+                                        <a href="javascript:void(0)" class="btn btn-success stc-permitenr-save form-control">Save</a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-6"> 
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <h5>Department : </h5><br>
-                                <select class="btn btn-success form-control stc-agent-sup-std-sub-location text-left stc-permitenr-dept" id="stc-agent-sup-std-dept"><option>Please select location first!!!</option>
-                                </select>
+                    <div class="tab-pane tabs-animation" id="existingemp" role="tabpanel">
+                        <?php if($_SESSION['stc_agent_sub_category']=='Supervisor'){?>
+                        <div class="row">
+                            <div class="col-md-12 col-xl-12"> 
+                                <input type="text" class="form-control search-emp" placeholder="Search here..">
+                            </div>
+                            <div class="col-md-12 col-xl-12"> 
+                                <table class="table table-bordered search-emp-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">Location</th>
+                                            <th class="text-center">Department</th>
+                                            <th class="text-center">Name</th>
+                                            <th class="text-center">Contact</th>
+                                            <th class="text-center">UId</th>
+                                            <th class="text-center">G.P No</th>
+                                            <th class="text-center">Shift</th>
+                                            <th class="text-center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php 
+                                            include_once("../MCU/db.php");
+
+                                            $projectsQuery = "SELECT stc_cust_pro_attend_supervise_pro_id FROM stc_cust_pro_attend_supervise WHERE stc_cust_pro_attend_supervise_super_id = '".$_SESSION['stc_agent_sub_id']."'";
+                                            $projectsResult = mysqli_query($con, $projectsQuery);
+                                            $projects = [];
+                                            while ($row = mysqli_fetch_assoc($projectsResult)) {
+                                                $projects[] = $row['stc_cust_pro_attend_supervise_pro_id'];
+                                            }
+
+                                            // Convert to a comma-separated string for use in the IN clause
+                                            $projectsStr = implode(',', $projects);
+                                            $query="SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact`, `gpno` FROM `stc_cust_pro_supervisor` LEFT JOIN `stc_epermit_enrollment` ON `stc_cust_pro_supervisor_id` = `emp_id` WHERE `stc_cust_pro_supervisor_created_by` =( SELECT `stc_cust_pro_supervisor_created_by` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id` ='".$_SESSION['stc_agent_sub_id']."' ) AND `stc_cust_pro_supervisor_status`=1 ORDER BY `stc_cust_pro_supervisor_fullname` ASC";
+                                            $sql=mysqli_query($con, $query);
+                                            $usercounter=0;
+                                            foreach($sql as $row){
+                                                $getquery=mysqli_query($con, "SELECT DISTINCT `stc_status_down_list_department_loc_id`, `stc_status_down_list_department_id`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `stc_cust_pro_attend_supervise_status` FROM `stc_cust_pro_attend_supervise` LEFT JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id`=`stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `stc_status_down_list_department_dept` ASC");
+                                                
+                                                $location='<select class="form-control btn btn-success multilocation text-left" disabled>';
+                                                $department='<select class="form-control btn btn-success multidept text-left">';
+                                                $counter=0;
+                                                $locations='';
+                                                $departments='';
+                                                $loopexit=0;
+                                                foreach($getquery as $getrow){
+                                                    $counter++;  
+                                                    // Check if the project ID exists
+                                                    if (in_array($getrow['stc_status_down_list_department_loc_id'], $projects)) {
+                                                        $loopexit = 1;
+                                                        $locations.='<option value="'.$getrow['stc_status_down_list_department_id'].'">'.$getrow['stc_status_down_list_department_location'].'</option>';
+                                                        $departments.='<option value="'.$getrow['stc_status_down_list_department_id'].'">'.$getrow['stc_status_down_list_department_dept'].'</option>';
+                                                    }
+                                                }
+                                                if($counter>1){
+                                                    $location.='<option value="NA" selected>Select</option>';
+                                                    $department.='<option value="NA" selected>Select</option>';
+                                                }else if($counter==0){
+                                                    $location.='<option value="NA">Location not found.</option>';
+                                                    $department.='<option value="NA">Department not found.</option>';
+                                                }
+                                                $location.=$locations;
+                                                $department.=$departments;
+                                                $location.='</select>';
+                                                $department.='</select>';
+                                                if($loopexit==1){
+                                                    $usercounter++;
+                                                    echo "<tr><td>".$location."</td><td>".$department."</td><td>".$row['stc_cust_pro_supervisor_fullname']."</td><td>".$row['stc_cust_pro_supervisor_contact']."</td><td>".$row['stc_cust_pro_supervisor_uid']."</td><td><input type='text' value='".$row['gpno']."' class='form-control multigpno' placeholder='Enter G.P No' ></td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' user_id='".$row['stc_cust_pro_supervisor_id']."'>Add</a></td></tr>";
+                                                }
+                                            }
+                                            echo '<tr><td>Showing '.$usercounter.' users</td></tr>'
+                                        ?>
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                    </div>
-                    <div class="col-md-6 col-xl-6"> 
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <h5>Name : </h5><br>
-                                <input type="text" class="form-control stc-name stc-permitenr-name" placeholder="Enter Name"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-6"> 
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <h5>G.P No : </h5><br>
-                                <input type="text" class="form-control stc-permitenr-gpno" placeholder="Enter G.P No"/>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-xl-6"> 
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <h5>Shift : </h5><br>
-                                <select class="btn btn-success form-control stc-permitenr-shift text-left " id="stc-shift">
-                                    <option>Please select Shift.</option>
-                                    <option>A</option>
-                                    <option>B</option>
-                                    <option>C</option>
-                                    <option>E (General)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-12 col-xl-12"> 
-                        <div class="main-card mb-3 card">
-                            <div class="card-body">
-                                <a href="javascript:void(0)" class="btn btn-success stc-permitenr-save">Save</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-12 col-xl-12"> 
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Location</th>
-                                    <th>Department</th>
-                                    <th>Name</th>
-                                    <th>G.P No</th>
-                                    <th>Shift</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php 
-                                    include_once("../MCU/db.php");
-                                    $query="
-                                        SELECT distinct
-                                            `location`,
-                                            `dep_id`,
-                                            `stc_status_down_list_department_dept`,
-                                            `emp_name`,
-                                            `gpno`
-                                        FROM `stc_epermit_enrollment`
-                                        LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_loc_id`
-                                        WHERE `created_by` = '".$_SESSION['stc_agent_sub_id']."' ORDER BY `emp_name` ASC
-                                    ";
-                                    $sql=mysqli_query($con, $query);
-                                    foreach($sql as $row){
-                                        echo "<tr><td>".$row['location']."</td><td>".$row['stc_status_down_list_department_dept']."</td><td>".$row['emp_name']."</td><td>".$row['gpno']."</td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' dept_id='".$row['dep_id']."'>Add</a></td></tr>";
-                                    }
-                                ?>
-                            </tbody>
-                        </table>
+                        <?php }?>
                     </div>
                 </div>
             </div>

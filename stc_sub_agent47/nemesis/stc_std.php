@@ -186,7 +186,7 @@ class transformers extends tesseract{
 		}else{
 			foreach ($optimusprimequery as $row) {
     			$optimusprime.='
-    				<option value="'.$row["stc_status_down_list_job_type_id"].'" selected>'.$row["stc_status_down_list_job_type_sub_title"].'</option>		               	
+    				<option value="'.$row["stc_status_down_list_job_type_id"].'">'.$row["stc_status_down_list_job_type_sub_title"].'</option>		               	
     		    ';
 			}			
 		}

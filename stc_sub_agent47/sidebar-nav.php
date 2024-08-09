@@ -75,7 +75,7 @@
                             <li>
                                 <a href="epermitenroll.php?page=epermitenroll" class="epermitenroll">
                                     <i class="metismenu-icon pe-7s-add-user"></i>
-                                    E-Permit Enrollment
+                                    Daily Attendance
                                 </a>
                             </li>
                             <li>
@@ -103,7 +103,7 @@
                             <li>
                                 <a href="epermitenroll.php?page=epermitenroll" class="epermitenroll">
                                     <i class="metismenu-icon pe-7s-add-user"></i>
-                                    E-Permit Enrollment
+                                    Daily Attendance
                                 </a>
                             </li>
                         ';

@@ -100,7 +100,7 @@ class transformers extends tesseract{
 	}
 
     // save permit enrollment
-    public function stc_save_epermitenroll($location, $dept, $name, $gpno, $shift){
+    public function stc_save_epermitenroll($location, $dept, $name, $phno, $email, $uid, $gpno, $shift){
         $optimusprime = "";
         $currentDateTime = date("Y-m-d H:i:s");
         $eightHoursAgo = date("Y-m-d H:i:s", strtotime('-8 hours'));
@@ -114,8 +114,40 @@ class transformers extends tesseract{
         if ($duplicateCount > 0) {
             $optimusprime = "Duplicate";
         } else {
-            // No duplicate found, proceed with insertion
-            $insertQuery = "INSERT INTO `stc_epermit_enrollment`(`location`, `dep_id`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."', UCASE('".mysqli_real_escape_string($this->stc_dbs, $name)."'), UCASE('".mysqli_real_escape_string($this->stc_dbs, $gpno)."'), '".mysqli_real_escape_string($this->stc_dbs, $shift)."', '".$currentDateTime."', '".$_SESSION['stc_agent_sub_id']."')";
+            $userid=0;
+            // Check user table for phone number or UID
+            $userCheckQuery = "SELECT `stc_cust_pro_supervisor_id` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_contact` = '".mysqli_real_escape_string($this->stc_dbs, $phno)."' OR `stc_cust_pro_supervisor_uid` = '".mysqli_real_escape_string($this->stc_dbs, $uid)."' OR `stc_cust_pro_supervisor_email` = '".mysqli_real_escape_string($this->stc_dbs, $email)."'";
+            $userCheckResult = mysqli_query($this->stc_dbs, $userCheckQuery);
+
+            if (mysqli_num_rows($userCheckResult)==0) {
+                $createruserid=$_SESSION['stc_agent_sub_id'];
+                $userCheckQuery = "SELECT `stc_cust_pro_supervisor_cust_id`, `stc_cust_pro_supervisor_created_by` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $createruserid)."'";
+                $userCheckResult = mysqli_query($this->stc_dbs, $userCheckQuery);
+                $userRow = mysqli_fetch_assoc($userCheckResult);
+                $cust_id=$userRow['stc_cust_pro_supervisor_cust_id'];
+                $man_id=$userRow['stc_cust_pro_supervisor_created_by'];
+                // Insert into user table if data does not exist
+                $insertUserQuery = "INSERT INTO `stc_cust_pro_supervisor`(`stc_cust_pro_supervisor_cust_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact`, `stc_cust_pro_supervisor_whatsapp`, `stc_cust_pro_supervisor_email`, `stc_cust_pro_supervisor_password`, `stc_cust_pro_supervisor_status`, `stc_cust_pro_supervisor_category`, `stc_cust_pro_supervisor_created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $cust_id)."','".mysqli_real_escape_string($this->stc_dbs, $name)."','".mysqli_real_escape_string($this->stc_dbs, $uid)."','".mysqli_real_escape_string($this->stc_dbs, $phno)."', '".mysqli_real_escape_string($this->stc_dbs, $phno)."', '".mysqli_real_escape_string($this->stc_dbs, $email)."', '123456', '1', 'Operator', '".mysqli_real_escape_string($this->stc_dbs, $man_id)."')";
+                $insertUserResult = mysqli_query($this->stc_dbs, $insertUserQuery);
+            }else{
+                $userRow = mysqli_fetch_assoc($userCheckResult);
+                $userid = $userRow['stc_cust_pro_supervisor_id'];
+            }
+            $getdept=mysqli_query($this->stc_dbs, "SELECT `stc_status_down_list_department_loc_id` FROM `stc_status_down_list_department` WHERE `stc_status_down_list_department_id`='".mysqli_real_escape_string($this->stc_dbs, $dept)."'");
+            $getdeptrow = mysqli_fetch_assoc($getdept);
+            $loc_id = $getdeptrow['stc_status_down_list_department_loc_id'];
+            
+            $getlocation=mysqli_query($this->stc_dbs, "SELECT distinct `stc_cust_pro_attend_supervise_id` FROM `stc_cust_pro_attend_supervise` WHERE `stc_cust_pro_attend_supervise_pro_id`='".mysqli_real_escape_string($this->stc_dbs, $loc_id)."' AND `stc_cust_pro_attend_supervise_super_id`='".mysqli_real_escape_string($this->stc_dbs, $userid)."'");
+            if(mysqli_num_rows($getlocation)==0){
+                $userCheckQuery = "SELECT `stc_cust_pro_supervisor_id` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_contact` = '".mysqli_real_escape_string($this->stc_dbs, $phno)."' OR `stc_cust_pro_supervisor_uid` = '".mysqli_real_escape_string($this->stc_dbs, $uid)."'";
+                $userCheckResult = mysqli_query($this->stc_dbs, $userCheckQuery);
+                $userCheckQueryrow = mysqli_fetch_assoc($userCheckResult);
+                $userid = $userCheckQueryrow['stc_cust_pro_supervisor_id'];
+                mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_pro_attend_supervise`(`stc_cust_pro_attend_supervise_pro_id`, `stc_cust_pro_attend_supervise_super_id`, `stc_cust_pro_attend_supervise_status`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $loc_id)."', '".mysqli_real_escape_string($this->stc_dbs, $userid)."', '1')");
+            }
+
+            // No duplicate found, proceed with insertion into epermit_enrollment
+            $insertQuery = "INSERT INTO `stc_epermit_enrollment`(`location`, `dep_id`, `emp_id`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."',  '".mysqli_real_escape_string($this->stc_dbs, $userid)."', UCASE('".mysqli_real_escape_string($this->stc_dbs, $name)."'), UCASE('".mysqli_real_escape_string($this->stc_dbs, $gpno)."'), '".mysqli_real_escape_string($this->stc_dbs, $shift)."', '".$currentDateTime."', '".$_SESSION['stc_agent_sub_id']."')";
 
             $insertResult = mysqli_query($this->stc_dbs, $insertQuery);
             if ($insertResult) {
@@ -126,7 +158,35 @@ class transformers extends tesseract{
         }
 
         return $optimusprime;
+    }
 
+    
+    public function stc_save_epermitenroll_multi($location, $dept, $name, $gpno, $user, $shift){
+        $optimusprime = "";
+        $currentDateTime = date("Y-m-d H:i:s");
+        $eightHoursAgo = date("Y-m-d H:i:s", strtotime('-8 hours'));
+
+        // Check if a similar record exists within the last 8 hours
+        $duplicateCheckQuery = "SELECT COUNT(*) as count FROM `stc_epermit_enrollment` WHERE `emp_id` = '".mysqli_real_escape_string($this->stc_dbs, $user)."' AND `created_date` >= '$eightHoursAgo'";
+        $duplicateCheckResult = mysqli_query($this->stc_dbs, $duplicateCheckQuery);
+        $row = mysqli_fetch_assoc($duplicateCheckResult);
+        $duplicateCount = $row['count'];
+
+        if ($duplicateCount > 0) {
+            $optimusprime = "Duplicate";
+        } else {
+            // No duplicate found, proceed with insertion into epermit_enrollment
+            $insertQuery = "INSERT INTO `stc_epermit_enrollment`(`location`, `dep_id`, `emp_id`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."',  '".mysqli_real_escape_string($this->stc_dbs, $user)."', UCASE('".mysqli_real_escape_string($this->stc_dbs, $name)."'), UCASE('".mysqli_real_escape_string($this->stc_dbs, $gpno)."'), '".mysqli_real_escape_string($this->stc_dbs, $shift)."', '".$currentDateTime."', '".$_SESSION['stc_agent_sub_id']."')";
+
+            $insertResult = mysqli_query($this->stc_dbs, $insertQuery);
+            if ($insertResult) {
+                $optimusprime = "Success";
+            } else {
+                $optimusprime = "failed";
+            }
+        }
+
+        return $optimusprime;
     }
 
     public function stc_save_totalpermitenr($totalpermitenr, $location, $dept, $remarks){
@@ -222,16 +282,36 @@ if(isset($_POST['save_permitenr'])){
     $location=$_POST['location'];
     $dept=$_POST['dept'];
     $name=$_POST['name'];
+    $phno=$_POST['phno'];
+    $email=$_POST['email'];
+    $uid=$_POST['uid'];
     $gpno=$_POST['gpno'];
     $shift=$_POST['shift'];
     $out='';
-    if($dept=="NA" || $name=='' || $gpno==''){
-        $out="empty";
-    }else if(!isset($_SESSION['stc_agent_sub_id'])){
+    if(!isset($_SESSION['stc_agent_sub_id'])){
         $out="login";
     }else{
         $metabots=new transformers();
-        $opmetabots=$metabots->stc_save_epermitenroll($location, $dept, $name, $gpno, $shift);
+        $opmetabots=$metabots->stc_save_epermitenroll($location, $dept, $name, $phno, $email, $uid, $gpno, $shift);
+        $out=$opmetabots;
+    }
+    echo json_encode($out);
+}
+
+// save permit enrollment
+if(isset($_POST['save_permitenr_multi'])){
+    $location=$_POST['location'];
+    $dept=$_POST['dept'];
+    $name=$_POST['name'];
+    $gpno=$_POST['gpno'];
+    $user=$_POST['user'];
+    $shift=$_POST['shift'];
+    $out='';
+    if(!isset($_SESSION['stc_agent_sub_id'])){
+        $out="login";
+    }else{
+        $metabots=new transformers();
+        $opmetabots=$metabots->stc_save_epermitenroll_multi($location, $dept, $name, $gpno, $user, $shift);
         $out=$opmetabots;
     }
     echo json_encode($out);

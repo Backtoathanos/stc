@@ -912,6 +912,8 @@ if(isset($_POST['save_Dailylist'])){
 		$out="Please Fill All Fields!!!";
 	}elseif($sup_site=="NA"){
 		$out="Please Select Your Site First!!!";
+	}elseif(empty($_SESSION['stc_agent_sub_id'])){
+		$out="logout";
 	}elseif(empty($_SESSION['stc_agent_sup_dailylist_cart_sess'])){
 		$out="Please Order atleast One Product!!!";
 	}else{
