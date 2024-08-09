@@ -43,6 +43,11 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <span>View Consumption</span>
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a role="tab" class="nav-link" id="tab-3" data-toggle="tab" href="#view-atten">
+                                <span>Attendance(from E-Permit Enrollment)</span>
+                            </a>
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane tabs-animation fade show active" id="view-req" role="tabpanel">
@@ -218,6 +223,105 @@ if(isset($_SESSION["stc_agent_id"])){
                                                             <th>Search...</th>
                                                         </tr>
                                                         </thead>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane tabs-animation fade" id="view-atten" role="tabpanel">
+                            <div class="row">
+                                <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                    <div class="card mb-3 widget-content">
+                                        <button class="mb-2 mr-2 btn btn-success btn-block">
+                                            <input 
+                                                type="month" 
+                                                class="form-control stc-consumpt-end-date"
+                                                value="<?php echo $newDate;?>" 
+                                            >
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-6 col-sm-12"> 
+                                    <div class="card mb-3 widget-content">
+                                        <select class="form-control btn btn-secondary stc-consumpt-agents-pending-items-rep-super-select">
+                                            <?php 
+                                                echo '<option value="0" selected>Please select Location!!!</option>';
+                                                echo '<option>JH-05-01 [TSL]</option>';
+                                                // $stcagentspendreportssup=mysqli_query($con, "
+                                                //     SELECT 
+                                                //         `stc_cust_pro_supervisor_id`,
+                                                //         `stc_cust_pro_supervisor_fullname` 
+                                                //     FROM `stc_cust_pro_supervisor` 
+                                                //     WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION["stc_agent_id"]."'
+                                                //     ORDER BY `stc_cust_pro_supervisor_fullname` ASC
+                                                // ");
+                                                // if(mysqli_num_rows($stcagentspendreportssup)>0){
+                                                //     foreach($stcagentspendreportssup as $pendrepcheckrow){
+                                                //         echo '<option align="left" value="'.$pendrepcheckrow['stc_cust_pro_supervisor_id'].'">'.$pendrepcheckrow['stc_cust_pro_supervisor_fullname'].'</option>';
+                                                //     }
+                                                // }else{
+                                                //     echo '<option value="0">No supervisor found!!!</option>';
+                                                // }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-xl-6 col-sm-12"> 
+                                    <div class="card mb-3 widget-content">
+                                        <select class="form-control btn btn-secondary">
+                                            <option value="0" selected>Please Select Department</option>       
+                                            <option value="0">PELLET PLANT - [08]</option>                            
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                    <div class="card mb-3 widget-content">
+                                        <button class="mb-2 mr-2 btn btn-success btn-block stc-consumptFind-hit">
+                                            <i class="metismenu-icon pe-7s-search"></i> Find
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                    <div class="card mb-3 widget-content">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body"><h5 class="card-title">Pending Items Reports</h5>
+                                                <div class="table-responsive">
+                                                    <table class="table table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Sl No</th>
+                                                                <th>Location</th>
+                                                                <th>Department</th>
+                                                                <th>Employee Name</th>
+                                                                <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+                                                                <th>6</th><th>7</th><th>8</th><th>9</th><th>10</th>
+                                                                <th>11</th><th>12</th><th>13</th><th>14</th><th>15</th>
+                                                                <th>16</th><th>17</th><th>18</th><th>19</th><th>20</th>
+                                                                <th>21</th><th>22</th><th>23</th><th>24</th><th>25</th>
+                                                                <th>26</th><th>27</th><th>28</th><th>29</th><th>30</th>
+                                                                <th>31</th>
+                                                                <th>Total</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td>1</td>
+                                                                <td>PELLET PLANT</td>
+                                                                <td>[08]</td>
+                                                                <td>AMAN KUMAR</td>
+                                                                <td>P</td><td>A</td><td>P</td><td>P</td><td>A</td>
+                                                                <td>P</td><td>P</td><td>A</td><td>P</td><td>P</td>
+                                                                <td>A</td><td>P</td><td>P</td><td>P</td><td>P</td><td>A</td><td>P</td>
+                                                                <td>P</td><td>A</td><td>P</td><td>P</td><td>A</td>
+                                                                <td>P</td><td>A</td><td>P</td><td>P</td><td>A</td><td>P</td><td>P</td>
+                                                                <td>P</td><td>P</td>
+                                                                <td>16</td> <!-- Calculate total of present days -->
+                                                            </tr>
+                                                            <!-- Add more rows as needed -->
+                                                        </tbody>
                                                     </table>
                                                 </div>
                                             </div>
