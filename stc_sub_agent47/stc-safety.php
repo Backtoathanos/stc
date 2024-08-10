@@ -2437,7 +2437,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">Employee's Name</h5>
                                         <div class="position-relative form-group">
-                                            <table class="table table-bordered">
+                                            <table class="table table-bordered table-responsive">
                                                 <thead>
                                                     <tr>
                                                         <th>Employee Name</th>
@@ -2489,13 +2489,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     ?>                                                        
                                                 </tbody>
                                             </table>
-                                            <script>
-                                                $('body').delegate('.checktd', 'click',  function(){
-                                                    $(this).find('input:checkbox').prop('checked', function(i, val) {
-                                                        return !val;
-                                                    });
-                                                });
-                                            </script>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
