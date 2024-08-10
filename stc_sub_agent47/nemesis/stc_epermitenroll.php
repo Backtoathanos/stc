@@ -253,7 +253,7 @@ class transformers extends tesseract{
             'remarks' => $remarks,
             'totalpenrollment' => $counter
         );
-		return $optimusprime;
+		return $optimusprimearr;
 	}
 }
 

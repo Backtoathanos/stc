@@ -257,7 +257,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 data    : {show_totalepermitenroll:1},
                                 dataType : "JSON",
                                 success : function(response){
-                                    // console.log(response);
                                     $('.stc-totalepermitenrollment-result').html(response['optimusprime']);
                                     $('.totalpenrollment').html(response['totalpenrollment']);
                                     $('.totalenrollremarks').html(response['remarks']);
@@ -381,7 +380,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     var selectedOption = $('.stc-permitenr-dept1').find('option:selected');
                     var dept = selectedOption.data('id');
                     var remarks=$('.stc-totalpermitenr-remarks').val();
-                    if(location=='Select' || dept==0){
+                    if(location=='Select' || dept==0 || totalpermitenr=='' || totalpermitenr==0){
                         alert("Please Select all fields.");
                     }else{
                         $.ajax({
@@ -694,7 +693,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <input type="text" class="form-control search-emp" placeholder="Search here..">
                             </div>
                             <div class="col-md-12 col-xl-12"> 
-                                <table class="table table-bordered search-emp-table">
+                                <table class="table table-bordered table-responsive search-emp-table">
                                     <thead>
                                         <tr>
                                             <th class="text-center">Location</th>

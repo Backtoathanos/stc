@@ -447,7 +447,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="row form control">
                                     <div class="col-md-12">
                                         <div class="card mb-3 widget-content">
-                                            <table class="table table-bordered">
+                                            <table class="table table-bordered table-responsive">
                                               <thead>
                                                 <tr>
                                                   <th class="text-center">UNIQUE ID</th>
