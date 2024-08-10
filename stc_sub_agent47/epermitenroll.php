@@ -445,13 +445,13 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     $(this).closest('tr').remove();
                                 }else if(response.trim()=="Duplicate"){
                                     alert("Duplicate record found within the last 8 hours");
-                                    $('.stc-permitenr-save').prop('disabled', false);
+                                    $('.save-multiple').prop('disabled', false);
                                 }else if(response.trim()=="failed"){
                                     alert("Daily Attendance Not Saved.");
-                                    $('.stc-permitenr-save').prop('disabled', false);
+                                    $('.save-multiple').prop('disabled', false);
                                 }else if(response.trim()=="empty"){
                                     alert("Please enter all fields.");
-                                    $('.stc-permitenr-save').prop('disabled', false);
+                                    $('.save-multiple').prop('disabled', false);
                                 }else if(response.trim()=="login"){
                                     widnow.location.reload();
                                 }
@@ -462,6 +462,58 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     alert("Please complete all fields.");
                 }
             });
+
+            $('body').delegate('.save-multiple2', 'click', function(e){
+                e.preventDefault();
+                var location=$('.stc-permitenr-location').val();
+                var deptselect = $('.stc-permitenr-dept').val();
+                var selectedOption = $('.stc-permitenr-dept').find('option:selected');
+                var dept = selectedOption.data('id');
+                var user = $(this).attr('user_id');
+                var name=$('.stc-permitenr-name').val();
+                var gpno=$('.stc-permitenr-gpno').val();
+                var shift=$('.stc-permitenr-shift').val();
+                if(shift!='NA' && dept!='NA' && gpno!=''){
+                    if(confirm("Are you sure?")){
+                        $.ajax({
+                            url : "nemesis/stc_epermitenroll.php",
+                            method : "POST",
+                            data : {
+                                save_permitenr_multi:1,
+                                location:location,
+                                dept:dept,
+                                name:name,
+                                gpno:gpno,
+                                user:user,
+                                shift:shift
+                            },
+                            dataType : "JSON",
+                            success : function(response){
+                                if(response.trim()=="Success"){
+                                    alert("Daily Attendance Saved Successfully.");
+                                    $('.stc-permitenr-name').val('');
+                                    $('.stc-permitenr-gpno').val('');
+                                    $('.stc-permitenr-shift').val('');
+                                }else if(response.trim()=="Duplicate"){
+                                    alert("Duplicate record found within the last 8 hours");
+                                    $('.save-multiple2').prop('disabled', false);
+                                }else if(response.trim()=="failed"){
+                                    alert("Daily Attendance Not Saved.");
+                                    $('.save-multiple2').prop('disabled', false);
+                                }else if(response.trim()=="empty"){
+                                    alert("Please enter all fields.");
+                                    $('.save-multiple2').prop('disabled', false);
+                                }else if(response.trim()=="login"){
+                                    widnow.location.reload();
+                                }
+                            }
+                        }); 
+                    }
+                }else{
+                    alert("Please complete all fields.");
+                }
+            });
+
             $('body').delegate('.stc-epermitenrollment-result-table th', 'click', function(e){
                 var table = $(this).parents('table').eq(0);
                 var rows = table.find('tbody > tr:eq(0)').toArray().sort(comparer($(this).index()));
@@ -625,7 +677,11 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             <div class="col-md-12 col-xl-12"> 
                                 <div class="main-card mb-3 card">
                                     <div class="card-body">
-                                        <a href="javascript:void(0)" class="btn btn-success stc-permitenr-save form-control">Save</a>
+                                        <?php if($_SESSION['stc_agent_sub_category']=='Supervisor'){?>
+                                            <a href="javascript:void(0)" class="btn btn-success stc-permitenr-save form-control">Save</a>
+                                        <?php }else{?>
+                                            <a href="javascript:void(0)" user_id="<?php echo $_SESSION['stc_agent_sub_id'];?>" class="btn btn-success save-multiple2 form-control">Save</a>
+                                        <?php }?>
                                     </div>
                                 </div>
                             </div>
