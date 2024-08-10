@@ -233,12 +233,12 @@ if(isset($_SESSION["stc_agent_id"])){
                         </div>
                         <div class="tab-pane tabs-animation fade" id="view-atten" role="tabpanel">
                             <div class="row">
-                                <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                <div class="col-md-6 col-xl-6 col-sm-12"> 
                                     <div class="card mb-3 widget-content">
                                         <button class="mb-2 mr-2 btn btn-success btn-block">
                                             <input 
                                                 type="month" 
-                                                class="form-control stc-consumpt-end-date"
+                                                class="form-control attendance-date-select"
                                                 value="<?php echo $newDate;?>" 
                                             >
                                         </button>
@@ -246,40 +246,31 @@ if(isset($_SESSION["stc_agent_id"])){
                                 </div>
                                 <div class="col-md-6 col-xl-6 col-sm-12"> 
                                     <div class="card mb-3 widget-content">
-                                        <select class="form-control btn btn-secondary stc-consumpt-agents-pending-items-rep-super-select">
-                                            <?php 
-                                                echo '<option value="0" selected>Please select Location!!!</option>';
-                                                echo '<option>JH-05-01 [TSL]</option>';
-                                                // $stcagentspendreportssup=mysqli_query($con, "
-                                                //     SELECT 
-                                                //         `stc_cust_pro_supervisor_id`,
-                                                //         `stc_cust_pro_supervisor_fullname` 
-                                                //     FROM `stc_cust_pro_supervisor` 
-                                                //     WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION["stc_agent_id"]."'
-                                                //     ORDER BY `stc_cust_pro_supervisor_fullname` ASC
-                                                // ");
-                                                // if(mysqli_num_rows($stcagentspendreportssup)>0){
-                                                //     foreach($stcagentspendreportssup as $pendrepcheckrow){
-                                                //         echo '<option align="left" value="'.$pendrepcheckrow['stc_cust_pro_supervisor_id'].'">'.$pendrepcheckrow['stc_cust_pro_supervisor_fullname'].'</option>';
-                                                //     }
-                                                // }else{
-                                                //     echo '<option value="0">No supervisor found!!!</option>';
-                                                // }
-                                            ?>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6 col-xl-6 col-sm-12"> 
-                                    <div class="card mb-3 widget-content">
-                                        <select class="form-control btn btn-secondary">
-                                            <option value="0" selected>Please Select Department</option>       
-                                            <option value="0">PELLET PLANT - [08]</option>                            
-                                        </select>
+                                        <button class="mb-2 mr-2 btn btn-success btn-block">
+                                            <select class="form-control btn btn-secondary attendance-dept-select">
+                                                <?php
+                                                    include_once("../MCU/db.php");
+                                                    $query="
+                                                        SELECT DISTINCT `stc_status_down_list_department_id`, `stc_status_down_list_department_loc_id`, `stc_status_down_list_department_dept`
+                                                        FROM `stc_status_down_list_department`
+                                                        LEFT JOIN `stc_cust_project_collaborate` 
+                                                        ON `stc_cust_project_collaborate_projectid` = `stc_status_down_list_department_loc_id`
+                                                        WHERE (`stc_cust_project_collaborate_teamid` = '".$_SESSION['stc_agent_id']."' 
+                                                        OR `stc_cust_project_collaborate_managerid` = '".$_SESSION['stc_agent_id']."') 
+                                                        ORDER BY `stc_status_down_list_department_dept` ASC
+                                                    ";
+                                                    $dept_qry=mysqli_query($con, $query);
+                                                    foreach($dept_qry as $dept_row){
+                                                        echo '<option value="'.$dept_row['stc_status_down_list_department_id'].'">'.$dept_row['stc_status_down_list_department_dept'].'</option>';
+                                                    }
+                                                ?>                  
+                                            </select>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="col-md-12 col-xl-12 col-sm-12"> 
                                     <div class="card mb-3 widget-content">
-                                        <button class="mb-2 mr-2 btn btn-success btn-block stc-consumptFind-hit">
+                                        <button class="mb-2 mr-2 btn btn-success btn-block stc-attendance-hit">
                                             <i class="metismenu-icon pe-7s-search"></i> Find
                                         </button>
                                     </div>
@@ -289,7 +280,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                         <div class="main-card mb-3 card">
                                             <div class="card-body"><h5 class="card-title">Pending Items Reports</h5>
                                                 <div class="table-responsive">
-                                                    <table class="table table-bordered">
+                                                    <table class="table table-bordered display-attendance">
                                                         <thead>
                                                             <tr>
                                                                 <th>Sl No</th>
@@ -307,20 +298,6 @@ if(isset($_SESSION["stc_agent_id"])){
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr>
-                                                                <td>1</td>
-                                                                <td>PELLET PLANT</td>
-                                                                <td>[08]</td>
-                                                                <td>AMAN KUMAR</td>
-                                                                <td>P</td><td>A</td><td>P</td><td>P</td><td>A</td>
-                                                                <td>P</td><td>P</td><td>A</td><td>P</td><td>P</td>
-                                                                <td>A</td><td>P</td><td>P</td><td>P</td><td>P</td><td>A</td><td>P</td>
-                                                                <td>P</td><td>A</td><td>P</td><td>P</td><td>A</td>
-                                                                <td>P</td><td>A</td><td>P</td><td>P</td><td>A</td><td>P</td><td>P</td>
-                                                                <td>P</td><td>P</td>
-                                                                <td>16</td> <!-- Calculate total of present days -->
-                                                            </tr>
-                                                            <!-- Add more rows as needed -->
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -474,6 +451,25 @@ if(isset($_SESSION["stc_agent_id"])){
                     }
                 });
             });
+
+            // call consumption byy supervisor & site
+            $('body').delegate('.stc-attendance-hit', 'click', function(e){
+                e.preventDefault();
+                var dept=$('.attendance-dept-select').val();
+                var date=$('.attendance-date-select').val();
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        js_search_attendance:1,
+                        dept:dept,
+                        date:date
+                    },
+                    success     : function(reportsfindres){
+                        $('.display-attendance').html(reportsfindres);
+                    }
+                });
+            });  
         });
     </script>
 </body>

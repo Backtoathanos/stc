@@ -312,12 +312,12 @@ class witcher_supervisor extends tesseract{
 				$insertval .='1,';
 			}
 		}
-		$optimusprime_qry="
+		$optimusprime_qry = "
 			INSERT INTO `stc_safetytbm_dailyfitppe_checklist`(
 				`stc_safetytbm_checklist_tbmid`,
-			    `stc_safetytbm_checklist_empname`,
-			    ".$insertqry."
-			    `stc_safetytbm_checklist_created_by`
+				`stc_safetytbm_checklist_empname`,
+				".$insertqry."
+				`stc_safetytbm_checklist_created_by`
 			) VALUES (
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_tbm_no)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_emp_name)."',

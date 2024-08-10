@@ -894,42 +894,57 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.stc-tbtm-ppe-checklistadd', 'click', function(e){
                 e.preventDefault();
                 var stc_tbm_no=$('.stc-tbm-no').val();
-                var emp_name=$('#stc-tbtm-ppe-checklistempname').val();
-                var filter = get_filter('checklistcb');
-                if(emp_name!=''){
-                     $.ajax({
-                        url         : "nemesis/stc_safety.php",
-                        method      : "POST",
-                        data        : {
-                            stc_safety_savetbmppechecklist:1,
-                            stc_tbm_no:stc_tbm_no,
-                            stc_emp_name:emp_name,
-                            stc_filter:filter
-                        },
-                        success     : function(response_tbm){
-                            // console.log(response_tbm);
-                            var response=response_tbm.trim();
-                            if(response=="success"){
-                                alert("Record added.");
-                                call_tbm_fields();
-                                $('#stc-tbtm-ppe-checklistempname').val('');
-                                $('.checklistcb').prop('checked', false);
-                            }else{
-                                alert("Something went wrong, please check and try again.");
-                            }
+                var emp_name=$.trim($(this).closest('tr').find('td:eq(0)').text());
+                var filter = get_ppefilter($(this), 'checklistcb');
+                if(filter.length>0){
+                    var validation=0;
+                    $('.attendance-ppe-table tr').each(function(){
+                        var checkempname = $.trim($(this).find('td:eq(1)').text());
+                        if(checkempname === emp_name){
+                            validation = 1;
+                            return false;
                         }
                     });
+                    if(validation==0){
+                        if(confirm("Are you sure?")){
+                            $(this).closest('tr').remove();
+                            $.ajax({
+                                url         : "nemesis/stc_safety.php",
+                                method      : "POST",
+                                data        : {
+                                    stc_safety_savetbmppechecklist:1,
+                                    stc_tbm_no:stc_tbm_no,
+                                    stc_emp_name:emp_name,
+                                    stc_filter:filter
+                                },
+                                success     : function(response_tbm){
+                                    // console.log(response_tbm);
+                                    var response=response_tbm.trim();
+                                    if(response=="success"){
+                                        alert("Record added.");
+                                        call_tbm_fields();
+                                        $('#stc-tbtm-ppe-checklistempname').val('');
+                                    }else{
+                                        alert("Something went wrong, please check and try again.");
+                                    }
+                                }
+                            });
+                        }
+                    }else{
+                        $(this).closest('tr').remove();
+                        alert("Employee already exist.");
+                    }
                 }else{
-                    alert("Please enter employees name!!!");
+                    alert("Please check ppe!!!");
                 }
                 // console.log(filter);
             });
 
             // filter tbm checkbox
-            function get_filter(class_name){
+            function get_ppefilter($this, class_name){
                 var filter = [];
-                $('.' + class_name + ':checked').each(function(){
-                   filter.push($(this).val()); 
+                $this.closest('tr').find('.' + class_name + ':checked').each(function(){
+                filter.push($(this).val()); 
                 });
                 return filter;
             }
@@ -2419,45 +2434,69 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">Daily PPE and Fitness Checklist</h5>
                                     </div>
-                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">Employee's Name</h5>
                                         <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-ppe-checklistempname" placeholder="Enter Employees Name">
-                                            <select class="form-control stc-tbm-checklistitem">
-                                                <?php 
-                                                    $result=mysqli_query($con, "
-                                                        SELECT DISTINCT `stc_safetytbm_checklist_empname`
-                                                        FROM `stc_safetytbm_dailyfitppe_checklist` 
-                                                        LEFT JOIN `stc_safetytbm` 
-                                                        ON `stc_safetytbm_id`=`stc_safetytbm_checklist_tbmid`
-                                                        WHERE `stc_safetytbm_created_by`='".$_SESSION['stc_agent_sub_id']."'
-                                                        AND `stc_safetytbm_checklist_empname`<>''
-                                                        ORDER BY `stc_safetytbm_checklist_empname` ASC
-                                                    ");
-                                                    if(mysqli_num_rows($result)>0){
-                                                        foreach($result as $resultrow){
-                                                            echo '<option>'.$resultrow['stc_safetytbm_checklist_empname'].'</option>';
+                                            <table class="table table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Employee Name</th>
+                                                        <th>Helmet</th>
+                                                        <th>Nose Mask</th>
+                                                        <th>Safety Goggle</th>
+                                                        <th>Hand Gloves</th>
+                                                        <th>FR-Jacket/Trouser</th>
+                                                        <th>Safety Shoes</th>
+                                                        <th>Earplug</th>
+                                                        <th>Leg Guard</th>
+                                                        <th>Physically fit for duty</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php 
+                                                        // $result=mysqli_query($con, "
+                                                        //     SELECT DISTINCT `stc_safetytbm_checklist_empname`
+                                                        //     FROM `stc_safetytbm_dailyfitppe_checklist` 
+                                                        //     LEFT JOIN `stc_safetytbm` 
+                                                        //     ON `stc_safetytbm_id`=`stc_safetytbm_checklist_tbmid`
+                                                        //     WHERE `stc_safetytbm_created_by`='".$_SESSION['stc_agent_sub_id']."'
+                                                        //     AND `stc_safetytbm_checklist_empname`<>''
+                                                        //     ORDER BY `stc_safetytbm_checklist_empname` ASC
+                                                        // ");
+                                                        $date=date('Y-m-d');
+                                                        $result=mysqli_query($con, "SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`created_by`LEFT JOIN `stc_agents` ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` WHERE DATE(`created_date`)='".$date."' AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$_SESSION['stc_agent_sub_id']."') ORDER BY `emp_name` ASC");
+
+                                                        if(mysqli_num_rows($result)>0){
+                                                            $i = 1;
+                                                            while($resultrow=mysqli_fetch_assoc($result)){
+                                                                echo '<tr>';
+                                                                echo '<td>'.$resultrow['emp_name'].'</td>';
+                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'h" value="Hardhat"></td>';
+                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'n" value="Nose Mask"></td>';
+                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'s" value="Safety Goggle"></td>';
+                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'hg" value="Hand Gloves"></td>';
+                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'fj" value="FR-Jacket/Trouser"></td>';
+                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'ss" value="Safety Shoes"></td>';
+                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'e" value="Earplug"></td>';
+                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'lg" value="Leg Guard"></td>';
+                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'p" value="Physically fit for duty"></td>';
+                                                                echo '<td><a href="#" class="form-control stc-tbtm-ppe-checklistadd btn btn-success">Add</a></td>';
+                                                                echo '</tr>';
+                                                                $i++;
+                                                            }
                                                         }
-                                                    }
-                                                ?>                                                        
-                                            </select>
+                                                    ?>                                                        
+                                                </tbody>
+                                            </table>
+                                            <script>
+                                                $('body').delegate('.checktd', 'click',  function(){
+                                                    $(this).find('input:checkbox').prop('checked', function(i, val) {
+                                                        return !val;
+                                                    });
+                                                });
+                                            </script>
                                         </div>
-                                    </div>                                    
-                                    <div class="col-md-7 col-sm-12 col-xl-7">
-                                        <div class="position-relative form-group">
-                                            <input type="checkbox" class="checklistcb" value="Hardhat"> Helmet
-                                            <input type="checkbox" class="checklistcb" value="Nose Mask"> Nose Mask
-                                            <input type="checkbox" class="checklistcb" value="Safety Goggle"> Safety Goggle
-                                            <input type="checkbox" class="checklistcb" value="Hand Gloves"> Hand Gloves
-                                            <input type="checkbox" class="checklistcb" value="FR-Jacket/Trouser"> FR-Jacket/Trouser
-                                            <input type="checkbox" class="checklistcb" value="Safety Shoes"> Safety Shoes
-                                            <input type="checkbox" class="checklistcb" value="Earplug"> Earplug
-                                            <input type="checkbox" class="checklistcb" value="Leg Guard"> Leg Guard
-                                            <input type="checkbox" class="checklistcb" value="Physically fit for duty"> Physically fit for duty
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 col-sm-12 col-xl-2">
-                                        <a href="#" class="form-control stc-tbtm-ppe-checklistadd btn btn-success">Add</a>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <table class="table table-bordered table-responsive">
@@ -2477,7 +2516,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <th class="text-center">Emp. Signature</th>
                                                 </tr>
                                             </thead>
-                                            <tbody class="stc-tbtm-ppe-checklist-show-table">
+                                            <tbody class="stc-tbtm-ppe-checklist-show-table attendance-ppe-table">
                                                 <tr>
                                                     <td colspan="6">Empty record</td>
                                                 </tr>

@@ -2310,15 +2310,15 @@ if(isset($_SESSION["stc_agent_id"])){
                                     </div>                                    
                                     <div class="col-md-7 col-sm-12 col-xl-7">
                                         <div class="position-relative form-group">
-                                            <input type="checkbox" class="checklistcb" value="Hardhat"> Helmet
-                                            <input type="checkbox" class="checklistcb" value="Nose Mask"> Nose Mask
-                                            <input type="checkbox" class="checklistcb" value="Safety Goggle"> Safety Goggle
-                                            <input type="checkbox" class="checklistcb" value="Hand Gloves"> Hand Gloves
-                                            <input type="checkbox" class="checklistcb" value="FR-Jacket/Trouser"> FR-Jacket/Trouser
-                                            <input type="checkbox" class="checklistcb" value="Safety Shoes"> Safety Shoes
-                                            <input type="checkbox" class="checklistcb" value="Earplug"> Earplug
-                                            <input type="checkbox" class="checklistcb" value="Leg Guard"> Leg Guard
-                                            <input type="checkbox" class="checklistcb" value="Physically fit for duty"> Physically fit for duty
+                                            <input type="checkbox" class="checklistcb" id="cb1" value="Hardhat"> <label for="cb1">Helmet</label>
+                                            <input type="checkbox" class="checklistcb" id="cb2" value="Nose Mask"> <label for="cb2">Nose Mask</label>
+                                            <input type="checkbox" class="checklistcb" id="cb3" value="Safety Goggle"> <label for="cb3">Safety Goggle</label>
+                                            <input type="checkbox" class="checklistcb" id="cb4" value="Hand Gloves"> <label for="cb4">Hand Gloves</label>
+                                            <input type="checkbox" class="checklistcb" id="cb5" value="FR-Jacket/Trouser"> <label for="cb5">FR-Jacket/Trouser</label>
+                                            <input type="checkbox" class="checklistcb" id="cb6" value="Safety Shoes"> <label for="cb6">Safety Shoes</label>
+                                            <input type="checkbox" class="checklistcb" id="cb7" value="Earplug"> <label for="cb7">Earplug</label>
+                                            <input type="checkbox" class="checklistcb" id="cb8" value="Leg Guard"> <label for="cb8">Leg Guard</label>
+                                            <input type="checkbox" class="checklistcb" id="cb9" value="Physically fit for duty"> <label for="cb9">Physically fit for duty</label>
                                         </div>
                                     </div>
                                     <div class="col-md-2 col-sm-12 col-xl-2">

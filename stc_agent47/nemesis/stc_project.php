@@ -2177,6 +2177,49 @@ class pirates_supervisor extends tesseract{
 		return $optimusprime;
 	}
 
+	public function stc_get_attendance($dept, $month, $year){
+		$optimusprime='';
+		$optimusprimeqry = mysqli_query($this->stc_dbs, "
+            SELECT distinct `stc_status_down_list_department_location`, `emp_id`, `emp_name`, `stc_status_down_list_department_dept` 
+            FROM `stc_epermit_enrollment` 
+            LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` 
+            WHERE `dep_id`='" . mysqli_real_escape_string($this->stc_dbs, $dept) . "' 
+            AND YEAR(`created_date`)='" . mysqli_real_escape_string($this->stc_dbs, $year) . "' 
+            AND MONTH(`created_date`)='" . mysqli_real_escape_string($this->stc_dbs, $month) . "'
+        ");
+		if (mysqli_num_rows($optimusprimeqry) > 0) {
+			$slno = 0;
+			foreach ($optimusprimeqry as $row) {
+				$attendance = '';
+				$slno++;
+				$totalp=0;
+				$totala=0;
+				$query =mysqli_query($this->stc_dbs, "SELECT DATE(`created_date`) as attend_date FROM `stc_epermit_enrollment` WHERE `emp_id`='" . mysqli_real_escape_string($this->stc_dbs, $row['emp_id']) . "' AND YEAR(`created_date`)='" . mysqli_real_escape_string($this->stc_dbs, $year) . "' AND MONTH(`created_date`)='" . mysqli_real_escape_string($this->stc_dbs, $month) . "'");
+				$attend_dates = array();
+				if (mysqli_num_rows($query) > 0) {
+					while ($row2 = mysqli_fetch_assoc($query)) {
+						$attend_dates[] = date('d', strtotime($row2['attend_date']));
+					}
+				}
+				$lastDay = date('t', mktime(0, 0, 0, $month, 1, $year));
+				for ($i = 1; $i <= $lastDay; $i++) {
+					if (in_array(str_pad($i, 2, '0', STR_PAD_LEFT), $attend_dates)) {
+						$attendance .= '<td><span style="color:green">P</span></td>';
+						$totalp++;
+					} else {
+						$attendance .= '<td><span style="color:red">A</span></td>';
+						$totala++;
+					}
+				}
+				$optimusprime .= '<tr><td>' . $slno . '</td><td>' . $row['stc_status_down_list_department_location'] . '</td><td>' . $row['stc_status_down_list_department_dept'] . '</td><td>' . $row['emp_name'] . '</td>' . $attendance . '<td><span style="color:green">Present - ' . $totalp . '</span></br><span style="color:red">Absent - ' . $totala . '</span></td></tr>';
+				$slno++;
+			}
+		} else {
+			$optimusprime = '<tr><td>No data found.</td></tr>';
+		}
+		return $optimusprime;
+	}
+
 	// call status down list
 	public function stc_call_status_down_list($location_id, $search, $status){
 		$optimusprime='
@@ -4010,6 +4053,49 @@ if(isset($_POST['js_pending_consump_reports_req'])){
 	$out.='
 			</tbody>
 		</table>
+	';
+	echo $out;
+}
+
+// call consumption by supervisor
+if(isset($_POST['js_search_attendance'])){
+	$dept=$_POST['dept'];
+	$month=date('m', strtotime($_POST['date']));
+	$year=date('Y', strtotime($_POST['date']));
+	$days='';
+	if ($month == 2) { // February
+		if (($year % 4 == 0 && $year % 100 != 0) || $year % 400 == 0) { // leap year
+			$lastDay = 29;
+		} else {
+			$lastDay = 28;
+		}
+	} elseif ($month == 4 || $month == 6 || $month == 9 || $month == 11) { // April, June, September, November
+		$lastDay = 30;
+	} else { // January, March, May, July, August, October, December
+		$lastDay = 31;
+	}
+	
+	for ($i = 1; $i <= $lastDay; $i++) {
+		$days .= '<th>' . $i . '</th>';
+	}
+	$out='<thead>
+    		<tr>
+    		    <th>Sl No</th>
+    		    <th>Location</th>
+    		    <th>Department</th>
+    		    <th>Employee Name</th>
+				'.$days.'
+				<th>Total</th>
+			</thead>
+			<tbody>
+	';
+
+	$objloki=new pirates_supervisor();
+	$opobjloki=$objloki->stc_get_attendance($dept, $month, $year);
+	$out.=$opobjloki;
+
+	$out.='
+			</tbody>
 	';
 	echo $out;
 }
