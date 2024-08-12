@@ -224,7 +224,7 @@ include_once("../MCU/db.php");
                                                 <div class="row">
                                                     <?php
                                                         $get_project_qry=mysqli_query($con, "
-                                                            SELECT 
+                                                            SELECT DISTINCT
                                                                 `stc_cust_project_id`,
                                                                 `stc_cust_project_date`,
                                                                 `stc_cust_project_title`,
@@ -242,7 +242,7 @@ include_once("../MCU/db.php");
                                                         
                                                         if($_SESSION['stc_agent_role']==3){
                                                             $get_project_qry=mysqli_query($con, "
-                                                                SELECT 
+                                                                SELECT DISTINCT
                                                                     `stc_cust_project_id`,
                                                                     `stc_cust_project_date`,
                                                                     `stc_cust_project_title`,
