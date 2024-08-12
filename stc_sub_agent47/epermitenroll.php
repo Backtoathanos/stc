@@ -701,7 +701,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <th class="text-center">Name</th>
                                             <th class="text-center">Contact</th>
                                             <th class="text-center">UId</th>
-                                            <th class="text-center">G.P No</th>
+                                            <th class="text-center">GatePassNo</th>
                                             <th class="text-center">Shift</th>
                                             <th class="text-center">Action</th>
                                         </tr>
