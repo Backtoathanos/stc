@@ -719,10 +719,17 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
                                             // Convert to a comma-separated string for use in the IN clause
                                             $projectsStr = implode(',', $projects);
-                                            $query="SELECT DISTINCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact`, `gpno` FROM `stc_cust_pro_supervisor` LEFT JOIN `stc_epermit_enrollment` ON `stc_cust_pro_supervisor_id` = `emp_id` WHERE `stc_cust_pro_supervisor_created_by` =( SELECT `stc_cust_pro_supervisor_created_by` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id` ='".$_SESSION['stc_agent_sub_id']."' ) AND `stc_cust_pro_supervisor_status`=1 ORDER BY `stc_cust_pro_supervisor_fullname` ASC";
+                                            $query="SELECT DISTINCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact` FROM `stc_cust_pro_supervisor` LEFT JOIN `stc_epermit_enrollment` ON `stc_cust_pro_supervisor_id` = `emp_id` WHERE `stc_cust_pro_supervisor_created_by` =( SELECT `stc_cust_pro_supervisor_created_by` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id` ='".$_SESSION['stc_agent_sub_id']."' ) AND `stc_cust_pro_supervisor_status`=1 ORDER BY `stc_cust_pro_supervisor_fullname` ASC";
                                             $sql=mysqli_query($con, $query);
                                             $usercounter=0;
                                             foreach($sql as $row){
+                                                $getgpnoquery=mysqli_query($con, "SELECT `gpno` FROM `stc_epermit_enrollment` WHERE `emp_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `id` DESC LIMIT 0,1");
+                                                $gpno='';
+                                                if(mysqli_num_rows($getgpnoquery)>0){
+                                                    $result=mysqli_fetch_assoc($getgpnoquery);
+                                                    $gpno=$result['gpno'];
+                                                }
+
                                                 $getquery=mysqli_query($con, "SELECT DISTINCT `stc_status_down_list_department_loc_id`, `stc_status_down_list_department_id`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `stc_cust_pro_attend_supervise_status` FROM `stc_cust_pro_attend_supervise` LEFT JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id`=`stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `stc_status_down_list_department_dept` ASC");
                                                 
                                                 $location='<select class="form-control btn btn-success multilocation text-left" disabled>';
@@ -753,7 +760,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 $department.='</select>';
                                                 if($loopexit==1){
                                                     $usercounter++;
-                                                    echo "<tr><td>".$location."</td><td>".$department."</td><td>".$row['stc_cust_pro_supervisor_fullname']."</td><td>".$row['stc_cust_pro_supervisor_contact']."</td><td>".$row['stc_cust_pro_supervisor_uid']."</td><td><input type='text' value='".$row['gpno']."' class='form-control multigpno' placeholder='Enter G.P No' ></td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' user_id='".$row['stc_cust_pro_supervisor_id']."'>Add</a></td></tr>";
+                                                    echo "<tr><td>".$location."</td><td>".$department."</td><td>".$row['stc_cust_pro_supervisor_fullname']."</td><td>".$row['stc_cust_pro_supervisor_contact']."</td><td>".$row['stc_cust_pro_supervisor_uid']."</td><td><input type='text' value='".$gpno."' class='form-control multigpno' placeholder='Enter G.P No' ></td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' user_id='".$row['stc_cust_pro_supervisor_id']."'>Add</a></td></tr>";
                                                 }
                                             }
                                             echo '<tr><td>Showing '.$usercounter.' users</td></tr>'
