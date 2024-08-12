@@ -719,7 +719,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
                                             // Convert to a comma-separated string for use in the IN clause
                                             $projectsStr = implode(',', $projects);
-                                            $query="SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact`, `gpno` FROM `stc_cust_pro_supervisor` LEFT JOIN `stc_epermit_enrollment` ON `stc_cust_pro_supervisor_id` = `emp_id` WHERE `stc_cust_pro_supervisor_created_by` =( SELECT `stc_cust_pro_supervisor_created_by` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id` ='".$_SESSION['stc_agent_sub_id']."' ) AND `stc_cust_pro_supervisor_status`=1 ORDER BY `stc_cust_pro_supervisor_fullname` ASC";
+                                            $query="SELECT DISTNCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact`, `gpno` FROM `stc_cust_pro_supervisor` LEFT JOIN `stc_epermit_enrollment` ON `stc_cust_pro_supervisor_id` = `emp_id` WHERE `stc_cust_pro_supervisor_created_by` =( SELECT `stc_cust_pro_supervisor_created_by` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id` ='".$_SESSION['stc_agent_sub_id']."' ) AND `stc_cust_pro_supervisor_status`=1 ORDER BY `stc_cust_pro_supervisor_fullname` ASC";
                                             $sql=mysqli_query($con, $query);
                                             $usercounter=0;
                                             foreach($sql as $row){
