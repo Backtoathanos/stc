@@ -413,10 +413,12 @@ class transformers extends tesseract{
 			$sl=0;
 			foreach($optimusprimeqry as $optimusprimerow){
 				$sl++;
-				if($sl==1){
-					$manager .= "`stc_cust_pro_supervisor_created_by`=".$optimusprimerow['stc_cust_pro_supervisor_created_by'];
-				}else{
-					$manager .= " OR `stc_cust_pro_supervisor_created_by`=".$optimusprimerow['stc_cust_pro_supervisor_created_by'];
+				if($optimusprimerow['stc_cust_pro_supervisor_created_by']!=''){
+					if($sl==1){
+						$manager .= "`stc_cust_pro_supervisor_created_by`=".$optimusprimerow['stc_cust_pro_supervisor_created_by'];
+					}else{
+						$manager .= " OR `stc_cust_pro_supervisor_created_by`=".$optimusprimerow['stc_cust_pro_supervisor_created_by'];
+					}
 				}
 			}
 			$manager .= ")";
