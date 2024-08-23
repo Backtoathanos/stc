@@ -429,7 +429,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 $('#stc-tbtm-ppe-checklistempname').val(value);
                 $('.checklistcb').prop('checked', true);
             });
-            
+
             $('body').delegate('.stc-tbm-resresponsibility', 'change', function(e){
                 var value = $(this).val();
                 $('#stc-tbtm-res-responsiblity').val(value);
@@ -467,7 +467,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-tbtm-date').val(response_tbm.tbm.stc_safetytbm_date);
                         $('#stc-tbtm-time').val(response_tbm.tbm.stc_safetytbm_time);
                         $('#stc-tbtm-place').val(response_tbm.tbm.stc_safetytbm_place);
-                        $('#stc-tbtm-location').val(response_tbm.tbm.stc_safetytbm_loc);
+                        // $('#stc-tbtm-location').val(response_tbm.tbm.stc_safetytbm_loc);
+                        $('#stc-tbtm-location').val(response_tbm.tbm.stc_safetytbm_loc_id);
                         $('#stc-tbtm-agendaofmeet').val(response_tbm.tbm.stc_safetytbm_agendaofmeet);
                         $('#stc-tbtm-pointtone').val(response_tbm.tbm.stc_safetytbm_ptone);
                         $('#stc-tbtm-pointtwo').val(response_tbm.tbm.stc_safetytbm_pttwo);
@@ -618,7 +619,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var stc_date=$('#stc-tbtm-date').val();
                 var stc_time=$('#stc-tbtm-time').val();
                 var stc_place=$('#stc-tbtm-place').val();
-                var stc_loc=$('#stc-tbtm-location').val();
+                var stc_loc=$('#stc-tbtm-location option:selected').text();
+                var stc_loc_id=$('#stc-tbtm-location').val();
                 var stc_agendaofmeeting=$('#stc-tbtm-agendaofmeet').val();
                 var stc_pointtone=$('#stc-tbtm-pointtone').val();
                 var stc_pointtwo=$('#stc-tbtm-pointtwo').val();
@@ -640,6 +642,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         stc_time:stc_time,
                         stc_place:stc_place,
                         stc_loc:stc_loc,
+                        stc_loc_id:stc_loc_id,
                         stc_agendaofmeeting:stc_agendaofmeeting,
                         stc_pointtone:stc_pointtone,
                         stc_pointtwo:stc_pointtwo,
@@ -685,119 +688,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     $('.saved-popup').toggle(700);
                 }, 1000);
             });
-
-            // $('body').delegate('#stc-tbtm-date', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            //     setTimeout(function() {
-            //         $('.saved-popup').toggle(700);
-            //     }, 1000);
-            // });
-
-            // $('body').delegate('#stc-tbtm-time', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-place', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-location', 'change', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            //     setTimeout(function() {
-            //         $('.saved-popup').toggle(700);
-            //     }, 1000);
-
-            // });
-
-            // $('body').delegate('#stc-tbtm-agendaofmeet', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-pointtone', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-pointtwo', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-pointthree', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-pointfour', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-pointfive', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-pointsix', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-suggestionsio', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-designation', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-entryname', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
-
-            // $('body').delegate('#stc-tbtm-gatepassno', 'focusout', function(e){
-            //     e.preventDefault();
-            //     save_tbm();
-            //     $('.saved-popup').remove();
-            //     $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-            // });
 
             // save entry time
             $('body').delegate('.stc-tbtm-gentryadd', 'click', function(e){
@@ -890,12 +780,51 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 return false;
             });
 
+            $('body').delegate('.checklistcb', 'click', function(e) {
+                var checkbox = $(this);
+                if($(this).val()!="Physically fit for duty"){
+                
+                    // If checkbox is unchecked
+                    if(!checkbox.prop('checked')) {
+                        // Append the select box below the checkbox
+                        checkbox.after('<select class="form-control uncheckedselect"><option value="Damage">Damage</option><option selected value="NA">NA</option><option value="Not Issued">Not Issued</option><option value="Not wear">Not wear</option></select>');
+
+                        // Optionally, append a label to indicate what the select box is for
+                        $(checkbox).parent().find('.uncheckedselect').before('<label class="uncheckedselectlabel">Please specify reason:</label><br>');
+                    }else{
+                        $(checkbox).parent().find('.uncheckedselect').remove();
+                        $(checkbox).parent().find('.uncheckedselectlabel').remove();
+                    }
+                }
+            });
+
+            $('body').delegate('.uncheckedselect', 'change', function(e) {
+                $(this).parent().find('.uncheckedssize').remove();
+                if(($(this).val()=="Damage" || $(this).val()=="Not Issued") && ($(this).parent().find('.checklistcb').val()=="Safety Shoes" || $(this).parent().find('.checklistcb').val()=="FR-Jacket/Trouser")){
+                    $(this).after('<input type="text" class="form-control uncheckedssize">');
+                }
+            });
+
             // checklist save
             $('body').delegate('.stc-tbtm-ppe-checklistadd', 'click', function(e){
                 e.preventDefault();
                 var stc_tbm_no=$('.stc-tbm-no').val();
                 var emp_name=$.trim($(this).closest('tr').find('td:eq(0)').text());
                 var filter = get_ppefilter($(this), 'checklistcb');
+                var uncheckedppe = [], uncheckedppereason = [], uncheckedppesize = [];                
+                $(this).closest('tr').find('.checklistcb').each(function(){
+                    if(!$(this).prop('checked')){ 
+                        if($(this).parent().find('.uncheckedselect').val()=="Damage" || $(this).parent().find('.uncheckedselect').val()=="Not Issued"){
+                            uncheckedppe.push($(this).val()); 
+                            uncheckedppereason.push($(this).parent().find('.uncheckedselect').val());
+                            if($(this).val()=="Safety Shoes" || $(this).val()=="FR-Jacket/Trouser"){
+                                uncheckedppesize.push($(this).parent().find('.uncheckedssize').val());
+                            }else{
+                                uncheckedppesize.push('');
+                            }
+                        }
+                    } 
+                });
                 if(filter.length>0){
                     var validation=0;
                     $('.attendance-ppe-table tr').each(function(){
@@ -915,7 +844,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     stc_safety_savetbmppechecklist:1,
                                     stc_tbm_no:stc_tbm_no,
                                     stc_emp_name:emp_name,
-                                    stc_filter:filter
+                                    stc_filter:filter,
+                                    stc_uncheckedppe:uncheckedppe,
+                                    stc_uncheckedppereason:uncheckedppereason,
+                                    stc_uncheckedppesize:uncheckedppesize
                                 },
                                 success     : function(response_tbm){
                                     // console.log(response_tbm);
@@ -937,19 +869,16 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 }else{
                     alert("Please check ppe!!!");
                 }
-                // console.log(filter);
             });
 
             // filter tbm checkbox
             function get_ppefilter($this, class_name){
                 var filter = [];
                 $this.closest('tr').find('.' + class_name + ':checked').each(function(){
-                filter.push($(this).val()); 
+                    filter.push($(this).val()); 
                 });
                 return filter;
             }
-
-
         });
     </script>
     <script>
@@ -2224,12 +2153,41 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <div class="position-relative form-group">
                                             <select class="form-control stc-tbtm-dropdownfields" id="stc-tbtm-location">
                                                 <option value="">Select</option>
-                                                <option>Tata cummins</option>
-                                                <option>Tata steel site</option>
-                                                <option>Jusco site</option>
-                                                <option>Mermandli site</option>
-                                                <option>Noamundi site</option>
-                                                <option>Haldia site</option>
+                                                <?php
+                                                    include_once("../MCU/db.php");
+                                                    $dept_qry = mysqli_query($con, "
+                                                        SELECT DISTINCT `stc_status_down_list_department_loc_id`, 
+                                                                        `stc_status_down_list_department_location`, 
+                                                                        `stc_status_down_list_department_dept`, 
+                                                                        `stc_cust_project_id`
+                                                        FROM `stc_cust_pro_attend_supervise`
+                                                        INNER JOIN `stc_cust_project` 
+                                                        ON `stc_cust_project_id` = `stc_cust_pro_attend_supervise_pro_id` 
+                                                        INNER JOIN `stc_status_down_list_department` 
+                                                        ON `stc_cust_project_id` = `stc_status_down_list_department_loc_id` 			
+                                                        WHERE `stc_cust_pro_attend_supervise_super_id` = '".mysqli_real_escape_string($con, $_SESSION['stc_agent_sub_id'])."'
+                                                        ORDER BY `stc_status_down_list_department_dept` ASC
+                                                    ");
+
+                                                    $place = '';
+                                                    $locarray = array();
+                                                    $locidarray = array();
+
+                                                    // Iterate over the department query results
+                                                    foreach($dept_qry as $dept_row) {
+                                                        $loc = $dept_row['stc_status_down_list_department_location']; // Correct field name to match your SELECT clause
+                                                        if (!in_array($loc, $locarray)) {
+                                                            $locarray[] = $loc;
+                                                            $locidarray[] = $dept_row['stc_status_down_list_department_loc_id'];
+                                                        }
+                                                        $place .= '<option value="'.$dept_row['stc_status_down_list_department_dept'].'">'.$dept_row['stc_status_down_list_department_dept'].'</option>';
+                                                    }
+
+                                                    // Output unique department locations
+                                                    foreach($locarray as $key=>$row) {                                                        
+                                                        echo '<option value="'.$locidarray[$key].'">'.$row.'</option>';
+                                                    }
+                                                ?>
                                             </select>
                                         </div>
                                     </div>
@@ -2248,7 +2206,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-4 col-sm-12 col-xl-4">
                                         <h5 class="card-title">Place *</h5>
                                         <div class="position-relative form-group">
-                                            <input type="text" class="form-control stc-tbtm-textfields" id="stc-tbtm-place" placeholder="Enter Place">
+                                            <select class="form-control stc-tbtm-dropdownfields" id="stc-tbtm-place">
+                                                <?php echo $place;?>
+                                            </select>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
@@ -2262,7 +2222,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <div class="col-md-2 col-sm-12 col-xl-2">
                                                 <h5 class="card-title">Shift</h5>
                                                 <div class="position-relative form-group">
-                                                    <input type="text" class="form-control" id="stc-tbtm-gentryshift" placeholder="Enter Shift">
+                                                    <select class="form-control" id="stc-tbtm-gentryshift">
+                                                        <option>A</option>
+                                                        <option>B</option>
+                                                        <option>C</option>
+                                                        <option selected>E(General)</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="col-md-2 col-sm-12 col-xl-2">
@@ -2274,10 +2239,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <div class="col-md-3 col-sm-12 col-xl-3">
                                                 <h5 class="card-title">Supervisor/Engineers Name</h5>
                                                 <div class="position-relative form-group">
-                                                    <input type="text" class="form-control" id="stc-tbtm-gentrysupengname" placeholder="Enter Supervisor/Engineers Name">
-                                                    <select class="form-control stc-tbm-gentrysupengname">
                                                         <?php 
-                                                            include_once("../MCU/db.php");
+                                                            $empname='';
                                                             $result=mysqli_query($con, "
                                                                 SELECT DISTINCT `stc_safetytbm_gateentry_supeng_name`
                                                                 FROM `stc_safetytbm_gateentry` 
@@ -2289,11 +2252,11 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                             ");
                                                             if(mysqli_num_rows($result)>0){
                                                                 foreach($result as $resultrow){
-                                                                    echo '<option>'.$resultrow['stc_safetytbm_gateentry_supeng_name'].'</option>';
+                                                                    $empname=$resultrow['stc_safetytbm_gateentry_supeng_name'];
                                                                 }
                                                             }
-                                                        ?>                                                        
-                                                    </select>
+                                                        ?>                                         
+                                                    <input type="text" class="form-control" id="stc-tbtm-gentrysupengname" disabled placeholder="Enter Supervisor/Engineers Name" value="<?php echo $empname; ?>">
                                                 </div>
                                             </div>
                                             <div class="col-md-2 col-sm-12 col-xl-2">
@@ -2311,12 +2274,11 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                             <th class="text-center">Shift</th>
                                                             <th class="text-center">Time</th>
                                                             <th class="text-center">Supervisor /Engineer name</th>
-                                                            <th class="text-center">Signature</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody class="stc-safety-gentry-show-table">
                                                         <tr>
-                                                            <td colspan="6">Empty record</td>
+                                                            <td colspan="5">Empty record</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -2455,15 +2417,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 </thead>
                                                 <tbody>
                                                     <?php 
-                                                        // $result=mysqli_query($con, "
-                                                        //     SELECT DISTINCT `stc_safetytbm_checklist_empname`
-                                                        //     FROM `stc_safetytbm_dailyfitppe_checklist` 
-                                                        //     LEFT JOIN `stc_safetytbm` 
-                                                        //     ON `stc_safetytbm_id`=`stc_safetytbm_checklist_tbmid`
-                                                        //     WHERE `stc_safetytbm_created_by`='".$_SESSION['stc_agent_sub_id']."'
-                                                        //     AND `stc_safetytbm_checklist_empname`<>''
-                                                        //     ORDER BY `stc_safetytbm_checklist_empname` ASC
-                                                        // ");
                                                         $date=date('Y-m-d');
                                                         $result=mysqli_query($con, "SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`created_by`LEFT JOIN `stc_agents` ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` WHERE DATE(`created_date`)='".$date."' AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$_SESSION['stc_agent_sub_id']."') ORDER BY `emp_name` ASC");
 
@@ -2522,22 +2475,23 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-suggestionsio" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                    <div class="col-md-4 col-sm-12 col-xl-4" style="display:none;">
                                         <h5 class="card-title">Name. *</h5>
                                         <div class="position-relative form-group">
                                             <input type="text" class="form-control stc-tbtm-textfields" id="stc-tbtm-entryname" placeholder="Enter Name.">
                                         </div>
                                     </div>
-                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                    <div class="col-md-4 col-sm-12 col-xl-4" style="display:none;">
                                         <h5 class="card-title">Designation *</h5>
                                         <div class="position-relative form-group">
                                             <select class="form-control stc-tbtm-dropdownfields" id="stc-tbtm-designation">
-                                                <option>Site Incharge</option>
+                                                <!-- <option>Site Incharge</option>
                                                 <option>Manager</option>
                                                 <option selected>Supervisor</option>
                                                 <option>Technician</option>
                                                 <option>Safety Supervisor</option>
-                                                <option>Coordinator</option>
+                                                <option>Coordinator</option> -->
+                                                <?php echo '<option>'.$_SESSION['stc_agent_sub_category'].'</option>'; ?>
                                             </select>
                                             <!-- <input type="text" class="form-control" id="stc-tbtm-designation" placeholder="Enter Designation"> -->
                                         </div>

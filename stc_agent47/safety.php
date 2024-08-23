@@ -126,11 +126,15 @@ if(isset($_SESSION["stc_agent_id"])){
                                                             <label for="exampleEmail" class="">Location</label>
                                                             <select class="form-control safety-filter-by-location">
                                                                 <option value="NA">Select</option>
-                                                                <option>Tata steel site</option>
-                                                                <option>Jusco site</option>
-                                                                <option>Mermandli site</option>
-                                                                <option>Noamundi site</option>
-                                                                <option>Haldia site</option>
+                                                                <?php 
+                                                                    include_once("../MCU/db.php");
+                                                                    $query=mysqli_query($con, "SELECT DISTINCT `stc_safetytbm_loc` FROM `stc_safetytbm` WHERE `stc_safetytbm_loc`<>'' ORDER BY `stc_safetytbm_loc` ASC");
+                                                                    if(mysqli_num_rows($query)>0){
+                                                                        foreach($query as $row){
+                                                                            echo '<option>'.$row['stc_safetytbm_loc'].'</option>';
+                                                                        }
+                                                                    }
+                                                                ?>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -593,7 +597,7 @@ if(isset($_SESSION["stc_agent_id"])){
             function call_tbm_fields(){
                 var stc_tbm_no=$('.stc-tbm-no').val();
                 $.ajax({
-                    url         : "../stc_sub_agent47/nemesis/stc_safety.php",
+                    url         : "nemesis/stc_safety.php",
                     method      : "POST",
                     data        : {stc_safety_calltbmfields:1,stc_tbm_no:stc_tbm_no},
                     dataType    : "JSON",
@@ -615,11 +619,15 @@ if(isset($_SESSION["stc_agent_id"])){
                         $('#stc-tbtm-gatepassno').val(response_tbm.tbm.stc_safetytbm_gatepass_no);
                         var tbm_entry=response_tbm.tbm_gateentry;
                         var tbm_entry_out='';
-                        if(tbm_entry.length>0){
-                            var sl=0;
-                            for(var i=0; i<tbm_entry.length; i++){
-                                sl++;
-                                tbm_entry_out+='<tr><td>' + sl + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_workpermitno + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_shift + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_time + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_supeng_name + '</td></tr>';
+                        if(tbm_entry!=undefined){
+                            if(tbm_entry.length>0){
+                                var sl=0;
+                                for(var i=0; i<tbm_entry.length; i++){
+                                    sl++;
+                                    tbm_entry_out+='<tr><td>' + sl + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_workpermitno + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_shift + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_time + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_supeng_name + '</td></tr>';
+                                }
+                            }else{
+                                tbm_entry_out+='<tr><td>Empty record</td></td>';
                             }
                         }else{
                             tbm_entry_out+='<tr><td>Empty record</td></td>';
@@ -628,11 +636,15 @@ if(isset($_SESSION["stc_agent_id"])){
 
                         var tbm_responsibilities=response_tbm.tbm_responsibility;
                         var tbm_responsibilities_out='';
-                        if(tbm_responsibilities.length>0){
-                            var sl=0;
-                            for(var i=0; i<tbm_responsibilities.length; i++){
-                                sl++;
-                                tbm_responsibilities_out+='<tr><td>' + sl + '</td><td>' + tbm_responsibilities[i].stc_safetytbm_responsibilities_item + '</td><td>' + tbm_responsibilities[i].stc_safetytbm_responsibilities_responsibilities + '</td><td>' + tbm_responsibilities[i].stc_safetytbm_responsibilities_targetdate + '</td></tr>';
+                        if(tbm_responsibilities!=undefined){
+                            if(tbm_responsibilities.length>0){
+                                var sl=0;
+                                for(var i=0; i<tbm_responsibilities.length; i++){
+                                    sl++;
+                                    tbm_responsibilities_out+='<tr><td>' + sl + '</td><td>' + tbm_responsibilities[i].stc_safetytbm_responsibilities_item + '</td><td>' + tbm_responsibilities[i].stc_safetytbm_responsibilities_responsibilities + '</td><td>' + tbm_responsibilities[i].stc_safetytbm_responsibilities_targetdate + '</td></tr>';
+                                }
+                            }else{
+                                tbm_responsibilities_out+='<tr><td>Empty record</td></td>';
                             }
                         }else{
                             tbm_responsibilities_out+='<tr><td>Empty record</td></td>';
@@ -640,40 +652,44 @@ if(isset($_SESSION["stc_agent_id"])){
                         $('.stc-tbtm-res-show-table').html(tbm_responsibilities_out);
 
                         var tbm_ppe_checklist=response_tbm.tbm_ppe_checklist;
-                        var tbm_ppe_checklist_out='';
-                        if(tbm_ppe_checklist.length>0){
-                            var sl=0;
-                            for(var i=0; i<tbm_ppe_checklist.length; i++){                                
-                                sl++;
-                                var hardhat='X';
-                                var SafetyGoggle='X';
-                                var NoseMask='X';
-                                var HandGloves='X';
-                                var FR_Jacket_Trouser='X';
-                                var SafetyShoes='X';
-                                var earplug='X';
-                                var legguard='X';
-                                var PhysicallyfitforDuty='X';
-                                if(tbm_ppe_checklist[i].stc_safetytbm_checklist_hardhat==1){
-                                    hardhat='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_SafetyGoggle==1){
-                                    SafetyGoggle='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_NoseMask==1){
-                                    NoseMask='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_HandGloves==1){
-                                    HandGloves='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_FR_Jacket_Trouser==1){
-                                    FR_Jacket_Trouser='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_SafetyShoes==1){
-                                    SafetyShoes='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_earplug==1){
-                                    earplug='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_legguard==1){
-                                    legguard='<i class="fa fa-check" aria-hidden="true"></i>';
-                                }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_PhysicallyfitforDuty==1){
-                                    PhysicallyfitforDuty='<i class="fa fa-check" aria-hidden="true"></i>';
+                        var tbm_ppe_checklist_out='';                        
+                        if(tbm_ppe_checklist!=undefined){
+                            if(tbm_ppe_checklist.length>0){
+                                var sl=0;
+                                for(var i=0; i<tbm_ppe_checklist.length; i++){                                
+                                    sl++;
+                                    var hardhat='X';
+                                    var SafetyGoggle='X';
+                                    var NoseMask='X';
+                                    var HandGloves='X';
+                                    var FR_Jacket_Trouser='X';
+                                    var SafetyShoes='X';
+                                    var earplug='X';
+                                    var legguard='X';
+                                    var PhysicallyfitforDuty='X';
+                                    if(tbm_ppe_checklist[i].stc_safetytbm_checklist_hardhat==1){
+                                        hardhat='<i class="fa fa-check" aria-hidden="true"></i>';
+                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_SafetyGoggle==1){
+                                        SafetyGoggle='<i class="fa fa-check" aria-hidden="true"></i>';
+                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_NoseMask==1){
+                                        NoseMask='<i class="fa fa-check" aria-hidden="true"></i>';
+                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_HandGloves==1){
+                                        HandGloves='<i class="fa fa-check" aria-hidden="true"></i>';
+                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_FR_Jacket_Trouser==1){
+                                        FR_Jacket_Trouser='<i class="fa fa-check" aria-hidden="true"></i>';
+                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_SafetyShoes==1){
+                                        SafetyShoes='<i class="fa fa-check" aria-hidden="true"></i>';
+                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_earplug==1){
+                                        earplug='<i class="fa fa-check" aria-hidden="true"></i>';
+                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_legguard==1){
+                                        legguard='<i class="fa fa-check" aria-hidden="true"></i>';
+                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_PhysicallyfitforDuty==1){
+                                        PhysicallyfitforDuty='<i class="fa fa-check" aria-hidden="true"></i>';
+                                    }
+                                    tbm_ppe_checklist_out+='<tr><td>' + sl + '</td><td>' + tbm_ppe_checklist[i].stc_safetytbm_checklist_empname + '</td><td class="text-center">' + hardhat + '</td><td class="text-center">' + SafetyGoggle + '</td><td class="text-center">' + NoseMask + '</td><td class="text-center">' + HandGloves + '</td><td class="text-center">' + FR_Jacket_Trouser + '</td><td class="text-center">' + SafetyShoes + '</td><td class="text-center">' + earplug + '</td><td class="text-center">' + legguard + '</td><td class="text-center">' + PhysicallyfitforDuty + '</td><td class="text-center"></td></tr>';
                                 }
-                                tbm_ppe_checklist_out+='<tr><td>' + sl + '</td><td>' + tbm_ppe_checklist[i].stc_safetytbm_checklist_empname + '</td><td class="text-center">' + hardhat + '</td><td class="text-center">' + SafetyGoggle + '</td><td class="text-center">' + NoseMask + '</td><td class="text-center">' + HandGloves + '</td><td class="text-center">' + FR_Jacket_Trouser + '</td><td class="text-center">' + SafetyShoes + '</td><td class="text-center">' + earplug + '</td><td class="text-center">' + legguard + '</td><td class="text-center">' + PhysicallyfitforDuty + '</td><td class="text-center"></td></tr>';
+                            }else{
+                                tbm_ppe_checklist_out+='<tr><td>Empty record</td></td>';
                             }
                         }else{
                             tbm_ppe_checklist_out+='<tr><td>Empty record</td></td>';
@@ -710,21 +726,9 @@ if(isset($_SESSION["stc_agent_id"])){
                 });
             });
 
-            // update
-            $('body').delegate('.stc-safetytbm-edit', 'click', function(e){
-                e.preventDefault();
-                var tbm_id=$(this).attr("id");
-                $('.stc-tbm-no').val(tbm_id);
-                $('.bd-tbt-box-meeting-modal-lg').modal('show');
-                call_tbm_fields();
-            });
-
             // save tbm
             function save_tbm(){
                 var stc_tbm_no=$('.stc-tbm-no').val();
-                var stc_date=$('#stc-tbtm-date').val();
-                var stc_time=$('#stc-tbtm-time').val();
-                var stc_place=$('#stc-tbtm-place').val();
                 var stc_agendaofmeeting=$('#stc-tbtm-agendaofmeet').val();
                 var stc_pointtone=$('#stc-tbtm-pointtone').val();
                 var stc_pointtwo=$('#stc-tbtm-pointtwo').val();
@@ -733,18 +737,13 @@ if(isset($_SESSION["stc_agent_id"])){
                 var stc_pointfive=$('#stc-tbtm-pointfive').val();
                 var stc_pointsix=$('#stc-tbtm-pointsix').val();
                 var stc_suggesionsio=$('#stc-tbtm-suggestionsio').val();
-                var stc_entryname=$('#stc-tbtm-entryname').val();
-                var stc_desgination=$('#stc-tbtm-designation').val();
                 var stc_gatepass=$('#stc-tbtm-gatepassno').val();
                 $.ajax({
-                    url         : "../stc_sub_agent47/nemesis/stc_safety.php",
+                    url         : "nemesis/stc_safety.php",
                     method      : "POST",
                     data        : {
                         stc_safety_updatetbm:1,
                         stc_tbm_no:stc_tbm_no,
-                        stc_date:stc_date,
-                        stc_time:stc_time,
-                        stc_place:stc_place,
                         stc_agendaofmeeting:stc_agendaofmeeting,
                         stc_pointtone:stc_pointtone,
                         stc_pointtwo:stc_pointtwo,
@@ -753,8 +752,6 @@ if(isset($_SESSION["stc_agent_id"])){
                         stc_pointfive:stc_pointfive,
                         stc_pointsix:stc_pointsix,
                         stc_suggesionsio:stc_suggesionsio,
-                        stc_entryname:stc_entryname,
-                        stc_desgination:stc_desgination,
                         stc_gatepass:stc_gatepass
                     },
                     success     : function(response_tbm){
@@ -2143,51 +2140,21 @@ if(isset($_SESSION["stc_agent_id"])){
                                         <input type="hidden" class="stc-tbm-no">
                                     </div>
                                     <div class="col-md-4 col-sm-12 col-xl-4">
-                                        <h5 class="card-title">Date *</h5>
+                                        <h5 class="card-title">Date</h5>
                                         <div class="position-relative form-group">
-                                            <input type="date" class="form-control" id="stc-tbtm-date">
+                                            <input type="date" class="form-control" id="stc-tbtm-date" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-12 col-xl-4">
-                                        <h5 class="card-title">Time *</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="time" class="form-control" id="stc-tbtm-time">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-12 col-xl-4">
-                                        <h5 class="card-title">Place *</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-place" placeholder="Enter Place">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-3 col-sm-12 col-xl-3">
-                                        <h5 class="card-title">Work permit no</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-gentryworkpermit-no" placeholder="Enter Work permit no">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 col-sm-12 col-xl-2">
-                                        <h5 class="card-title">Shift</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-gentryshift" placeholder="Enter Shift">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 col-sm-12 col-xl-2">
                                         <h5 class="card-title">Time</h5>
                                         <div class="position-relative form-group">
-                                            <input type="time" class="form-control" id="stc-tbtm-gentrytime">
+                                            <input type="time" class="form-control" id="stc-tbtm-time" disabled>
                                         </div>
                                     </div>
-                                    <div class="col-md-3 col-sm-12 col-xl-3">
-                                        <h5 class="card-title">Supervisor/Engineers Name</h5>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Place</h5>
                                         <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-gentrysupengname" placeholder="Enter Supervisor/Engineers Name">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 col-sm-12 col-xl-2">
-                                        <h5 class="card-title">.</h5>
-                                        <div class="position-relative form-group">
-                                            <a href="#" class="btn btn-success form-control stc-tbtm-gentryadd">Add</a>
+                                            <input type="text" class="form-control" id="stc-tbtm-place" placeholder="Enter Place" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
@@ -2199,7 +2166,6 @@ if(isset($_SESSION["stc_agent_id"])){
                                                     <th class="text-center">Shift</th>
                                                     <th class="text-center">Time</th>
                                                     <th class="text-center">Supervisor /Engineer name</th>
-                                                    <th class="text-center">Signature</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="stc-safety-gentry-show-table">
@@ -2302,28 +2268,6 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">Daily PPE and Fitness Checklist</h5>
                                     </div>
-                                    <div class="col-md-3 col-sm-12 col-xl-3">
-                                        <h5 class="card-title">Employee's Name</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-ppe-checklistempname" placeholder="Enter Employees Name">
-                                        </div>
-                                    </div>                                    
-                                    <div class="col-md-7 col-sm-12 col-xl-7">
-                                        <div class="position-relative form-group">
-                                            <input type="checkbox" class="checklistcb" id="cb1" value="Hardhat"> <label for="cb1">Helmet</label>
-                                            <input type="checkbox" class="checklistcb" id="cb2" value="Nose Mask"> <label for="cb2">Nose Mask</label>
-                                            <input type="checkbox" class="checklistcb" id="cb3" value="Safety Goggle"> <label for="cb3">Safety Goggle</label>
-                                            <input type="checkbox" class="checklistcb" id="cb4" value="Hand Gloves"> <label for="cb4">Hand Gloves</label>
-                                            <input type="checkbox" class="checklistcb" id="cb5" value="FR-Jacket/Trouser"> <label for="cb5">FR-Jacket/Trouser</label>
-                                            <input type="checkbox" class="checklistcb" id="cb6" value="Safety Shoes"> <label for="cb6">Safety Shoes</label>
-                                            <input type="checkbox" class="checklistcb" id="cb7" value="Earplug"> <label for="cb7">Earplug</label>
-                                            <input type="checkbox" class="checklistcb" id="cb8" value="Leg Guard"> <label for="cb8">Leg Guard</label>
-                                            <input type="checkbox" class="checklistcb" id="cb9" value="Physically fit for duty"> <label for="cb9">Physically fit for duty</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2 col-sm-12 col-xl-2">
-                                        <a href="#" class="form-control stc-tbtm-ppe-checklistadd btn btn-success">Add</a>
-                                    </div>
                                     <div class="col-md-12 col-sm-12 col-xl-12">
                                         <table class="table table-bordered table-responsive">
                                             <thead>
@@ -2344,7 +2288,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                             </thead>
                                             <tbody class="stc-tbtm-ppe-checklist-show-table">
                                                 <tr>
-                                                    <td colspan="6">Empty record</td>
+                                                    <td colspan="12">Empty record</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -2353,26 +2297,6 @@ if(isset($_SESSION["stc_agent_id"])){
                                         <h5 class="card-title">Any Suggestions for SIO/IO: *</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control" id="stc-tbtm-suggestionsio" placeholder="Enter text"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-12 col-xl-4">
-                                        <h5 class="card-title">Name. *</h5>
-                                        <div class="position-relative form-group">
-                                            <input type="text" class="form-control" id="stc-tbtm-entryname" placeholder="Enter Name.">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-sm-12 col-xl-4">
-                                        <h5 class="card-title">Designation *</h5>
-                                        <div class="position-relative form-group">
-                                            <select class="form-control" id="stc-tbtm-designation">
-                                                <option>Site Incharge</option>
-                                                <option>Manager</option>
-                                                <option selected>Supervisor</option>
-                                                <option>Technician</option>
-                                                <option>Safety Supervisor</option>
-                                                <option>Coordinator</option>
-                                            </select>
-                                            <!-- <input type="text" class="form-control" id="stc-tbtm-designation" placeholder="Enter Designation"> -->
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-12 col-xl-4">
