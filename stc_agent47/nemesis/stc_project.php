@@ -2638,13 +2638,14 @@ class pirates_supervisor extends tesseract{
 	}
 
 	// update rewq line items
-	public function stc_change_req_item_update($req_item_id, $req_item_name){
+	public function stc_change_req_item_update($req_item_id, $req_item_name, $req_item_priority){
 		$odin='';
 		$odin_requpdateqry=mysqli_query($this->stc_dbs, "
 			UPDATE
 			    `stc_cust_super_requisition_list_items`
 			SET
-			    `stc_cust_super_requisition_list_items_title` = '".mysqli_real_escape_string($this->stc_dbs, $req_item_name)."'
+			    `stc_cust_super_requisition_list_items_title` = '".mysqli_real_escape_string($this->stc_dbs, $req_item_name)."',
+			    `stc_cust_super_requisition_items_priority` = '".mysqli_real_escape_string($this->stc_dbs, $req_item_priority)."'
 			WHERE
 			    `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $req_item_id)."'
 		");
@@ -4140,8 +4141,9 @@ if(isset($_POST['stc_req_edit_item_show'])){
 if(isset($_POST['stc_req_edit_item_update'])){
 	$req_item_id=$_POST['req_item_id'];
 	$req_item_name=$_POST['req_item_name'];
+	$req_item_priority=$_POST['req_item_priority'];
 	$odin_req=new pirates_supervisor();
-	$odin_req_out=$odin_req->stc_change_req_item_update($req_item_id, $req_item_name);
+	$odin_req_out=$odin_req->stc_change_req_item_update($req_item_id, $req_item_name, $req_item_priority);
 	echo $odin_req_out;
 }
 

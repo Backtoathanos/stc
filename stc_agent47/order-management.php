@@ -170,13 +170,14 @@ include_once("../MCU/db.php");
                                                                     <th class="text-center">Approve Quantity</th>
                                                                     <th class="text-center">Remains Quantity</th>
                                                                     <th class="text-center">Status</th>
+                                                                    <th class="text-center">Type</th>
                                                                     <th class="text-center">Action</th>
                                                                 </thead>
                                                                 <tbody>
                                                                 <?php 
                                                                         $reqstatus='';
                                                                         $requissuperqry=mysqli_query($con, "
-                                                                            SELECT 
+                                                                            SELECT DISTINCT
                                                                                 `stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` as list_id,
                                                                                 `stc_cust_super_requisition_list_date`,
                                                                                 `stc_cust_project_title`,
@@ -189,20 +190,21 @@ include_once("../MCU/db.php");
                                                                                 `stc_cust_super_requisition_list_items_reqqty`,
                                                                                 `stc_cust_super_requisition_list_items_approved_qty`,
                                                                                 `stc_cust_super_requisition_list_items_status`,
-                                                                                `stc_cust_super_requisition_items_finalqty`
+                                                                                `stc_cust_super_requisition_items_finalqty`,
+                                                                                `stc_cust_super_requisition_items_priority`
                                                                             FROM `stc_cust_super_requisition_list_items`
-                                                                            INNER JOIN `stc_cust_super_requisition_list` 
+                                                                            LEFT JOIN `stc_cust_super_requisition_list` 
                                                                             ON `stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_req_id`
-                                                                            INNER JOIN `stc_cust_pro_supervisor` 
+                                                                            LEFT JOIN `stc_cust_pro_supervisor` 
                                                                             ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id`
-                                                                            INNER JOIN `stc_cust_project` 
+                                                                            LEFT JOIN `stc_cust_project` 
                                                                             ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
                                                                             LEFT JOIN `stc_cust_project_collaborate` 
                                                                             ON `stc_cust_project_id`=`stc_cust_project_collaborate_projectid`
                                                                             WHERE (
                                                                                 `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."' OR 
                                                                                 `stc_cust_project_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
-                                                                            )AND stc_cust_super_requisition_list_status<2
+                                                                            )AND stc_cust_super_requisition_list_status<3
                                                                             ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
                                                                         ");
                                                                         $sl=0;
@@ -227,15 +229,17 @@ include_once("../MCU/db.php");
                                                                                 $unselected="";
                                                                                 $status_selected=$requisrow['stc_cust_super_requisition_list_items_status']==1 ? $selected : $unselected;
                                                                                 $trid="stc-req-tr-".$requisrow['item_list_id'];
+                                                                                $priority=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
+                                                                                $style=$requisrow['stc_cust_super_requisition_items_priority']==2 ? 'style="background:#ffa5a5;color:black"' : "";
                                                                                 if($requisrow['stc_cust_super_requisition_list_items_status']==1){
                                                                                     echo '
-                                                                                        <tr id="'.$trid.'" class="tr-search-fromhere">
+                                                                                        <tr id="'.$trid.'" class="tr-search-fromhere" '.$style.'>
                                                                                             <td class="text-center">'.$sl.'</td>
                                                                                             <td>'.date('d-m-Y h:i a', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'</td>
                                                                                             <td>'.$requisrow['stc_cust_project_title'].'</td>
                                                                                             <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'
                                                                                             </td>
-                                                                                            <td><a href="javascript:void(0)" style="font-size: 15px;text-decoration: none;color: black;" class="edit-req-item" id="'.$requisrow['item_list_id'].'"> <i class="fas fa-edit" ></i> '.$requisrow['stc_cust_super_requisition_list_items_title'].'</a></td>
+                                                                                            <td><a href="javascript:void(0)" style="font-size: 15px;text-decoration: none;color: black;" data-toggle="modal" data-target="#stc-sup-requisition-item-edit-modal" class="edit-req-item" id="'.$requisrow['item_list_id'].'"> <i class="fas fa-edit" ></i> '.$requisrow['stc_cust_super_requisition_list_items_title'].'</a></td>
                                                                                             <td class="text-center">'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
                                                                                             <td class="text-right">
                                                                                                 '.number_format($requisrow['stc_cust_super_requisition_list_items_reqqty'], 2).'
@@ -251,6 +255,7 @@ include_once("../MCU/db.php");
                                                                                                     <option value="0" '.$unselected.'>Not Allow</option>
                                                                                                 </select>
                                                                                             </td>
+                                                                                            <td class="text-center">'.$priority.'</td>
                                                                                             <td class="text-center">'.$actionstatus.'</td>
                                                                                         </tr>
                                                                                     ';
@@ -561,7 +566,6 @@ include_once("../MCU/db.php");
                     }, 
                     success     : function(response_items){
                         // console.log(response_items);
-                        $("#stc-sup-requisition-item-edit-modal").modal("show");
                         $(".stc-super-own-name-text").val(response_items);
                         $('.stc-super-own-req-id-hidd').val(req_id);
                     }
@@ -573,20 +577,22 @@ include_once("../MCU/db.php");
                 e.preventDefault();
                 var req_item_id=$('.stc-super-own-req-id-hidd').val();
                 var req_item_name=$('.stc-super-own-name-text').val();
+                var req_item_priority=$('.stc-sup-priority').val();
                 $.ajax({
                     url         : "nemesis/stc_project.php",
                     method      : "POST",
                     data        : {
                         stc_req_edit_item_update:1,
                         req_item_id:req_item_id,
-                        req_item_name:req_item_name
+                        req_item_name:req_item_name,
+                        req_item_priority:req_item_priority
                     }, 
                     success     : function(response_items){
                         // console.log(response_items);
                         response_items=response_items.trim();
                         if(response_items=="Item Updated Successfully."){
                             alert(response_items);
-                            $('#stc-sup-requisition-item-edit-modal').modal('hide');
+                            window.location.reload();
                         }else{
                             alert(response_items);
                         }
@@ -608,10 +614,19 @@ include_once("../MCU/db.php");
             <div class="modal-body">
               <div class="row">
                 <div class="col-sm-12 col-md-6 col-lg-6">
-                    <h3>Item Name :</h3>
+                    <h4>Item Name :</h4>
                 </div>
                 <div class="col-sm-12 col-md-6 col-lg-6">
                    <input type="text" class="form-control stc-super-own-name-text">
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <h4>Item Priority :</h4>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                <select class="form-control stc-sup-priority">
+                    <option value="1">Normal</option>
+                    <option value="2">Urgent</option>
+                </select>
                 </div>
                 <div class="col-sm-12 col-md-6 col-lg-6">
                 </div>
