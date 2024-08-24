@@ -318,10 +318,6 @@ class witcher_supervisor extends tesseract{
 			$query=mysqli_query($this->stc_dbs, "SELECT `stc_safetytbm_loc_id` FROM `stc_safetytbm` WHERE `stc_safetytbm_id`='".$stc_tbm_no."'");
 			$result=mysqli_fetch_assoc($query);
 			$project_id=$result['stc_safetytbm_loc_id'];
-			$optimusprime_res=mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_super_requisition_list`(`stc_cust_super_requisition_list_date`, `stc_cust_super_requisition_list_super_id`, `stc_cust_super_requisition_list_project_id`, `stc_cust_super_requisition_list_status`) VALUE ('".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', '".$project_id."', '1')");
-			$optimusprime_res=mysqli_query($this->stc_dbs, "SELECT MAX(`stc_cust_super_requisition_list_id`) as reqid FROM `stc_cust_super_requisition_list` WHERE `stc_cust_super_requisition_list_super_id`='".$_SESSION['stc_agent_sub_id']."'");
-			$result=mysqli_fetch_assoc($optimusprime_res);
-			$req_id=$result['reqid'];
 			foreach($stc_uncheckedppe as $key => $values){
 				$size='';
 				$unit='Nos';
@@ -334,7 +330,14 @@ class witcher_supervisor extends tesseract{
 					$unit="No";
 				}
 				$requisition=$stc_uncheckedppe[$key].' for '.$stc_emp_name.$size;
-				$optimusprime_res=mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_super_requisition_list_items`(`stc_cust_super_requisition_list_items_req_id`, `stc_cust_super_requisition_list_items_title`, `stc_cust_super_requisition_list_items_unit`, `stc_cust_super_requisition_list_items_reqqty`, `stc_cust_super_requisition_items_type`, `stc_cust_super_requisition_items_priority`, `stc_cust_super_requisition_list_items_status`) VALUES('".$req_id."', '".$requisition."', '".$unit."', '1', 'PPE', '1', '1')");
+				$query=mysqli_query($this->stc_dbs, "SELECT `stc_cust_super_requisition_list_items_req_id` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_title`='".$requisition."' AND `stc_cust_super_requisition_list_items_title`='".$requisition."' AND `stc_cust_super_requisition_list_items_unit`='".$unit."' AND `stc_cust_super_requisition_list_items_reqqty`='1' AND (`stc_cust_super_requisition_list_items_approved_qty`='0' OR `stc_cust_super_requisition_items_finalqty`='0')");
+				if(mysqli_num_rows($query)==0){
+					$optimusprime_res=mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_super_requisition_list`(`stc_cust_super_requisition_list_date`, `stc_cust_super_requisition_list_super_id`, `stc_cust_super_requisition_list_project_id`, `stc_cust_super_requisition_list_status`) VALUE ('".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', '".$project_id."', '1')");
+					$optimusprime_res=mysqli_query($this->stc_dbs, "SELECT MAX(`stc_cust_super_requisition_list_id`) as reqid FROM `stc_cust_super_requisition_list` WHERE `stc_cust_super_requisition_list_super_id`='".$_SESSION['stc_agent_sub_id']."'");
+					$result=mysqli_fetch_assoc($optimusprime_res);
+					$req_id=$result['reqid'];
+					$optimusprime_res=mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_super_requisition_list_items`(`stc_cust_super_requisition_list_items_req_id`, `stc_cust_super_requisition_list_items_title`, `stc_cust_super_requisition_list_items_unit`, `stc_cust_super_requisition_list_items_reqqty`, `stc_cust_super_requisition_items_type`, `stc_cust_super_requisition_items_priority`, `stc_cust_super_requisition_list_items_status`) VALUES('".$req_id."', '".$requisition."', '".$unit."', '1', 'PPE', '1', '1')");				
+				}
 			}
 		}
 		$optimusprime_qry = "
