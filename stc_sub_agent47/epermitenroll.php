@@ -709,61 +709,108 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <tbody>
                                         <?php 
                                             include_once("../MCU/db.php");
-
                                             $projectsQuery = "SELECT stc_cust_pro_attend_supervise_pro_id FROM stc_cust_pro_attend_supervise WHERE stc_cust_pro_attend_supervise_super_id = '".$_SESSION['stc_agent_sub_id']."'";
                                             $projectsResult = mysqli_query($con, $projectsQuery);
                                             $projects = [];
                                             while ($row = mysqli_fetch_assoc($projectsResult)) {
                                                 $projects[] = $row['stc_cust_pro_attend_supervise_pro_id'];
                                             }
-
-                                            // Convert to a comma-separated string for use in the IN clause
-                                            $projectsStr = implode(',', $projects);
-                                            $query="SELECT DISTINCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact` FROM `stc_cust_pro_supervisor` LEFT JOIN `stc_epermit_enrollment` ON `stc_cust_pro_supervisor_id` = `emp_id` WHERE `stc_cust_pro_supervisor_created_by` =( SELECT `stc_cust_pro_supervisor_created_by` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id` ='".$_SESSION['stc_agent_sub_id']."' ) AND `stc_cust_pro_supervisor_status`=1 ORDER BY `stc_cust_pro_supervisor_fullname` ASC";
-                                            $sql=mysqli_query($con, $query);
-                                            $usercounter=0;
-                                            foreach($sql as $row){
-                                                $getgpnoquery=mysqli_query($con, "SELECT `gpno` FROM `stc_epermit_enrollment` WHERE `emp_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `id` DESC LIMIT 0,1");
-                                                $gpno='';
-                                                if(mysqli_num_rows($getgpnoquery)>0){
-                                                    $result=mysqli_fetch_assoc($getgpnoquery);
-                                                    $gpno=$result['gpno'];
-                                                }
-
-                                                $getquery=mysqli_query($con, "SELECT DISTINCT `stc_status_down_list_department_loc_id`, `stc_status_down_list_department_id`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `stc_cust_pro_attend_supervise_status` FROM `stc_cust_pro_attend_supervise` LEFT JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id`=`stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `stc_status_down_list_department_dept` ASC");
+                                            $commsep_projects=implode(',', $projects);
+                                            $UsersQuery = "SELECT DISTINCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact` FROM stc_cust_pro_attend_supervise INNER JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`stc_cust_pro_attend_supervise_super_id` WHERE stc_cust_pro_attend_supervise_pro_id IN (".$commsep_projects.")";
+                                            $UsersResult = mysqli_query($con, $UsersQuery);
+                                            if(mysqli_num_rows($UsersResult)>0){
+                                                $usercounter=0;
+                                                foreach($UsersResult as $row){
+                                                    $getgpnoquery=mysqli_query($con, "SELECT `gpno` FROM `stc_epermit_enrollment` WHERE `emp_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `id` DESC LIMIT 0,1");
+                                                    $gpno='';
+                                                    if(mysqli_num_rows($getgpnoquery)>0){
+                                                        $result=mysqli_fetch_assoc($getgpnoquery);
+                                                        $gpno=$result['gpno'];
+                                                    }
+                                                    $getquery=mysqli_query($con, "SELECT DISTINCT `stc_status_down_list_department_loc_id`, `stc_status_down_list_department_id`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `stc_cust_pro_attend_supervise_status` FROM `stc_cust_pro_attend_supervise` LEFT JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id`=`stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$_SESSION['stc_agent_sub_id']."' ORDER BY `stc_status_down_list_department_dept` ASC");
                                                 
-                                                $location='<select class="form-control btn btn-success multilocation text-left" disabled>';
-                                                $department='<select class="form-control btn btn-success multidept text-left">';
-                                                $counter=0;
-                                                $locations='';
-                                                $departments='';
-                                                $loopexit=0;
-                                                foreach($getquery as $getrow){
-                                                    $counter++;  
-                                                    // Check if the project ID exists
-                                                    if (in_array($getrow['stc_status_down_list_department_loc_id'], $projects)) {
-                                                        $loopexit = 1;
+                                                    $location='<select class="form-control btn btn-success multilocation text-left" disabled>';
+                                                    $department='<select class="form-control btn btn-success multidept text-left">';
+                                                    $counter=0;
+                                                    $locations='';
+                                                    $departments='';
+                                                    $loopexit=0;
+                                                    foreach($getquery as $getrow){
+                                                        $counter++;  
                                                         $locations.='<option value="'.$getrow['stc_status_down_list_department_id'].'">'.$getrow['stc_status_down_list_department_location'].'</option>';
                                                         $departments.='<option value="'.$getrow['stc_status_down_list_department_id'].'">'.$getrow['stc_status_down_list_department_dept'].'</option>';
                                                     }
-                                                }
-                                                if($counter>1){
-                                                    $location.='<option value="NA" selected>Select</option>';
-                                                    $department.='<option value="NA" selected>Select</option>';
-                                                }else if($counter==0){
-                                                    $location.='<option value="NA">Location not found.</option>';
-                                                    $department.='<option value="NA">Department not found.</option>';
-                                                }
-                                                $location.=$locations;
-                                                $department.=$departments;
-                                                $location.='</select>';
-                                                $department.='</select>';
-                                                if($loopexit==1){
+                                                    if($counter>1){
+                                                        $location.='<option value="NA" selected>Select</option>';
+                                                        $department.='<option value="NA" selected>Select</option>';
+                                                    }else if($counter==0){
+                                                        $location.='<option value="NA">Location not found.</option>';
+                                                        $department.='<option value="NA">Department not found.</option>';
+                                                    }
+                                                    $location.=$locations;
+                                                    $department.=$departments;
+                                                    $location.='</select>';
+                                                    $department.='</select>';
                                                     $usercounter++;
                                                     echo "<tr><td>".$location."</td><td>".$department."</td><td>".$row['stc_cust_pro_supervisor_fullname']."</td><td>".$row['stc_cust_pro_supervisor_contact']."</td><td>".$row['stc_cust_pro_supervisor_uid']."</td><td><input type='text' value='".$gpno."' class='form-control multigpno' placeholder='Enter G.P No' ></td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' user_id='".$row['stc_cust_pro_supervisor_id']."'>Add</a></td></tr>";
                                                 }
+                                                echo '<tr><td>Showing '.$usercounter.' employees</td></tr>';
                                             }
-                                            echo '<tr><td>Showing '.$usercounter.' users</td></tr>'
+                                            // old book
+                                            // $projectsQuery = "SELECT stc_cust_pro_attend_supervise_pro_id FROM stc_cust_pro_attend_supervise WHERE stc_cust_pro_attend_supervise_super_id = '".$_SESSION['stc_agent_sub_id']."'";
+                                            // $projectsResult = mysqli_query($con, $projectsQuery);
+                                            // $projects = [];
+                                            // while ($row = mysqli_fetch_assoc($projectsResult)) {
+                                            //     $projects[] = $row['stc_cust_pro_attend_supervise_pro_id'];
+                                            // }
+
+                                            // Convert to a comma-separated string for use in the IN clause
+                                            // $projectsStr = implode(',', $projects);
+                                            // $query="SELECT DISTINCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact` FROM `stc_cust_pro_supervisor` LEFT JOIN `stc_epermit_enrollment` ON `stc_cust_pro_supervisor_id` = `emp_id` WHERE `stc_cust_pro_supervisor_created_by` =( SELECT `stc_cust_pro_supervisor_created_by` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id` ='".$_SESSION['stc_agent_sub_id']."' ) AND `stc_cust_pro_supervisor_status`=1 ORDER BY `stc_cust_pro_supervisor_fullname` ASC";
+                                            // $sql=mysqli_query($con, $query);
+                                            // $usercounter=0;
+                                            // foreach($sql as $row){
+                                            //     $getgpnoquery=mysqli_query($con, "SELECT `gpno` FROM `stc_epermit_enrollment` WHERE `emp_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `id` DESC LIMIT 0,1");
+                                            //     $gpno='';
+                                            //     if(mysqli_num_rows($getgpnoquery)>0){
+                                            //         $result=mysqli_fetch_assoc($getgpnoquery);
+                                            //         $gpno=$result['gpno'];
+                                            //     }
+
+                                            //     $getquery=mysqli_query($con, "SELECT DISTINCT `stc_status_down_list_department_loc_id`, `stc_status_down_list_department_id`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `stc_cust_pro_attend_supervise_status` FROM `stc_cust_pro_attend_supervise` LEFT JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id`=`stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `stc_status_down_list_department_dept` ASC");
+                                                
+                                            //     $location='<select class="form-control btn btn-success multilocation text-left" disabled>';
+                                            //     $department='<select class="form-control btn btn-success multidept text-left">';
+                                            //     $counter=0;
+                                            //     $locations='';
+                                            //     $departments='';
+                                            //     $loopexit=0;
+                                            //     foreach($getquery as $getrow){
+                                            //         $counter++;  
+                                            //         // Check if the project ID exists
+                                            //         if (in_array($getrow['stc_status_down_list_department_loc_id'], $projects)) {
+                                            //             $loopexit = 1;
+                                            //             $locations.='<option value="'.$getrow['stc_status_down_list_department_id'].'">'.$getrow['stc_status_down_list_department_location'].'</option>';
+                                            //             $departments.='<option value="'.$getrow['stc_status_down_list_department_id'].'">'.$getrow['stc_status_down_list_department_dept'].'</option>';
+                                            //         }
+                                            //     }
+                                            //     if($counter>1){
+                                            //         $location.='<option value="NA" selected>Select</option>';
+                                            //         $department.='<option value="NA" selected>Select</option>';
+                                            //     }else if($counter==0){
+                                            //         $location.='<option value="NA">Location not found.</option>';
+                                            //         $department.='<option value="NA">Department not found.</option>';
+                                            //     }
+                                            //     $location.=$locations;
+                                            //     $department.=$departments;
+                                            //     $location.='</select>';
+                                            //     $department.='</select>';
+                                            //     if($loopexit==1){
+                                            //         $usercounter++;
+                                            //         echo "<tr><td>".$location."</td><td>".$department."</td><td>".$row['stc_cust_pro_supervisor_fullname']."</td><td>".$row['stc_cust_pro_supervisor_contact']."</td><td>".$row['stc_cust_pro_supervisor_uid']."</td><td><input type='text' value='".$gpno."' class='form-control multigpno' placeholder='Enter G.P No' ></td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' user_id='".$row['stc_cust_pro_supervisor_id']."'>Add</a></td></tr>";
+                                            //     }
+                                            // }
+                                            // echo '<tr><td>Showing '.$usercounter.' users</td></tr>';
                                         ?>
                                     </tbody>
                                 </table>
