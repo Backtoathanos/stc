@@ -22,6 +22,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\branchElectronicsController;
 use App\Http\Controllers\branchSiteController;
 use App\Http\Controllers\SchoolController;
+use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\RequisitionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -193,4 +195,14 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/school/canteen', [SchoolController::class, 'canteenshow']);    
     Route::get('/branch/school/canteen/list', [SchoolController::class, 'canteenlist']);
     Route::get('/branch/school/canteen/delete', [SchoolController::class, 'canteendelete']);
+    
+    // for stc requisition
+    Route::get('/branch/stc/projects', [ProjectController::class, 'show']);    
+    Route::get('/branch/stc/projects/list', [ProjectController::class, 'list']);
+    Route::get('/branch/stc/projects/delete', [ProjectController::class, 'delete']);
+    
+    // for stc requisition
+    Route::get('/branch/stc/requisition', [RequisitionController::class, 'show']);    
+    Route::get('/branch/stc/list', [RequisitionController::class, 'list']);
+    Route::get('/branch/stc/delete', [RequisitionController::class, 'delete']);
 });
