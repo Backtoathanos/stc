@@ -505,12 +505,12 @@ class prime extends tesseract{
 
 	// show equipmentdetails 
 	public function stc_equipement_details_get($search){
-		$filter=" WHERE `model_no` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `capacity` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_cust_pro_supervisor_fullname` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_status_down_list_department_dept` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."'";
+		$filter=" AND (`model_no` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `capacity` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_cust_pro_supervisor_fullname` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_status_down_list_department_dept` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."')";
 		$search=$search==''?'':$filter;
 	
 		// Check for duplicate unique ID
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "
-			SELECT `id`, `area`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `model_no`, `capacity`, `equipment_name`, `equipment_no`, `stc_cust_pro_supervisor_fullname`, `created_date`  FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id`=`equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id`=`equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by`=`stc_cust_pro_supervisor_id` ".$search." ORDER BY TIMESTAMP(`created_date`) DESC
+			SELECT `id`, `area`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `model_no`, `capacity`, `equipment_name`, `equipment_no`, `stc_cust_pro_supervisor_fullname`, `created_date`  FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id`=`equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id`=`equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by`=`stc_cust_pro_supervisor_id` WHERE `created_by`='".$_SESSION['stc_agent_sub_id']."' ".$search." ORDER BY TIMESTAMP(`created_date`) DESC
 		");
 		$blackpearl=[];
 		if(mysqli_num_rows($blackpearl_qry)>0){

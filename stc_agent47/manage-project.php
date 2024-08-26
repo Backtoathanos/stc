@@ -272,10 +272,10 @@ include_once("../MCU/db.php");
                                                             $indust='';
                                                             if($_SESSION['stc_agent_role']==3){
                                                                 $indust='
-                                                                    <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Project AHU Details" class="stc-project-ahu-show-ret" style="font-size: 25px;color: #cc7676;">
+                                                                    <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Project AHU Details" class="stc-project-ahu-show-ret" style="font-size: 25px;color: #cc7676;"  data-toggle="modal" data-target=".bd-projectahudetails-modal-lg">
                                                                         <i class="fas fa-cogs"></i>
                                                                     </a>
-                                                                    <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Project Pump Details" class="stc-project-pump-show-ret" style="font-size: 25px;color: #cc7676;">
+                                                                    <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Project Pump Details" class="stc-project-pump-show-ret" style="font-size: 25px;color: #cc7676;"  data-toggle="modal" data-target=".bd-projectpumpdetails-modal-lg">
                                                                         <i class="fa fa-industry"></i>
                                                                     </a>
                                                                 ';
@@ -301,27 +301,37 @@ include_once("../MCU/db.php");
                                                             if($get_project_row['stc_cust_project_status']=='1'){
                                                                 $blacknwhitestyle='';
                                                             }
+                                                            $project_address = $get_project_row['stc_cust_project_address'];
+                                                            if (strlen($project_address) > 40) {
+                                                                $first_part = substr($project_address, 0, 40);                                                               
+                                                                $project_address= '<span title="' . $project_address . '">'.$first_part.'...</span>';
+                                                            }
+                                                            $projectname=$get_project_row['stc_cust_project_title'];
+                                                            if (strlen($projectname) > 30) {
+                                                                $first_part = substr($projectname, 0, 30);                                                           
+                                                                $projectname= '<span title="' . $get_project_row['stc_cust_project_title'] . '">'.$first_part.'...</span>';
+                                                            }
                                                             echo '<div class="col-md-3 projecttarget" style="margin-bottom:15px;">
                                                                     <div class="card profile-card-3" '.$blacknwhitestyle.'>
                                                                         <div class="background-block">
                                                                             <img src="https://images.pexels.com/photos/459225/pexels-photo-459225.jpeg?auto=compress&cs=tinysrgb&h=650&w=940" alt="profile-sample1" class="background"/>
                                                                         </div>
                                                                         <div class="card-content">
-                                                                            <h2>'.$get_project_row['stc_cust_project_title'].'<small>'.$get_project_row['stc_cust_project_refr'].'</small></h2>
+                                                                            <h2>'.$projectname.'<small>'.$get_project_row['stc_cust_project_refr'].'</small></h2>
                                                                             <input type="hidden" id="stc-ag-edittitle'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_title'].'">
                                                                             <input type="hidden" id="stc-ag-editrefre'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_refr'].'">
                                                                             <input type="hidden" id="stc-ag-editaddress'.$get_project_row['stc_cust_project_id'].'" value="'.$get_project_row['stc_cust_project_address'].'">
                                                                             <h3 style="font-size: 0.75rem;">
-                                                                                '.$get_project_row['stc_cust_project_address'].'<br>
+                                                                                '.$project_address.'<br>
                                                                                 '.$get_project_row['stc_cust_project_responsive_person'].'<br>
                                                                                 '.$sharedinfo.'
 
                                                                             </h3>
                                                                             <div class="icon-block">
-                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Edit Project" class="stc-project-edit-ret" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-edit"></i></a>
-                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "View Connected Supervisor" class="stc-project-show-consup" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-user"></i></a>
-                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "View Project Details" class="stc-project-show-ret" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-eye"></i></a>
-                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Collaborate" class="stc-project-collaborate" style="font-size: 25px;color: #cc7676;"> <i class="fas fa-handshake-o"></i></a>
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Edit Project" class="stc-project-edit-ret" style="font-size: 25px;color: #cc7676;" data-toggle="modal" data-target=".bd-projectedit-modal-lg"> <i class="fas fa-edit"></i></a>
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "View Connected Supervisor" class="stc-project-show-consup" style="font-size: 25px;color: #cc7676;" data-toggle="modal" data-target=".bd-connproject-modal-lg"> <i class="fas fa-user"></i></a>
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "View Project Details" class="stc-project-show-ret" style="font-size: 25px;color: #cc7676;" data-toggle="modal" data-target=".bd-projectdetails-modal-lg"> <i class="fas fa-eye"></i></a>
+                                                                                <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Collaborate" class="stc-project-collaborate" style="font-size: 25px;color: #cc7676;" data-toggle="modal" data-target=".bd-collaborate-modal-lg"> <i class="fas fa-handshake-o"></i></a>
                                                                                 <a href="#" id="'.$get_project_row['stc_cust_project_id'].'" title = "Add Project Details" class="add-project-details-btn" style="font-size: 25px;color: #cc7676;" data-toggle="modal" data-target=".bd-addprojectdetails-modal-lg"> <i class="fas fa-file"></i></a>
                                                                                 '.$indust.'
                                                                             </div>
@@ -924,7 +934,6 @@ include_once("../MCU/db.php");
                         $('#stc-ag-remarks').val(res_data['stc_cust_project_details_remarks']);
                         $('#stc-ag-po-number').val(res_data['stc_cust_project_details_po_number']);
                         $('#tc-ag-po-value').val(res_data['stc_cust_project_details_po_value']);
-                        $('.bd-projectdetails-modal-lg').modal("show");
                     }
                 });
             });
@@ -944,7 +953,6 @@ include_once("../MCU/db.php");
                     success     : function(res_data){
                         // console.log(res_data);
                         $('.stc-ag-connectedsupervisor').html(res_data);
-                        $('.bd-connproject-modal-lg').modal("show");
                     }
                 });
             });
@@ -960,7 +968,6 @@ include_once("../MCU/db.php");
                 $('#stc-ag-ed-project-name').val(pro_title);
                 $('#stc-ag-ed-project-refr').val(pro_ref);
                 $('#stc-ag-ed-job-details').val(pro_address);
-                $('.bd-projectedit-modal-lg').modal("show");
             });
 
             // call ahu modal show
@@ -1026,7 +1033,6 @@ include_once("../MCU/db.php");
                         var reponse=res_data.trim();
                         if(reponse=="Details Edited Successfully."){
                             alert(reponse);
-                            $('.bd-projectedit-modal-lg').modal("hide");
                         }else{
                             alert(reponse);
                         }
@@ -1483,7 +1489,6 @@ include_once("../MCU/db.php");
                 e.preventDefault();
                 var id = $(this).attr("id");
                 $('.collaborate-project-id').val(id);
-                $('.bd-collaborate-modal-lg').modal('show');
                 stc_cust_project_collaborated(id);
             });
 
