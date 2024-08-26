@@ -2239,24 +2239,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <div class="col-md-3 col-sm-12 col-xl-3">
                                                 <h5 class="card-title">Supervisor/Engineers Name</h5>
                                                 <div class="position-relative form-group">
-                                                        <?php 
-                                                            $empname='';
-                                                            $result=mysqli_query($con, "
-                                                                SELECT DISTINCT `stc_safetytbm_gateentry_supeng_name`
-                                                                FROM `stc_safetytbm_gateentry` 
-                                                                LEFT JOIN `stc_safetytbm` 
-                                                                ON `stc_safetytbm_id`=`stc_safetytbm_gateentry_tbmid`
-                                                                WHERE `stc_safetytbm_created_by`='".$_SESSION['stc_agent_sub_id']."'
-                                                                AND `stc_safetytbm_gateentry_supeng_name`<>''
-                                                                ORDER BY `stc_safetytbm_gateentry_supeng_name` ASC
-                                                            ");
-                                                            if(mysqli_num_rows($result)>0){
-                                                                foreach($result as $resultrow){
-                                                                    $empname=$resultrow['stc_safetytbm_gateentry_supeng_name'];
-                                                                }
-                                                            }
-                                                        ?>                                         
-                                                    <input type="text" class="form-control" id="stc-tbtm-gentrysupengname" disabled placeholder="Enter Supervisor/Engineers Name" value="<?php echo $empname; ?>">
+                                                    <input type="text" class="form-control" id="stc-tbtm-gentrysupengname" disabled placeholder="Enter Supervisor/Engineers Name" value="<?php echo $_SESSION['stc_agent_sub_name']; ?>">
                                                 </div>
                                             </div>
                                             <div class="col-md-2 col-sm-12 col-xl-2">
