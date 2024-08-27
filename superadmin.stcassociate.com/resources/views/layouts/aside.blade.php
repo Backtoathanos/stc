@@ -32,77 +32,6 @@
             </a>
           </li>
           <li class="nav-item">
-            <a href="javascript:void(0)" class="nav-link @if (Request::segment(2) == 'electronicsbranch') active @elseif(Request::segment(2) == 'groceriesbranch') active @elseif(Request::segment(2) == 'managerbranch') active @elseif(Request::segment(2) == 'schoolbranch') active @elseif(Request::segment(2) == 'sitebranch') active @elseif(Request::segment(2) == 'adminbranch') active @elseif(Request::segment(2) == 'tradingbranch') active @elseif(Request::segment(2) == 'uadminbranch') active @endif">
-              <i class="nav-icon fas fa-user"></i>
-              <p>
-                Branch
-                <i class="fas fa-angle-left right"></i>
-              </p>
-            </a>
-            <ul class="nav nav-treeview">
-              <li class="nav-item">
-                <a href="javascript:void(0)" class="nav-link @if(Request::segment(2) == 'school') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>School
-                  <i class="fas fa-angle-left right"></i></p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="{{ url('/branch/school/monthlyclosing') }}" class="nav-link @if(Request::segment(3) == 'monthlyclosing') active @endif">
-                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
-                      <p>Monthly Closing</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{{ url('/branch/school/fee') }}" class="nav-link @if(Request::segment(3) == 'fee') active @endif">
-                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
-                      <p>Fee</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{{ url('/branch/school/canteen') }}" class="nav-link @if(Request::segment(3) == 'canteen') active @endif">
-                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
-                      <p>Canteen</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-              <li class="nav-item">
-                <a href="javascript:void(0)" class="nav-link @if(Request::segment(2) == 'stc') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>STC
-                  <i class="fas fa-angle-left right"></i></p>
-                </a>
-                <ul class="nav nav-treeview">
-                  <li class="nav-item">
-                    <a href="{{ url('/branch/stc/projects') }}" class="nav-link @if(Request::segment(3) == 'projects') active @endif">
-                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
-                      <p>Projects</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{{ url('/branch/stc/requisition') }}" class="nav-link @if(Request::segment(3) == 'requisition') active @endif">
-                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
-                      <p>Requisition</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{{ url('/branch/stc/std') }}" class="nav-link @if(Request::segment(3) == 'std') active @endif">
-                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
-                      <p>Status Down List</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{{ url('/branch/stc/canteen') }}" class="nav-link @if(Request::segment(3) == 'canteen') active @endif">
-                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
-                      <p>Canteen</p>
-                    </a>
-                  </li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <li class="nav-item">
             <a 
               href="javascript:void(0)" 
               class="nav-link 
@@ -175,10 +104,93 @@
                 </a>
               </li>
               <li class="nav-item">
-                <a href="{{ url('/master/brand') }}" class="nav-link @if(Request::segment(2) == 'customer') active @endif">
+                <a href="{{ url('/master/customer') }}" class="nav-link @if(Request::segment(2) == 'customer') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Customer</p>
                 </a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="javascript:void(0)" class="nav-link @if (Request::segment(2) == 'electronicsbranch') active @elseif(Request::segment(2) == 'groceriesbranch') active @elseif(Request::segment(2) == 'managerbranch') active @elseif(Request::segment(2) == 'schoolbranch') active @elseif(Request::segment(2) == 'sitebranch') active @elseif(Request::segment(2) == 'adminbranch') active @elseif(Request::segment(2) == 'tradingbranch') active @elseif(Request::segment(2) == 'uadminbranch') active @endif">
+              <i class="nav-icon fas fa-user"></i>
+              <p>
+                Branch
+                <i class="fas fa-angle-left right"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+              <li class="nav-item">
+                <a href="javascript:void(0)" class="nav-link @if(Request::segment(2) == 'school') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>School
+                  <i class="fas fa-angle-left right"></i></p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/school/monthlyclosing') }}" class="nav-link @if(Request::segment(3) == 'monthlyclosing') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Monthly Closing</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/school/fee') }}" class="nav-link @if(Request::segment(3) == 'fee') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Fee</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/school/canteen') }}" class="nav-link @if(Request::segment(3) == 'canteen') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Canteen</p>
+                    </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item">
+                <a href="javascript:void(0)" class="nav-link @if(Request::segment(2) == 'stc') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>STC
+                  <i class="fas fa-angle-left right"></i></p>
+                </a>
+                <ul class="nav nav-treeview">
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/stc/projects') }}" class="nav-link @if(Request::segment(3) == 'projects') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Projects</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/stc/requisitions') }}" class="nav-link @if(Request::segment(3) == 'requisitions') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Requisitions</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/stc/requisition') }}" class="nav-link @if(Request::segment(3) == 'requisition') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Requisition</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/stc/requisitionitem') }}" class="nav-link @if(Request::segment(3) == 'requisitionitem') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Requisitions Item</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/stc/requisitionsitemreceived') }}" class="nav-link @if(Request::segment(3) == 'requisitionsitemreceived') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Requisitions Item Received</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/stc/std') }}" class="nav-link @if(Request::segment(3) == 'std') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Status Down List</p>
+                    </a>
+                  </li>
+                </ul>
               </li>
             </ul>
           </li>

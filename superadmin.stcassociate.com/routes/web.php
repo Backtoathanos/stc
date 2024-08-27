@@ -202,7 +202,11 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/stc/projects/delete', [ProjectController::class, 'delete']);
     
     // for stc requisition
-    Route::get('/branch/stc/requisition', [RequisitionController::class, 'show']);    
-    Route::get('/branch/stc/list', [RequisitionController::class, 'list']);
-    Route::get('/branch/stc/delete', [RequisitionController::class, 'delete']);
+    Route::get('/branch/stc/requisitions', [RequisitionController::class, 'show']);    
+    Route::get('/branch/stc/requisitions/list', [RequisitionController::class, 'list']);
+    Route::get('/branch/stc/requisitions/delete', [RequisitionController::class, 'delete']);
+    Route::get('/branch/stc/requisitions/itemlist', [RequisitionController::class, 'itemlist']);
+    Route::get('/branch/stc/requisitions/itemdelete', [RequisitionController::class, 'itemdelete']);
+    Route::get('/branch/stc/requisitions/itemdislist', [RequisitionController::class, 'itemdislist']);
+    Route::get('/branch/stc/requisitions/itemdisdelete', [RequisitionController::class, 'itemdisdelete']);
 });
