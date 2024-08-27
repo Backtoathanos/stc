@@ -2180,7 +2180,7 @@ class pirates_supervisor extends tesseract{
 	public function stc_get_attendance($dept, $month, $year){
 		$optimusprime='';
 		$optimusprimeqry = mysqli_query($this->stc_dbs, "
-            SELECT distinct `stc_status_down_list_department_location`, `emp_id`, `emp_name`, `stc_status_down_list_department_dept` 
+            SELECT distinct `stc_status_down_list_department_location`, `emp_id`, `emp_name`
             FROM `stc_epermit_enrollment` 
             LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` 
             WHERE `dep_id`='" . mysqli_real_escape_string($this->stc_dbs, $dept) . "' 
@@ -2194,11 +2194,13 @@ class pirates_supervisor extends tesseract{
 				$slno++;
 				$totalp=0;
 				$totala=0;
-				$query =mysqli_query($this->stc_dbs, "SELECT DATE(`created_date`) as attend_date FROM `stc_epermit_enrollment` WHERE `emp_id`='" . mysqli_real_escape_string($this->stc_dbs, $row['emp_id']) . "' AND YEAR(`created_date`)='" . mysqli_real_escape_string($this->stc_dbs, $year) . "' AND MONTH(`created_date`)='" . mysqli_real_escape_string($this->stc_dbs, $month) . "'");
+				$department='';
+				$query =mysqli_query($this->stc_dbs, "SELECT DISTINCT DATE(ee.`created_date`) as attend_date, dep.`stc_status_down_list_department_dept` FROM `stc_epermit_enrollment` ee LEFT JOIN `stc_status_down_list_department` dep ON ee.`dep_id`=dep.`stc_status_down_list_department_id` WHERE `emp_id`='" . mysqli_real_escape_string($this->stc_dbs, $row['emp_id']) . "' AND YEAR(ee.`created_date`)='" . mysqli_real_escape_string($this->stc_dbs, $year) . "' AND MONTH(ee.`created_date`)='" . mysqli_real_escape_string($this->stc_dbs, $month) . "'");
 				$attend_dates = array();
 				if (mysqli_num_rows($query) > 0) {
 					while ($row2 = mysqli_fetch_assoc($query)) {
 						$attend_dates[] = date('d', strtotime($row2['attend_date']));
+						$department=$row2['stc_status_down_list_department_dept'];
 					}
 				}
 				$lastDay = date('t', mktime(0, 0, 0, $month, 1, $year));
@@ -2211,7 +2213,7 @@ class pirates_supervisor extends tesseract{
 						$totala++;
 					}
 				}
-				$optimusprime .= '<tr><td>' . $slno . '</td><td>' . $row['stc_status_down_list_department_location'] . '</td><td>' . $row['stc_status_down_list_department_dept'] . '</td><td>' . $row['emp_name'] . '</td>' . $attendance . '<td><span style="color:green">Present - ' . $totalp . '</span></br><span style="color:red">Absent - ' . $totala . '</span></td></tr>';
+				$optimusprime .= '<tr><td>' . $slno . '</td><td>' . $row['stc_status_down_list_department_location'] . '</td><td>' . $department . '</td><td>' . $row['emp_name'] . '</td>' . $attendance . '<td><span style="color:green">Present - ' . $totalp . '</span></br><span style="color:red">Absent - ' . $totala . '</span></td></tr>';
 				$slno++;
 			}
 		} else {

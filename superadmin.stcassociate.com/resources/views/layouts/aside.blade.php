@@ -167,24 +167,6 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="{{ url('/branch/stc/requisition') }}" class="nav-link @if(Request::segment(3) == 'requisition') active @endif">
-                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
-                      <p>Requisition</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{{ url('/branch/stc/requisitionitem') }}" class="nav-link @if(Request::segment(3) == 'requisitionitem') active @endif">
-                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
-                      <p>Requisitions Item</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{{ url('/branch/stc/requisitionsitemreceived') }}" class="nav-link @if(Request::segment(3) == 'requisitionsitemreceived') active @endif">
-                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
-                      <p>Requisitions Item Received</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
                     <a href="{{ url('/branch/stc/std') }}" class="nav-link @if(Request::segment(3) == 'std') active @endif">
                       <i class="far fa-arrow-alt-circle-right nav-icon"></i>
                       <p>Status Down List</p>
