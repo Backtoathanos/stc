@@ -2186,6 +2186,8 @@ class pirates_supervisor extends tesseract{
 			WHERE MONTH(ee.`created_date`)='" . mysqli_real_escape_string($this->stc_dbs, $month) . "' 
 			AND YEAR(ee.`created_date`)='" . mysqli_real_escape_string($this->stc_dbs, $year) . "'
 			AND ee.`dep_id`='" . mysqli_real_escape_string($this->stc_dbs, $dept) . "'
+			AND ee.`emp_id`<>0
+			ORDER BY ee.`emp_name` ASC
 		");
 		if(mysqli_num_rows($optimusprime_query)>0){
 			$slno=0;
@@ -2256,7 +2258,7 @@ class pirates_supervisor extends tesseract{
 					}
 				}
 			
-				$optimusprime .= '<tr><td>' . $slno . '</td><td>' . $row['stc_status_down_list_department_location'] . '</td><td>' . $row['stc_status_down_list_department_dept'] . '</td><td>' . $row['emp_name'] . '</td>' . $attendance . '<td><span style="color:green">' . $totalp . '</span></td><td><span style="color:red">' . $totala . '</span></td></tr>';
+				$optimusprime .= '<tr><td>' . $slno . '</td><td>' . $row['stc_status_down_list_department_location'] . '</td><td>' . $row['stc_status_down_list_department_dept'] . '</td><td>' . $row['emp_name'] . '</td>' . $attendance . '<td class="text-right"><span style="color:green">' . $totalp . '</span></td><td class="text-right"><span style="color:red">' . $totala . '</span></td></tr>';
 				$slno++;
 			}
 			
