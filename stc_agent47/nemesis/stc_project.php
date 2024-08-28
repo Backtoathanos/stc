@@ -2256,7 +2256,7 @@ class pirates_supervisor extends tesseract{
 					}
 				}
 			
-				$optimusprime .= '<tr><td>' . $slno . '</td><td>' . $row['stc_status_down_list_department_location'] . '</td><td>' . $row['stc_status_down_list_department_dept'] . '</td><td>' . $row['emp_name'] . '</td>' . $attendance . '<td><span style="color:green">Present - ' . $totalp . '</span></br><span style="color:red">Absent - ' . $totala . '</span></td></tr>';
+				$optimusprime .= '<tr><td>' . $slno . '</td><td>' . $row['stc_status_down_list_department_location'] . '</td><td>' . $row['stc_status_down_list_department_dept'] . '</td><td>' . $row['emp_name'] . '</td>' . $attendance . '<td><span style="color:green">' . $totalp . '</span></td><td><span style="color:red">' . $totala . '</span></td></tr>';
 				$slno++;
 			}
 			
@@ -4172,7 +4172,8 @@ if(isset($_POST['js_search_attendance'])){
     		    <th>Department</th>
     		    <th>Employee Name</th>
 				'.$days.'
-				<th>Total</th>
+				<th>Total Present</th>
+				<th>Total Absent</th>
 			</thead>
 			<tbody>
 	';
