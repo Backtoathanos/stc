@@ -2244,6 +2244,8 @@ class pirates_supervisor extends tesseract{
 							}else{
 								$imgTag='<span style="color:green">P</span>';
 							}
+						}else{
+							$imgTag='<span style="color:green">P</span>';
 						}
 			
 						$attendance .= '<td>' . $imgTag . '</td>';
