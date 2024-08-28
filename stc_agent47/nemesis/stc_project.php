@@ -2241,6 +2241,8 @@ class pirates_supervisor extends tesseract{
 								
 								// Create an anchor tag with the image
 								$imgTag = '<a href="../stc_sub_agent47/safety_img/' . $imgLocation . '" target="_blank"><span style="color:green">P</span></a>';
+							}else{
+								$imgTag='<span style="color:green">P</span>';
 							}
 						}
 			
