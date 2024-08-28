@@ -2240,18 +2240,18 @@ class pirates_supervisor extends tesseract{
 								$imgLocation = $imgRow['stc_safetytbm_img_location'];
 								
 								// Create an anchor tag with the image
-								$imgTag = $imgLocation!='' ? '<a href="../stc_sub_agent47/safety_img/' . $imgLocation . '" target="_blank" title="click to view images"><span style="color:green;font-size: 35px;">P</span></a>' : '';
+								$imgTag = $imgLocation!='' ? '<a href="../stc_sub_agent47/safety_img/' . $imgLocation . '" target="_blank" title="click to view images"><span style="color:green;font-size: 35px;">P</span></a>' : '<span style="color:green">P</span>';
 							}else{
-								$imgTag='<span style="color:green;font-size: 35px;">P</span>';
+								$imgTag='<span style="color:green">P</span>';
 							}
 						}else{
-							$imgTag='<span style="color:green;font-size: 35px;">P</span>';
+							$imgTag='<span style="color:green">P</span>';
 						}
 			
 						$attendance .= '<td>' . $imgTag . '</td>';
 						$totalp++;
 					} else {
-						$attendance .= '<td><span style="color:red; font-size: 35px;">A</span></td>';
+						$attendance .= '<td><span style="color:red">A</span></td>';
 						$totala++;
 					}
 				}
