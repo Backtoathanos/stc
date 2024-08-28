@@ -343,7 +343,7 @@
                       render: function(data, type, row) {
                         var output='';
                         if(data=="1"){
-                          output='Noraml';
+                          output='Normal';
                         }else {
                           output='Urgent';
                         }
