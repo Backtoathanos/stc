@@ -201,23 +201,28 @@ include_once("../MCU/db.php");
                                                                             ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
                                                                             LEFT JOIN `stc_cust_project_collaborate` 
                                                                             ON `stc_cust_project_id`=`stc_cust_project_collaborate_projectid`
+                                                                            LEFT JOIN `stc_cust_pro_supervisor_collaborate` 
+                                                                            ON `stc_cust_pro_supervisor_id`=`stc_cust_pro_supervisor_collaborate_userid`
                                                                             WHERE (
-                                                                                `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."' OR 
+                                                                                `stc_cust_project_createdby`='".$_SESSION['stc_agent_id']."' OR 
                                                                                 `stc_cust_project_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
-                                                                            )AND stc_cust_super_requisition_list_status<3
+                                                                            ) AND (
+                                                                                `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."' OR 
+                                                                                `stc_cust_pro_supervisor_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
+                                                                            ) AND stc_cust_super_requisition_list_status<3
                                                                             ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
                                                                         ");
                                                                         $sl=0;
                                                                         if(mysqli_num_rows($requissuperqry)!=0){
                                                                             foreach($requissuperqry as $requisrow){
-                                                                                $actionstatus="";
+                                                                                $actionstatus="#";
                                                                                 if($requisrow['stc_cust_super_requisition_list_status']==1){
                                                                                     $actionstatus='
                                                                                         <a href="#" class="btn btn-primary add_to_purchase" atc-ic="'.$requisrow['item_list_id'].'"id="add_to_accept_cart'.$requisrow['item_list_id'].'" title="Approve" style="font-size: 35px;color: black;"><i class="fas fa-plus-circle"></i></a>
                                                                                         <a href="#" class="btn btn-danger remove_from_purchase" operat-ic="'.$requisrow['item_list_id'].'"id="rem_from_accept_cart'.$requisrow['item_list_id'].'" style="font-size: 35px;color: black;display:none;"><i class="fas fa-trash" ></i></a>
                                                                                     ';
                                                                                 }elseif($requisrow['stc_cust_super_requisition_list_status']==2){
-                                                                                    $actionstatus='<a href="#" class="btn btn-danger remove_from_purchase" operat-ic="'.$requisrow['item_list_id'].'"id="rem_from_accept_cart'.$requisrow['item_list_id'].'" style="font-size: 35px;color: black;"><i class="fas fa-trash" ></i></a>';
+                                                                                    // $actionstatus='<a href="#" class="btn btn-danger remove_from_purchase" operat-ic="'.$requisrow['item_list_id'].'"id="rem_from_accept_cart'.$requisrow['item_list_id'].'" style="font-size: 35px;color: black;"><i class="fas fa-trash" ></i></a>';
                                                                                 }else{
                                                                                     $actionstatus='#';
                                                                                 }

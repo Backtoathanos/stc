@@ -469,6 +469,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         $('#stc-tbtm-place').val(response_tbm.tbm.stc_safetytbm_place);
                         // $('#stc-tbtm-location').val(response_tbm.tbm.stc_safetytbm_loc);
                         $('#stc-tbtm-location').val(response_tbm.tbm.stc_safetytbm_loc_id);
+                        if(response_tbm.tbm.stc_safetytbm_loc_id=='0'){$('#stc-tbtm-location').val("NA");}
                         $('#stc-tbtm-agendaofmeet').val(response_tbm.tbm.stc_safetytbm_agendaofmeet);
                         $('#stc-tbtm-pointtone').val(response_tbm.tbm.stc_safetytbm_ptone);
                         $('#stc-tbtm-pointtwo').val(response_tbm.tbm.stc_safetytbm_pttwo);
@@ -666,27 +667,48 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         }
                     }
                 });
+                
             }
 
             
             $('body').delegate('.stc-tbtm-textfields', 'focusout', function(e){
                 e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-                setTimeout(function() {
-                    $('.saved-popup').toggle(700);
-                }, 1000);
+                var stc_loc_id=$('#stc-tbtm-location').val();
+                if(stc_loc_id!="NA"){
+                    save_tbm();
+                    $('.saved-popup').remove();
+                    $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+                    setTimeout(function() {
+                        $('.saved-popup').toggle(700);
+                    }, 1000);
+                }else{
+                    $('.saved-popup').remove();
+                    alert("Select Location");
+                    $('#stc-tbtm-location').after('<p class="saved-popup text-danger">Select Location</p>');
+                    setTimeout(function() {
+                        $('.saved-popup').toggle(700);
+                    }, 5000);
+                }
             });
             
             $('body').delegate('.stc-tbtm-dropdownfields', 'change', function(e){
                 e.preventDefault();
-                save_tbm();
-                $('.saved-popup').remove();
-                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
-                setTimeout(function() {
-                    $('.saved-popup').toggle(700);
-                }, 1000);
+                var stc_loc_id=$('#stc-tbtm-location').val();
+                if(stc_loc_id!="NA"){
+                    save_tbm();
+                    $('.saved-popup').remove();
+                    $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+                    setTimeout(function() {
+                        $('.saved-popup').toggle(700);
+                    }, 1000);
+                }else{
+                    $('.saved-popup').remove();
+                    alert("Select Location");
+                    $('#stc-tbtm-location').after('<p class="saved-popup text-danger">Select Location</p>');
+                    setTimeout(function() {
+                        $('.saved-popup').toggle(700);
+                    }, 5000);
+                }
             });
 
             // save entry time
@@ -809,65 +831,75 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.stc-tbtm-ppe-checklistadd', 'click', function(e){
                 e.preventDefault();
                 var stc_tbm_no=$('.stc-tbm-no').val();
+                var stc_tbm_location=$('#stc-tbtm-location').val();
                 var emp_name=$.trim($(this).closest('tr').find('td:eq(0)').text());
                 var filter = get_ppefilter($(this), 'checklistcb');
-                var uncheckedppe = [], uncheckedppereason = [], uncheckedppesize = [];                
-                $(this).closest('tr').find('.checklistcb').each(function(){
-                    if(!$(this).prop('checked')){ 
-                        if($(this).parent().find('.uncheckedselect').val()=="Damage" || $(this).parent().find('.uncheckedselect').val()=="Not Issued"){
-                            uncheckedppe.push($(this).val()); 
-                            uncheckedppereason.push($(this).parent().find('.uncheckedselect').val());
-                            if($(this).val()=="Safety Shoes" || $(this).val()=="FR-Jacket/Trouser"){
-                                uncheckedppesize.push($(this).parent().find('.uncheckedssize').val());
-                            }else{
-                                uncheckedppesize.push('');
-                            }
-                        }
-                    } 
-                });
-                if(filter.length>0){
-                    var validation=0;
-                    $('.attendance-ppe-table tr').each(function(){
-                        var checkempname = $.trim($(this).find('td:eq(1)').text());
-                        if(checkempname === emp_name){
-                            validation = 1;
-                            return false;
-                        }
-                    });
-                    if(validation==0){
-                        if(confirm("Are you sure?")){
-                            $(this).closest('tr').remove();
-                            $.ajax({
-                                url         : "nemesis/stc_safety.php",
-                                method      : "POST",
-                                data        : {
-                                    stc_safety_savetbmppechecklist:1,
-                                    stc_tbm_no:stc_tbm_no,
-                                    stc_emp_name:emp_name,
-                                    stc_filter:filter,
-                                    stc_uncheckedppe:uncheckedppe,
-                                    stc_uncheckedppereason:uncheckedppereason,
-                                    stc_uncheckedppesize:uncheckedppesize
-                                },
-                                success     : function(response_tbm){
-                                    // console.log(response_tbm);
-                                    var response=response_tbm.trim();
-                                    if(response=="success"){
-                                        alert("Record added.");
-                                        call_tbm_fields();
-                                        $('#stc-tbtm-ppe-checklistempname').val('');
-                                    }else{
-                                        alert("Something went wrong, please check and try again.");
-                                    }
+                var uncheckedppe = [], uncheckedppereason = [], uncheckedppesize = []; 
+                if(stc_tbm_location=="NA"){
+                    $('.saved-popup').remove();
+                    alert("Select Location");
+                    $('#stc-tbtm-location').after('<p class="saved-popup text-danger">Select Location</p>');
+                    setTimeout(function() {
+                        $('.saved-popup').toggle(700);
+                    }, 5000);
+                }else{
+                    $(this).closest('tr').find('.checklistcb').each(function(){
+                        if(!$(this).prop('checked')){ 
+                            if($(this).parent().find('.uncheckedselect').val()=="Damage" || $(this).parent().find('.uncheckedselect').val()=="Not Issued"){
+                                uncheckedppe.push($(this).val()); 
+                                uncheckedppereason.push($(this).parent().find('.uncheckedselect').val());
+                                if($(this).val()=="Safety Shoes" || $(this).val()=="FR-Jacket/Trouser"){
+                                    uncheckedppesize.push($(this).parent().find('.uncheckedssize').val());
+                                }else{
+                                    uncheckedppesize.push('');
                                 }
-                            });
+                            }
+                        } 
+                    });
+                    if(filter.length>0){
+                        var validation=0;
+                        $('.attendance-ppe-table tr').each(function(){
+                            var checkempname = $.trim($(this).find('td:eq(1)').text());
+                            if(checkempname === emp_name){
+                                validation = 1;
+                                return false;
+                            }
+                        });
+                        if(validation==0){
+                            if(confirm("Are you sure?")){
+                                $(this).closest('tr').remove();
+                                $.ajax({
+                                    url         : "nemesis/stc_safety.php",
+                                    method      : "POST",
+                                    data        : {
+                                        stc_safety_savetbmppechecklist:1,
+                                        stc_tbm_no:stc_tbm_no,
+                                        stc_emp_name:emp_name,
+                                        stc_filter:filter,
+                                        stc_uncheckedppe:uncheckedppe,
+                                        stc_uncheckedppereason:uncheckedppereason,
+                                        stc_uncheckedppesize:uncheckedppesize
+                                    },
+                                    success     : function(response_tbm){
+                                        // console.log(response_tbm);
+                                        var response=response_tbm.trim();
+                                        if(response=="success"){
+                                            alert("Record added.");
+                                            call_tbm_fields();
+                                            $('#stc-tbtm-ppe-checklistempname').val('');
+                                        }else{
+                                            alert("Something went wrong, please check and try again.");
+                                        }
+                                    }
+                                });
+                            }
+                        }else{
+                            $(this).closest('tr').remove();
+                            alert("Employee already exist.");
                         }
                     }else{
-                        $(this).closest('tr').remove();
-                        alert("Employee already exist.");
+                        alert("Please check ppe!!!");
                     }
-                }else{
-                    alert("Please check ppe!!!");
                 }
             });
 
@@ -2152,7 +2184,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <h5 class="card-title">Location *</h5>
                                         <div class="position-relative form-group">
                                             <select class="form-control stc-tbtm-dropdownfields" id="stc-tbtm-location">
-                                                <option value="">Select</option>
+                                                <option value="NA">Select</option>
                                                 <?php
                                                     include_once("../MCU/db.php");
                                                     $dept_qry = mysqli_query($con, "
@@ -2194,7 +2226,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-4 col-sm-12 col-xl-4">
                                         <h5 class="card-title">Date *</h5>
                                         <div class="position-relative form-group">
-                                            <input type="date" class="form-control stc-tbtm-textfields" id="stc-tbtm-date">
+                                            <input type="date" class="form-control stc-tbtm-textfields" id="stc-tbtm-date" disabled>
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-12 col-xl-4">
