@@ -24,6 +24,7 @@ use App\Http\Controllers\branchSiteController;
 use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RequisitionController;
+use App\Http\Controllers\STDController;
 
 /*
 |--------------------------------------------------------------------------
@@ -209,4 +210,10 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/stc/requisitions/itemdelete', [RequisitionController::class, 'itemdelete']);
     Route::get('/branch/stc/requisitions/itemdislist', [RequisitionController::class, 'itemdislist']);
     Route::get('/branch/stc/requisitions/itemdisdelete', [RequisitionController::class, 'itemdisdelete']);
+    
+    // for stc std
+    Route::get('/branch/stc/std', [STDController::class, 'show']);    
+    Route::get('/branch/stc/std/list', [STDController::class, 'list']);
+    Route::get('/branch/stc/std/update/{id}/edit', [STDController::class, 'edit']);
+    Route::get('/branch/stc/std/delete', [STDController::class, 'delete']);
 });
