@@ -67,13 +67,44 @@
                   <table id="example1" class="table table-bordered table-striped">
                     <thead>
                       <tr>
-                        <th class="text-center">Id</th>
+                        <th class="text-center">ID</th>
                         <th class="text-center">Created Date</th>
                         <th class="text-center">Location</th>
-                        <th class="text-center">Project Name</th>
-                        <th class="text-center">Equipment No</th>
+                        <th class="text-center">Project name</th>
+                        <th class="text-center">Equipment Number</th>
                         <th class="text-center">Equipment Status</th>
-                        <th class="text-center">Manpower Requirement</th>
+                        <th class="text-center">Manpower Req</th>
+                        <th class="text-center">Sub Location</th>
+                        <th class="text-center">Area</th>
+                        <th class="text-center">Equipment Type</th>
+                        <th class="text-center">Reason</th>
+                        <th class="text-center">Material Desc</th>
+                        <th class="text-center">From Date</th>
+                        <th class="text-center">Rect Date</th>
+                        <th class="text-center">Tools Req</th>
+                        <th class="text-center">Remarks</th>
+                        <th class="text-center">Job Type</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-center">Capacity</th>
+                        <th class="text-center">Reason Attribute</th>
+                        <th class="text-center">Varities Id</th>
+                        <th class="text-center">Created_by_select</th>
+                        <th class="text-center">Permit No</th>
+                        <th class="text-center">Creator Details</th>
+                        <th class="text-center">Responsive Person</th>
+                        <th class="text-center">Target Date</th>
+                        <th class="text-center">Jobdone Details</th>
+                        <th class="text-center">Jobpending Details</th>
+                        <th class="text-center">Failure Root Cost</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Fremarks</th>
+                        <th class="text-center">Ftarget Date</th>
+                        <th class="text-center">Wipstatus</th>
+                        <th class="text-center">Created By</th>
+                        <th class="text-center">Updated By</th>
+                        <th class="text-center">Updated Date</th>
+                        <th class="text-center">Status Updated By</th>
+                        <th class="text-center">Status Updated On</th>
                         <th class="text-center">Action</th>
                       </tr>
                     </thead>
@@ -81,13 +112,44 @@
                     </tbody>
                     <tfoot>
                       <tr>
-                        <th class="text-center">Id</th>
+                        <th class="text-center">ID</th>
                         <th class="text-center">Created Date</th>
                         <th class="text-center">Location</th>
-                        <th class="text-center">Project Name</th>
-                        <th class="text-center">Equipment No</th>
+                        <th class="text-center">Project name</th>
+                        <th class="text-center">Equipment Number</th>
                         <th class="text-center">Equipment Status</th>
-                        <th class="text-center">Manpower Requirement</th>
+                        <th class="text-center">Manpower Req</th>
+                        <th class="text-center">Sub Location</th>
+                        <th class="text-center">Area</th>
+                        <th class="text-center">Equipment Type</th>
+                        <th class="text-center">Reason</th>
+                        <th class="text-center">Material Desc</th>
+                        <th class="text-center">From Date</th>
+                        <th class="text-center">Rect Date</th>
+                        <th class="text-center">Tools Req</th>
+                        <th class="text-center">Remarks</th>
+                        <th class="text-center">Job Type</th>
+                        <th class="text-center">Qty</th>
+                        <th class="text-center">Capacity</th>
+                        <th class="text-center">Reason Attribute</th>
+                        <th class="text-center">Varities Id</th>
+                        <th class="text-center">Created_by_select</th>
+                        <th class="text-center">Permit No</th>
+                        <th class="text-center">Creator Details</th>
+                        <th class="text-center">Responsive Person</th>
+                        <th class="text-center">Target Date</th>
+                        <th class="text-center">Jobdone Details</th>
+                        <th class="text-center">Jobpending Details</th>
+                        <th class="text-center">Failure Root Cost</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Fremarks</th>
+                        <th class="text-center">Ftarget Date</th>
+                        <th class="text-center">Wipstatus</th>
+                        <th class="text-center">Created By</th>
+                        <th class="text-center">Updated By</th>
+                        <th class="text-center">Updated Date</th>
+                        <th class="text-center">Status Updated By</th>
+                        <th class="text-center">Status Updated On</th>
                         <th class="text-center">Action</th>
                       </tr>
                     </tfoot>
@@ -134,7 +196,14 @@
             responsive: true,
             lengthChange: false,
             autoWidth: true,
-            ajax: "{{ url('/branch/stc/std/list') }}",
+            // ajax: "{{ url('/branch/stc/std/list') }}",
+            ajax: {
+                url: "{{ url('/branch/stc/std/list') }}",
+                type: 'POST', // Use POST for large requests
+                data: function(d) {
+                    d._token = "{{ csrf_token() }}"; // Add CSRF token for security
+                }
+            },
             columns: [
                 { data: 'stc_status_down_list_id' },
                 { data: 'stc_status_down_list_date' },
@@ -143,12 +212,61 @@
                 { data: 'stc_status_down_list_equipment_number' },
                 { data: 'stc_status_down_list_equipment_status' },
                 { data: 'stc_status_down_list_manpower_req' },
+                { data: 'stc_status_down_list_sub_location' },
+                { data: 'stc_status_down_list_area' },
+                { data: 'stc_status_down_list_equipment_type' },
+                { data: 'stc_status_down_list_reason' },
+                { data: 'stc_status_down_list_material_desc' },
+                { data: 'stc_status_down_list_from_date' },
+                { data: 'stc_status_down_list_rect_date' },
+                { data: 'stc_status_down_list_tools_req' },
+                { data: 'stc_status_down_list_remarks' },
+                { data: 'stc_status_down_list_jobtype' },
+                { data: 'stc_status_down_list_qty' },
+                { data: 'stc_status_down_list_capacity' },
+                { data: 'stc_status_down_list_reasonattribute' },
+                { data: 'stc_status_down_list_varities_id' },
+                { data: 'stc_status_down_list_created_by_select' },
+                { data: 'stc_status_down_list_permit_no' },
+                { data: 'stc_status_down_list_creator_details' },
+                { data: 'stc_status_down_list_responsive_person' },
+                { data: 'stc_status_down_list_target_date' },
+                { data: 'stc_status_down_list_jobdone_details' },
+                { data: 'stc_status_down_list_jobpending_details' },
+                { data: 'stc_status_down_list_failurerootcost' },
+                {
+                    data: 'stc_status_down_list_status',
+                        render: function(data, type, row) {
+                            var output='Closed';
+                            if(data==1){
+                                output="Planning";
+                            }else if(data==2){
+                                output="Pending";
+                            }else if(data==3){
+                                output="Work-in-Progress";
+                            }else if(data==4){
+                                output="Work-Done";
+                            }else if(data==5){
+                                output="Work Complete";
+                            }
+                            return output;
+                        },
+                        className: 'text-center'
+                    },
+                { data: 'stc_status_down_list_fremarks' },
+                { data: 'stc_status_down_list_ftarget_date' },
+                { data: 'stc_status_down_list_wipstatus' },
+                { data: 'stc_status_down_list_created_by' },
+                { data: 'stc_status_down_list_updated_by' },
+                { data: 'stc_status_down_list_updated_date' },
+                { data: 'stc_status_down_list_status_updated_by' },
+                { data: 'stc_status_down_list_status_updated_on' },
                 { data: 'actionData' }
             ],
             columnDefs: [
                 { "targets": [0, 2, 3, 4], "className": "text-center" },
                 { "targets": [1, 5, 6], "className": "text-left" },
-                { "targets": [7], "orderable": false }  // Disable ordering on the last column
+                { "targets": [4,5,6,7,8,9,10,11], "orderable": false }  // Disable ordering on the last column
             ],
             dom: 'Bfrtip',
             buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]

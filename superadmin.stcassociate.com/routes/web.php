@@ -213,7 +213,6 @@ Route::group(['middleware' => 'superadmin'], function(){
     
     // for stc std
     Route::get('/branch/stc/std', [STDController::class, 'show']);    
-    Route::get('/branch/stc/std/list', [STDController::class, 'list']);
-    Route::get('/branch/stc/std/update/{id}/edit', [STDController::class, 'edit']);
+    Route::post('/branch/stc/std/list', [STDController::class, 'list']);
     Route::get('/branch/stc/std/delete', [STDController::class, 'delete']);
 });
