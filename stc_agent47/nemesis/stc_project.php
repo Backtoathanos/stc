@@ -2223,6 +2223,7 @@ class pirates_supervisor extends tesseract{
 							SELECT stc_safetytbm_id 
 							FROM stc_safetytbm 
 							WHERE DATE(stc_safetytbm_date) = '" . mysqli_real_escape_string($this->stc_dbs, "$year-$month-$dayStr") . "'
+							AND `stc_safetytbm_place`='".$row['stc_status_down_list_department_dept']."'
 						");
 			
 						$imgTag = '';
@@ -2232,9 +2233,7 @@ class pirates_supervisor extends tesseract{
 			
 							// Get image location using stc_safetytbm_id
 							$imgQuery = mysqli_query($this->stc_dbs, "
-								SELECT stc_safetytbm_img_location 
-								FROM stc_safetytbm_img 
-								WHERE stc_safetytbm_img_tbmid = '" . mysqli_real_escape_string($this->stc_dbs, $tbmId) . "'
+								SELECT stc_safetytbm_img_location FROM stc_safetytbm_img WHERE stc_safetytbm_img_tbmid = '" . mysqli_real_escape_string($this->stc_dbs, $tbmId) . "'
 							");
 			
 							if (mysqli_num_rows($imgQuery) > 0) {
