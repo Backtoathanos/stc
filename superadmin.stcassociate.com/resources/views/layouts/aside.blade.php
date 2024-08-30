@@ -172,6 +172,12 @@
                       <p>Status Down List</p>
                     </a>
                   </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/stc/equipment') }}" class="nav-link @if(Request::segment(3) == 'equipment') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Equipment Details</p>
+                    </a>
+                  </li>
                 </ul>
               </li>
             </ul>

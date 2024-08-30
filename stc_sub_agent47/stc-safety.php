@@ -2440,7 +2440,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                             while($resultrow=mysqli_fetch_assoc($result)){
                                                                 echo '<tr>';
                                                                 echo '<td>'.$resultrow['emp_name'].'</td>';
-                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'h" value="Hardhat"></td>';
+                                                                echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'h" value="Safety Helmet"></td>';
                                                                 echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'n" value="Nose Mask"></td>';
                                                                 echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'s" value="Safety Goggle"></td>';
                                                                 echo '<td class="checktd text-center"><input type="checkbox" style="height: 30px; width: 20px;" checked class="checklistcb" id="cb'.$i.'hg" value="Hand Gloves"></td>';
