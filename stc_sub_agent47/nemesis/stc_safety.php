@@ -276,7 +276,7 @@ class witcher_supervisor extends tesseract{
 		$insertqry='';
 		$insertval='';
 		foreach($stc_filter as $key => $values){
-			if($values == "Hardhat"){
+			if($values == "Safety Helmet"){
 				$insertqry .='`stc_safetytbm_checklist_hardhat`,';
 				$insertval .='1,';
 			}
@@ -1599,9 +1599,9 @@ if(isset($_POST['stc_safety_savetbmppechecklist'])){
 	$stc_tbm_no=$_POST['stc_tbm_no'];
 	$stc_emp_name=$_POST['stc_emp_name'];
 	$stc_filter=$_POST['stc_filter'];
-	$stc_uncheckedppe=$_POST['stc_uncheckedppe'];
-	$stc_uncheckedppereason=$_POST['stc_uncheckedppereason'];
-	$stc_uncheckedppesize=$_POST['stc_uncheckedppesize'];
+	$stc_uncheckedppe=isset($_POST['stc_uncheckedppe']) ? $_POST['stc_uncheckedppe'] : '';
+	$stc_uncheckedppereason=isset($_POST['stc_uncheckedppereason']) ? $_POST['stc_uncheckedppereason'] : '';
+	$stc_uncheckedppesize=isset($_POST['stc_uncheckedppesize']) ? $_POST['stc_uncheckedppesize'] : '';
 	$objsearchreq=new witcher_supervisor();
 	$opobjsearchreq=$objsearchreq->stc_save_tbm_ppe_checklist($stc_tbm_no, $stc_emp_name, $stc_filter, $stc_uncheckedppe, $stc_uncheckedppereason, $stc_uncheckedppesize);
 	echo $opobjsearchreq;

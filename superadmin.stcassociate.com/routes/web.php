@@ -25,6 +25,7 @@ use App\Http\Controllers\SchoolController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RequisitionController;
 use App\Http\Controllers\STDController;
+use App\Http\Controllers\EquipmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -215,4 +216,9 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/stc/std', [STDController::class, 'show']);    
     Route::post('/branch/stc/std/list', [STDController::class, 'list']);
     Route::get('/branch/stc/std/delete', [STDController::class, 'delete']);
+    
+    // for stc equipment
+    Route::get('/branch/stc/equipment', [EquipmentController::class, 'show']);    
+    Route::post('/branch/stc/equipment/list', [EquipmentController::class, 'list']);
+    Route::get('/branch/stc/equipment/delete', [EquipmentController::class, 'delete']);
 });

@@ -851,7 +851,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 if($(this).val()=="Safety Shoes" || $(this).val()=="FR-Jacket/Trouser"){
                                     uncheckedppesize.push($(this).parent().find('.uncheckedssize').val());
                                 }else{
-                                    uncheckedppesize.push('');
+                                    uncheckedppesize.push(' ');
                                 }
                             }
                         } 
