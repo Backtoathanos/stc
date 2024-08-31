@@ -239,7 +239,7 @@ class procurement extends tesseract{
 			) VALUES (
 				'".$cust_order_refr."', 
 				'".$date."', 
-				'".@$_SESSION['stc_agent_id']."',
+				'".$_SESSION['stc_agent_id']."',
 				'1'
 			)
 		");
@@ -485,9 +485,9 @@ if(isset($_POST['place_req_sess_act'])){
 	$outobjrequipl=$objrequipl->stc_requisitionto_cart($cust_order_refr);
 	if($outobjrequipl=="no"){
 		$out="Please recheck your requisition & try again.";
-	}elseif(empty($_SESSION['stc_agent_id'])){
+	}else if(!isset($_SESSION['stc_agent_id'])){
 		$out="Please check ";
-	}elseif($outobjrequipl=="yes"){
+	}else if($outobjrequipl=="yes"){
 		$out="Thankyou for your requisition #TeamSTC will start working on it soon.";
 		unset($_SESSION["stc_supervisor_req_final_cart_req_sess"]);
 		unset($_SESSION["stc_supervisor_req_final_cart_req_item_sess"]);

@@ -189,11 +189,11 @@ class transformers extends tesseract{
         return $optimusprime;
     }
 
-    public function stc_save_totalpermitenr($totalpermitenr, $location, $dept, $remarks){
+    public function stc_save_totalpermitenr($totalpermitenr, $location, $dept, $epermitno, $remarks){
         $optimusprime = "";
         $currentDateTime = date("Y-m-d H:i:s");
         $qry="
-            INSERT INTO `stc_totalpermitenrollment`(`totalpermitenr`, `location`, `dep_id`, `remarks`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $totalpermitenr)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."', '".mysqli_real_escape_string($this->stc_dbs, $remarks)."', '".$currentDateTime."', '".$_SESSION['stc_agent_sub_id']."')
+            INSERT INTO `stc_totalpermitenrollment`(`totalpermitenr`, `location`, `dep_id`, `epermitno`, `remarks`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $totalpermitenr)."', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $dept)."', '".mysqli_real_escape_string($this->stc_dbs, $epermitno)."', '".mysqli_real_escape_string($this->stc_dbs, $remarks)."', '".$currentDateTime."', '".$_SESSION['stc_agent_sub_id']."')
         ";
         $optimusprimequery=mysqli_query($this->stc_dbs, $qry);
         if($optimusprimequery){
@@ -209,9 +209,10 @@ class transformers extends tesseract{
         $date=date('Y-m-d');
         $slno = 0;
         $counter=0;
+        $epermit='';
         $remarks='';
         $query="
-            SELECT `id`, `totalpermitenr`, `remarks`, `created_date`, `created_by` 
+            SELECT `id`, `totalpermitenr`, `epermitno`, `remarks`, `created_date`, `created_by` 
             FROM `stc_totalpermitenrollment`
             WHERE `created_by`='".$_SESSION['stc_agent_sub_id']."' AND DATE(`created_date`)='".$date."'
             ORDER BY `id` ASC
@@ -236,6 +237,7 @@ class transformers extends tesseract{
                 $slno++;
                 $counter+=$row['totalpermitenr'];
                 $remarks=$row['remarks'];
+                $epermit=$epermit=='' ? $row['epermitno'] : " ,".$row['epermitno'];
 				$optimusprime .= "
                     <tr>
                         <td class='text-center'>".$slno."</td>
@@ -250,6 +252,7 @@ class transformers extends tesseract{
         ';
         $optimusprimearr = array(
             'optimusprime' => $optimusprime,
+            'epermit' => $epermit,
             'remarks' => $remarks,
             'totalpenrollment' => $counter
         );
@@ -322,6 +325,7 @@ if(isset($_POST['save_totalpermitenr'])){
     $totalpermitenr=$_POST['totalpermitenr'];
     $location=$_POST['location'];
     $dept=$_POST['dept'];
+    $epermitno=$_POST['epermitno'];
     $remarks=$_POST['remarks'];
     $out='';
     if($totalpermitenr=="NA"){
@@ -330,7 +334,7 @@ if(isset($_POST['save_totalpermitenr'])){
         $out="login";
     }else{
         $metabots=new transformers();
-        $opmetabots=$metabots->stc_save_totalpermitenr($totalpermitenr, $location, $dept, $remarks);
+        $opmetabots=$metabots->stc_save_totalpermitenr($totalpermitenr, $location, $dept, $epermitno, $remarks);
         $out=$opmetabots;
     }
     echo json_encode($out);

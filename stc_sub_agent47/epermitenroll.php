@@ -259,6 +259,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 success : function(response){
                                     $('.stc-totalepermitenrollment-result').html(response['optimusprime']);
                                     $('.totalpenrollment').html(response['totalpenrollment']);
+                                    $('.epermit').html(response['epermit']);
                                     $('.totalenrollremarks').html(response['remarks']);
                                     var penrollment=response['totalpenrollment']==undefined ? 0 : response['totalpenrollment'];
                                     totalnonenrollment=totalpentry-penrollment;
@@ -380,6 +381,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     var selectedOption = $('.stc-permitenr-dept1').find('option:selected');
                     var dept = selectedOption.data('id');
                     var remarks=$('.stc-totalpermitenr-remarks').val();
+                    var epermitno=$('.stc-epermiteno').val();
                     if(location=='Select' || dept==0 || totalpermitenr=='' || totalpermitenr==0){
                         alert("Please Select all fields.");
                     }else{
@@ -391,6 +393,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 totalpermitenr:totalpermitenr,
                                 location:location,
                                 dept:dept,
+                                epermitno:epermitno,
                                 remarks:remarks
                             },
                             dataType : "JSON",
@@ -398,6 +401,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 if(response.trim()=="Success"){
                                     alert("Total E-Permit Enrollment Saved Successfully.");
                                     $('.stc-totalpermitenr').val('');
+                                    $('.stc-epermiteno').val('');
+                                    $('.stc-totalpermitenr-remarks').val('');
                                     $('.stc-sup-req-search').click();
                                 }else if(response.trim()=="failed"){
                                     alert("Total E-Permit Enrollment Not Saved.");
@@ -871,6 +876,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <div class="col-md-12 col-xl-12"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
+                                <h5>E-Permit No : </h5><br>
+                                <input type="text" class="form-control stc-epermiteno" placeholder="Enter E-Permit No"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xl-12"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
                                 <h5>Total E-Permit Enrollment : </h5><br>
                                 <input type="number" class="form-control stc-totalpermitenr" placeholder="Enter Total E-Permit Enrollment"/>
                             </div>
@@ -913,8 +926,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <td><span class="text-success totalnonpenrollment"></span></td>
                                         </tr>
                                         <tr>
+                                            <td>E-Permit No</td>
+                                            <td><span class="text-success epermit"></span></td>
+                                        </tr>
+                                        <tr>
                                             <td>Remarks</td>
-                                            <td><span class="text-danger totalenrollremarks">Pending for Appporval</span></td>
+                                            <td><span class="text-danger totalenrollremarks"></span></td>
                                         </tr>
                                     </tbody>
                                 </table>
