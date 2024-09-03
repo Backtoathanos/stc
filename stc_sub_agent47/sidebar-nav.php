@@ -92,7 +92,7 @@
                             </li>
                         ';
                     }
-                    if($_SESSION['stc_agent_sub_category']=="Technician" || $_SESSION['stc_agent_sub_category']=="Operator" || $_SESSION['stc_agent_sub_category']=="Helper" || $_SESSION['stc_agent_sub_category']=="Electrician" || $_SESSION['stc_agent_sub_category']=="Coordinator"){
+                    if($_SESSION['stc_agent_sub_category']=="Technician" || $_SESSION['stc_agent_sub_category']=="Operator" || $_SESSION['stc_agent_sub_category']=="Helper" || $_SESSION['stc_agent_sub_category']=="Electrician" || $_SESSION['stc_agent_sub_category']=="Coordinator" || $_SESSION['stc_agent_sub_category']=="Service Group"){
                         echo '
                             <li>
                                 <a href="stc-status-down-list.php?page=std" class="std">

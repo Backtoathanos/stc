@@ -593,6 +593,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 </ul>
                 <?php }?>
                 <div class="tab-content">
+                    <?php if($_SESSION['stc_agent_sub_category']!='Service Group'){ ?>
                     <div class="tab-pane tabs-animation fade active" id="newemp" role="tabpanel">
                         <div class="row">
                             <div class="col-md-6 col-xl-6"> 
@@ -691,8 +692,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane tabs-animation" id="existingemp" role="tabpanel">
-                        <?php if($_SESSION['stc_agent_sub_category']=='Supervisor'){?>
+                    <?php }?>
+                    <div class="tab-pane tabs-animation <?php if($_SESSION['stc_agent_sub_category']=='Service Group'){ echo "fade active"; }?>" id="existingemp" role="tabpanel">
+                        <?php if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Service Group'){?>
                         <div class="row">
                             <div class="col-md-12 col-xl-12"> 
                                 <input type="text" class="form-control search-emp" placeholder="Search here..">
@@ -721,7 +723,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 $projects[] = $row['stc_cust_pro_attend_supervise_pro_id'];
                                             }
                                             $commsep_projects=implode(',', $projects);
-                                            $UsersQuery = "SELECT DISTINCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact` FROM stc_cust_pro_attend_supervise INNER JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`stc_cust_pro_attend_supervise_super_id` WHERE stc_cust_pro_attend_supervise_pro_id IN (".$commsep_projects.")";
+                                            $UsersQuery = "SELECT DISTINCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact`, `stc_cust_pro_supervisor_category` FROM stc_cust_pro_attend_supervise INNER JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`stc_cust_pro_attend_supervise_super_id` WHERE stc_cust_pro_attend_supervise_pro_id IN (".$commsep_projects.")";
                                             $UsersResult = mysqli_query($con, $UsersQuery);
                                             if(mysqli_num_rows($UsersResult)>0){
                                                 $usercounter=0;
@@ -757,7 +759,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     $location.='</select>';
                                                     $department.='</select>';
                                                     $usercounter++;
-                                                    echo "<tr><td>".$location."</td><td>".$department."</td><td>".$row['stc_cust_pro_supervisor_fullname']."</td><td>".$row['stc_cust_pro_supervisor_contact']."</td><td>".$row['stc_cust_pro_supervisor_uid']."</td><td><input type='text' value='".$gpno."' class='form-control multigpno' placeholder='Enter G.P No' ></td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' user_id='".$row['stc_cust_pro_supervisor_id']."'>Add</a></td></tr>";
+                                                    if($row['stc_cust_pro_supervisor_category']!="Service Group"){
+                                                        echo "<tr><td>".$location."</td><td>".$department."</td><td>".$row['stc_cust_pro_supervisor_fullname']."</td><td>".$row['stc_cust_pro_supervisor_contact']."</td><td>".$row['stc_cust_pro_supervisor_uid']."</td><td><input type='text' value='".$gpno."' class='form-control multigpno' placeholder='Enter G.P No' ></td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' user_id='".$row['stc_cust_pro_supervisor_id']."'>Add</a></td></tr>";
+                                                    }
                                                 }
                                                 echo '<tr><td>Showing '.$usercounter.' employees</td></tr>';
                                             }
