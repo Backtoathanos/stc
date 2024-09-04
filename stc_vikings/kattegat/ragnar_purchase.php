@@ -2239,7 +2239,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
 						<td class='text-right'>".number_format($stock, 2)."</td>
 						<td class='text-center'>
-							<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
+							<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' data-toggle='modal' data-target='.bd-showadhocdetails-modal-lg' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
 						</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_source']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_destination']."</td>
@@ -2269,6 +2269,21 @@ class ragnarPurchaseAdhoc extends tesseract{
 					<td>No record found.</td>
 				</tr>
 			";
+		}
+		return $odin;
+	}
+
+	public function stc_call_poadhoc_ddetails($poaid){
+		$odin='';
+		$odin_query=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_super_requisition_list_items_rec_list_id`, `stc_cust_project_title`, `stc_cust_pro_supervisor_fullname`, `stc_cust_super_requisition_list_items_rec_recqty`, `stc_cust_super_requisition_list_items_rec_date` FROM `stc_cust_super_requisition_list_items_rec` LEFT JOIN `stc_cust_super_requisition_list` ON `stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_rec_list_id` LEFT JOIN `stc_cust_project` ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id` WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`=".$poaid." ORDER BY TIMESTAMP(`stc_cust_super_requisition_list_items_rec_date`) DESC");
+		if(mysqli_num_rows($odin_query)>0){
+			$slno=0;
+			foreach($odin_query as $odin_row){
+				$slno++;
+				$odin.='<tr><td>'.$slno.'</td><td>'.$odin_row['stc_cust_super_requisition_list_items_rec_list_id'].'</td><td>'.$odin_row['stc_cust_super_requisition_list_items_rec_date'].'</td><td>'.$odin_row['stc_cust_project_title'].'</td><td>'.$odin_row['stc_cust_pro_supervisor_fullname'].'</td><td class="text-right">'.number_format($odin_row['stc_cust_super_requisition_list_items_rec_recqty'], 2).'</td></tr>';
+			}
+		}else{
+			$odin='<tr><td>No record found.</td></tr>';
 		}
 		return $odin;
 	}
@@ -3078,6 +3093,13 @@ if(isset($_POST['stc_call_poadhoc'])){
 	$status=$_POST['status'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
 	$outbjornestocking=$bjornestocking->stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status);
+	echo $outbjornestocking;
+}
+// call po adhoc
+if(isset($_POST['stc_call_poadhoc_details'])){
+	$poaid=$_POST['poaid'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_call_poadhoc_ddetails($poaid);
 	echo $outbjornestocking;
 }
 

@@ -370,6 +370,23 @@ include("kattegat/role_check.php");
             });
           }
 
+          
+          $('body').delegate('.get-dispatch-details', 'click', function(e){
+            var poaid=$(this).attr('id');
+            $.ajax({
+              url       : "kattegat/ragnar_purchase.php",
+              method    : "post",
+              data      : {
+                stc_call_poadhoc_details:1,
+                poaid: poaid
+              },
+              success   : function(data){
+                // console.log(data);
+                $('.show-dispatchdetails-table').html(data);
+              }
+            });
+          });
+
           // save po adhoc
           $('body').delegate('.stc-poadhoc-save', 'click', function(e){
             e.preventDefault();
@@ -573,6 +590,52 @@ include("kattegat/role_check.php");
                 <div class="col-xl-12 col-md-12 col-sm-12">
                   <div class="card-border mb-3 card card-body border-success">
                     <button type="button"  data-dismiss="modal" class="btn btn-success stc-poadhoc-edititemname">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <div class="row">
+                <div class="col-xl-6 col-md-6 col-sm-6">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-showadhocdetails-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Dispatch Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5
+                      for=""
+                      >Dispatch Details
+                    </h5>
+                    <table class="table table-bordered table-reponsive">
+                      <thead>
+                        <tr>
+                          <th>Sl No</th>
+                          <th>Date</th>
+                          <th>Requisition Number</th>
+                          <th>Project Name</th>
+                          <th>User Name</th>
+                          <th>Dispatched Quantity</th>
+                        </tr>
+                      </thead>
+                      <tbody class="show-dispatchdetails-table">
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
