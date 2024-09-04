@@ -327,7 +327,7 @@ include_once("../MCU/db.php");
                             </div>
                             <div class="tab-pane tabs-animation fade" id="alot-budget" role="tabpanel">
                                 <div class="row">
-                                    <div class="col-md-10">
+                                    <div class="col-md-12">
                                         <div class="main-card mb-3 card">
                                             <div class="card-body"><h5 class="card-title">Link Project</h5>
                                                 <form class="stc-project-alot-cust">
@@ -365,13 +365,13 @@ include_once("../MCU/db.php");
                                                                 <select name="stc_alot_pro_supervisor" id="exampleSelect" class="form-control" required>
                                                                     <?php 
                                                                         $proseleqry=mysqli_query($con, "
-                                                                            SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` 
+                                                                            SELECT `stc_cust_pro_supervisor_id`, TRIM(`stc_cust_pro_supervisor_fullname`) as stc_cust_pro_supervisor_fullname
                                                                             FROM `stc_cust_pro_supervisor` 
                                                                             LEFT JOIN `stc_cust_pro_supervisor_collaborate` 
                                                                             ON `stc_cust_pro_supervisor_collaborate_userid`=`stc_cust_pro_supervisor_id`
                                                                             WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'
                                                                             OR `stc_cust_pro_supervisor_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
-                                                                            ORDER BY `stc_cust_pro_supervisor_fullname` ASC
+                                                                            ORDER BY TRIM(`stc_cust_pro_supervisor_fullname`) ASC
                                                                         ");
                                                                         if(mysqli_num_rows($proseleqry)>0){
                                                                             foreach($proseleqry as $proselrow){
@@ -392,6 +392,51 @@ include_once("../MCU/db.php");
                                                         </div>
                                                     </div>
                                                 </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Sl No</th>
+                                                            <th class="text-center">Project Name</th>
+                                                            <th class="text-center">User Name</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php
+                                                            $query=mysqli_query($con, "
+                                                                SELECT DISTINCT `stc_cust_pro_supervisor_id`,  `stc_cust_project_title`,  `stc_cust_pro_supervisor_fullname`  
+                                                                FROM `stc_cust_pro_attend_supervise`
+                                                                LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_attend_supervise_super_id`=`stc_cust_pro_supervisor_id` 
+                                                                LEFT JOIN `stc_cust_project` ON `stc_cust_pro_attend_supervise_pro_id`=`stc_cust_project_id` 
+                                                                LEFT JOIN `stc_cust_project_collaborate` ON `stc_cust_project_collaborate_projectid`=`stc_cust_project_id`
+                                                                WHERE `stc_cust_pro_supervisor_fullname`<>'' AND (`stc_cust_project_createdby`='".$_SESSION['stc_agent_id']."' OR `stc_cust_project_collaborate_teamid`='".$_SESSION['stc_agent_id']."')
+                                                                ORDER BY TRIM(`stc_cust_project_title`) ASC
+                                                            ");
+                                                            $projects=array();
+                                                            foreach($query as $row){
+                                                                if(!in_array($row['stc_cust_project_title'], $projects)) {
+                                                                    array_push($projects, $row['stc_cust_project_title']);
+                                                                }
+                                                            }
+                                                            $slno=0;
+                                                            foreach($projects as $project){
+                                                                $slno++;
+                                                                $users='';
+                                                                foreach($query as $row){
+                                                                    if($row['stc_cust_project_title']==$project){
+                                                                        $users.='<a href="#" class="stc-user-view" title="View" data-toggle="modal" data-target=".bd-showuser-modal-lg" id="'.$row['stc_cust_pro_supervisor_id'].'"> '.$row['stc_cust_pro_supervisor_fullname'].'</a>'.'<br>';
+                                                                    }
+                                                                }
+                                                                echo '<tr><td>'.$slno.'</td><td>'.$project.'</td><td>'.$users.'</td></tr>';
+                                                            }
+                                                        ?>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -555,7 +600,9 @@ include_once("../MCU/db.php");
             });
 
             // call user
-            $('.stc-user-view').on('click', function(){
+            // $('.stc-user-view').on('click', function(){
+            $('body').delegate('.stc-user-view', 'click', function(e){
+                e.preventDefault();
                 var user_id = $(this).attr('id');
                 $.ajax({
                     url         : "nemesis/stc_project.php",
@@ -1177,6 +1224,7 @@ include_once("../MCU/db.php");
                                                 <option>Operator</option>
                                                 <option>Helper</option>
                                                 <option>Safety Supervisor</option>
+                                                <option>Service Group</option>
                                                 <option>Site Incharge</option>
                                                 <option selected>Supervisor</option>
                                                 <option>Technician</option>
