@@ -407,7 +407,6 @@ if(isset($_POST['go_for_req_sess'])){
 		    	     'itemstatus'				=>     $_POST["itemstatus"]  
 		    	);  
 		    	$_SESSION["stc_supervisor_req_final_cart_req_item_sess"][] = $item_array;
-		    	echo "Item Added to Requisition Cart!!!";
 		    }  
 		}else{  
 			$item_array = array(  
@@ -419,31 +418,27 @@ if(isset($_POST['go_for_req_sess'])){
 			$_SESSION["stc_supervisor_req_final_cart_req_item_sess"][] = $item_array;  
 		    echo "Requisition Cart Created & Item Added to Requisition Cart!!!";
 		}  
+		if(isset($_SESSION["stc_supervisor_req_final_cart_req_sess"])) {  
+			$is_available = 0;  
+			foreach($_SESSION["stc_supervisor_req_final_cart_req_sess"] as $keys => $values) {  
+				if($_SESSION["stc_supervisor_req_final_cart_req_sess"][$keys]['req_id'] == $_POST["item_req_id"]) {  
+					$is_available++;
+					// echo "Requisition already added in a list!!!";
+					break;
+				}  
+			}  
+			if($is_available < 1) {  
+				$item_array = array( 'req_id' => $_POST["item_req_id"] );  
+				$_SESSION["stc_supervisor_req_final_cart_req_sess"][] = $item_array;  
+				echo "Item Added to Requisition Cart!!!";
+			}  
+		}else{
+			$item_array = array( 'req_id' => $_POST["item_req_id"] );
+			$_SESSION["stc_supervisor_req_final_cart_req_sess"][] = $item_array;  
+			echo "Requisition Cart Created & Item Added to Requisition Cart!!!";
+		}
 	}else{
 		echo "Invalid Quantity.";
-	}
-	if(isset($_SESSION["stc_supervisor_req_final_cart_req_sess"])) {  
-		$is_available = 0;  
-		foreach($_SESSION["stc_supervisor_req_final_cart_req_sess"] as $keys => $values) {  
-			if($_SESSION["stc_supervisor_req_final_cart_req_sess"][$keys]['req_id'] == $_POST["item_req_id"]) {  
-			    $is_available++;
-			    // echo "Requisition already added in a list!!!";
-			    break;
-			}  
-		}  
-	    if($is_available < 1) {  
-	    	$item_array = array(  
-	    	     'req_id'             		=>     $_POST["item_req_id"]
-	    	);  
-	    	$_SESSION["stc_supervisor_req_final_cart_req_sess"][] = $item_array;  
-	    	echo "Item Added to Requisition Cart!!!";
-	    }  
-	}else{
-		$item_array = array(
-	    	     'req_id'             		=>     $_POST["item_req_id"]
-		);
-		$_SESSION["stc_supervisor_req_final_cart_req_sess"][] = $item_array;  
-	    echo "Requisition Cart Created & Item Added to Requisition Cart!!!";
 	}
 }
 

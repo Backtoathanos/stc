@@ -195,12 +195,16 @@ include_once("../MCU/db.php");
                                                     <div class="card-body"><h5 class="card-title">Supervisor Requisition</h5>
                                                         <form class="#">
                                                             <div class="row">
-                                                                <div class="col-md-12">
+                                                                <div class="col-md-11">
                                                                     <input type="text" class="form-control searc-pro-table" placeholder="Search here..">
+                                                                </div>
+                                                                <div class="col-md-1">
+                                                                    <a class="btn btn-success form-control acceptall" title="Accept All" style="font-size: 20px;"><i class="fas fa-check-circle"></i></a>
                                                                 </div>
                                                                 <div class="col-md-12" style="overflow-x:auto;">
                                                                     <table class="mb-0 table table-hover table-bordered stc-pro-req-table">
                                                                         <thead>
+                                                                            <th># <input type="checkbox" class="form-control master-checkbox" title="Select All" style="width:40px;"></th>
                                                                             <th class="text-center">Requisition ID</th>
                                                                             <th class="text-center">Requisition Date</th>
                                                                             <th class="text-center">Requisition From</th>
@@ -264,6 +268,7 @@ include_once("../MCU/db.php");
                                                                                         $bgcolor=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ff9e9e;'" : "";
                                                                                         echo '
                                                                                             <tr>
+                                                                                                <td class="text-center"><input type="checkbox" class="form-control select-req" style="width:40px;"></td>
                                                                                                 <td class="text-center">'.$requisrow['list_id'].'</td>
                                                                                                 <td class="text-center">'.date('d-m-Y', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'</td>
                                                                                                 <td class="text-center">'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
@@ -408,8 +413,7 @@ include_once("../MCU/db.php");
                     },
                     success : function(requisition){
                         // console.log(requisition);
-                        alert(requisition);
-                        call_requisition_appr_cart();
+                        // alert(requisition);
                     }
                 });
             });
@@ -485,7 +489,6 @@ include_once("../MCU/db.php");
                         },
                         success : function(requisition){
                             // console.log(requisition);
-                            alert(requisition);
                         }
                     });
                 }
@@ -509,6 +512,25 @@ include_once("../MCU/db.php");
                     }
                 });
             });
+                        
+            $('.master-checkbox').click(function() {
+                if($(this).prop('checked')){
+                    $('.select-req').prop('checked', true);
+                }else{
+                    $('.select-req').prop('checked', false);
+                }
+            });
+                        
+            $('.acceptall').click(function() {
+                $('.select-req:checked').each(function() {
+                    $(this).closest('tr').find('.add_to_accept_cart').click();
+                });
+                $('.master-checkbox').prop('checked', false);
+                $('.select-req').prop('checked', false);
+                call_requisition_appr_cart();
+            });
+
+            
         });
     </script>
 </body>
