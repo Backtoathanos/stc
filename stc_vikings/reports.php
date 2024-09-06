@@ -2331,7 +2331,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var tojob = $("#stc-mrd-tojob").val();
                 var customer = $("#stc-mrd-customer").val();
                 var location = $("#stc-mrd-location").val();
-                var dept = $("#stc-mrd-dept").val();
+                var dept = $("#stc-mrd-dept").text();
+                var pro_id = $("#stc-mrd-dept").val();
                 var tomaterial = $("#stc-mrd-tomaterial").val();
                 if(from!="" && to!=""){
                     $.ajax({
@@ -2345,6 +2346,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                             customer:customer,
                             location:location,
                             dept:dept,
+                            pro_id:pro_id,
                             tomaterial:tomaterial
                         },
                         success : function(response){

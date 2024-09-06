@@ -4020,18 +4020,18 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
    public function stc_mrd_location_call($customer_id){
       $odin='<option value="NA">Select</option>';
       $odin_get_locqry=mysqli_query($this->stc_dbs, "
-         SELECT DISTINCT `stc_status_down_list_plocation` 
-         FROM `stc_status_down_list` 
-         INNER JOIN `stc_cust_pro_supervisor` 
-         ON `stc_status_down_list_created_by`=`stc_cust_pro_supervisor_id` 
-         WHERE `stc_cust_pro_supervisor_cust_id`='".mysqli_real_escape_string($this->stc_dbs, $customer_id)."'
-         AND `stc_status_down_list_plocation`<>''
-         ORDER BY `stc_status_down_list_plocation` ASC
+         SELECT DISTINCT `stc_status_down_list_department_location` 
+         FROM `stc_status_down_list_department` 
+         INNER JOIN `stc_cust_project` 
+         ON `stc_status_down_list_department_loc_id`=`stc_cust_project_id` 
+         WHERE `stc_cust_project_cust_id`='".mysqli_real_escape_string($this->stc_dbs, $customer_id)."'
+         AND `stc_status_down_list_department_location`<>''
+         ORDER BY `stc_status_down_list_department_location` ASC
       ");
       if(mysqli_num_rows($odin_get_locqry)>0){
          foreach($odin_get_locqry as $odin_get_locrow){
             $odin.='
-               <option>'.$odin_get_locrow['stc_status_down_list_plocation'].'</option>
+               <option>'.$odin_get_locrow['stc_status_down_list_department_location'].'</option>
             ';
          }
       }else{
@@ -4046,16 +4046,16 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
    public function stc_mrd_dept_call($location){
       $odin='<option value="NA">Select</option>';
       $odin_get_deptqry=mysqli_query($this->stc_dbs, "
-         SELECT DISTINCT`stc_status_down_list_sub_location` 
-         FROM `stc_status_down_list` 
-         WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location)."'
-         AND `stc_status_down_list_sub_location`<>''
-         ORDER BY `stc_status_down_list_sub_location` ASC
+         SELECT DISTINCT `stc_status_down_list_department_loc_id`, `stc_status_down_list_department_dept` 
+         FROM `stc_status_down_list_department` 
+         WHERE `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $location)."'
+         AND `stc_status_down_list_department_dept`<>''
+         ORDER BY `stc_status_down_list_department_dept` ASC
       ");
       if(mysqli_num_rows($odin_get_deptqry)>0){
          foreach($odin_get_deptqry as $odin_get_deptrow){
             $odin.='
-               <option>'.$odin_get_deptrow['stc_status_down_list_sub_location'].'</option>
+               <option value="'.$odin_get_deptrow['stc_status_down_list_department_loc_id'].'">'.$odin_get_deptrow['stc_status_down_list_department_dept'].'</option>
             ';
          }
       }else{
@@ -4067,7 +4067,7 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
    }
 
    // call mrd
-   public function stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $tomaterial){      
+   public function stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $pro_id, $tomaterial){      
       $odin='';
       $filter_query='';
       if(empty($from)){
@@ -4080,14 +4080,16 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
          $filter_query.=" AND stc_cust_project_cust_id='".mysqli_real_escape_string($this->stc_dbs, $customer)."'";
       }
       $sdl_joiner='';
-      if($location!="NA"){
-         $sdl_joiner='            
-            LEFT JOIN `stc_status_down_list`
-            ON R.`stc_cust_super_requisition_list_sdlid`=`stc_status_down_list_id`
-         ';
-         $filter_query.=" AND stc_status_down_list_plocation='".mysqli_real_escape_string($this->stc_dbs, $location)."'";
-      }
-      if($dept!="NA"){
+      if(($tojob=="1" || $tojob=="NA") && $dept!="NA"){
+         $filter_query.=" AND P.`stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $pro_id)."'";
+      }else if($tojob=="2" && $dept!="NA"){
+         if($location!="NA"){
+            $sdl_joiner='            
+               LEFT JOIN `stc_status_down_list`
+               ON R.`stc_cust_super_requisition_list_sdlid`=`stc_status_down_list_id`
+            ';
+            $filter_query.=" AND stc_status_down_list_plocation='".mysqli_real_escape_string($this->stc_dbs, $location)."'";
+         }
          $filter_query.=" AND stc_status_down_list_sub_location='".mysqli_real_escape_string($this->stc_dbs, $dept)."'";
       }
       if($tomaterial!="NA"){
@@ -4753,11 +4755,12 @@ if(isset($_POST['stc_mrd_call_mrd'])){
    $customer=$_POST['customer'];
    $location=$_POST['location'];
    $dept=$_POST['dept'];
+   $pro_id=$_POST['pro_id'];
    $tomaterial=$_POST['tomaterial'];
 
    $bjorneschoolfee=new ragnarReportsViewMaterialRequisitionDetails();
 
-   $out=$bjorneschoolfee->stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $tomaterial);
+   $out=$bjorneschoolfee->stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $pro_id, $tomaterial);
    echo $out;
 }
 #<----------------------------Object sections of epermit reports class--------------------------------->
