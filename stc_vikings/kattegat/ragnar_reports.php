@@ -4080,9 +4080,9 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
          $filter_query.=" AND stc_cust_project_cust_id='".mysqli_real_escape_string($this->stc_dbs, $customer)."'";
       }
       $sdl_joiner='';
-      if(($tojob=="1" || $tojob=="NA") && $dept!="NA"){
+      if(($tojob=="1" || $tojob=="NA") && $dept!="NA" && $pro_id!="NA"){
          $filter_query.=" AND P.`stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $pro_id)."'";
-      }else if($tojob=="2" && $dept!="NA"){
+      }else if($tojob=="2" && $dept!="NA" && $pro_id!="NA"){
          if($location!="NA"){
             $sdl_joiner='            
                LEFT JOIN `stc_status_down_list`
