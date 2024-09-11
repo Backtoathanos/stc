@@ -960,6 +960,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <th style="width:1%" class="text-center">CAPACITY</th>
                      <th style="width:4%" class="text-center">REASON</th>
                      <th style="width:2%" class="text-center sl-hide">REASON ATTRIBUTE</th>
+                     <th style="width:1%" class="text-center">PERMIT NO</th>
                      <th style="width:4%" class="text-center">MATERIAL</th>
                      <th style="width:1%" class="text-center">STATUS</th>
                      <th style="width:1%" class="text-center">DELAY</th>
@@ -1168,6 +1169,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <span class="jobdonedet-print" style="display:none;">'.$reason_value.'</span>
                   </td>
                   <td class="sl-hide">'.$row['stc_status_down_list_reasonattribute'].'</td>
+                  <td>'.$row['stc_status_down_list_permit_no'].'</td>
                   <td class="sl-hide text-center">'.$material_view.'</td>
                   <td class="text-center" style="background-color:'.$status2color.'">'.$status.'</td>
                   <td class="text-right">'.$dperiod.' Days</td>

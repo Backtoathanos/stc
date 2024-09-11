@@ -190,7 +190,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                         $shiftEdata.='<td>'.$ShiftEcounter.'</td>';
                                                                                         $total = $ShiftAcounter + $ShiftBcounter + $ShiftCcounter + $ShiftEcounter;
                                                                                         $shifttdata.='<td style="font-weight:bold">'.$total.'</td>';
-                                                                                        $totalnonenrollment=$total - $Epermitcounter;
+                                                                                        $totalnonenrollment=($total - $Epermitcounter)>=0?$total - $Epermitcounter:0;
                                                                                         $deptnonenrollmentcounter.='<td style="font-weight:bold">'.$totalnonenrollment.'</td>';
                                                                                     }
                                                                                     $shiftAtotal='<td>'.$TotalShiftAcounter.'</td>';

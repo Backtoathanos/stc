@@ -46,7 +46,7 @@ class transformers extends tesseract{
             }
         }
         $query="
-            SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `created_date`, `created_by` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`created_by`LEFT JOIN `stc_agents` ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` ".$filter." ORDER BY `emp_name` ASC
+            SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `status`, `created_date`, `created_by` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`created_by`LEFT JOIN `stc_agents` ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` ".$filter." ORDER BY `emp_name` ASC
         ";
 		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
 		$optimusprime='
@@ -60,6 +60,8 @@ class transformers extends tesseract{
                         <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">EMPLOYEE NAME<i class="fa fa-sort"></i></a></th>
                         <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">GP NO<i class="fa fa-sort"></i></a></th>
                         <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">SHIFT<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">STATUS<i class="fa fa-sort"></i></a></th>
+                        <th class="text-center"><a href="javascript:void(0)" class="btn btn-primray sort">ACTION</a></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -76,6 +78,7 @@ class transformers extends tesseract{
                 if ($todayDate == date('d-m-Y', strtotime($row['created_date']))) {
                     $countPEntry++;
                 }
+                $status=$row['status']==1?"Active":"Draft";
 				$optimusprime .= "
                     <tr>
                         <td class='text-center'>".$slno."</td>
@@ -85,6 +88,8 @@ class transformers extends tesseract{
                         <td class='text-left'>".$row['emp_name']."</td>
                         <td class='text-center'>".$row['gpno']."</td>
                         <td class='text-center'>".$row['shift']."</td>
+                        <td class='text-center'>".$status."</td>
+                        <td class='text-center'><a href='javascript:void(0)' class='btn btn-danger epremit-deletebtn' id='".$row['id']."'><i class='fa fa-trash'></i></a></td>
                     </tr>";			
 			}
 		}
@@ -258,6 +263,17 @@ class transformers extends tesseract{
         );
 		return $optimusprimearr;
 	}
+
+    public function stc_delete_epermit_attendance($id){
+        $optimusprime='';
+        $optimusprime_query=mysqli_query($this->stc_dbs, "DELETE FROM `stc_epermit_enrollment` WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+        if($optimusprime_query){
+            $optimusprime="Record deleted.";
+        }else{
+            $optimusprime="Something went wrong, please re login and try again.";
+        }
+        return $optimusprime;
+    }
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -344,6 +360,13 @@ if(isset($_POST['save_totalpermitenr'])){
 if(isset($_POST['show_totalepermitenroll'])){
 	$metabots=new transformers();
 	$opmetabots=$metabots->stc_call_totalpermitenr();
+	echo json_encode($opmetabots);
+}
+
+if(isset($_POST['stc_epermit_delete'])){
+    $id=$_POST['id'];
+	$metabots=new transformers();
+	$opmetabots=$metabots->stc_delete_epermit_attendance($id);
 	echo json_encode($opmetabots);
 }
 ?>

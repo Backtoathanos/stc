@@ -277,6 +277,22 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 });
             }
 
+            $('body').delegate('.epremit-deletebtn', 'click', function(e){
+                e.preventDefault();
+                if(confirm("Are you sure?")){
+                    var id=$(this).attr('id');
+                    $.ajax({
+                        url     : "nemesis/stc_epermitenroll.php",
+                        method  : "POST",
+                        data    : {stc_epermit_delete:1, id:id},
+                        dataType : "JSON",
+                        success : function(response){
+                            alert(response);
+                        }
+                    });
+                }
+            });
+
             // save permit enrollment
             $('body').delegate('.stc-permitenr-save', 'click', function(e){
                 e.preventDefault();
@@ -370,6 +386,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     });   
                 }else{
                     alert("Please complete all details.");
+                }
+            });
+
+            $('body').delegate('.stc-epermitenocheckbox', 'click', function(e){
+                if($(this).prop('checked')==true){
+                    $('.stc-totalpermitenr-remarks').closest('.col-md-12').show();
+                }else{
+                    $('.stc-totalpermitenr-remarks').closest('.col-md-12').hide();
                 }
             });
 
@@ -578,23 +602,23 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 </button>
             </div>
             <div class="modal-body">
-                <?php if($_SESSION['stc_agent_sub_category']=='Supervisor'){?>
+                <?php if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){?>
                 <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                     <li class="nav-item">
-                        <a role="tab" class="nav-link show active" id="tab-1" data-toggle="tab" href="#newemp">
-                            <span>New</span>
+                        <a role="tab" class="nav-link show active" id="tab-1" data-toggle="tab" href="#existingemp">
+                            <span>Existing</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a role="tab" class="nav-link " id="tab-2" data-toggle="tab" href="#existingemp">
-                            <span>Existing</span>
+                        <a role="tab" class="nav-link " id="tab-2" data-toggle="tab" href="#newemp">
+                            <span>New</span>
                         </a>
                     </li>
                 </ul>
                 <?php }?>
                 <div class="tab-content">
                     <?php if($_SESSION['stc_agent_sub_category']!='Service Group'){ ?>
-                    <div class="tab-pane tabs-animation fade active" id="newemp" role="tabpanel">
+                    <div class="tab-pane tabs-animation" id="newemp" role="tabpanel">
                         <div class="row">
                             <div class="col-md-6 col-xl-6"> 
                                 <div class="main-card mb-3 card">
@@ -614,7 +638,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     </div>
                                 </div>
                             </div>
-                            <?php if($_SESSION['stc_agent_sub_category']=='Supervisor'){?>
+                            <?php if(($_SESSION['stc_agent_sub_category']=='Supervisor') || ($_SESSION['stc_agent_sub_category']=='Site Incharge')){?>
                             <div class="col-md-6 col-xl-6"> 
                                 <div class="main-card mb-3 card">
                                     <div class="card-body">
@@ -647,16 +671,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     </div>
                                 </div>
                             </div>
-                            <?php }else{?>
-                            <div class="col-md-6 col-xl-6"> 
-                                <div class="main-card mb-3 card">
-                                    <div class="card-body">
-                                        <h5>Name : </h5><br>
-                                        <input type="text" class="form-control stc-name stc-permitenr-name" value="<?php echo $_SESSION['stc_agent_sub_name'];?>" disabled placeholder="Enter Name"/>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php }?>
                             <div class="col-md-6 col-xl-6"> 
                                 <div class="main-card mb-3 card">
                                     <div class="card-body">
@@ -682,19 +696,16 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             <div class="col-md-12 col-xl-12"> 
                                 <div class="main-card mb-3 card">
                                     <div class="card-body">
-                                        <?php if($_SESSION['stc_agent_sub_category']=='Supervisor'){?>
-                                            <a href="javascript:void(0)" class="btn btn-success stc-permitenr-save form-control">Save</a>
-                                        <?php }else{?>
-                                            <a href="javascript:void(0)" user_id="<?php echo $_SESSION['stc_agent_sub_id'];?>" class="btn btn-success save-multiple2 form-control">Save</a>
-                                        <?php }?>
+                                        <a href="javascript:void(0)" class="btn btn-success stc-permitenr-save form-control">Save</a>
                                     </div>
                                 </div>
                             </div>
+                            <?php }?>
                         </div>
                     </div>
                     <?php }?>
-                    <div class="tab-pane tabs-animation <?php if($_SESSION['stc_agent_sub_category']=='Service Group'){ echo "fade active"; }?>" id="existingemp" role="tabpanel">
-                        <?php if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Service Group'){?>
+                    <div class="tab-pane tabs-animation fade active" id="existingemp" role="tabpanel">
+                        <?php if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Service Group' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){?>
                         <div class="row">
                             <div class="col-md-12 col-xl-12"> 
                                 <input type="text" class="form-control search-emp" placeholder="Search here..">
@@ -728,13 +739,15 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             if(mysqli_num_rows($UsersResult)>0){
                                                 $usercounter=0;
                                                 foreach($UsersResult as $row){
-                                                    $getgpnoquery=mysqli_query($con, "SELECT `gpno` FROM `stc_epermit_enrollment` WHERE `emp_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `id` DESC LIMIT 0,1");
+                                                    $getgpnoquery=mysqli_query($con, "SELECT `gpno`, `shift` FROM `stc_epermit_enrollment` WHERE `emp_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `id` DESC LIMIT 0,1");
                                                     $gpno='';
+                                                    $shift='';
                                                     if(mysqli_num_rows($getgpnoquery)>0){
                                                         $result=mysqli_fetch_assoc($getgpnoquery);
                                                         $gpno=$result['gpno'];
+                                                        $shift=$result['shift'];
                                                     }
-                                                    $getquery=mysqli_query($con, "SELECT DISTINCT `stc_status_down_list_department_loc_id`, `stc_status_down_list_department_id`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `stc_cust_pro_attend_supervise_status` FROM `stc_cust_pro_attend_supervise` LEFT JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id`=`stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$_SESSION['stc_agent_sub_id']."' ORDER BY `stc_status_down_list_department_dept` ASC");
+                                                    $getquery=mysqli_query($con, "SELECT DISTINCT `stc_status_down_list_department_loc_id`, `stc_status_down_list_department_id`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `stc_cust_pro_attend_supervise_status` FROM `stc_cust_pro_attend_supervise` LEFT JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id`=`stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$_SESSION['stc_agent_sub_id']."' AND `stc_status_down_list_department_dept`<>'' ORDER BY `stc_status_down_list_department_dept` ASC");
                                                 
                                                     $location='<select class="form-control btn btn-success multilocation text-left" disabled>';
                                                     $department='<select class="form-control btn btn-success multidept text-left">';
@@ -760,66 +773,20 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     $department.='</select>';
                                                     $usercounter++;
                                                     if($row['stc_cust_pro_supervisor_category']!="Service Group"){
-                                                        echo "<tr><td>".$location."</td><td>".$department."</td><td>".$row['stc_cust_pro_supervisor_fullname']."</td><td>".$row['stc_cust_pro_supervisor_contact']."</td><td>".$row['stc_cust_pro_supervisor_uid']."</td><td><input type='text' value='".$gpno."' class='form-control multigpno' placeholder='Enter G.P No' ></td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' user_id='".$row['stc_cust_pro_supervisor_id']."'>Add</a></td></tr>";
+                                                        $shift_select="<option value='NA'>Please select Shift.</option>";
+                                                        $shift_array=array("A", "B", "C", "E (General)");
+                                                        foreach($shift_array as $shift_row){
+                                                            if($shift==$shift_row){
+                                                                $shift_select.="<option selected>".$shift_row."</option>";
+                                                            }else{
+                                                                $shift_select.="<option>".$shift_row."</option>";
+                                                            }
+                                                        }
+                                                        echo "<tr><td>".$location."</td><td>".$department."</td><td>".$row['stc_cust_pro_supervisor_fullname']."</td><td>".$row['stc_cust_pro_supervisor_contact']."</td><td>".$row['stc_cust_pro_supervisor_uid']."</td><td><input type='text' value='".$gpno."' class='form-control multigpno' placeholder='Enter G.P No' ></td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'>".$shift_select."</select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' user_id='".$row['stc_cust_pro_supervisor_id']."'>Add</a></td></tr>";
                                                     }
                                                 }
                                                 echo '<tr><td>Showing '.$usercounter.' employees</td></tr>';
                                             }
-                                            // old book
-                                            // $projectsQuery = "SELECT stc_cust_pro_attend_supervise_pro_id FROM stc_cust_pro_attend_supervise WHERE stc_cust_pro_attend_supervise_super_id = '".$_SESSION['stc_agent_sub_id']."'";
-                                            // $projectsResult = mysqli_query($con, $projectsQuery);
-                                            // $projects = [];
-                                            // while ($row = mysqli_fetch_assoc($projectsResult)) {
-                                            //     $projects[] = $row['stc_cust_pro_attend_supervise_pro_id'];
-                                            // }
-
-                                            // Convert to a comma-separated string for use in the IN clause
-                                            // $projectsStr = implode(',', $projects);
-                                            // $query="SELECT DISTINCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact` FROM `stc_cust_pro_supervisor` LEFT JOIN `stc_epermit_enrollment` ON `stc_cust_pro_supervisor_id` = `emp_id` WHERE `stc_cust_pro_supervisor_created_by` =( SELECT `stc_cust_pro_supervisor_created_by` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id` ='".$_SESSION['stc_agent_sub_id']."' ) AND `stc_cust_pro_supervisor_status`=1 ORDER BY `stc_cust_pro_supervisor_fullname` ASC";
-                                            // $sql=mysqli_query($con, $query);
-                                            // $usercounter=0;
-                                            // foreach($sql as $row){
-                                            //     $getgpnoquery=mysqli_query($con, "SELECT `gpno` FROM `stc_epermit_enrollment` WHERE `emp_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `id` DESC LIMIT 0,1");
-                                            //     $gpno='';
-                                            //     if(mysqli_num_rows($getgpnoquery)>0){
-                                            //         $result=mysqli_fetch_assoc($getgpnoquery);
-                                            //         $gpno=$result['gpno'];
-                                            //     }
-
-                                            //     $getquery=mysqli_query($con, "SELECT DISTINCT `stc_status_down_list_department_loc_id`, `stc_status_down_list_department_id`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `stc_cust_pro_attend_supervise_status` FROM `stc_cust_pro_attend_supervise` LEFT JOIN `stc_status_down_list_department` ON `stc_cust_pro_attend_supervise_pro_id`=`stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$row['stc_cust_pro_supervisor_id']."' ORDER BY `stc_status_down_list_department_dept` ASC");
-                                                
-                                            //     $location='<select class="form-control btn btn-success multilocation text-left" disabled>';
-                                            //     $department='<select class="form-control btn btn-success multidept text-left">';
-                                            //     $counter=0;
-                                            //     $locations='';
-                                            //     $departments='';
-                                            //     $loopexit=0;
-                                            //     foreach($getquery as $getrow){
-                                            //         $counter++;  
-                                            //         // Check if the project ID exists
-                                            //         if (in_array($getrow['stc_status_down_list_department_loc_id'], $projects)) {
-                                            //             $loopexit = 1;
-                                            //             $locations.='<option value="'.$getrow['stc_status_down_list_department_id'].'">'.$getrow['stc_status_down_list_department_location'].'</option>';
-                                            //             $departments.='<option value="'.$getrow['stc_status_down_list_department_id'].'">'.$getrow['stc_status_down_list_department_dept'].'</option>';
-                                            //         }
-                                            //     }
-                                            //     if($counter>1){
-                                            //         $location.='<option value="NA" selected>Select</option>';
-                                            //         $department.='<option value="NA" selected>Select</option>';
-                                            //     }else if($counter==0){
-                                            //         $location.='<option value="NA">Location not found.</option>';
-                                            //         $department.='<option value="NA">Department not found.</option>';
-                                            //     }
-                                            //     $location.=$locations;
-                                            //     $department.=$departments;
-                                            //     $location.='</select>';
-                                            //     $department.='</select>';
-                                            //     if($loopexit==1){
-                                            //         $usercounter++;
-                                            //         echo "<tr><td>".$location."</td><td>".$department."</td><td>".$row['stc_cust_pro_supervisor_fullname']."</td><td>".$row['stc_cust_pro_supervisor_contact']."</td><td>".$row['stc_cust_pro_supervisor_uid']."</td><td><input type='text' value='".$gpno."' class='form-control multigpno' placeholder='Enter G.P No' ></td><td><select class='btn btn-success form-control stc-permitenr-shift text-left ' id='stc-shift'><option value='NA'>Please select Shift.</option><option>A</option><option>B</option><option>C</option><option>E (General)</option></select></td><td><a href='javascript:void(0)' class='btn btn-primary save-multiple' user_id='".$row['stc_cust_pro_supervisor_id']."'>Add</a></td></tr>";
-                                            //     }
-                                            // }
-                                            // echo '<tr><td>Showing '.$usercounter.' users</td></tr>';
                                         ?>
                                     </tbody>
                                 </table>
@@ -894,6 +861,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         </div>
                     </div>
                     <div class="col-md-12 col-xl-12"> 
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5>For Non-Enrollement : </h5><br>
+                                <input type="checkbox" class="form-control stc-epermitenocheckbox"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-xl-12" style="display: none;"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Remarks : (For Non-Enrollement)</h5><br>
