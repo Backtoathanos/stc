@@ -80,179 +80,175 @@ if(isset($_SESSION["stc_agent_id"])){
                         <div class="tab-pane tabs-animation fade active" id="view-req" role="tabpanel">
                             <div class="row">
                                 <div class="col-md-12">
-                                    <div class="row">
-                                        <div class="col-md-12 col-xl-12"> 
-                                            <div class="main-card mb-3 card">
-                                                <div class="card-body">
-                                                    <h5 class="card-title">View E-Permit Enrollment</h5>
-                                                    <form class="needs-validation" novalidate>
-                                                        <div class="form-row">
-                                                            <div class="col-md-12 mb-3">
-                                                            <?php
-                                                                $showdate=date('Y-m-d');
-                                                                if(isset($_GET['search_date'])){
-                                                                    $showdate=date('Y-m-d', strtotime($_GET['search_date']));
-                                                                }
-                                                            ?>
-                                                                <input type="date" value='<?php echo $showdate;?>' class='datefilter form-control'>
-                                                                <a href="javascript:void(0)" class="datefilterbtn btn btn-primary">Find</a>
-                                                            </div>
-                                                            <div class="col-md-12 mb-3">
-                                                                <table class="table table-bordered table-hover">
-                                                                    <thead>
-                                                                        <tr>
-                                                                            <th colspan="15" class="text-center">E-Permit Enrolment Record</th>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <?php 
-
-                                                                                $showdate=date('d-m-Y');
-                                                                                $shiftAtotal='';
-                                                                                $shiftBtotal='';
-                                                                                $shiftCtotal='';
-                                                                                $shiftEtotal='';
-                                                                                $shiftAdata='';
-                                                                                $shiftBdata='';
-                                                                                $shiftCdata='';
-                                                                                $shiftEdata='';
-                                                                                $totalplantentry=0;
-                                                                                $shifttdata='';
-                                                                                include_once("../MCU/db.php");
-                                                                                $filter=' WHERE DATE(`created_date`)="'.date('Y-m-d').'" AND `dep_id`<>0';
-                                                                                $filter2=' AND DATE(`created_date`)="'.date('Y-m-d').'"';
-                                                                                if(isset($_GET['search_date'])){
-                                                                                    $filter=' WHERE DATE(`created_date`)="'.$_GET['search_date'].'" AND `dep_id`<>0';
-                                                                                    $filter2=' AND DATE(`created_date`)="'.$_GET['search_date'].'"';
-                                                                                    $showdate=date('d-m-Y', strtotime($_GET['search_date']));
-                                                                                }
-                                                                                echo '<th class="text-center">Date</th>';
-                                                                                echo '<th class="text-center">'.$showdate.'</th>';
-                                                                                $sql=mysqli_query($con, "SELECT `dep_id`, `shift`, `stc_status_down_list_department_dept` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` ".$filter." ORDER BY `stc_status_down_list_department_dept` ASC");
-                                                                                $TotalShiftAcounter=0;
-                                                                                $TotalShiftBcounter=0;
-                                                                                $TotalShiftCcounter=0;
-                                                                                $TotalShiftEcounter=0;
-                                                                                $Totalepermitcounter=0;
-                                                                                $deptepermitcounter='';
-                                                                                $departments = array();
-                                                                                $departmentsid = array();
-                                                                                $Remarks='';
-                                                                                $deptnonenrollmentcounter='';
-                                                                                if(mysqli_num_rows($sql)>0){
-                                                                                    foreach($sql as $row){
-                                                                                        if (!in_array($row['stc_status_down_list_department_dept'], $departments)) {
-                                                                                            $departments[] = $row['stc_status_down_list_department_dept'];
-                                                                                            $departmentsid[] = $row['dep_id'];
-                                                                                        }
-                                                                                    }
-                                                                                    foreach($departments as $key=>$department) {
-                                                                                        $RemarksData='';
-                                                                                        $ShiftAcounter=0;
-                                                                                        $ShiftBcounter=0;
-                                                                                        $ShiftCcounter=0;
-                                                                                        $ShiftEcounter=0;
-                                                                                        echo '<th rowspan="2">' . $department . '</th>';
-                                                                                        $dept_id=$departmentsid[$key];
-                                                                                        $sql2=mysqli_query($con, "SELECT `id`, `shift`, `emp_name`, `created_date` FROM `stc_epermit_enrollment` WHERE `dep_id`='".$dept_id."' ".$filter2."");
-                                                                                        foreach($sql2 as $row2){
-                                                                                            if($row2['shift']=="A"){ $totalplantentry++;$ShiftAcounter++; }
-                                                                                            if($row2['shift']=="B"){ $totalplantentry++;$ShiftBcounter++; }
-                                                                                            if($row2['shift']=="C"){ $totalplantentry++;$ShiftCcounter++; }
-                                                                                            if($row2['shift']=="E (General)"){ $totalplantentry++;$ShiftEcounter++; }
-                                                                                        }
-                                                                                        $sql3=mysqli_query($con, "SELECT `id`, `totalpermitenr`, `dep_id`, `remarks` FROM `stc_totalpermitenrollment` WHERE `dep_id`='".$dept_id."' ".$filter2."");
-                                                                                        $Epermitcounter=0;
-                                                                                        $rema='';
-                                                                                        if(mysqli_num_rows($sql3)>0){
-                                                                                            foreach($sql3 as $row3){
-                                                                                                $Epermitcounter+=$row3['totalpermitenr'];
-                                                                                                $Totalepermitcounter+=$row3['totalpermitenr'];
-                                                                                                $rema=$row3['remarks'];
-                                                                                            }
-                                                                                            if($Epermitcounter==0){
-                                                                                                $deptepermitcounter.='<td style="font-weight:bold">0</td>';
-                                                                                            }else{
-                                                                                                $deptepermitcounter.='<td style="font-weight:bold">'.$Epermitcounter.'</td>';
-                                                                                                $RemarksData.=$rema;
-                                                                                            }
-                                                                                        }else{
-                                                                                            $deptepermitcounter.='<td style="font-weight:bold">0</td>';
-                                                                                        }
-                                                                                        $Remarks.='<td>'.$RemarksData.'</td>';
-                                                                                        $TotalShiftAcounter+=$ShiftAcounter;
-                                                                                        $TotalShiftBcounter+=$ShiftBcounter;
-                                                                                        $TotalShiftCcounter+=$ShiftCcounter;
-                                                                                        $TotalShiftEcounter+=$ShiftEcounter;
-
-                                                                                        $shiftAdata.='<td>'.$ShiftAcounter.'</td>';
-                                                                                        $shiftBdata.='<td>'.$ShiftBcounter.'</td>';
-                                                                                        $shiftCdata.='<td>'.$ShiftCcounter.'</td>';
-                                                                                        $shiftEdata.='<td>'.$ShiftEcounter.'</td>';
-                                                                                        $total = $ShiftAcounter + $ShiftBcounter + $ShiftCcounter + $ShiftEcounter;
-                                                                                        $shifttdata.='<td style="font-weight:bold">'.$total.'</td>';
-                                                                                        $totalnonenrollment=($total - $Epermitcounter)>=0?$total - $Epermitcounter:0;
-                                                                                        $deptnonenrollmentcounter.='<td style="font-weight:bold">'.$totalnonenrollment.'</td>';
-                                                                                    }
-                                                                                    $shiftAtotal='<td>'.$TotalShiftAcounter.'</td>';
-                                                                                    $shiftBtotal='<td>'.$TotalShiftBcounter.'</td>';
-                                                                                    $shiftCtotal='<td>'.$TotalShiftCcounter.'</td>';
-                                                                                    $shiftEtotal='<td>'.$TotalShiftEcounter.'</td>';
-                                                                                }
-                                                                            ?>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <th class="text-center">Shift</th>
-                                                                            <th class="text-center">Manpower Entry in TSL</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        <tr>
-                                                                            <td>1st (A)</td>
-                                                                            <?php echo $shiftAtotal;?>
-                                                                            <?php echo $shiftAdata;?>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>General (E)</td>
-                                                                            <?php echo $shiftEtotal;?>
-                                                                            <?php echo $shiftEdata;?>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>2nd (B)</td>
-                                                                            <?php echo $shiftBtotal;?>
-                                                                            <?php echo $shiftBdata;?>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td>3rd (C)</td>
-                                                                            <?php echo $shiftCtotal;?>
-                                                                            <?php echo $shiftCdata;?>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style="font-weight:bold">Total Entry In Plant</td>
-                                                                            <td style="font-weight:bold"><?php echo $totalplantentry;?></td>
-                                                                            <?php echo $shifttdata;?>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style="font-weight:bold">Total E-Permit Enrolment</td>
-                                                                            <td style="font-weight:bold"><?php echo $Totalepermitcounter;?></td>
-                                                                            <?php echo $deptepermitcounter;?>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style="font-weight:bold">Total Non Enrolment</td>
-                                                                            <td style="font-weight:bold"><?php echo $totalplantentry-$Totalepermitcounter;?></td>
-                                                                            <?php echo $deptnonenrollmentcounter;?>
-                                                                        </tr>
-                                                                        <tr>
-                                                                            <td style="font-weight:bold">Remarks</td>
-                                                                            <td></td>
-                                                                            <?php echo $Remarks;?>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
+                                    <div class="main-card mb-3 card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">View E-Permit Enrollment</h5>
+                                            <form class="needs-validation" novalidate>
+                                                <div class="form-row">
+                                                    <div class="col-md-12 mb-3">
+                                                        <?php
+                                                            $showdate=date('Y-m-d');
+                                                            if(isset($_GET['search_date'])){
+                                                                $showdate=date('Y-m-d', strtotime($_GET['search_date']));
+                                                            }
+                                                        ?>
+                                                            <input type="date" value='<?php echo $showdate;?>' class='datefilter form-control'>
+                                                            <a href="javascript:void(0)" class="datefilterbtn btn btn-primary">Find</a>
                                                         </div>
-                                                    </form> 
+                                                        <div class="col-md-12 mb-3">
+                                                        <table class="table table-bordered table-hover">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th colspan="15" class="text-center">E-Permit Enrolment Record</th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <?php 
+
+                                                                        $showdate=date('d-m-Y');
+                                                                        $shiftAtotal='';
+                                                                        $shiftBtotal='';
+                                                                        $shiftCtotal='';
+                                                                        $shiftEtotal='';
+                                                                        $shiftAdata='';
+                                                                        $shiftBdata='';
+                                                                        $shiftCdata='';
+                                                                        $shiftEdata='';
+                                                                        $totalplantentry=0;
+                                                                        $shifttdata='';
+                                                                        include_once("../MCU/db.php");
+                                                                        $filter=' AND DATE(`created_date`)="'.date('Y-m-d').'" AND `dep_id`<>0';
+                                                                        $filter2=' AND DATE(`created_date`)="'.date('Y-m-d').'"';
+                                                                        if(isset($_GET['search_date'])){
+                                                                            $filter=' AND DATE(`created_date`)="'.$_GET['search_date'].'" AND `dep_id`<>0';
+                                                                            $filter2=' AND DATE(`created_date`)="'.$_GET['search_date'].'"';
+                                                                            $showdate=date('d-m-Y', strtotime($_GET['search_date']));
+                                                                        }
+                                                                        echo '<th class="text-center">Date</th><th class="text-center">'.$showdate.'</th>';
+                                                                        $query="SELECT DISTINCT `dep_id`, `shift`, `stc_status_down_list_department_dept` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` LEFT JOIN `stc_cust_project` ON `stc_cust_project_id`=`stc_status_down_list_department_loc_id` LEFT JOIN `stc_cust_project_collaborate` ON `stc_cust_project_collaborate_projectid`=`stc_status_down_list_department_loc_id` WHERE (`stc_cust_project_collaborate_teamid`='".$_SESSION['stc_agent_id']."' OR `stc_cust_project_createdby`='".$_SESSION['stc_agent_id']."') ".$filter." ORDER BY `stc_status_down_list_department_dept` ASC";
+                                                                        $sql=mysqli_query($con, $query);
+                                                                        $TotalShiftAcounter=0;
+                                                                        $TotalShiftBcounter=0;
+                                                                        $TotalShiftCcounter=0;
+                                                                        $TotalShiftEcounter=0;
+                                                                        $Totalepermitcounter=0;
+                                                                        $deptepermitcounter='';
+                                                                        $departments = array();
+                                                                        $departmentsid = array();
+                                                                        $Remarks='';
+                                                                        $deptnonenrollmentcounter='';
+                                                                        if(mysqli_num_rows($sql)>0){
+                                                                            foreach($sql as $row){
+                                                                                if (!in_array($row['stc_status_down_list_department_dept'], $departments)) {
+                                                                                    $departments[] = $row['stc_status_down_list_department_dept'];
+                                                                                    $departmentsid[] = $row['dep_id'];
+                                                                                }
+                                                                            }
+                                                                            foreach($departments as $key=>$department) {
+                                                                                $RemarksData='';
+                                                                                $ShiftAcounter=0;
+                                                                                $ShiftBcounter=0;
+                                                                                $ShiftCcounter=0;
+                                                                                $ShiftEcounter=0;
+                                                                                echo '<th rowspan="2">' . $department . '</th>';
+                                                                                $dept_id=$departmentsid[$key];
+                                                                                $sql2=mysqli_query($con, "SELECT `id`, `shift`, `emp_name`, `created_date` FROM `stc_epermit_enrollment` WHERE `dep_id`='".$dept_id."' ".$filter2."");
+                                                                                foreach($sql2 as $row2){
+                                                                                    if($row2['shift']=="A"){ $totalplantentry++;$ShiftAcounter++; }
+                                                                                    if($row2['shift']=="B"){ $totalplantentry++;$ShiftBcounter++; }
+                                                                                    if($row2['shift']=="C"){ $totalplantentry++;$ShiftCcounter++; }
+                                                                                    if($row2['shift']=="E (General)"){ $totalplantentry++;$ShiftEcounter++; }
+                                                                                }
+                                                                                $sql3=mysqli_query($con, "SELECT `id`, `totalpermitenr`, `dep_id`, `remarks` FROM `stc_totalpermitenrollment` WHERE `dep_id`='".$dept_id."' ".$filter2."");
+                                                                                $Epermitcounter=0;
+                                                                                $rema='';
+                                                                                if(mysqli_num_rows($sql3)>0){
+                                                                                    foreach($sql3 as $row3){
+                                                                                        $Epermitcounter+=$row3['totalpermitenr'];
+                                                                                        $Totalepermitcounter+=$row3['totalpermitenr'];
+                                                                                        $rema=$row3['remarks'];
+                                                                                    }
+                                                                                    if($Epermitcounter==0){
+                                                                                        $deptepermitcounter.='<td style="font-weight:bold">0</td>';
+                                                                                    }else{
+                                                                                        $deptepermitcounter.='<td style="font-weight:bold">'.$Epermitcounter.'</td>';
+                                                                                        $RemarksData.=$rema;
+                                                                                    }
+                                                                                }else{
+                                                                                    $deptepermitcounter.='<td style="font-weight:bold">0</td>';
+                                                                                }
+                                                                                $Remarks.='<td>'.$RemarksData.'</td>';
+                                                                                $TotalShiftAcounter+=$ShiftAcounter;
+                                                                                $TotalShiftBcounter+=$ShiftBcounter;
+                                                                                $TotalShiftCcounter+=$ShiftCcounter;
+                                                                                $TotalShiftEcounter+=$ShiftEcounter;
+
+                                                                                $shiftAdata.='<td>'.$ShiftAcounter.'</td>';
+                                                                                $shiftBdata.='<td>'.$ShiftBcounter.'</td>';
+                                                                                $shiftCdata.='<td>'.$ShiftCcounter.'</td>';
+                                                                                $shiftEdata.='<td>'.$ShiftEcounter.'</td>';
+                                                                                $total = $ShiftAcounter + $ShiftBcounter + $ShiftCcounter + $ShiftEcounter;
+                                                                                $shifttdata.='<td style="font-weight:bold">'.$total.'</td>';
+                                                                                $totalnonenrollment=($total - $Epermitcounter)>=0?$total - $Epermitcounter:0;
+                                                                                $deptnonenrollmentcounter.='<td style="font-weight:bold">'.$totalnonenrollment.'</td>';
+                                                                            }
+                                                                            $shiftAtotal='<td>'.$TotalShiftAcounter.'</td>';
+                                                                            $shiftBtotal='<td>'.$TotalShiftBcounter.'</td>';
+                                                                            $shiftCtotal='<td>'.$TotalShiftCcounter.'</td>';
+                                                                            $shiftEtotal='<td>'.$TotalShiftEcounter.'</td>';
+                                                                        }
+                                                                    ?>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th class="text-center">Shift</th>
+                                                                    <th class="text-center">Manpower Entry</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>1st (A)</td>
+                                                                    <?php echo $shiftAtotal;?>
+                                                                    <?php echo $shiftAdata;?>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>General (E)</td>
+                                                                    <?php echo $shiftEtotal;?>
+                                                                    <?php echo $shiftEdata;?>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>2nd (B)</td>
+                                                                    <?php echo $shiftBtotal;?>
+                                                                    <?php echo $shiftBdata;?>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>3rd (C)</td>
+                                                                    <?php echo $shiftCtotal;?>
+                                                                    <?php echo $shiftCdata;?>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="font-weight:bold">Total Entry In Plant</td>
+                                                                    <td style="font-weight:bold"><?php echo $totalplantentry;?></td>
+                                                                    <?php echo $shifttdata;?>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="font-weight:bold">Total E-Permit Enrolment</td>
+                                                                    <td style="font-weight:bold"><?php echo $Totalepermitcounter;?></td>
+                                                                    <?php echo $deptepermitcounter;?>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="font-weight:bold">Total Non Enrolment</td>
+                                                                    <td style="font-weight:bold"><?php echo $totalplantentry-$Totalepermitcounter;?></td>
+                                                                    <?php echo $deptnonenrollmentcounter;?>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td style="font-weight:bold">Remarks</td>
+                                                                    <td></td>
+                                                                    <?php echo $Remarks;?>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            </form> 
                                         </div>
                                     </div>
                                 </div>
