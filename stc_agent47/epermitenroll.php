@@ -149,7 +149,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                                 $ShiftBcounter=0;
                                                                                 $ShiftCcounter=0;
                                                                                 $ShiftEcounter=0;
-                                                                                echo '<th rowspan="2">' . $department . '</th>';
+                                                                                echo '<th rowspan="2" style="width:145px;">' . $department . '</th>';
                                                                                 $dept_id=$departmentsid[$key];
                                                                                 $sql2=mysqli_query($con, "SELECT `id`, `shift`, `emp_name`, `created_date` FROM `stc_epermit_enrollment` WHERE `dep_id`='".$dept_id."' ".$filter2."");
                                                                                 foreach($sql2 as $row2){
@@ -199,8 +199,8 @@ if(isset($_SESSION["stc_agent_id"])){
                                                                     ?>
                                                                 </tr>
                                                                 <tr>
-                                                                    <th class="text-center">Shift</th>
-                                                                    <th class="text-center">Manpower Entry</th>
+                                                                    <th class="text-center" style="width:140px;">Shift</th>
+                                                                    <th class="text-center" style="width:140px;">Manpower Entry</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
