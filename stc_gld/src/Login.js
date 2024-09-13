@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet';
-
+import { useAuth } from './AuthContext';
 import './Login.css'; 
 import './components/assets/css/material-dashboard.css?v=2.1.2'; 
 
 function Login() {
+  const { login } = useAuth();
+  
   useEffect(() => {
     document.title = "STC GLD || Login";
     
-    // Find the favicon element
     const favicon = document.getElementById("favicon");
-
-    // Check if favicon element exists before setting the href
     if (favicon) {
       favicon.href = `${process.env.PUBLIC_URL}/stc_logo_title.png`;
     }
@@ -27,15 +26,15 @@ function Login() {
     formData.append('stc_electro_login_uname', username);
     formData.append('stc_electro_login_upassword', password);
     formData.append('agent_signin', true);
-
     try {
-      const response = await fetch('/vanaheim/useroath.php', {
+      const response = await fetch('http://localhost/stc/stc_gld/src/vanaheim/useroath.php', {
         method: 'POST',
         body: formData,
       });
       const result = await response.text();
       if (result.trim() === 'success') {
-        window.location.href = 'stc_mazeRunner/dashboard.php';
+        login();
+        window.location.href = '/dashboard';
       } else {
         alert('Please check username or password!');
       }
