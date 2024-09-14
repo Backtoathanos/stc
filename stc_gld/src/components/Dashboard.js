@@ -3,7 +3,8 @@ import {Link, useNavigate} from 'react-router-dom';
 import './Login.css';
 export default function Dashboard(){
     const navigate = useNavigate();
-    function logoutSubmit() {
+    function logoutSubmit(e) {
+        e.preventDefault();
         localStorage.removeItem("login"); // Clears the login status from localStorage
         localStorage.setItem("loginStatus", "Logged out successfully."); // Optional message
         navigate("/"); // Redirects to the login page
@@ -26,10 +27,10 @@ export default function Dashboard(){
                             </Link>
                         </li>
                         <li className="nav-item">
-                            <button className="nav-link" style={{ border: 'none', background: 'none' }} onClick={logoutSubmit}>
+                            <Link className="nav-link" style={{ border: 'none', background: 'none' }} onClick={logoutSubmit}>
                             <i className="material-icons">logout</i>
                             <p>Logout</p>
-                            </button>
+                            </Link>
                         </li>
                     </ul>
                 </div>
