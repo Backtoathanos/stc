@@ -1,0 +1,9 @@
+/* Datatable.css */
+.data-table .rdt_Table {
+    width: 100%; /* Ensure the table takes full width */
+}
+
+.data-table input[type="text"] {
+    width: 300px;
+    margin: 0 auto;
+}

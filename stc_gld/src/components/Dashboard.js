@@ -1,75 +1,121 @@
+import Footer from "./layouts/Footer";
+import Navbar from "./layouts/Navbar";
+import Sidebar from './layouts/Sidebar';
+import { useLocation } from 'react-router-dom';
 
-import {Link, useNavigate} from 'react-router-dom';
-import './Login.css';
-export default function Dashboard(){
-    const navigate = useNavigate();
-    function logoutSubmit(e) {
-        e.preventDefault();
-        localStorage.removeItem("login"); // Clears the login status from localStorage
-        localStorage.setItem("loginStatus", "Logged out successfully."); // Optional message
-        navigate("/"); // Redirects to the login page
-    }
-    
+export default function Dashboard() {
+    const location = useLocation();
+
+    // Extracting the current route
+    const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
+
     return (
         <div className="wrapper ">
-            <div className="sidebar" data-color="purple" data-background-color="white">
-                <div className="logo">
-                    <Link to="/" className="simple-text logo-normal">
-                    STC GLD
-                    </Link>
-                </div>
-                <div className="sidebar-wrapper">
-                    <ul className="nav">
-                        <li className="nav-item active">
-                            <Link to="/dashboard" className="nav-link">
-                            <i className="material-icons">dashboard</i>
-                            <p>Dashboard</p>
-                            </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" style={{ border: 'none', background: 'none' }} onClick={logoutSubmit}>
-                            <i className="material-icons">logout</i>
-                            <p>Logout</p>
-                            </Link>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+            <Sidebar activeRoute={currentRoute} />
             <div className="main-panel">
-                <nav className="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
-                    <div className="container-fluid">
-                    <div className="navbar-wrapper">
-                        <Link to="/" className="navbar-brand">Dashboard</Link>
-                    </div>
-                    <button className="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
-                        <span className="sr-only">Toggle navigation</span>
-                        <span className="navbar-toggler-icon icon-bar"></span>
-                        <span className="navbar-toggler-icon icon-bar"></span>
-                        <span className="navbar-toggler-icon icon-bar"></span>
-                    </button>
-                    </div>
-                </nav>
+                <Navbar />
                 <div className="content">
                     <div className="container-fluid">
-                    <div className="row form-group">
-                        <div className="col-sm-6 col-md-6">
-                            <h1>Hi i am dashboard</h1>
+                        <div className="row">
+                            <div className="col-lg-3 col-md-6 col-sm-6">
+                                <div className="card card-stats">
+                                    <div className="card-header card-header-warning card-header-icon">
+                                        <div className="card-icon">
+                                            <i className="material-icons">content_copy</i>
+                                        </div>
+                                        <p className="card-category">Total Customer</p>
+                                        <h3 className="card-title">
+                                            <small></small>
+                                        </h3>
+                                    </div>
+                                    <div className="card-footer">
+                                        <div className="stats">
+                                            <i className="material-icons">local_offer</i> Carry On
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-lg-3 col-md-6 col-sm-6">
+                                <div className="card card-stats">
+                                    <div className="card-header card-header-success card-header-icon">
+                                        <div className="card-icon">
+                                            <i className="material-icons">store</i>
+                                        </div>
+                                        <p className="card-category">Revenue</p>
+                                        <p className="card-title">₹ 0</p>
+                                    </div>
+                                    <div className="card-footer">
+                                        <div className="stats">
+                                            <i className="material-icons">date_range</i> Last 1 Month
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-lg-3 col-md-6 col-sm-6">
+                                <div className="card card-stats">
+                                    <div className="card-header card-header-danger card-header-icon">
+                                        <div className="card-icon">
+                                            <i className="fa fa-user-secret" aria-hidden="true"></i>
+                                        </div>
+                                        <p className="card-category">Total Agent</p>
+                                        <h3 className="card-title">
+                                            0
+                                        </h3>
+                                    </div>
+                                    <div className="card-footer">
+                                        <div className="stats">
+                                            <i className="material-icons">local_offer</i> Tracked from STC Electronics
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="col-lg-3 col-md-6 col-sm-6">
+                                <div className="card card-stats">
+                                    <div className="card-header card-header-info card-header-icon">
+                                        <div className="card-icon">
+                                            <i className="fa fa-instagram"></i>
+                                        </div>
+                                        <p className="card-category">Followers</p>
+                                        <h3 className="card-title">+
+                                            0
+                                        </h3>
+                                    </div>
+                                    <div className="card-footer">
+                                        <div className="stats">
+                                            <i className="material-icons">update</i> Just Updated
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-md-12 col-sm-12">
+                                <div className="card card-chart">
+                                    <div className="card-header">
+                                        <h2 className="text-center">Analytics Reports From 0</h2>
+                                        0
+                                        <div style={{ width: "100%", height: "20%", textAlign: "center" }}>
+                                            <div>Sales </div>
+                                            <canvas id="chartjs_bar"></canvas>
+                                        </div>
+                                    </div>
+                                    <div className="card-body">
+                                        <h4 className="card-title">Daily Sales</h4>
+                                        <p className="card-category">
+                                            <span className="text-success"><i className="fa fa-long-arrow-up"></i>  </span> </p>
+                                    </div>
+                                    <div className="card-footer">
+                                        <div className="stats">
+                                            <i className="material-icons">access_time</i> updated a minutes ago
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    </div>
                 </div>
-                <footer className="footer">
-                    <div className="container-fluid">
-                    <div className="copyright float-right">
-                        &copy;
-                        <script>
-                        document.write(new Date().getFullYear())
-                        </script>, made with <i className="material-icons">favorite</i> by
-                        GIS
-                    </div>
-                    </div>
-                </footer>
+                <Footer />
             </div>
         </div>
-    )
+    );
 }

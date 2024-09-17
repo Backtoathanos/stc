@@ -2,6 +2,7 @@
 import {Link, useNavigate} from 'react-router-dom';
 import './Login.css';
 import { useEffect, useState } from 'react';
+import Footer from './layouts/Footer';
 export default function Login(){
     const navigate=useNavigate();
     const [user, setUser]=useState("");
@@ -151,17 +152,7 @@ export default function Login(){
                     </div>
                     </div>
                 </div>
-                <footer className="footer">
-                    <div className="container-fluid">
-                    <div className="copyright float-right">
-                        &copy;
-                        <script>
-                        document.write(new Date().getFullYear())
-                        </script>, made with <i className="material-icons">favorite</i> by
-                        GIS
-                    </div>
-                    </div>
-                </footer>
+                <Footer />
             </div>
         </div>
     )

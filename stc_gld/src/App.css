@@ -70,3 +70,8 @@ span.psw {
     width: 100%;
   }
 }
+
+.nav-item .active {
+  background-color: purple; /* Change color or style for active state */
+  color: white;
+}
