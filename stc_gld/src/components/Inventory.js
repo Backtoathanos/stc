@@ -4,20 +4,32 @@ import Footer from "./layouts/Footer";
 import Navbar from "./layouts/Navbar";
 import Sidebar from './layouts/Sidebar';
 import { useLocation } from 'react-router-dom';
+import CustomerModal from './CustomerModal';
+import { RotatingLines } from 'react-loader-spinner'; // Importing spinner from react-loader-spinner
 import './Datatable.css';
 
 export default function Dashboard() {
     const location = useLocation();
     const [data, setData] = useState([]);
     const [search, setSearch] = useState(''); // State for search filter
+    const [loading, setLoading] = useState(true); // Loading state
+    const [modalShow, setModalShow] = useState(false); // State for modal visibility
+    const [selectedProductId, setSelectedProductId] = useState(null);
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
 
     // Fetch data from PHP API
     useEffect(() => {
+        setLoading(true); // Start loading before data fetch
         fetch('http://localhost/stc/stc_gld/vanaheim/getInventoryData.php')  // Update URL with your PHP API path
             .then(response => response.json())
-            .then(data => setData(data))
-            .catch(error => console.error('Error fetching data:', error));
+            .then(data => {
+                setData(data);
+                setLoading(false); // End loading after data fetch
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                setLoading(false); // End loading on error
+            });
     }, []);
 
     // Define columns for DataTable
@@ -25,8 +37,33 @@ export default function Dashboard() {
         {
             name: 'Slno',
             selector: (row, index) => index + 1,  // auto-generate serial number
+            sortable: false,
+            center: true
+        },
+        {
+            name: 'Product Id',
+            selector: row => row.stc_product_id,
             sortable: true,
             center: true
+        },
+        {
+            name: 'Image',
+            selector: row => row.stc_product_image,
+            sortable: false,
+            center: true,
+            cell: row => {
+                const imageUrl = `https://stcassociate.com/stc_symbiote/stc_product_image/${row.stc_product_image}`;
+                const defaultImageUrl = 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996'; // Replace with the actual path to your default image
+
+                return (
+                    <img 
+                        src={row.stc_product_image ? imageUrl : defaultImageUrl} 
+                        alt="Product" 
+                        style={{ width: '100px', height: '80px', borderRadius: '5px' }} 
+                        onError={(e) => e.target.src = defaultImageUrl} // If the image fails to load, use default
+                    />
+                );
+            }
         },
         {
             name: 'Product Description',
@@ -47,9 +84,27 @@ export default function Dashboard() {
         },
         {
             name: 'Sale Rate',
-            selector: row => row.stc_product_id,
+            selector: row => row.rate_including_gst,
             sortable: true,
             right: true
+        },
+        {
+            name: 'Action',
+            selector: row => row.stc_product_id,
+            sortable: false,
+            center: true,
+            cell: row => (
+                <a
+                    href="#"
+                    className="btn btn-primary"
+                    onClick={() => {
+                        setSelectedProductId(row.stc_product_id);
+                        setModalShow(true);
+                    }}
+                >
+                    Add
+                </a>
+            )
         }
     ];
 
@@ -83,14 +138,26 @@ export default function Dashboard() {
                                         </div>
                                     </div>
                                     <div className="card-body">
-                                    <DataTable 
-                                        columns={columns}
-                                        data={filteredData}  // Use filtered data
-                                        pagination   // Enables pagination
-                                        highlightOnHover  // Adds hover effect
-                                        striped  // Adds striped rows
-                                        className="data-table"  // Apply the custom class
-                                    />
+                                        {loading ? (
+                                            <div className="spinner-container" style={{ textAlign: 'center' }}>
+                                                <RotatingLines
+                                                    strokeColor="blue"
+                                                    strokeWidth="5"
+                                                    animationDuration="0.75"
+                                                    width="50"
+                                                    visible={true}
+                                                />
+                                            </div>
+                                        ) : (
+                                            <DataTable
+                                                columns={columns}
+                                                data={filteredData}
+                                                pagination
+                                                highlightOnHover
+                                                striped
+                                                className="data-table"  // Custom class for additional styling
+                                            />
+                                        )}
                                     </div>
                                     <div className="card-footer">
                                         <div className="stats">
@@ -104,6 +171,11 @@ export default function Dashboard() {
                 </div>
                 <Footer />
             </div>
+            <CustomerModal
+                show={modalShow}
+                handleClose={() => setModalShow(false)}
+                productId={selectedProductId}
+            />
         </div>
     );
 }

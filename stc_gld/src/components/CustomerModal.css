@@ -1,0 +1,5 @@
+input[type=text], input[type=number], textarea{
+    padding: 25px;
+    font-size: 20px;
+    border: 2px solid #752180;
+}

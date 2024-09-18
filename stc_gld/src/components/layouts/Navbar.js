@@ -12,7 +12,6 @@ export default function Navbar(){
         <nav className="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
             <div className="container-fluid">
             <div className="navbar-wrapper">
-                <a className="navbar-brand" href="javascript:;">Dashboard</a>
             </div>
             <button className="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="sr-only">Toggle navigation</span>
@@ -23,15 +22,10 @@ export default function Navbar(){
             <div className="collapse navbar-collapse justify-content-end">
                 <form className="navbar-form">
                 <div className="input-group no-border">
-                    <input type="text" value="" className="form-control stc-elec-pd-search-val" placeholder="Search..."/>
-                    <button type="submit" href="" className="btn btn-white btn-round btn-just-icon stc-elec-pd-search-hit">
-                    <i className="material-icons">search</i>
-                    <div className="ripple-container"></div>
-                    </button>
                 </div>
                 </form>
                 <ul className="navbar-nav">
-                <li className="nav-item dropdown active">
+                {/* <li className="nav-item dropdown">
                     <a className="nav-link" href="request-action.php" id="navbarDropdownMenuLink">
                     <i className="material-icons">notifications</i>
                     <span className="notification">
@@ -40,7 +34,7 @@ export default function Navbar(){
                         Some Actions
                     </p>
                     </a>
-                </li>
+                </li> */}
                 <li className="nav-item dropdown">
                     <a className="nav-link" href="javascript:;" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i className="material-icons">person</i>

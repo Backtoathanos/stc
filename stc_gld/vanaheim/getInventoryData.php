@@ -7,7 +7,8 @@ header("Access-Control-Allow-Headers: Content-Type");
 include "../../MCU/db.php";
 
 // Fetch data from your inventory table
-$query = "SELECT P.stc_product_id, P.stc_product_name, P.stc_product_unit, i.stc_item_inventory_pd_qty FROM stc_item_inventory i LEFT JOIN stc_product P ON i.stc_item_inventory_pd_id=P.stc_product_id ORDER BY P.stc_product_name ASC";
+$query = "SELECT DISTINCT P.stc_product_id, P.stc_product_name, P.stc_product_unit, P.stc_product_image, ROUND(i.stc_item_inventory_pd_qty, 2) AS stc_item_inventory_pd_qty, P.stc_product_gst, GI.stc_product_grn_items_rate, ROUND(GI.stc_product_grn_items_rate * (1 + P.stc_product_gst / 100), 2) AS rate_including_gst FROM stc_item_inventory i LEFT JOIN stc_product P ON i.stc_item_inventory_pd_id = P.stc_product_id LEFT JOIN stc_product_grn_items GI ON i.stc_item_inventory_pd_id = GI.stc_product_grn_items_product_id
+WHERE i.stc_item_inventory_pd_qty > 0 AND GI.stc_product_grn_items_rate = (SELECT `stc_product_grn_items_rate` FROM stc_product_grn_items WHERE `stc_product_grn_items_product_id` = i.stc_item_inventory_pd_id ORDER BY `stc_product_grn_items_id` DESC LIMIT 1 ) ORDER BY P.stc_product_name ASC";
 $result = mysqli_query($con, $query);
 
 $data = [];

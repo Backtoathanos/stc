@@ -7,3 +7,28 @@
     width: 300px;
     margin: 0 auto;
 }
+/* Datatable.css */
+.data-table .rdt_Table {
+    width: 100%;
+    border: 1px solid #ddd;  /* Add a border around the table */
+}
+
+.data-table .rdt_TableRow {
+    border-bottom: 1px solid #ddd;  /* Add a border between rows */
+}
+
+.data-table .rdt_TableCol {
+    border-right: 1px solid #ddd;  /* Add a border between columns */
+    text-align: center;
+}
+
+.data-table .rdt_TableCell {
+    border-right: 1px solid #ddd;  /* Add a border between columns */
+}
+.data-table .rdt_TableCell:nth-child(2)  {
+    width: 10px;
+}
+
+.data-table .rdt_TableRow:last-child {
+    border-bottom: none;  /* Remove the bottom border of the last row */
+}
