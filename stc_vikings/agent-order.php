@@ -1849,7 +1849,8 @@ include("kattegat/role_check.php");
                       var obj_response=response.trim();
                       if(obj_response=="yes"){
                           alert("Record updated successfully!!!");
-                          resetFormFields();
+                          $('.it-emp-name').val('');
+                          $('.it-ppe-type:checked').prop('checked', false);
                           item_tracker_call();
                       }else if(obj_response=="reload"){
                           window.location.reload();

@@ -10,6 +10,10 @@ import './Datatable.css';
 
 export default function Dashboard() {
     const location = useLocation();
+    useEffect(() => {
+        document.title = "STC GLD || Inventory"; // Set the title
+      }, []);
+
     const [data, setData] = useState([]);
     const [search, setSearch] = useState(''); // State for search filter
     const [loading, setLoading] = useState(true); // Loading state

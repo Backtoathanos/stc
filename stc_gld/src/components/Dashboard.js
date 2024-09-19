@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import Footer from "./layouts/Footer";
 import Navbar from "./layouts/Navbar";
 import Sidebar from './layouts/Sidebar';
@@ -5,7 +6,9 @@ import { useLocation } from 'react-router-dom';
 
 export default function Dashboard() {
     const location = useLocation();
-
+    useEffect(() => {
+        document.title = "STC GLD || Dashboard"; // Set the title
+      }, []);
     // Extracting the current route
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
 
