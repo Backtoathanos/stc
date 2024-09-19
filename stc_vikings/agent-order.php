@@ -1824,6 +1824,7 @@ include("kattegat/role_check.php");
         // save dispatch
         $('body').delegate('.it-save', 'click', function(e){
             e.preventDefault();
+            $(this).prop('disabled', true);
             var user_id = $('.it-emp-name').val();
             var ppe_type = getCheckedValues('it-ppe-type');//$('.it-ppe-type').val();
             var qty = $('.it-qty').val();
@@ -1851,6 +1852,7 @@ include("kattegat/role_check.php");
                           alert("Record updated successfully!!!");
                           $('.it-emp-name').val('');
                           $('.it-ppe-type:checked').prop('checked', false);
+                          $(".it-save").prop('disabled', false);
                           item_tracker_call();
                       }else if(obj_response=="reload"){
                           window.location.reload();
