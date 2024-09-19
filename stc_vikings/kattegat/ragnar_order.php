@@ -3259,6 +3259,7 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	// call ppe tracker 
 	public function stc_item_tracker_call($search){
 		$blackpearl='';
+		$filter='';
 		if(!empty($search)){
 			$filter="WHERE 
 				`stc_item_tracker_toppe` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR 
