@@ -20,6 +20,12 @@ export default function Sidebar({ activeRoute }) {
                             <p>Inventory</p>
                         </Link>
                     </li>
+                    <li className={`nav-item ${activeRoute === 'challan' ? 'active' : ''}`}>
+                        <Link to="/challan" className="nav-link">
+                            <i className="material-icons">forum</i>
+                            <p>Challan</p>
+                        </Link>
+                    </li>
                 </ul>
             </div>
         </div>

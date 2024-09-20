@@ -7,12 +7,14 @@ import { useLocation } from 'react-router-dom';
 import CustomerModal from './CustomerModal';
 import { RotatingLines } from 'react-loader-spinner'; // Importing spinner from react-loader-spinner
 import './Datatable.css';
+import axios from 'axios';
+import { debounce } from 'lodash';
 
 export default function Dashboard() {
     const location = useLocation();
     useEffect(() => {
         document.title = "STC GLD || Inventory"; // Set the title
-      }, []);
+    }, []);
 
     const [data, setData] = useState([]);
     const [search, setSearch] = useState(''); // State for search filter
@@ -20,21 +22,33 @@ export default function Dashboard() {
     const [modalShow, setModalShow] = useState(false); // State for modal visibility
     const [selectedProductId, setSelectedProductId] = useState(null);
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
+    const [filteredData, setFilteredData] = useState([]); // To handle filtered data
 
-    // Fetch data from PHP API
+    const fetchData = debounce((query = '') => {
+        if (query.length > 3 || query === '') {
+            setLoading(true);
+            // Send the search query as a parameter to the API
+            axios.get(`http://localhost/stc/stc_gld/vanaheim/getInventoryData.php?search=${query}`)
+                .then(response => {
+                    const resultData = response.data;
+                    if (Array.isArray(resultData)) {
+                        setData(resultData); // Ensure data is an array
+                    } else {
+                        setData([]); // If it's not an array, set it to an empty array
+                    }
+                    setLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    setData([]); // Set to an empty array in case of error
+                    setLoading(false);
+                });
+        }
+    }, 500);
+
     useEffect(() => {
-        setLoading(true); // Start loading before data fetch
-        fetch('http://localhost/stc/stc_gld/vanaheim/getInventoryData.php')  // Update URL with your PHP API path
-            .then(response => response.json())
-            .then(data => {
-                setData(data);
-                setLoading(false); // End loading after data fetch
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                setLoading(false); // End loading on error
-            });
-    }, []);
+        fetchData(search);
+    }, [search]);
 
     // Define columns for DataTable
     const columns = [
@@ -60,10 +74,10 @@ export default function Dashboard() {
                 const defaultImageUrl = 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996'; // Replace with the actual path to your default image
 
                 return (
-                    <img 
-                        src={row.stc_product_image ? imageUrl : defaultImageUrl} 
-                        alt="Product" 
-                        style={{ width: '100px', height: '80px', borderRadius: '5px' }} 
+                    <img
+                        src={row.stc_product_image ? imageUrl : defaultImageUrl}
+                        alt="Product"
+                        style={{ width: '100px', height: '80px', borderRadius: '5px' }}
                         onError={(e) => e.target.src = defaultImageUrl} // If the image fails to load, use default
                     />
                 );
@@ -112,12 +126,6 @@ export default function Dashboard() {
         }
     ];
 
-    // Filter data based on search input
-    const filteredData = data.filter(item =>
-        item.stc_product_name.toLowerCase().includes(search.toLowerCase()) ||
-        item.stc_product_unit.toLowerCase().includes(search.toLowerCase())
-    );
-
     return (
         <div className="wrapper ">
             <Sidebar activeRoute={currentRoute} />
@@ -130,18 +138,17 @@ export default function Dashboard() {
                                 <div className="card card-chart">
                                     <div className="card-header">
                                         <h2 className="text-center">Inventory</h2>
-                                        <div className="text-center">
-                                            <input
-                                                type="text"
-                                                placeholder="Search..."
-                                                value={search}
-                                                onChange={(e) => setSearch(e.target.value)}
-                                                className="form-control"
-                                                style={{ width: '300px', margin: '0 auto' }}
-                                            />
-                                        </div>
                                     </div>
                                     <div className="card-body">
+                                        <div className="form-group">
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                placeholder="Search by product name or unit..."
+                                                value={search}
+                                                onChange={(e) => setSearch(e.target.value)} // Update search state
+                                            />
+                                        </div>
                                         {loading ? (
                                             <div className="spinner-container" style={{ textAlign: 'center' }}>
                                                 <RotatingLines
@@ -155,7 +162,7 @@ export default function Dashboard() {
                                         ) : (
                                             <DataTable
                                                 columns={columns}
-                                                data={filteredData}
+                                                data={data}
                                                 pagination
                                                 highlightOnHover
                                                 striped

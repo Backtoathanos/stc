@@ -10,50 +10,85 @@ const CustomerModal = ({ show, handleClose, productId }) => {
     const [customerName, setCustomerName] = useState('');
     const [customerContact, setCustomerContact] = useState('');
     const [customerAddress, setCustomerAddress] = useState('');
-    const [quantity, setQuantity] = useState(1); // New state for product quantity
-    const [rate, setRate] = useState(1); // New state for product quantity
+    const [quantity, setQuantity] = useState(1);
+    const [rate, setRate] = useState(1);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Fetch customer options when the modal is shown
     useEffect(() => {
-    axios.get('http://localhost/stc/stc_gld/vanaheim/index.php', {
-        params: {
-            action: 'getCustomers' // Specify the action parameter for fetching customers
+        if (show) {
+            axios.get('http://localhost/stc/stc_gld/vanaheim/index.php', {
+                params: { action: 'getCustomers' }
+            })
+            .then(response => {
+                if (Array.isArray(response.data)) {
+                    const options = response.data.map(gld_customer => ({
+                        value: gld_customer.gld_customer_id,
+                        label: gld_customer.gld_customer_cont_no
+                    }));
+                    setCustomerOptions(options);
+                } else {
+                    console.error('Unexpected response format:', response.data);
+                }
+            })
+            .catch(error => console.error('Error fetching customer options:', error));
         }
-    })
-    .then(response => {
-        if (Array.isArray(response.data)) {
-            const options = response.data.map(stc_trading_customer => ({
-                value: stc_trading_customer.stc_trading_customer_id,
-                label: stc_trading_customer.stc_trading_customer_title
-            }));
-            setCustomerOptions(options);
-        } else {
-            console.error('Unexpected response format:', response.data);
-        }
-    })
-    .catch(error => console.error('Error fetching customer options:', error));
-}, []);
+    }, [show]);
 
+    // Handle adding customer and product
     const handleAddCustomer = () => {
-        // Check if a customer is selected or if a new customer needs to be added
+        if (isSubmitting) return;
+
+        setIsSubmitting(true); // Prevent multiple submissions
+
         const customerId = selectedCustomer ? selectedCustomer.value : null;
         const customerData = {
-            product_id: productId, // Include product ID
-            quantity: quantity,    // Include quantity
-            rate: rate,    // Include rate
+            product_id: productId,
+            quantity,
+            rate,
             id: customerId,
             name: customerName,
             contact: customerContact,
             address: customerAddress
         };
 
-        // API call to add customer and link with product
-        axios.post('http://localhost/stc/stc_gld/vanaheim/index.php', customerData)
+        axios.post('http://localhost/stc/stc_gld/vanaheim/index.php?action=addCustomer', customerData)
             .then(response => {
                 console.log('Customer and product added successfully:', response.data);
-                handleClose();  // Close the modal
+                
+                // If a new customer is added, update the select options
+                if (!customerId) {
+                    const newCustomerOption = {
+                        value: response.data.newCustomerId, 
+                        label: customerName
+                    };
+                    setCustomerOptions([...customerOptions, newCustomerOption]);
+                    setSelectedCustomer(newCustomerOption); // Set newly added customer
+                }
+
+                // Reset fields after successful submission
+                resetForm();
+                handleClose();
             })
-            .catch(error => console.error('Error adding customer and product:', error));
+            .catch(error => console.error('Error adding customer and product:', error))
+            .finally(() => setIsSubmitting(false));
     };
+
+    // Reset form fields
+    const resetForm = () => {
+        setSelectedCustomer(null);
+        setCustomerName('');
+        setCustomerContact('');
+        setCustomerAddress('');
+        setQuantity(1);
+        setRate(1);
+        setIsSubmitting(false); // Reset the submission state
+    };
+
+    useEffect(() => {
+        // Reset form fields when modal is closed
+        if (!show) resetForm();
+    }, [show]);
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -64,11 +99,7 @@ const CustomerModal = ({ show, handleClose, productId }) => {
                 <Form>
                     <Form.Group controlId="formProductId">
                         <Form.Label>Product ID</Form.Label>
-                        <Form.Control
-                            type="text"
-                            value={productId}
-                            readOnly
-                        />
+                        <Form.Control type="text" value={productId} readOnly />
                     </Form.Group>
 
                     <Form.Group controlId="formQuantity">
@@ -76,9 +107,9 @@ const CustomerModal = ({ show, handleClose, productId }) => {
                         <Form.Control
                             type="number"
                             value={quantity}
-                            placeholder="Enter Quantity"
                             onChange={e => setQuantity(e.target.value)}
                             min="1"
+                            placeholder="Enter Quantity"
                         />
                     </Form.Group>
 
@@ -87,9 +118,9 @@ const CustomerModal = ({ show, handleClose, productId }) => {
                         <Form.Control
                             type="number"
                             value={rate}
-                            placeholder="Enter Rate"
                             onChange={e => setRate(e.target.value)}
                             min="1"
+                            placeholder="Enter Rate"
                         />
                     </Form.Group>
 
@@ -97,8 +128,8 @@ const CustomerModal = ({ show, handleClose, productId }) => {
                         <Form.Label>Customer</Form.Label>
                         <Select
                             options={customerOptions}
-                            onChange={setSelectedCustomer}
                             value={selectedCustomer}
+                            onChange={setSelectedCustomer}
                             placeholder="Select or add new customer"
                         />
                         <Form.Text className="text-muted">
@@ -146,8 +177,8 @@ const CustomerModal = ({ show, handleClose, productId }) => {
                 <Button variant="secondary" onClick={handleClose}>
                     Close
                 </Button>
-                <Button variant="primary" onClick={handleAddCustomer}>
-                    Add Customer and Product
+                <Button variant="primary" onClick={handleAddCustomer} disabled={isSubmitting}>
+                    {isSubmitting ? 'Saving...' : 'Add Customer and Product'}
                 </Button>
             </Modal.Footer>
         </Modal>

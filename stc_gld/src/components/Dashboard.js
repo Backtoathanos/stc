@@ -91,7 +91,7 @@ export default function Dashboard() {
                                 </div>
                             </div>
                         </div>
-                        <div className="row">
+                        {/* <div className="row">
                             <div className="col-md-12 col-sm-12">
                                 <div className="card card-chart">
                                     <div className="card-header">
@@ -114,7 +114,7 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
                 <Footer />

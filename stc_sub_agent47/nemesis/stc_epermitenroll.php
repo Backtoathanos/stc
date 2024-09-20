@@ -30,17 +30,18 @@ class transformers extends tesseract{
 		return $optimusprime;
 	}
 	// call sitename
-	public function stc_call_epermitenroll($begdate, $enddate){
-        $filter='WHERE DATE(`created_date`)="'.$enddate.'" AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department`  ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='.$_SESSION['stc_agent_sub_id'].')'; 
+	public function stc_call_epermitenroll($begdate, $enddate, $shift){
+        $shift=$shift!="NA"? '`shift`="'.$shift.'" AND ':'';
+        $filter='WHERE '.$shift.'DATE(`created_date`)="'.$enddate.'" AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department`  ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='.$_SESSION['stc_agent_sub_id'].')'; 
         $countPEntry = 0;
         if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
             if($enddate==''){
                 $enddate=DATE('Y-m-d');
-                $filter='WHERE DATE(`created_date`)="'.$enddate.'" AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department`  ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='.$_SESSION['stc_agent_sub_id'].')'; 
+                $filter='WHERE '.$shift.'DATE(`created_date`)="'.$enddate.'" AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department`  ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='.$_SESSION['stc_agent_sub_id'].')'; 
             }
         }else{
             if($enddate==''){
-                $filter='WHERE DATE(`created_date`)="'.$enddate.'" AND `created_by`="'.$_SESSION['stc_agent_sub_id'].'"';
+                $filter='WHERE '.$shift.'DATE(`created_date`)="'.$enddate.'" AND `created_by`="'.$_SESSION['stc_agent_sub_id'].'"';
             }else{
                 $filter.=' AND `created_by`="'.$_SESSION['stc_agent_sub_id'].'"';
             }
@@ -291,8 +292,9 @@ if(isset($_POST['call_department'])){
 if(isset($_POST['show_epermitenroll'])){
     $begdate=date('Y-m-d', strtotime($_POST['begdate']));
     $enddate=date('Y-m-d', strtotime($_POST['enddate']));
+    $shift=$_POST['shift'];
 	$metabots=new transformers();
-	$opmetabots=$metabots->stc_call_epermitenroll($begdate, $enddate);
+	$opmetabots=$metabots->stc_call_epermitenroll($begdate, $enddate, $shift);
 	echo json_encode($opmetabots);
 }
 

@@ -5,6 +5,7 @@ import Protected from './Protected';
 import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import Inventory from './components/Inventory';
+import Challan from './components/Challan';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
         <Route index element={<Login />}/>
         <Route path="/dashboard" element={<Protected Component={Dashboard} />}/>
         <Route path="/inventory" element={<Protected Component={Inventory} />}/>
+        <Route path="/challan" element={<Protected Component={Challan} />}/>
       </Routes>
     </BrowserRouter>
   );

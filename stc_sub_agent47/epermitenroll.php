@@ -115,6 +115,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                                 </div>
                                                             </div>
                                                             <div class="col-md-4 mb-3">
+                                                                <label for="validationCustom01">Shift</label>
+                                                                <select class="btn btn-success form-control stc-sup-req-shift text-left "><option value="NA">Please select Shift.</option><option>A</option><option>B</option><option>C</option><option selected="">E (General)</option></select>
+                                                            </div>
+                                                            <div class="col-md-4 mb-3">
                                                                 <label for="validationCustomUsername">Search</label>
                                                                 <div class="input-group">
                                                                     <a class="btn btn-primary stc-sup-req-search"><i class="fa fa-search"></i> Search</a>
@@ -231,18 +235,19 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.stc-sup-req-search', 'click', function(e){
                 var begdate=$('#stc-sup-req-beg-date').val();
                 var enddate=$('#stc-sup-req-end-date').val();
-                show_epermitenroll(begdate, enddate);
+                var shift=$('.stc-sup-req-shift').val();
+                show_epermitenroll(begdate, enddate, shift);
             });
 
             var totalpentry=0;
             var totalnonenrollment=0;
             // show requistion cart items
-            show_epermitenroll('', '');
-            function show_epermitenroll(begdate, enddate){
+            show_epermitenroll('', '', '');
+            function show_epermitenroll(begdate, enddate, shift){
                 $.ajax({
                     url     : "nemesis/stc_epermitenroll.php",
                     method  : "POST",
-                    data    : {show_epermitenroll:1, begdate:begdate, enddate:enddate},
+                    data    : {show_epermitenroll:1, begdate:begdate, enddate:enddate, shift:shift},
                     dataType : "JSON",
                     success : function(response){
                         // console.log(response);
