@@ -2193,7 +2193,6 @@ class pirates_supervisor extends tesseract{
 			$slno=0;
 			foreach($optimusprime_query as $row){
 				$attendance = '';
-				$slno++;
 				$totalp=0;
 				$totala=0;
 			
@@ -2256,9 +2255,9 @@ class pirates_supervisor extends tesseract{
 						$totala++;
 					}
 				}
-			
-				$optimusprime .= '<tr><td>' . $slno . '</td><td>' . $row['stc_status_down_list_department_location'] . '</td><td>' . $row['stc_status_down_list_department_dept'] . '</td><td>' . $row['emp_name'] . '</td>' . $attendance . '<td class="text-right"><span style="color:green">' . $totalp . '</span></td><td class="text-right"><span style="color:red">' . $totala . '</span></td></tr>';
 				$slno++;
+				$optimusprime .= '<tr><td>' . $slno . '</td><td>' . $row['stc_status_down_list_department_location'] . '</td><td>' . $row['stc_status_down_list_department_dept'] . '</td><td>' . $row['emp_name'] . '</td>' . $attendance . '<td class="text-right"><span style="color:green">' . $totalp . '</span></td><td class="text-right"><span style="color:red">' . $totala . '</span></td></tr>';
+				
 			}
 			
 		}else{
