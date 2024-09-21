@@ -65,6 +65,7 @@ export default function ChallanDashboard() {
             cell: row => (
                 <input
                     type="checkbox"
+                    className="form-control"
                     checked={selectedRows.includes(row.id)}
                     onChange={() => handleRowSelect(row)}
                 />
@@ -145,95 +146,83 @@ export default function ChallanDashboard() {
             center: true
         }
     ];
-
-    const handleModalSubmit = () => {
-        // Perform update query logic here
-        // After successful update, close the modal and reset state if necessary
-        setIsModalOpen(false);
-        setChallanNumber(''); // Reset challan number
+    const handleChallanUpdate = () => {
+        if (selectedRows.length > 0) {
+            const selectedIds = selectedRows.map(row => row.id);  // Get selected row IDs
+        
+            axios.post('http://localhost/stc/stc_gld/vanaheim/index.php?action=updateChallan', {
+                ids: selectedIds
+            })
+            .then(response => {
+                console.log('Update success:', response.data);
+            })
+            .catch(error => {
+                console.error('Error updating challan:', error);
+            });
+            
+        }
     };
-
     return (
-        <>
-            <div className="wrapper">
-                <Sidebar activeRoute={currentRoute} />
-                <div className="main-panel">
-                    <Navbar />
-                    <div className="content">
-                        <div className="container-fluid">
-                            <div className="row">
-                                <div className="col-md-12 col-sm-12">
-                                    <div className="card card-chart">
-                                        <div className="card-header">
-                                            <h2 className="text-center">Challan</h2>
+        <div className="wrapper">
+            <Sidebar activeRoute={currentRoute} />
+            <div className="main-panel">
+                <Navbar />
+                <div className="content">
+                    <div className="container-fluid">
+                        <div className="row">
+                            <div className="col-md-12 col-sm-12">
+                                <div className="card card-chart">
+                                    <div className="card-header">
+                                        <h2 className="text-center">Challan</h2>
+                                    </div>
+                                    <div className="card-body">
+                                        <div className="form-group">
+                                            <input
+                                                type="text"
+                                                className="form-control"
+                                                placeholder="Search by Challan Number, Product ID, etc..."
+                                                value={search}
+                                                onChange={(e) => setSearch(e.target.value)}
+                                            />
                                         </div>
-                                        <div className="card-body">
-                                            <div className="form-group">
-                                                <input
-                                                    type="text"
-                                                    className="form-control"
-                                                    placeholder="Search by Challan Number, Product ID, etc..."
-                                                    value={search}
-                                                    onChange={(e) => setSearch(e.target.value)}
+                                        {loading ? (
+                                            <div className="spinner-container" style={{ textAlign: 'center' }}>
+                                                <RotatingLines
+                                                    strokeColor="blue"
+                                                    strokeWidth="5"
+                                                    animationDuration="0.75"
+                                                    width="50"
+                                                    visible={true}
                                                 />
                                             </div>
-                                            {loading ? (
-                                                <div className="spinner-container" style={{ textAlign: 'center' }}>
-                                                    <RotatingLines
-                                                        strokeColor="blue"
-                                                        strokeWidth="5"
-                                                        animationDuration="0.75"
-                                                        width="50"
-                                                        visible={true}
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <DataTable
-                                                    columns={columns}
-                                                    data={data}
-                                                    pagination
-                                                    highlightOnHover
-                                                    striped
-                                                    className="data-table"
-                                                />
-                                            )}
-                                            {selectedRows.length > 0 && (
-                                                <button onClick={() => setIsModalOpen(true)} className="btn btn-primary">
-                                                    Proceed to Challan
-                                                </button>
-                                            )}
-                                        </div>
-                                        <div className="card-footer">
-                                            <div className="stats">
-                                                <i className="material-icons">access_time</i> updated a few minutes ago
-                                            </div>
+                                        ) : (
+                                            <DataTable
+                                                columns={columns}
+                                                data={data}
+                                                pagination
+                                                highlightOnHover
+                                                striped
+                                                className="data-table"
+                                            />
+                                        )}
+                                        {selectedRows.length > 0 && (
+                                            <button onClick={handleChallanUpdate} className="btn btn-primary">
+                                                Proceed to Challan
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="card-footer">
+                                        <div className="stats">
+                                            <i className="material-icons">access_time</i> updated a few minutes ago
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <Footer />
                 </div>
+                <Footer />
             </div>
-            {isModalOpen && (
-                <div className="modal" style={{ display: 'block' }}>
-                    <div className="modal-content modal-xm">
-                        <label>Previous Challan Number</label>
-                        {/* Replace this with the actual previous challan number if available */}
-                        <p>{selectedRows.length > 0 ? "Previous Challan: XYZ123" : ""}</p>
-                        <h4>Add Challan Number</h4>
-                        <input
-                            type="text"
-                            value={challanNumber}
-                            onChange={(e) => setChallanNumber(e.target.value)}
-                            placeholder="Enter Challan Number"
-                        />
-                        <button onClick={handleModalSubmit}>Submit</button>
-                        <button className="btn btn-danger" onClick={() => setIsModalOpen(false)}>Cancel</button>
-                    </div>
-                </div>
-            )}
-        </>
+        </div>
     );
 }
