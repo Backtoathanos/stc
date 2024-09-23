@@ -1,0 +1,86 @@
+.print-preview-container {
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.print-header, .print-footer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    text-align: center;
+    background: white; /* Ensure background is white for printing */
+}
+.print-header p{
+    text-align: left;
+    margin-bottom: 0px;
+}
+
+.print-header {
+    top: 0;
+    padding: 10px 0;
+    border-bottom: 1px solid #000;
+}
+
+.print-footer {
+    bottom: 0;
+    padding: 10px 0;
+    border-top: 1px solid #000;
+}
+
+.print-content {
+    margin-top: 200px; /* Space for fixed header */
+    margin-bottom: 50px; /* Space for fixed footer */
+}
+
+.challan-table {
+    width: 100%;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+.challan-table th, .challan-table td {
+    border: 1px solid #000;
+    padding: 8px;
+    text-align: left;
+}
+
+.print-button {
+    margin-top: 20px;
+}
+
+@media print {
+    @page {
+        size: A4 landscape; /* Landscape orientation */
+        margin: 10mm;
+    }
+
+    .print-button {
+        display: none; /* Hide the print button in print mode */
+    }
+
+    .print-header, .print-footer {
+        position: fixed; /* Keep them fixed on every printed page */
+        left: 0;
+        right: 0;
+        text-align: center;
+        background: white;
+    }
+
+    .print-header {
+        top: -2px;
+    }
+
+    .print-footer {
+        bottom: 0;
+    }
+
+    .print-content {
+        margin-top: 140px; /* Space for header */
+        margin-bottom: 50px; /* Space for footer */
+    }
+
+    .challan-table {
+        page-break-inside: avoid; /* Prevent table from breaking inside pages */
+    }
+}

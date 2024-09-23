@@ -8,6 +8,9 @@ import { RotatingLines } from 'react-loader-spinner';
 import './Datatable.css';
 import axios from 'axios';
 import { debounce } from 'lodash';
+import Swal from 'sweetalert2';
+import { Modal, Button } from 'react-bootstrap';
+import Select from 'react-select';
 
 export default function ChallanDashboard() {
     const location = useLocation();
@@ -15,14 +18,16 @@ export default function ChallanDashboard() {
         document.title = "STC GLD || Challan";
     }, []);
 
+    const [showModal, setShowModal] = useState(false);
     const [data, setData] = useState([]);
     const [search, setSearch] = useState(''); // State for search filter
     const [loading, setLoading] = useState(true); // Loading state
     const currentRoute = location.pathname === "/challan" ? "challan" : "dashboard";
 
     const [selectedRows, setSelectedRows] = useState([]);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [challanNumber, setChallanNumber] = useState('');
+
+    const [challanOptions, setChallanOptions] = useState([]);
+    const [selectedChallan, setSelectedChallan] = useState(null);
 
     const fetchData = debounce((query = '') => {
         if (query.length > 3 || query === '') {
@@ -76,12 +81,6 @@ export default function ChallanDashboard() {
             width: '50px'
         },
         {
-            name: 'Slno',
-            selector: (row, index) => index + 1,  // auto-generate serial number
-            sortable: false,
-            center: true
-        },
-        {
             name: 'Challan Number',
             selector: row => row.challan_number,
             sortable: true,
@@ -109,6 +108,15 @@ export default function ChallanDashboard() {
             name: 'Rate',
             selector: row => row.rate,
             sortable: true,
+            right: true
+        },
+        {
+            name: 'Total',
+            selector: row => {
+                const total = row.rate * row.qty;
+                return total ? total.toFixed(2) : '0.00';  // Round to 2 decimal places
+            },
+            sortable: false,
             right: true
         },
         {
@@ -146,22 +154,90 @@ export default function ChallanDashboard() {
             center: true
         }
     ];
+
+    const handlePrintChallan = () => {
+        setShowModal(true);  // Show modal when "Print Challan" button is clicked
+    };
+
+    const handleCloseModal = () => {
+        setShowModal(false); // Close modal when the close button is clicked
+    };
+
     const handleChallanUpdate = () => {
         if (selectedRows.length > 0) {
-            const selectedIds = selectedRows.map(row => row.id);  // Get selected row IDs
-        
-            axios.post('http://localhost/stc/stc_gld/vanaheim/index.php?action=updateChallan', {
-                ids: selectedIds
-            })
-            .then(response => {
-                console.log('Update success:', response.data);
-            })
-            .catch(error => {
-                console.error('Error updating challan:', error);
+            // Show confirmation dialog before proceeding
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'Do you want to proceed with updating the selected challans?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, proceed',
+                cancelButtonText: 'No, cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // If confirmed, proceed with the update
+                    setLoading(true);  // Show loading spinner
+                    const selectedIds = selectedRows.map(row => row);  // Ensure the correct field is mapped for the IDs
+
+                    axios.post('http://localhost/stc/stc_gld/vanaheim/index.php?action=updateChallanStatus', {
+                        ids: selectedIds
+                    })
+                        .then(response => {
+                            console.log('Update success:', response.data);
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success',
+                                text: response.data.message
+                            }).then(() => {
+                                // Reload data after success
+                                fetchData();  // Fetch updated challan data
+                                getChallan();
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error updating challan:', error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to update challan. Please try again.'
+                            });
+                        })
+                        .finally(() => {
+                            setLoading(false);  // Hide loading spinner
+                        });
+                } else {
+                    // If cancelled, do nothing
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'Cancelled',
+                        text: 'Challan update was cancelled'
+                    });
+                }
             });
-            
         }
     };
+
+    const getChallan = () => {
+        axios.get('http://localhost/stc/stc_gld/vanaheim/index.php?action=getDistinctChallanNos')
+            .then(response => {
+                const data = response.data;
+                // Map the data to the format required by react-select
+                const options = data.map(item => ({
+                    value: item.challan_no,
+                    label: item.challan_no
+                }));
+                setChallanOptions(options);
+            })
+            .catch(error => {
+                console.error('Error fetching challan numbers:', error);
+            });
+    };
+
+    // Call the getChallan function inside useEffect
+    useEffect(() => {
+        getChallan();
+    }, []);
+
     return (
         <div className="wrapper">
             <Sidebar activeRoute={currentRoute} />
@@ -177,6 +253,7 @@ export default function ChallanDashboard() {
                                     </div>
                                     <div className="card-body">
                                         <div className="form-group">
+                                            <button className="print-challan" onClick={handlePrintChallan}>Print Challan</button>
                                             <input
                                                 type="text"
                                                 className="form-control"
@@ -210,11 +287,39 @@ export default function ChallanDashboard() {
                                                 Proceed to Challan
                                             </button>
                                         )}
-                                    </div>
-                                    <div className="card-footer">
-                                        <div className="stats">
-                                            <i className="material-icons">access_time</i> updated a few minutes ago
-                                        </div>
+                                        {/* Modal */}
+                                        <Modal show={showModal} onHide={handleCloseModal}>
+                                            <Modal.Header>
+                                                <Modal.Title>Print Challan</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                <Select
+                                                    value={selectedChallan}
+                                                    onChange={setSelectedChallan}
+                                                    options={challanOptions}
+                                                    placeholder="Select Challan Number"
+                                                    isSearchable={true}
+                                                    className="form-control"
+                                                />
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={handleCloseModal}>
+                                                    Close
+                                                </Button>
+                                                <Button variant="primary" onClick={() => {
+                                                    // Redirect to the print-preview page with the selected challan number
+                                                    if (selectedChallan) {
+                                                        window.location.href = `/print-preview?challan_no=${selectedChallan.value}`;
+                                                    } else {
+                                                        alert("Please select a challan number");
+                                                    }
+                                                }}>
+                                                    Print
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+
+
                                     </div>
                                 </div>
                             </div>
