@@ -514,6 +514,28 @@ include("kattegat/role_check.php");
               }
             });  
           });  
+          
+          $('body').delegate('.img-inputbtn', 'click', function(e){
+            var adhoc_id=$(this).attr('id');
+            var img_id=$(this).parent().find('.img-idinput').val();
+            $.ajax({
+              url     : "kattegat/ragnar_purchase.php",
+              method  : "POST",
+              data    : {
+                stc_po_adhoc_imgupdate:1,
+                adhoc_id:adhoc_id,
+                img_id:img_id
+              },
+              success : function(response_items){
+                var response=response_items.trim();
+                if(response=="success"){
+                  alert("Item Name Updated Successfully.");
+                }else{
+                  alert("Something went wrong please check and try again.");
+                }
+              }
+            });  
+          });  
         });
     </script>
 </body>

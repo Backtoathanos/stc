@@ -2215,7 +2215,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 			$status=array(1 => 'Stock', 2 => 'Dispatched');
 			foreach($odinqry as $odinrow){
 				$slno++;
-				$productog="";
+				$productog='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				$delivered=0;
 				$sql_qry=mysqli_query($this->stc_dbs, "
 					SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
@@ -2228,6 +2228,16 @@ class ragnarPurchaseAdhoc extends tesseract{
 					}
 				}
 				$stock=$odinrow['stc_purchase_product_adhoc_qty'] - $delivered;;
+				$sql_qry=mysqli_query($this->stc_dbs, "
+					SELECT `stc_product_image` FROM `stc_product` WHERE `stc_product_id`='".$odinrow['stc_purchase_product_adhoc_productid']."'
+				");
+				$pro_image='';
+				if(mysqli_num_rows($sql_qry)>0){
+					foreach($sql_qry as $sql_row){
+						$pro_image=$sql_row['stc_product_image'];
+						$productog="<img src='../stc_symbiote/stc_product_image/".$pro_image."' style='height:80px;'>";
+					}
+				}
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
@@ -2333,6 +2343,19 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$odin='';
 		$checkqry=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+		");
+		if($checkqry){
+			$odin='success';
+		}else{
+			$odin='failed';
+		}
+		return $odin;
+	}
+
+	public function stc_poadhoc_imgupdate($adhoc_id, $img_id){
+		$odin='';
+		$checkqry=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_productid`='".mysqli_real_escape_string($this->stc_dbs, $img_id)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
 		");
 		if($checkqry){
 			$odin='success';
@@ -3126,6 +3149,15 @@ if(isset($_POST['stc_po_adhoc_update'])){
 	$adhoc_name=$_POST['adhoc_name'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
 	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name);
+	echo $outbjornestocking;
+}
+
+// update image id
+if(isset($_POST['stc_po_adhoc_imgupdate'])){
+	$adhoc_id=$_POST['adhoc_id'];
+	$img_id=$_POST['img_id'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_imgupdate($adhoc_id, $img_id);
 	echo $outbjornestocking;
 }
 ?>
