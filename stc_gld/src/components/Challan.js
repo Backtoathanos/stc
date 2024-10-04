@@ -19,6 +19,8 @@ export default function ChallanDashboard() {
     }, []);
 
     const [showModal, setShowModal] = useState(false);
+    const [showModal1, setShowModal1] = useState(false);
+
     const [data, setData] = useState([]);
     const [search, setSearch] = useState(''); // State for search filter
     const [loading, setLoading] = useState(true); // Loading state
@@ -28,6 +30,10 @@ export default function ChallanDashboard() {
 
     const [challanOptions, setChallanOptions] = useState([]);
     const [selectedChallan, setSelectedChallan] = useState(null);
+
+    const [selectedChallanForPayment, setSelectedChallanForPayment] = useState(null); // Selected row for payment
+    const [paymentAmount, setPaymentAmount] = useState(''); // Payment input
+
 
     const fetchData = debounce((query = '') => {
         if (query.length > 3 || query === '') {
@@ -63,6 +69,13 @@ export default function ChallanDashboard() {
 
         setSelectedRows(newSelectedRows);
     };
+    const handleAddPayment = (row) => {
+        const dues = (row.rate * row.qty) - row.paid_amount; // Calculate dues
+        setPaymentAmount(dues.toFixed(2)); // Set dues in paymentAmount with 2 decimal places
+        setSelectedChallanForPayment(row); // Set the selected challan
+        setShowModal(true); // Show the modal
+    };    
+
     // Define columns for DataTable
     const columns = [
         {
@@ -126,6 +139,12 @@ export default function ChallanDashboard() {
             right: true
         },
         {
+            name: 'Dues',
+            selector: row => ((row.rate * row.qty) - row.paid_amount).toFixed(2),
+            sortable: false,
+            right: true
+        },
+        {
             name: 'Payment Status',
             selector: row => parseInt(row.payment_status) === 0 ? 'Credit' : parseInt(row.payment_status) === 1 ? 'Cash' : 'A/C',
             sortable: true,
@@ -152,15 +171,26 @@ export default function ChallanDashboard() {
             selector: row => row.created_by,
             sortable: true,
             center: true
+        },
+        {
+            name: 'Action',
+            selector: row => row.created_by,
+            cell: row => (
+                <button onClick={() => handleAddPayment(row)}>Add Payment</button>
+            ),
+            button: true,
+            sortable: true,
+            center: true
         }
     ];
 
     const handlePrintChallan = () => {
-        setShowModal(true);  // Show modal when "Print Challan" button is clicked
+        setShowModal1(true);  // Show modal when "Print Challan" button is clicked
     };
 
     const handleCloseModal = () => {
         setShowModal(false); // Close modal when the close button is clicked
+        setShowModal1(false);
     };
 
     const handleChallanUpdate = () => {
@@ -223,8 +253,8 @@ export default function ChallanDashboard() {
                 const data = response.data;
                 // Map the data to the format required by react-select
                 const options = data.map(item => ({
-                    value: item.challan_no,
-                    label: item.challan_no
+                    value: item.challan_number,
+                    label: item.challan_number
                 }));
                 setChallanOptions(options);
             })
@@ -237,6 +267,44 @@ export default function ChallanDashboard() {
     useEffect(() => {
         getChallan();
     }, []);
+
+    const handleSavePayment = () => {
+        if (paymentAmount && selectedChallanForPayment) {
+            setLoading(true);
+            axios.post('http://localhost/stc/stc_gld/vanaheim/index.php?action=addPayment', {
+                challan_id: selectedChallanForPayment.id,
+                payment_amount: paymentAmount
+            })
+                .then(response => {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Payment added successfully!'
+                    }).then(() => {
+                        // Fetch updated data after payment is added
+                        fetchData();
+                        handleCloseModal();
+                    });
+                })
+                .catch(error => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to add payment. Please try again.'
+                    });
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: 'Please enter a valid payment amount.'
+            });
+        }
+    };
+
 
     return (
         <div className="wrapper">
@@ -288,7 +356,7 @@ export default function ChallanDashboard() {
                                             </button>
                                         )}
                                         {/* Modal */}
-                                        <Modal show={showModal} onHide={handleCloseModal}>
+                                        <Modal show={showModal1} onHide={handleCloseModal}>
                                             <Modal.Header>
                                                 <Modal.Title>Print Challan</Modal.Title>
                                             </Modal.Header>
@@ -307,9 +375,9 @@ export default function ChallanDashboard() {
                                                     Close
                                                 </Button>
                                                 <Button variant="primary" onClick={() => {
-                                                    // Redirect to the print-preview page with the selected challan number
+                                                    // Redirect to the print-preview page with the selected challan number in a new tab
                                                     if (selectedChallan) {
-                                                        window.location.href = `/print-preview?challan_no=${selectedChallan.value}`;
+                                                        window.open(`/stc_gld/print-preview?challan_no=${selectedChallan.value}`, '_blank');
                                                     } else {
                                                         alert("Please select a challan number");
                                                     }
@@ -318,7 +386,34 @@ export default function ChallanDashboard() {
                                                 </Button>
                                             </Modal.Footer>
                                         </Modal>
-
+                                        <Modal show={showModal} onHide={handleCloseModal}>
+                                            <Modal.Header>
+                                                <Modal.Title>Add Payment</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                {selectedChallanForPayment && (
+                                                    <>
+                                                        <p>Challan Number: {selectedChallanForPayment.challan_number}</p>
+                                                        <input
+                                                            type="number"
+                                                            className="form-control"
+                                                            placeholder="Enter payment amount"
+                                                            value={paymentAmount}
+                                                            onChange={(e) => setPaymentAmount(e.target.value)}
+                                                        />
+                                                        <p>Total Dues: {paymentAmount}</p>
+                                                    </>
+                                                )}
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={handleCloseModal}>
+                                                    Close
+                                                </Button>
+                                                <Button variant="primary" onClick={handleSavePayment}>
+                                                    Save Payment
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
 
                                     </div>
                                 </div>
@@ -328,6 +423,6 @@ export default function ChallanDashboard() {
                 </div>
                 <Footer />
             </div>
-        </div>
+        </div >
     );
 }

@@ -37,6 +37,10 @@ switch ($action) {
         getChallanDetails($conn);
         break;
 
+    case 'addPayment':
+        addPayment($conn);
+        break;
+
     default:
         echo json_encode(['error' => 'Invalid API action', 'fault' => $_GET['action']]);
         break;
@@ -110,6 +114,7 @@ function getChallan($conn) {
     echo json_encode($challanData);
 }
 
+// update challan status to print preview
 function updateChallanStatus($conn) {
     // Decode the JSON data from the request body
     $data = json_decode(file_get_contents('php://input'), true);
@@ -139,7 +144,7 @@ function updateChallanStatus($conn) {
 
 // function to get distinct challans
 function getDistinctChallanNos($conn) {
-    $query = "SELECT DISTINCT challan_number FROM gld_challan WHERE status='1'";
+    $query = "SELECT DISTINCT challan_number FROM gld_challan WHERE status='1' ORDER BY TIMESTAMP(created_date) DESC";
     $result = $conn->query($query);
 
     $challanNos = [];
@@ -151,6 +156,7 @@ function getDistinctChallanNos($conn) {
     echo json_encode($challanNos);
 }
 
+// get challan details for row
 function getChallanDetails($conn) {
     $challan_number = $_GET['challan_no'];
     $query = "SELECT gld_challan.challan_number, gld_customer.gld_customer_title AS customer_name, gld_customer.gld_customer_cont_no AS customer_phone, stc_product.stc_product_name AS product_name, stc_product.stc_product_rack_id AS Rackid, gld_challan.qty, gld_challan.rate, gld_challan.payment_status, gld_customer.gld_customer_address, gld_challan.created_date  
@@ -178,5 +184,25 @@ function getChallanDetails($conn) {
         echo json_encode($challanDetails);
     } else {
         echo json_encode(['error' => 'No details found for the selected challan.']);
+    }
+}
+
+// update challan add payment
+function addPayment($conn) {
+    // Decode the JSON data from the request body
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    // Get the array of IDs from the request
+    $challan_id = $data['challan_id'];
+    $payment_amount = $data['payment_amount'];
+    
+    // update the SQL query
+    $query = "UPDATE `gld_challan` SET `paid_amount` = '".$payment_amount."'  WHERE `id` =$challan_id";
+    
+    // Execute the query
+    if ($conn->query($query)) {
+        echo json_encode(['success' => true, 'message' => 'Challan status updated successfully.']);
+    } else {
+        echo json_encode(['error' => 'Failed to update challan status.']);
     }
 }

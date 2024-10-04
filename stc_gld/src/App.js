@@ -10,7 +10,7 @@ import PrintPreview from './components/PrintPreview';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/stc_gld">
       <Routes>
         <Route index element={<Login />}/>
         <Route path="/dashboard" element={<Protected Component={Dashboard} />}/>
