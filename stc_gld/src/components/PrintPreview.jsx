@@ -19,7 +19,7 @@ const PrintPreview = () => {
 
         if (challanNo) {
             // Fetch details of the selected challan
-            axios.get(`http://localhost/stc/stc_gld/vanaheim/index.php?action=getChallanDetails&challan_no=${challanNo}`)
+            axios.get(`https://stcassociate.com/stc_gld/vanaheim/index.php?action=getChallanDetails&challan_no=${challanNo}`)
                 .then(response => {
                     setChallanDetails(response.data);
                 })

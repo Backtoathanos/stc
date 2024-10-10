@@ -52,7 +52,7 @@ export default function Login(){
         e.preventDefault(); // Prevent page refresh
 
         if (user !== "" && password !== "") {
-            var url="http://localhost/stc/stc_gld/vanaheim/useroath.php";
+            var url="https://stcassociate.com/stc_gld/vanaheim/useroath.php";
             var headers = {
                 "Accept" : "application/json",
                 "Content-type" : "application/json"

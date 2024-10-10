@@ -39,7 +39,7 @@ export default function ChallanDashboard() {
         if (query.length > 3 || query === '') {
             setLoading(true);
             // Send the search query as a parameter to the API
-            axios.get(`http://localhost/stc/stc_gld/vanaheim/index.php?action=getChallan&search=${query}`)
+            axios.get(`https://stcassociate.com/stc_gld/vanaheim/index.php?action=getChallan&search=${query}`)
                 .then(response => {
                     const resultData = response.data;
                     if (Array.isArray(resultData)) {
@@ -209,7 +209,7 @@ export default function ChallanDashboard() {
                     setLoading(true);  // Show loading spinner
                     const selectedIds = selectedRows.map(row => row);  // Ensure the correct field is mapped for the IDs
 
-                    axios.post('http://localhost/stc/stc_gld/vanaheim/index.php?action=updateChallanStatus', {
+                    axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=updateChallanStatus', {
                         ids: selectedIds
                     })
                         .then(response => {
@@ -248,7 +248,7 @@ export default function ChallanDashboard() {
     };
 
     const getChallan = () => {
-        axios.get('http://localhost/stc/stc_gld/vanaheim/index.php?action=getDistinctChallanNos')
+        axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php?action=getDistinctChallanNos')
             .then(response => {
                 const data = response.data;
                 // Map the data to the format required by react-select
@@ -271,7 +271,7 @@ export default function ChallanDashboard() {
     const handleSavePayment = () => {
         if (paymentAmount && selectedChallanForPayment) {
             setLoading(true);
-            axios.post('http://localhost/stc/stc_gld/vanaheim/index.php?action=addPayment', {
+            axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=addPayment', {
                 challan_id: selectedChallanForPayment.id,
                 payment_amount: paymentAmount
             })

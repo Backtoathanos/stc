@@ -2215,7 +2215,6 @@ class ragnarPurchaseAdhoc extends tesseract{
 			$status=array(1 => 'Stock', 2 => 'Dispatched');
 			foreach($odinqry as $odinrow){
 				$slno++;
-				$productog='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				$delivered=0;
 				$sql_qry=mysqli_query($this->stc_dbs, "
 					SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
@@ -2231,6 +2230,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$sql_qry=mysqli_query($this->stc_dbs, "
 					SELECT `stc_product_image` FROM `stc_product` WHERE `stc_product_id`='".$odinrow['stc_purchase_product_adhoc_productid']."'
 				");
+				$productog='';
 				$pro_image='';
 				if(mysqli_num_rows($sql_qry)>0){
 					foreach($sql_qry as $sql_row){
@@ -2238,6 +2238,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 						$productog="<img src='../stc_symbiote/stc_product_image/".$pro_image."' style='height:80px;'>";
 					}
 				}
+				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
+				
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
