@@ -17,7 +17,7 @@ const CustomerModal = ({ show, handleClose, productId }) => {
     // Fetch customer options when the modal is shown
     useEffect(() => {
         if (show) {
-            axios.get('http://localhost/stc/stc_gld/vanaheim/index.php', {
+            axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php', {
                 params: { action: 'getCustomers' }
             })
             .then(response => {
@@ -52,7 +52,7 @@ const CustomerModal = ({ show, handleClose, productId }) => {
             address: customerAddress
         };
 
-        axios.post('http://localhost/stc/stc_gld/vanaheim/index.php?action=addCustomer', customerData)
+        axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=addCustomer', customerData)
             .then(response => {
                 console.log('Customer and product added successfully:', response.data);
                 
