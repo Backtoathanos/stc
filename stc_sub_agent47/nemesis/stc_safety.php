@@ -85,10 +85,14 @@ class witcher_supervisor extends tesseract{
 				INSERT INTO `stc_safetytbm`(
 					`stc_safetytbm_date`, 
 					`stc_safetytbm_std_id`, 
+					`stc_safetytbm_entry_name`,
+					`stc_safetytbm_designation`,
 					`stc_safetytbm_created_by`
 				) VALUES (
 					'".$date."',
 					'".$sdlno."',
+					'".$_SESSION['stc_agent_sub_name']."',
+					'".$_SESSION['stc_agent_sub_category']."',
 					'".$_SESSION['stc_agent_sub_id']."'
 				)
 			");
@@ -184,8 +188,6 @@ class witcher_supervisor extends tesseract{
 			    `stc_safetytbm_ptfour` 			= '".mysqli_real_escape_string($this->stc_dbs, $stc_pointfour)."',
 			    `stc_safetytbm_ptfive` 			= '".mysqli_real_escape_string($this->stc_dbs, $stc_pointfive)."',
 			    `stc_safetytbm_ptsix` 			= '".mysqli_real_escape_string($this->stc_dbs, $stc_pointsix)."',
-			    `stc_safetytbm_entry_name` 		= '".mysqli_real_escape_string($this->stc_dbs, $stc_entryname)."',
-			    `stc_safetytbm_designation` 	= '".mysqli_real_escape_string($this->stc_dbs, $stc_desgination)."',
 			    `stc_safetytbm_gatepass_no` 	= '".mysqli_real_escape_string($this->stc_dbs, $stc_gatepass)."',
 			    `stc_safetytbm_std_id` 			= '".mysqli_real_escape_string($this->stc_dbs, $sdlno)."',
 			    `stc_safetytbm_remarks` 		= '".mysqli_real_escape_string($this->stc_dbs, $stc_suggesionsio)."'
