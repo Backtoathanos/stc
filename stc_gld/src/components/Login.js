@@ -47,43 +47,54 @@ export default function Login(){
             default:
         }
     }
-
+    const setCookie = (name, value, days) => {
+        const expires = new Date(Date.now() + days * 864e5).toUTCString();
+        document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; Secure; SameSite=Strict`;
+    };
+    
+    const deleteCookie = (name) => {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    };
+        
     const handleSubmit = (e) => {
         e.preventDefault(); // Prevent page refresh
-
+    
         if (user !== "" && password !== "") {
-            var url="https://stcassociate.com/stc_gld/vanaheim/useroath.php";
+            var url = "https://stcassociate.com/stc_gld/vanaheim/useroath.php";
             var headers = {
-                "Accept" : "application/json",
-                "Content-type" : "application/json"
+                "Accept": "application/json",
+                "Content-Type": "application/json"
             };
             var Data = {
-                user:user,
-                password:password,
-                check_login:1
-            }
+                user: user,
+                password: password,
+                check_login: 1
+            };
             fetch(url, {
-                method : "POST",
-                header :headers,
-                body : JSON.stringify(Data)
-            }).then((response) => response.json()).
-            then((response) => {
-                if(response[0].result === "success"){
-                    setMsg("successfully login!!! Redirecting.");
-                    setTimeout(function(){
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(Data)
+            }).then((response) => response.json())
+            .then((response) => {
+                if (response[0].result === "success") {
+                    const userId = response[0].user_id; // Get the user ID from response
+                    setMsg("Successfully logged in!!! Redirecting.");
+                    setCookie("user_id", userId, 7); // Set cookie with correct name
+                    setTimeout(function () {
                         localStorage.setItem("login", true);
                         navigate("/dashboard");
-                    }, 3000);
-                }else{
+                    }, 2000);
+                } else {
                     setError(response[0].result);
                 }
             }).catch((err) => {
                 setError(err);
-            })
+            });
         } else {
             setError("All fields are required.");
         }
-    }
+    };
+    
 
     return (
         <div className="wrapper ">

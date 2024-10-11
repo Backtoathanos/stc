@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form } from 'react-bootstrap';
 import Select from 'react-select';
 import axios from 'axios';
+import Swal from 'sweetalert2'; // Import SweetAlert2
 import './CustomerModal.css';
 
-const CustomerModal = ({ show, handleClose, productId }) => {
+const CustomerModal = ({ show, handleClose, productId, productRate }) => {
     const [customerOptions, setCustomerOptions] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [customerName, setCustomerName] = useState('');
@@ -41,20 +42,29 @@ const CustomerModal = ({ show, handleClose, productId }) => {
 
         setIsSubmitting(true); // Prevent multiple submissions
 
+        const userIdCookie = document.cookie.split('; ').find(row => row.startsWith('user_id='));
+        if (!userIdCookie) {
+            console.error('User ID cookie not found.');
+            setIsSubmitting(false);  // Reset the submit state to allow future submissions
+            return;  // Stop the function execution if no user_id cookie is found
+        }
+
+        const userId = userIdCookie.split('=')[1];
         const customerId = selectedCustomer ? selectedCustomer.value : null;
         const customerData = {
             product_id: productId,
             quantity,
-            rate,
+            rate:productRate,
             id: customerId,
             name: customerName,
             contact: customerContact,
-            address: customerAddress
+            address: customerAddress,
+            userId:userId
         };
 
         axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=addCustomer', customerData)
             .then(response => {
-                console.log('Customer and product added successfully:', response.data);
+                // console.log('Customer and product added successfully:', response.data);
                 
                 // If a new customer is added, update the select options
                 if (!customerId) {
@@ -68,7 +78,14 @@ const CustomerModal = ({ show, handleClose, productId }) => {
 
                 // Reset fields after successful submission
                 resetForm();
-                handleClose();
+                handleClose(); // Close the modal after showing the alert
+                // Show SweetAlert2 success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Customer and product added successfully.',
+                    confirmButtonText: 'OK'
+                })
             })
             .catch(error => console.error('Error adding customer and product:', error))
             .finally(() => setIsSubmitting(false));
@@ -117,7 +134,7 @@ const CustomerModal = ({ show, handleClose, productId }) => {
                         <Form.Label>Rate</Form.Label>
                         <Form.Control
                             type="number"
-                            value={rate}
+                            value={productRate}
                             onChange={e => setRate(e.target.value)}
                             min="1"
                             placeholder="Enter Rate"

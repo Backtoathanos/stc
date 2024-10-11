@@ -21,6 +21,7 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true); // Loading state
     const [modalShow, setModalShow] = useState(false); // State for modal visibility
     const [selectedProductId, setSelectedProductId] = useState(null);
+    const [selectedProductRate, setSelectedProductRate] = useState(null);
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
     const [filteredData, setFilteredData] = useState([]); // To handle filtered data
 
@@ -87,7 +88,22 @@ export default function Dashboard() {
             name: 'Product Description',
             selector: row => row.stc_product_name,
             sortable: true,
+            cell: (row) => (
+                <>
+                    <span>{row.stc_product_name.length > 50 
+                        ? `${row.stc_product_name.substring(0, 50)}...` 
+                        : row.stc_product_name}</span>
+                    {row.stc_product_name.length > 50 && (
+                        <button 
+                            onClick={() => alert(row.stc_product_name)} 
+                            style={{ marginLeft: '10px', background: 'none', color: 'blue', cursor: 'pointer', border: 'none' }}>
+                            View More
+                        </button>
+                    )}
+                </>
+            ),
         },
+        
         {
             name: 'Unit',
             selector: row => row.stc_product_unit,
@@ -117,6 +133,7 @@ export default function Dashboard() {
                     className="btn btn-primary"
                     onClick={() => {
                         setSelectedProductId(row.stc_product_id);
+                        setSelectedProductRate(row.rate_including_gst);
                         setModalShow(true);
                     }}
                 >
@@ -172,7 +189,7 @@ export default function Dashboard() {
                                     </div>
                                     <div className="card-footer">
                                         <div className="stats">
-                                            <i className="material-icons">access_time</i> updated a minutes ago
+                                            {/* <i className="material-icons">access_time</i> updated a minutes ago */}
                                         </div>
                                     </div>
                                 </div>
@@ -186,6 +203,7 @@ export default function Dashboard() {
                 show={modalShow}
                 handleClose={() => setModalShow(false)}
                 productId={selectedProductId}
+                productRate={selectedProductRate}
             />
         </div>
     );

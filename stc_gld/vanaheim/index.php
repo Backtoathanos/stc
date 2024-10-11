@@ -71,6 +71,7 @@ function addCustomer($conn) {
     $productId = $data['product_id'];
     $quantity = $data['quantity'];
     $rate = $data['rate'];
+    $userId=$data['userId'];
     if($productId){
 
         // Insert new customer if no existing customer is selected
@@ -79,9 +80,9 @@ function addCustomer($conn) {
             $conn->query($query);
             $customerId = $conn->insert_id;
         }
-
+        $date = date('Y-m-d H:i:s');
         // Link customer to the product and set the quantity
-        $productQuery = "INSERT INTO gld_challan (cust_id, product_id, qty, rate) VALUES ('$customerId', '$productId', '$quantity', '$rate')";
+        $productQuery = "INSERT INTO gld_challan (cust_id, product_id, qty, rate, created_date, created_by) VALUES ('$customerId', '$productId', '$quantity', '$rate', '$date', '$userId')";
         if ($conn->query($productQuery)) {
             echo json_encode(['success' => true, 'message' => 'Customer and product added successfully']);
         } else {
@@ -93,10 +94,11 @@ function addCustomer($conn) {
 // Function to fetch customers from the database
 function getChallan($conn) {
     $search = isset($_GET['search']) ? $_GET['search'] : '';
-    $query = "SELECT id, stc_product_name, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) as qty, ROUND(rate, 2) as rate, ROUND(paid_amount, 2) as paid_amount, payment_status, status, created_date, created_by 
+    $query = "SELECT id, stc_product_name, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) as qty, ROUND(rate, 2) as rate, ROUND(paid_amount, 2) as paid_amount, payment_status, status, created_date, stc_trading_user_name 
                   FROM gld_challan GC
                   LEFT JOIN stc_product ON GC.product_id=stc_product_id
                   LEFT JOIN gld_customer ON GC.cust_id=gld_customer_id
+                  LEFT JOIN stc_trading_user ON GC.created_by=stc_trading_user_id
                   WHERE (challan_number LIKE '%$search%' 
                      OR stc_product_name LIKE '%$search%' 
                      OR gld_customer_title LIKE '%$search%' 
@@ -159,7 +161,7 @@ function getDistinctChallanNos($conn) {
 // get challan details for row
 function getChallanDetails($conn) {
     $challan_number = $_GET['challan_no'];
-    $query = "SELECT gld_challan.challan_number, gld_customer.gld_customer_title AS customer_name, gld_customer.gld_customer_cont_no AS customer_phone, stc_product.stc_product_name AS product_name, stc_product.stc_product_rack_id AS Rackid, gld_challan.qty, gld_challan.rate, gld_challan.payment_status, gld_customer.gld_customer_address, gld_challan.created_date  
+    $query = "SELECT gld_challan.challan_number, gld_customer.gld_customer_title AS customer_name, gld_customer.gld_customer_cont_no AS customer_phone, stc_product.stc_product_name AS product_name, stc_product.stc_product_rack_id AS Rackid, stc_product.stc_product_unit AS unit, gld_challan.qty, gld_challan.rate, gld_challan.paid_amount, gld_challan.payment_status, gld_customer.gld_customer_address, gld_challan.created_date  
               FROM gld_challan
               JOIN gld_customer ON gld_challan.cust_id = gld_customer.gld_customer_id
               JOIN stc_product ON gld_challan.product_id = stc_product.stc_product_id
@@ -175,10 +177,13 @@ function getChallanDetails($conn) {
             $challanDetails['customer_name'] = $row['customer_name'];
             $challanDetails['customer_phone'] = $row['customer_phone'];
             $challanDetails['customer_address'] = $row['gld_customer_address'];
+            $dues=($row['qty'] * $row['rate']) - $row['paid_amount'];
             $challanDetails['products'][] = [
                 'product_name' => $row['product_name'],
                 'qty' => $row['qty'],
-                'rate' => $row['rate']
+                'rate' => $row['rate'],
+                'unit' => $row['unit'],
+                'dues' => $dues
             ];
         }
         echo json_encode($challanDetails);

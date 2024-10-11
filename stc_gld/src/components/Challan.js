@@ -94,8 +94,12 @@ export default function ChallanDashboard() {
             width: '50px'
         },
         {
-            name: 'Challan Number',
-            selector: row => row.challan_number,
+            name: 'Action',
+            selector: row => row.created_by,
+            cell: row => (
+                <button onClick={() => handleAddPayment(row)}>Add Payment</button>
+            ),
+            button: true,
             sortable: true,
             center: true
         },
@@ -103,8 +107,29 @@ export default function ChallanDashboard() {
             name: 'Product Name',
             selector: row => row.stc_product_name,
             sortable: true,
-            center: true
-        },
+            cell: (row) => (
+                <div style={{ textAlign: 'center' }}>
+                    <span>
+                        {row.stc_product_name.length > 20 
+                            ? `${row.stc_product_name.substring(0, 20)}...` 
+                            : row.stc_product_name}
+                    </span>
+                    {row.stc_product_name.length > 20 && (
+                        <button 
+                            onClick={() => alert(row.stc_product_name)} 
+                            style={{ 
+                                marginTop: '5px', // Add some spacing above the button
+                                background: 'none', 
+                                color: 'blue', 
+                                cursor: 'pointer', 
+                                border: 'none' 
+                            }}>
+                            View More
+                        </button>
+                    )}
+                </div>
+            )
+        },  
         {
             name: 'Customer Name',
             selector: row => row.gld_customer_title,
@@ -142,7 +167,15 @@ export default function ChallanDashboard() {
             name: 'Dues',
             selector: row => ((row.rate * row.qty) - row.paid_amount).toFixed(2),
             sortable: false,
-            right: true
+            right: true,
+            cell: row => {
+                const duesValue = ((row.rate * row.qty) - row.paid_amount).toFixed(2);
+                return (
+                    <span style={{ color: duesValue > 0 ? 'red' : 'black' }}>
+                        {duesValue}
+                    </span>
+                );
+            }
         },
         {
             name: 'Payment Status',
@@ -168,17 +201,7 @@ export default function ChallanDashboard() {
         },
         {
             name: 'Created By',
-            selector: row => row.created_by,
-            sortable: true,
-            center: true
-        },
-        {
-            name: 'Action',
-            selector: row => row.created_by,
-            cell: row => (
-                <button onClick={() => handleAddPayment(row)}>Add Payment</button>
-            ),
-            button: true,
+            selector: row => row.stc_trading_user_name,
             sortable: true,
             center: true
         }
@@ -276,6 +299,7 @@ export default function ChallanDashboard() {
                 payment_amount: paymentAmount
             })
                 .then(response => {
+                    handleCloseModal();
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
@@ -283,7 +307,6 @@ export default function ChallanDashboard() {
                     }).then(() => {
                         // Fetch updated data after payment is added
                         fetchData();
-                        handleCloseModal();
                     });
                 })
                 .catch(error => {

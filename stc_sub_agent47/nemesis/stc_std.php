@@ -641,11 +641,18 @@ class transformers extends tesseract{
 				$job_type='';
 				$job_varities='';
 				if (!empty($row['stc_status_down_list_varities_id'])) {
+					$ids_array = explode(",", $row['stc_status_down_list_varities_id']);
+					$filtered_ids = array_filter($ids_array, function($value) {
+						return $value !== "NA" && $value !== "";
+					});
+
+					$cleaned_ids = implode(",", $filtered_ids);
 					$stc_call_jobtypeqry=mysqli_query($this->stc_dbs, "
-						SELECT `stc_status_down_list_job_type_title`, `stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_id` IN (".$row['stc_status_down_list_varities_id'].")
+						SELECT `stc_status_down_list_job_type_title`, `stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_id` IN (".$cleaned_ids.")
 					");
 					$job_type_array = [];
 					$job_varities_array = [];
+
 					foreach($stc_call_jobtypeqry as $stc_call_jobtyperow){
 						// Add job_type to the array if it's not already there
 						if (!in_array($stc_call_jobtyperow['stc_status_down_list_job_type_title'], $job_type_array)) {
