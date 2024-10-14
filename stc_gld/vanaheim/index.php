@@ -135,7 +135,7 @@ function updateChallanStatus($conn) {
         
         if ($result && $result->num_rows > 1) {
             // More than one distinct customer ID found
-            echo json_encode(['error' => 'Customer IDs are different for the selected challans. Update aborted.']);
+            echo json_encode(['error' => 'Different customers found for the selected challans. Update aborted.']);
             return; // Stop the execution here if the customer IDs are different
         }
 
