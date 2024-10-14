@@ -54,17 +54,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <span>View Status Down List</span>
                             </a>
                         </li>
-                        <!-- <li class="nav-item">
-                            <a role="tab" class="nav-link show" id="tab-2" data-toggle="tab" href="#create-req">
-                                <span>Create Status Down List</span>
-                            </a>
-                        </li> -->
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane tabs-animation fade show active" id="view-req" role="tabpanel">
                             <div class="row">
                                 <div class="col-md-12 col-xl-12"> 
-                                    <div class="main-card mb-3 card">
+                                    <div class="main-card mb-3 card" style="position:absolute; width:99%;">
                                         <div class="card-body">
                                             <?php
                                                 if($_SESSION['stc_agent_sub_category']!="Supervisor" && $_SESSION['stc_agent_sub_category']!="Site Incharge"){
@@ -77,14 +72,13 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <?php
                                                 }
                                             ?>
-                                            <?php
-                                                // if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
-                                            ?>
                                             <div class="row">
                                                 <div class="col-lg-3 col-md-3">
-                                                    <h5 style="position: relative;top: 8px;">Department :</h5>
+                                                    <h5>Month :</h5>
+                                                    <input type="month" class="form-control" id="stc-agent-sup-std-month-find" value="<?php echo $date=date("Y-m"); ?>">
                                                 </div>
                                                 <div class="col-lg-7 col-md-7">
+                                                    <h5>Department :</h5>
                                                     <select class="form-control" id="stc-agent-sup-std-location-find">
                                                     <?php
                                                             include_once("../MCU/db.php");
@@ -105,20 +99,17 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     </select>
                                                 </div>
                                                 <div class="col-lg-2 col-md-2">
-                                                    <a href="#" class="form-control btn btn-success stc-std-list-show-hit">Find</a>
+                                                    <h5>Job Status :</h5>
+                                                    <select class="form-control" id="stc-agent-sup-std-jstatus-find">
+                                                        <option value="2">Down</option>
+                                                        <option value="1">Planning</option>
+                                                        <option value="3">Work-in-Progress</option>                                                    
+                                                    </select>
+                                                </div>
+                                                <div class="col-lg-12 col-md-12">
+                                                    <a href="#" class="form-control btn btn-success stc-std-list-show-hit">Search</a>
                                                 </div>
                                             </div>
-                                            <?php
-                                                // }
-                                            ?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-md-12 col-xl-12"> 
-                                    <div class="main-card mb-3 card">
-                                        <div class="card-body">
                                             <div class="card mb-3 widget-content stc-std-search-result tabledata-responsvie" style="overflow-x: auto;">
                                             </div>
                                         </div>
@@ -580,7 +571,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     $(this).after('<p class="text-success attribute-message-show">Record updated.</p>');
                     stc_update_std();
                     var location_id=$('#stc-agent-sup-std-location-find').val();
-                    std_list_call(location_id);
+                    var month=$('#stc-agent-sup-std-month-find').val();
+                    var status=$('#stc-agent-sup-std-jstatus-find').val();
+                    std_list_call(location_id, month, status);
                 }
             });
 
@@ -591,7 +584,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     $(this).after('<p class="text-success attribute-message-show">Record updated.</p>');
                     stc_update_std();
                     var location_id=$('#stc-agent-sup-std-location-find').val();
-                    std_list_call(location_id);
+                    var month=$('#stc-agent-sup-std-month-find').val();
+                    var status=$('#stc-agent-sup-std-jstatus-find').val();
+                    std_list_call(location_id, month, status);
                 }
             });
 
@@ -612,14 +607,16 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 return filter;
             }
 
-            function std_list_call(location_id){
+            function std_list_call(location_id, month, status){
                 $('.stc-std-search-result').html("Loading..");
                 $.ajax({
                     url         : "nemesis/stc_std.php",
                     method      : "POST",
                     data        : {
                         stc_down_list_hit:1,
-                        location_id:location_id
+                        location_id:location_id,
+                        month:month,
+                        status:status
                     },
                     success     : function(response_sdl){
                         // console.log(response_sdl);
@@ -632,7 +629,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.stc-std-list-show-hit', 'click', function(e){
                 e.preventDefault();
                 var location_id=$('#stc-agent-sup-std-location-find').val();
-                std_list_call(location_id);
+                var month=$('#stc-agent-sup-std-month-find').val();
+                var status=$('#stc-agent-sup-std-jstatus-find').val();
+                std_list_call(location_id, month, status);
             });
 
 
@@ -664,7 +663,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         success     : function(response_sdl){
                             alert(response_sdl);
                             var location_id=$('#stc-agent-sup-std-location-find').val();
-                            std_list_call(location_id);
+                            std_list_call(location_id, month, status);
                         }
                     });
                 }
@@ -695,7 +694,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 $('.bd-std-jobdonedetails-modal-lg').modal('hide');
                                 $(".stc-cust-ag-jobdonedetails").val('');
                                 var location_id=$('#stc-agent-sup-std-location-find').val();
-                                std_list_call(location_id);
+                                var month=$('#stc-agent-sup-std-month-find').val();
+                                var status=$('#stc-agent-sup-std-jstatus-find').val();
+                                std_list_call(location_id, month, status);
                             }else{
                                 alert(response_sdl);
                             }
@@ -830,7 +831,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             }else{
                                 alert(response_sdl);
                                 var location_id=$('#stc-agent-sup-std-location-find').val();
-                                std_list_call(location_id);
+                                var month=$('#stc-agent-sup-std-month-find').val();
+                                var status=$('#stc-agent-sup-std-jstatus-find').val();
+                                std_list_call(location_id, month, status);
                             }
                         }
                     });

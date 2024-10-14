@@ -351,7 +351,7 @@ class transformers extends tesseract{
 	}
 
 	// status down list
-	public function stc_call_status_down_list($location_id){
+	public function stc_call_status_down_list($location_id, $month, $status){
 		$head_hidden1 = '';
 		$head_hidden2 = '';
 		$head_hidden3 = '';
@@ -398,12 +398,17 @@ class transformers extends tesseract{
 				</thead>
 				<tbody>
 		';
+		$montha=date('m', strtotime($month));
+		$year=date('Y', strtotime($month));
 		$optimusprimeqry=mysqli_query($this->stc_dbs, "
 			SELECT DISTINCT `stc_cust_pro_supervisor_created_by`
 			FROM `stc_status_down_list` 
 			LEFT JOIN `stc_cust_pro_supervisor`
 			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
 			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
+			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' 
+			AND MONTH(`stc_status_down_list_date`)='".mysqli_real_escape_string($this->stc_dbs, $montha)."' 
+			AND YEAR(`stc_status_down_list_date`)='".mysqli_real_escape_string($this->stc_dbs, $year)."' 
 		");
 		$manager = "";
 		if(mysqli_num_rows($optimusprimeqry)>0){
@@ -463,7 +468,10 @@ class transformers extends tesseract{
 			ON `stc_cust_project_id`=`stc_status_down_list_location` 
 			LEFT JOIN `stc_cust_pro_supervisor` 
 			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
-			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
+			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
+			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' 
+			AND MONTH(`stc_status_down_list_date`)='".mysqli_real_escape_string($this->stc_dbs, $montha)."'
+			AND YEAR(`stc_status_down_list_date`)='".mysqli_real_escape_string($this->stc_dbs, $year)."'   
 			".$manager."
 			AND `stc_status_down_list_status`<5
 			ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
@@ -1312,8 +1320,10 @@ if(isset($_POST['stc_std_perticular_call_hit'])){
 // call std
 if(isset($_POST['stc_down_list_hit'])){
 	$location_id=$_POST['location_id'];
+	$month=$_POST['month'];
+	$status=$_POST['status'];
 	$metabots=new transformers();
-	$opmetabots=$metabots->stc_call_status_down_list($location_id);
+	$opmetabots=$metabots->stc_call_status_down_list($location_id, $month, $status);
 	echo $opmetabots;
 }
 
