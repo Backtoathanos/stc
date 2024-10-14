@@ -128,13 +128,23 @@ function updateChallanStatus($conn) {
     if (!empty($ids) && is_array($ids)) {
         // Escape and format IDs for SQL IN clause
         $escapedIds = implode(',', array_map('intval', $ids)); // Use intval to ensure the IDs are treated as numbers
+
+        // Query to check for distinct cust_id values for the provided IDs
+        $checkQuery = "SELECT DISTINCT `cust_id` FROM `gld_challan` WHERE `id` IN ($escapedIds)";
+        $result = $conn->query($checkQuery);
         
-        $date=date('dmYHis');
-        // Create the SQL query
-        $query = "UPDATE `gld_challan` SET `status` = '1', `challan_number` = '".$date."'  WHERE `id` IN ($escapedIds)";
-        
-        // Execute the query
-        if ($conn->query($query)) {
+        if ($result && $result->num_rows > 1) {
+            // More than one distinct customer ID found
+            echo json_encode(['error' => 'Customer IDs are different for the selected challans. Update aborted.']);
+            return; // Stop the execution here if the customer IDs are different
+        }
+
+        // If only one distinct customer ID is found, proceed with the update
+        $date = date('dmYHis');
+        $updateQuery = "UPDATE `gld_challan` SET `status` = '1', `challan_number` = '$date' WHERE `id` IN ($escapedIds)";
+
+        // Execute the update query
+        if ($conn->query($updateQuery)) {
             echo json_encode(['success' => true, 'message' => 'Challan status updated successfully.']);
         } else {
             echo json_encode(['error' => 'Failed to update challan status.']);

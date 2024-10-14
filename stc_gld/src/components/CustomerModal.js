@@ -5,14 +5,14 @@ import axios from 'axios';
 import Swal from 'sweetalert2'; // Import SweetAlert2
 import './CustomerModal.css';
 
-const CustomerModal = ({ show, handleClose, productId, productRate }) => {
+const CustomerModal = ({ show, handleClose, productId, productRate, productQuantity }) => {
     const [customerOptions, setCustomerOptions] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [customerName, setCustomerName] = useState('');
     const [customerContact, setCustomerContact] = useState('');
     const [customerAddress, setCustomerAddress] = useState('');
     const [quantity, setQuantity] = useState(1);
-    const [rate, setRate] = useState(1);
+    const [rate, setRate] = useState(productRate); // Start with the initial rate
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     // Fetch customer options when the modal is shown
@@ -40,11 +40,21 @@ const CustomerModal = ({ show, handleClose, productId, productRate }) => {
     const handleAddCustomer = () => {
         if (isSubmitting) return;
 
+        // Validation: Check if entered quantity exceeds available inventory
+        if (quantity > productQuantity) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: `Entered quantity (${quantity}) exceeds available inventory (${productQuantity}).`,
+                confirmButtonText: 'OK'
+            });
+            return; // Stop submission if validation fails
+        }
+
         setIsSubmitting(true); // Prevent multiple submissions
 
         const userIdCookie = document.cookie.split('; ').find(row => row.startsWith('user_id='));
         if (!userIdCookie) {
-            console.error('User ID cookie not found.');
             setIsSubmitting(false);  // Reset the submit state to allow future submissions
             return;  // Stop the function execution if no user_id cookie is found
         }
@@ -53,19 +63,17 @@ const CustomerModal = ({ show, handleClose, productId, productRate }) => {
         const customerId = selectedCustomer ? selectedCustomer.value : null;
         const customerData = {
             product_id: productId,
-            quantity,
-            rate:productRate,
+            quantity, // Use the current quantity value
+            rate, // Use the current rate value
             id: customerId,
             name: customerName,
             contact: customerContact,
             address: customerAddress,
-            userId:userId
+            userId: userId
         };
 
         axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=addCustomer', customerData)
             .then(response => {
-                // console.log('Customer and product added successfully:', response.data);
-                
                 // If a new customer is added, update the select options
                 if (!customerId) {
                     const newCustomerOption = {
@@ -79,13 +87,14 @@ const CustomerModal = ({ show, handleClose, productId, productRate }) => {
                 // Reset fields after successful submission
                 resetForm();
                 handleClose(); // Close the modal after showing the alert
+
                 // Show SweetAlert2 success message
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
                     text: 'Customer and product added successfully.',
                     confirmButtonText: 'OK'
-                })
+                });
             })
             .catch(error => console.error('Error adding customer and product:', error))
             .finally(() => setIsSubmitting(false));
@@ -98,7 +107,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate }) => {
         setCustomerContact('');
         setCustomerAddress('');
         setQuantity(1);
-        setRate(1);
+        setRate(productRate); // Reset rate to the initial product rate
         setIsSubmitting(false); // Reset the submission state
     };
 
@@ -126,19 +135,26 @@ const CustomerModal = ({ show, handleClose, productId, productRate }) => {
                             value={quantity}
                             onChange={e => setQuantity(e.target.value)}
                             min="1"
+                            max={productQuantity} // Ensure the quantity doesn't exceed inventory
                             placeholder="Enter Quantity"
                         />
+                        <Form.Text className="text-muted">
+                            Available quantity: {productQuantity}
+                        </Form.Text>
                     </Form.Group>
 
                     <Form.Group controlId="formRate">
                         <Form.Label>Rate</Form.Label>
                         <Form.Control
                             type="number"
-                            value={productRate}
+                            value={rate}
                             onChange={e => setRate(e.target.value)}
                             min="1"
                             placeholder="Enter Rate"
                         />
+                        <Form.Text className="text-muted">
+                            Available rate: {productRate}
+                        </Form.Text>
                     </Form.Group>
 
                     <Form.Group controlId="formCustomerSelect">

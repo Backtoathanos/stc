@@ -22,6 +22,7 @@ export default function Dashboard() {
     const [modalShow, setModalShow] = useState(false); // State for modal visibility
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [selectedProductRate, setSelectedProductRate] = useState(null);
+    const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
     const [filteredData, setFilteredData] = useState([]); // To handle filtered data
 
@@ -134,6 +135,7 @@ export default function Dashboard() {
                     onClick={() => {
                         setSelectedProductId(row.stc_product_id);
                         setSelectedProductRate(row.rate_including_gst);
+                        setSelectedProductQuantity(row.stc_item_inventory_pd_qty);
                         setModalShow(true);
                     }}
                 >
@@ -204,6 +206,7 @@ export default function Dashboard() {
                 handleClose={() => setModalShow(false)}
                 productId={selectedProductId}
                 productRate={selectedProductRate}
+                productQuantity={selectedProductQuantity}
             />
         </div>
     );
