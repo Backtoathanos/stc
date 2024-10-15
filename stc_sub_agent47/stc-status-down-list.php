@@ -103,7 +103,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <select class="form-control" id="stc-agent-sup-std-jstatus-find">
                                                         <option value="2">Down</option>
                                                         <option value="1">Planning</option>
-                                                        <option value="3">Work-in-Progress</option>                                                    
+                                                        <option value="3">Work-in-Progress</option>  
+                                                        <option value="4">Work Done</option> 
+                                                        <option value="6">Close</option>                                                   
                                                     </select>
                                                 </div>
                                                 <div class="col-lg-12 col-md-12">

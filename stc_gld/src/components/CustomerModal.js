@@ -14,6 +14,9 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
     const [quantity, setQuantity] = useState(1);
     const [rate, setRate] = useState(productRate); // Start with the initial rate
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [quantityError, setQuantityError] = useState('');
+    const [rateError, setRateError] = useState('');
+    const [customerError, setCustomerError] = useState('');
 
     // Fetch customer options when the modal is shown
     useEffect(() => {
@@ -21,74 +24,95 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php', {
                 params: { action: 'getCustomers' }
             })
-            .then(response => {
-                if (Array.isArray(response.data)) {
-                    const options = response.data.map(gld_customer => ({
-                        value: gld_customer.gld_customer_id,
-                        label: gld_customer.gld_customer_cont_no
-                    }));
-                    setCustomerOptions(options);
-                } else {
-                    console.error('Unexpected response format:', response.data);
-                }
-            })
-            .catch(error => console.error('Error fetching customer options:', error));
+                .then(response => {
+                    if (Array.isArray(response.data)) {
+                        const options = response.data.map(gld_customer => ({
+                            value: gld_customer.gld_customer_id,
+                            label: gld_customer.gld_customer_cont_no
+                        }));
+                        setCustomerOptions(options);
+                    } else {
+                        console.error('Unexpected response format:', response.data);
+                    }
+                })
+                .catch(error => console.error('Error fetching customer options:', error));
         }
     }, [show]);
 
     // Handle adding customer and product
     const handleAddCustomer = () => {
-        if (isSubmitting) return;
-
-        // Validation: Check if entered quantity exceeds available inventory
-        if (quantity > productQuantity) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: `Entered quantity (${quantity}) exceeds available inventory (${productQuantity}).`,
-                confirmButtonText: 'OK'
-            });
+        // Reset error messages
+        setQuantityError('');
+        setRateError('');
+        setCustomerError('');
+    
+        // Parse quantity and rate as numbers
+        const parsedQuantity = parseFloat(quantity);
+        const parsedRate = parseFloat(rate);
+    
+        // Validation: Check if entered quantity exceeds available inventory or is invalid
+        if (isNaN(parsedQuantity) || parsedQuantity <= 0 || parsedQuantity > productQuantity) {
+            if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
+                setQuantityError('Invalid Quantity. Quantity must be greater than 0.');
+            } else if (parsedQuantity > productQuantity) {
+                setQuantityError(`Entered quantity (${parsedQuantity}) exceeds available inventory (${productQuantity}).`);
+            }
             return; // Stop submission if validation fails
         }
-
+    
+        // Validation: Check if rate is valid
+        if (isNaN(parsedRate) || parsedRate <= 0 || parsedRate < productRate) {
+            if (isNaN(parsedRate) || parsedRate <= 0) {
+                setRateError('Invalid Rate. Rate must be greater than 0.');
+            } else if (parsedRate < productRate) {
+                setRateError(`Entered rate (${parsedRate}) is less than the base product rate (${productRate}).`);
+            }
+            return; // Stop submission if validation fails
+        }
+        const customerId = selectedCustomer ? selectedCustomer.value : null;
+        
+        if(customerId==null){
+            if(customerName==""){
+                setCustomerError(`Select customer.`);
+                return;
+            }
+        }
+    
         setIsSubmitting(true); // Prevent multiple submissions
-
+    
         const userIdCookie = document.cookie.split('; ').find(row => row.startsWith('user_id='));
         if (!userIdCookie) {
             setIsSubmitting(false);  // Reset the submit state to allow future submissions
             return;  // Stop the function execution if no user_id cookie is found
         }
-
         const userId = userIdCookie.split('=')[1];
-        const customerId = selectedCustomer ? selectedCustomer.value : null;
         const customerData = {
             product_id: productId,
-            quantity, // Use the current quantity value
-            rate, // Use the current rate value
+            quantity: parsedQuantity, // Use the parsed quantity
+            rate: parsedRate, // Use the parsed rate
             id: customerId,
             name: customerName,
             contact: customerContact,
             address: customerAddress,
             userId: userId
         };
-
+    
         axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=addCustomer', customerData)
             .then(response => {
                 // If a new customer is added, update the select options
                 if (!customerId) {
                     const newCustomerOption = {
-                        value: response.data.newCustomerId, 
+                        value: response.data.newCustomerId,
                         label: customerName
                     };
                     setCustomerOptions([...customerOptions, newCustomerOption]);
                     setSelectedCustomer(newCustomerOption); // Set newly added customer
                 }
-
+    
                 // Reset fields after successful submission
                 resetForm();
                 handleClose(); // Close the modal after showing the alert
-
-                // Show SweetAlert2 success message
+    
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
@@ -99,6 +123,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             .catch(error => console.error('Error adding customer and product:', error))
             .finally(() => setIsSubmitting(false));
     };
+    
 
     // Reset form fields
     const resetForm = () => {
@@ -109,6 +134,8 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
         setQuantity(1);
         setRate(productRate); // Reset rate to the initial product rate
         setIsSubmitting(false); // Reset the submission state
+        setQuantityError(''); // Clear quantity error
+        setRateError(''); // Clear rate error
     };
 
     useEffect(() => {
@@ -141,6 +168,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                         <Form.Text className="text-muted">
                             Available quantity: {productQuantity}
                         </Form.Text>
+                        {quantityError && <div style={{ color: 'red' }}>{quantityError}</div>} {/* Display quantity error */}
                     </Form.Group>
 
                     <Form.Group controlId="formRate">
@@ -155,6 +183,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                         <Form.Text className="text-muted">
                             Available rate: {productRate}
                         </Form.Text>
+                        {rateError && <div style={{ color: 'red' }}>{rateError}</div>} {/* Display rate error */}
                     </Form.Group>
 
                     <Form.Group controlId="formCustomerSelect">
@@ -168,6 +197,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                         <Form.Text className="text-muted">
                             If customer is not listed, add new details below.
                         </Form.Text>
+                        {customerError && <div style={{ color: 'red' }}>{customerError}</div>} {/* Display quantity error */}
                     </Form.Group>
 
                     {!selectedCustomer && (
