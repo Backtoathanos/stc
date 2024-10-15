@@ -75,7 +75,7 @@
                                         ?>
                                     </div>
                                     <div class="widget-subheading">
-                                        Your Position on your co
+                                        <?php echo @$_SESSION['stc_agent_sub_category'];?>
                                     </div>
                                 </div>
                                 <div class="widget-content-right header-user-info ml-3">

@@ -430,7 +430,7 @@ if(isset($_GET['tbm_no'])){
                 <h4>Designation : <span><?php echo $get_stc_safety['stc_safetytbm_designation'];?></span></h4>
               </div>
               <div class="col-xl-12 col-lg-12 col-md-12">
-                <h4>GP/P No. : <span><?php echo $get_stc_safety['stc_safetytbm_gatepass_no'];?></span></h4>
+                <h4>GP/SP No. : <span><?php echo $get_stc_safety['stc_safetytbm_gatepass_no'];?></span></h4>
               </div>
               <div class="col-xl-12 col-lg-12 col-md-12">
                 <h4>Signature : <span></span></h4>

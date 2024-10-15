@@ -11,6 +11,9 @@ const PrintPreview = () => {
     const getQueryParams = (query) => {
         return new URLSearchParams(query);
     };
+    useEffect(() => {
+        document.title = "STC GLD || Challan Print Preview"; // Set the title
+    }, []);
 
     // Fetch challan details when the page loads
     useEffect(() => {
@@ -50,7 +53,7 @@ const PrintPreview = () => {
                         alt="Global Logo"
                         style={{ height: '100px', marginRight: '15px' }}
                     />
-                    <h2 style={{ margin: '0', padding: '0' }}>Retail Cash Memo</h2>
+                    <h2 style={{ margin: '0', padding: '0' }}>RCM</h2>
                 </div>
 
                 {/* Left and Right Aligned Sections */}

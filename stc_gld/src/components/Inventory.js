@@ -30,7 +30,7 @@ export default function Dashboard() {
         if (query.length > 3 || query === '') {
             setLoading(true);
             // Send the search query as a parameter to the API
-            axios.get(`https://stcassociate.com/stc_gld/vanaheim/getInventoryData.php?search=${query}`)
+            axios.get(`http://localhost/stc/stc_gld/vanaheim/getInventoryData.php?search=${query}`)
                 .then(response => {
                     const resultData = response.data;
                     if (Array.isArray(resultData)) {

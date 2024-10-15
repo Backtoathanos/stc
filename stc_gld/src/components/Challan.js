@@ -101,7 +101,8 @@ export default function ChallanDashboard() {
             ),
             button: true,
             sortable: true,
-            center: true
+            center: true,
+            width: '100px'
         },
         {
             name: 'Product Name',
@@ -128,19 +129,22 @@ export default function ChallanDashboard() {
                         </button>
                     )}
                 </div>
-            )
+            ),
+            width: '250px'
         },  
         {
             name: 'Customer Name',
             selector: row => row.gld_customer_title,
             sortable: true,
-            center: true
+            center: true,
+            width: '150px'
         },
         {
             name: 'Quantity',
             selector: row => row.qty,
             sortable: true,
-            right: true
+            right: true,
+            width: '100px'
         },
         {
             name: 'Rate',
@@ -197,7 +201,8 @@ export default function ChallanDashboard() {
             name: 'Created Date',
             selector: row => row.created_date,
             sortable: true,
-            center: true
+            center: true,
+            width: '200px'
         },
         {
             name: 'Created By',

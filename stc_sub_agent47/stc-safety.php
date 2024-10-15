@@ -2512,9 +2512,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         </div>
                                     </div>
                                     <div class="col-md-4 col-sm-12 col-xl-4">
-                                        <h5 class="card-title">GP/P No. *</h5>
+                                        <h5 class="card-title">GP/SP No. *</h5>
                                         <div class="position-relative form-group">
-                                            <input type="text" class="form-control stc-tbtm-textfields" id="stc-tbtm-gatepassno" placeholder="Enter GP/P No.">
+                                            <input type="text" class="form-control stc-tbtm-textfields" id="stc-tbtm-gatepassno" placeholder="Enter GP/SP No.">
                                         </div>
                                     </div>
                                 </div>
