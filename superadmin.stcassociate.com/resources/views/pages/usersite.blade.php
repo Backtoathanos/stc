@@ -59,6 +59,7 @@
                         <th class="text-center">Email</th>
                         <th class="text-center">Contact</th>
                         <th class="text-center">Whatsapp</th>
+                        <th class="text-center">UID</th>
                         <th class="text-center">Address</th>
                         <th class="text-center">City</th>
                         <th class="text-center">State</th>
@@ -79,6 +80,7 @@
                             <td>{{$value->stc_cust_pro_supervisor_email}}</td>
                             <td>{{$value->stc_cust_pro_supervisor_contact}}</td>
                             <td>{{$value->stc_cust_pro_supervisor_whatsapp}}</td>
+                            <td>{{$value->stc_cust_pro_supervisor_uid}}</td>
                             <td>{{$value->stc_cust_pro_supervisor_address}}</td>
                             <td>{{$value->stc_city_name}}</td>
                             <td>{{$value->stc_state_name}}</td>
@@ -120,6 +122,7 @@
                         <th class="text-center">Email</th>
                         <th class="text-center">Contact</th>
                         <th class="text-center">Whatsapp</th>
+                        <th class="text-center">UID</th>
                         <th class="text-center">Address</th>
                         <th class="text-center">City</th>
                         <th class="text-center">State</th>

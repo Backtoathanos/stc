@@ -36,23 +36,36 @@ class prime extends tesseract{
 		return $op;
 	}
 
-	public function stc_update_password($stc_ac_id, $stc_ac_pass, $stc_ac_repass){
-		$op='';
-		$updatebumblebee=mysqli_query($this->stc_dbs, "
-			UPDATE
-			    `stc_cust_pro_supervisor`
-			SET
-			    `stc_cust_pro_supervisor_password` = '".mysqli_real_escape_string($this->stc_dbs, $stc_ac_pass)."'
-			WHERE
-				`stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_ac_id)."'
+	public function stc_update_password($stc_ac_id, $stc_ac_pass, $stc_ac_repass, $stc_old_password) {
+		$op = '';
+	
+		// Fetch the current password from the database
+		$query = mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_pro_supervisor_password`
+			FROM `stc_cust_pro_supervisor`
+			WHERE `stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_ac_id)."'
+			AND `stc_cust_pro_supervisor_password` = '".mysqli_real_escape_string($this->stc_dbs, $stc_old_password)."'
 		");
-		if($updatebumblebee){
-			$op="success";
-		}else{
-			$op="error";
+		// Check if the old password matches the stored one
+		if (mysqli_num_rows($query)>0) {
+				
+			// Update the password if old password is correct
+			$updatebumblebee = mysqli_query($this->stc_dbs, "
+				UPDATE `stc_cust_pro_supervisor`
+				SET `stc_cust_pro_supervisor_password` = '".mysqli_real_escape_string($this->stc_dbs, $stc_ac_pass)."'
+				WHERE `stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_ac_id)."'
+			");
+				
+			if ($updatebumblebee) {
+				$op = "success";
+			} else {
+				$op = "error updating password";
+			}
+		} else {
+			$op = "old password incorrect";
 		}
 		return $op;
-	}
+	}	
 
 	public function stc_forgot_password($user){
 		$op='';
@@ -104,6 +117,42 @@ class prime extends tesseract{
 		}
 		return $op;
 	}
+
+	public function stc_update_image($user_id, $file_name) {
+		// Assume you have a database connection setup in your prime class
+		$sql = "UPDATE stc_cust_pro_supervisor SET stc_cust_pro_supervisor_image = '".$file_name."' WHERE stc_cust_pro_supervisor_id = '".$user_id."'";
+		return mysqli_query($this->stc_dbs, $sql);
+	}
+
+	public function stc_update_accountdetails($stc_ac_id, $uid, $address, $pincode, $city, $state){
+		$op = '';
+	
+		// Fetch the current password from the database
+		$query = mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_pro_supervisor_uid`
+			FROM `stc_cust_pro_supervisor`
+			WHERE `stc_cust_pro_supervisor_id` <> '".mysqli_real_escape_string($this->stc_dbs, $stc_ac_id)."'
+			AND `stc_cust_pro_supervisor_uid` = '".mysqli_real_escape_string($this->stc_dbs, $uid)."'
+		");
+		// Check if the old password matches the stored one
+		if (mysqli_num_rows($query)==0) {
+				
+			// Update the password if old password is correct
+			$updatebumblebee = mysqli_query($this->stc_dbs, "
+				UPDATE `stc_cust_pro_supervisor` SET `stc_cust_pro_supervisor_uid` = '".mysqli_real_escape_string($this->stc_dbs, $uid)."', `stc_cust_pro_supervisor_address` = '".mysqli_real_escape_string($this->stc_dbs, $address)."', `stc_cust_pro_supervisor_pincode` = '".mysqli_real_escape_string($this->stc_dbs, $pincode)."', `stc_cust_pro_supervisor_cityid` = '".mysqli_real_escape_string($this->stc_dbs, $city)."', `stc_cust_pro_supervisor_state_id` = '".mysqli_real_escape_string($this->stc_dbs, $state)."' WHERE `stc_cust_pro_supervisor_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_ac_id)."'
+			");
+				
+			if ($updatebumblebee) {
+				$op = "success";
+			} else {
+				$op = "error updating profile";
+			}
+		} else {
+			$op = "invalid uid.";
+		}
+		return $op;
+	}
+	
 }
 
 if(isset($_POST['agent_signin'])){
@@ -126,14 +175,13 @@ if(isset($_POST['stc_ag_account_update'])){
 		$stc_ac_id=$_POST['stc_ac_id'];
 		$stc_ac_pass=$_POST['stc_ac_pass'];
 		$stc_ac_repass=$_POST['stc_ac_repass'];
+		$stc_old_password=$_POST['stc_old_password'];
 		$objlogin=new prime();
-		$out=$objlogin->stc_update_password($stc_ac_id, $stc_ac_pass, $stc_ac_repass);
+		$out=$objlogin->stc_update_password($stc_ac_id, $stc_ac_pass, $stc_ac_repass, $stc_old_password);
 	}
 
 	echo $out;
 }
-
-
 
 if(isset($_POST['agent_forgotpassword'])){
 	if(empty($_POST["agent_name"])){
@@ -160,4 +208,64 @@ if(isset($_POST['agent_resetpassword'])){
 	}
 	echo $message;
 }
+
+if (isset($_POST['upload_image'])) {
+    $avatar = $_POST["avatar"];
+    $out = '';
+    
+    if (empty($_SESSION['stc_agent_sub_id'])) {
+        $out = "empty";
+    } else {
+        // Extract the base64 image string
+        $image_parts = explode(";base64,", $avatar);
+        $image_type_aux = explode("image/", $image_parts[0]);
+        $image_type = $image_type_aux[1]; // e.g. png, jpg
+        $image_base64 = base64_decode($image_parts[1]);
+
+        // Define directory and filename
+        $directory = '../assets/images/user_images/';
+        $user_id = $_SESSION['stc_agent_sub_id']; // assuming user ID is stored in session
+        $file_name = 'user_' . $user_id . '.' . $image_type;
+        $file_path = $directory . $file_name;
+
+        // Create the directory if it doesn't exist
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
+
+        // Save the image file
+        file_put_contents($file_path, $image_base64);
+
+        // Now update the user table with the image filename
+        $objlogin = new prime();
+        $update_result = $objlogin->stc_update_image($user_id, $file_name); // Pass user ID and image name to update
+
+        if ($update_result) {
+            $out = 'success';
+        } else {
+            $out = 'error_updating_image';
+        }
+    }
+
+    echo $out;
+}
+
+if(isset($_POST['stc_ag_accountdetails_update'])){
+	$out="";
+	if(empty($_SESSION['stc_agent_sub_id'])){
+	  	$out = "empty";
+	}else{
+		$stc_ac_id=$_POST['stc_ac_id'];
+		$uid=$_POST['uid'];
+		$address=$_POST['address'];
+		$pincode=$_POST['pincode'];
+		$city=$_POST['city'];
+		$state=$_POST['state'];
+		$objlogin=new prime();
+		$out=$objlogin->stc_update_accountdetails($stc_ac_id, $uid, $address, $pincode, $city, $state);
+	}
+
+	echo $out;
+}
+
 ?>
