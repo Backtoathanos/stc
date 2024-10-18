@@ -284,17 +284,17 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                                         $sql=mysqli_query($con, "SELECT `type`, `point` FROM `stc_cust_employee_rating` WHERE `created_by`='".$_SESSION['stc_agent_sub_id']."'");
                                                                         if(mysqli_num_rows($sql)>0){
                                                                             foreach($sql as $row){
-                                                                                if($row['type']=='Call Attend'){
+                                                                                if(ucwords(strtolower($row['type']))=='Call Attend'){
                                                                                     $cattend+=$row['point'];
-                                                                                }else if($row['type']=='Daily Job Activity'){
+                                                                                }else if(ucwords(strtolower($row['type']))=='Daily Job Activity'){
                                                                                     $dja+=$row['point'];
-                                                                                }else if($row['type']=='Preventive Maintenance'){
+                                                                                }else if(ucwords(strtolower($row['type']))=='Preventive Maintenance'){
                                                                                     $pm+=$row['point'];
-                                                                                }else if($row['type']=='Breakdown Maintenance'){
+                                                                                }else if(ucwords(strtolower($row['type']))=='Breakdown Maintenance'){
                                                                                     $bm+=$row['point'];
-                                                                                }else if($row['type']=='Attendance'){
+                                                                                }else if(ucwords(strtolower($row['type']))=='Attendance'){
                                                                                     $attendance+=$row['point'];
-                                                                                }else if($row['type']=='TBM'){
+                                                                                }else if(ucwords(strtolower($row['type']))=='TBM'){
                                                                                     $tbm+=$row['point'];
                                                                                 }
                                                                             }

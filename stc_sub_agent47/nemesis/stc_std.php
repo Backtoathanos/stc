@@ -207,6 +207,7 @@ class transformers extends tesseract{
 		if($stc_j_plannning=="BREAKDOWN MAINTENANCE" || $action_status==2){
 			$status="Down";
 		}
+		mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."', 'Status Down List created - ".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."', '2', '1', '".$_SESSION['stc_agent_sub_category']."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".$_SESSION['stc_cust_pro_supervisor_id']."')");
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_status_down_list`(
 			    `stc_status_down_list_date`,
