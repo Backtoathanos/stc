@@ -10,7 +10,7 @@ class prime extends tesseract{
 	// check agents existance
 	public function stc_login($user,$pass){
 		$checkbumblebee=mysqli_query($this->stc_dbs, "
-			SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_category` 
+			SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_category`, `stc_cust_pro_supervisor_image` 
 			FROM `stc_cust_pro_supervisor` 
 			WHERE (
 				`stc_cust_pro_supervisor_contact`='".mysqli_real_escape_string($this->stc_dbs, $user)."' OR 
@@ -29,6 +29,7 @@ class prime extends tesseract{
 			$_SESSION['stc_agent_sub_id']=$user_id;
 			$_SESSION['stc_agent_sub_name']=$user_name;
 			$_SESSION['stc_agent_sub_category']=$category;
+			$_SESSION['stc_agent_sub_image']=$user_details['stc_cust_pro_supervisor_image'];
 			$op="success";
 		}else{
 			$op="Please Check Username & Password Again.";

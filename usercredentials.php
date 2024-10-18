@@ -11,7 +11,7 @@
     $decryption=openssl_decrypt ($user_id, $ciphering, $decryption_key, $options, $decryption_iv);
     if($user_type=="siteuser"){
         $checkbumblebee=mysqli_query($con, "
-			SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_category` 
+			SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_category`, `stc_cust_pro_supervisor_image` 
 			FROM `stc_cust_pro_supervisor` 
 			WHERE `stc_cust_pro_supervisor_id`='".$decryption."'
 		");
@@ -23,6 +23,7 @@
             $_SESSION['stc_agent_sub_id']=$user_id;
             $_SESSION['stc_agent_sub_name']=$user_name;
             $_SESSION['stc_agent_sub_category']=$category;
+			$_SESSION['stc_agent_sub_image']=$user_details['stc_cust_pro_supervisor_image'];
             header('Location:stc_sub_agent47/dashboard.php');
         }else{
             header('Location:404.shtml');
