@@ -9,14 +9,14 @@ include "../../MCU/db.php";
 $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
 
 // Modify query to filter by product name if a search query is provided
-$query = "SELECT DISTINCT P.stc_product_id, P.stc_product_name, P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image, ROUND(i.stc_item_inventory_pd_qty, 2) AS stc_item_inventory_pd_qty, P.stc_product_gst, GI.stc_product_grn_items_rate, ROUND(GI.stc_product_grn_items_rate * (1 + P.stc_product_gst / 100), 2) AS rate_including_gst FROM stc_item_inventory i LEFT JOIN stc_product P ON i.stc_item_inventory_pd_id = P.stc_product_id LEFT JOIN stc_product_grn_items GI ON i.stc_item_inventory_pd_id = GI.stc_product_grn_items_product_id WHERE i.stc_item_inventory_pd_qty > 0 AND GI.stc_product_grn_items_rate = (SELECT `stc_product_grn_items_rate` FROM stc_product_grn_items WHERE `stc_product_grn_items_product_id` = i.stc_item_inventory_pd_id ORDER BY `stc_product_grn_items_id` DESC LIMIT 1 )";
+$query = "SELECT P.stc_product_id, P.stc_product_name, P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image, R.stc_rack_name, ppa.stc_purchase_product_adhoc_qty as stc_item_inventory_pd_qty, P.stc_product_gst, ppa.stc_purchase_product_adhoc_rate as rate_including_gst, ROUND(ppa.stc_purchase_product_adhoc_rate * (1 + P.stc_product_sale_percentage / 100), 2) AS rate_including_percentage FROM stc_purchase_product_adhoc ppa LEFT JOIN stc_product P ON ppa.stc_purchase_product_adhoc_productid = P.stc_product_id LEFT JOIN stc_rack R ON ppa.stc_purchase_product_adhoc_rackid = R.stc_rack_id WHERE ppa.stc_purchase_product_adhoc_qty > 0 AND ppa.stc_purchase_product_adhoc_status=1 AND ppa.stc_purchase_product_adhoc_productid<>0";
 
 // If search query is not empty, add a filter for the product name
 if ($search !== '') {
-    $query .= " AND P.stc_product_name LIKE '%$search%'";
+    $query .= " AND (P.stc_product_name LIKE '%$search%' OR R.stc_rack_name LIKE '%$search%')";
 }
 
-$query .= " ORDER BY P.stc_product_name ASC";
+$query .= " GROUP BY P.stc_product_id ORDER BY P.stc_product_name ASC";
 
 $result = mysqli_query($con, $query);
 
@@ -34,17 +34,7 @@ foreach($result as $key => $row){
 
     // Update stc_item_inventory_pd_qty in the result array
     $row['stc_item_inventory_pd_qty'] = number_format($remainingQty, 2);
-
-    $brand_name='';
-    if($row['stc_product_brand_id']!=0){
-        $query = mysqli_query($con, "SELECT stc_brand_title FROM `stc_brand` WHERE `stc_brand_id` = " . $row['stc_product_brand_id']);
-
-        if(mysqli_num_rows($query)>0){
-            $brandData = mysqli_fetch_assoc($query);
-            $brand_name = $brandData['stc_brand_title'];
-        }
-        $row['stc_product_name'] = $row['stc_product_name'] . ' ' . $brand_name;
-    }
+    $row['rate_including_gst'] = number_format($row['rate_including_gst'], 2);
 
     // Remove row if remaining quantity is 0 or less
     if ($remainingQty >0) {

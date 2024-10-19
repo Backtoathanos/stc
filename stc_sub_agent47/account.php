@@ -267,13 +267,15 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 <div class="row">
                                                     <div class="col-sm-12 col-md-12">
                                                         <div class="position-relative form-group">
-                                                            <table class="table table-bordered">
+                                                            <div class="row">
+                                                                <!-- Continue for other cards -->
+                                                            <!-- <table class="table table-bordered">
                                                                 <thead>
                                                                     <th class="text-center">Slno</th>
                                                                     <th class="text-center">Type</th>
                                                                     <th class="text-center">Rating</th>
                                                                 </thead>
-                                                                <tbody>
+                                                                <tbody> -->
                                                                     <?php 
                                                                         $cattend=0;
                                                                         $dja=0;
@@ -309,26 +311,29 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                                         );
                                                                         $slno=0;
                                                                         $total=0;
+                                                                        $color_arr = array(
+                                                                            'Call Attend' => '#ffcccc',         // Light red
+                                                                            'Daily Job Activity' => '#cceeff',  // Light blue
+                                                                            'Preventive Maintenance' => '#ccffcc', // Light green
+                                                                            'Breakdown Maintenance' => '#ffffcc',  // Light yellow
+                                                                            'Attendance' => '#ffccff',          // Light pink
+                                                                            'TBM' => '#ffcc99'                  // Light orange
+                                                                        );
+                                                                        
                                                                         foreach($type_arr as $key=>$row){
                                                                             $slno++;
                                                                             echo '
-                                                                                <tr>
-                                                                                    <td>'.$slno.'</td>
-                                                                                    <td>'.$key.'</td>
-                                                                                    <td>'.$row.'</td>
-                                                                                </tr>
+                                                                                <div class="col-md-4"><div class="card text-center mb-4" style="background-color:'.$color_arr[$key].'"><div class="card-body"><h5 class="card-title">'.$key.'</h5><p class="card-text">'.$row.'</p></div></div></div>
                                                                             ';
                                                                             $total+=$row;
                                                                         }
                                                                         echo '
-                                                                            <tr>
-                                                                                <th colspan="2">Total</th>
-                                                                                <th>'.$total.'</th>
-                                                                            </tr>
+                                                                            <div class="col-md-12"><div class="card text-center mb-4" style="background-color:#d3d6ff"><div class="card-body"><h5 class="card-title">Total</h5><p class="card-text" style=" font-size: 45px; font-weight: bold;">'.$total.'</p></div></div></div>
                                                                         ';
                                                                     ?>
-                                                                </tbody>
-                                                            </table>
+                                                                <!-- </tbody>
+                                                            </table> -->
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
