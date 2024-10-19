@@ -36,6 +36,16 @@ foreach($result as $key => $row){
     $row['stc_item_inventory_pd_qty'] = number_format($remainingQty, 2);
     $row['rate_including_gst'] = number_format($row['rate_including_gst'], 2);
 
+    $brand_name='';
+    if($row['stc_product_brand_id']!=0){
+        $query = mysqli_query($con, "SELECT stc_brand_title FROM `stc_brand` WHERE `stc_brand_id` = " . $row['stc_product_brand_id']);
+        if(mysqli_num_rows($query)>0){
+            $brandData = mysqli_fetch_assoc($query);
+            $brand_name = $brandData['stc_brand_title'];
+        }
+        $row['stc_product_name'] = $row['stc_product_name'] . ' ' . $brand_name;
+    }
+
     // Remove row if remaining quantity is 0 or less
     if ($remainingQty >0) {
         $data[] = $row; // Add the row to the data array
