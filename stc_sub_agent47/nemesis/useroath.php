@@ -233,7 +233,7 @@ if (isset($_POST['upload_image'])) {
         if (!file_exists($directory)) {
             mkdir($directory, 0777, true);
         }
-
+		$_SESSION['stc_agent_sub_image']='assets/images/user_images/'.$file_name;
         // Save the image file
         file_put_contents($file_path, $image_base64);
 

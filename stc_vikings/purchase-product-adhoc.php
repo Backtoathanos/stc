@@ -43,7 +43,7 @@ include("kattegat/role_check.php");
       
       .fade:not(.show) {
         opacity: 10;
-      }
+      }      
     </style>
 </head>
 <body>
@@ -100,22 +100,7 @@ include("kattegat/role_check.php");
                                         ></textarea>
                                       </div>
                                     </div>
-                                    <div class="col-xl-6 col-md-6 col-sm-6">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="quantity"
-                                          >Quantity
-                                        </h5>
-                                        <input
-                                          id="quantity"
-                                          name="quantity"
-                                          type="text"
-                                          placeholder="Quantity"
-                                          class="form-control validate"
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-xl-6 col-md-6 col-sm-6">
+                                    <div class="col-xl-3 col-md-3 col-sm-12">
                                       <div class="card-border mb-3 card card-body border-success">
                                         <h5
                                           for="unit"
@@ -130,7 +115,37 @@ include("kattegat/role_check.php");
                                         />
                                       </div>
                                     </div>
-                                    <div class="col-xl-6 col-md-6 col-sm-12">
+                                    <div class="col-xl-3 col-md-3 col-sm-12">
+                                      <div class="card-border mb-3 card card-body border-success">
+                                        <h5
+                                          for="quantity"
+                                          >Quantity
+                                        </h5>
+                                        <input
+                                          id="quantity"
+                                          name="quantity"
+                                          type="text"
+                                          placeholder="Quantity"
+                                          class="form-control validate"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div class="col-xl-3 col-md-3 col-sm-12">
+                                      <div class="card-border mb-3 card card-body border-success">
+                                        <h5
+                                          for="rate"
+                                          >Rate
+                                        </h5>
+                                        <input
+                                          id="rate"
+                                          name="rate"
+                                          type="text"
+                                          placeholder="Rate"
+                                          class="form-control validate"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div class="col-xl-3 col-md-3 col-sm-12">
                                       <div class="card-border mb-3 card card-body border-success">
                                         <h5
                                           for="rack"
@@ -153,7 +168,7 @@ include("kattegat/role_check.php");
                                         </select>
                                       </div>
                                     </div>
-                                    <div class="col-xl-6 col-md-6 col-sm-12">
+                                    <div class="col-xl-2 col-md-2 col-sm-12">
                                       <div class="card-border mb-3 card card-body border-success">
                                         <h5
                                           for="condition"
@@ -170,7 +185,7 @@ include("kattegat/role_check.php");
                                         </select>
                                       </div>
                                     </div>
-                                    <div class="col-xl-6 col-md-6 col-sm-6">
+                                    <div class="col-xl-5 col-md-5 col-sm-12">
                                       <div class="card-border mb-3 card card-body border-success">
                                         <h5
                                           for="source"
@@ -185,7 +200,7 @@ include("kattegat/role_check.php");
                                         />
                                       </div>
                                     </div>
-                                    <div class="col-xl-6 col-md-6 col-sm-6">
+                                    <div class="col-xl-5 col-md-5 col-sm-12">
                                       <div class="card-border mb-3 card card-body border-success">
                                         <h5
                                           for="destination"
@@ -305,6 +320,7 @@ include("kattegat/role_check.php");
                                               <th>Rack</th>
                                               <th>Unit</th>
                                               <th>Quantity</th>
+                                              <th>Rate</th>
                                               <th>Stock</th>
                                               <th>Dispatched Details</th>
                                               <th>From Source (Supplier/Location)</th>
@@ -324,6 +340,7 @@ include("kattegat/role_check.php");
                                               <tr><td colspan="8">Search</td></tr>
                                             </tbody>
                                           </table>
+                                          <div id="pagination"></div>
                                       </form>
                                     </div>
                                   </div>
@@ -341,34 +358,63 @@ include("kattegat/role_check.php");
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function(){
-          $('body').delegate('.stc-adhocpo-find', 'click', function(e){
-            e.preventDefault();
-            var itemname=$('#stc-poa-searchbyitem').val();
-            var sourcedestination=$('#tc-poa-searchbydourcedestination').val();
-            var byrack=$('.tc-poa-searchbyrack').val();
-            var status=$('.stc-po-status-in').val();
-            stc_call_poadhoc(itemname, sourcedestination, byrack, status); 
-          });
+          var currentPage = 1;
+          var pageSize = 10;
 
           // call merchant for purchase
           // stc_call_poadhoc('', '', '', '');
-          function stc_call_poadhoc(itemname, sourcedestination, byrack, status){
+          function loadTableData(page) {
             $.ajax({
-              url       : "kattegat/ragnar_purchase.php",
-              method    : "post",
-              data      : {
-                stc_call_poadhoc:1,
-                itemname: itemname, 
-                sourcedestination: sourcedestination, 
-                byrack: byrack, 
-                status: status
+              url: "kattegat/ragnar_purchase.php",
+              method: "POST",
+              data: {
+                stc_call_poadhoc: 1,
+                itemname: $('#stc-poa-searchbyitem').val(),
+                sourcedestination: $('#tc-poa-searchbydourcedestination').val(),
+                byrack: $('.tc-poa-searchbyrack').val(),
+                status: $('.stc-po-status-in').val(),
+                page: page,
+                pageSize: pageSize
               },
-              success   : function(data){
-                // console.log(data);
-                $('.stc-call-view-poadhoc-row').html(data);
+              dataType : "JSON",
+              success: function(data) {
+                $('.stc-call-view-poadhoc-row').html(data.odin);
+                // Update pagination controls
+                updatePagination(data.count_num);
               }
             });
           }
+
+          function updatePagination(data) {
+            var totalPages = Math.ceil(parseInt(data) / pageSize);
+            $('#pagination').empty();
+
+            for (var i = 1; i <= totalPages; i++) {
+              var pageLink = $('<a href="javascript:void(0)" class="paginationbtn" style=" padding: 5px; margin: 0px; background: #c3ffe3; border: 1px solid grey; ">' + i + '</a>');
+              pageLink.click(function(e) {
+                e.preventDefault();
+                currentPage = parseInt($(this).text());
+                loadTableData(currentPage);
+              });
+              $('#pagination').append(pageLink);
+            }
+          }
+          // Initial data load
+          loadTableData(currentPage);
+
+          // Event listener for pagination links
+          $('body').delegate('#pagination a', 'click', function(e) {
+            e.preventDefault();
+            currentPage = parseInt($(this).text());
+            loadTableData(currentPage);
+          });
+
+          // Event listener for search button
+          $('body').delegate('.stc-adhocpo-find', 'click', function(e) {
+            e.preventDefault();
+            currentPage = 1; // Reset page to 1 on search
+            loadTableData(currentPage);
+          });
 
           
           $('body').delegate('.get-dispatch-details', 'click', function(e){
@@ -392,6 +438,7 @@ include("kattegat/role_check.php");
             e.preventDefault();
             var itemname=$('#itemname').val();
             var quantity=$('#quantity').val();
+            var rate=$('#rate').val();
             var unit=$('#unit').val();
             var rack=$('#rack').val();
             var condition=$('#condition').val();
@@ -405,6 +452,7 @@ include("kattegat/role_check.php");
                 stc_po_adhoc_save:1,
                 itemname:itemname,
                 quantity:quantity,
+                rate:rate,
                 unit:unit,
                 rack:rack,
                 condition:condition,

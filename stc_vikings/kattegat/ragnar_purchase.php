@@ -2127,13 +2127,14 @@ class ragnarGRNAdd extends tesseract{
 class ragnarPurchaseAdhoc extends tesseract{
 
 	// save po adhoc trigger
-	public function stc_po_adhoc_save($itemname, $quantity, $unit, $rack, $condition, $source, $destination, $remarks){	
+	public function stc_po_adhoc_save($itemname, $quantity, $rate, $unit, $rack, $condition, $source, $destination, $remarks){	
 		$odin='';
 		$date=date("Y-m-d H:i:s");		
 		$lokipo=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_purchase_product_adhoc`(
 				`stc_purchase_product_adhoc_itemdesc`,
 				`stc_purchase_product_adhoc_qty`,
+				`stc_purchase_product_adhoc_rate`,
 				`stc_purchase_product_adhoc_unit`,
 				`stc_purchase_product_adhoc_rackid`,
 				`stc_purchase_product_adhoc_condition`,
@@ -2146,6 +2147,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 			)VALUES(
 				'".mysqli_real_escape_string($this->stc_dbs, $itemname)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $quantity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $rate)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $unit)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $rack)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $condition)."',
@@ -2166,7 +2168,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}
 
 	// call po adhoc
-	public function stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status){
+	public function stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status, $page, $pageSize){
 		$odin='';
 		$filter='';
 		if($itemname!=""){
@@ -2184,12 +2186,42 @@ class ragnarPurchaseAdhoc extends tesseract{
 		if($status!="NA"){
 			$filter.="AND `stc_purchase_product_adhoc_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."'";
 		}
-		$odinqry=mysqli_query($this->stc_dbs, "
+		$query="
 			SELECT
 				`stc_purchase_product_adhoc_id`,
 				`stc_purchase_product_adhoc_productid`,
 				`stc_purchase_product_adhoc_itemdesc`,
 				`stc_purchase_product_adhoc_qty`,
+				`stc_purchase_product_adhoc_rate`,
+				`stc_purchase_product_adhoc_unit`,
+				`stc_rack_name`,
+				`stc_purchase_product_adhoc_condition`,
+				`stc_purchase_product_adhoc_source`,
+				`stc_purchase_product_adhoc_destination`,
+				`stc_purchase_product_adhoc_recievedby`,
+				`stc_purchase_product_adhoc_status`,
+				`stc_purchase_product_adhoc_remarks`,
+				`stc_user_name`,
+				`stc_purchase_product_adhoc_created_date`,
+				`stc_purchase_product_adhoc_updated_by`,
+				`stc_purchase_product_adhoc_updated_date`
+			FROM `stc_purchase_product_adhoc`
+			LEFT JOIN `stc_rack`
+			ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
+			LEFT JOIN `stc_user`
+			ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
+			WHERE `stc_purchase_product_adhoc_qty`>0 ".$filter."
+			ORDER BY TIMESTAMP(`stc_purchase_product_adhoc_created_date`) DESC
+		";
+		$query .= " LIMIT " . ($page - 1) * $pageSize . ", " . $pageSize;
+		$odinqry=mysqli_query($this->stc_dbs, $query);
+		$count_numqry=mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_purchase_product_adhoc_id`,
+				`stc_purchase_product_adhoc_productid`,
+				`stc_purchase_product_adhoc_itemdesc`,
+				`stc_purchase_product_adhoc_qty`,
+				`stc_purchase_product_adhoc_rate`,
 				`stc_purchase_product_adhoc_unit`,
 				`stc_rack_name`,
 				`stc_purchase_product_adhoc_condition`,
@@ -2210,6 +2242,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 			WHERE `stc_purchase_product_adhoc_qty`>0 ".$filter."
 			ORDER BY TIMESTAMP(`stc_purchase_product_adhoc_created_date`) DESC
 		");
+		$count_num=mysqli_num_rows($count_numqry);
 		if(mysqli_num_rows($odinqry)>0){
 			$slno=0;
 			$status=array(1 => 'Stock', 2 => 'Dispatched');
@@ -2249,6 +2282,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-center'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
 						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
+						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."</td>
 						<td class='text-right'>".number_format($stock, 2)."</td>
 						<td class='text-center'>
 							<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' data-toggle='modal' data-target='.bd-showadhocdetails-modal-lg' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
@@ -2282,7 +2316,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				</tr>
 			";
 		}
-		return $odin;
+		return $odin=array('count_num' => $count_num, 'odin' => $odin);
 	}
 
 	public function stc_call_poadhoc_ddetails($poaid){
@@ -3091,6 +3125,7 @@ if(isset($_POST['stc_stocking_send_hit'])){
 if(isset($_POST['stc_po_adhoc_save'])){
 	$itemname=$_POST['itemname'];
 	$quantity=$_POST['quantity'];
+	$rate=$_POST['rate'];
 	$unit=$_POST['unit'];
 	$rack=$_POST['rack'];
 	$condition=$_POST['condition'];
@@ -3104,7 +3139,7 @@ if(isset($_POST['stc_po_adhoc_save'])){
 		echo "Please Login";
 	}else{
 		$objloki=new ragnarPurchaseAdhoc();
-		$objlokiout=$objloki->stc_po_adhoc_save($itemname, $quantity, $unit, $rack, $condition, $source, $destination, $remarks);
+		$objlokiout=$objloki->stc_po_adhoc_save($itemname, $quantity, $rate, $unit, $rack, $condition, $source, $destination, $remarks);
 		echo json_encode($objlokiout);
 		// echo $objlokiout;
 	}		
@@ -3116,9 +3151,11 @@ if(isset($_POST['stc_call_poadhoc'])){
 	$sourcedestination=$_POST['sourcedestination'];
 	$byrack=$_POST['byrack'];
 	$status=$_POST['status'];
+	$page=$_POST['page'];
+	$pageSize=$_POST['pageSize'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status);
-	echo $outbjornestocking;
+	$outbjornestocking=$bjornestocking->stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status, $page, $pageSize);
+	echo json_encode($outbjornestocking);
 }
 // call po adhoc
 if(isset($_POST['stc_call_poadhoc_details'])){
