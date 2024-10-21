@@ -118,12 +118,6 @@ export default function Dashboard() {
             right: true
         },
         {
-            name: 'Inv Qty.',
-            selector: row => row.stc_item_inventory_pd_qty,
-            sortable: true,
-            right: true
-        },
-        {
             name: 'Sale Rate',
             selector: row => row.rate_including_gst,
             sortable: true,

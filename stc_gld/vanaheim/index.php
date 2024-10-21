@@ -41,6 +41,10 @@ switch ($action) {
         addPayment($conn);
         break;
 
+    case 'deleteChallan':
+        deleteChallan($conn);
+        break;
+
     default:
         echo json_encode(['error' => 'Invalid API action', 'fault' => $_GET['action']]);
         break;
@@ -76,7 +80,7 @@ function addCustomer($conn) {
 
         // Insert new customer if no existing customer is selected
         if (!$customerId) {
-            $query = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_address) VALUES ('$customerName', '$customerContact', '$customerAddress')";
+            $query = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_city_id, gld_customer_state_id, gld_customer_address) VALUES ('$customerName', '$customerContact', '65', '16', '$customerAddress')";
             $conn->query($query);
             $customerId = $conn->insert_id;
         }
@@ -213,3 +217,23 @@ function addPayment($conn) {
         echo json_encode(['error' => 'Failed to update challan status.']);
     }
 }
+
+// delete challan
+function deleteChallan($conn) {
+    // Decode the JSON data from the request body
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    // Get the array of IDs from the request
+    $id = $data['id'];
+    // update the SQL query
+    $query = "DELETE FROM  `gld_challan` WHERE `id` =$id";
+    
+    // Execute the query
+    if ($conn->query($query)) {
+        echo json_encode(['success' => true, 'message' => 'Challan deleted successfully.']);
+    } else {
+        echo json_encode(['error' => 'Failed to delete challan.']);
+    }
+}
+
+?>

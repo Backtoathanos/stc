@@ -75,6 +75,51 @@ export default function ChallanDashboard() {
         setSelectedChallanForPayment(row); // Set the selected challan
         setShowModal(true); // Show the modal
     };    
+    const handleDelete = (id) => {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you really want to delete this record? This process cannot be undone.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Make the API call to delete the record
+                axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=deleteChallan', {
+                    id: id
+                })
+                .then(response => {
+                    // Handle successful deletion
+                    if(response.data.success) {
+                        Swal.fire(
+                            'Deleted!',
+                            'Your record has been deleted.',
+                            'success'
+                        );
+                        fetchData(search);
+                    } else {
+                        // Handle if the server responds with failure
+                        Swal.fire(
+                            'Failed!',
+                            'The record could not be deleted.',
+                            'error'
+                        );
+                    }
+                })
+                .catch(error => {
+                    // Handle error if the request fails
+                    Swal.fire(
+                        'Error!',
+                        'An error occurred while trying to delete the record.',
+                        'error'
+                    );
+                    console.error('Delete error:', error);
+                });
+            }
+        });
+    };
 
     // Define columns for DataTable
     const columns = [
@@ -102,6 +147,26 @@ export default function ChallanDashboard() {
             button: true,
             sortable: true,
             center: true,
+            width: '100px'
+        },
+        {
+            name: 'Delete',  // New column for Delete button
+            cell: row => (
+                <button 
+                    onClick={() => handleDelete(row.id)} 
+                    style={{ 
+                        backgroundColor: 'red', 
+                        color: 'white', 
+                        border: 'none', 
+                        borderRadius: '5px', 
+                        cursor: 'pointer' 
+                    }}>
+                    Delete
+                </button>
+            ),
+            ignoreRowClick: true,
+            allowOverflow: true,
+            button: true,
             width: '100px'
         },
         {
@@ -241,7 +306,7 @@ export default function ChallanDashboard() {
                         ids: selectedIds
                     })
                         .then(response => {
-                            console.log('Update success:', response.data);
+                            // console.log('Update success:', response.data);
                             Swal.fire({
                                 icon: 'success',
                                 title: 'Success',
@@ -253,7 +318,7 @@ export default function ChallanDashboard() {
                             });
                         })
                         .catch(error => {
-                            console.error('Error updating challan:', error);
+                            // console.error('Error updating challan:', error);
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Error',
