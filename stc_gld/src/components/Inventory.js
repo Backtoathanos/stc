@@ -106,10 +106,16 @@ export default function Dashboard() {
         },
         
         {
-            name: 'Unit',
-            selector: row => row.stc_product_unit,
+            name: 'Rack',
+            selector: row => row.stc_rack_name,
             sortable: true,
             center: true
+        },
+        {
+            name: 'Inv Qty.',
+            selector: row => row.stc_item_inventory_pd_qty,
+            sortable: true,
+            right: true
         },
         {
             name: 'Inv Qty.',
