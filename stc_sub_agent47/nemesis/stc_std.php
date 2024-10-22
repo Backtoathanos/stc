@@ -911,7 +911,13 @@ class transformers extends tesseract{
 				`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
 		");
 		if($optimusprime_updateqry){
-			mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $actiontype)."', 'Status Down List created - ".mysqli_real_escape_string($this->stc_dbs, $actiontype)."', '1', '1', '".$_SESSION['stc_agent_sub_category']."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".$_SESSION['stc_agent_sub_id']."')");
+			$optimusprime_updateqry=mysqli_query($this->stc_dbs, "
+				SELECT `stc_status_down_list_jobtype` FROM `stc_status_down_list` 
+				WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
+			");
+			$result=mysqli_fetch_assoc($optimusprime_updateqry);
+			$jobtype=$result['stc_status_down_list_jobtype'];
+			mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $jobtype)."', 'Status Down List updated - ".$_SESSION['stc_agent_sub_name']."', '1', '1', '".$_SESSION['stc_agent_sub_category']."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".$_SESSION['stc_agent_sub_id']."')");
 			$optimusprime='Status updated!!!';
 		}else{
 			$optimusprime='Hmmm!!! Somethig went wrong on updating pending reason.';
