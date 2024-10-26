@@ -400,7 +400,25 @@ include("kattegat/role_check.php");
             }
           }
           // Initial data load
-          loadTableData(currentPage);
+          // loadTableData(currentPage);
+          var browserWidth = $(window).width();
+
+          // Define the threshold for tablet and mobile (e.g., 992px as a common breakpoint)
+          var tabletMobileBreakpoint = 992;
+          var leftPanelWidth = 400;
+
+          // Calculate final width based on conditions
+          var formWidth = browserWidth > tabletMobileBreakpoint ? browserWidth - leftPanelWidth : browserWidth;
+
+          // Set the width of the form
+          $('.stc-view-purchase-order-form').css('width', formWidth + 'px');
+
+          // Optional: Update the form width on window resize
+          $(window).resize(function () {
+              browserWidth = $(window).width();
+              formWidth = browserWidth > tabletMobileBreakpoint ? browserWidth - leftPanelWidth : browserWidth;
+              $('.stc-view-purchase-order-form').css('width', formWidth + 'px');
+          });
 
           // Event listener for pagination links
           $('body').delegate('#pagination a', 'click', function(e) {
@@ -583,7 +601,28 @@ include("kattegat/role_check.php");
                 }
               }
             });  
-          });  
+          }); 
+          $('body').delegate('.img-inputratebtn', 'click', function(e){
+            var adhoc_id=$(this).attr('id');
+            var rate=$(this).parent().find('.img-idrateinput').val();
+            $.ajax({
+              url     : "kattegat/ragnar_purchase.php",
+              method  : "POST",
+              data    : {
+                stc_po_adhoc_rateupdate:1,
+                adhoc_id:adhoc_id,
+                rate:rate
+              },
+              success : function(response_items){
+                var response=response_items.trim();
+                if(response=="success"){
+                  alert("Rate Updated Successfully.");
+                }else{
+                  alert("Something went wrong please check and try again.");
+                }
+              }
+            });  
+          });   
         });
     </script>
 </body>

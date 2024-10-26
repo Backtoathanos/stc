@@ -2273,22 +2273,23 @@ class ragnarPurchaseAdhoc extends tesseract{
 				}
 				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				
+				$pro_rate='<input type="number" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
 						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
-						<td>".$productog."</td>
-						<td><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a></td>
-						<td class='text-center'>".$odinrow['stc_rack_name']."</td>
+						<td style='width: 180px;'>".$productog."</td>
+						<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a></td>
+						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
 						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
-						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."</td>
+						<td class='text-right' style='width: 125px;'>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."".$pro_rate."</td>
 						<td class='text-right'>".number_format($stock, 2)."</td>
-						<td class='text-center'>
+						<td class='text-center' style='width: 180px;'>
 							<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' data-toggle='modal' data-target='.bd-showadhocdetails-modal-lg' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
 						</td>
-						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_source']."</td>
-						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_destination']."</td>
+						<td class='text-center' style='width: 180px;'>".$odinrow['stc_purchase_product_adhoc_source']."</td>
+						<td class='text-center' style='width: 180px;'>".$odinrow['stc_purchase_product_adhoc_destination']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_condition']."</td>
 						<td class='text-center'></td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_recievedby']."</td>
@@ -2392,6 +2393,19 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$odin='';
 		$checkqry=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_productid`='".mysqli_real_escape_string($this->stc_dbs, $img_id)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+		");
+		if($checkqry){
+			$odin='success';
+		}else{
+			$odin='failed';
+		}
+		return $odin;
+	}
+
+	public function stc_poadhoc_rateupdate($adhoc_id, $rate){
+		$odin='';
+		$checkqry=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_rate`='".mysqli_real_escape_string($this->stc_dbs, $rate)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
 		");
 		if($checkqry){
 			$odin='success';
@@ -3197,6 +3211,15 @@ if(isset($_POST['stc_po_adhoc_imgupdate'])){
 	$img_id=$_POST['img_id'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
 	$outbjornestocking=$bjornestocking->stc_poadhoc_imgupdate($adhoc_id, $img_id);
+	echo $outbjornestocking;
+}
+
+// update image id
+if(isset($_POST['stc_po_adhoc_rateupdate'])){
+	$adhoc_id=$_POST['adhoc_id'];
+	$rate=$_POST['rate'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_rateupdate($adhoc_id, $rate);
 	echo $outbjornestocking;
 }
 ?>
