@@ -796,10 +796,16 @@ class transformers extends tesseract{
 					WHERE
 						`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
 				");
+				$checkQuery = mysqli_query($this->stc_dbs, "SELECT `stc_status_down_list_jobtype` FROM `stc_status_down_list` WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'");
+				$cdate = date("Y-m-d");
+				$result=mysqli_fetch_assoc($checkQuery);
+				$jtype=$result['stc_status_down_list_jobtype'];
+				mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('".$jtype."', '".$jtype." done by ".$_SESSION['stc_agent_sub_name']."', '1', '1', '".$_SESSION['stc_agent_sub_category']."', '$date', '".$_SESSION['stc_agent_sub_id']."')");
 				$optimusprime = 'Status Updated!!!';
 			}else{
 				$optimusprime = 'Status not updated. Please fill all fields.';
 			}
+			
 		}else{
 			$optimusprime_qry=mysqli_query($this->stc_dbs, "
 				UPDATE 

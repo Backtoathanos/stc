@@ -194,7 +194,22 @@ class witcher_supervisor extends tesseract{
 			WHERE
 			    `stc_safetytbm_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_tbm_no)."'
 		");
+		
 		if($optimusprimequery){
+			$optimusprimequery = mysqli_query($this->stc_dbs, "SELECT stc_safetytbm_date FROM `stc_safetytbm` WHERE `stc_safetytbm_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_tbm_no)."' AND `stc_safetytbm_loc`<>'' AND `stc_safetytbm_place`<>'' AND `stc_safetytbm_agendaofmeet`<>'' AND `stc_safetytbm_ptone`<>'' AND `stc_safetytbm_pttwo`<>'' AND `stc_safetytbm_ptthree`<>'' AND `stc_safetytbm_ptfour`<>'' AND `stc_safetytbm_ptfive`<>'' AND `stc_safetytbm_ptsix`<>''");
+
+			if (mysqli_num_rows($optimusprimequery) > 0) {
+				$date = date("Y-m-d H:i:s");
+				$result=mysqli_fetch_assoc($optimusprimequery);
+				$cdate = date("Y-m-d", strtotime($result['stc_safetytbm_date']));
+				// Check if an entry with the same date already exists
+				$checkQuery = mysqli_query($this->stc_dbs, "SELECT * FROM `stc_cust_employee_rating` WHERE DATE(`created_date`) = '$cdate' AND `created_by` = '".$_SESSION['stc_agent_sub_id']."'");
+				
+				if (mysqli_num_rows($checkQuery) == 0) { // If no entry with the same date exists
+					mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('TBM', 'TBM done by ".$_SESSION['stc_agent_sub_name']."', '1', '1', '".$_SESSION['stc_agent_sub_category']."', '$date', '".$_SESSION['stc_agent_sub_id']."')");
+				}
+			}
+
 			$optimusprime="success";
 		}else{
 			$optimusprime="not success";
@@ -338,7 +353,7 @@ class witcher_supervisor extends tesseract{
 					$optimusprime_res=mysqli_query($this->stc_dbs, "SELECT MAX(`stc_cust_super_requisition_list_id`) as reqid FROM `stc_cust_super_requisition_list` WHERE `stc_cust_super_requisition_list_super_id`='".$_SESSION['stc_agent_sub_id']."'");
 					$result=mysqli_fetch_assoc($optimusprime_res);
 					$req_id=$result['reqid'];
-					$optimusprime_res=mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_super_requisition_list_items`(`stc_cust_super_requisition_list_items_req_id`, `stc_cust_super_requisition_list_items_title`, `stc_cust_super_requisition_list_items_unit`, `stc_cust_super_requisition_list_items_reqqty`, `stc_cust_super_requisition_items_type`, `stc_cust_super_requisition_items_priority`, `stc_cust_super_requisition_list_items_status`) VALUES('".$req_id."', '".$requisition."', '".$unit."', '1', 'PPE', '1', '1')");				
+					$optimusprime_res=mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_super_requisition_list_items`(`stc_cust_super_requisition_list_items_req_id`, `stc_cust_super_requisition_list_items_title`, `stc_cust_super_requisition_list_items_unit`, `stc_cust_super_requisition_list_items_reqqty`, `stc_cust_super_requisition_items_type`, `stc_cust_super_requisition_items_priority`, `stc_cust_super_requisition_list_items_status`) VALUES('".$req_id."', '".$requisition."', '".$unit."', '1', 'PPE', '1', '1')");			
 				}
 			}
 		}

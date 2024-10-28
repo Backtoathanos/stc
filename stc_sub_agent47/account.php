@@ -296,7 +296,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                                                     $bm+=$row['point'];
                                                                                 }else if(ucwords(strtolower($row['type']))=='Attendance'){
                                                                                     $attendance+=$row['point'];
-                                                                                }else if(ucwords(strtolower($row['type']))=='TBM'){
+                                                                                }else if($row['type']=='TBM'){
                                                                                     $tbm+=$row['point'];
                                                                                 }
                                                                             }
