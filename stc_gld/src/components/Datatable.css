@@ -27,6 +27,7 @@
 }
 .data-table .rdt_TableCell:nth-child(2)  {
     width: 10px;
+    height: 75px;
 }
 
 .data-table .rdt_TableRow:last-child {

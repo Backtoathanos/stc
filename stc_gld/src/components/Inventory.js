@@ -55,68 +55,82 @@ export default function Dashboard() {
     // Define columns for DataTable
     const columns = [
         {
-            name: 'Slno',
-            selector: (row, index) => index + 1,  // auto-generate serial number
-            sortable: false,
-            center: true
-        },
-        {
-            name: 'Product Id',
-            selector: row => row.stc_product_id,
+            name: 'Product',
+            selector: row => row.stc_product_name,
             sortable: true,
-            center: true
-        },
-        {
-            name: 'Image',
-            selector: row => row.stc_product_image,
-            sortable: false,
             center: true,
             cell: row => {
                 const imageUrl = `https://stcassociate.com/stc_symbiote/stc_product_image/${row.stc_product_image}`;
-                const defaultImageUrl = 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996'; // Replace with the actual path to your default image
-
+                const defaultImageUrl = 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996';
+        
                 return (
-                    <img
-                        src={row.stc_product_image ? imageUrl : defaultImageUrl}
-                        alt="Product"
-                        style={{ width: '100px', height: '80px', borderRadius: '5px' }}
-                        onError={(e) => e.target.src = defaultImageUrl} // If the image fails to load, use default
-                    />
+                    <div style={{ position: 'absolute', left: '20px', marginTop: '10px', marginBottom: '10px', display: 'flex', alignItems: 'center', maxWidth: '250px' }}>
+                        <div style={{ width: '60px', flexShrink: 0 }}>
+                            <img
+                                src={row.stc_product_image ? imageUrl : defaultImageUrl}
+                                alt="Product"
+                                style={{ width: '100%', height: '60px', borderRadius: '5px' }}
+                                onError={(e) => e.target.src = defaultImageUrl} // Use default if image fails to load
+                            />
+                        </div>
+                        <div style={{ marginLeft: '10px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <strong>
+                                {row.stc_product_name.length > 50 
+                                    ? `${row.stc_product_name.substring(0, 50)}...` 
+                                    : row.stc_product_name}
+                            </strong>
+                            {row.stc_product_name.length > 50 && (
+                                <button 
+                                    onClick={() => alert(row.stc_product_name)} 
+                                    style={{ marginLeft: '10px', background: 'none', color: 'blue', cursor: 'pointer', border: 'none' }}>
+                                    View More
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 );
             }
-        },
+        },       
         {
-            name: 'Product Description',
-            selector: row => row.stc_product_name,
+            name: 'Product Id (SKU)',
+            selector: row => row.stc_product_id,
             sortable: true,
-            cell: (row) => (
-                <>
-                    <span>{row.stc_product_name.length > 50 
-                        ? `${row.stc_product_name.substring(0, 50)}...` 
-                        : row.stc_product_name}</span>
-                    {row.stc_product_name.length > 50 && (
-                        <button 
-                            onClick={() => alert(row.stc_product_name)} 
-                            style={{ marginLeft: '10px', background: 'none', color: 'blue', cursor: 'pointer', border: 'none' }}>
-                            View More
-                        </button>
-                    )}
-                </>
-            ),
-        },
+            center: true
+        },   
         
         {
             name: 'Rack',
             selector: row => row.stc_rack_name,
             sortable: true,
             center: true
-        },
-        {
+        },{
             name: 'Inv Qty.',
-            selector: row => row.stc_item_inventory_pd_qty,
+            selector: row => row.stc_item_inventory_pd_qty + ' ' + row.stc_product_unit,
             sortable: true,
-            right: true
+            right: true,
+            cell: row => (
+                <span
+                    style={{
+                        background: '#afafaf',
+                        borderRadius: '10%',
+                        padding: '10px',
+                        color: '#000000',
+                        fontWeight: 'bold',
+                        display: 'inline-block',
+                        minWidth: '100px',
+                        textAlign: 'right'
+                    }}
+                >
+                    {`${row.stc_item_inventory_pd_qty}`} 
+                    <i style={{
+                        fontWeight: '400',
+                        minWidth: '100px',
+                        textAlign: 'right'
+                    }}>{` ${row.stc_product_unit}`}</i>
+                </span>
+            ),
         },
+        
         {
             name: 'Sale Rate',
             selector: row => row.rate_including_gst,

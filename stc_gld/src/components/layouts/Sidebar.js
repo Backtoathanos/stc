@@ -2,9 +2,9 @@ import { Link } from 'react-router-dom';
 
 export default function Sidebar({ activeRoute }) {
     return (
-        <div className="sidebar" data-color="purple" data-background-color="white" data-image="%PUBLIC_URL%/assets/img/sidebar-1.jpg">
+        <div className="sidebar" data-color="purple" data-background-color="white" data-image={`${process.env.PUBLIC_URL}/assets/img/sidebar-1.jpg`}>
             <div className="logo">
-                <Link to="http://www.creative-tim.com" className="simple-text logo-normal"> STC GLD </Link>
+                <Link to="javascript:void(0)" className="simple-text logo-normal"> STC GLD </Link>
             </div>
             <div className="sidebar-wrapper">
                 <ul className="nav">
@@ -24,6 +24,12 @@ export default function Sidebar({ activeRoute }) {
                         <Link to="/challan" className="nav-link">
                             <i className="material-icons">forum</i>
                             <p>Challan</p>
+                        </Link>
+                    </li>
+                    <li className={`nav-item ${activeRoute === 'invoice' ? 'active' : ''}`}>
+                        <Link to="/invoice" className="nav-link">
+                            <i className="material-icons">forum</i>
+                            <p>Invoice (RCM)</p>
                         </Link>
                     </li>
                 </ul>

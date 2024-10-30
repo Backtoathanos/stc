@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import Inventory from './components/Inventory';
 import Challan from './components/Challan';
 import PrintPreview from './components/PrintPreview';
+import Invoice from './components/invoice';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/dashboard" element={<Protected Component={Dashboard} />}/>
         <Route path="/inventory" element={<Protected Component={Inventory} />}/>
         <Route path="/challan" element={<Protected Component={Challan} />}/>
+        <Route path="/invoice" element={<Protected Component={Invoice} />}/>
         <Route path="/print-preview" element={<Protected Component={PrintPreview} />}/>
       </Routes>
     </BrowserRouter>

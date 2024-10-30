@@ -25,8 +25,16 @@ switch ($action) {
         getChallan($conn);
         break;
 
+    case 'getChallaned':
+        getChallaned($conn);
+        break;
+
     case 'updateChallanStatus':
         updateChallanStatus($conn);
+        break;
+
+    case 'updateChallanStatus2':
+        updateChallanStatus2($conn);
         break;
     
     case 'getDistinctChallanNos':
@@ -112,6 +120,23 @@ function getChallan($conn) {
     echo json_encode($challanData);
 }
 
+// Function to fetch customers from the database
+function getChallaned($conn) {
+    $search = isset($_GET['search']) ? $_GET['search'] : '';
+    $query = "SELECT GC.id, COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name) AS stc_product_name, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, ROUND(rate, 2) AS rate, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%') AND status=1";
+
+    $result = $conn->query($query);
+
+    $challanData = [];
+
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $challanData[] = $row;
+        }
+    }
+    echo json_encode($challanData);
+}
+
 // update challan status to print preview
 function updateChallanStatus($conn) {
     // Decode the JSON data from the request body
@@ -138,6 +163,44 @@ function updateChallanStatus($conn) {
         // If only one distinct customer ID is found, proceed with the update
         $date = date('dmYHis');
         $updateQuery = "UPDATE `gld_challan` SET `status` = '1', `challan_number` = '$date' WHERE `id` IN ($escapedIds)";
+
+        // Execute the update query
+        if ($conn->query($updateQuery)) {
+            echo json_encode(['success' => true, 'message' => 'Challan status updated successfully.']);
+        } else {
+            echo json_encode(['error' => 'Failed to update challan status.']);
+        }
+    } else {
+        echo json_encode(['error' => 'No valid IDs provided.']);
+    }
+}
+
+// update challan status2 to print preview
+function updateChallanStatus2($conn) {
+    // Decode the JSON data from the request body
+    $data = json_decode(file_get_contents('php://input'), true);
+    
+    // Get the array of IDs from the request
+    $ids = $data['ids'];
+    
+    // Check if we have valid IDs
+    if (!empty($ids) && is_array($ids)) {
+        // Escape and format IDs for SQL IN clause
+        $escapedIds = implode(',', array_map('intval', $ids)); // Use intval to ensure the IDs are treated as numbers
+
+        // Query to check for distinct cust_id values for the provided IDs
+        $checkQuery = "SELECT DISTINCT `cust_id` FROM `gld_challan` WHERE `id` IN ($escapedIds)";
+        $result = $conn->query($checkQuery);
+        
+        if ($result && $result->num_rows > 1) {
+            // More than one distinct customer ID found
+            echo json_encode(['error' => 'Different customers found for the selected challans. Update aborted.']);
+            return; // Stop the execution here if the customer IDs are different
+        }
+
+        // If only one distinct customer ID is found, proceed with the update
+        $date = date('dmYHis');
+        $updateQuery = "UPDATE `gld_challan` SET `status` = '2', `challan_number` = '$date' WHERE `id` IN ($escapedIds)";
 
         // Execute the update query
         if ($conn->query($updateQuery)) {
