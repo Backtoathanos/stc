@@ -45,7 +45,7 @@ foreach($result as $key => $row){
         }
         $row['stc_product_name'] = $row['stc_product_name'] . ' ' . $brand_name;
     }
-    $row['stc_product_name'] = $row['stc_sub_cat_name']!="OTHERS" ? $row['stc_product_name'] . " " .$row['stc_sub_cat_name'] : $row['stc_product_name'];
+    $row['stc_product_name'] = $row['stc_sub_cat_name']!="OTHERS" ? $row['stc_sub_cat_name'] . " " .$row['stc_product_name'] : $row['stc_product_name'];
 
     // Remove row if remaining quantity is 0 or less
     if ($remainingQty >0) {
