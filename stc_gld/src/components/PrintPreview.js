@@ -11,18 +11,27 @@ const PrintPreview = () => {
     const getQueryParams = (query) => {
         return new URLSearchParams(query);
     };
+    const queryParams = getQueryParams(location.search);
     useEffect(() => {
-        document.title = "STC GLD || Challan Print Preview"; // Set the title
+        let titlename = 'Invoice'; // Default title
+
+        if (queryParams.get('status') === 'billed') {
+            titlename = 'Challan';
+        }
+        document.title = "STC GLD || " + titlename + " Print Preview"; // Set the title
     }, []);
 
     // Fetch challan details when the page loads
     useEffect(() => {
-        const queryParams = getQueryParams(location.search);
-        const challanNo = queryParams.get('challan_no');
-
+        let challanNo = queryParams.get('challan_no') || 'default';
+        let status = queryParams.get('status') || 'default';
         if (challanNo) {
+            let geturl=`https://stcassociate.com/stc_gld/vanaheim/index.php?action=getChallanDetails&challan_no=${challanNo}&status=challan`;
+            if(status=="billed"){
+                geturl=`https://stcassociate.com/stc_gld/vanaheim/index.php?action=getChallanDetails&challan_no=${challanNo}&status=billed`;
+            }
             // Fetch details of the selected challan
-            axios.get(`https://stcassociate.com/stc_gld/vanaheim/index.php?action=getChallanDetails&challan_no=${challanNo}`)
+            axios.get(geturl)
                 .then(response => {
                     setChallanDetails(response.data);
                 })
@@ -33,7 +42,7 @@ const PrintPreview = () => {
     }, [location.search]);
 
     if (!challanDetails) {
-        return <div>Loading challan details...</div>;
+        return <div>Loading {queryParams.get('status') === 'billed' ? 'invoice' : 'challan'} details...</div>;
     }
     const formatDate = (dateString) => {
         const date = new Date(dateString);
@@ -53,15 +62,15 @@ const PrintPreview = () => {
                         alt="Global Logo"
                         style={{ height: '100px', marginRight: '15px' }}
                     />
-                    <h2 style={{ margin: '0', padding: '0' }}>RCM</h2>
+                    <h2 style={{ margin: '0', padding: '0' }}>{queryParams.get('status') === 'billed' ? 'RCM' : 'Challan'}</h2>
                 </div>
 
                 {/* Left and Right Aligned Sections */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
                     {/* Left 50% for Challan No */}
                     <div style={{ width: '50%', textAlign: 'left' }}>
-                        <p>Challan No: {challanDetails?.challan_number}</p>
-                        <p>Challan Date: {challanDetails?.challan_date ? formatDate(challanDetails.challan_date) : ''}</p>
+                        <p>{queryParams.get('status') === 'billed' ? 'Invoice' : 'Challan'} No: {challanDetails?.challan_number}</p>
+                        <p>{queryParams.get('status') === 'billed' ? 'Invoice' : 'Challan'} Date: {challanDetails?.challan_date ? formatDate(challanDetails.challan_date) : ''}</p>
                     </div>
 
                     {/* Right 50% for Customer Info */}

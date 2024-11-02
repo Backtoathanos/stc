@@ -141,9 +141,14 @@ export default function ChallanDashboard() {
         {
             name: 'Action',
             selector: row => row.created_by,
-            cell: row => (
-                <button onClick={() => handleAddPayment(row)}>Add Payment</button>
-            ),
+            cell: row => {
+                const duesValue = ((row.rate * row.qty) - row.paid_amount).toFixed(2);
+                
+                // Conditionally render button if dues are greater than 0
+                return duesValue > 0 ? (
+                    <button onClick={() => handleAddPayment(row)}>Add Payment</button>
+                ) : "Paid";
+            },
             button: true,
             sortable: true,
             center: true,
@@ -470,7 +475,7 @@ export default function ChallanDashboard() {
                                                 <Button variant="primary" onClick={() => {
                                                     // Redirect to the print-preview page with the selected challan number in a new tab
                                                     if (selectedChallan) {
-                                                        window.open(`/stc_gld/print-preview?challan_no=${selectedChallan.value}`, '_blank');
+                                                        window.open(`/stc_gld/print-preview?challan_no=${selectedChallan.value}&status=challan`, '_blank');
                                                     } else {
                                                         alert("Please select a challan number");
                                                     }

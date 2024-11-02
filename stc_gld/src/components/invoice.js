@@ -141,34 +141,20 @@ export default function ChallanDashboard() {
         {
             name: 'Action',
             selector: row => row.created_by,
-            cell: row => (
-                <button onClick={() => handleAddPayment(row)}>Add Payment</button>
-            ),
+            cell: row => {
+                const duesValue = ((row.rate * row.qty) - row.paid_amount).toFixed(2);
+
+                // Conditionally render button if dues are greater than 0 and status is not 3
+                return duesValue > 0 && row.status !== 3 ? (
+                    <button onClick={() => handleAddPayment(row)}>Add Payment</button>
+                ) : "Paid";
+            },
             button: true,
             sortable: true,
             center: true,
             width: '100px'
         },
-        {
-            name: 'Delete',  // New column for Delete button
-            cell: row => (
-                <button 
-                    onClick={() => handleDelete(row.id)} 
-                    style={{ 
-                        backgroundColor: 'red', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '5px', 
-                        cursor: 'pointer' 
-                    }}>
-                    Delete
-                </button>
-            ),
-            ignoreRowClick: true,
-            allowOverflow: true,
-            button: true,
-            width: '100px'
-        },
+        
         {
             name: 'Product Name',
             selector: row => row.stc_product_name,
@@ -206,7 +192,7 @@ export default function ChallanDashboard() {
         },
         {
             name: 'Quantity',
-            selector: row => row.qty,
+            selector: row => row.qty + ' ' + row.stc_product_unit,
             sortable: true,
             right: true,
             width: '100px'
@@ -256,8 +242,9 @@ export default function ChallanDashboard() {
             name: 'Status',
             selector: row => {
                 return parseInt(row.status) === 0 ? 'Unchallaned' :
-                    parseInt(row.status) === 1 ? 'Challaned' :
-                        parseInt(row.status) === 2 ? 'Billed' : 'Unknown';
+                            parseInt(row.status) === 1 ? 'Challaned' :
+                                parseInt(row.status) === 2 ? 'Billed' : 
+                                    parseInt(row.status) === 3 ? 'Closed' : 'Unknown';
             },
             sortable: true,
             center: true
@@ -302,7 +289,7 @@ export default function ChallanDashboard() {
                     setLoading(true);  // Show loading spinner
                     const selectedIds = selectedRows.map(row => row);  // Ensure the correct field is mapped for the IDs
 
-                    axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=updateChallanStatus2', {
+                    axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=updateChallanBillNo', {
                         ids: selectedIds
                     })
                         .then(response => {
@@ -341,7 +328,7 @@ export default function ChallanDashboard() {
     };
 
     const getChallan = () => {
-        axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php?action=getDistinctChallanNos')
+        axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php?action=getDistinctBillNos')
             .then(response => {
                 const data = response.data;
                 // Map the data to the format required by react-select
@@ -445,7 +432,7 @@ export default function ChallanDashboard() {
                                         )}
                                         {selectedRows.length > 0 && (
                                             <button onClick={handleChallanUpdate} className="btn btn-primary">
-                                                Proceed to Challan
+                                                Proceed to Invoice (RCM)
                                             </button>
                                         )}
                                         {/* Modal */}
@@ -458,7 +445,7 @@ export default function ChallanDashboard() {
                                                     value={selectedChallan}
                                                     onChange={setSelectedChallan}
                                                     options={challanOptions}
-                                                    placeholder="Select Challan Number"
+                                                    placeholder="Select Bill Number"
                                                     isSearchable={true}
                                                     className="form-control"
                                                 />
@@ -470,7 +457,7 @@ export default function ChallanDashboard() {
                                                 <Button variant="primary" onClick={() => {
                                                     // Redirect to the print-preview page with the selected challan number in a new tab
                                                     if (selectedChallan) {
-                                                        window.open(`/stc_gld/print-preview?challan_no=${selectedChallan.value}`, '_blank');
+                                                        window.open(`/stc_gld/print-preview?challan_no=${selectedChallan.value}&status=billed`, '_blank');
                                                     } else {
                                                         alert("Please select a challan number");
                                                     }

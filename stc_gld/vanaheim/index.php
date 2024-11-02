@@ -33,14 +33,18 @@ switch ($action) {
         updateChallanStatus($conn);
         break;
 
-    case 'updateChallanStatus2':
-        updateChallanStatus2($conn);
+    case 'updateChallanBillNo':
+        updateChallanBillNo($conn);
         break;
     
     case 'getDistinctChallanNos':
         getDistinctChallanNos($conn);
         break;
-
+    
+    case 'getDistinctBillNos':
+        getDistinctBillNos($conn);
+        break;
+        
     case 'getChallanDetails':
         getChallanDetails($conn);
         break;
@@ -123,7 +127,7 @@ function getChallan($conn) {
 // Function to fetch customers from the database
 function getChallaned($conn) {
     $search = isset($_GET['search']) ? $_GET['search'] : '';
-    $query = "SELECT GC.id, COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name) AS stc_product_name, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, ROUND(rate, 2) AS rate, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%') AND status=1";
+    $query = "SELECT GC.id, COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name) AS stc_product_name, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, stc_product_unit, ROUND(rate, 2) AS rate, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%') AND (status=2 OR status=3)";
 
     $result = $conn->query($query);
 
@@ -131,6 +135,7 @@ function getChallaned($conn) {
 
     if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+            $row['created_date']=date('d-m-Y H:i a', strtotime($row['created_date']));
             $challanData[] = $row;
         }
     }
@@ -176,31 +181,36 @@ function updateChallanStatus($conn) {
 }
 
 // update challan status2 to print preview
-function updateChallanStatus2($conn) {
+function updateChallanBillNo($conn) {
     // Decode the JSON data from the request body
     $data = json_decode(file_get_contents('php://input'), true);
-    
+
     // Get the array of IDs from the request
     $ids = $data['ids'];
-    
+
     // Check if we have valid IDs
     if (!empty($ids) && is_array($ids)) {
         // Escape and format IDs for SQL IN clause
-        $escapedIds = implode(',', array_map('intval', $ids)); // Use intval to ensure the IDs are treated as numbers
+        $escapedIds = implode(',', array_map('intval', $ids));
 
         // Query to check for distinct cust_id values for the provided IDs
         $checkQuery = "SELECT DISTINCT `cust_id` FROM `gld_challan` WHERE `id` IN ($escapedIds)";
         $result = $conn->query($checkQuery);
-        
+
         if ($result && $result->num_rows > 1) {
             // More than one distinct customer ID found
             echo json_encode(['error' => 'Different customers found for the selected challans. Update aborted.']);
             return; // Stop the execution here if the customer IDs are different
         }
 
-        // If only one distinct customer ID is found, proceed with the update
+        // Get the last bill number and increment it by 1
+        $lastBillQuery = "SELECT MAX(`bill_number`) AS last_bill_number FROM `gld_challan`";
+        $billResult = $conn->query($lastBillQuery);
+        $lastBillNumber = ($billResult && $billResult->num_rows > 0) ? (int)$billResult->fetch_assoc()['last_bill_number'] + 1 : 1;
+
+        // Generate a unique challan number based on the current date and time
         $date = date('dmYHis');
-        $updateQuery = "UPDATE `gld_challan` SET `status` = '2', `challan_number` = '$date' WHERE `id` IN ($escapedIds)";
+        $updateQuery = "UPDATE `gld_challan` SET `bill_number` = '$lastBillNumber', `status` = '3', `challan_number` = '$date' WHERE `id` IN ($escapedIds)";
 
         // Execute the update query
         if ($conn->query($updateQuery)) {
@@ -211,6 +221,7 @@ function updateChallanStatus2($conn) {
     } else {
         echo json_encode(['error' => 'No valid IDs provided.']);
     }
+
 }
 
 // function to get distinct challans
@@ -227,14 +238,33 @@ function getDistinctChallanNos($conn) {
     echo json_encode($challanNos);
 }
 
+// function to get distinct challans
+function getDistinctBillNos($conn) {
+    $query = "SELECT DISTINCT bill_number FROM gld_challan WHERE (status='2' OR status='3') AND bill_number<>'' ORDER BY TIMESTAMP(created_date) DESC";
+    $result = $conn->query($query);
+
+    $challanNos = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $challanNos[] = ['challan_number' => $row['bill_number']];
+        }
+    }
+    echo json_encode($challanNos);
+}
+
 // get challan details for row
 function getChallanDetails($conn) {
     $challan_number = $_GET['challan_no'];
+    $status = $_GET['status'];
+    $query="gld_challan.challan_number = '$challan_number'";
+    if($status=="billed"){
+        $query="gld_challan.bill_number = '$challan_number'";
+    }
     $query = "SELECT gld_challan.challan_number, gld_customer.gld_customer_title AS customer_name, gld_customer.gld_customer_cont_no AS customer_phone, stc_product.stc_product_name AS product_name, stc_product.stc_product_rack_id AS Rackid, stc_product.stc_product_unit AS unit, gld_challan.qty, gld_challan.rate, gld_challan.paid_amount, gld_challan.payment_status, gld_customer.gld_customer_address, gld_challan.created_date  
               FROM gld_challan
               JOIN gld_customer ON gld_challan.cust_id = gld_customer.gld_customer_id
               JOIN stc_product ON gld_challan.product_id = stc_product.stc_product_id
-              WHERE gld_challan.challan_number = '$challan_number'";
+              WHERE ".$query;
 
     $result = $conn->query($query);
     
