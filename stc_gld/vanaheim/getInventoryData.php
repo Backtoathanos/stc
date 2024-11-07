@@ -46,20 +46,20 @@ foreach($result as $key => $row){
     }
     $row['stc_product_name'] = $row['stc_sub_cat_name']!="OTHERS" ? $row['stc_sub_cat_name'] . " " .$row['stc_product_name'] : $row['stc_product_name'];
 
-    
-    $delivered=0;
-    $sql_qry=mysqli_query($con, "
-        SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
-        FROM `stc_cust_super_requisition_list_items_rec` 
-        WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$odinrow['stc_purchase_product_adhoc_id']."'
-    ");
-    if(mysqli_num_rows($sql_qry)>0){
-        foreach($sql_qry as $sql_row){
-            $delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+    if($odinrow['stc_purchase_product_adhoc_id']!=0){
+        $delivered=0;
+        $sql_qry=mysqli_query($con, "
+            SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
+            FROM `stc_cust_super_requisition_list_items_rec` 
+            WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$odinrow['stc_purchase_product_adhoc_id']."'
+        ");
+        if(mysqli_num_rows($sql_qry)>0){
+            foreach($sql_qry as $sql_row){
+                $delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+            }
         }
+        $row['stc_item_inventory_pd_qty'] = $odinrow['stc_item_inventory_pd_qty'] - $delivered;
     }
-    $row['stc_item_inventory_pd_qty'] = $odinrow['stc_item_inventory_pd_qty'] - $delivered;
-
     // Remove row if remaining quantity is 0 or less
     if ($remainingQty >0) {
         $data[] = $row; // Add the row to the data array
