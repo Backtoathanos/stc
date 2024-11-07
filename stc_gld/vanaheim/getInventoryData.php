@@ -48,7 +48,7 @@ foreach($result as $key => $row){
 
     
     $delivered=0;
-    $sql_qry=mysqli_query($this->stc_dbs, "
+    $sql_qry=mysqli_query($con, "
         SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
         FROM `stc_cust_super_requisition_list_items_rec` 
         WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$odinrow['stc_purchase_product_adhoc_id']."'
