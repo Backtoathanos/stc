@@ -58,7 +58,7 @@ foreach($result as $key => $row){
                 $delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
             }
         }
-        $row['stc_item_inventory_pd_qty'] = $row['stc_item_inventory_pd_qty'] - ($odinrow['stc_item_inventory_pd_qty'] + $delivered);
+        $row['stc_item_inventory_pd_qty'] = number_format($row['stc_item_inventory_pd_qty'] - ($odinrow['stc_item_inventory_pd_qty'] + $delivered), 2);
     }
     // Remove row if remaining quantity is 0 or less
     if ($remainingQty >0) {
