@@ -1,6 +1,6 @@
 <?php  
 session_start(); 
-if(isset($_SESSION["stc_agent_sub_id"])){ 
+if(isset($_SESSION["stc_agent_id"])){ 
 }else{ 
     header("Location:index.html"); 
 } 
