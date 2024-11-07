@@ -9,7 +9,7 @@ include "../../MCU/db.php";
 $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
 
 // Modify query to filter by product name if a search query is provided
-$query = "SELECT P.stc_product_id, P.stc_product_name, stc_sub_cat_name, P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image, R.stc_rack_name, ppa.stc_purchase_product_adhoc_qty as stc_item_inventory_pd_qty, P.stc_product_gst, ppa.stc_purchase_product_adhoc_rate as rate_including_gst, ROUND(ppa.stc_purchase_product_adhoc_rate * (1 + P.stc_product_sale_percentage / 100), 2) AS rate_including_percentage FROM stc_purchase_product_adhoc ppa LEFT JOIN stc_product P ON ppa.stc_purchase_product_adhoc_productid = P.stc_product_id LEFT JOIN stc_rack R ON ppa.stc_purchase_product_adhoc_rackid = R.stc_rack_id LEFT JOIN stc_sub_category ON stc_product_sub_cat_id = stc_sub_cat_id WHERE ppa.stc_purchase_product_adhoc_qty > 0 AND ppa.stc_purchase_product_adhoc_status=1 AND ppa.stc_purchase_product_adhoc_productid<>0";
+$query = "SELECT ppa.stc_purchase_product_adhoc_id, P.stc_product_id, P.stc_product_name, stc_sub_cat_name, P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image, R.stc_rack_name, ppa.stc_purchase_product_adhoc_qty as stc_item_inventory_pd_qty, P.stc_product_gst, ppa.stc_purchase_product_adhoc_rate as rate_including_gst, ROUND(ppa.stc_purchase_product_adhoc_rate * (1 + P.stc_product_sale_percentage / 100), 2) AS rate_including_percentage FROM stc_purchase_product_adhoc ppa LEFT JOIN stc_product P ON ppa.stc_purchase_product_adhoc_productid = P.stc_product_id LEFT JOIN stc_rack R ON ppa.stc_purchase_product_adhoc_rackid = R.stc_rack_id LEFT JOIN stc_sub_category ON stc_product_sub_cat_id = stc_sub_cat_id WHERE ppa.stc_purchase_product_adhoc_qty > 0 AND ppa.stc_purchase_product_adhoc_status=1 AND ppa.stc_purchase_product_adhoc_productid<>0";
 
 // If search query is not empty, add a filter for the product name
 if ($search !== '') {
@@ -22,7 +22,6 @@ $result = mysqli_query($con, $query);
 
 $data = [];
 foreach($result as $key => $row){
-// while ($row = mysqli_fetch_assoc($result)) {
     $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = " . $row['stc_product_id']);
     $totalQty=0;
     if(mysqli_num_rows($query)>0){
@@ -46,6 +45,20 @@ foreach($result as $key => $row){
         $row['stc_product_name'] = $row['stc_product_name'] . ' ' . $brand_name;
     }
     $row['stc_product_name'] = $row['stc_sub_cat_name']!="OTHERS" ? $row['stc_sub_cat_name'] . " " .$row['stc_product_name'] : $row['stc_product_name'];
+
+    
+    $delivered=0;
+    $sql_qry=mysqli_query($this->stc_dbs, "
+        SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
+        FROM `stc_cust_super_requisition_list_items_rec` 
+        WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$odinrow['stc_purchase_product_adhoc_id']."'
+    ");
+    if(mysqli_num_rows($sql_qry)>0){
+        foreach($sql_qry as $sql_row){
+            $delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+        }
+    }
+    $row['stc_item_inventory_pd_qty'] = $odinrow['stc_item_inventory_pd_qty'] - $delivered;
 
     // Remove row if remaining quantity is 0 or less
     if ($remainingQty >0) {

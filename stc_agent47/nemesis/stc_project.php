@@ -1329,6 +1329,77 @@ class pirates_project extends tesseract{
 		}
 		return $blackpearl;
 	}
+
+	//show equipment details
+	public function stc_equipement_details_get($search){
+		$query=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_pro_supervisor_collaborate_userid` FROM `stc_agents`  LEFT JOIN `stc_cust_pro_supervisor_collaborate` ON `stc_agents_id`=`stc_cust_pro_supervisor_collaborate_managerid` OR `stc_agents_id`=`stc_cust_pro_supervisor_collaborate_teamid` WHERE `stc_agents_id`='".$_SESSION['stc_agent_id']."'");
+		$users='';
+		if(mysqli_num_rows($query)>0){
+			foreach($query as $rows){
+				if($users==''){
+					$users=$rows['stc_cust_pro_supervisor_collaborate_userid'];
+				}else{
+					$users.=','.$rows['stc_cust_pro_supervisor_collaborate_userid'];
+				}
+			}
+		}
+		// Initialize the base query
+		$baseQuery = "SELECT `id`, `area`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `model_no`, `capacity`, `equipment_name`, `equipment_no`, `stc_cust_pro_supervisor_fullname`, `created_date` FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id` = `equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id` = `equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by` = `stc_cust_pro_supervisor_id`";
+
+		// Initialize filter array
+		$filters = [];
+
+		// Add user filter if $users is not empty
+		if (!empty($users)) {
+		$filters[] = "`created_by` IN (" . mysqli_real_escape_string($this->stc_dbs, $users) . ")";
+		}
+
+		// Add search filter if $search is not empty
+		if (!empty($search)) {
+			$escapedSearch = mysqli_real_escape_string($this->stc_dbs, $search);
+			$filters[] = "(
+				`model_no` = '$escapedSearch' OR 
+				`capacity` REGEXP '$escapedSearch' OR 
+				`stc_cust_pro_supervisor_fullname` REGEXP '$escapedSearch' OR 
+				`area` REGEXP '$escapedSearch' OR 
+				`stc_status_down_list_department_location` REGEXP '$escapedSearch' OR 
+				`stc_status_down_list_department_dept` REGEXP '$escapedSearch' OR 
+				`equipment_name` REGEXP '$escapedSearch' OR 
+				`equipment_no` REGEXP '$escapedSearch'
+			)";
+		}
+
+		// Combine filters with `AND` if any exist
+		$filterString = !empty($filters) ? " WHERE " . implode(" AND ", $filters) : "";
+
+		// Complete query with filters and ordering
+		$query = $baseQuery . $filterString . " ORDER BY TIMESTAMP(`created_date`) DESC";
+
+		// Execute query
+		$blackpearl_qry = mysqli_query($this->stc_dbs, $query);
+
+		$blackpearl=[];
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$blackpearl[] = $blackpearl_row;
+			}
+		}
+	
+		return $blackpearl;
+	}
+
+	// show equipment details perticular
+	public function stc_get_equipmentdetails($id){
+		$blackpearl = array();		
+		// Insert the new record into the equipment_details table
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details` WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+		if(mysqli_num_rows($blackpearl_qry)>0){
+			foreach($blackpearl_qry as $blackpearl_row){
+				$blackpearl[]=$blackpearl_row;
+			}
+		}
+		return $blackpearl;
+	}
 }
 
 class pirates_supervisor extends tesseract{
@@ -4640,5 +4711,21 @@ if(isset($_POST['call_item_tracker'])){
 	$odin_req=new pirates_project();
 	$odin_req_out=$odin_req->stc_item_tracker_call();
 	echo $odin_req_out;
+}
+
+// call equipment details
+if(isset($_POST['call_equipementdetails'])){
+	$search=isset($_POST['search']) ? $_POST['search'] : '';
+	$odin_req=new pirates_project();
+	$odin_req_out=$odin_req->stc_equipement_details_get($search);
+	echo json_encode($odin_req_out);
+}
+
+// delete equipment details
+if(isset($_POST['get_equipementdetails'])){
+	$id=$_POST['id'];
+	$metabots=new pirates_project();
+	$opmetabots=$metabots->stc_get_equipmentdetails($id);
+	echo json_encode($opmetabots);
 }
 ?>

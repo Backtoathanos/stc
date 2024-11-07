@@ -188,7 +188,7 @@ include("kattegat/role_check.php");
                                           name="rack_name"
                                           type="text"
                                           class="form-control validate"
-                                          placeholder="Enter Brand Name"
+                                          placeholder="Enter Rack Name"
                                           required
                                         />
                                         <input type="hidden" name="rack_hit">

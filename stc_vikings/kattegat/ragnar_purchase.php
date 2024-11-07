@@ -2172,7 +2172,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$odin='';
 		$filter='';
 		if($itemname!=""){
-			$filter.="AND `stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."'";
+			$filter.="AND (`stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_desc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."')";
 		}
 		if($sourcedestination!=""){
 			$filter.="
@@ -2190,6 +2190,9 @@ class ragnarPurchaseAdhoc extends tesseract{
 			SELECT
 				`stc_purchase_product_adhoc_id`,
 				`stc_purchase_product_adhoc_productid`,
+				`stc_product_id`,
+				`stc_product_name`,
+				`stc_product_image`,
 				`stc_purchase_product_adhoc_itemdesc`,
 				`stc_purchase_product_adhoc_qty`,
 				`stc_purchase_product_adhoc_rate`,
@@ -2206,10 +2209,9 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_updated_by`,
 				`stc_purchase_product_adhoc_updated_date`
 			FROM `stc_purchase_product_adhoc`
-			LEFT JOIN `stc_rack`
-			ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
-			LEFT JOIN `stc_user`
-			ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
+			LEFT JOIN `stc_product` ON `stc_purchase_product_adhoc_productid`=`stc_product_id`
+			LEFT JOIN `stc_rack` ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
+			LEFT JOIN `stc_user` ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
 			WHERE `stc_purchase_product_adhoc_qty`>0 ".$filter."
 			ORDER BY TIMESTAMP(`stc_purchase_product_adhoc_created_date`) DESC
 		";
@@ -2219,6 +2221,9 @@ class ragnarPurchaseAdhoc extends tesseract{
 			SELECT
 				`stc_purchase_product_adhoc_id`,
 				`stc_purchase_product_adhoc_productid`,
+				`stc_product_id`,
+				`stc_product_name`,
+				`stc_product_image`,
 				`stc_purchase_product_adhoc_itemdesc`,
 				`stc_purchase_product_adhoc_qty`,
 				`stc_purchase_product_adhoc_rate`,
@@ -2235,10 +2240,9 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_updated_by`,
 				`stc_purchase_product_adhoc_updated_date`
 			FROM `stc_purchase_product_adhoc`
-			LEFT JOIN `stc_rack`
-			ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
-			LEFT JOIN `stc_user`
-			ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
+			LEFT JOIN `stc_product` ON `stc_purchase_product_adhoc_productid`=`stc_product_id`
+			LEFT JOIN `stc_rack` ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
+			LEFT JOIN `stc_user` ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
 			WHERE `stc_purchase_product_adhoc_qty`>0 ".$filter."
 			ORDER BY TIMESTAMP(`stc_purchase_product_adhoc_created_date`) DESC
 		");
@@ -2259,7 +2263,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						$delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
 					}
 				}
-				$stock=$odinrow['stc_purchase_product_adhoc_qty'] - $delivered;;
+				$stock=$odinrow['stc_purchase_product_adhoc_qty'] - $delivered;
 				$sql_qry=mysqli_query($this->stc_dbs, "
 					SELECT `stc_product_image` FROM `stc_product` WHERE `stc_product_id`='".$odinrow['stc_purchase_product_adhoc_productid']."'
 				");
@@ -2279,6 +2283,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-center'>".$slno."</td>
 						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
 						<td style='width: 180px;'>".$productog."</td>
+						<td class='text-center'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$odinrow['stc_product_name']."</a></td>
 						<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a></td>
 						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
@@ -2411,6 +2416,112 @@ class ragnarPurchaseAdhoc extends tesseract{
 			$odin='success';
 		}else{
 			$odin='failed';
+		}
+		return $odin;
+	}
+
+	public function stc_poadhoc_rohistory($adhoc_id){
+		$odin='';
+		$query="SELECT stc_product_name, stc_product_unit FROM stc_product WHERE stc_product_id=".$adhoc_id;
+		$result=mysqli_query($this->stc_dbs, $query);
+		if(mysqli_num_rows($result)>0){
+			// gld challan
+			$product_name='';
+			$product_unit='';
+			$gld_challan = []; // Initialize the array to store results
+			foreach($result as $row){
+				$product_name=$row['stc_product_name'];
+				$product_unit=$row['stc_product_unit'];
+			}
+
+			// purchased order data
+			$purchased_data=[]; 
+			
+			$query = "SELECT DISTINCT `stc_merchant_name`, `stc_purchase_product_id`, `stc_purchase_product_order_date`, `stc_product_grn_id`, `stc_product_grn_date`, `stc_product_grn_items_qty`, `stc_product_grn_items_rate`, `stc_user_name` FROM `stc_product_grn_items` LEFT JOIN `stc_product_grn` ON `stc_product_grn_items_grn_order_id`=`stc_product_grn_id` LEFT JOIN `stc_purchase_product` ON `stc_product_grn_items_purchase_order_id`=`stc_purchase_product_id` LEFT JOIN `stc_merchant` ON `stc_purchase_product_merchant_id`=`stc_merchant_id` LEFT JOIN `stc_user` ON `stc_purchase_product_created_by`=`stc_user_id` WHERE `stc_product_grn_items_product_id`=" . intval($adhoc_id);
+			$result = mysqli_query($this->stc_dbs, $query);
+
+
+			if ($result) {
+				foreach ($result as $row) {
+					$row['stc_purchase_product_order_date']=date('d-m-Y H:i a', strtotime($row['stc_purchase_product_order_date']));
+					$row['stc_product_grn_date']=date('d-m-Y H:i a', strtotime($row['stc_product_grn_date']));
+					$purchased_data[] = $row; // Add each row to the array
+				}
+			}
+
+			// adhoc challan data
+			$adhocchallan_data=[]; 
+			
+			$query = "SELECT `stc_customer_name`, `stc_cust_project_title`, `stc_cust_super_requisition_list_items_rec_list_id`, `stc_cust_super_requisition_list_items_rec_recqty`, `stc_cust_super_requisition_list_items_rec_date` FROM `stc_cust_super_requisition_list_items_rec` LEFT JOIN `stc_cust_super_requisition_list` ON `stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_rec_list_id` LEFT JOIN `stc_cust_project` ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id` LEFT JOIN `stc_customer` ON `stc_cust_project_cust_id`=`stc_customer_id` WHERE `stc_cust_super_requisition_list_items_rec_list_pd_id`=" . intval($adhoc_id);
+			$result = mysqli_query($this->stc_dbs, $query);
+
+
+			if ($result) {
+				foreach ($result as $row) {
+					$row['stc_cust_super_requisition_list_items_rec_date']=date('d-m-Y H:i a', strtotime($row['stc_cust_super_requisition_list_items_rec_date']));
+					$adhocchallan_data[] = $row; // Add each row to the array
+				}
+			}
+
+			// purchased adhoc data
+			$challan_data=[]; 
+			
+			$query = "SELECT `stc_purchase_product_adhoc_source`, `stc_purchase_product_adhoc_destination`, `stc_purchase_product_adhoc_recievedby`, `stc_purchase_product_adhoc_qty`, `stc_purchase_product_adhoc_rate`, `stc_purchase_product_adhoc_destination`, `stc_purchase_product_adhoc_recievedby`, `stc_user_name`, `stc_purchase_product_adhoc_created_date` FROM `stc_purchase_product_adhoc` LEFT JOIN `stc_user` ON `stc_purchase_product_adhoc_created_by`=`stc_user_id` WHERE `stc_purchase_product_adhoc_productid`=" . intval($adhoc_id);
+			$result = mysqli_query($this->stc_dbs, $query);
+
+
+			if ($result) {
+				foreach ($result as $row) {
+					$row['stc_purchase_product_adhoc_created_date']=date('d-m-Y H:i a', strtotime($row['stc_purchase_product_adhoc_created_date']));
+					$purchasedadhoc_data[] = $row; // Add each row to the array
+				}
+			}
+
+			// challan_data
+			$challan_data=[]; 
+			
+			$query = "SELECT `stc_customer_name`, `stc_cust_project_title`, `stc_sale_product_id`, `stc_sale_product_cust_order_date`, `stc_sale_product_items_product_qty`, `stc_sale_product_items_product_sale_rate` FROM `stc_sale_product_items` LEFT JOIN `stc_sale_product` ON `stc_sale_product_items_sale_product_id`=`stc_sale_product_id` LEFT JOIN `stc_cust_super_requisition_list` ON `stc_sale_product_order_id`=`stc_cust_super_requisition_list_id` LEFT JOIN `stc_cust_project` ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id` LEFT JOIN `stc_customer` ON `stc_sale_product_cust_id`=`stc_customer_id` WHERE `stc_sale_product_items_product_id`=" . intval($adhoc_id) . " ORDER BY DATE(`stc_sale_product_cust_order_date`) DESC";
+			$result = mysqli_query($this->stc_dbs, $query);
+
+
+			if ($result) {
+				foreach ($result as $row) {
+					$row['stc_sale_product_cust_order_date']=date('d-m-Y H:i a', strtotime($row['stc_sale_product_cust_order_date']));
+					$challan_data[] = $row; // Add each row to the array
+				}
+			}
+
+			// gld challan data
+			$query = "SELECT `id`, `product_id`, `gld_customer_title`, `requisition_id`, `challan_number`, `bill_number`, `qty`, `rate`, `paid_amount`, `payment_status`, `status`, `created_date`, `stc_trading_user_name` FROM `gld_challan` LEFT JOIN `gld_customer` ON `gld_customer_id`=`cust_id` LEFT JOIN `stc_trading_user` ON `stc_trading_user_id`=`created_by` WHERE `product_id` = " . intval($adhoc_id);
+			$result = mysqli_query($this->stc_dbs, $query);
+
+
+			if ($result) {
+				foreach ($result as $row) {
+					$row['created_date']=date('d-m-Y H:i a', strtotime($row['created_date']));
+					$gld_challan[] = $row; // Add each row to the array
+				}
+			}
+			
+			$odin=array(
+				'Product_name' => $product_name,
+				'product_unit' => $product_unit,
+				'purchased' => $purchased_data,
+				'purchasedadhoc' => $purchasedadhoc_data,
+				'challan' => $challan_data,
+				'directchallan' => $adhocchallan_data,
+				'gld_challan' => $gld_challan
+			);
+		}else{
+			$odin=array(
+				'Product_name' => "No data.",
+				'product_unit' => "No data.",
+				'purchased' => "No data.",
+				'purchasedadhoc' => "No data.",
+				'challan' => "No data.",
+				'directchallan' => "No data.",
+				'gld_challan' => "No data."
+			);
 		}
 		return $odin;
 	}
@@ -3221,5 +3332,13 @@ if(isset($_POST['stc_po_adhoc_rateupdate'])){
 	$bjornestocking=new ragnarPurchaseAdhoc();
 	$outbjornestocking=$bjornestocking->stc_poadhoc_rateupdate($adhoc_id, $rate);
 	echo $outbjornestocking;
+}
+
+// update image id
+if(isset($_POST['stc_po_adhoc_getprohistory'])){
+	$adhoc_id=$_POST['adhoc_id'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_rohistory($adhoc_id);
+	echo json_encode($outbjornestocking);
 }
 ?>

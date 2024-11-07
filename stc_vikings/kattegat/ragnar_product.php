@@ -587,7 +587,7 @@ class ragnarProduct extends tesseract{
 			AND `stc_product_cat_id`		=	'".mysqli_real_escape_string($this->stc_dbs, $stcpdcat				)."'
 			AND `stc_product_sub_cat_id`	=	'".mysqli_real_escape_string($this->stc_dbs, $stcpdsubcat			)."'
 			AND `stc_product_brand_id`		=	'".mysqli_real_escape_string($this->stc_dbs, $stcpdbrand			)."'
-			AND `stc_product_id`			=	'".mysqli_real_escape_string($this->stc_dbs, $product_id			)."'
+			AND `stc_product_id`			<>	'".mysqli_real_escape_string($this->stc_dbs, $product_id			)."'
 		");
 		$count_loki_out=mysqli_num_rows($check_loki);
 		if($count_loki_out == 0){

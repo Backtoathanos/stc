@@ -74,12 +74,17 @@
                             </li>
                         ';
                     }
-                ?>
-                
+                ?>                
                 <li>
                     <a href="stc-std.php?page=statusdownlist" class="statusdownlist">
                         <i class="metismenu-icon pe-7s-switch"></i>
                         Status Down List
+                    </a>
+                </li>             
+                <li>
+                    <a href="stc-equipmentdetails.php?page=equipmentdetails" class="equipmentdetails">
+                        <i class="metismenu-icon pe-7s-plugin"></i>
+                        Equipment Details
                     </a>
                 </li>
                 <li>

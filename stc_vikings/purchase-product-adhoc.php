@@ -316,6 +316,7 @@ include("kattegat/role_check.php");
                                               <th>Sl No.</th>
                                               <th>Date</th>
                                               <th>Linked Product</th>
+                                              <th>Product Name</th>
                                               <th>Item Name</th>
                                               <th>Rack</th>
                                               <th>Unit</th>
@@ -623,6 +624,213 @@ include("kattegat/role_check.php");
               }
             });  
           });   
+
+          $('body').delegate('.show-product-history', 'click', function(e){
+            var adhoc_id=$(this).attr('id');
+            $.ajax({
+              url     : "kattegat/ragnar_purchase.php",
+              method  : "POST",
+              data    : {
+                stc_po_adhoc_getprohistory:1,
+                adhoc_id:adhoc_id
+              },
+              dataType : "JSON",
+              success : function(response_items){
+                $('.producthistproname').html(response_items['Product_name']);
+                $('.producthistprounit').html(response_items['product_unit']);
+                var purchased_data = response_items['purchased'];
+                if (Array.isArray(purchased_data) && purchased_data.length > 0) {
+                    var data = '';
+                    var slno=0;
+                    var totalqnty=0;
+                    var totalrate=0;
+                    var total=0;
+                    $.each(purchased_data, function(index, row) {
+                        slno++;
+                        var quantity=parseFloat(row.stc_product_grn_items_qty);
+                        var rate=parseFloat(row.stc_product_grn_items_rate);
+                        var totalamount=parseFloat(rate) * parseFloat(quantity);
+                        totalqnty+=parseFloat(row.stc_product_grn_items_qty);
+                        totalrate+=parseFloat(row.stc_product_grn_items_rate);
+                        total+=parseFloat(row.stc_product_grn_items_qty) * parseFloat(row.stc_product_grn_items_rate);
+                        data += `<tr>
+                                    <td>${row.stc_merchant_name}</td>
+                                    <td>${row.stc_purchase_product_id}</td>
+                                    <td>${row.stc_purchase_product_order_date}</td>
+                                    <td>${row.stc_product_grn_id}</td>
+                                    <td>${row.stc_product_grn_date}</td>
+                                    <td class="text-right">${quantity.toFixed(2) + ' ' + response_items['product_unit']}</td>
+                                    <td class="text-right">${rate.toFixed(2)}</td>
+                                    <td class="text-right">${totalamount.toFixed(2)}</td>
+                                    <td class="text-center">${row.stc_user_name}</td>
+                                </tr>`;
+                    });
+                    data += `<tr>
+                                <td class="text-right" colspan="4"><b>Total</b></td>
+                                <td class="text-center">${slno}</td>
+                                <td class="text-right">${totalqnty.toFixed(2) + ' ' + response_items['product_unit']}</td>
+                                <td class="text-center"></td>
+                                <td class="text-right">${total.toFixed(2)}</td>
+                                <td class="text-center"></td>
+                            </tr>`;
+                    // Append data to table body
+                    $('.projecthistory-purchased').html(data);
+                } else {
+                    // Show a message or an empty row if no data is found
+                    $('.projecthistory-purchased').html('<tr><td colspan="10">No GLD Challan data available</td></tr>');
+                }
+
+                var purchasedadhoc_data = response_items['purchasedadhoc'];
+                if (Array.isArray(purchasedadhoc_data) && purchasedadhoc_data.length > 0) {
+                    var data = '';
+                    var slno=0;
+                    var totalqnty=0;
+                    var totalrate=0;
+                    var total=0;
+                    $.each(purchasedadhoc_data, function(index, row) {
+                        slno++;
+                        var quantity=parseFloat(row.stc_purchase_product_adhoc_qty);
+                        var rate=parseFloat(row.stc_purchase_product_adhoc_rate);
+                        var totalamount=parseFloat(rate) * parseFloat(quantity);
+                        totalqnty+=parseFloat(row.stc_purchase_product_adhoc_qty);
+                        totalrate+=parseFloat(row.stc_purchase_product_adhoc_rate);
+                        total+=parseFloat(row.stc_purchase_product_adhoc_qty) * parseFloat(row.stc_purchase_product_adhoc_rate);
+                        data += `<tr>
+                                    <td>${row.stc_purchase_product_adhoc_source}</td>
+                                    <td>${row.stc_purchase_product_adhoc_destination}</td>
+                                    <td class="text-right">${quantity.toFixed(2) + ' ' + response_items['product_unit']}</td>
+                                    <td class="text-right">${rate.toFixed(2)}</td>
+                                    <td class="text-right">${totalamount.toFixed(2)}</td>
+                                    <td>${row.stc_purchase_product_adhoc_recievedby}</td>
+                                    <td>${row.stc_purchase_product_adhoc_created_date}</td>
+                                    <td class="text-center">${row.stc_user_name}</td>
+                                </tr>`;
+                    });
+                    data += `<tr>
+                                <td class="text-right" colspan="1"><b>Total</b></td>
+                                <td class="text-center">${slno}</td>
+                                <td class="text-right">${totalqnty.toFixed(2) + ' ' + response_items['product_unit']}</td>
+                                <td class="text-center"></td>
+                                <td class="text-right">${total.toFixed(2)}</td>
+                                <td class="text-center"></td>
+                            </tr>`;
+                    // Append data to table body
+                    $('.projecthistory-purchasedadhoc').html(data);
+                } else {
+                    // Show a message or an empty row if no data is found
+                    $('.projecthistory-purchasedadhoc').html('<tr><td colspan="10">No GLD Challan data available</td></tr>');
+                }
+
+                var directchallan_data = response_items['directchallan'];
+                if (Array.isArray(directchallan_data) && directchallan_data.length > 0) {
+                    var data = '';
+                    var slno=0;
+                    var totalqnty=0;
+                    $.each(directchallan_data, function(index, row) {
+                        slno++;
+                        var quantity=parseFloat(row.stc_cust_super_requisition_list_items_rec_recqty);
+                        totalqnty+=parseFloat(row.stc_cust_super_requisition_list_items_rec_recqty);
+                        data += `<tr>
+                                    <td>${row.stc_customer_name}</td>
+                                    <td>${row.stc_cust_project_title}</td>
+                                    <td>${row.stc_cust_super_requisition_list_items_rec_list_id}</td>
+                                    <td class="text-right">${quantity.toFixed(2) + ' ' + response_items['product_unit']}</td>
+                                    <td>${row.stc_cust_super_requisition_list_items_rec_date}</td>
+                                </tr>`;
+                    });
+                    data += `<tr>
+                                <td class="text-right" colspan="2"><b>Total</b></td>
+                                <td class="text-center">${slno}</td>
+                                <td class="text-right">${totalqnty.toFixed(2) + ' ' + response_items['product_unit']}</td>
+                                <td class="text-center"></td>
+                            </tr>`;
+                    // Append data to table body
+                    $('.projecthistory-directChallan').html(data);
+                } else {
+                    // Show a message or an empty row if no data is found
+                    $('.projecthistory-directChallan').html('<tr><td colspan="10">No GLD Challan data available</td></tr>');
+                }
+
+
+                var challan_data = response_items['challan'];
+                if (Array.isArray(challan_data) && challan_data.length > 0) {
+                    var data = '';
+                    var slno=0;
+                    var totalqnty=0;
+                    var totalrate=0;
+                    var total=0;
+                    $.each(challan_data, function(index, row) {
+                        slno++;
+                        var quantity=parseFloat(row.stc_sale_product_items_product_qty);
+                        var rate=parseFloat(row.stc_sale_product_items_product_sale_rate);
+                        totalqnty+=parseFloat(row.stc_sale_product_items_product_qty);
+                        total+=quantity * rate;
+                        data += `<tr>
+                                    <td>${row.stc_customer_name}</td>
+                                    <td>${row.stc_cust_project_title}</td>
+                                    <td>${row.stc_sale_product_id}</td>
+                                    <td class="text-right">${quantity.toFixed(2) + ' ' + response_items['product_unit']}</td>
+                                    <td class="text-right">${rate.toFixed(2)}</td>
+                                    <td>${total.toFixed(2)}</td>
+                                    <td>${row.stc_sale_product_cust_order_date}</td>
+                                </tr>`;
+                    });
+                    data += `<tr>
+                                <td class="text-right" colspan="2"><b>Total</b></td>
+                                <td class="text-center">${slno}</td>
+                                <td class="text-right">${totalqnty.toFixed(2) + ' ' + response_items['product_unit']}</td>
+                                <td class="text-center"></td>
+                                <td class="text-center">${total}</td>
+                            </tr>`;
+                    // Append data to table body
+                    $('.projecthistory-gstchallan').html(data);
+                } else {
+                    // Show a message or an empty row if no data is found
+                    $('.projecthistory-gstchallan').html('<tr><td colspan="10">No GLD Challan data available</td></tr>');
+                }
+
+                // gld chllan data
+                var gld_challan = response_items['gld_challan'];
+                if (Array.isArray(gld_challan) && gld_challan.length > 0) {
+                    var data = '';
+                    var slno=0;
+                    var totalqnty=0;
+                    var total=0;
+                    $.each(gld_challan, function(index, row) {
+                        slno++;
+                        totalqnty+=parseFloat(row.qty);
+                        total+=parseFloat(row.qty) * parseFloat(row.rate);
+                        data += `<tr>
+                                    <td>${row.gld_customer_title}</td>
+                                    <td>${row.bill_number}</td>
+                                    <td>${row.challan_number}</td>
+                                    <td class="text-right">${row.qty + ' ' + response_items['product_unit']}</td>
+                                    <td class="text-right">${row.rate}</td>
+                                    <td class="text-right">${row.qty * row.rate}</td>
+                                    <td class="text-center">${row.created_date}</td>
+                                    <td class="text-center">${row.stc_trading_user_name}</td>
+                                </tr>`;
+                    });
+                    data += `<tr>
+                                <td class="text-right" colspan="2"><b>Total</b></td>
+                                <td class="text-center">${slno}</td>
+                                <td class="text-right">${totalqnty.toFixed(2) + ' ' + response_items['product_unit']}</td>
+                                <td class="text-right"></td>
+                                <td class="text-right">${total.toFixed(2)}</td>
+                                <td class="text-center"></td>
+                                <td class="text-center"></td>
+                            </tr>`;
+                    // Append data to table body
+                    $('.projecthistory-gldchallan').html(data);
+                } else {
+                    // Show a message or an empty row if no data is found
+                    $('.projecthistory-gldchallan').html('<tr><td colspan="10">No GLD Challan data available</td></tr>');
+                }
+              }
+            });  
+          });   
+
+          
         });
     </script>
 </body>
@@ -749,6 +957,160 @@ include("kattegat/role_check.php");
                 </div>
               </div>
             </div>
+            <div class="modal-footer">
+              <div class="row">
+                <div class="col-xl-6 col-md-6 col-sm-6">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-modal-product-history" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Product History</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card border-success mb-3 card-body">
+                    <h2>Product Name - <span class="producthistproname"></span></h2>
+                    <p>Unit - <span class="producthistprounit"></span></p>
+                  </div>
+                </div>
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card border-success mb-3 card-body">                    
+                    <!-- Nav tabs -->
+                    <ul class="nav body-tabs body-tabs-layout tabs-animated body-tabs-animated" role="tablist">
+                        <!-- Purchased Tabs (Green) -->
+                        <li class="nav-item" style="background-color: #00dd00; color: #fff;">
+                            <a class="nav-link active" id="purchased-tab" data-toggle="tab" href="#purchased" role="tab" aria-controls="purchased" aria-selected="true" style="color: #fff; display: block; padding: 10px 15px; text-align: center; font-weight: bold;">
+                                <span>Purchased</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="background-color: #00dd00; color: #fff;">
+                            <a class="nav-link" id="purchasedadhoc-tab" data-toggle="tab" href="#purchasedadhoc" role="tab" aria-controls="purchasedadhoc" aria-selected="true" style="color: #fff; display: block; padding: 10px 15px; text-align: center;">
+                                <span>Purchased Adhoc</span>
+                            </a>
+                        </li>
+
+                        <!-- Sold Tabs (Red) -->
+                        <li class="nav-item" style="background-color: #ff6060; color: #fff;">
+                            <a class="nav-link" id="gstChallan-tab" data-toggle="tab" href="#gstChallan" role="tab" aria-controls="gstChallan" aria-selected="false" style="color: #fff; display: block; padding: 10px 15px; text-align: center;">
+                                <span>Invoice Challan</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="background-color: #ff6060; color: #fff;">
+                            <a class="nav-link" id="directChallan-tab" data-toggle="tab" href="#directChallan" role="tab" aria-controls="directChallan" aria-selected="false" style="color: #fff; display: block; padding: 10px 15px; text-align: center;">
+                                <span>Without Invoice Challan</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" style="background-color: #ff6060; color: #fff;">
+                            <a class="nav-link" id="gldChallan-tab" data-toggle="tab" href="#gldChallan" role="tab" aria-controls="gldChallan" aria-selected="false" style="color: #fff; display: block; padding: 10px 15px; text-align: center;">
+                                <span>GLD Challan</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content mt-3">
+                      <div class="tab-pane fade show active" id="purchased" role="tabpanel" aria-labelledby="purchased-tab">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th class="text-center">Merchant (Vendor)</th>
+                              <th class="text-center">PO No</th>
+                              <th class="text-center">PO Date</th>
+                              <th class="text-center">GRN No</th>
+                              <th class="text-center">GRN Date</th>
+                              <th class="text-center">Quantity</th>
+                              <th class="text-center">Rate</th>
+                              <th class="text-center">GST</th>
+                              <th class="text-center">Total</th>
+                            </tr>
+                          </thead>
+                          <tbody class="projecthistory-purchased"></tbody>
+                        </table>
+                      </div>
+                      <div class="tab-pane fade" id="purchasedadhoc" role="tabpanel" aria-labelledby="purchasedadhoc-tab">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th class="text-center">Merchant (Vendor)</th>
+                              <th class="text-center">Godown</th>
+                              <th class="text-center">Quantity</th>
+                              <th class="text-center">Rate</th>
+                              <th class="text-center">Total</th>
+                              <th class="text-center">Recieved By</th>
+                              <th class="text-center">Created Date</th>
+                              <th class="text-center">Created By</th>
+                            </tr>
+                          </thead>
+                          <tbody class="projecthistory-purchasedadhoc"></tbody>
+                        </table>
+                      </div>
+                      <div class="tab-pane fade" id="gstChallan" role="tabpanel" aria-labelledby="gstChallan-tab">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th class="text-center">Customer</th>
+                              <th class="text-center">Sitename</th>
+                              <th class="text-center">Challan No</th>
+                              <th class="text-center">Quantity</th>
+                              <th class="text-center">Rate</th>
+                              <th class="text-center">Total</th>
+                              <th class="text-center">Created Date</th>
+                            </tr>
+                          </thead>
+                          <tbody class="projecthistory-gstchallan"></tbody>
+                        </table>
+                      </div>
+                      <div class="tab-pane fade" id="directChallan" role="tabpanel" aria-labelledby="directChallan-tab">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th class="text-center">Customer</th>
+                              <th class="text-center">Sitename</th>
+                              <th class="text-center">Requisition No</th>
+                              <th class="text-center">Quantity</th>
+                              <th class="text-center">Created Date</th>
+                            </tr>
+                          </thead>
+                          <tbody class="projecthistory-directChallan"></tbody>
+                        </table>
+                      </div>
+                      <div class="tab-pane fade" id="gldChallan" role="tabpanel" aria-labelledby="gldChallan-tab">
+                        <table class="table table-bordered">
+                          <thead>
+                            <tr>
+                              <th class="text-center">Customer</th>
+                              <th class="text-center">Bill Number</th>
+                              <th class="text-center">Challan Number</th>
+                              <th class="text-center">Quantity</th>
+                              <th class="text-center">Rate</th>
+                              <th class="text-center">Total</th>
+                              <th class="text-center">Created Date</th>
+                              <th class="text-center">Created By</th>
+                            </tr>
+                          </thead>
+                          <tbody class="projecthistory-gldchallan"></tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
             <div class="modal-footer">
               <div class="row">
                 <div class="col-xl-6 col-md-6 col-sm-6">
