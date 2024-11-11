@@ -1859,6 +1859,7 @@ class ragnarRequisitionView extends tesseract{
 		$query="
 			SELECT
 				I.`stc_cust_super_requisition_list_id` as item_id,
+				`stc_cust_project_id`,
 				`stc_cust_project_title`,
 				`stc_requisition_combiner_id`,
 				`stc_requisition_combiner_date`,
@@ -1877,6 +1878,7 @@ class ragnarRequisitionView extends tesseract{
 				`stc_cust_super_requisition_list_items_status`,
 				`stc_cust_super_requisition_list_status`,
 				`stc_cust_pro_supervisor_contact`,
+				`stc_cust_pro_supervisor_id`,
 				`stc_cust_pro_supervisor_fullname`,
 				`stc_agents_name`
 			FROM `stc_cust_super_requisition_list_items` I
@@ -1891,7 +1893,7 @@ class ragnarRequisitionView extends tesseract{
 			INNER JOIN `stc_cust_pro_supervisor`
 			ON `stc_cust_super_requisition_list_super_id`=`stc_cust_pro_supervisor_id`
 			INNER JOIN `stc_agents`
-			ON `stc_agents_id`=`stc_cust_pro_supervisor_created_by`
+			ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id`
 			WHERE DATE(`stc_cust_super_requisition_list_date`) 
 			BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $req_begdate)."' 
 			AND '".mysqli_real_escape_string($this->stc_dbs, $req_enddate)."'
@@ -1949,12 +1951,21 @@ class ragnarRequisitionView extends tesseract{
 					$apprpd_qty=$lokigetappritemrow['stc_appr_qty'];
 				}
 				$checkqty=$ivar_row["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
-				$actiondeliver='
-				<a class="req-product-Modal-cash-close" data-toggle="modal" data-target=".res-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$ivar_row['item_id'].'" list-id="'.$ivar_row["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
+				$actiondeliver='<a class="req-product-Modal-cash-close" data-toggle="modal" data-target=".res-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$ivar_row['item_id'].'" list-id="'.$ivar_row["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
 				$actiondeliver=$ivar_row["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver : "";
 				$priority=$ivar_row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
 				$bgcolor=$ivar_row['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ffb0b0;'" : "";
+
+				$query=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_agents_id`, `stc_agents_name` FROM `stc_agents` LEFT JOIN `stc_cust_pro_supervisor_collaborate` ON `stc_agents_id`=`stc_cust_pro_supervisor_collaborate_teamid` LEFT JOIN `stc_cust_project` ON `stc_agents_id`=`stc_cust_project_createdby` WHERE `stc_cust_pro_supervisor_collaborate_userid`='".$ivar_row['stc_cust_pro_supervisor_id']."' AND (`stc_cust_project_id`='".$ivar_row['stc_cust_project_id']."')");
 				
+				$agent_name='';
+				if(mysqli_num_rows($query)>0){
+					$result=mysqli_fetch_assoc($query);
+					$agent_name=$result['stc_agents_name'];
+				}
+				if($agent_name==''){
+					$agent_name=$ivar_row['stc_agents_name'];
+				}
 				$ivar.='
 					<tr>
 						<td>'.$slno.'</td>
@@ -1963,7 +1974,7 @@ class ragnarRequisitionView extends tesseract{
 						<td class="text-center">'.$ivar_row['stc_requisition_combiner_refrence'].'</td>
 						<td class="text-center">'.$ivar_row['stc_cust_project_title'].'</td>
 						<td class="text-center">'.$ivar_row['stc_cust_pro_supervisor_fullname'].' <br>('.$ivar_row['stc_cust_pro_supervisor_contact'].')</td>
-						<td class="text-center">'.$ivar_row['stc_agents_name'].'</td>
+						<td class="text-center">'.$agent_name.'</td>
 						<td>'.$ivar_row['stc_cust_super_requisition_list_items_title'].'</td>
 						<td class="text-center">'.$ivar_row['stc_cust_super_requisition_list_items_unit'].'</td>
 						<td class="text-right">'.number_format($ivar_row['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
