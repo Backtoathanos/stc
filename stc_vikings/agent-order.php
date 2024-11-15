@@ -40,13 +40,16 @@ include("kattegat/role_check.php");
     </style>
 </head>
 <body>
+    <div class="spinner" style="display: none;position: fixed;top: 50%; left: 50%;z-index: 999;">
+        <img src="https://cdn.pixabay.com/animation/2023/08/11/21/18/21-18-05-265_256.gif" alt="Loading...">
+    </div>
     <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
         <?php include_once("header-nav.php");?>
         <div class="app-main">
             <?php include_once("sidebar-nav.php");?>                   
             <div class="app-main__outer">
-                    <div class="app-main__inner"> 
-                        <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+                <div class="app-main__inner"> 
+                    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                             <!-- <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-1" data-toggle="tab" href="#tab-content-1">
                                     <span>Check Order</span>
@@ -82,9 +85,9 @@ include("kattegat/role_check.php");
                                     <span>Tools Track </span>
                                 </a>
                             </li>
-                        </ul>
-                        <div class="tab-content">
-                            <div class="tab-pane tabs-animation fade" id="tab-content-1" role="tabpanel">
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane tabs-animation fade" id="tab-content-1" role="tabpanel">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
@@ -381,8 +384,8 @@ include("kattegat/role_check.php");
                                     </div>
                                   </div> 
                                 </div>
-                            </div>
-                            <div class="tab-pane tabs-animation fade" id="tab-content-2" role="tabpanel">
+                        </div>
+                        <div class="tab-pane tabs-animation fade" id="tab-content-2" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
@@ -477,8 +480,8 @@ include("kattegat/role_check.php");
                                     </div>
                                   </div> 
                                 </div>
-                            </div>
-                            <div class="tab-pane tabs-animation fade" id="tab-content-5" role="tabpanel">
+                        </div>
+                        <div class="tab-pane tabs-animation fade" id="tab-content-5" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
@@ -575,8 +578,8 @@ include("kattegat/role_check.php");
                                     </div>
                                   </div> 
                                 </div>
-                            </div>
-                            <div class="tab-pane tabs-animation fade show active" id="tab-content-3" role="tabpanel">
+                        </div>
+                        <div class="tab-pane tabs-animation fade show active" id="tab-content-3" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
@@ -626,8 +629,8 @@ include("kattegat/role_check.php");
                                     </div>
                                   </div> 
                                 </div>
-                            </div>
-                            <div class="tab-pane tabs-animation fade" id="tab-content-4" role="tabpanel">
+                        </div>
+                        <div class="tab-pane tabs-animation fade" id="tab-content-4" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
@@ -699,8 +702,8 @@ include("kattegat/role_check.php");
                                     </div>
                                   </div> 
                                 </div>
-                            </div>
-                            <div class="tab-pane tabs-animation fade" id="tab-content-6" role="tabpanel">
+                        </div>
+                        <div class="tab-pane tabs-animation fade" id="tab-content-6" role="tabpanel">
                                 <div class="row">
                                   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
                                       <div class="card-border mb-3 card card-body border-success" style="overflow-x: auto; white-space: nowrap;">
@@ -718,8 +721,11 @@ include("kattegat/role_check.php");
                                             <div class="col-md-2">
                                                 <a href="javascript:void(0)" class="btn btn-primary form-control" data-toggle="modal" data-target=".bd-ppetracker-modal-lg">Add PPE Tracker</a>
                                             </div>
-                                            <div class="col-md-10">
-                                                <input type="text" id="searchInput" class="form-control" placeholder="Type to search...">
+                                            <div class="col-md-8">
+                                                <input type="text" id="searchInputppe" class="form-control" placeholder="Type to search...">
+                                            </div>
+                                            <div class="col-md-2">
+                                              <a href="javascript:void(0)" id="searchInputppebtn" class="btn btn-success form-control">Find</a>
                                             </div>
                                             <div class="col-md-12">
                                                 <table class="table table-stripped table-bordered table-hover">
@@ -744,8 +750,8 @@ include("kattegat/role_check.php");
                                       </div>
                                   </div>
                                 </div>
-                            </div>
-                            <div class="tab-pane tabs-animation fade" id="tab-content-7" role="tabpanel">
+                        </div>
+                        <div class="tab-pane tabs-animation fade" id="tab-content-7" role="tabpanel">
                                 <div class="row">
                                   <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
                                       <div class="card-border mb-3 card card-body border-success" style="overflow-x: auto; ">
@@ -763,8 +769,12 @@ include("kattegat/role_check.php");
                                             <div class="col-md-2">
                                                 <a href="javascript:void(0)" class="btn btn-primary form-control itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg">Add Tools</a>
                                             </div>
-                                            <div class="col-md-10">
+                                            <div class="col-md-8">
                                                 <input type="text" id="itt-toolssearchInput" class="form-control" placeholder="Type to search...">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <a href="javascript:void(0)" id="itt-toolssearchInputbtn" class="btn btn-success form-control">Find</a>
+                                            
                                             </div>
                                             <div class="col-md-12">
                                                 <table class="table table-stripped table-bordered table-hover">
@@ -788,15 +798,16 @@ include("kattegat/role_check.php");
                                                     </thead>
                                                     <tbody class="tools-tracker-show"></tbody>
                                                 </table>
+                                                <div class="paginationtts"></div>
                                             </div>
                                         </div>
                                       </div>
                                   </div>
                                 </div>
-                            </div>
                         </div>
-                    </div>  
-                </div>
+                    </div>
+                </div>  
+            </div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
@@ -1626,6 +1637,7 @@ include("kattegat/role_check.php");
           var req_sitenmae = $('#stc-requisitionlist-sitename-finder').val();
           var req_materialtype = $('#stc-requisitionlist-materialtype').val();
           var validation=1;
+          var page = 1;
           $(this).attr('disabled');
           $('.stc-view-ag-requisitionbylist-form').html("<p style='color:red;'>Working on it, Please wait...</p>");
           $('.req-alert-text').remove();
@@ -1635,11 +1647,12 @@ include("kattegat/role_check.php");
             validation=0;
           }
 
-          if(req_materialtype=='NA'){
-            $('#stc-requisitionlist-materialtype').after("<p class='req-alert-text' style='color:red;'>Material type required</p>");
-            validation=0;
-          }
+          // if(req_materialtype=='NA'){
+          //   $('#stc-requisitionlist-materialtype').after("<p class='req-alert-text' style='color:red;'>Material type required</p>");
+          //   validation=0;
+          // }
           if(validation==1){
+            $('.spinner').show();
             $.ajax({
               url       : "kattegat/ragnar_order.php",
               method    : "POST",
@@ -1650,17 +1663,57 @@ include("kattegat/role_check.php");
                 req_customer:req_customer,
                 req_reqnumber:req_reqnumber,
                 req_sitenmae:req_sitenmae,
-                req_materialtype:req_materialtype
+                req_materialtype:req_materialtype,
+                page: page
               },
               success   : function(response){
                 $('.stc-view-ag-requisitionbylist-form').html(response);
                 $('.stc-req-list-find').removeAttr('disabled');
+              },
+              complete: function() {
+                // Hide the spinner after the AJAX request completes
+                $('.spinner').hide();
               }
             });
           }else{
             alert("Please fill required fields.");
           }
         });
+
+        $('body').delegate('.page-link', 'click', function(e){
+          e.preventDefault();
+          var req_begdate = $('.reqlistbegdate').val();
+          var req_enddate = $('.reqlistenddate').val();
+          var req_customer = $('#stc-requisitionlist-customer-in').val();
+          var req_reqnumber = $('#stc-requisitionlist-number-finder').val();
+          var req_sitenmae = $('#stc-requisitionlist-sitename-finder').val();
+          var req_materialtype = $('#stc-requisitionlist-materialtype').val();
+          var page = $(this).data('page'); // Get the selected page number
+          $('.spinner').show();
+          // Repeat the AJAX request with the selected page
+          $.ajax({
+            url: "kattegat/ragnar_order.php",
+            method: "POST",
+            data: {
+              stc_rquisition_bylist_find: 1,
+              req_begdate: req_begdate,
+              req_enddate: req_enddate,
+              req_customer: req_customer,
+              req_reqnumber: req_reqnumber,
+              req_sitenmae: req_sitenmae,
+              req_materialtype: req_materialtype,
+              page: page
+            },
+            success: function(response){
+              $('.stc-view-ag-requisitionbylist-form').html(response);
+            },
+            complete: function() {
+              // Hide the spinner after the AJAX request completes
+              $('.spinner').hide();
+            }
+          });
+        });
+
 
         $('body').delegate('.stc-req-item-static-search', "keyup", function() {
           var value = $(this).val().toLowerCase();
@@ -1801,13 +1854,14 @@ include("kattegat/role_check.php");
 
     <script>
       $(document).ready(function(){
-        function item_tracker_call(searchTerm){
+        function item_tracker_call(searchTerm, page = 1){
             $.ajax({
                 url : "kattegat/ragnar_order.php",
                 method : "POST",
                 data : {
-                    call_item_tracker:1,
-                    searchTerm:searchTerm
+                    call_item_tracker: 1,
+                    searchTerm: searchTerm,
+                    page: page
                 },
                 success : function(response){
                     $('.item-tracker-show').html(response);
@@ -1815,11 +1869,20 @@ include("kattegat/role_check.php");
             });
         }
 
-        $('#searchInput').on('input', function () {
-            // Get the search value
-            var searchTerm = $(this).val().toLowerCase();
-            item_tracker_call(searchTerm);
+        $('body').delegate('#searchInputppebtn', 'click', function(e){
+            var searchTerm = $('#searchInputppe').val().toLowerCase();
+            if (searchTerm != ''){
+                item_tracker_call(searchTerm);
+            }
         });
+
+        $('body').delegate('.page-link2', 'click', function(e){
+            e.preventDefault();
+            var page = $(this).data('page');
+            var searchTerm = $('#searchInputppe').val().toLowerCase();
+            item_tracker_call(searchTerm, page);
+        });
+
 
         // save dispatch
         $('body').delegate('.it-save', 'click', function(e){
@@ -1895,37 +1958,64 @@ include("kattegat/role_check.php");
         function resetFormFields() {
             $('.formcontrol').find('input, textarea').val('');
             $('.formcontrol').find('input:checked').prop('checked', false);
-        }
-        
+        }        
         call_tools_tracker('');
-        $('body').delegate('#itt-toolssearchInput', 'focusout', function(e){
-          var search=$(this).val();
-          call_tools_tracker(search);
+        // Search button click event
+        $('body').delegate('#itt-toolssearchInputbtn', 'click', function(e) {
+            var searchTerm = $('#itt-toolssearchInput').val().toLowerCase();
+            if (searchTerm != '') {
+                call_tools_tracker(searchTerm);
+            }
         });
+
+        // Pagination link click event
+        $('body').delegate('.page-link3', 'click', function(e) {
+            e.preventDefault();
+            var page = $(this).data('page');
+            var searchTerm = $('#itt-toolssearchInput').val().toLowerCase();
+            call_tools_tracker(searchTerm, page);
+        });
+
         // call tools tracker
-        function call_tools_tracker(search){
+        function call_tools_tracker(search, page = 1) {
+            $('.spinner').show();
             $.ajax({
-                url : "kattegat/ragnar_order.php",
-                method : "POST",
-                data : {
-                    call_tools_tracker:1,
-                    search:search
+                url: "kattegat/ragnar_order.php",
+                method: "POST",
+                data: {
+                    call_tools_tracker: 1,
+                    search: search,
+                    page: page
                 },
-                dataType : "JSON",
-                success : function(response){
-                  var data='';
-                  // Check if response is valid
-                  if (response.length > 0) {
-                      // Loop through the JSON data
-                      var slno=0;
-                      for (var i = 0; i < response.length; i++) {
-                        slno++;
-                        data+='<tr><td>' + slno + '</td><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].machinesrno + '</td><td>' + response[i].make + '</td><td>' + response[i].tooltype + '</td><td>' + response[i].purchase_details + '</td><td>' + response[i].warranty + '</td><td>' + response[i].taxinvono + '</td><td>' + response[i].taxinvodate + '</td><td>' + response[i].remarks + '</td><td>' + response[i].created_date + '</td><td>' + response[i].stc_user_name + '</td><td><a href="javascript:void(0)" class="btn btn-primary itt-edit-toolsdetails" id="' + response[i].id + '"  data-toggle="modal" data-target=".bd-toolstracker-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-primary itt-toolstracking" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertracker-modal-lg"><i class="fa fa-plus"></i></a><a href="javascript:void(0)" class="btn btn-primary itt-toolstrackingshow" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertrackershow-modal-lg"><i class="fa fa-shipping-fast"></i></a></td></tr>';
+                dataType: "JSON",
+                success: function(response) {
+                    var data = '';
+                    // Check if response data is valid
+                    if (response.data && response.data.length > 0) {
+                        var slno = (page - 1) * 10;
+                        response.data.forEach(function(item, index) {
+                            slno++;
+                            data += '<tr><td>' + slno + '</td><td>' + item.unique_id + '</td><td>' + item.itemdescription + '</td><td>' + item.machinesrno + '</td><td>' + item.make + '</td><td>' + item.tooltype + '</td><td>' + item.purchase_details + '</td><td>' + item.warranty + '</td><td>' + item.taxinvono + '</td><td>' + item.taxinvodate + '</td><td>' + item.remarks + '</td><td>' + item.created_date + '</td><td>' + item.stc_user_name + '</td><td><a href="javascript:void(0)" class="btn btn-primary itt-edit-toolsdetails" id="' + item.id + '" data-toggle="modal" data-target=".bd-toolstracker-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-primary itt-toolstracking" id="' + item.id + '" data-toggle="modal" data-target=".bd-toolstrackertracker-modal-lg"><i class="fa fa-plus"></i></a><a href="javascript:void(0)" class="btn btn-primary itt-toolstrackingshow" id="' + item.id + '" data-toggle="modal" data-target=".bd-toolstrackertrackershow-modal-lg"><i class="fa fa-shipping-fast"></i></a></td></tr>';
+                        });
+                    } else {
+                        data = "<td colspan='14'>No data found.</td>";
+                    }
+                    $('.tools-tracker-show').html(data);
+
+                    // Pagination links
+                    var pagination = '';
+                    for (var i = 1; i <= response.total_pages; i++) {
+                      if(i==page){
+                        pagination += '<a href="javascript:void(0)" class="page-link3" style="background: #00ff5a; color: black;padding: 10px;" data-page="' + i + '">' + i + '</a> ';
+                      }else{
+                        pagination += '<a href="javascript:void(0)" class="page-link3" data-page="' + i + '">' + i + '</a> ';
                       }
-                  } else {
-                    data="<td>No data found.</td>";
-                  }
-                  $('.tools-tracker-show').html(data);
+                    }
+                    $('.paginationtts').html(pagination);
+                },
+                complete: function() {
+                  // Hide the spinner after the AJAX request completes
+                  $('.spinner').hide();
                 }
             });
         }

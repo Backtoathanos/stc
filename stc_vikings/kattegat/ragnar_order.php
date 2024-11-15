@@ -1804,7 +1804,7 @@ class ragnarRequisitionView extends tesseract{
 	}
 
 	// call requisition by list
-	public function stc_getrequisitionlist($req_begdate, $req_enddate, $req_customer, $req_reqnumber, $req_sitenmae, $req_materialtype){
+	public function stc_getrequisitionlist($req_begdate, $req_enddate, $req_customer, $req_reqnumber, $req_sitenmae, $req_materialtype, $offset, $records_per_page, $page){
 		$ivar='
 			<input type"text" class="form-control stc-req-item-static-search" placeholder="Search here">
 			<table class="table table-bordered table-hover table-responsive stc-reqbyitem-table">
@@ -1899,6 +1899,12 @@ class ragnarRequisitionView extends tesseract{
 			AND '".mysqli_real_escape_string($this->stc_dbs, $req_enddate)."'
 			".$filter."
 		";
+
+		$total_result = mysqli_query($this->stc_dbs, $query);
+		$total_records = mysqli_num_rows($total_result);
+		$total_pages = ceil($total_records / $records_per_page);
+
+		$query=$query." LIMIT $offset, $records_per_page ";
 		$ivar_qry=mysqli_query($this->stc_dbs, $query);
 		if(mysqli_num_rows($ivar_qry)>0){
 			$slno=0;
@@ -2009,6 +2015,15 @@ class ragnarRequisitionView extends tesseract{
 				</tbody>		
 			</table>
 		';
+		$ivar .= '<div class="pagination">'.$offset.'/'.$total_records;
+		for ($i = 1; $i <= $total_pages; $i++) {
+			if($i==$page){
+				$ivar .= '<a href="javascript:void(0)" style="background: #00ff5a; color: black;" class="page-link" data-page="' . $i . '">' . $i . '</a> ';
+			}else{
+				$ivar .= '<a href="javascript:void(0)" class="page-link" data-page="' . $i . '">' . $i . '</a> ';
+			}
+		}
+		$ivar .= '</div>';
 		return $ivar;
 	}
 }
@@ -3267,10 +3282,12 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		return $blackpearl;
 	}
 
-	// call ppe tracker 
-	public function stc_item_tracker_call($search){
-		$blackpearl='';
-		$filter='';
+	public function stc_item_tracker_call($search, $page){
+		$blackpearl = '';
+		$filter = '';
+		$limit = 10; // Number of records per page
+		$offset = ($page - 1) * $limit;
+	
 		if(!empty($search)){
 			$filter="WHERE 
 				`stc_item_tracker_toppe` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR 
@@ -3279,36 +3296,46 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 				`stc_item_tracker_validity` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR 
 				`stc_item_tracker_remarks` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."'";
 		}
-		$blackpearl_query="
+	
+		// Count total records for pagination
+		$count_query = "SELECT COUNT(*) as total FROM `stc_item_tracker` ".$filter;
+		$count_result = mysqli_query($this->stc_dbs, $count_query);
+		$total_records = mysqli_fetch_assoc($count_result)['total'];
+		$total_pages = ceil($total_records / $limit);
+	
+		$blackpearl_query = "
 			SELECT
-			    `stc_item_tracker_id`,
-			    `stc_item_tracker_user_id`,
-			    `stc_item_tracker_toppe`,
-			    `stc_item_tracker_qty`,
-			    `stc_item_tracker_unit`,
-			    `stc_item_tracker_issuedate`,
-			    `stc_item_tracker_validity`,
-			    `stc_item_tracker_remarks`,
-			    `stc_item_tracker_createdby`,
-			    `stc_item_tracker_created_date`
+				`stc_item_tracker_id`,
+				`stc_item_tracker_user_id`,
+				`stc_item_tracker_toppe`,
+				`stc_item_tracker_qty`,
+				`stc_item_tracker_unit`,
+				`stc_item_tracker_issuedate`,
+				`stc_item_tracker_validity`,
+				`stc_item_tracker_remarks`,
+				`stc_item_tracker_createdby`,
+				`stc_item_tracker_created_date`
 			FROM `stc_item_tracker`
 			".$filter."
 			ORDER BY TIMESTAMP(`stc_item_tracker_created_date`) DESC
+			LIMIT $offset, $limit
 		";
-		$blackpearl_result=mysqli_query($this->stc_dbs, $blackpearl_query);
-
-		$slno=0;
-		if(mysqli_num_rows($blackpearl_result)>0){
+		$blackpearl_result = mysqli_query($this->stc_dbs, $blackpearl_query);
+	
+		// Generate the table rows as before
+		$slno = $offset;
+		if(mysqli_num_rows($blackpearl_result) > 0){
 			foreach($blackpearl_result as $blackpearl_row){
 				$slno++;
-				$validity=$blackpearl_row['stc_item_tracker_validity']==1 ? $blackpearl_row['stc_item_tracker_validity'].' month' : $blackpearl_row['stc_item_tracker_validity']." months";
+				// Continue with table rows as before
+				$validity = $blackpearl_row['stc_item_tracker_validity'] == 1 ? $blackpearl_row['stc_item_tracker_validity'].' month' : $blackpearl_row['stc_item_tracker_validity']." months";
 				$validityMonths = $blackpearl_row['stc_item_tracker_validity'];
 				$issuedate = new DateTime($blackpearl_row['stc_item_tracker_issuedate']);
 				$nextissuedate = $issuedate->add(new DateInterval("P{$validityMonths}M"));
 				$nextissuedateFormatted = $nextissuedate->format('d-m-Y');
-
-				$dateofissue=$blackpearl_row['stc_item_tracker_issuedate']==''? '' : date('d-m-Y', strtotime($blackpearl_row['stc_item_tracker_issuedate']));
-				$blackpearl.="
+	
+				$dateofissue = $blackpearl_row['stc_item_tracker_issuedate'] == '' ? '' : date('d-m-Y', strtotime($blackpearl_row['stc_item_tracker_issuedate']));
+				$blackpearl .= "
 					<tr>
 						<td>".$slno."</td>
 						<td>".$blackpearl_row['stc_item_tracker_user_id']."</td>
@@ -3321,18 +3348,29 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 						<td>".$blackpearl_row['stc_item_tracker_remarks']."</td>
 					</tr>
 				";
-				
-				// <td class='text-center'><a href='javascript:void(0)' id='".$blackpearl_row['stc_item_tracker_id']."' class='btn btn-primary'><i class='fas fa-edit'></i></a></td>
 			}
-		}else{
-			$blackpearl.="
+		} else {
+			$blackpearl .= "
 				<tr>
 					<td colspan='7' class='text-center'> No data found!!</td>
 				</tr>
 			";
 		}
+	
+		// Add pagination controls
+		$blackpearl .= "<tr><td colspan='9' class='text-center'>";
+		for ($i = 1; $i <= $total_pages; $i++) {
+			if($i==$page){
+				$blackpearl .= '<a href="javascript:void(0)" style="background: #00ff5a; color: black;padding: 10px;" class="page-link2" data-page="' . $i . '">' . $i . '</a> ';
+			}else{
+				$blackpearl .= '<a href="javascript:void(0)" class="page-link2" data-page="' . $i . '">' . $i . '</a> ';
+			}
+		}
+		$blackpearl .= "</td></tr>";
+	
 		return $blackpearl;
 	}
+	
 
 	// save tool track
 	public function stc_tool_tracker_save($unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks){
@@ -3390,22 +3428,46 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	}
 
 	// show tool track
-	public function stc_tool_tracker_get($search){
-		$filter=" WHERE `unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `itemdescription` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `machinesrno` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `make` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `tooltype` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `purchase_details` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `taxinvono` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' ";
-		$search=$search==''?'':$filter;
+	public function stc_tool_tracker_get($search, $page){
+		$filter = " WHERE `unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
+			OR `itemdescription` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
+			OR `machinesrno` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
+			OR `make` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
+			OR `tooltype` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
+			OR `purchase_details` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
+			OR `taxinvono` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' ";
+		
+		$search = $search == '' ? '' : $filter;
 	
-		// Check for duplicate unique ID
+		// Pagination variables
+		$limit = 10; // Number of records per page
+		$offset = ($page - 1) * $limit;
+	
+		// Total record count for pagination
+		$count_query = "SELECT COUNT(*) as total FROM `stc_tooldetails` ".$search;
+		$count_result = mysqli_query($this->stc_dbs, $count_query);
+		$total_records = mysqli_fetch_assoc($count_result)['total'];
+		$total_pages = ceil($total_records / $limit);
+	
+		// Main query with limit and offset
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "
-			SELECT * FROM `stc_tooldetails` LEFT JOIN `stc_user` ON `stc_tooldetails`.`created_by`=`stc_user`.`stc_user_id` ".$search."
+			SELECT * FROM `stc_tooldetails` 
+			LEFT JOIN `stc_user` ON `stc_tooldetails`.`created_by` = `stc_user`.`stc_user_id` 
+			".$search."
+			LIMIT $offset, $limit
 		");
-		$blackpearl=[];
-		if(mysqli_num_rows($blackpearl_qry)>0){
+	
+		$blackpearl = [];
+		if(mysqli_num_rows($blackpearl_qry) > 0){
 			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
 				$blackpearl[] = $blackpearl_row;
 			}
 		}
 	
-		return $blackpearl;
+		return [
+			'data' => $blackpearl,
+			'total_pages' => $total_pages
+		];
 	}
 
 	// for edit
@@ -4052,9 +4114,14 @@ if(isset($_POST['stc_rquisition_bylist_find'])){
 	$req_reqnumber=$_POST['req_reqnumber'];
 	$req_sitenmae=$_POST['req_sitenmae'];
 	$req_materialtype=$_POST['req_materialtype'];
+
+	$page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+	$records_per_page = 10;
+	$offset = ($page - 1) * $records_per_page;
+
 	$out='';
 	$objpdres=new ragnarRequisitionView();	
-	$opobjpdres=$objpdres->stc_getrequisitionlist($req_begdate, $req_enddate, $req_customer, $req_reqnumber, $req_sitenmae, $req_materialtype);
+	$opobjpdres=$objpdres->stc_getrequisitionlist($req_begdate, $req_enddate, $req_customer, $req_reqnumber, $req_sitenmae, $req_materialtype, $offset, $records_per_page, $page);
 	echo $opobjpdres;
 }
 
@@ -4085,8 +4152,9 @@ if(isset($_POST['save_item_tracker'])){
 // call procurment tracker
 if(isset($_POST['call_item_tracker'])){
 	$search=isset($_POST['searchTerm'])?$_POST['searchTerm']:'';
+	$page=isset($_POST['page'])?$_POST['page']:'';
 	$odin_req=new ragnarCallRequisitionItemTrack();
-	$odin_req_out=$odin_req->stc_item_tracker_call($search);
+	$odin_req_out=$odin_req->stc_item_tracker_call($search, $page);
 	echo $odin_req_out;
 }
 
@@ -4121,11 +4189,15 @@ if(isset($_POST['save_tool_tracker'])){
 
 // call tools tracker
 if(isset($_POST['call_tools_tracker'])){
-	$search=isset($_POST['search']) ? $_POST['search'] : '';
-	$odin_req=new ragnarCallRequisitionItemTrack();
-	$odin_req_out=$odin_req->stc_tool_tracker_get($search);
-	echo json_encode($odin_req_out);
+    $search = isset($_POST['search']) ? $_POST['search'] : '';
+    $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+
+    $odin_req = new ragnarCallRequisitionItemTrack();
+    $odin_req_out = $odin_req->stc_tool_tracker_get($search, $page);
+
+    echo json_encode($odin_req_out);
 }
+
 
 // savce tools tracker
 if(isset($_POST['save_tool_trackertrack'])){
