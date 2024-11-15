@@ -10,3 +10,73 @@ input[type=text], input[type=number], textarea{
 #formCustomerAddress{
     padding:15px;
 }
+
+.product-details-container {
+    max-width: 600px; /* Limit the width for better readability */
+    margin: 20px auto; /* Center the container */
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #ffffff; /* White background for contrast */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+.product-title {
+    text-align: center; /* Center the title */
+    color: #333; /* Darker color for better visibility */
+    margin-bottom: 20px;
+}
+
+.product-details-grid {
+    display: grid; /* Use grid for layout */
+    grid-template-columns: repeat(2, 1fr); /* Two columns layout */
+    gap: 15px; /* Space between items */
+}
+
+.detail-item {
+    padding: 15px; /* Inner padding for each item */
+    border: 1px solid #e0e0e0; /* Light border for separation */
+    border-radius: 5px; /* Rounded corners */
+    background-color: #f9f9f9; /* Light background for each item */
+}
+
+.detail-label {
+    font-weight: bold; /* Make labels bold */
+    color: #555; /* Slightly lighter color for labels */
+}
+
+.detail-value {
+    color: #333; /* Darker color for values */
+    margin-left: 10px; /* Space between label and value */
+}
+
+.modal-content {
+    max-width: 500px;
+}
+.product-image {
+    max-width: 100%; /* Make the image responsive */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 8px; /* Optional: add rounded corners */
+}
+.product-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr; /* 1 part for image, 2 parts for details */
+    gap: 20px; /* Space between columns */
+}
+
+.image-container {
+    display: flex;
+    justify-content: center; /* Center the image horizontally */
+    align-items: center; /* Center the image vertically */
+}
+
+.product-image {
+    max-width: 100%; /* Responsive image */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 8px; /* Optional: rounded corners */
+}
+
+.details-container {
+    display: flex;
+    flex-direction: column; /* Stack detail items vertically */
+}

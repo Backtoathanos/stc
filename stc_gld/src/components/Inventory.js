@@ -5,6 +5,7 @@ import Navbar from "./layouts/Navbar";
 import Sidebar from './layouts/Sidebar';
 import { useLocation } from 'react-router-dom';
 import CustomerModal from './CustomerModal';
+import ProductModal from './ProductModal';
 import { RotatingLines } from 'react-loader-spinner'; // Importing spinner from react-loader-spinner
 import './Datatable.css';
 import axios from 'axios';
@@ -15,6 +16,8 @@ export default function Dashboard() {
     useEffect(() => {
         document.title = "STC GLD || Inventory"; // Set the title
     }, []);
+    const [isFirstModalOpen, setFirstModalOpen] = useState(false);
+    const [isSecondModalOpen, setSecondModalOpen] = useState(false);
 
     const [data, setData] = useState([]);
     const [search, setSearch] = useState(''); // State for search filter
@@ -62,7 +65,7 @@ export default function Dashboard() {
             cell: row => {
                 const imageUrl = `https://stcassociate.com/stc_symbiote/stc_product_image/${row.stc_product_image}`;
                 const defaultImageUrl = 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996';
-        
+
                 return (
                     <div style={{ position: 'absolute', left: '20px', marginTop: '10px', marginBottom: '10px', display: 'flex', alignItems: 'center', maxWidth: '250px' }}>
                         <div style={{ width: '60px', flexShrink: 0 }}>
@@ -73,37 +76,62 @@ export default function Dashboard() {
                                 onError={(e) => e.target.src = defaultImageUrl} // Use default if image fails to load
                             />
                         </div>
-                        <div style={{ marginLeft: '10px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            <strong>
-                                {row.stc_product_name.length > 50 
-                                    ? `${row.stc_product_name.substring(0, 50)}...` 
-                                    : row.stc_product_name}
-                            </strong>
-                            {row.stc_product_name.length > 50 && (
-                                <button 
-                                    onClick={() => alert(row.stc_product_name)} 
-                                    style={{ marginLeft: '10px', background: 'none', color: 'blue', cursor: 'pointer', border: 'none' }}>
-                                    View More
-                                </button>
-                            )}
-                        </div>
+                        <a
+                            href="#"
+                            onClick={() => {
+                                setSelectedProductId(row.stc_product_id);
+                                setSecondModalOpen(true);
+                            }}
+                        >
+                            <div style={{ marginLeft: '10px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                <strong>
+                                    {row.stc_product_name.length > 50
+                                        ? `${row.stc_product_name.substring(0, 50)}...`
+                                        : row.stc_product_name}
+                                </strong>
+                                {row.stc_product_name.length > 50 && (
+                                    <button
+                                        onClick={() => alert(row.stc_product_name)}
+                                        style={{ marginLeft: '10px', background: 'none', color: 'blue', cursor: 'pointer', border: 'none' }}>
+                                        View More
+                                    </button>
+                                )}
+                            </div>
+                        </a>
                     </div>
                 );
             }
-        },       
+        },
         {
             name: 'Product Id (SKU)',
             selector: row => row.stc_product_id,
             sortable: true,
-            center: true
-        },   
-        
+            center: true,
+            cell: row => (
+                <a
+                    href="#"
+                    onClick={() => {
+                        setSelectedProductId(row.stc_product_id);
+                        setSecondModalOpen(true);
+                    }}
+                >
+                    {row.stc_product_id}
+                </a>
+            )
+        },
         {
             name: 'Rack',
             selector: row => row.stc_rack_name,
             sortable: true,
             center: true
-        },{
+        }, 
+        {
+            name: 'Unit',
+            selector: row => row.stc_product_unit,
+            sortable: true,
+            center: true
+        },
+        {
             name: 'Inv Qty.',
             selector: row => row.stc_item_inventory_pd_qty + ' ' + row.stc_product_unit,
             sortable: true,
@@ -121,7 +149,7 @@ export default function Dashboard() {
                         textAlign: 'right'
                     }}
                 >
-                    {`${row.stc_item_inventory_pd_qty}`} 
+                    {`${row.stc_item_inventory_pd_qty}`}
                     <i style={{
                         fontWeight: '400',
                         minWidth: '100px',
@@ -130,7 +158,7 @@ export default function Dashboard() {
                 </span>
             ),
         },
-        
+
         {
             name: 'Sale Rate',
             selector: row => row.rate_including_gst,
@@ -221,6 +249,11 @@ export default function Dashboard() {
                 productId={selectedProductId}
                 productRate={selectedProductRate}
                 productQuantity={selectedProductQuantity}
+            />
+            <ProductModal
+                show={isSecondModalOpen}  // Pass the boolean variable, not as a function
+                handleClose={() => setSecondModalOpen(false)}
+                productId={selectedProductId}
             />
         </div>
     );

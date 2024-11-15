@@ -57,6 +57,10 @@ switch ($action) {
         deleteChallan($conn);
         break;
 
+    case 'getProductDetails':
+        getProductDetails($conn);
+        break;
+
     default:
         echo json_encode(['error' => 'Invalid API action', 'fault' => $_GET['action']]);
         break;
@@ -290,6 +294,57 @@ function getChallanDetails($conn) {
         echo json_encode(['error' => 'No details found for the selected challan.']);
     }
 }
+
+// get products details
+function getProductDetails($conn) {
+    if (!isset($_GET['productId']) || !is_numeric($_GET['productId'])) {
+        echo json_encode(['error' => 'Invalid or missing product ID.']);
+        return;
+    }
+
+    $productId = $_GET['productId'];
+
+    $query = "
+        SELECT 
+            p.stc_product_id AS productId, 
+            p.stc_product_name AS productName,
+            p.stc_product_desc AS productDescription,
+            c.stc_cat_name AS categoryName,
+            sc.stc_sub_cat_name AS subCategoryName,
+            r.stc_rack_name AS rackName,
+            b.stc_brand_title AS brandName,
+            p.stc_product_unit AS unit,
+            p.stc_product_hsncode AS hsnCode,
+            p.stc_product_gst AS gst,
+            p.stc_product_avail AS availability,
+            p.stc_product_image AS productImage,
+            p.stc_product_sale_percentage AS salePercentage
+        FROM stc_product p
+        LEFT JOIN stc_category c ON p.stc_product_cat_id = c.stc_cat_id
+        LEFT JOIN stc_sub_category sc ON p.stc_product_sub_cat_id = sc.stc_sub_cat_id
+        LEFT JOIN stc_rack r ON p.stc_product_rack_id = r.stc_rack_id
+        LEFT JOIN stc_brand b ON p.stc_product_brand_id = b.stc_brand_id
+        WHERE p.stc_product_id = ?
+    ";
+
+    if ($stmt = $conn->prepare($query)) {
+        $stmt->bind_param("i", $productId); // Bind productId as an integer
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $productDetails = $result->fetch_assoc(); // Fetch the single row
+            echo json_encode(['success' => true, 'product' => $productDetails, 'message' => 'Product details fetched successfully.']);
+        } else {
+            echo json_encode(['error' => 'No details found for the selected product.']);
+        }
+
+        $stmt->close();
+    } else {
+        echo json_encode(['error' => 'Failed to prepare query.']);
+    }
+}
+
 
 // update challan add payment
 function addPayment($conn) {
