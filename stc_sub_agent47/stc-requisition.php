@@ -22,7 +22,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="./main.css" rel="stylesheet">
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <style>
       .fade:not(.show) {
         opacity: 10;
@@ -135,7 +134,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <!-- <script src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
     <script>
         $(document).ready(function(){
@@ -385,10 +383,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <div class="form-row">
                                                         <div class="col-md-4 mb-3">
                                                             <label for="validationCustom01">Item Desc</label>
-                                                            <!-- <input type="text" class="form-control" name="stc-sup-desc" placeholder="Enter item name" required> -->
-                                                            <select class="form-control" id="item-desc" name="stc-sup-desc" required="">
-                                                                <option value="" disabled selected>Enter item name</option>
-                                                            </select>
+                                                            <input type="text" class="form-control" name="stc-sup-desc" placeholder="Enter item name" required>
                                                             <div class="valid-feedback">
                                                                 Looks good!
                                                             </div>
