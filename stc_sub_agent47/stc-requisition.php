@@ -168,29 +168,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             
             sdlno=result.sdl==undefined ? "0" : result.sdl;
 
-            $('#item-desc').select2({
-                placeholder: 'Enter item name',
-                minimumInputLength: 3, // Trigger search after typing 2 characters
-                ajax: {
-                    url     : "nemesis/stc_agcart.php", // Replace with your API route
-                    dataType: 'json',
-                    delay: 250, // Add delay to prevent too many requests
-                    data: function (params) {
-                        return {
-                            query: params.term // Search term
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: data.map(function(item) {
-                                return { id: item.id, text: item.name };
-                            })
-                        };
-                    },
-                    cache: true
-                }
-            });
-
             // search requistion by date
             $('body').delegate('.stc-sup-req-search', 'click', function(e){
                 e.preventDefault();
