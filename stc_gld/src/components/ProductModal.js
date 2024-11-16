@@ -20,8 +20,7 @@ const ProductModal = ({ show, handleClose, productId }) => {
     // Fetch customer options when the modal is shown
     useEffect(() => {
         if (show) {
-            // axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php', {
-            axios.get('http://localhost/stc/stc_gld/vanaheim/index.php', {
+            axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php', {
                 params: { action: 'getProductDetails', productId: productId }
             })
                 .then(response => {
