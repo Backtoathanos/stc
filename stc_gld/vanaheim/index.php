@@ -21,6 +21,10 @@ switch ($action) {
         addCustomer($conn);
         break;
 
+    case 'getAgents':
+        getAgents($conn);
+        break;
+
     case 'getChallan':
         getChallan($conn);
         break;
@@ -68,7 +72,7 @@ switch ($action) {
 
 // Function to fetch customers from the database
 function getCustomers($conn) {
-    $query = "SELECT gld_customer_id, gld_customer_cont_no FROM gld_customer";
+    $query = "SELECT gld_customer_id, gld_customer_cont_no FROM gld_customer order by `gld_customer_cont_no` asc";
     $result = $conn->query($query);
 
     $customers = [];
@@ -79,6 +83,21 @@ function getCustomers($conn) {
     }
 
     echo json_encode($customers);
+}
+
+// Function to fetch customers from the database
+function getAgents($conn) {
+    $query = "SELECT `stc_own_agents_id`, `stc_own_agents_name` FROM `stc_own_agents` ORDER BY `stc_own_agents_name` ASC";
+    $result = $conn->query($query);
+
+    $agents = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $agents[] = $row;
+        }
+    }
+
+    echo json_encode($agents);
 }
 
 // Function to add a new customer and associate them with a product

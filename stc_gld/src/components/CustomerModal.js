@@ -11,12 +11,19 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
     const [customerName, setCustomerName] = useState('');
     const [customerContact, setCustomerContact] = useState('');
     const [customerAddress, setCustomerAddress] = useState('');
+    const [agentOptions, setAgentOptions] = useState([]);
+    const [selecteAgent, setSelectedAgent] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [rate, setRate] = useState(productRate); // Start with the initial rate
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [quantityError, setQuantityError] = useState('');
     const [rateError, setRateError] = useState('');
     const [customerError, setCustomerError] = useState('');
+    const [agentError, setAgentError] = useState('');
+    
+
+
+
 
     // Fetch customer options when the modal is shown
     useEffect(() => {
@@ -39,17 +46,38 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
         }
     }, [show]);
 
+    // get agents
+    useEffect(() => {
+        if (show) {
+            axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php', {
+                params: { action: 'getAgents' }
+            })
+                .then(response => {
+                    if (Array.isArray(response.data)) {
+                        const options = response.data.map(gld_agents => ({
+                            value: gld_agents.stc_own_agents_id,
+                            label: gld_agents.stc_own_agents_name
+                        }));
+                        setAgentOptions(options);
+                    } else {
+                        console.error('Unexpected response format:', response.data);
+                    }
+                })
+                .catch(error => console.error('Error fetching customer options:', error));
+        }
+    }, [show]);
+
     // Handle adding customer and product
     const handleAddCustomer = () => {
         // Reset error messages
         setQuantityError('');
         setRateError('');
         setCustomerError('');
-    
+
         // Parse quantity and rate as numbers
         const parsedQuantity = parseFloat(quantity);
         const parsedRate = parseFloat(rate);
-    
+
         // Validation: Check if entered quantity exceeds available inventory or is invalid
         if (isNaN(parsedQuantity) || parsedQuantity <= 0 || parsedQuantity > productQuantity) {
             if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
@@ -59,7 +87,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             }
             return; // Stop submission if validation fails
         }
-    
+
         // Validation: Check if rate is valid
         if (isNaN(parsedRate) || parsedRate <= 0 || parsedRate < productRate) {
             if (isNaN(parsedRate) || parsedRate <= 0) {
@@ -70,16 +98,16 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             return; // Stop submission if validation fails
         }
         const customerId = selectedCustomer ? selectedCustomer.value : null;
-        
-        if(customerId==null){
-            if(customerName==""){
+
+        if (customerId == null) {
+            if (customerName == "") {
                 setCustomerError(`Select customer.`);
                 return;
             }
         }
-    
+
         setIsSubmitting(true); // Prevent multiple submissions
-    
+
         const userIdCookie = document.cookie.split('; ').find(row => row.startsWith('user_id='));
         if (!userIdCookie) {
             setIsSubmitting(false);  // Reset the submit state to allow future submissions
@@ -96,7 +124,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             address: customerAddress,
             userId: userId
         };
-    
+
         axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=addCustomer', customerData)
             .then(response => {
                 // If a new customer is added, update the select options
@@ -108,11 +136,11 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                     setCustomerOptions([...customerOptions, newCustomerOption]);
                     setSelectedCustomer(newCustomerOption); // Set newly added customer
                 }
-    
+
                 // Reset fields after successful submission
                 resetForm();
                 handleClose(); // Close the modal after showing the alert
-    
+
                 Swal.fire({
                     icon: 'success',
                     title: 'Success!',
@@ -123,7 +151,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             .catch(error => console.error('Error adding customer and product:', error))
             .finally(() => setIsSubmitting(false));
     };
-    
+
 
     // Reset form fields
     const resetForm = () => {
@@ -235,6 +263,18 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                         </>
                     )}
                 </Form>
+
+
+                <Form.Group controlId="formAgent">
+                    <Form.Label>Agent</Form.Label>
+                    <Select
+                        options={agentOptions}
+                        value={selecteAgent}
+                        onChange={setSelectedAgent}
+                        placeholder="Select agent"
+                    />
+                    {agentError && <div style={{ color: 'red' }}>{agentError}</div>} {/* Display rate error */}
+                </Form.Group>
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={handleClose}>

@@ -25,7 +25,11 @@ const ProductModal = ({ show, handleClose, productId }) => {
             })
                 .then(response => {
                     let product = response.data.product;
-                    setProductName(product.productName);
+                    let productName=product.productName;
+                    if(product.subCategoryName!='OTHERS'){
+                        productName=product.subCategoryName + ' ' + product.productName;
+                    }
+                    setProductName(productName);
                     setProductDescription(product.productDescription);
                     setProductCategory(product.categoryName);
                     setHsnCode(product.hsnCode);
@@ -67,7 +71,9 @@ const ProductModal = ({ show, handleClose, productId }) => {
                 <div className="product-details-container">
                     <div className="product-details-grid">
                         <div className="detail-item image-container">
-                            <img src={image} alt="Product" className="product-image" />
+                            <a href={image} target="_blank">
+                                <img src={image} alt="Product" className="product-image" />
+                            </a>
                         </div>
                         <div className="details-container">
                             <div className="detail-item">
