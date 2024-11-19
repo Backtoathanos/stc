@@ -363,7 +363,6 @@ include("kattegat/role_check.php");
           var pageSize = 10;
 
           // call merchant for purchase
-          // stc_call_poadhoc('', '', '', '');
           function loadTableData(page) {
             $.ajax({
               url: "kattegat/ragnar_purchase.php",
@@ -391,15 +390,34 @@ include("kattegat/role_check.php");
             $('#pagination').empty();
 
             for (var i = 1; i <= totalPages; i++) {
-              var pageLink = $('<a href="javascript:void(0)" class="paginationbtn" style=" padding: 5px; margin: 0px; background: #c3ffe3; border: 1px solid grey; ">' + i + '</a>');
+              var pageLink = $(
+                '<a href="javascript:void(0)" class="paginationbtn" style="padding: 5px; margin: 0px; background: #c3ffe3; border: 1px solid grey;">' + 
+                i + 
+                '</a>'
+              );
+
+              // Highlight the current page
+              if (i === currentPage) {
+                pageLink.css({
+                  background: "#4caf50", // Highlight background color (green in this case)
+                  color: "white"        // Font color
+                });
+              }
+
               pageLink.click(function(e) {
                 e.preventDefault();
+
+                // Update currentPage
                 currentPage = parseInt($(this).text());
+
+                // Load table data for the selected page
                 loadTableData(currentPage);
               });
+
               $('#pagination').append(pageLink);
             }
           }
+
           // Initial data load
           // loadTableData(currentPage);
           var browserWidth = $(window).width();

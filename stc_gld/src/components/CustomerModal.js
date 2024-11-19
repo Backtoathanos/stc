@@ -19,10 +19,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
     const [quantityError, setQuantityError] = useState('');
     const [rateError, setRateError] = useState('');
     const [customerError, setCustomerError] = useState('');
-    const [agentError, setAgentError] = useState('');
-    
-
-
+    const [agentError, setAgentError] = useState(''); 
 
 
     // Fetch customer options when the modal is shown
@@ -54,11 +51,11 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             })
                 .then(response => {
                     if (Array.isArray(response.data)) {
-                        const options = response.data.map(gld_agents => ({
+                        const options1 = response.data.map(gld_agents => ({
                             value: gld_agents.stc_own_agents_id,
                             label: gld_agents.stc_own_agents_name
                         }));
-                        setAgentOptions(options);
+                        setAgentOptions(options1);
                     } else {
                         console.error('Unexpected response format:', response.data);
                     }
