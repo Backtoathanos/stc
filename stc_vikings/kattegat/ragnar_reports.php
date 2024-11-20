@@ -4069,7 +4069,8 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
    }
 
    // call mrd
-   public function stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $pro_id, $tomaterial){      
+   public function stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $pro_id, $tomaterial, $page, $limit){  
+      $offset = ($page - 1) * $limit;     
       $odin='';
       $filter_query='';
       if(empty($from)){
@@ -4124,8 +4125,13 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
          ".$sdl_joiner."
          WHERE DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $from)."'
          AND '".mysqli_real_escape_string($this->stc_dbs, $to)."' ".$filter_query."
-         ORDER BY DATE(R.`stc_cust_super_requisition_list_date`) DESC, R.`stc_cust_super_requisition_list_sdlid` DESC
+         ORDER BY DATE(R.`stc_cust_super_requisition_list_date`) DESC, R.`stc_cust_super_requisition_list_sdlid` DESC         
       ";
+
+      $total_result = mysqli_query($this->stc_dbs, $query);
+      $total_record = mysqli_num_rows($total_result);
+
+      $query.="LIMIT $limit OFFSET $offset";
       $odin_get_mrdqry=mysqli_query($this->stc_dbs, $query);
       if(mysqli_num_rows($odin_get_mrdqry)>0){
          $prev_pno='';
@@ -4210,14 +4216,21 @@ class ragnarReportsViewMaterialRequisitionDetails extends tesseract{
                </tr>
             ';
          }
-      }else{
-         $odin.='
-            <tr>
-               <td>No record found.</td>
-            </tr>
-         ';
-      }
-      return $odin;
+      } else {
+         $odin .= '<tr><td colspan="15">No record found.</td></tr>';
+     }
+ 
+     // Add pagination controls
+     $pages = ceil($total_record / $limit);
+     $pagination = '<tr><td colspan="15"><div class="pagination">';
+     for ($i = 1; $i <= $pages; $i++) {
+         $active = ($i == $page) ? 'active' : '';
+         $activestyle = ($i == $page) ? "style='background-color: #afaeff; font-weight: bold;padding: 5px;'" : "style='font-weight: bold;padding: 5px;'";
+         $pagination .= "<a href='javascript:void(0)' class='stc-mrd-page $active' $activestyle data-page='$i'>$i</a>";
+     }
+     $pagination .= '</div></td></tr>';
+ 
+     return $odin . $pagination;
    }
 }
 
@@ -4749,22 +4762,24 @@ if(isset($_POST['stc_mrd_call_dept'])){
    echo $out;
 }
 
-if(isset($_POST['stc_mrd_call_mrd'])){
-   $out='';
-   $from=date('Y-m-d', strtotime($_POST['from']));
-   $to=date('Y-m-d', strtotime($_POST['to']));
-   $tojob=$_POST['tojob'];
-   $customer=$_POST['customer'];
-   $location=$_POST['location'];
-   $dept=$_POST['dept'];
-   $pro_id=$_POST['pro_id'];
-   $tomaterial=$_POST['tomaterial'];
+if (isset($_POST['stc_mrd_call_mrd'])) {
+   $out = '';
+   $from = date('Y-m-d', strtotime($_POST['from']));
+   $to = date('Y-m-d', strtotime($_POST['to']));
+   $tojob = $_POST['tojob'];
+   $customer = $_POST['customer'];
+   $location = $_POST['location'];
+   $dept = $_POST['dept'];
+   $pro_id = $_POST['pro_id'];
+   $tomaterial = $_POST['tomaterial'];
+   $page = isset($_POST['page']) ? intval($_POST['page']) : 1;
+   $limit = isset($_POST['limit']) ? intval($_POST['limit']) : 10;
 
-   $bjorneschoolfee=new ragnarReportsViewMaterialRequisitionDetails();
-
-   $out=$bjorneschoolfee->stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $pro_id, $tomaterial);
-   echo $out;
+   $bjorneschoolfee = new ragnarReportsViewMaterialRequisitionDetails();
+   $out = $bjorneschoolfee->stc_mrd_find($from, $to, $tojob, $customer, $location, $dept, $pro_id, $tomaterial, $page, $limit);
+   echo json_encode($out);
 }
+
 #<----------------------------Object sections of epermit reports class--------------------------------->
 // call school fee
 if(isset($_POST['stc_find_epermit_attendance'])){

@@ -2324,40 +2324,58 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             });
 
             // call find for mrd
-            $('body').delegate('.stc-mrd-hit', 'click', function(e){
+            $('body').delegate('.stc-mrd-hit', 'click', function (e) {
                 e.preventDefault();
+                var page = 1;
+                get_mrd(page);
+            });
+
+            function get_mrd(page){
                 var from = $("#stc-mrd-from").val();
                 var to = $("#stc-mrd-to").val();
                 var tojob = $("#stc-mrd-tojob").val();
                 var customer = $("#stc-mrd-customer").val();
                 var location = $("#stc-mrd-location").val();
-                var dept = $("#stc-mrd-dept").text();
+                var dept = $("#stc-mrd-dept option:selected").text();
                 var pro_id = $("#stc-mrd-dept").val();
                 var tomaterial = $("#stc-mrd-tomaterial").val();
-                if(from!="" && to!=""){
+                var page = page || 1; // Current page, default to 1
+                var limit = 10; // Number of records per page
+
+                if (from !== "" && to !== "") {
                     $.ajax({
-                        url     : "kattegat/ragnar_reports.php",
-                        method  : "post",
-                        data    : {
-                            stc_mrd_call_mrd:1,
-                            from:from,
-                            to:to,
-                            tojob:tojob,
-                            customer:customer,
-                            location:location,
-                            dept:dept,
-                            pro_id:pro_id,
-                            tomaterial:tomaterial
+                        url: "kattegat/ragnar_reports.php",
+                        method: "post",
+                        data: {
+                            stc_mrd_call_mrd: 1,
+                            from: from,
+                            to: to,
+                            tojob: tojob,
+                            customer: customer,
+                            location: location,
+                            dept: dept,
+                            pro_id: pro_id,
+                            tomaterial: tomaterial,
+                            page: page,
+                            limit: limit
                         },
-                        success : function(response){
-                            // console.log(response);
+                        dataType: "JSON",
+                        success: function (response) {
                             $('.stc-reports-mrd-view').html(response);
                         }
                     });
-                }else{
-                    alert("Please select date.");
+                } else {
+                    alert("Please select a date.");
                 }
+            }
+
+            $('body').delegate('.stc-mrd-page', 'click', function (e) {
+                e.preventDefault();
+                var page = $(this).data('page');
+                get_mrd(page);
+                // $('.stc-mrd-hit').data('page', page).trigger('click'); // Trigger the main search with updated page
             });
+
 
             $('body').delegate('.showmrd-details', 'click', function(e){
                 var reqid=$(this).attr('reqnumber');
