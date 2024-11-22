@@ -111,17 +111,18 @@ function addCustomer($conn) {
     $quantity = $data['quantity'];
     $rate = $data['rate'];
     $userId=$data['userId'];
+    $agentId=$data['agentId'];
     if($productId){
 
         // Insert new customer if no existing customer is selected
         if (!$customerId) {
-            $query = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_city_id, gld_customer_state_id, gld_customer_address) VALUES ('$customerName', '$customerContact', '65', '16', '$customerAddress')";
+            $query = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_city_id, gld_customer_state_id, gld_customer_address, agent_id) VALUES ('$customerName', '$customerContact', '65', '16', '$customerAddress')";
             $conn->query($query);
             $customerId = $conn->insert_id;
         }
         $date = date('Y-m-d H:i:s');
         // Link customer to the product and set the quantity
-        $productQuery = "INSERT INTO gld_challan (cust_id, product_id, qty, rate, created_date, created_by) VALUES ('$customerId', '$productId', '$quantity', '$rate', '$date', '$userId')";
+        $productQuery = "INSERT INTO gld_challan (cust_id, product_id, qty, rate, agent_id, created_date, created_by) VALUES ('$customerId', '$productId', '$quantity', '$agentId', '$rate', '$date', '$userId')";
         if ($conn->query($productQuery)) {
             echo json_encode(['success' => true, 'message' => 'Customer and product added successfully']);
         } else {

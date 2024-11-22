@@ -102,6 +102,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                 return;
             }
         }
+        const agentId = selecteAgent ? selecteAgent.value : 0;
 
         setIsSubmitting(true); // Prevent multiple submissions
 
@@ -119,7 +120,8 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             name: customerName,
             contact: customerContact,
             address: customerAddress,
-            userId: userId
+            userId: userId,
+            agentId: agentId
         };
 
         axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=addCustomer', customerData)
