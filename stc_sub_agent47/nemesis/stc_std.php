@@ -207,7 +207,9 @@ class transformers extends tesseract{
 		if($stc_j_plannning=="BREAKDOWN MAINTENANCE" || $action_status==2){
 			$status="Down";
 		}
-		mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."', 'Status Down List created - ".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."', '1', '1', '".$_SESSION['stc_agent_sub_category']."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".$_SESSION['stc_agent_sub_id']."')");
+		if($_SESSION['stc_agent_sub_category']!="Service Group"){
+			mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."', 'Status Down List created - ".mysqli_real_escape_string($this->stc_dbs, $stc_j_plannning)."', '1', '1', '".$_SESSION['stc_agent_sub_category']."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".$_SESSION['stc_agent_sub_id']."')");
+		}
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_status_down_list`(
 			    `stc_status_down_list_date`,
@@ -769,6 +771,7 @@ class transformers extends tesseract{
 		if($status==4){
 			$optimusprime_cqry=mysqli_query($this->stc_dbs, "
 				SELECT 
+					`stc_status_down_list_date`,
 					`stc_status_down_list_qty`,
 					`stc_status_down_list_capacity`,
 					`stc_status_down_list_reasonattribute`,
@@ -777,7 +780,9 @@ class transformers extends tesseract{
 				WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."' 
 			");
 			$validated=1;
+			$created_date='';
 			foreach($optimusprime_cqry as $optimusprime_crow){
+				$created_date=$optimusprime_crow['stc_status_down_list_date'];
 				if(($optimusprime_crow['stc_status_down_list_qty']==0) || ($optimusprime_crow['stc_status_down_list_capacity']=='') || ($optimusprime_crow['stc_status_down_list_reasonattribute']=='')){
 					$validated=0;
 					break;
@@ -796,11 +801,42 @@ class transformers extends tesseract{
 					WHERE
 						`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
 				");
-				$checkQuery = mysqli_query($this->stc_dbs, "SELECT `stc_status_down_list_jobtype` FROM `stc_status_down_list` WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'");
-				$cdate = date("Y-m-d");
-				$result=mysqli_fetch_assoc($checkQuery);
-				$jtype=$result['stc_status_down_list_jobtype'];
-				mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('".$jtype."', '".$jtype." done by ".$_SESSION['stc_agent_sub_name']."', '1', '1', '".$_SESSION['stc_agent_sub_category']."', '$date', '".$_SESSION['stc_agent_sub_id']."')");
+				if($_SESSION['stc_agent_sub_category']=="Supervisor"){
+					$checkQuery = mysqli_query($this->stc_dbs, "SELECT `stc_status_down_list_jobtype` FROM `stc_status_down_list` WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'");
+					$result=mysqli_fetch_assoc($checkQuery);
+					$jtype=$result['stc_status_down_list_jobtype'];
+
+					$rating=0;
+					$created_timestamp = strtotime($created_date);
+					$current_timestamp = strtotime($date);
+
+					$duration_in_hours = ($current_timestamp - $created_timestamp) / 3600; // Convert seconds to hours
+					if($jtype=="BREAKDOWN MAINTENANCE"){
+						if ($duration_in_hours <= 8) {
+							$rating = 5;
+						} elseif ($duration_in_hours > 8 && $duration_in_hours <= 12) {
+							$rating = 4;
+						} elseif ($duration_in_hours > 12 && $duration_in_hours <= 16) {
+							$rating = 3;
+						} elseif ($duration_in_hours > 16 && $duration_in_hours <= 20) {
+							$rating = 2;
+						} elseif ($duration_in_hours > 20 && $duration_in_hours <= 24) {
+							$rating = 1;
+						}
+					} else if($jtype=="PREVENTIVE MAINTENANCE" || $jtype=="DAILY JOB ACTIVITY"){
+						if ($duration_in_hours <= 8) {
+							$rating = 1;
+						}
+					} else if($jtype=="CALL ATTEND"){
+						if ($duration_in_hours <= 2) {
+							$rating = 1;
+						}
+					}
+
+					if($rating>0){
+						mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('".$jtype."', '".$jtype." done by ".$_SESSION['stc_agent_sub_name']."', '".$rating."', '1', '".$_SESSION['stc_agent_sub_category']."', '$date', '".$_SESSION['stc_agent_sub_id']."')");
+					}
+				}
 				$optimusprime = 'Status Updated!!!';
 			}else{
 				$optimusprime = 'Status not updated. Please fill all fields.';
