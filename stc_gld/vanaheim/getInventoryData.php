@@ -22,17 +22,7 @@ $result = mysqli_query($con, $query);
 
 $data = [];
 foreach($result as $key => $row){
-    $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = " . $row['stc_product_id']);
-    $totalQty=0;
-    if(mysqli_num_rows($query)>0){
-        $qtyData = mysqli_fetch_assoc($query);
-        $totalQty = $qtyData['total_qty'];
-    }
-    // Calculate remaining quantity
-    $remainingQty = $row['stc_item_inventory_pd_qty'] - $totalQty;
-
-    // Update stc_item_inventory_pd_qty in the result array
-    $row['stc_item_inventory_pd_qty'] = number_format($remainingQty, 2);
+    
     $row['rate_including_gst'] = number_format($row['rate_including_gst'], 2);
 
     $brand_name='';
@@ -46,20 +36,26 @@ foreach($result as $key => $row){
     }
     $row['stc_product_name'] = $row['stc_sub_cat_name']!="OTHERS" ? $row['stc_sub_cat_name'] . " " .$row['stc_product_name'] : $row['stc_product_name'];
 
-    if($row['stc_purchase_product_adhoc_id']!=0){
-        $delivered=0;
-        $sql_qry=mysqli_query($con, "
-            SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
-            FROM `stc_cust_super_requisition_list_items_rec` 
-            WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$row['stc_purchase_product_adhoc_id']."'
-        ");
-        if(mysqli_num_rows($sql_qry)>0){
-            foreach($sql_qry as $sql_row){
-                $delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
-            }
-        }
-        $row['stc_item_inventory_pd_qty'] = number_format($row['stc_item_inventory_pd_qty'] - ($odinrow['stc_item_inventory_pd_qty'] + $delivered), 2);
+    $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = " . $row['stc_product_id']);
+    $gldQty=0;
+    if(mysqli_num_rows($query)>0){
+        $qtyData = mysqli_fetch_assoc($query);
+        $gldQty = $qtyData['total_qty'];
     }
+
+    $directqty=0;
+    $sql_qry=mysqli_query($con, "
+        SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
+        FROM `stc_cust_super_requisition_list_items_rec` 
+        WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$row['stc_purchase_product_adhoc_id']."'
+    ");
+    if(mysqli_num_rows($sql_qry)>0){
+        foreach($sql_qry as $sql_row){
+            $directqty+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+        }
+    }
+    $remainingqty=$row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
+    $row['stc_item_inventory_pd_qty'] = number_format($remainingqty, 2);
     // Remove row if remaining quantity is 0 or less
     if ($remainingQty >0) {
         $data[] = $row; // Add the row to the data array
