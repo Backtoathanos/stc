@@ -38,10 +38,6 @@ foreach($result as $key => $row){
 
     $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = " . $row['stc_product_id']);
     $gldQty=0;
-    if(mysqli_num_rows($query)>0){
-        $qtyData = mysqli_fetch_assoc($query);
-        $gldQty = $qtyData['total_qty'];
-    }
 
     $directqty=0;
     $sql_qry=mysqli_query($con, "
@@ -57,7 +53,7 @@ foreach($result as $key => $row){
     $remainingqty=$row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
     $row['stc_item_inventory_pd_qty'] = number_format($remainingqty, 2);
     // Remove row if remaining quantity is 0 or less
-    if ($remainingQty >0) {
+    if ($remainingqty >0) {
         $data[] = $row; // Add the row to the data array
     } else {
         unset($data[$key]); // Remove the row from the data array
