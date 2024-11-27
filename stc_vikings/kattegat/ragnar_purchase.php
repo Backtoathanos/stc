@@ -2381,10 +2381,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}
 
 	// update po adhoc item name
-	public function stc_poadhoc_update($adhoc_id, $adhoc_name){
+	public function stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit){
 		$odin='';
 		$checkqry=mysqli_query($this->stc_dbs, "
-			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."', `stc_purchase_product_adhoc_unit`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_unit)."', `stc_purchase_product_adhoc_rackid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_rack)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
 		");
 		if($checkqry){
 			$odin='success';
@@ -3311,8 +3311,10 @@ if(isset($_POST['stc_po_adhoc_delete'])){
 if(isset($_POST['stc_po_adhoc_update'])){
 	$adhoc_id=$_POST['adhoc_id'];
 	$adhoc_name=$_POST['adhoc_name'];
+	$adhoc_rack=$_POST['adhoc_rack'];
+	$adhoc_unit=$_POST['adhoc_unit'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name);
+	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit);
 	echo $outbjornestocking;
 }
 

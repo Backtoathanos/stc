@@ -570,22 +570,32 @@ include("kattegat/role_check.php");
           
           $('body').delegate('.edit-itemname', 'click', function(e){
             var item_name=$(this).html();
+            var item_rack = $(this).closest('tr').find('td:eq(5)').html().trim();
+            var item_unit=$(this).closest('tr').find('td:eq(6)').html();
             var item_id=$(this).attr("id");
             $('#edit-pro-id').remove();
             $('#stcpoadhoceitemname').val(item_name);
+            $('#stcpoadhoceitemrack option').filter(function() {
+              return $(this).text().trim() === item_rack;
+            }).prop('selected', true);
+            $('#stcpoadhoceitemunit').val(item_unit);
             $('#stc-poadhocedit-id').val(item_id);
           });
           
           $('body').delegate('.stc-poadhoc-edititemname', 'click', function(e){
             var adhoc_id=$('#stc-poadhocedit-id').val();
             var adhoc_name=$('#stcpoadhoceitemname').val();
+            var adhoc_rack=$('#stcpoadhoceitemrack').val();
+            var adhoc_unit=$('#stcpoadhoceitemunit').val();
             $.ajax({
               url     : "kattegat/ragnar_purchase.php",
               method  : "POST",
               data    : {
                 stc_po_adhoc_update:1,
                 adhoc_id:adhoc_id,
-                adhoc_name:adhoc_name
+                adhoc_name:adhoc_name,
+                adhoc_rack:adhoc_rack,
+                adhoc_unit:adhoc_unit
               },
               success : function(response_items){
                 var response=response_items.trim();
@@ -922,6 +932,38 @@ include("kattegat/role_check.php");
                     />
                   </div>
                 </div>
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5
+                      for=""
+                      >Item Rack
+                    </h5>
+                    <select id="stcpoadhoceitemrack" class="form-control validate">
+                      <?php
+                        $rackqry=mysqli_query($con, "
+                          SELECT `stc_rack_id`, `stc_rack_name` FROM `stc_rack` ORDER BY `stc_rack_name` ASC
+                        ");
+                        foreach($rackqry as $rackqrow){
+                          echo '<option value="'.$rackqrow['stc_rack_id'].'">'.$rackqrow['stc_rack_name'].'</option>';
+                        }
+                      ?>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5
+                      for=""
+                      >Item Unit
+                    </h5>
+                    <input
+                      id="stcpoadhoceitemunit"
+                      type="text"
+                      placeholder="Edit Unit"
+                      class="form-control validate"
+                    />
+                  </div>
+                </div>                
                 <div class="col-xl-12 col-md-12 col-sm-12">
                   <div class="card-border mb-3 card card-body border-success">
                     <button type="button"  data-dismiss="modal" class="btn btn-success stc-poadhoc-edititemname">Save</button>
