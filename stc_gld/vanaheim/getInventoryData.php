@@ -50,11 +50,11 @@ foreach($result as $key => $row){
             $sql_qry2=mysqli_query($con, "
                 SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
                 FROM `stc_cust_super_requisition_list_items_rec` 
-                WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$sql_qry['stc_purchase_product_adhoc_id']."'
+                WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$sql_row['stc_purchase_product_adhoc_id']."'
             ");
             if(mysqli_num_rows($sql_qry2)>0){
-                foreach($sql_qry2 as $sql_row){
-                    $directqty+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+                foreach($sql_qry2 as $sql_row2){
+                    $directqty+=$sql_row2['stc_cust_super_requisition_list_items_rec_recqty'];
                 }
             }
         }
