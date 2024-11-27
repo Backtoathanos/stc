@@ -2192,6 +2192,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_productid`,
 				`stc_product_id`,
 				`stc_product_name`,
+				`stc_sub_cat_name`,
 				`stc_product_image`,
 				`stc_purchase_product_adhoc_itemdesc`,
 				`stc_purchase_product_adhoc_qty`,
@@ -2210,6 +2211,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_updated_date`
 			FROM `stc_purchase_product_adhoc`
 			LEFT JOIN `stc_product` ON `stc_purchase_product_adhoc_productid`=`stc_product_id`
+			LEFT JOIN `stc_sub_category` ON `stc_product_sub_cat_id`=`stc_sub_cat_id`
 			LEFT JOIN `stc_rack` ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
 			LEFT JOIN `stc_user` ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
 			WHERE `stc_purchase_product_adhoc_qty`>0 ".$filter."
@@ -2278,12 +2280,13 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				
 				$pro_rate='<input type="number" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
+				$product_name=$odinrow['stc_sub_cat_name']!="OTEHRS"?$odinrow['stc_sub_cat_name']. ' ' .$odinrow['stc_product_name']:$odinrow['stc_product_name'];
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
 						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
 						<td style='width: 180px;'>".$productog."</td>
-						<td class='text-center'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$odinrow['stc_product_name']."</a></td>
+						<td class='text-center'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$product_name."</a></td>
 						<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a></td>
 						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>

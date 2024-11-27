@@ -38,16 +38,25 @@ foreach($result as $key => $row){
 
     $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = " . $row['stc_product_id']);
     $gldQty=0;
-
+    
     $directqty=0;
     $sql_qry=mysqli_query($con, "
-        SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
-        FROM `stc_cust_super_requisition_list_items_rec` 
-        WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$row['stc_purchase_product_adhoc_id']."'
+        SELECT `stc_purchase_product_adhoc_id` 
+        FROM `stc_purchase_product_adhoc` 
+        WHERE `stc_purchase_product_adhoc_productid`='".$row['stc_product_id']."'
     ");
     if(mysqli_num_rows($sql_qry)>0){
         foreach($sql_qry as $sql_row){
-            $directqty+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+            $sql_qry2=mysqli_query($con, "
+                SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
+                FROM `stc_cust_super_requisition_list_items_rec` 
+                WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$sql_qry['stc_purchase_product_adhoc_id']."'
+            ");
+            if(mysqli_num_rows($sql_qry2)>0){
+                foreach($sql_qry2 as $sql_row){
+                    $directqty+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+                }
+            }
         }
     }
     $remainingqty=$row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
