@@ -2280,7 +2280,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				
 				$pro_rate='<input type="number" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
-				$product_name=$odinrow['stc_sub_cat_name']!="OTEHRS"?$odinrow['stc_sub_cat_name']. ' ' .$odinrow['stc_product_name']:$odinrow['stc_product_name'];
+				$product_name=$odinrow['stc_sub_cat_name']!="OTHERS"?$odinrow['stc_sub_cat_name']. ' ' .$odinrow['stc_product_name']:$odinrow['stc_product_name'];
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
