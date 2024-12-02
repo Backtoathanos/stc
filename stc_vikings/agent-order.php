@@ -85,6 +85,11 @@ include("kattegat/role_check.php");
                                     <span>Tools Track </span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-7" data-toggle="tab" href="#tab-content-7">
+                                    <span>Order Material List </span>
+                                </a>
+                            </li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane tabs-animation fade" id="tab-content-1" role="tabpanel">
