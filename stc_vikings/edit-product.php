@@ -61,10 +61,12 @@ include("kattegat/role_check.php");
                                             if(isset($_GET['pdid'])){
                                               $stcretquery=mysqli_query($con, "
                                                 SELECT * FROM `stc_product`
-                                                INNER JOIN `stc_category`
+                                                LEFT JOIN `stc_category`
                                                 ON `stc_product_cat_id`=`stc_cat_id`
-                                                INNER JOIN `stc_sub_category`
+                                                LEFT JOIN `stc_sub_category`
                                                 ON `stc_product_sub_cat_id`=`stc_sub_cat_id`
+                                                LEFT JOIN `stc_brand`
+                                                ON `stc_product_brand_id`=`stc_brand_id`
                                                 WHERE `stc_product_id`='".$_GET['pdid']."'
                                               ");
                                               $stcretresult=mysqli_fetch_assoc($stcretquery);  
@@ -102,9 +104,10 @@ include("kattegat/role_check.php");
                                         <div class="card-border mb-3 card card-body border-primary">
                                             <h5
                                               for="category"
-                                              >Category : <?php echo $stcretresult['stc_cat_name'];?></h5
+                                              >Category : <span><?php echo $stcretresult['stc_cat_name'];?></span></h5
                                             >
                                             <select
+                                              id="category"
                                               class="custom-select tm-select-accounts call_cat"
                                               name="stcpdcategory"
                                             ></select>
@@ -114,9 +117,10 @@ include("kattegat/role_check.php");
                                         <div class="card-border mb-3 card card-body border-primary">
                                             <h5
                                               for="subcategory"
-                                              >Sub Category : <?php echo $stcretresult['stc_sub_cat_name'];?></h5
+                                              >Sub Category : <span><?php echo $stcretresult['stc_sub_cat_name'];?></span></h5
                                             >
                                             <select
+                                              id="subcategory"
                                               class="custom-select tm-select-accounts call_sub_cat"
                                               name="stcpdsubcategory"
                                             >
@@ -127,10 +131,11 @@ include("kattegat/role_check.php");
                                         <div class="card-border mb-3 card card-body border-primary">
                                             <h5
                                               for="unit"
-                                              >Unit : <?php echo $stcretresult['stc_product_unit'];?></h5
+                                              >Unit : <span><?php echo $stcretresult['stc_product_unit'];?></span></h5
                                             >
                                             <select
-                                              class="custom-select tm-select-accounts"
+                                              id="unit"
+                                              class="custom-select tm-select-accounts stcpdunit"
                                               name="stcpdunit"
                                             >
                                               <option selected>Select Unit</option>
@@ -154,11 +159,12 @@ include("kattegat/role_check.php");
                                     <div class="col-md-6">
                                         <div class="card-border mb-3 card card-body border-primary">
                                             <h5
-                                              for="status"
-                                              >GST : <?php echo $stcretresult['stc_product_gst'];?>%</h5
+                                              for="gst"
+                                              >GST : <span><?php echo $stcretresult['stc_product_gst'];?></span>%</h5
                                             >
                                             <select
-                                              class="custom-select tm-select-accounts"
+                                              id="gst"
+                                              class="custom-select tm-select-accounts gst"
                                               name="stcpdgst"
                                             >
                                               <option selected>Select GST</option>
@@ -172,11 +178,11 @@ include("kattegat/role_check.php");
                                     <div class="col-md-6">
                                         <div class="card-border mb-3 card card-body border-primary">
                                           <h5
-                                            for="quantity"
+                                            for="hsncode"
                                             >HSN Code
                                           </h5>
                                           <input
-                                            id="name"
+                                            id="hsncode"
                                             name="stcpdhsncode"
                                             type="number"
                                             placeholder="Product Name"
@@ -191,11 +197,11 @@ include("kattegat/role_check.php");
                                     <div class="col-md-6">
                                         <div class="card-border mb-3 card card-body border-primary">
                                             <h5
-                                              for="status"
+                                              for="percentage"
                                               >Percentage</h5
                                             >
                                             <input
-                                              id="name"
+                                              id="percentage"
                                               name="stcpdpercentage"
                                               type="text"
                                               placeholder="Product Percentage"
@@ -208,9 +214,10 @@ include("kattegat/role_check.php");
                                         <div class="card-border mb-3 card card-body border-primary">
                                             <h5
                                               for="make"
-                                              >Make </h5
+                                              >Make : <span><?php echo $stcretresult['stc_brand_title'];?></span></h5
                                             >
                                             <select
+                                              id="make"
                                               class="custom-select tm-select-accounts call_brand"
                                               name="stcpdbrand"
                                             >
@@ -257,6 +264,7 @@ include("kattegat/role_check.php");
               }
             });
           });
+
         });
     </script>
 </body>

@@ -31,6 +31,63 @@ $(document).ready(function(){
 				$('.call_sub_cat').html(data[1]);
 				$('.call_rack').html(data[2]);
 				$('.call_brand').html(data[3]);
+        // Get the text from the <span> element
+        var unit = $('h5[for="unit"] span').text().trim(); // Fetch "NOS"
+
+        // Match the text to an <option> and select it
+        var found = false;
+        $('.stcpdunit option').each(function () {
+            if ($(this).text().trim().toLowerCase() === unit.toLowerCase()) { // Case-insensitive comparison
+                $(this).prop('selected', true); // Select the matching <option>
+                found = true;
+                return false; // Exit the loop
+            }
+        });
+
+        
+        // Get the text from the <span> element
+        var gst = $('h5[for="gst"] span').text().trim(); // Fetch "NOS"
+        $('.gst').val(gst);
+
+        // Get the text from the <span> element
+        var subcat = $('h5[for="subcategory"] span').text().trim(); // Fetch "NOS"
+
+        // Match the text to an <option> and select it
+        var found = false;
+        $('.call_sub_cat option').each(function () {
+            if ($(this).text().trim().toLowerCase() === subcat.toLowerCase()) { // Case-insensitive comparison
+                $(this).prop('selected', true); // Select the matching <option>
+                found = true;
+                return false; // Exit the loop
+            }
+        });
+
+        // Get the text from the <span> element
+        var category = $('h5[for="category"] span').text().trim(); // Fetch "NOS"
+
+        // Match the text to an <option> and select it
+        var found = false;
+        $('.call_cat option').each(function () {
+            if ($(this).text().trim().toLowerCase() === category.toLowerCase()) { // Case-insensitive comparison
+                $(this).prop('selected', true); // Select the matching <option>
+                found = true;
+                return false; // Exit the loop
+            }
+        });
+
+        // Get the text from the <span> element
+        var brand = $('h5[for="make"] span').text().trim(); // Fetch "NOS"
+
+        // Match the text to an <option> and select it
+        var found = false;
+        $('.call_brand option').each(function () {
+            if ($(this).text().trim().toLowerCase() === brand.toLowerCase()) { // Case-insensitive comparison
+                $(this).prop('selected', true); // Select the matching <option>
+                found = true;
+                return false; // Exit the loop
+            }
+        });
+
 			}
 		});
 	}
