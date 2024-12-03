@@ -37,8 +37,8 @@ foreach($result as $key => $row){
     $row['stc_product_name'] = $row['stc_sub_cat_name']!="OTHERS" ? $row['stc_sub_cat_name'] . " " .$row['stc_product_name'] : $row['stc_product_name'];
 
     $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = " . $row['stc_product_id']);
-    $gldQty=0;
-    
+    $result=mysqli_fetch_assoc($query);
+    $gldQty=$result['total_qty'];
     $directqty=0;
     $sql_qry=mysqli_query($con, "
         SELECT `stc_purchase_product_adhoc_id` 
