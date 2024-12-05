@@ -86,7 +86,7 @@ include("kattegat/role_check.php");
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a role="tab" class="nav-link" id="tab-7" data-toggle="tab" href="#tab-content-7">
+                                <a role="tab" class="nav-link" id="tab-8" data-toggle="tab" href="#tab-content-8">
                                     <span>Order Material List </span>
                                 </a>
                             </li>
