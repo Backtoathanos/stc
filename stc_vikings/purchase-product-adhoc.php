@@ -28,6 +28,7 @@ include("kattegat/role_check.php");
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="./main.css" rel="stylesheet">
     <link href="assets/css/style.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css" rel="stylesheet" />
     <style>
       .stc-purchase-view-table th{
         text-align: center;
@@ -44,6 +45,15 @@ include("kattegat/role_check.php");
       .fade:not(.show) {
         opacity: 10;
       }      
+      .searchable-dropdown {
+        position: relative;
+        max-width: 300px;
+      }
+
+      #dropdown-search {
+        margin-bottom: 10px;
+      }
+
     </style>
 </head>
 <body>
@@ -124,7 +134,7 @@ include("kattegat/role_check.php");
                                         <input
                                           id="quantity"
                                           name="quantity"
-                                          type="text"
+                                          type="number"
                                           placeholder="Quantity"
                                           class="form-control validate"
                                         />
@@ -139,7 +149,7 @@ include("kattegat/role_check.php");
                                         <input
                                           id="rate"
                                           name="rate"
-                                          type="text"
+                                          type="number"
                                           placeholder="Rate"
                                           class="form-control validate"
                                         />
@@ -359,6 +369,22 @@ include("kattegat/role_check.php");
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function(){
+
+          $('#dropdown-search').on('input', function() {
+            var searchTerm = $(this).val().toLowerCase();
+
+            // Loop through options and hide those that don't match the search term
+            $('#stcpoadhoceitemrack option').each(function() {
+              var text = $(this).text().toLowerCase();
+              if (text.includes(searchTerm)) {
+                $(this).show();
+              } else {
+                $(this).hide();
+              }
+            });
+          });
+
+          
           var currentPage = 1;
           var pageSize = 10;
 
@@ -482,33 +508,37 @@ include("kattegat/role_check.php");
             var source=$('#source').val();
             var destination=$('#destination').val();
             var remarks=$('#remarks').val();
-            $.ajax({
-              url     : "kattegat/ragnar_purchase.php",
-              method  : "POST",
-              data    : {
-                stc_po_adhoc_save:1,
-                itemname:itemname,
-                quantity:quantity,
-                rate:rate,
-                unit:unit,
-                rack:rack,
-                condition:condition,
-                source:source,
-                destination:destination,
-                remarks:remarks
-              },
-              dataType : "JSON",
-              success : function(response_items){
-                var response=response_items;
-                if(response=="success"){
-                  alert("Purchase Order Adhoc saved successfully.");
-                  $(".stc-add-poadhoc-product-form")[0].reset();
-                  $('.paginationbtn.active').click();
-                }else{
-                  alert("Something went wrong please check and try again.");
+            if(itemname!='' && quantity!=0 && rate!=0){
+              $.ajax({
+                url     : "kattegat/ragnar_purchase.php",
+                method  : "POST",
+                data    : {
+                  stc_po_adhoc_save:1,
+                  itemname:itemname,
+                  quantity:quantity,
+                  rate:rate,
+                  unit:unit,
+                  rack:rack,
+                  condition:condition,
+                  source:source,
+                  destination:destination,
+                  remarks:remarks
+                },
+                dataType : "JSON",
+                success : function(response_items){
+                  var response=response_items;
+                  if(response=="success"){
+                    alert("Purchase Order Adhoc saved successfully.");
+                    $(".stc-add-poadhoc-product-form")[0].reset();
+                    $('.paginationbtn.active').click();
+                  }else{
+                    alert("Something went wrong please check and try again.");
+                  }
                 }
-              }
-            });
+              });
+            }else{
+              alert('Please update required fields.');
+            }
           });
           
           // add recieving modal
@@ -940,16 +970,19 @@ include("kattegat/role_check.php");
                       for=""
                       >Item Rack
                     </h5>
-                    <select id="stcpoadhoceitemrack" class="form-control validate">
-                      <?php
-                        $rackqry=mysqli_query($con, "
-                          SELECT `stc_rack_id`, `stc_rack_name` FROM `stc_rack` ORDER BY `stc_rack_name` ASC
-                        ");
-                        foreach($rackqry as $rackqrow){
-                          echo '<option value="'.$rackqrow['stc_rack_id'].'">'.$rackqrow['stc_rack_name'].'</option>';
-                        }
-                      ?>
-                    </select>
+                    <div class="searchable-dropdown">
+                      <input type="text" id="dropdown-search" placeholder="Search..." class="form-control" />
+                      <select id="stcpoadhoceitemrack" class="form-control validate">
+                        <?php
+                          $rackqry=mysqli_query($con, "
+                            SELECT `stc_rack_id`, `stc_rack_name` FROM `stc_rack` ORDER BY `stc_rack_name` ASC
+                          ");
+                          foreach($rackqry as $rackqrow){
+                            echo '<option value="'.$rackqrow['stc_rack_id'].'">'.$rackqrow['stc_rack_name'].'</option>';
+                          }
+                        ?>
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div class="col-xl-12 col-md-12 col-sm-12">
