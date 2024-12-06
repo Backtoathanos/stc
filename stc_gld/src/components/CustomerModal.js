@@ -13,13 +13,14 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
     const [customerAddress, setCustomerAddress] = useState('');
     const [agentOptions, setAgentOptions] = useState([]);
     const [selecteAgent, setSelectedAgent] = useState(null);
+    const [requisition, setRequisition] = useState();
     const [quantity, setQuantity] = useState(1);
     const [rate, setRate] = useState(productRate); // Start with the initial rate
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [quantityError, setQuantityError] = useState('');
     const [rateError, setRateError] = useState('');
     const [customerError, setCustomerError] = useState('');
-    const [agentError, setAgentError] = useState(''); 
+    const [agentError, setAgentError] = useState('');
 
 
     // Fetch customer options when the modal is shown
@@ -32,7 +33,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                     if (Array.isArray(response.data)) {
                         const options = response.data.map(gld_customer => ({
                             value: gld_customer.gld_customer_id,
-                            label: gld_customer.gld_customer_cont_no
+                            label: gld_customer.gld_customer_cont_no + ' - ' + gld_customer.gld_customer_title
                         }));
                         setCustomerOptions(options);
                     } else {
@@ -114,6 +115,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
         const userId = userIdCookie.split('=')[1];
         const customerData = {
             product_id: productId,
+            requisition: requisition,
             quantity: parsedQuantity, // Use the parsed quantity
             rate: parsedRate, // Use the parsed rate
             id: customerId,
@@ -158,6 +160,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
         setCustomerName('');
         setCustomerContact('');
         setCustomerAddress('');
+        setRequisition('');
         setQuantity(1);
         setRate(productRate); // Reset rate to the initial product rate
         setIsSubmitting(false); // Reset the submission state
@@ -182,6 +185,16 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                         <Form.Control type="text" value={productId} readOnly />
                     </Form.Group>
 
+                    <Form.Group controlId="formRequisition">
+                        <Form.Label>Requisition Number</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={requisition}
+                            onChange={e => setRequisition(e.target.value)}
+                            placeholder="Enter Requisition Number"
+                        />
+                    </Form.Group>
+
                     <Form.Group controlId="formQuantity">
                         <Form.Label>Quantity</Form.Label>
                         <Form.Control
@@ -202,10 +215,11 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                         <Form.Label>Rate</Form.Label>
                         <Form.Control
                             type="number"
-                            value={rate}
+                            value={productRate}
                             onChange={e => setRate(e.target.value)}
                             min="1"
                             placeholder="Enter Rate"
+                            disabled
                         />
                         <Form.Text className="text-muted">
                             Available rate: {productRate}

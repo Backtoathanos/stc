@@ -72,7 +72,7 @@ switch ($action) {
 
 // Function to fetch customers from the database
 function getCustomers($conn) {
-    $query = "SELECT gld_customer_id, gld_customer_cont_no FROM gld_customer order by `gld_customer_cont_no` asc";
+    $query = "SELECT gld_customer_id, gld_customer_cont_no, gld_customer_title FROM gld_customer order by `gld_customer_cont_no` asc";
     $result = $conn->query($query);
 
     $customers = [];
@@ -108,6 +108,7 @@ function addCustomer($conn) {
     $customerContact = $data['contact'];
     $customerAddress = $data['address'];
     $productId = $data['product_id'];
+    $requisition = $data['requisition'];
     $quantity = $data['quantity'];
     $rate = $data['rate'];
     $userId=$data['userId'];
@@ -122,7 +123,7 @@ function addCustomer($conn) {
         }
         $date = date('Y-m-d H:i:s');
         // Link customer to the product and set the quantity
-        $productQuery = "INSERT INTO gld_challan (cust_id, product_id, qty, rate, agent_id, created_date, created_by) VALUES ('$customerId', '$productId', '$quantity', '$agentId', '$rate', '$date', '$userId')";
+        $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, product_id, qty, rate, agent_id, created_date, created_by) VALUES ('$customerId', '$requisition', '$productId', '$quantity', '$agentId', '$rate', '$date', '$userId')";
         if ($conn->query($productQuery)) {
             echo json_encode(['success' => true, 'message' => 'Customer and product added successfully']);
         } else {
