@@ -85,12 +85,9 @@ include("kattegat/role_check.php");
                                             required
                                           />
                                           <input type="hidden" name="category_hit">
-                                        </div>
-                                        <div class="col-12">
                                           <button type="submit" class="btn btn-primary btn-block text-uppercase">Add Category Now</button>
-                                        </div>
-                                        <div> <h5 class="form-control" id="carshow" style="display: none;"></h5></div>
-                                        
+                                          <div> <h5 class="form-control" id="carshow" style="display: none;"></h5></div>
+                                        </div>                                        
                                       </form>
                                     </div>
                                 </div>
@@ -121,11 +118,9 @@ include("kattegat/role_check.php");
                                             required
                                           />
                                           <input type="hidden" name="sub_category_hit">
-                                        </div>
-                                        <div class="col-12">
                                           <button type="submit" class="btn btn-primary btn-block text-uppercase">Add Sub Category Now</button>
+                                          <div> <h5 class="form-control" id="subcatshow" style="display: none;"></h5></div>
                                         </div>
-                                        <div> <h5 class="form-control" id="subcatshow" style="display: none;"></h5></div>
                                         
                                       </form>
                                     </div>
@@ -157,11 +152,9 @@ include("kattegat/role_check.php");
                                         required
                                       />
                                       <input type="hidden" name="brand_hit">
-                                    </div>
-                                    <div class="col-12">
                                       <button type="submit" class="btn btn-primary btn-block text-uppercase">Add Brand</button>
+                                      <div> <h5 class="form-control" id="brandshow" style="display: none;"></h5></div>
                                     </div>
-                                    <div> <h5 class="form-control" id="brandshow" style="display: none;"></h5></div>
                                   </form>
                                 </div>
                               </div>
@@ -192,26 +185,109 @@ include("kattegat/role_check.php");
                                           required
                                         />
                                         <input type="hidden" name="rack_hit">
-                                      </div>
-                                      <div class="col-12">
                                         <button type="submit" class="btn btn-primary btn-block text-uppercase">Add Rack Now</button>
                                       </div>
                                       <div> <h5 class="form-control" id="rackshow" style="display: none;"></h5></div>
                                     </form>
                                   </div>
                                 </div>
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                          <table class="table table-bordered">
+                                            <tbody>
+                                              <?php 
+                                                include_once("../MCU/db.php");
+
+                                                $query = mysqli_query($con, "SELECT stc_rack_id, stc_rack_name FROM stc_rack ORDER BY stc_rack_name ASC");
+
+                                                $columnCount = 20; // Number of columns per row
+                                                $counter = 0; // Initialize counter
+
+                                                $data = '<tr>'; // Start the first row
+                                                foreach ($query as $row) {
+                                                  $quer_nested=mysqli_query($con, "SELECT DISTINCT `stc_purchase_product_adhoc_itemdesc` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_rackid`='".$row['stc_rack_id']."' AND `stc_purchase_product_adhoc_status`=1");
+                                                  $style="style='Background-color: #ff6565;'";
+                                                  $productsContainer='';
+                                                  if(mysqli_num_rows($quer_nested)>0){
+                                                    foreach($quer_nested as $quer_row){
+                                                      $productsContainer.=$productsContainer!=""?"</br>".$quer_row['stc_purchase_product_adhoc_itemdesc']:$quer_row['stc_purchase_product_adhoc_itemdesc'];
+                                                    }
+                                                    $style='style="Background-color:#76ff76;" data-toggle="modal" data-target=".bd-modal-showproductdetails"';
+                                                  }
+                                                  $data .= '<td class="text-center tdclick" '.$style.'>' . $row['stc_rack_name'] . '<span style="display:none;" class="tdspanproducts">'.$productsContainer.'</span></td>';
+                                                  $counter++;
+
+                                                  // Start a new row after 10 columns
+                                                  if ($counter % $columnCount == 0) {
+                                                    $data .= '</tr><tr>'; // Close current row and start a new one
+                                                  }
+                                                }
+
+                                                // Close the last row if it's not a complete set of columns
+                                                if ($counter % $columnCount != 0) {
+                                                  $data .= '</tr>';
+                                                }
+
+                                                echo $data;
+
+                                              ?>
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                    </div>
+                                  </div>
                             </div>
                         </div>
                     </div>  
                 </div>
         </div>
     </div>
+    <div class="modal fade bd-modal-showproductdetails" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-s ">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLongTitle">Show Products Detail</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-xl-12 col-md-12 col-sm-12">
+                    <div class="card-border mb-3 card card-body border-success">
+                      <p>Products : <span class='showproducts' style="font-size:20px; font-weight:bold"></span></p>
+                    </div>
+                  </div>  
+                </div>
+              </div>
+              <div class="modal-footer">
+                <div class="row">
+                  <div class="col-xl-6 col-md-6 col-sm-6">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  </div>
+              </div>
+              </div>
+          </div>
+      </div>
+  </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
     <script type="text/javascript" src="./assets/scripts/jarvis.js"></script>
     <script>
         $(document).ready(function(){
+          // Attach event handler
+          $('body').on('click', '.tdclick', function (e) {
+              e.preventDefault();
+
+              // Retrieve the text from the .tdspanproducts element
+              var products_name = $(this).find('.tdspanproducts').html();
+
+              // Update the .showproducts element's content
+              $('.showproducts').html(products_name);
+          });
+
           // rack directions
           $('.stc-rack-form').on('submit', function(e){
             e.preventDefault();
