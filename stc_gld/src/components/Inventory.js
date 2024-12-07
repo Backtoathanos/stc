@@ -33,7 +33,7 @@ export default function Dashboard() {
         if (query.length > 3 || query === '') {
             setLoading(true);
             // Send the search query as a parameter to the API
-            axios.get(`http://localhost/stc/stc_gld/vanaheim/getInventoryData.php?search=${query}`)
+            axios.get(`https://stcassociate.com/stc_gld/vanaheim/getInventoryData.php?search=${query}`)
                 .then(response => {
                     const resultData = response.data;
                     if (Array.isArray(resultData)) {
@@ -63,7 +63,7 @@ export default function Dashboard() {
             sortable: true,
             center: true,
             cell: row => {
-                const imageUrl = `http://localhost/stc/stc_symbiote/stc_product_image/${row.stc_product_image}`;
+                const imageUrl = `https://stcassociate.com/stc_symbiote/stc_product_image/${row.stc_product_image}`;
                 const defaultImageUrl = 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996';
 
                 return (
