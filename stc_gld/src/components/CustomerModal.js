@@ -6,6 +6,10 @@ import Swal from 'sweetalert2'; // Import SweetAlert2
 import './CustomerModal.css';
 
 const CustomerModal = ({ show, handleClose, productId, productRate, productQuantity }) => {
+    productRate = productRate.includes(",") 
+    ? productRate.replace(/,/g, "") 
+    : productRate;
+
     const [customerOptions, setCustomerOptions] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [customerName, setCustomerName] = useState('');
@@ -88,6 +92,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
 
         // Validation: Check if rate is valid
         if (isNaN(parsedRate) || parsedRate <= 0 || parsedRate < productRate) {
+            console.log(parsedRate);
             if (isNaN(parsedRate) || parsedRate <= 0) {
                 setRateError('Invalid Rate. Rate must be greater than 0.');
             } else if (parsedRate < productRate) {
@@ -219,7 +224,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                             onChange={e => setRate(e.target.value)}
                             min="1"
                             placeholder="Enter Rate"
-                            disabled
+                            readOnly
                         />
                         <Form.Text className="text-muted">
                             Available rate: {productRate}
