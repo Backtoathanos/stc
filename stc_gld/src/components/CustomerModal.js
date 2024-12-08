@@ -6,7 +6,7 @@ import Swal from 'sweetalert2'; // Import SweetAlert2
 import './CustomerModal.css';
 
 const CustomerModal = ({ show, handleClose, productId, productRate, productQuantity }) => {
-    productRate = productRate.includes(",") 
+    productRate = productRate && productRate.includes(",") 
     ? productRate.replace(/,/g, "") 
     : productRate;
 
