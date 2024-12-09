@@ -636,6 +636,16 @@ class ragnarProduct extends tesseract{
 		}
 		return $odin;
 	}
+	
+	public function remove_rack($id){
+		$check_loki=mysqli_query($this->stc_dbs, "DELETE FROM `stc_rack` WHERE `stc_rack_id`='".strtoupper($id)."'");
+		if($check_loki){
+			$odin = "Rack deleted.";
+		}else{
+			$odin = "This rack is already in record!!";
+		}
+		return $odin;
+	}
 
 	// category insert tot table
 	public function cat_in($category_name){
@@ -956,6 +966,14 @@ if(isset($_POST['rack_hit'])){
 	$rack_name=$_POST['rack_name'];
 	$objloki=new ragnarProduct();
 	$objlokiout=$objloki->rack_in($rack_name);
+	echo json_encode($objlokiout);
+}
+
+// rack hit
+if(isset($_POST['remove_rack'])){
+	$id=$_POST['id'];
+	$objloki=new ragnarProduct();
+	$objlokiout=$objloki->remove_rack($id);
 	echo json_encode($objlokiout);
 }
 

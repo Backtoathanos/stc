@@ -219,13 +219,15 @@ include("kattegat/role_check.php");
                                                   $quer_nested=mysqli_query($con, "SELECT DISTINCT `stc_purchase_product_adhoc_itemdesc` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_rackid`='".$row['stc_rack_id']."' AND `stc_purchase_product_adhoc_status`=1");
                                                   $style="style='Background-color: #ff6565;'";
                                                   $productsContainer='';
+                                                  $remove_rack='<a href="javascript:void(0)" class="remove-rack" id="'.$row['stc_rack_id'].'"><i class="fa fa-trash"></i></a>';
                                                   if(mysqli_num_rows($quer_nested)>0){
                                                     foreach($quer_nested as $quer_row){
                                                       $productsContainer.=$productsContainer!=""?"</br>".$quer_row['stc_purchase_product_adhoc_itemdesc']:$quer_row['stc_purchase_product_adhoc_itemdesc'];
                                                     }
                                                     $style='style="Background-color:#76ff76;" data-toggle="modal" data-target=".bd-modal-showproductdetails"';
+                                                    $remove_rack='';
                                                   }
-                                                  $data .= '<td class="text-center tdclick" '.$style.'><b>' . $row['stc_rack_name'] . '</b><span style="display:none;" class="tdspanproducts">'.$productsContainer.'</span></td>';
+                                                  $data .= '<td class="text-center tdclick" '.$style.'><b>' . $row['stc_rack_name'] . ' '.$remove_rack.'</b><span style="display:none;" class="tdspanproducts">'.$productsContainer.'</span></td>';
                                                   $counter++;
 
                                                   // Start a new row after 10 columns
@@ -298,6 +300,32 @@ include("kattegat/role_check.php");
               $('.showrack_name').html('<b>' + rack_name + '</b>');
               $('.showproducts').html(products_name);
           });
+
+          $('body').on('click', '.remove-rack', function (e) {
+              e.preventDefault();
+
+              const id = $(this).attr('id'); // Get the rack ID
+              const rack = $(this); // Reference to the clicked button/link
+
+              // Confirm with the user before removing the rack
+              if (!confirm("Are you sure you want to remove this rack?")) {
+                  return;
+              }
+
+              // Make the AJAX call
+              $.ajax({
+                  url: "kattegat/ragnar_product.php",
+                  method: "POST",
+                  data: { remove_rack: 1, id: id },
+                  dataType: "JSON",
+                  success: function (response) {
+                    // Notify the user and remove the rack element
+                    alert('Rack removed successfully.');
+                    rack.closest('td').remove();
+                  }
+              });
+          });
+
 
           // rack directions
           $('.stc-rack-form').on('submit', function(e){
