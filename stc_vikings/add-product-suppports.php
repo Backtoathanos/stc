@@ -199,7 +199,7 @@ include("kattegat/role_check.php");
                                               <?php 
                                                 include_once("../MCU/db.php");
 
-                                                $query = mysqli_query($con, "SELECT stc_rack_id, stc_rack_name FROM stc_rack ORDER BY stc_rack_name ASC");
+                                                $query = mysqli_query($con, "SELECT stc_rack_id, stc_rack_name FROM stc_rack ORDER BY LEFT(stc_rack_name, 1) ASC, CAST(SUBSTRING(stc_rack_name, 2) AS UNSIGNED) ASC");
 
                                                 $columnCount = 20; // Number of columns per row
                                                 $counter = 0; // Initialize counter
@@ -215,7 +215,7 @@ include("kattegat/role_check.php");
                                                     }
                                                     $style='style="Background-color:#76ff76;" data-toggle="modal" data-target=".bd-modal-showproductdetails"';
                                                   }
-                                                  $data .= '<td class="text-center tdclick" '.$style.'>' . $row['stc_rack_name'] . '<span style="display:none;" class="tdspanproducts">'.$productsContainer.'</span></td>';
+                                                  $data .= '<td class="text-center tdclick" '.$style.'><b>' . $row['stc_rack_name'] . '</b><span style="display:none;" class="tdspanproducts">'.$productsContainer.'</span></td>';
                                                   $counter++;
 
                                                   // Start a new row after 10 columns
@@ -256,7 +256,7 @@ include("kattegat/role_check.php");
                 <div class="row">
                   <div class="col-xl-12 col-md-12 col-sm-12">
                     <div class="card-border mb-3 card card-body border-success">
-                      <p>Products : <span class='showproducts' style="font-size:20px; font-weight:bold"></span></p>
+                      <p>Products in Rack <span class="showrack_name"></span>: <br><span class='showproducts' style="font-size:20px; font-weight:bold"></span></p>
                     </div>
                   </div>  
                 </div>
@@ -280,11 +280,12 @@ include("kattegat/role_check.php");
           // Attach event handler
           $('body').on('click', '.tdclick', function (e) {
               e.preventDefault();
-
+              var rack_name=$(this).find('b').html();
               // Retrieve the text from the .tdspanproducts element
               var products_name = $(this).find('.tdspanproducts').html();
 
               // Update the .showproducts element's content
+              $('.showrack_name').html('<b>' + rack_name + '</b>');
               $('.showproducts').html(products_name);
           });
 

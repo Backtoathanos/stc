@@ -76,9 +76,10 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
         setRateError('');
         setCustomerError('');
 
+        const sanitizedRate = typeof productRate === 'string' ? productRate.replace(/,/g, '') : productRate;
         // Parse quantity and rate as numbers
         const parsedQuantity = parseFloat(quantity);
-        const parsedRate = parseFloat(rate);
+        const parsedRate = parseFloat(sanitizedRate);
 
         // Validation: Check if entered quantity exceeds available inventory or is invalid
         if (isNaN(parsedQuantity) || parsedQuantity <= 0 || parsedQuantity > productQuantity) {
@@ -92,7 +93,6 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
 
         // Validation: Check if rate is valid
         if (isNaN(parsedRate) || parsedRate <= 0 || parsedRate < productRate) {
-            console.log(parsedRate);
             if (isNaN(parsedRate) || parsedRate <= 0) {
                 setRateError('Invalid Rate. Rate must be greater than 0.');
             } else if (parsedRate < productRate) {

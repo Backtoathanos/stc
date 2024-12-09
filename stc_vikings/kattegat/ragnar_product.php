@@ -624,7 +624,8 @@ class ragnarProduct extends tesseract{
 		$check_loki=mysqli_query($this->stc_dbs, "SELECT * FROM `stc_rack` WHERE `stc_rack_name`='".strtoupper($rack_name)."'");
 		$do_action=mysqli_num_rows($check_loki);
 		if($do_action == 0){
-			$loki_query=mysqli_query($this->stc_dbs, "INSERT INTO `stc_rack`(`stc_rack_name`) VALUES('".strtoupper($rack_name)."')");
+			$date=date('Y-m-d H:i:s');
+			$loki_query=mysqli_query($this->stc_dbs, "INSERT INTO `stc_rack`(`stc_rack_name`, `stc_rack_status`, `stc_rack_created_by`, `stc_rack_created_date`) VALUES('".strtoupper($rack_name)."', '1', '".$_SESSION['stc_empl_id']."', '".$date."')");
 			if($loki_query){
 				$odin = $rack_name." Added!!";
 			}else{
