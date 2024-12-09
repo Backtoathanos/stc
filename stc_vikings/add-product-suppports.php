@@ -200,12 +200,22 @@ include("kattegat/role_check.php");
                                                 include_once("../MCU/db.php");
 
                                                 $query = mysqli_query($con, "SELECT stc_rack_id, stc_rack_name FROM stc_rack ORDER BY LEFT(stc_rack_name, 1) ASC, CAST(SUBSTRING(stc_rack_name, 2) AS UNSIGNED) ASC");
+                                                $racks = [];
 
+                                                // Fetch racks into an array
+                                                while ($row = mysqli_fetch_assoc($query)) {
+                                                    $racks[] = $row;
+                                                }
+
+                                                // Define a custom natural sorting function
+                                                usort($racks, function ($a, $b) {
+                                                    return strnatcmp($a['stc_rack_name'], $b['stc_rack_name']);
+                                                });
                                                 $columnCount = 20; // Number of columns per row
                                                 $counter = 0; // Initialize counter
 
                                                 $data = '<tr>'; // Start the first row
-                                                foreach ($query as $row) {
+                                                foreach ($racks as $row) {
                                                   $quer_nested=mysqli_query($con, "SELECT DISTINCT `stc_purchase_product_adhoc_itemdesc` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_rackid`='".$row['stc_rack_id']."' AND `stc_purchase_product_adhoc_status`=1");
                                                   $style="style='Background-color: #ff6565;'";
                                                   $productsContainer='';
