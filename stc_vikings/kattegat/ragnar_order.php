@@ -5,7 +5,7 @@ session_start();
 class ragnarOrderView extends tesseract{
 	// call customer on po page
 	public function stc_call_customer(){
-		$check_loki=mysqli_query($this->stc_dbs, "SELECT * FROM `stc_customer` GROUP BY `stc_customer_name` ASC");
+		$check_loki=mysqli_query($this->stc_dbs, "SELECT DISTINCT stc_customer_id, stc_customer_name FROM `stc_customer`INNER JOIN `stc_cust_project`ON `stc_customer_id`=`stc_cust_project_cust_id` ORDER BY `stc_customer_name` ASC");
 		$odin='<option value="NA" selected>Select Customer</option>';
 		$do_action=mysqli_num_rows($check_loki);
 		if($do_action == 0){
@@ -788,12 +788,16 @@ class ragnarRequisitionView extends tesseract{
 		$array = array(
 			"byreqcustomer" => $bjornefilterreqcustomerid,
 			"byreqnumber" => $bjornefilterreqnumber,
-			"byreqsitename" => $bjornefilterreqsitename
+			"byreqsitename" => $bjornefilterreqsitename,
+			"byreqmaterial" => $bjornefilterreqmaterials
 		);
 
 		$reqcustomer='';
 		$reqno='';
 		$reqsitename='';
+		$reqmaterialsname='';
+
+		$itemjoiner='';
 		$loopcount=0;
 		foreach($array as $key => $value){
 			if($array['byreqcustomer']!="NA"){
@@ -804,7 +808,7 @@ class ragnarRequisitionView extends tesseract{
 
 			if(!empty($array['byreqnumber'])){
 				$reqno="
-					AND `stc_requisition_combiner_id`='".mysqli_real_escape_string($this->stc_dbs, $array['byreqnumber'])."'
+					AND (`stc_requisition_combiner_id` regexp '".mysqli_real_escape_string($this->stc_dbs, $array['byreqnumber'])."' OR L.`stc_cust_super_requisition_list_id` regexp '".mysqli_real_escape_string($this->stc_dbs, $array['byreqnumber'])."')
 				";
 			}
 
@@ -814,6 +818,13 @@ class ragnarRequisitionView extends tesseract{
 							`stc_cust_project_title` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byreqsitename'])."'
 						OR
 							`stc_requisition_combiner_refrence` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byreqsitename'])."')
+				";
+			}
+
+			if(!empty($array['byreqmaterial'])){
+				$itemjoiner='INNER JOIN `stc_cust_super_requisition_list_items` I ON L.`stc_cust_super_requisition_list_id`=I.`stc_cust_super_requisition_list_items_req_id`';
+				$reqmaterialsname="
+					AND `stc_cust_super_requisition_list_items_title` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byreqmaterial'])."'
 				";
 			}
 		}
@@ -827,21 +838,17 @@ class ragnarRequisitionView extends tesseract{
 		        `stc_customer_name`,
 				`stc_requisition_combiner_status`
 			FROM `stc_requisition_combiner`
-			INNER JOIN `stc_requisition_combiner_req` 
-			ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id`
-			INNER JOIN `stc_cust_super_requisition_list` 
-			ON `stc_cust_super_requisition_list_id`=`stc_requisition_combiner_req_requisition_id`
-			INNER JOIN `stc_cust_project` 
-			ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
-			INNER JOIN `stc_customer` 
-			ON `stc_cust_project_cust_id`=`stc_customer_id`
-			INNER JOIN `stc_agents` 
-			ON `stc_agents_id`=`stc_requisition_combiner_agent_id`
+			INNER JOIN `stc_requisition_combiner_req` ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id`
+			INNER JOIN `stc_cust_super_requisition_list` L ON L.`stc_cust_super_requisition_list_id`=`stc_requisition_combiner_req_requisition_id`
+			".$itemjoiner."
+			INNER JOIN `stc_cust_project` ON L.`stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
+			INNER JOIN `stc_customer` ON `stc_cust_project_cust_id`=`stc_customer_id`
+			INNER JOIN `stc_agents` ON `stc_agents_id`=`stc_requisition_combiner_agent_id`
 		    WHERE (
 		        DATE(`stc_requisition_combiner_date`)
 		         BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornefilterreqbegdate)."'
 		         AND '".mysqli_real_escape_string($this->stc_dbs, $bjornefilterreqenddate)."'
-		    )".$reqcustomer.$reqno.$reqsitename.$endfilterqry
+		    )".$reqcustomer.$reqno.$reqsitename.$reqmaterialsname.$endfilterqry
 		);
 
 		if(mysqli_num_rows($ivarfilterquery)!=0){
@@ -3731,11 +3738,7 @@ if(isset($_POST['stcreqaction'])){
 		$bjorneendval=20;
 	}
 	$objpdres=new ragnarRequisitionView();	
-	if(empty($bjornefilterreqmaterials)){
-		$opobjpdres=$objpdres->stc_getrequisition_by_multiple_inp($bjornefilterreqbegdate, $bjornefilterreqenddate, $bjornefilterreqcustomerid, $bjornefilterreqnumber, $bjornefilterreqsitename, $bjornefilterreqmaterials, $bjornebegval, $bjorneendval);
-	}else{
-		$opobjpdres=$objpdres->stc_getrequisition_by_multiple_inp_for_materials($bjornefilterreqbegdate, $bjornefilterreqenddate, $bjornefilterreqcustomerid, $bjornefilterreqnumber, $bjornefilterreqsitename, $bjornefilterreqmaterials, $bjornebegval, $bjorneendval);
-	}
+	$opobjpdres=$objpdres->stc_getrequisition_by_multiple_inp($bjornefilterreqbegdate, $bjornefilterreqenddate, $bjornefilterreqcustomerid, $bjornefilterreqnumber, $bjornefilterreqsitename, $bjornefilterreqmaterials, $bjornebegval, $bjorneendval);
 	$out=$opobjpdres;
 	echo $out;
 }

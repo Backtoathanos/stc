@@ -412,9 +412,10 @@ include("kattegat/role_check.php");
                                                   <tr>
                                                     <th scope="col">From/<br>To</th>
                                                     <th scope="col" width="20%">By Customer</th>
-                                                    <th scope="col" width="20%">By Requisition Number</th>
                                                     <th scope="col" width="20%">By Sitename</th>
+                                                    <th scope="col" width="20%">By Requisition Number</th>
                                                     <th scope="col" width="20%">By Req. Material Name</th>
+                                                    <th scope="col" width="20%"></th>
                                                   </tr>
                                                 </thead>
                                                 <tbody>
@@ -427,9 +428,6 @@ include("kattegat/role_check.php");
                                                         ?>   
                                                       <p><input type="date" value="<?php echo $effectiveDate;?>" class="form-control reqbegdate"></p>
                                                       <p><input type="date" value="<?php echo $newDate;?>" class="form-control reqenddate"></p>
-                                                      <p><a href="#" id="purchaseproddatefilt">
-                                                        <i style="font-size: 20px;background: #0c0c1b;border-radius: 50%;padding: 5px;margin: 0;color: #77ffd3;float: right;" class="fa fa-arrow-down"></i>
-                                                      </a></p>
                                                     </td>
                                                     <td>
                                                       <select
@@ -441,19 +439,19 @@ include("kattegat/role_check.php");
                                                     </td>
                                                     <td>
                                                       <input 
+                                                        type="text" 
+                                                        id="stc-requisition-sitename-finder" 
+                                                        class="form-control"
+                                                        placeholder="By Sitename" 
+                                                      >
+                                                    <td>
+                                                      <input 
                                                         type="number" 
                                                         id="stc-requisition-number-finder" 
                                                         class="form-control"
                                                         placeholder="Requisition Number" 
                                                       >
                                                     </td>
-                                                    <td>
-                                                      <input 
-                                                        type="text" 
-                                                        id="stc-requisition-sitename-finder" 
-                                                        class="form-control"
-                                                        placeholder="By Sitename" 
-                                                      >
                                                     </td>
                                                     <td>
                                                       <input 
@@ -462,6 +460,11 @@ include("kattegat/role_check.php");
                                                         class="form-control stc-requisition-material-in"
                                                         placeholder="By Requisition Material Name" 
                                                       >
+                                                    </td>
+                                                    <td>
+                                                      <a href="#" id="aorfilterbtn" class="btn btn-primary">
+                                                      Find  
+                                                      </a>
                                                     </td>
                                                   </tr>
                                                 </tbody>
@@ -1240,63 +1243,7 @@ include("kattegat/role_check.php");
         var jsendvalue='';
         // filter challan
         // by date
-        $('body').delegate('#purchaseproddatefilt', 'click', function(e){
-          e.preventDefault();
-          jsreqbegdate=$('.reqbegdate').val();
-          jsreqenddate=$('.reqenddate').val();
-          jsreqcustomerid=$("#stc-requisition-customer-in").val();
-          jsreqnumber=$("#stc-requisition-number-finder").val();
-          jsreqsitename=$("#stc-requisition-sitename-finder").val();
-          jsreqmaterial=$(".stc-requisition-material-in").val();
-          jsbegvalue=$('.begvalueinputsearch').val();
-          jsendvalue=$('.endvalueinputsearch').val();
-          stc_filter_customer_requisition(jsreqbegdate, jsreqenddate, jsreqcustomerid, jsreqnumber, jsreqsitename, jsreqmaterial, jsbegvalue, jsendvalue);
-        });
-
-        // by customer id
-        $("#stc-requisition-customer-in").change(function(e){
-          e.preventDefault();
-          jsreqbegdate=$('.reqbegdate').val();
-          jsreqenddate=$('.reqenddate').val();
-          jsreqcustomerid=$("#stc-requisition-customer-in").val();
-          jsreqnumber=$("#stc-requisition-number-finder").val();
-          jsreqsitename=$("#stc-requisition-sitename-finder").val();
-          jsreqmaterial=$(".stc-requisition-material-in").val();
-          jsbegvalue=$('.begvalueinputsearch').val();
-          jsendvalue=$('.endvalueinputsearch').val();
-          stc_filter_customer_requisition(jsreqbegdate, jsreqenddate, jsreqcustomerid, jsreqnumber, jsreqsitename, jsreqmaterial, jsbegvalue, jsendvalue);
-        });
-
-        // by requisition number
-        $("#stc-requisition-number-finder").on('keyup', function(e){
-          e.preventDefault();
-          jsreqbegdate=$('.reqbegdate').val();
-          jsreqenddate=$('.reqenddate').val();
-          jsreqcustomerid=$("#stc-requisition-customer-in").val();
-          jsreqnumber=$("#stc-requisition-number-finder").val();
-          jsreqsitename=$("#stc-requisition-sitename-finder").val();
-          jsreqmaterial=$(".stc-requisition-material-in").val();
-          jsbegvalue=$('.begvalueinputsearch').val();
-          jsendvalue=$('.endvalueinputsearch').val();
-          stc_filter_customer_requisition(jsreqbegdate, jsreqenddate, jsreqcustomerid, jsreqnumber, jsreqsitename, jsreqmaterial, jsbegvalue, jsendvalue);
-        });
-
-        // by agent name
-        $("#stc-requisition-sitename-finder").on('keyup', function(e){
-          e.preventDefault();
-          jsreqbegdate=$('.reqbegdate').val();
-          jsreqenddate=$('.reqenddate').val();
-          jsreqcustomerid=$("#stc-requisition-customer-in").val();
-          jsreqnumber=$("#stc-requisition-number-finder").val();
-          jsreqsitename=$("#stc-requisition-sitename-finder").val();
-          jsreqmaterial=$(".stc-requisition-material-in").val();
-          jsbegvalue=$('.begvalueinputsearch').val();
-          jsendvalue=$('.endvalueinputsearch').val();
-          stc_filter_customer_requisition(jsreqbegdate, jsreqenddate, jsreqcustomerid, jsreqnumber, jsreqsitename, jsreqmaterial, jsbegvalue, jsendvalue);
-        });
-
-        // by Material name
-        $(".stc-requisition-material-in").on('keyup', function(e){
+        $('body').delegate('#aorfilterbtn', 'click', function(e){
           e.preventDefault();
           jsreqbegdate=$('.reqbegdate').val();
           jsreqenddate=$('.reqenddate').val();
@@ -1315,7 +1262,7 @@ include("kattegat/role_check.php");
           begvalue=$('.begvalueinputsearch').val();
           endvalue=$('.endvalueinputsearch').val();
           if(endvalue==0){
-            alert("Seriously!!!");
+            alert("Invalid pagination.");
           }else{
             outbegvalueinputted= (+begvalue) - 20;
             outendvalueinputted= (+endvalue) - 20;
@@ -1337,7 +1284,7 @@ include("kattegat/role_check.php");
           begvalue=$('.begvalueinputsearch').val();
           endvalue=$('.endvalueinputsearch').val();
           if(endvalue==0){
-            alert("Seriously!!!");
+            alert("Invalid pagination.");
           }else{
             outbegvalueinputted= (+begvalue) + 20;
             outendvalueinputted= (+endvalue) + 20;

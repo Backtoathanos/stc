@@ -268,6 +268,7 @@ if(isset($_GET['requi_id'])){
               <table class="table table-bordered stc-table-req" style="color: black;">
                     <tr>
                         <th class="text-center">#</th>
+                        <th class="text-center">SITE NAME</th>
                         <th class="text-center" width="70%" class="text-left">----------------------------------------------------ITEMS DESCRIPTIONS--------------------------------------------------</th>
                         <th class="text-center">UNIT</th>
                         <th class="text-center">QTY</th>
@@ -290,6 +291,7 @@ if(isset($_GET['requi_id'])){
                         $currentrequisition=mysqli_query($con, "
                           SELECT DISTINCT
                               `stc_cust_super_requisition_list_id`,
+                              `stc_cust_super_requisition_list_items_req_id`,
                               `stc_cust_super_requisition_list_items_title`,
                               `stc_cust_super_requisition_list_items_unit`,
                               `stc_cust_super_requisition_items_priority`
@@ -313,11 +315,29 @@ if(isset($_GET['requi_id'])){
                               $response_rec=mysqli_fetch_assoc($recqry);
                               $dispatchqty=$response_rec['qty'];
                             }
+                            $recqry=mysqli_query($con, "
+                              SELECT `stc_cust_project_title` FROM `stc_cust_super_requisition_list` INNER JOIN `stc_cust_project` ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id` WHERE `stc_cust_super_requisition_list_id`='".$row['stc_cust_super_requisition_list_items_req_id']."'
+                            ");
+                            $supervisorname='';
+                            if(mysqli_num_rows($recqry)>0){
+                              $response_rec=mysqli_fetch_assoc($recqry);
+                              $sitename=$response_rec['stc_cust_project_title'];
+                            }
+                            $recqry=mysqli_query($con, "
+                              SELECT `stc_cust_pro_supervisor_fullname` FROM `stc_cust_super_requisition_list` INNER JOIN `stc_cust_pro_supervisor` ON `stc_cust_super_requisition_list_super_id`=`stc_cust_pro_supervisor_id` WHERE `stc_cust_super_requisition_list_id`='".$row['stc_cust_super_requisition_list_items_req_id']."'
+                            ");
+                            $supervisorname='';
+                            if(mysqli_num_rows($recqry)>0){
+                              $response_rec=mysqli_fetch_assoc($recqry);
+                              $supervisorname=$response_rec['stc_cust_pro_supervisor_fullname'];
+                            }
+
                             if($dispatchqty>0){
                               $sl++;
                             ?>
                             <tr>
                               <td class="no"><?php echo $sl;?></td>
+                              <td class="text-left"><?php echo $sitename;?></td>
                               <td class="text-left">
                                 <h6>
                                   <?php echo nl2br($row['stc_cust_super_requisition_list_items_title']).' '.$priority;?>
@@ -325,7 +345,7 @@ if(isset($_GET['requi_id'])){
                               </td>
                               <td class="unit"><?php echo $row['stc_cust_super_requisition_list_items_unit'];?></td>
                               <td class="qty"><?php echo number_format($dispatchqty, 2);?></td>
-                              <td class="text-center"></td>
+                              <td class="text-center"><?php echo $supervisorname;?></td>
                               <td class="text-center"></td>
                             </tr>
                             <?php

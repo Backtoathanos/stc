@@ -123,7 +123,7 @@ function addCustomer($conn) {
         }
         $date = date('Y-m-d H:i:s');
         // Link customer to the product and set the quantity
-        $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, product_id, qty, rate, agent_id, created_date, created_by) VALUES ('$customerId', '$requisition', '$productId', '$quantity', '$agentId', '$rate', '$date', '$userId')";
+        $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, product_id, qty, rate, agent_id, created_date, created_by) VALUES ('$customerId', '$requisition', '$productId', '$quantity', '$rate', '$agentId', '$date', '$userId')";
         if ($conn->query($productQuery)) {
             echo json_encode(['success' => true, 'message' => 'Customer and product added successfully']);
         } else {

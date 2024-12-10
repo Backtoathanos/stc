@@ -2265,58 +2265,75 @@ class ragnarPurchaseAdhoc extends tesseract{
 						$delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
 					}
 				}
-				$stock=$odinrow['stc_purchase_product_adhoc_qty'] - $delivered;
+				$deliveredgld=0;
 				$sql_qry=mysqli_query($this->stc_dbs, "
-					SELECT `stc_product_image` FROM `stc_product` WHERE `stc_product_id`='".$odinrow['stc_purchase_product_adhoc_productid']."'
+					SELECT `qty` FROM `gld_challan` WHERE `product_id`='".$odinrow['stc_product_id']."'
 				");
-				$productog='';
-				$pro_image='';
 				if(mysqli_num_rows($sql_qry)>0){
 					foreach($sql_qry as $sql_row){
-						$pro_image=$sql_row['stc_product_image'];
-						$productog="<img src='../stc_symbiote/stc_product_image/".$pro_image."' style='height:80px;'>";
+						$deliveredgld+=$sql_row['qty'];
 					}
 				}
-				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
-				
-				$pro_rate='<input type="number" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
-				$product_name=$odinrow['stc_sub_cat_name']!="OTHERS"?$odinrow['stc_sub_cat_name']. ' ' .$odinrow['stc_product_name']:$odinrow['stc_product_name'];
-				$odin.="
-					<tr>
-						<td class='text-center'>".$slno."</td>
-						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
-						<td style='width: 180px;'>".$productog."</td>
-						<td class='text-center'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$product_name."</a></td>
-						<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a></td>
-						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
-						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
-						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
-						<td class='text-right' style='width: 125px;'>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."".$pro_rate."</td>
-						<td class='text-right'>".number_format($stock, 2)."</td>
-						<td class='text-center' style='width: 180px;'>
-							<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' data-toggle='modal' data-target='.bd-showadhocdetails-modal-lg' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
-						</td>
-						<td class='text-center' style='width: 180px;'>".$odinrow['stc_purchase_product_adhoc_source']."</td>
-						<td class='text-center' style='width: 180px;'>".$odinrow['stc_purchase_product_adhoc_destination']."</td>
-						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_condition']."</td>
-						<td class='text-center'></td>
-						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_recievedby']."</td>
-						<td class='text-center'>".$odinrow['stc_user_name']."</td>
-						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
-						<td class='text-center'>".$odinrow['stc_user_name']."</td>
-						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_updated_date']))."</td>
-						<td class='text-center'>".$status[$odinrow['stc_purchase_product_adhoc_status']]."</td>
-						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_remarks']."</td>
-						<td class='text-center'>
-							<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card' 
-							></i></a>
-							<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o' 
-							></i></a>
-							<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash' 
-							></i></a>
-						</td>
-					</tr>
-				";
+				$stock=$odinrow['stc_purchase_product_adhoc_qty'] - ($delivered + $deliveredgld);
+				if($stock>0){
+					$sql_qry=mysqli_query($this->stc_dbs, "
+						SELECT `stc_product_image` FROM `stc_product` WHERE `stc_product_id`='".$odinrow['stc_purchase_product_adhoc_productid']."'
+					");
+					$productog='';
+					$pro_image='';
+					if(mysqli_num_rows($sql_qry)>0){
+						foreach($sql_qry as $sql_row){
+							$pro_image=$sql_row['stc_product_image'];
+							$productog="<img src='../stc_symbiote/stc_product_image/".$pro_image."' style='height:80px;'>";
+						}
+					}
+					$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
+					
+					$pro_rate='<input type="number" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
+					$product_name=$odinrow['stc_sub_cat_name']!="OTHERS"?$odinrow['stc_sub_cat_name']. ' ' .$odinrow['stc_product_name']:$odinrow['stc_product_name'];
+					$odin.="
+						<tr>
+							<td class='text-center'>".$slno."</td>
+							<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
+							<td style='width: 180px;'>".$productog."</td>
+							<td class='text-center'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$product_name."</a></td>
+							<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a></td>
+							<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
+							<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
+							<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
+							<td class='text-right' style='width: 125px;'>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."".$pro_rate."</td>
+							<td class='text-right'>".number_format($stock, 2)."</td>
+							<td class='text-center' style='width: 180px;'>
+								<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' data-toggle='modal' data-target='.bd-showadhocdetails-modal-lg' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
+							</td>
+							<td class='text-center' style='width: 180px;'>".$odinrow['stc_purchase_product_adhoc_source']."</td>
+							<td class='text-center' style='width: 180px;'>".$odinrow['stc_purchase_product_adhoc_destination']."</td>
+							<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_condition']."</td>
+							<td class='text-center'></td>
+							<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_recievedby']."</td>
+							<td class='text-center'>".$odinrow['stc_user_name']."</td>
+							<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
+							<td class='text-center'>".$odinrow['stc_user_name']."</td>
+							<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_updated_date']))."</td>
+							<td class='text-center'>".$status[$odinrow['stc_purchase_product_adhoc_status']]."</td>
+							<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_remarks']."</td>
+							<td class='text-center'>
+								<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card' 
+								></i></a>
+								<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o' 
+								></i></a>
+								<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash' 
+								></i></a>
+							</td>
+						</tr>
+					";
+				}else{
+					$odin="
+						<tr>
+							<td>No record found.</td>
+						</tr>
+					";
+				}
 			}
 		}else{
 			$odin="
