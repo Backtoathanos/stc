@@ -595,6 +595,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           var rack=$('#poadhocitem option:selected').attr('rack');
           $('.stcbalancedqty').val(qty);
           $('.stcbalancedqtyrack').val(rack);
+          $('.stcbalancedqtyunit').val(rack);
         });
         
         
