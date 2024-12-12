@@ -216,13 +216,34 @@ include("kattegat/role_check.php");
 
                                                 $data = '<tr>'; // Start the first row
                                                 foreach ($racks as $row) {
-                                                  $quer_nested=mysqli_query($con, "SELECT DISTINCT `stc_purchase_product_adhoc_itemdesc` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_rackid`='".$row['stc_rack_id']."' AND `stc_purchase_product_adhoc_status`=1");
+                                                  $quer_nested=mysqli_query($con, "SELECT DISTINCT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_productid`, `stc_purchase_product_adhoc_itemdesc`, `stc_purchase_product_adhoc_qty`, `stc_purchase_product_adhoc_unit` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_rackid`='".$row['stc_rack_id']."' AND `stc_purchase_product_adhoc_status`=1 ORDER BY `stc_purchase_product_adhoc_itemdesc` ASC");
                                                   $style="style='Background-color: #ff6565;'";
                                                   $productsContainer='';
                                                   $remove_rack='<a href="javascript:void(0)" class="remove-rack" id="'.$row['stc_rack_id'].'"><i class="fa fa-trash"></i></a>';
                                                   if(mysqli_num_rows($quer_nested)>0){
                                                     foreach($quer_nested as $quer_row){
-                                                      $productsContainer.=$productsContainer!=""?"</br>".$quer_row['stc_purchase_product_adhoc_itemdesc']:$quer_row['stc_purchase_product_adhoc_itemdesc'];
+                                                      $delivered=0;
+                                                      $sql_qry=mysqli_query($con, "
+                                                        SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
+                                                        FROM `stc_cust_super_requisition_list_items_rec` 
+                                                        WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$quer_row['stc_purchase_product_adhoc_id']."'
+                                                      ");
+                                                      if(mysqli_num_rows($sql_qry)>0){
+                                                        foreach($sql_qry as $sql_row){
+                                                          $delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+                                                        }
+                                                      }
+                                                      $deliveredgld=0;
+                                                      $sql_qry=mysqli_query($con, "
+                                                        SELECT `qty` FROM `gld_challan` WHERE `product_id`='".$quer_row['stc_purchase_product_adhoc_productid']."'
+                                                      ");
+                                                      if(mysqli_num_rows($sql_qry)>0){
+                                                        foreach($sql_qry as $sql_row){
+                                                          $deliveredgld+=$sql_row['qty'];
+                                                        }
+                                                      }
+                                                      $stock=$quer_row['stc_purchase_product_adhoc_qty'] - ($delivered + $deliveredgld);
+                                                      $productsContainer.=$productsContainer!=""?"</br>".$quer_row['stc_purchase_product_adhoc_itemdesc'].' - '.$stock.'/'.$quer_row['stc_purchase_product_adhoc_unit']:$quer_row['stc_purchase_product_adhoc_itemdesc'].' - '.$stock.'/'.$quer_row['stc_purchase_product_adhoc_unit'];
                                                     }
                                                     $style='style="Background-color:#76ff76;" data-toggle="modal" data-target=".bd-modal-showproductdetails"';
                                                     $remove_rack='';
