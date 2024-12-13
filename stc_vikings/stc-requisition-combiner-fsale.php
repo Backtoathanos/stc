@@ -551,8 +551,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           e.preventDefault();
           var req_id=$('#stc-req-list-id-rep2').val();
           var req_item_id=$('#stc-req-list-item-id-rep2').val();
-          var dispatch_qnty=parseInt($('#stcdispatchedqty').val(), 10);
-          var orderqty=parseInt($('#stc-req-list-item-id-orderqty').val(), 10);
+          var dispatch_qnty=parseFloat($('#stcdispatchedqty').val(), 10);
+          var orderqty=parseFloat($('#stc-req-list-item-id-orderqty').val(), 10);
           var poadhocitem=$('#poadhocitem').val();
           var balanced_qty=parseInt($('#poadhocitem option:selected').attr('qty'));
           if((dispatch_qnty>orderqty)){
