@@ -3378,6 +3378,50 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		return $blackpearl;
 	}
 	
+	public function stc_item_tracker_ppesummary() {
+		// Initialize an empty result array
+		$resultData = [];
+	
+		// SQL Query to fetch data
+		$sql = "
+			SELECT 
+				`stc_item_tracker_id`, 
+				`stc_item_tracker_user_id`, 
+				`stc_item_tracker_toppe`, 
+				`stc_item_tracker_qty`, 
+				`stc_item_tracker_unit`, 
+				`stc_item_tracker_issuedate`, 
+				`stc_item_tracker_validity`, 
+				`stc_item_tracker_remarks`, 
+				`stc_item_tracker_createdby`, 
+				`stc_item_tracker_created_date`,
+				DATE_ADD(`stc_item_tracker_issuedate`, INTERVAL `stc_item_tracker_validity` MONTH) AS `expiration_date`
+			FROM 
+				`stc_item_tracker` 
+			WHERE 
+				DATE_ADD(`stc_item_tracker_issuedate`, INTERVAL `stc_item_tracker_validity` MONTH) BETWEEN 
+					DATE_FORMAT(CURDATE(), '%Y-%m-01') 
+					AND LAST_DAY(CURDATE())
+			ORDER BY `stc_item_tracker_toppe` ASC
+		";
+	
+		// Execute the query
+		$sqlquery = mysqli_query($this->stc_dbs, $sql);
+	
+		// Check if query execution was successful
+		if ($sqlquery) {
+			// Fetch rows into the result array
+			while ($row = mysqli_fetch_assoc($sqlquery)) {
+				$resultData[] = $row;
+			}
+		} else {
+			// Log or handle errors if the query fails
+			error_log("Query failed: " . mysqli_error($this->stc_dbs));
+		}
+	
+		// Return the result array
+		return $resultData;
+	}	
 
 	// save tool track
 	public function stc_tool_tracker_save($unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks){
@@ -4159,6 +4203,12 @@ if(isset($_POST['call_item_tracker'])){
 	$odin_req=new ragnarCallRequisitionItemTrack();
 	$odin_req_out=$odin_req->stc_item_tracker_call($search, $page);
 	echo $odin_req_out;
+}
+// call procurment tracker
+if(isset($_POST['ppesummary'])){
+	$odin_req=new ragnarCallRequisitionItemTrack();
+	$odin_req_out=$odin_req->stc_item_tracker_ppesummary();
+	echo json_encode($odin_req_out);
 }
 
 #<-----------------Object section of tool tracker Class------------------->

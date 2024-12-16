@@ -729,11 +729,14 @@ include("kattegat/role_check.php");
                                             <div class="col-md-2">
                                                 <a href="javascript:void(0)" class="btn btn-primary form-control" data-toggle="modal" data-target=".bd-ppetracker-modal-lg">Add PPE Tracker</a>
                                             </div>
-                                            <div class="col-md-8">
+                                            <div class="col-md-6">
                                                 <input type="text" id="searchInputppe" class="form-control" placeholder="Type to search...">
                                             </div>
                                             <div class="col-md-2">
                                               <a href="javascript:void(0)" id="searchInputppebtn" class="btn btn-success form-control">Find</a>
+                                            </div>
+                                            <div class="col-md-2">
+                                              <a href="javascript:void(0)" class="btn btn-success form-control" data-toggle="modal" data-target=".bd-ppetrackersummary-modal-lg">Show PPE Summary</a>
                                             </div>
                                             <div class="col-md-12">
                                                 <table class="table table-stripped table-bordered table-hover">
@@ -1806,6 +1809,38 @@ include("kattegat/role_check.php");
 
     <script>
       $(document).ready(function(){
+        stc_call_ppesummary();
+        function stc_call_ppesummary(){
+          $.ajax({
+            url       : "kattegat/ragnar_order.php",
+            method    : "post",
+            data      : {ppesummary:1},
+            dataType  : 'JSON',
+            success   : function(response){
+              // console.log(data);
+              var data='';
+              var legguardcounter=0,safetygogglescounter=0,safetyjacketcounter=0,safetyshoescounter=0,safetyhelmetcounter=0,handglovescounter=0,earplugcounter=0;
+              for (var i = 0; i < response.length; i++) {
+                if(response[i].stc_item_tracker_toppe=="Leg Guard"){legguardcounter++;}
+                if(response[i].stc_item_tracker_toppe=="Safety Goggles"){safetygogglescounter++;}
+                if(response[i].stc_item_tracker_toppe=="Safety Jacket"){safetyjacketcounter++;}
+                if(response[i].stc_item_tracker_toppe=="Safety Shoes"){safetyshoescounter++;}
+                if(response[i].stc_item_tracker_toppe=="Safety Helmet"){safetyhelmetcounter++;}
+                if(response[i].stc_item_tracker_toppe=="Hand Gloves"){handglovescounter++;}
+                if(response[i].stc_item_tracker_toppe=="Ear Plug"){earplugcounter++;}
+                data+='<tr><td>'+ response[i].stc_item_tracker_user_id +'</td><td>'+ response[i].stc_item_tracker_toppe +'</td><td>'+ response[i].stc_item_tracker_qty +'</td><td>'+ response[i].stc_item_tracker_unit +'</td><td>'+ response[i].stc_item_tracker_issuedate +'</td><td>'+ response[i].expiration_date +'</td><td>'+ response[i].stc_item_tracker_remarks +'</td></tr>';
+              }
+              $('#ppesummary').html(data);
+              $('.legguardsummary').html(legguardcounter);
+              $('.safetygogglessummary').html(safetygogglescounter);
+              $('.safetyjacketsummary').html(safetyjacketcounter);
+              $('.safetyshoessummary').html(safetyshoescounter);
+              $('.safetyhelmetsummary').html(safetyhelmetcounter);
+              $('.handglovessummary').html(handglovescounter);
+              $('.earplugsummary').html(earplugcounter);
+            }
+          });
+        }
         function item_tracker_call(searchTerm, page = 1){
             $.ajax({
                 url : "kattegat/ragnar_order.php",
@@ -2514,6 +2549,109 @@ include("kattegat/role_check.php");
                                     <div class="col-md-12">
                                         <div class="card mb-3 widget-content">
                                             <button class="form-control btn btn-success it-save">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ppe track -->
+<div class="modal fade bd-ppetrackersummary-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">PPE Tracker</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 mb-4">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="card text-center p-3">
+                                  <img src="../stc_agent47/assets/images/safety_img/safety_legguard.png" style="position: relative; left: 35%; width: 21%; height: 47px;">
+                                    <h5>Leg Guards</h5>
+                                    <span class="legguardsummary display-6">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center p-3">
+                                  <img src="../stc_agent47/assets/images/safety_img/safety_safetygoggles.png" style="position: relative; left: 35%; width: 21%; height: 47px;">
+                                    <h5>Safety Goggles</h5>
+                                    <span class="safetygogglessummary display-6">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center p-3">
+                                  <img src="../stc_agent47/assets/images/safety_img/safety_hvjacket.png" style="position: relative; left: 35%; width: 21%; height: 47px;">
+                                    <h5>Safety Jackets</h5>
+                                    <span class="safetyjacketsummary display-6">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center p-3">
+                                  <img src="../stc_agent47/assets/images/safety_img/safety_shoe.png" style="position: relative; left: 35%; width: 21%; height: 47px;">
+                                    <h5>Safety Shoes</h5>
+                                    <span class="safetyshoessummary display-6">0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-3">
+                                <div class="card text-center p-3">
+                                    <img src="../stc_agent47/assets/images/safety_img/safety_helmet.png" style="position: relative; left: 35%; width: 21%; height: 47px;">
+                                    <h5>Safety Helmets</h5>
+                                    <span class="safetyhelmetsummary display-6">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center p-3">
+                                  <img src="../stc_agent47/assets/images/safety_img/safety_leathergloves.png" style="position: relative; left: 35%; width: 21%; height: 47px;">
+                                    <h5>Hand Gloves</h5>
+                                    <span class="handglovessummary display-6">0</span>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center p-3">
+                                  <img src="../stc_agent47/assets/images/safety_img/safety_earplug.png" style="position: relative; left: 35%; width: 21%; height: 47px;">
+                                    <h5>Ear Plugs</h5>
+                                    <span class="earplugsummary display-6">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row formcontrol">
+                                    <div class="col-md-12">
+                                        <div class="card mb-3 widget-content">
+                                            <table class="table table-bordered table-hover">
+                                              <thead>
+                                                <tr>
+                                                  <th class="text-center">Employee Name</th>
+                                                  <th class="text-center">Item</th>
+                                                  <th class="text-center">Quantity</th>
+                                                  <th class="text-center">Unit</th>
+                                                  <th class="text-center">Issue Date</th>
+                                                  <th class="text-center">Validity</th>
+                                                  <th class="text-center">Remarks</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody id="ppesummary">
+                                              </tbody>
+                                            </table>
                                         </div>
                                     </div>
                                 </div>
