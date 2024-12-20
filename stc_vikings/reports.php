@@ -175,6 +175,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     <span>E-Permit</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-14" data-toggle="tab" href="#tab-content-14">
+                                    <span>GLD</span>
+                                </a>
+                            </li>
                             ';
                                 }
                             ?>
@@ -1372,6 +1377,100 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                             </div>
+                            <!-- stc trading -->
+                            <div class="tab-pane tabs-animation fade" id="tab-content-14" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="description" align="center"
+                                              >View GLD Sale
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                          <?php 
+                                              $date = date("d-m-Y");
+                                              $year = date("Y");
+                                              $month = date("m");
+                                              $day = 1;
+                                              $combinedtodate=$day.'-'.$month.'-'.$year;
+                                              $newDate = date('Y-m-d', strtotime($date)); 
+                                              // $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
+                                              $effectiveDate = date('Y-m-d', strtotime($combinedtodate));
+                                            ?>   
+                                          <p><input type="date" value="<?php echo $effectiveDate;?>" class="form-control stcgldbegdate"></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-6 col-lg-6 col-md-6">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                          <p><input type="date" value="<?php echo $newDate;?>" class="form-control stcgldenddate"></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-xl-12 col-lg-12 col-md-12" style="display:none;">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <h5
+                                              for="searchgld"
+                                              >Search
+                                            </h5>
+                                            <input type="text" id="searchgld" class="form-control stcgldsearch" placeholder="Search">
+                                        </div>
+                                    </div>                                   
+                                    <div class="col-md-10 col-xl-10 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <button class="mb-2 mr-2 btn btn-success btn-block stcgld-purchasesale-hit">
+                                                <i class="metismenu-icon pe-7s-search"></i> Find
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2 col-xl-2 col-sm-12 hidden-gld-excel-section"> 
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <button class="mb-2 mr-2 btn btn-success btn-block stc-gld-exportexcel-hit" data-type="excel">
+                                                <i class="fa fa-file-excel-o"></i> Export Excel
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                        <div class="card-border mb-3 card card-body border-success stc-reports-gld-purchasesale-view">
+                                          <table class="mb-0 table table-bordered ">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Party Name</th>
+                                                    <th scope="col">Challan No</th>
+                                                    <th scope="col">Challan Date</th>
+                                                    <th scope="col">Material Details</th>
+                                                    <th scope="col">Material Quantity</th>
+                                                    <th scope="col">Material Rate</th>
+                                                    <th scope="col">Amount</th>
+                                                    <th scope="col">Due Amount</th> 
+                                                    <th scope="col">Remarks</th> 
+                                                    <th scope="col">Order By</th> 
+                                                </tr>
+                                            </thead>
+                                            <tbody class="">
+                                              <tr>
+                                                <td colspan="2">
+                                                  <button type="button" class="btn btn-primary stcsndpbegbuttoninvsearch" style="float:right;">
+                                                    <i class="fas fa-arrow-left"></i>
+                                                  </button>
+                                                  <input type="hidden" class="stcsndpbegvalueinputsearch" value="0">
+                                                </td>
+                                                <td colspan="11">
+                                                  <button type="button" class="btn btn-primary stcsndpendbuttoninvsearch">
+                                                    <i class="fas fa-arrow-right"></i>
+                                                  </button>
+                                                  <input type="hidden" class="stcsndpendvalueinputsearch" value="30">
+                                                </td>
+                                              </tr>
+                                            </tbody>
+                                          </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>  
                 </div>
@@ -1579,8 +1678,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             });
         });
     </script>
-    <script>
-        
+    <script>        
         $(document).ready(function() {
             $(window).bind("scroll", function() {
                 var offset = $(this).scrollTop();
@@ -1606,26 +1704,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 }
             });
         });
-
-
-        // function statusFunction() {
-        //     var input, filter, table, tr, td, i, txtValue;
-        //     input = document.getElementById("statusInput");
-        //     filter = input.value.toUpperCase();
-        //     table = document.getElementById("stc-show-std-details-table");
-        //     tr = table.getElementsByTagName("tr");
-        //     for (i = 0; i < tr.length; i++) {
-        //         td = tr[i].getElementsByTagName("td")[14];
-        //         if (td) {
-        //             txtValue = td.textContent || td.innerText;
-        //             if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        //                 tr[i].style.display = "";
-        //             } else {
-        //                 tr[i].style.display = "none";
-        //             }
-        //         }       
-        //     }
-        // }
 
         $(document).ready(function(){
             $('body').delegate('.print-btn-sdl', 'click', function(){
@@ -2462,6 +2540,41 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         // console.log(response_sandp);
                         $('.stc-show-school-attendance').html(response_sandp);
                     }
+                });
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function(){
+            $('.hidden-gld-excel-section').hide();
+            // call purchase sale
+            $('body').delegate('.stcgld-purchasesale-hit', 'click', function(e){
+                e.preventDefault();
+                $('.hidden-gld-excel-section').show();
+                var beg_date=$('.stcgldbegdate').val();
+                var end_date=$('.stcgldenddate').val();
+                var stcgldsearch=$('.stcgldsearch').val();
+                $.ajax({
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "post",
+                    data    : {
+                        stc_find_gld_purchase_sale_reports:1,
+                        beg_date:beg_date,
+                        end_date:end_date,
+                        stcgldsearch:stcgldsearch
+                    },
+                    success : function(response_sandp){
+                        // console.log(response_sandp);
+                        $('.stc-reports-gld-purchasesale-view').html(response_sandp);
+                    }
+                });
+            });
+
+            // create excel
+            $('body').delegate('.stc-gld-exportexcel-hit', 'click', function(e){
+                e.preventDefault();
+                $("#stc-reports-gld-pending-view").table2excel({
+                    filename: "stc-gld-reports.xls"
                 });
             });
         });

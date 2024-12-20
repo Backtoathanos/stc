@@ -9,16 +9,16 @@ include "../../MCU/db.php";
 $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
 
 // Modify query to filter by product name if a search query is provided
-$query = "SELECT ppa.stc_purchase_product_adhoc_id, P.stc_product_id, P.stc_product_name, stc_sub_cat_name, P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image, R.stc_rack_name, sum(ppa.stc_purchase_product_adhoc_qty) as stc_item_inventory_pd_qty, P.stc_product_gst, ppa.stc_purchase_product_adhoc_rate as rate_including_gst, ROUND(ppa.stc_purchase_product_adhoc_rate * (1 + P.stc_product_sale_percentage / 100), 2) AS rate_including_percentage FROM stc_purchase_product_adhoc ppa LEFT JOIN stc_product P ON ppa.stc_purchase_product_adhoc_productid = P.stc_product_id LEFT JOIN stc_rack R ON ppa.stc_purchase_product_adhoc_rackid = R.stc_rack_id LEFT JOIN stc_sub_category ON stc_product_sub_cat_id = stc_sub_cat_id WHERE ppa.stc_purchase_product_adhoc_qty > 0 AND ppa.stc_purchase_product_adhoc_status=1 AND ppa.stc_purchase_product_adhoc_productid<>0";
+$cquery = "SELECT ppa.stc_purchase_product_adhoc_id, P.stc_product_id, P.stc_product_name, stc_sub_cat_name, P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image, R.stc_rack_name, sum(ppa.stc_purchase_product_adhoc_qty) as stc_item_inventory_pd_qty, P.stc_product_gst, ppa.stc_purchase_product_adhoc_rate as rate_including_gst, ROUND(ppa.stc_purchase_product_adhoc_rate * (1 + P.stc_product_sale_percentage / 100), 2) AS rate_including_percentage FROM stc_purchase_product_adhoc ppa LEFT JOIN stc_product P ON ppa.stc_purchase_product_adhoc_productid = P.stc_product_id LEFT JOIN stc_rack R ON ppa.stc_purchase_product_adhoc_rackid = R.stc_rack_id LEFT JOIN stc_sub_category ON stc_product_sub_cat_id = stc_sub_cat_id WHERE ppa.stc_purchase_product_adhoc_qty > 0 AND ppa.stc_purchase_product_adhoc_status=1 AND ppa.stc_purchase_product_adhoc_productid<>0";
 
 // If search query is not empty, add a filter for the product name
 if ($search !== '') {
-    $query .= " AND (P.stc_product_name LIKE '%$search%' OR R.stc_rack_name LIKE '%$search%')";
+    $cquery .= " AND (P.stc_product_name LIKE '%$search%' OR R.stc_rack_name LIKE '%$search%') ";
 }
 
-$query .= " GROUP BY P.stc_product_id ORDER BY P.stc_product_name ASC";
+$cquery .= " GROUP BY P.stc_product_id ORDER BY P.stc_product_name ASC";
 
-$result = mysqli_query($con, $query);
+$result = mysqli_query($con, $cquery);
 
 $data = [];
 foreach($result as $key => $row){
@@ -70,5 +70,5 @@ foreach($result as $key => $row){
 }
 
 // Return data as JSON
-echo json_encode($data);
+echo json_encode($cquery);
 ?>

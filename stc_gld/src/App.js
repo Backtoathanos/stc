@@ -8,6 +8,7 @@ import Inventory from './components/Inventory';
 import Challan from './components/Challan';
 import PrintPreview from './components/PrintPreview';
 import Invoice from './components/invoice';
+import Order from './components/order';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/challan" element={<Protected Component={Challan} />}/>
         <Route path="/invoice" element={<Protected Component={Invoice} />}/>
         <Route path="/print-preview" element={<Protected Component={PrintPreview} />}/>
+        <Route path="/order" element={<Protected Component={Order} />}/>
       </Routes>
     </BrowserRouter>
   );

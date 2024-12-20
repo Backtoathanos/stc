@@ -25,8 +25,8 @@ export default function Navbar(){
                 </div>
                 </form>
                 <ul className="navbar-nav">
-                {/* <li className="nav-item dropdown">
-                    <a className="nav-link" href="request-action.php" id="navbarDropdownMenuLink">
+                <li className="nav-item dropdown">
+                    <a className="nav-link" href="/stc_gld/order" id="navbarDropdownMenuLink">
                     <i className="material-icons">notifications</i>
                     <span className="notification">
                     </span>
@@ -34,16 +34,16 @@ export default function Navbar(){
                         Some Actions
                     </p>
                     </a>
-                </li> */}
+                </li>
                 <li className="nav-item dropdown">
-                    <a className="nav-link" href="javascript:;" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a className="nav-link" href="javascript:void(0)" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i className="material-icons">person</i>
                     <p className="d-lg-none d-md-block">
                         Account
                     </p>
                     </a>
                     <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
-                    <a className="dropdown-item" href="#">Profile</a>
+                    {/* <a className="dropdown-item" href="#">Profile</a> */}
                     <div className="dropdown-divider"></div>
                     <a className="dropdown-item" onClick={logoutSubmit}>Log out</a>
                     </div>

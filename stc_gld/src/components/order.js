@@ -11,10 +11,10 @@ import './Datatable.css';
 import axios from 'axios';
 import { debounce } from 'lodash';
 
-export default function Dashboard() {
+export default function Order() {
     const location = useLocation();
     useEffect(() => {
-        document.title = "STC GLD || Inventory"; // Set the title
+        document.title = "STC GLD || Order"; // Set the title
     }, []);
     const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);
@@ -26,7 +26,7 @@ export default function Dashboard() {
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [selectedProductRate, setSelectedProductRate] = useState(null);
     const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
-    const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
+    const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "order";
     const [filteredData, setFilteredData] = useState([]); // To handle filtered data
 
     const fetchData = debounce((query = '') => {
@@ -125,7 +125,7 @@ export default function Dashboard() {
             selector: row => row.stc_rack_name,
             sortable: true,
             center: true
-        }, 
+        },
         {
             name: 'Unit',
             selector: row => row.stc_product_unit,
@@ -199,7 +199,7 @@ export default function Dashboard() {
                             <div className="col-md-12 col-sm-12">
                                 <div className="card card-chart">
                                     <div className="card-header">
-                                        <h2 className="text-center">Inventory</h2>
+                                        <h2 className="text-center">Order</h2>
                                     </div>
                                     <div className="card-body">
                                         <div className="form-group">

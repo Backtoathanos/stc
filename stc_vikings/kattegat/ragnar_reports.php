@@ -2741,6 +2741,117 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
       ';
       return $odin;
    }
+
+   public function stc_gld_call_sale($bjornebegdate, $bjorneenddate){
+      $grandtotal=0;
+      $totaldues=0;
+      $check_loki=mysqli_query($this->stc_dbs, "
+         SELECT `id`, `stc_product_name`, `stc_sub_cat_name`, `stc_product_unit`, `gld_customer_title`, `challan_number`, `bill_number`, `qty`, `rate`, `paid_amount`, `payment_status`, `agent_id`, `status`, `created_date`, `stc_trading_user_name` 
+         FROM `gld_challan`
+         INNER JOIN `gld_customer` 
+         ON `cust_id` = `gld_customer_id` 
+         INNER JOIN `stc_product` 
+         ON `product_id` = `stc_product_id` 
+         INNER JOIN `stc_sub_category` 
+         ON `stc_product_sub_cat_id` = `stc_sub_cat_id` 
+         INNER JOIN `stc_trading_user` 
+         ON `created_by` = `stc_trading_user_id`
+         WHERE `status`<>0 AND DATE(`created_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
+         AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."' ORDER BY TIMESTAMP(`created_date`) DESC
+      ");
+      $odin='
+         <table class="mb-0 table table-bordered table-hover table-responsive" id="stc-reports-trading-pending-view">
+            <thead>
+              <tr>
+               <th class="text-center" scope="col">Party Name</th>
+               <th class="text-center" scope="col">Challan No</th>
+               <th class="text-center" scope="col">Challan Date</th>
+               <th class="text-center" scope="col">Material Details</th>
+               <th class="text-center" scope="col">Quantity</th>
+               <th class="text-center" scope="col">Unit</th>
+               <th class="text-center" scope="col">Rate</th>
+               <th class="text-center" scope="col">Amount</th>
+               <th class="text-center" scope="col">Due Amount</th> 
+               <th class="text-center" scope="col">Created By</th> 
+              </tr>
+            </thead>
+            <tbody>  
+       ';
+      $do_action=mysqli_num_rows($check_loki);
+      if($do_action == 0){
+         $odin .= "<tr><td colspan='14' align='center'>No Record Found!!!</td></tr>";
+      }else{
+         foreach ($check_loki as $row) {
+            $total=$row['qty'] * $row['rate'];
+            $due=$total - $row['paid_amount'];
+            $product_name=$row["stc_product_name"];
+            if($row["stc_sub_cat_name"]!="OTHERS"){
+               $product_name=$row["stc_sub_cat_name"].' '.$row["stc_product_name"];
+            }
+            $odin.='
+               <tr>
+                     <td class="text-center">
+                       <b>'.$row["gld_customer_title"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.$row["challan_number"].'</b>
+                     </td>
+                     <td class="text-center">
+                       <b>'.date('d-m-y', strtotime($row["created_date"])).'</b>
+                     </td>
+                     <td>
+                       <b>'.$product_name.'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($row["qty"], 2).'</b>
+                     </td>          
+                     <td class="text-right">
+                       <b>'.$row["stc_product_unit"].'</b>
+                     </td>          
+                     <td class="text-right">
+                       <b>'.number_format($row['rate'], 2).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($total, 2).'</b>
+                     </td>
+                     <td class="text-right">
+                        '.$due.'
+                     </td>
+                     <td>
+                       <b>'.$row["stc_trading_user_name"].'</b>
+                     </td>
+                  </tr>          
+            ';          
+            $totaldues+=$due;
+            $grandtotal+=$total;
+         }
+      }
+      if($totaldues>10){
+         $coltotaldues='<b style="color: red;">'.number_format($totaldues, 2).'</b>';
+      }else{
+         $coltotaldues='<b>'.number_format($totaldues, 2).'</b>';
+      }
+      $odin.='
+               <tr>
+                  <td class="text-right" colspan="9">Total Sale :</td>
+                  <td class="text-right"><b>'.number_format($grandtotal, 2).'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+               <tr>
+                  <td class="text-right" colspan="9">Total Recieved :</td>
+                  <td class="text-right"><b>'.number_format(($grandtotal - $totaldues), 2).'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+               <tr>
+                  <td class="text-right" colspan="9">Total Dues :</td>
+                  <td class="text-right"><b>'.$coltotaldues.'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+            </tbody>
+            </table>
+      ';
+      return $odin;
+   }
 }
 
 class ragnarReportsViewgroceriesPurchaseSaleReports extends tesseract{
@@ -4674,6 +4785,17 @@ if(isset($_POST['stc_find_trading_purchase_sale_reports'])){
    echo $out;
 }
 
+// call sale purchase trading
+if(isset($_POST['stc_find_gld_purchase_sale_reports'])){
+   $out='';
+   $bjornebegdate=date('Y-m-d',strtotime($_POST['beg_date']));
+   $bjorneenddate=date('Y-m-d',strtotime($_POST['end_date']));
+   $stcgldsearch=$_POST['stcgldsearch'];
+
+   $bjornesale=new ragnarReportsViewTradingPurchaseSaleReports();
+   $out=$bjornesale->stc_gld_call_sale($bjornebegdate, $bjorneenddate);
+   echo $out;
+}
 #<----------------------------------Object sections of sandp reports class-------------------------------->
 // call sale purchase groceries
 if(isset($_POST['stc_find_groceries_purchase_sale_reports'])){
