@@ -70,5 +70,5 @@ foreach($result as $key => $row){
 }
 
 // Return data as JSON
-echo json_encode($cquery);
+echo json_encode($data);
 ?>
