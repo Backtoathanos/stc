@@ -1174,6 +1174,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <option>CALL ATTEND</option>
                                     <option>DAILY JOB ACTIVITY</option>
                                     <option>PREVENTIVE MAINTENANCE</option>
+                                    <option>WINTER OVERHAULING</option>
                                 </select> 
                             </div>
                         </div>

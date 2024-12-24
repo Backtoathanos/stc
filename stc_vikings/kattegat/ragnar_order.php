@@ -2218,8 +2218,10 @@ class ragnarRequisitionPertView extends tesseract{
 					$apprpd_qty=$lokigetappritemrow['stc_appr_qty'];
 				}
 				$checkqty=$requisrow["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
-				$actiondeliver='<a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
-				<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>';
+				$actiondeliver='
+					<a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
+					<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>
+				';
 				$actiondeliver=$requisrow["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver : "";
 				$priority=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
 				$bgcolor=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ffb0b0;'" : "";

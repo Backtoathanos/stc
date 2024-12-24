@@ -2860,6 +2860,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <option>CALL ATTEND</option>
                                                 <option>DAILY JOB ACTIVITY</option>
                                                 <option>PREVENTIVE MAINTENANCE</option>
+                                                <option>WINTER OVERHAULING</option>
                                             </select>
                                         </div>
                                     </div>
