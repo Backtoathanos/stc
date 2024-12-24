@@ -591,11 +591,13 @@ class ragnarReportsViewRequiReports extends tesseract{
       $bmplanning=$bmjobdone=$bmprogress=$bmpendingjon=0;
       $djaplanning=$djajobdone=$djaprogress=$djapendingjon=0;
       $pmplanning=$pmjobdone=$pmprogress=$pmpendingjon=0;
+      $whplanning=$whjobdone=$whprogress=$whpendingjon=0;
 
       $cplanning48=$cjobdone48=$cprogress48=$cpendingjon48=0;
       $bmplanning48=$bmjobdone48=$bmprogress48=$bmpendingjon48=0;
       $djaplanning48=$djajobdone48=$djaprogress48=$djapendingjon48=0;
       $pmplanning48=$pmjobdone48=$pmprogress48=$pmpendingjon48=0;
+      $whplanning48=$whjobdone48=$whprogress48=$whpendingjon48=0;
       
       $planning=0;
       $jobdone=0;
@@ -675,6 +677,20 @@ class ragnarReportsViewRequiReports extends tesseract{
                   $pmjobdone++;
                   if ($dperiod<2) $pmjobdone48++;
                }
+            }else if($prerow['stc_status_down_list_jobtype']=="WINTER OVERHAULING"){
+               if($prerow['stc_status_down_list_status']==1){
+                  $whplanning++;
+                  if ($dperiod<2) $whplanning48++;
+               }else if($prerow['stc_status_down_list_status']==2){
+                  $whpendingjon++;
+                  if ($dperiod<2) $whpendingjon48++;
+               }else if($prerow['stc_status_down_list_status']==3){
+                  $whprogress++;
+                  if ($dperiod<2) $whprogress48++;
+               }else if($prerow['stc_status_down_list_status']==4){
+                  $whjobdone++;
+                  if ($dperiod<2) $whjobdone48++;
+               }
             }
          }
 
@@ -687,11 +703,13 @@ class ragnarReportsViewRequiReports extends tesseract{
          $djapendingday = $djaplanningday - $djajobdone48;
          $pmplanningday = $pmplanning48 + $pmprogress48 + $pmjobdone48;
          $pmpendingday = $pmplanningday - $pmjobdone48;
+         $whplanningday = $whplanning48 + $whprogress48 + $whjobdone48;
+         $whpendingday = $whplanningday - $whjobdone48;
          
-         $totalp+=$bmplanningday + $cplanningday + $djaplanningday + $pmplanningday;
-         $totalwp+=$bmprogress48 + $cprogress48 + $djaprogress48 + $pmprogress48;
-         $totalwd+=$bmjobdone48 + $cjobdone48 + $djajobdone48 + $pmjobdone48;
-         $totalpending+=$bmpendingday + $cpendingday + $djapendingday + $pmpendingday;
+         $totalp+=$bmplanningday + $cplanningday + $djaplanningday + $pmplanningday + $whplanning48;
+         $totalwp+=$bmprogress48 + $cprogress48 + $djaprogress48 + $pmprogress48 + $whprogress48;
+         $totalwd+=$bmjobdone48 + $cjobdone48 + $djajobdone48 + $pmjobdone48 + $whjobdone48;
+         $totalpending+=$bmpendingday + $cpendingday + $djapendingday + $pmpendingday + $whpendingday;
          
          $abmplanningday = $bmplanning + $bmprogress + $bmjobdone;
          $abmpendingday = $abmplanningday - $bmjobdone;
@@ -701,6 +719,8 @@ class ragnarReportsViewRequiReports extends tesseract{
          $adjapendingday = $adjaplanningday - $djajobdone;
          $apmplanningday = $pmplanning + $pmprogress + $pmjobdone;
          $apmpendingday = $apmplanningday - $pmjobdone;
+         $awhplanningday = $whplanning + $whprogress + $whjobdone;
+         $awhpendingday = $awhplanningday - $whjobdone;
          
          $atotalp+=$abmplanningday + $acplanningday + $adjaplanningday + $apmplanningday;
          $atotalwp+=$bmprogress + $cprogress + $djaprogress + $pmprogress;
@@ -759,7 +779,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `pmplanning48`,
                   SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `pmpendingjon48`,
                   SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `pmprogress48`,
-                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `pmjobdone48`
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `pmjobdone48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'WINTER OVERHAULING' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `whplanning48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'WINTER OVERHAULING' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `whpendingjon48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'WINTER OVERHAULING' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `whprogress48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'WINTER OVERHAULING' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `whjobdone48`
                   FROM `stc_status_down_list` 
                   LEFT JOIN `stc_cust_project` 
                   ON `stc_cust_project_id`=`stc_status_down_list_location` 
@@ -803,12 +827,19 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <td class="text-right" style="background-color: #82f900;">'.$result['djajobdone48'].'</td>
                         <td class="text-right" style="background-color: #ff4545;">'.$result['djapendingjon48'].'</td>
                      </tr>
-                     <tr style="background-color:white;border-bottom: 3px solid black;">
+                     <tr style="background-color:white;">
                         <td class="text-center">PREVENTIVE MAINTENANCE</td>
                         <td class="text-right" style="background-color: #00f9b4;">'.$result['pmplanning48'].'</td>
                         <td class="text-right" style="background-color: #f6f900;">'.$result['pmprogress48'].'</td>
                         <td class="text-right" style="background-color: #82f900;">'.$result['pmjobdone48'].'</td>
                         <td class="text-right" style="background-color: #ff4545;">'.$result['pmpendingjon48'].'</td>
+                     </tr>
+                     <tr style="background-color:white;border-bottom: 3px solid black;">
+                        <td class="text-center">WINTER OVERHAULING</td>
+                        <td class="text-right" style="background-color: #00f9b4;">'.$result['whplanning48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['whprogress48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['whjobdone48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['whpendingjon48'].'</td>
                      </tr>
                      <tr style="background-color:white;border-bottom: 3px solid black;">
                         <td class="text-center">TOTAL</td>
@@ -838,7 +869,11 @@ class ragnarReportsViewRequiReports extends tesseract{
                   SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `pmplanning48`,
                   SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `pmpendingjon48`,
                   SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `pmprogress48`,
-                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `pmjobdone48`
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'PREVENTIVE MAINTENANCE' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `pmjobdone48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'WINTER OVERHAULING' AND `stc_status_down_list_status` = 1 THEN 1 ELSE 0 END) AS `whplanning48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'WINTER OVERHAULING' AND `stc_status_down_list_status` = 2 THEN 1 ELSE 0 END) AS `whpendingjon48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'WINTER OVERHAULING' AND `stc_status_down_list_status` = 3 THEN 1 ELSE 0 END) AS `whprogress48`,
+                  SUM(CASE WHEN `stc_status_down_list_jobtype` = 'WINTER OVERHAULING' AND `stc_status_down_list_status` = 4 THEN 1 ELSE 0 END) AS `whjobdone48`
                FROM `stc_status_down_list` 
                LEFT JOIN `stc_cust_project` ON `stc_cust_project_id`=`stc_status_down_list_location` 
                WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
@@ -880,12 +915,19 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <td class="text-right" style="background-color: #82f900;">'.$result['djajobdone48'].'</td>
                         <td class="text-right" style="background-color: #ff4545;">'.$result['djapendingjon48'].'</td>
                      </tr>
-                     <tr style="background-color:white;border-bottom: 3px solid black;">
+                     <tr style="background-color:white;">
                         <td class="text-center">PREVENTIVE MAINTENANCE</td>
                         <td class="text-right" style="background-color: #00f9b4;">'.$result['pmplanning48'].'</td>
                         <td class="text-right" style="background-color: #f6f900;">'.$result['pmprogress48'].'</td>
                         <td class="text-right" style="background-color: #82f900;">'.$result['pmjobdone48'].'</td>
                         <td class="text-right" style="background-color: #ff4545;">'.$result['pmpendingjon48'].'</td>
+                     </tr>
+                     <tr style="background-color:white;border-bottom: 3px solid black;">
+                        <td class="text-center">WINTER OVERHAULING</td>
+                        <td class="text-right" style="background-color: #00f9b4;">'.$result['whplanning48'].'</td>
+                        <td class="text-right" style="background-color: #f6f900;">'.$result['whprogress48'].'</td>
+                        <td class="text-right" style="background-color: #82f900;">'.$result['whjobdone48'].'</td>
+                        <td class="text-right" style="background-color: #ff4545;">'.$result['whpendingjon48'].'</td>
                      </tr>
                      <tr style="background-color:white;border-bottom: 3px solid black;">
                         <td class="text-center">TOTAL</td>
@@ -920,12 +962,19 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-right" style="background-color: #82f900;">'.$djajobdone.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$adjapendingday.'</td>
                </tr>
-               <tr style="background-color:white;border-bottom: 3px solid black;">
+               <tr style="background-color:white;">
                   <td class="text-center">PREVENTIVE MAINTENANCE</td>
                   <td class="text-right" style="background-color: #00f9b4;">'.$apmplanningday.'</td>
                   <td class="text-right" style="background-color: #f6f900;">'.$pmprogress.'</td>
                   <td class="text-right" style="background-color: #82f900;">'.$pmjobdone.'</td>
                   <td class="text-right" style="background-color: #ff4545;">'.$apmpendingday.'</td>
+               </tr>
+               <tr style="background-color:white;border-bottom: 3px solid black;">
+                  <td class="text-center">WINTER OVERHAULING</td>
+                  <td class="text-right" style="background-color: #00f9b4;">'.$awhplanningday.'</td>
+                  <td class="text-right" style="background-color: #f6f900;">'.$whprogress.'</td>
+                  <td class="text-right" style="background-color: #82f900;">'.$whjobdone.'</td>
+                  <td class="text-right" style="background-color: #ff4545;">'.$awhpendingday.'</td>
                </tr>
                <tr style="background-color:white;border-bottom: 3px solid black;">
                   <td class="text-center">TOTAL</td>
