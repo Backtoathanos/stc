@@ -805,7 +805,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <td class="text-right" style="background-color: #f6f900;">'.$result['bmprogress48'].'</td>
                         <td class="text-right" style="background-color: #82f900;">'.$result['bmjobdone48'].'</td>
                         <td class="text-right" style="background-color: #ff4545;">'.$result['bmpendingjon48'].'</td>
-                        <td class="text-center" rowspan="10">
+                        <td class="text-center" rowspan="11">
                            <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
                            <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
                            '.$data_fields.'
@@ -842,7 +842,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <td class="text-right" style="background-color: #ff4545;">'.$result['whpendingjon48'].'</td>
                      </tr>
                      <tr style="background-color:white;border-bottom: 3px solid black;">
-                        <td class="text-center">TOTAL</td>
+                        <td class="text-center" colspan="2">TOTAL</td>
                         <td class="text-right"><b>'.$totalp48.'</b></td>
                         <td class="text-right"><b>'.$totalwp48.'</b></td>
                         <td class="text-right"><b>'.$totalwd48.'</b></td>
@@ -893,7 +893,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <td class="text-right" style="background-color: #f6f900;">'.$result['bmprogress48'].'</td>
                         <td class="text-right" style="background-color: #82f900;">'.$result['bmjobdone48'].'</td>
                         <td class="text-right" style="background-color: #ff4545;">'.$result['bmpendingjon48'].'</td>
-                        <td class="text-center" rowspan="10">
+                        <td class="text-center" rowspan="11">
                            <a href="#" class="btn btn-primary" data-toggle="modal" data-target=".bd-stdfilter-modal-lg">FILTER</a>
                            <ul class="btn btn-default stc-datatable-filter-ul"><a href="javascript:void(0)" class="data-fields-display btn btn-success">FIELDS</a>
                            '.$data_fields.'
@@ -930,7 +930,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                         <td class="text-right" style="background-color: #ff4545;">'.$result['whpendingjon48'].'</td>
                      </tr>
                      <tr style="background-color:white;border-bottom: 3px solid black;">
-                        <td class="text-center">TOTAL</td>
+                        <td class="text-center" colspan="2">TOTAL</td>
                         <td class="text-right"><b>'.$totalp48.'</b></td>
                         <td class="text-right"><b>'.$totalwp48.'</b></td>
                         <td class="text-right"><b>'.$totalwd48.'</b></td>
@@ -977,7 +977,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   <td class="text-right" style="background-color: #ff4545;">'.$awhpendingday.'</td>
                </tr>
                <tr style="background-color:white;border-bottom: 3px solid black;">
-                  <td class="text-center">TOTAL</td>
+                  <td class="text-center" colspan="2">TOTAL</td>
                   <td class="text-right"><strong>'.$atotalp.'</strong></td>
                   <td class="text-right"><strong>'.$atotalwp.'</strong></td>
                   <td class="text-right"><strong>'.$atotalwd.'</strong></td>
