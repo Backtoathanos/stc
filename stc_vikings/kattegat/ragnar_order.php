@@ -2221,8 +2221,15 @@ class ragnarRequisitionPertView extends tesseract{
 				$actiondeliver='
 					<a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
 					<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>
+					<a class="stc_add_togld" style="font-size:25px;color:black;" title="Add to GLD" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-shopping-cart"></i></a>
 				';
 				$actiondeliver=$requisrow["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver : "";
+				$lokigetappritemqry=mysqli_query($this->stc_dbs, "
+					SELECT `id`, `requisition_list_id`, `status`, `created_by`, `created_date` FROM `stc_requisition_gld` WHERE `requisition_list_id`='".$requisrow['list_item_id']."'
+				");
+				if(mysqli_num_rows($lokigetappritemqry)>0){
+					$actiondeliver='GLD';
+				}
 				$priority=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
 				$bgcolor=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ffb0b0;'" : "";
 				
@@ -3106,6 +3113,47 @@ class ragnarRequisitionPertAdd extends tesseract{
 		}else{
 			$loki="Hmmm!!! Something went wrong. Dispatched not done properly.";
 		}
+		return $loki;
+	}
+	
+	public function stc_ag_req_gld($stc_req_id){
+		$loki = '';
+		$date = date("Y-m-d H:i:s");
+
+		// Check if the requisition_list_id already exists
+		$checkQuery = mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) as count 
+			FROM `stc_requisition_gld` 
+			WHERE `requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."'
+		");
+
+		$result = mysqli_fetch_assoc($checkQuery);
+
+		// Proceed with the insert only if no matching record is found
+		if ($result['count'] == 0) {
+			$gamorarecgoqry = mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_requisition_gld` (
+					`requisition_list_id`,
+					`status`, 
+					`created_by`, 
+					`created_date`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."',
+					'1',
+					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."',
+					'$date'
+				)
+			");
+
+			if ($gamorarecgoqry) {
+				$loki = "success";
+			} else {
+				$loki = "Hmmm!!! Something went wrong. Please try again later.";
+			}
+		} else {
+			$loki = "Record already exists.";
+		}
+
 		return $loki;
 	}
 }
@@ -4126,6 +4174,14 @@ if(isset($_POST['stc_dispatch_hit'])){
 	$poadhocitem=$_POST['poadhocitem'];
 	$raven=new ragnarRequisitionPertAdd();
 	$outraven=$raven->stc_ag_req_direct($stc_req_id, $stc_req_item_id, $stc_tools_id, $dispatch_qty, $poadhocitem);
+	// echo json_encode($outraven);
+	echo $outraven;
+}
+
+if(isset($_POST['stc_gld_hit'])){
+	$stc_req_id=$_POST['stc_req_id'];
+	$raven=new ragnarRequisitionPertAdd();
+	$outraven=$raven->stc_ag_req_gld($stc_req_id);
 	// echo json_encode($outraven);
 	echo $outraven;
 }

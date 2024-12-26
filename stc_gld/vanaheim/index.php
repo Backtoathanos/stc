@@ -65,6 +65,14 @@ switch ($action) {
         getProductDetails($conn);
         break;
 
+    case 'getRequisitions':
+        getRequisitions($conn);
+        break;
+
+    case 'setChallanRequisition':
+        setChallanRequisition($conn);
+        break;
+
     default:
         echo json_encode(['error' => 'Invalid API action', 'fault' => $_GET['action']]);
         break;
@@ -125,10 +133,12 @@ function addCustomer($conn) {
         // Link customer to the product and set the quantity
         $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, product_id, qty, rate, agent_id, created_date, created_by) VALUES ('$customerId', '$requisition', '$productId', '$quantity', '$rate', '$agentId', '$date', '$userId')";
         if ($conn->query($productQuery)) {
-            echo json_encode(['success' => true, 'message' => 'Customer and product added successfully']);
+            echo json_encode(['success' => true, 'message' => 'Challan created successfully']);
         } else {
-            echo json_encode(['error' => 'Failed to add customer and product']);
+            echo json_encode(['error' => 'Failed to create Challan']);
         }
+    }else{
+        echo json_encode(['error' => 'Invalid product ID']);
     }
 }
 
@@ -366,7 +376,6 @@ function getProductDetails($conn) {
     }
 }
 
-
 // update challan add payment
 function addPayment($conn) {
     // Decode the JSON data from the request body
@@ -402,6 +411,142 @@ function deleteChallan($conn) {
         echo json_encode(['success' => true, 'message' => 'Challan deleted successfully.']);
     } else {
         echo json_encode(['error' => 'Failed to delete challan.']);
+    }
+}
+
+// get requisitions details
+function getRequisitions($conn) {
+
+    $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
+
+    $query = "
+        SELECT 
+            `id`, 
+            `requisition_list_id`, 
+            I.`stc_cust_super_requisition_list_items_title`, 
+            I.`stc_cust_super_requisition_items_finalqty`, 
+            `stc_cust_project_title`, 
+            `stc_cust_pro_supervisor_fullname`, 
+            `stc_cust_pro_supervisor_contact`,
+            `status`
+        FROM `stc_requisition_gld` 
+        LEFT JOIN `stc_cust_super_requisition_list_items` I ON `requisition_list_id` = I.`stc_cust_super_requisition_list_id` 
+        LEFT JOIN `stc_cust_super_requisition_list` L ON I.`stc_cust_super_requisition_list_items_req_id` = L.`stc_cust_super_requisition_list_id` 
+        LEFT JOIN `stc_cust_pro_supervisor` ON L.`stc_cust_super_requisition_list_super_id` = `stc_cust_pro_supervisor_id` 
+        LEFT JOIN `stc_cust_project` ON L.`stc_cust_super_requisition_list_project_id` = `stc_cust_project_id` 
+        WHERE `status` = 1
+    ";
+
+    if ($search != '') {
+        $query .= " AND (
+            `stc_cust_project_title` LIKE ? OR 
+            `stc_cust_super_requisition_list_items_title` LIKE ? OR 
+            `stc_cust_pro_supervisor_fullname` LIKE ? OR 
+            `stc_cust_pro_supervisor_contact` LIKE ?
+        )";
+    }
+
+    if ($stmt = $conn->prepare($query)) {
+        if ($search != '') {
+            $searchWildcard = '%' . $search . '%';
+            $stmt->bind_param("ssss", $searchWildcard, $searchWildcard, $searchWildcard, $searchWildcard);
+        }
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $productDetails = $result->fetch_all(MYSQLI_ASSOC); // Fetch all matching rows
+             // Apply number_format to the `stc_cust_super_requisition_items_finalqty` column
+            foreach ($productDetails as &$product) {
+                $query=mysqli_query($conn, "SELECT DISTINCT `stc_cust_super_requisition_list_purchaser_pd_id`, `stc_product_name` FROM `stc_cust_super_requisition_list_purchaser` LEFT JOIN `stc_product` ON `stc_cust_super_requisition_list_purchaser_pd_id`=`stc_product_id` WHERE `stc_cust_super_requisition_list_purchaser_list_item_id`='".$product['requisition_list_id']."'");
+                if(mysqli_num_rows($query)>0){
+                    foreach($query as $row){
+                        $product['stc_product_id'] = $row['stc_cust_super_requisition_list_purchaser_pd_id'];
+                        $product['stc_product_name'] = $row['stc_product_name'];
+                    }
+                }
+                if (isset($product['stc_cust_super_requisition_items_finalqty'])) {
+                    $product['stc_cust_super_requisition_items_finalqty'] = number_format($product['stc_cust_super_requisition_items_finalqty'], 2);
+                }
+            }
+            echo json_encode([
+                'success' => true, 
+                'products' => $productDetails, 
+                'message' => 'Product details fetched successfully.'
+            ]);
+        } else {
+            echo json_encode([
+                'success' => false, 
+                'message' => 'No details found for the selected product.'
+            ]);
+        }
+
+        $stmt->close();
+    } else {
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Failed to prepare query.'
+        ]);
+    }
+
+}
+// set requisitions details
+function setChallanRequisition($conn) {
+    // Decode the JSON data from the request body
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    // Extract values from the decoded JSON
+    $ListId = $data['ListId'] ?? '';
+    $customerName = $data['userName'] ?? '';
+    $customerContact = $data['contact'] ?? '';
+    $customerAddress = $data['address'] ?? '';
+    $productId = $data['productId'] ?? null;
+    $requisition = $data['requisition'] ?? '';
+    $quantity = $data['quantity'] ?? 0;
+    $rate = 0;
+    $userId=$data['userId'] ?? 0;
+
+    if ($productId) {
+        // Check if a customer already exists with the given contact number
+        $checkQuery = "SELECT gld_customer_id FROM gld_customer WHERE gld_customer_cont_no = '$customerContact'";
+        $result = $conn->query($checkQuery);
+
+        if ($result && $result->num_rows > 0) {
+            // If customer exists, fetch the customer ID
+            $row = $result->fetch_assoc();
+            $customerId = $row['gld_customer_id'];
+        } else {
+            // Insert a new customer if not found
+            $insertQuery = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_city_id, gld_customer_state_id, gld_customer_address) 
+                            VALUES ('$customerName', '$customerContact', '65', '16', '$customerAddress')";
+            if ($conn->query($insertQuery)) {
+                $customerId = $conn->insert_id;
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to add customer', 'query' => $insertQuery]);
+                return;
+            }
+        }
+
+        $checkQuery = "SELECT `stc_purchase_product_adhoc_rate` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid`='$productId' ORDER BY `stc_purchase_product_adhoc_id` DESC LIMIT 1";
+        $result = $conn->query($checkQuery);
+        if ($result && $result->num_rows > 0) {
+            // If customer exists, fetch the customer ID
+            $row = $result->fetch_assoc();
+            $rate = $row['stc_purchase_product_adhoc_rate'];
+        }
+        $date = date('Y-m-d H:i:s');
+        // Link customer to the product and set the quantity
+        $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, product_id, qty, rate, agent_id, created_date, created_by) 
+                         VALUES ('$customerId', '$requisition', '$productId', '$quantity', '$rate', '0', '$date', '$userId')";
+        if ($conn->query($productQuery)) {
+            $conn->query("UPDATE `stc_requisition_gld` SET `status`=2 WHERE `id`='$ListId'");
+            echo json_encode(['success' => true, 'message' => 'Challan created successfully', 'sss' => "UPDATE `stc_requisition_gld` SET `status`=2 WHERE `requisition_list_id`='$ListId'"]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to create Challan']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Invalid product ID']);
     }
 }
 

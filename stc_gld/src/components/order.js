@@ -10,12 +10,15 @@ import { RotatingLines } from 'react-loader-spinner'; // Importing spinner from 
 import './Datatable.css';
 import axios from 'axios';
 import { debounce } from 'lodash';
+import { Modal, Button } from 'react-bootstrap';
+import Swal from 'sweetalert2';
 
 export default function Order() {
     const location = useLocation();
     useEffect(() => {
         document.title = "STC GLD || Order"; // Set the title
     }, []);
+    const [showModal, setShowModal] = useState(false);
     const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);
 
@@ -24,84 +27,57 @@ export default function Order() {
     const [loading, setLoading] = useState(true); // Loading state
     const [modalShow, setModalShow] = useState(false); // State for modal visibility
     const [selectedProductId, setSelectedProductId] = useState(null);
+    const [selectedQuantity, setSelectedQuantity] = useState(null);
+    const [selecteduname, setselecteduname] = useState(null);
+    const [selectedcontact, setselectedcontact] = useState(null);
+    const [selectedAddress, setselectedAddress] = useState(null);
+    const [selectedRequisition, setselectedRequisition] = useState(null);
+    const [selectedListId, setselectedListId] = useState(null);
+    
     const [selectedProductRate, setSelectedProductRate] = useState(null);
     const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "order";
     const [filteredData, setFilteredData] = useState([]); // To handle filtered data
-
+    
     const fetchData = debounce((query = '') => {
-        if (query.length > 3 || query === '') {
-            setLoading(true);
-            // Send the search query as a parameter to the API
-            axios.get(`https://stcassociate.com/stc_gld/vanaheim/getInventoryData.php?search=${query}`)
-                .then(response => {
-                    const resultData = response.data;
-                    if (Array.isArray(resultData)) {
-                        setData(resultData); // Ensure data is an array
-                    } else {
-                        setData([]); // If it's not an array, set it to an empty array
-                    }
-                    setLoading(false);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    setData([]); // Set to an empty array in case of error
-                    setLoading(false);
-                });
-        }
+        setLoading(true);
+        axios
+            .get('https://stcassociate.com/stc_gld/vanaheim/index.php?action=getRequisitions', {
+                params: { search: query },
+            })
+            .then(response => {
+                const resultData = response.data;
+                if (resultData.success && Array.isArray(resultData.products)) {
+                    setData(resultData.products);
+                } else {
+                    setData([]);
+                }
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                setData([]);
+                setLoading(false);
+            });
     }, 500);
-
+    
     useEffect(() => {
-        fetchData(search);
-    }, [search]);
-
+        fetchData(); // Fetch data initially without a query
+    }, []);
+    
     // Define columns for DataTable
     const columns = [
         {
-            name: 'Product',
-            selector: row => row.stc_product_name,
+            name: 'Project Name',
+            selector: (row) => row.stc_cust_project_title,
             sortable: true,
             center: true,
-            cell: row => {
-                const imageUrl = `https://stcassociate.com/stc_symbiote/stc_product_image/${row.stc_product_image}`;
-                const defaultImageUrl = 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996';
-
-                return (
-                    <div style={{ position: 'absolute', left: '20px', marginTop: '10px', marginBottom: '10px', display: 'flex', alignItems: 'center', maxWidth: '250px' }}>
-                        <div style={{ width: '60px', flexShrink: 0 }}>
-                            <img
-                                src={row.stc_product_image ? imageUrl : defaultImageUrl}
-                                alt="Product"
-                                style={{ width: '100%', height: '60px', borderRadius: '5px' }}
-                                onError={(e) => e.target.src = defaultImageUrl} // Use default if image fails to load
-                            />
-                        </div>
-                    </div>
-                );
-            }
         },
         {
-            name: 'Product Name',
-            selector: row => row.stc_product_id,
+            name: 'Requisition Items Title',
+            selector: (row) => row.stc_cust_super_requisition_list_items_title,
             sortable: true,
             center: true,
-            cell: row => (
-                <a
-                    href="#"
-                    onClick={() => {
-                        setSelectedProductId(row.stc_product_id);
-                        setSecondModalOpen(true);
-                    }}
-                >
-                    <div style={{ marginLeft: '10px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        <strong>
-                            {row.stc_product_name.length > 20
-                                ? `${row.stc_product_name.substring(0, 20)}...`
-                                : row.stc_product_name}
-                        </strong>
-                    </div>
-                </a>
-            )
         },
         {
             name: 'Product Id (SKU)',
@@ -121,73 +97,112 @@ export default function Order() {
             )
         },
         {
-            name: 'Rack',
-            selector: row => row.stc_rack_name,
+            name: 'Products Name',
+            selector: (row) => row.stc_product_name,
             sortable: true,
-            center: true
+            center: true,
         },
         {
-            name: 'Unit',
-            selector: row => row.stc_product_unit,
+            name: 'Supervisor Name',
+            selector: (row) => row.stc_cust_pro_supervisor_fullname,
             sortable: true,
-            center: true
+            center: true,
         },
         {
-            name: 'Inv Qty.',
-            selector: row => row.stc_item_inventory_pd_qty + ' ' + row.stc_product_unit,
+            name: 'Supervisor Contact Number',
+            selector: (row) => row.stc_cust_pro_supervisor_contact,
+            sortable: true,
+            center: true,
+        },
+        {
+            name: 'Quantity',
+            selector: (row) => row.stc_cust_super_requisition_items_finalqty,
             sortable: true,
             right: true,
-            cell: row => (
-                <span
-                    style={{
-                        background: '#afafaf',
-                        borderRadius: '10%',
-                        padding: '10px',
-                        color: '#000000',
-                        fontWeight: 'bold',
-                        display: 'inline-block',
-                        minWidth: '100px',
-                        textAlign: 'right'
-                    }}
-                >
-                    {`${row.stc_item_inventory_pd_qty}`}
-                    <i style={{
-                        fontWeight: '400',
-                        minWidth: '100px',
-                        textAlign: 'right'
-                    }}>{` ${row.stc_product_unit}`}</i>
-                </span>
-            ),
-        },
-
-        {
-            name: 'Sale Rate',
-            selector: row => row.rate_including_gst,
-            sortable: true,
-            right: true
-        },
-        {
+        },{
             name: 'Action',
             selector: row => row.stc_product_id,
             sortable: false,
             center: true,
             cell: row => (
-                <a
-                    href="#"
-                    className="btn btn-primary"
-                    onClick={() => {
-                        setSelectedProductId(row.stc_product_id);
-                        setSelectedProductRate(row.rate_including_gst);
-                        setSelectedProductQuantity(row.stc_item_inventory_pd_qty);
-                        setModalShow(true);
-                    }}
-                >
-                    Add
-                </a>
+                row.status === 1 ? (
+                    <a
+                        href="#"
+                        className="btn btn-primary"
+                        onClick={() => {
+                            setSelectedProductId(row.stc_product_id);
+                            setSelectedQuantity(row.stc_cust_super_requisition_items_finalqty);
+                            setselecteduname(row.stc_cust_pro_supervisor_fullname);
+                            setselectedcontact(row.stc_cust_pro_supervisor_contact);
+                            setselectedRequisition(row.requisition_list_id);
+                            setselectedListId(row.id);
+                            setShowModal(true);
+                        }}
+                    >
+                        Add
+                    </a>
+                ) : (
+                    <span>Challaned.</span> // Optional: render something else when condition is false
+                )
             )
-        }
+        }        
     ];
 
+    const handleCloseModal = () => {
+        setShowModal(false); // Close modal when the close button is clicked
+    };
+    const handleSaveProduct = () => {
+        const userIdCookie = document.cookie.split('; ').find(row => row.startsWith('user_id='));
+        if (!userIdCookie) {
+            return;  // Stop the function execution if no user_id cookie is found
+        }
+        const userId = userIdCookie.split('=')[1];
+        // Assuming you want to save the data via an API call:
+        const productData = {
+            ListId: selectedListId,
+            productId: selectedProductId,
+            quantity: selectedQuantity,
+            userName: selecteduname,
+            contact: selectedcontact,
+            address: selectedAddress,
+            requisition: selectedRequisition,
+            userId: userId,
+        };
+        setLoading(true);
+        // Example API call
+        axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=setChallanRequisition', productData)
+            .then(response => {
+                setShowModal(false);
+                if(response.data.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: "Challan created successfully!"
+                    }).then(() => {
+                        // Reload data after success
+                        fetchData();  // Fetch updated challan data
+                    })
+                    .finally(() => {
+                        setLoading(false);
+                    });
+                } else {
+                    // Handle if the server responds with failure
+                    Swal.fire(
+                        'Failed!',
+                        'Challan cannot be created without Product ID.',
+                        'error'
+                    )
+                    .finally(() => {
+                        setLoading(false);
+                    });
+                }
+            })
+            .catch(error => {
+                // Handle error
+                console.error("Error saving product", error);
+                alert("Error saving product");
+            });
+    };
     return (
         <div className="wrapper ">
             <Sidebar activeRoute={currentRoute} />
@@ -244,13 +259,63 @@ export default function Order() {
                 </div>
                 <Footer />
             </div>
-            <CustomerModal
-                show={modalShow}
-                handleClose={() => setModalShow(false)}
-                productId={selectedProductId}
-                productRate={selectedProductRate}
-                productQuantity={selectedProductQuantity}
-            />
+            <Modal show={showModal} onHide={handleCloseModal}>
+                <Modal.Header>
+                    <Modal.Title>Add Product</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                        <>
+                            <p>Product ID</p>
+                            <input
+                                type="number"
+                                className="form-control"
+                                placeholder="Enter Produt ID"
+                                value={selectedProductId}
+                                onChange={(e) => setSelectedProductId(e.target.value)}
+                            />
+                            <p>Quantity</p>
+                            <input
+                                type="number"
+                                className="form-control"
+                                placeholder="Enter Quantity"
+                                value={selectedQuantity}
+                                onChange={(e) => setSelectedQuantity(e.target.value)}
+                            />
+                            <p>User Name</p>
+                            <input
+                                type="name"
+                                className="form-control"
+                                placeholder="Enter User Name"
+                                value={selecteduname}
+                                onChange={(e) => setselecteduname(e.target.value)}
+                            />
+                            <p>Contact</p>
+                            <input
+                                type="number"
+                                className="form-control"
+                                placeholder="Enter Contact"
+                                value={selectedcontact}
+                                onChange={(e) => setselectedcontact(e.target.value)}
+                            />
+                            <p>Address</p>
+                            <textarea
+                                className="form-control"
+                                placeholder="Enter Address"
+                                value={selectedAddress}
+                                onChange={(e) => setselectedAddress(e.target.value)}
+                            ></textarea>
+                        </>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModal}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={handleSaveProduct}>
+                        Save Product
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+            
             <ProductModal
                 show={isSecondModalOpen}  // Pass the boolean variable, not as a function
                 handleClose={() => setSecondModalOpen(false)}

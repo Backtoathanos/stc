@@ -587,6 +587,31 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             // }
           }
         });
+        
+        $('body').delegate('.stc_add_togld', 'click', function(e){
+          e.preventDefault();
+          var req_id=$(this).attr('id');
+          if(confirm("Are you sure want transfer to gld?")){
+            $(this).closest('td').html('GLD');
+            $.ajax({
+              url       : "kattegat/ragnar_order.php",
+              method    :'POST',
+              data      : {
+                stc_gld_hit:1,
+                stc_req_id:req_id
+              },
+              success   : function(response_dis){
+                var response=response_dis.trim();
+                if(response=="success"){
+                  alert("Item added to GLD.");
+                }else{
+                  alert(response_dis);
+                  // window.location.reload();
+                }
+              }
+            });
+          }
+        });
 
         $('body').delegate('.poadhocitem', 'change', function(e){
           e.preventDefault();

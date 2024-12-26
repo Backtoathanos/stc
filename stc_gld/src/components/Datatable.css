@@ -15,6 +15,7 @@
 
 .data-table .rdt_TableRow {
     border-bottom: 1px solid #ddd;  /* Add a border between rows */
+    width: auto;
 }
 
 .data-table .rdt_TableCol {
