@@ -294,7 +294,7 @@ function updateChallanBillNo($conn) {
 
 // function to get distinct challans
 function getDistinctChallanNos($conn) {
-    $query = "SELECT DISTINCT challan_number FROM gld_challan ORDER BY TIMESTAMP(created_date) DESC";
+    $query = "SELECT DISTINCT challan_number FROM gld_challan WHERE status<>0 ORDER BY TIMESTAMP(created_date) DESC";
     $result = $conn->query($query);
 
     $challanNos = [];
