@@ -24,7 +24,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "cross-env REACT_APP_API_URL=http://localhost/stc/stc_gld/vanaheim react-scripts start",
+    "start": "cross-env REACT_APP_API_URL=https://stcassociate.com/stc_gld/vanaheim react-scripts start",
     "build": "cross-env REACT_APP_API_URL=https://stcassociate.com/stc_gld/vanaheim react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
