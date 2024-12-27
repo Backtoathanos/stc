@@ -16,6 +16,7 @@ export default function Dashboard() {
     useEffect(() => {
         document.title = "STC GLD || Inventory"; // Set the title
     }, []);
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
     const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);
 
@@ -33,7 +34,7 @@ export default function Dashboard() {
         if (query.length > 3 || query === '') {
             setLoading(true);
             // Send the search query as a parameter to the API
-            axios.get(`https://stcassociate.com/stc_gld/vanaheim/getInventoryData.php?search=${query}`)
+            axios.get(`${API_BASE_URL}/getInventoryData.php?search=${query}`)
                 .then(response => {
                     const resultData = response.data;
                     if (Array.isArray(resultData)) {

@@ -130,12 +130,45 @@ function addCustomer($conn) {
             $customerId = $conn->insert_id;
         }
         $date = date('Y-m-d H:i:s');
+        $adhoc_id=0;
         // Link customer to the product and set the quantity
-        $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, product_id, qty, rate, agent_id, created_date, created_by) VALUES ('$customerId', '$requisition', '$productId', '$quantity', '$rate', '$agentId', '$date', '$userId')";
-        if ($conn->query($productQuery)) {
-            echo json_encode(['success' => true, 'message' => 'Challan created successfully']);
-        } else {
-            echo json_encode(['error' => 'Failed to create Challan']);
+        $query = $conn->query("SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid`='$productId' AND `stc_purchase_product_adhoc_status`=1 ORDER BY `stc_purchase_product_adhoc_id` ASC");
+        while ($row = $query->fetch_assoc()) {
+            $delivered=0;
+            $sql_qry=$conn->query("
+                SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
+                FROM `stc_cust_super_requisition_list_items_rec` 
+                WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$row['stc_purchase_product_adhoc_id']."'
+            ");
+            if(mysqli_num_rows($sql_qry)>0){
+                foreach($sql_qry as $sql_row){
+                    $delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+                }
+            }
+            $deliveredgld=0;
+            $sql_qry=$conn->query("
+                SELECT `qty` FROM `gld_challan` WHERE `adhoc_id`='".$row['stc_purchase_product_adhoc_id']."'
+            ");
+            if(mysqli_num_rows($sql_qry)>0){
+                foreach($sql_qry as $sql_row){
+                    $deliveredgld+=$sql_row['qty'];
+                }
+            }
+            $stock=$row['stc_purchase_product_adhoc_qty'] - ($delivered + $deliveredgld);
+            if ($stock >= $quantity) {
+                $adhoc_id = $row['stc_purchase_product_adhoc_id'];
+                break;
+            }
+        }
+        if($adhoc_id>0){
+            $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, adhoc_id, product_id, qty, rate, agent_id, created_date, created_by) VALUES ('$customerId', '$requisition', '$adhoc_id', '$productId', '$quantity', '$rate', '$agentId', '$date', '$userId')";
+            if ($conn->query($productQuery)) {
+                echo json_encode(['success' => true, 'message' => 'Challan created successfully']);
+            } else {
+                echo json_encode(['error' => 'Failed to create Challan']);
+            }
+        }else {
+            echo json_encode(['error' => 'Out of Stock.']);
         }
     }else{
         echo json_encode(['error' => 'Invalid product ID']);
@@ -261,7 +294,7 @@ function updateChallanBillNo($conn) {
 
 // function to get distinct challans
 function getDistinctChallanNos($conn) {
-    $query = "SELECT DISTINCT challan_number FROM gld_challan WHERE status='1' ORDER BY TIMESTAMP(created_date) DESC";
+    $query = "SELECT DISTINCT challan_number FROM gld_challan ORDER BY TIMESTAMP(created_date) DESC";
     $result = $conn->query($query);
 
     $challanNos = [];
@@ -536,14 +569,47 @@ function setChallanRequisition($conn) {
             $rate = $row['stc_purchase_product_adhoc_rate'];
         }
         $date = date('Y-m-d H:i:s');
+        $adhoc_id=0;
         // Link customer to the product and set the quantity
-        $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, product_id, qty, rate, agent_id, created_date, created_by) 
-                         VALUES ('$customerId', '$requisition', '$productId', '$quantity', '$rate', '0', '$date', '$userId')";
-        if ($conn->query($productQuery)) {
-            $conn->query("UPDATE `stc_requisition_gld` SET `status`=2 WHERE `id`='$ListId'");
-            echo json_encode(['success' => true, 'message' => 'Challan created successfully', 'sss' => "UPDATE `stc_requisition_gld` SET `status`=2 WHERE `requisition_list_id`='$ListId'"]);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to create Challan']);
+        $query = $conn->query("SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid`='$productId' AND `stc_purchase_product_adhoc_status`=1 ORDER BY `stc_purchase_product_adhoc_id` ASC");
+        while ($row = $query->fetch_assoc()) {
+            $delivered=0;
+            $sql_qry=$conn->query("
+                SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
+                FROM `stc_cust_super_requisition_list_items_rec` 
+                WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$row['stc_purchase_product_adhoc_id']."'
+            ");
+            if(mysqli_num_rows($sql_qry)>0){
+                foreach($sql_qry as $sql_row){
+                    $delivered+=$sql_row['stc_cust_super_requisition_list_items_rec_recqty'];
+                }
+            }
+            $deliveredgld=0;
+            $sql_qry=$conn->query("
+                SELECT `qty` FROM `gld_challan` WHERE `adhoc_id`='".$row['stc_purchase_product_adhoc_id']."'
+            ");
+            if(mysqli_num_rows($sql_qry)>0){
+                foreach($sql_qry as $sql_row){
+                    $deliveredgld+=$sql_row['qty'];
+                }
+            }
+            $stock=$row['stc_purchase_product_adhoc_qty'] - ($delivered + $deliveredgld);
+            if ($stock >= $quantity) {
+                $adhoc_id = $row['stc_purchase_product_adhoc_id'];
+                break;
+            }
+        }
+        if($adhoc_id>0){
+            // Link customer to the product and set the quantity
+            $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, adhoc_id, product_id, qty, rate, agent_id, created_date, created_by) VALUES ('$customerId', '$requisition', '$adhoc_id', '$productId', '$quantity', '$rate', '0', '$date', '$userId')";
+            if ($conn->query($productQuery)) {
+                $conn->query("UPDATE `stc_requisition_gld` SET `status`=2 WHERE `id`='$ListId'");
+                echo json_encode(['success' => true, 'message' => 'Challan created successfully']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Failed to create Challan']);
+            }
+        }else {
+            echo json_encode(['error' => false, 'message' => 'Out of Stock.']);
         }
     } else {
         echo json_encode(['success' => false, 'message' => 'Invalid product ID']);

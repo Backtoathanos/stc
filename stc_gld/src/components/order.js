@@ -18,6 +18,7 @@ export default function Order() {
     useEffect(() => {
         document.title = "STC GLD || Order"; // Set the title
     }, []);
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
     const [showModal, setShowModal] = useState(false);
     const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);
@@ -39,12 +40,9 @@ export default function Order() {
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "order";
     const [filteredData, setFilteredData] = useState([]); // To handle filtered data
     
-    const fetchData = debounce((query = '') => {
+    const fetchData = debounce((search = '') => {
         setLoading(true);
-        axios
-            .get('https://stcassociate.com/stc_gld/vanaheim/index.php?action=getRequisitions', {
-                params: { search: query },
-            })
+        axios.get(`${API_BASE_URL}/index.php?action=getRequisitions`, search)
             .then(response => {
                 const resultData = response.data;
                 if (resultData.success && Array.isArray(resultData.products)) {
@@ -170,7 +168,7 @@ export default function Order() {
         };
         setLoading(true);
         // Example API call
-        axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=setChallanRequisition', productData)
+        axios.post(`${API_BASE_URL}/index.php?action=setChallanRequisition`, productData)
             .then(response => {
                 setShowModal(false);
                 if(response.data.success) {
@@ -189,7 +187,7 @@ export default function Order() {
                     // Handle if the server responds with failure
                     Swal.fire(
                         'Failed!',
-                        'Challan cannot be created without Product ID.',
+                        response.data.message,
                         'error'
                     )
                     .finally(() => {

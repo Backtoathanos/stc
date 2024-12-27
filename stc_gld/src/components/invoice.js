@@ -18,6 +18,7 @@ export default function ChallanDashboard() {
         document.title = "STC GLD || Challan";
     }, []);
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
     const [showModal, setShowModal] = useState(false);
     const [showModal1, setShowModal1] = useState(false);
 
@@ -39,7 +40,7 @@ export default function ChallanDashboard() {
         if (query.length > 3 || query === '') {
             setLoading(true);
             // Send the search query as a parameter to the API
-            axios.get(`https://stcassociate.com/stc_gld/vanaheim/index.php?action=getChallaned&search=${query}`)
+            axios.get(`${API_BASE_URL}/index.php?action=getChallaned&search=${query}`)
                 .then(response => {
                     const resultData = response.data;
                     if (Array.isArray(resultData)) {
@@ -87,7 +88,7 @@ export default function ChallanDashboard() {
         }).then((result) => {
             if (result.isConfirmed) {
                 // Make the API call to delete the record
-                axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=deleteChallan', {
+                axios.post(`${API_BASE_URL}/index.php?action=deleteChallan`, {
                     id: id
                 })
                 .then(response => {
@@ -289,7 +290,7 @@ export default function ChallanDashboard() {
                     setLoading(true);  // Show loading spinner
                     const selectedIds = selectedRows.map(row => row);  // Ensure the correct field is mapped for the IDs
 
-                    axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=updateChallanBillNo', {
+                    axios.post(`${API_BASE_URL}/index.php?action=updateChallanBillNo`, {
                         ids: selectedIds
                     })
                         .then(response => {
@@ -328,7 +329,7 @@ export default function ChallanDashboard() {
     };
 
     const getChallan = () => {
-        axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php?action=getDistinctBillNos')
+        axios.get(`${API_BASE_URL}/index.php?action=getDistinctBillNos`)
             .then(response => {
                 const data = response.data;
                 // Map the data to the format required by react-select
@@ -351,7 +352,7 @@ export default function ChallanDashboard() {
     const handleSavePayment = () => {
         if (paymentAmount && selectedChallanForPayment) {
             setLoading(true);
-            axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=addPayment', {
+            axios.post(`${API_BASE_URL}/index.php?action=addPayment`, {
                 challan_id: selectedChallanForPayment.id,
                 payment_amount: paymentAmount
             })

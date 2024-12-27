@@ -5,6 +5,7 @@ import Swal from 'sweetalert2'; // Import SweetAlert2
 import './CustomerModal.css';
 
 const ProductModal = ({ show, handleClose, productId }) => {
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
     const [{ ProductDetails }, setProductDetails] = useState('');
     const [productName, setProductName] = useState('');
     const [productDescription, setProductDescription] = useState('');
@@ -20,7 +21,7 @@ const ProductModal = ({ show, handleClose, productId }) => {
     // Fetch customer options when the modal is shown
     useEffect(() => {
         if (show) {
-            axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php', {
+            axios.get('${API_BASE_URL}/index.php', {
                 params: { action: 'getProductDetails', productId: productId }
             })
                 .then(response => {

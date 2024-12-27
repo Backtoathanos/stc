@@ -2267,7 +2267,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				}
 				$deliveredgld=0;
 				$sql_qry=mysqli_query($this->stc_dbs, "
-					SELECT `qty` FROM `gld_challan` WHERE `product_id`='".$odinrow['stc_product_id']."'
+					SELECT `qty` FROM `gld_challan` WHERE `adhoc_id`='".$odinrow['stc_purchase_product_adhoc_id']."'
 				");
 				if(mysqli_num_rows($sql_qry)>0){
 					foreach($sql_qry as $sql_row){

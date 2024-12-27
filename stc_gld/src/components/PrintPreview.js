@@ -7,6 +7,8 @@ const PrintPreview = () => {
     const [challanDetails, setChallanDetails] = useState(null);
     const location = useLocation();
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    
     // Function to extract query parameters
     const getQueryParams = (query) => {
         return new URLSearchParams(query);
@@ -26,9 +28,9 @@ const PrintPreview = () => {
         let challanNo = queryParams.get('challan_no') || 'default';
         let status = queryParams.get('status') || 'default';
         if (challanNo) {
-            let geturl=`https://stcassociate.com/stc_gld/vanaheim/index.php?action=getChallanDetails&challan_no=${challanNo}&status=challan`;
+            let geturl=`${API_BASE_URL}/index.php?action=getChallanDetails&challan_no=${challanNo}&status=challan`;
             if(status=="billed"){
-                geturl=`https://stcassociate.com/stc_gld/vanaheim/index.php?action=getChallanDetails&challan_no=${challanNo}&status=billed`;
+                geturl=`${API_BASE_URL}/index.php?action=getChallanDetails&challan_no=${challanNo}&status=billed`;
             }
             // Fetch details of the selected challan
             axios.get(geturl)

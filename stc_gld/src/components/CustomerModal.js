@@ -10,6 +10,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
     ? productRate.replace(/,/g, "") 
     : productRate;
 
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
     const [customerOptions, setCustomerOptions] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [customerName, setCustomerName] = useState('');
@@ -30,7 +31,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
     // Fetch customer options when the modal is shown
     useEffect(() => {
         if (show) {
-            axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php', {
+            axios.get(`${API_BASE_URL}/index.php`, {
                 params: { action: 'getCustomers' }
             })
                 .then(response => {
@@ -51,7 +52,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
     // get agents
     useEffect(() => {
         if (show) {
-            axios.get('https://stcassociate.com/stc_gld/vanaheim/index.php', {
+            axios.get(`${API_BASE_URL}/index.php`, {
                 params: { action: 'getAgents' }
             })
                 .then(response => {
@@ -131,7 +132,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             agentId: agentId
         };
 
-        axios.post('https://stcassociate.com/stc_gld/vanaheim/index.php?action=addCustomer', customerData)
+        axios.post(`${API_BASE_URL}/index.php?action=addCustomer`, customerData)
             .then(response => {
                 // If a new customer is added, update the select options
                 if (!customerId) {

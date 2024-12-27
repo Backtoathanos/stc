@@ -813,8 +813,20 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                           ");
                           $result=mysqli_num_rows($checsql)>0 ? mysqli_fetch_assoc($checsql) : 0;
                           $rec_qty=$result!=0 ? $result['recqty'] : 0;
-                          $balanced_qty=$sqlrow['stc_purchase_product_adhoc_qty'] - $rec_qty;
-                          echo '<option value="'.$sqlrow['stc_purchase_product_adhoc_id'].'" qty="'.$balanced_qty.'" rack="'.$sqlrow['stc_rack_name'].'" unit="'.$sqlrow['stc_purchase_product_adhoc_unit'].'">'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</option>';
+                          
+                          $deliveredgld=0;
+                          $sql_qry=mysqli_query($con, "
+                            SELECT `qty` FROM `gld_challan` WHERE `adhoc_id`='".$sqlrow['stc_purchase_product_adhoc_id']."'
+                          ");
+                          if(mysqli_num_rows($sql_qry)>0){
+                            foreach($sql_qry as $sql_row){
+                              $deliveredgld+=$sql_row['qty'];
+                            }
+                          }
+                          $balanced_qty=$sqlrow['stc_purchase_product_adhoc_qty'] - ($rec_qty + $deliveredgld);
+                          if($balanced_qty>0){
+                            echo '<option value="'.$sqlrow['stc_purchase_product_adhoc_id'].'" qty="'.$balanced_qty.'" rack="'.$sqlrow['stc_rack_name'].'" unit="'.$sqlrow['stc_purchase_product_adhoc_unit'].'">'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</option>';
+                          }
                         }
                       }else{
                         echo '<option value="NA">No record found.</option>';

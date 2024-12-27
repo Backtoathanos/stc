@@ -9,6 +9,7 @@ export default function Login(){
     const [password, setPassword]=useState("");
     const [error, setError]=useState("");
     const [msg, setMsg]=useState("");
+    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
     useEffect(() => {
         let login=localStorage.getItem("login");
@@ -60,7 +61,7 @@ export default function Login(){
         e.preventDefault(); // Prevent page refresh
     
         if (user !== "" && password !== "") {
-            var url = "https://stcassociate.com/stc_gld/vanaheim/useroath.php";
+            var url = API_BASE_URL+"/useroath.php";
             var headers = {
                 "Accept": "application/json",
                 "Content-Type": "application/json"
