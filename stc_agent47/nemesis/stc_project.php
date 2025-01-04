@@ -3146,10 +3146,10 @@ class pirates_supervisor extends tesseract{
 			LEFT JOIN `stc_cust_pro_supervisor`
 			ON `stc_cust_pro_supervisor_id`=`stc_safetyhotwork_createdby`
 			WHERE ".$supervise_rec." (
-				MONTH(`stc_safetyhotwork_startingdate`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
-				YEAR(`stc_safetyhotwork_startingdate`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+				MONTH(`stc_safetyhotwork_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`stc_safetyhotwork_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
 			) 
-			ORDER BY DATE(`stc_safetyhotwork_startingdate`) DESC
+			ORDER BY DATE(`stc_safetyhotwork_date`) DESC
 		");
 		if(mysqli_num_rows($optimusprimequery)>0){
 			$website=$_SERVER['SERVER_NAME'];
