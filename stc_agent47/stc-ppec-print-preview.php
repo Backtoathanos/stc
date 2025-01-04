@@ -263,6 +263,7 @@ if(isset($_GET['ppec_no'])){
               <span class="subheading7"><p >CHECKLIST OF PERSONAL PROTECTIVE EQUIPMENTS (PPE)</p></span>
             </div>
             <div class="col-sm-12 col-xl-12 col-lg-12 col-md-12">
+              <span class="subheading3"><p >DATE: <?php echo $get_stc_safety['stc_safetyppec_date']?></p></span>
               <span class="subheading3"><p >W.O. NO: <?php echo $get_stc_safety['stc_safetyppec_wono']?></p></span>
               <span class="subheading4"><p >JOB SITE NAME: <?php echo $get_stc_safety['stc_safetyppec_sitename']?></p></span>
               <span class="subheading3"><p >CHECK :- OK/ NOT OK/ NOT APPLICABLE:</p></span>
@@ -274,8 +275,8 @@ if(isset($_GET['ppec_no'])){
                 <div class="col-xl-8 col-lg-8 col-md-8">
                   <p >CHECKLIST OF PERSONAL PROTECTIVE EQUIPMENTS (PPE)</p>
                 </div>
-              </div> -->
-            </div>
+              </div>
+            </div> -->
             <div class="col-xl-12 col-lg-12 col-md-12">
               <table border="1" cellspacing="0" cellpadding="0" id="stc-table-count">
                 <thead>

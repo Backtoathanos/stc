@@ -433,9 +433,6 @@ if(isset($_GET['tbm_no'])){
                 <h4>GP/SP No. : <span><?php echo $get_stc_safety['stc_safetytbm_gatepass_no'];?></span></h4>
               </div>
               <div class="col-xl-12 col-lg-12 col-md-12">
-                <h4>Signature : <span></span></h4>
-              </div>
-              <div class="col-xl-12 col-lg-12 col-md-12">
                 <?php 
                   $checksafetyqry=mysqli_query($con, "SELECT * FROM `stc_safetytbm_img` WHERE `stc_safetytbm_img_tbmid`='".$get_stc_safety['stc_safetytbm_id']."' AND `stc_safetytbm_img_location`<>'' LIMIT 0,1");
                   foreach($checksafetyqry as $checksafetyrow4){
