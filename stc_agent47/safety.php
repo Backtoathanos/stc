@@ -113,6 +113,11 @@ if(isset($_SESSION["stc_agent_id"])){
                                     <span>CAPA</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-10" data-toggle="tab" href="#safetytab_10">
+                                    <span>T&T Data</span>
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane tabs-animation fade show active" id="safetytab_0" role="tabpanel">
@@ -526,8 +531,115 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Corrective & Preventing Action comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body"><h5 class="card-title">Collective & Prevenive Action Report</h5>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="position-relative form-group">
+                                                            <label for="exampleEmail" class="">By Month</label>
+                                                            <input type="month" class="form-control safety-capa-filter-by-month" value="<?php echo date("Y-m");?>">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <div class="position-relative form-group">
+                                                            <label for="exampleEmail" class="">By Supervisor Name</label>
+                                                            <input type="text" class="form-control safety-capa-filter-by-supervisorname" placeholder="Enter Supervisor Name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="position-relative form-group">
+                                                            <button type="text" class="form-control btn btn-primary safety-capa-filter-by-search">Search</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Date.</th>
+                                                            <th class="text-center">Sitename.</th>
+                                                            <th width="10%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-nearmiss-res-table">
+                                                        <tr>
+                                                            <td>04-01-2024</td>
+                                                            <td>LDC</td>
+                                                            <td>
+                                                                <a target="_blank" href="https://stcassociate.com/stc_agent47/safety-capa-print-preview.php?capa_no=21" class="form-control btn btn-success">View</a>
+                                                                <a href="#" class="form-control btn btn-secondary stc-safetycapa-edit" id="21">Edit</a>
+                                                                <a href="#" class="form-control btn btn-danger stc-safetycapa-delete" id="21">Delete</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane tabs-animation fade" id="safetytab_10" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body"><h5 class="card-title">T&T Data</h5>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="position-relative form-group">
+                                                            <label for="exampleEmail" class="">By Month</label>
+                                                            <input type="month" class="form-control safety-tandt-filter-by-month" value="<?php echo date("Y-m");?>">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <div class="position-relative form-group">
+                                                            <label for="exampleEmail" class="">By Tools Name</label>
+                                                            <input type="text" class="form-control safety-tandt-filter-by-supervisorname" placeholder="Enter Tools Name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="position-relative form-group">
+                                                            <button class="form-control btn btn-primary safety-tandt-filter-by-search">Search</button>
+                                                            <button class="form-control btn btn-success datacallmethod">Add</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Sl No</th>
+                                                            <th class="text-center">Tools Name</th>
+                                                            <th class="text-center">Calibration Date</th>
+                                                            <th class="text-center">Calibration Due</th>
+                                                            <th width="10%" class="text-center">Certificate Attended</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-nearmiss-res-table">
+                                                        <tr>
+                                                            <td>01</td>
+                                                            <td>Xyz</td>
+                                                            <td>10-12-2024</td>
+                                                            <td>21-12-2025</td>
+                                                            <td>
+                                                                <a target="_blank" href="https://stcassociate.com/stc_agent47/safety-capa-print-preview.php?capa_no=21" class="form-control btn btn-success">View</a>
+                                                                <a href="#" class="form-control btn btn-danger stc-safetycapa-delete" id="21">Delete</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -2117,6 +2229,55 @@ if(isset($_SESSION["stc_agent_id"])){
             }); 
         });
     </script>
+    <script>
+        $(document).ready(function () {
+            $('.datacallmethod').click(function(){
+                $('#toolsModal').modal('show');
+            });
+
+            // Handle form submission
+            $('#toolsForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Collect form data
+                let formData = new FormData(this);
+
+                // AJAX request to send data
+                $.ajax({
+                    url: 'server-side-script.php', // Replace with your server-side script
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        // Assuming the server returns the added row as JSON
+                        let newRow = JSON.parse(response);
+
+                        // Append new row to the table
+                        $('#toolsTable').append(`
+                            <tr>
+                                <td>${newRow.sl_no}</td>
+                                <td>${newRow.tool_name}</td>
+                                <td>${newRow.calibration_date}</td>
+                                <td>${newRow.calibration_due}</td>
+                                <td>${newRow.certificate_attended || ''}</td>
+                                <td><button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#toolsModal">Add</button></td>
+                            </tr>
+                        `);
+
+                        // Close modal
+                        $('#toolsModal').modal('hide');
+
+                        // Reset form
+                        $('#toolsForm')[0].reset();
+                    },
+                    error: function () {
+                        alert('Error saving data. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
 <div class="modal fade bd-tbt-box-meeting-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -3381,6 +3542,39 @@ if(isset($_SESSION["stc_agent_id"])){
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="toolsModal" tabindex="-1" role="dialog" aria-labelledby="toolsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="position: relative;top: 30px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">TOOLS & TACKLES DATA</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="toolsForm">
+                    <div class="mb-3">
+                        <label for="toolName" class="form-label">Tools Name</label>
+                        <input type="text" class="form-control" id="toolName" name="toolName" placeholder="Enter Tools Name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="calibrationDate" class="form-label">Calibration Date</label>
+                        <input type="date" class="form-control" id="calibrationDate" name="calibrationDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="calibrationDue" class="form-label">Calibration Due</label>
+                        <input type="date" class="form-control" id="calibrationDue" name="calibrationDue" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="certificate" class="form-label">Certificate Attended</label>
+                        <input type="file" class="form-control" id="certificate" name="certificate">
+                    </div>
+                    <button type="submit" class="btn btn-success">Save</button>
+                </form>
             </div>
         </div>
     </div>

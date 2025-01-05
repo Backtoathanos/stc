@@ -309,7 +309,6 @@ if(isset($_GET['ttht_no'])){
               <div class="row">
                   <div class="col-xl-6 col-lg-6 col-md-6"><br><br>
                       <p>SUPERVISOR & TECHNICIAN :- <?php echo $get_stc_safety['stc_safetytoolslist_supervisor']; ?></p><br><br>
-                      <p>SIGNATURE</p>
                   </div>
               </div>
               <div class="row">
