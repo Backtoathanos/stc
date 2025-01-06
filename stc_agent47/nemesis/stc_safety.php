@@ -65,6 +65,59 @@ class prime extends tesseract{
 		}
 		return $optimusprime;
 	}
+
+	public function stc_update_tandtdata($toolData) {
+		$result = '';
+	
+		$insertQuery = mysqli_query($this->stc_dbs, "
+			INSERT INTO `toolstackelsdata` (
+				`title`,
+				`calibration_date`,
+				`calibration_due`,
+				`status`,
+				`docs`,
+				`created_by`
+			) VALUES (
+				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['toolName']) . "',
+				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDate']) . "',
+				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDue']) . "',
+				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['status']) . "',
+				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['certificatePath']) . "',
+				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['created_by']) . "'
+			)
+		");
+	
+		if ($insertQuery) {
+			$result = "success";
+		} else {
+			$result = "not success: " . mysqli_error($this->stc_dbs);
+		}
+	
+		return $result;
+	}
+
+	public function stc_call_tandtdata($search){
+		$optimusprime='';
+		$query = "
+			SELECT * FROM `toolstackelsdata` WHERE `status`='1'
+		";
+		if($search!=''){
+			$query .= ' AND `title` REGEXP "'.mysqli_real_escape_string($this->stc_dbs, $search).'"';
+		}
+		$query .= " ORDER BY `id` DESC";
+		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
+		$data = [];
+		if (mysqli_num_rows($optimusprimequery) > 0) {
+			$i = 1; // Counter for serial number
+			while ($row = mysqli_fetch_assoc($optimusprimequery)) {
+				$row['calibration_date'] = date('d-m-Y', strtotime($row['calibration_date']));
+				$row['calibration_due'] = date('d-m-Y', strtotime($row['calibration_due']));
+				$data[] = $row;
+			}
+			$optimusprime=$data;
+		}
+		return $optimusprime;
+	}
 }
 
 // update save for tbm
@@ -89,6 +142,87 @@ if(isset($_POST['stc_safety_calltbmfields'])){
 	$stc_tbm_no=$_POST['stc_tbm_no'];
 	$objsearchreq=new prime();
 	$opobjsearchreq=$objsearchreq->stc_call_tbm_fields($stc_tbm_no);
+	echo json_encode($opobjsearchreq);
+}
+
+if (isset($_POST['tandtdataaction'])) {
+	$calibrationDate = $_POST['calibrationDate'];
+	$calibrationDue = $_POST['calibrationDue'];
+
+	// Convert the dates to timestamps for comparison
+	$calibrationDateTimestamp = strtotime($calibrationDate);
+	$calibrationDueTimestamp = strtotime($calibrationDue);
+
+	// Validate that calibrationDue is not less than calibrationDate
+	if ($calibrationDueTimestamp < $calibrationDateTimestamp) {
+		echo json_encode(['status' => false, 'message' => 'calibration Due cannot be less than calibration Date.']);
+		exit;
+	}
+
+    $toolData = [
+        'toolName' => $_POST['toolName'],
+        'calibrationDate' => $_POST['calibrationDate'],
+        'calibrationDue' => $_POST['calibrationDue'],
+        'status' => 1, // Example status
+        'created_by' => $_SESSION['stc_agent_id'], // Example user ID
+        'certificatePath' => '' // Placeholder for file path
+    ];
+
+    if (isset($_FILES['certificate']) && $_FILES['certificate']['error'] === UPLOAD_ERR_OK) {
+		$uploadDir = '../docs/'; // Absolute path to the directory
+	
+		// Check if the directory exists, create if not
+		if (!is_dir($uploadDir)) {
+			mkdir($uploadDir, 0777, true); // Create directory if it doesn't exist
+		}
+	
+		$fileTmpPath = $_FILES['certificate']['tmp_name'];
+		$fileName = $_FILES['certificate']['name'];
+	
+		// Replace spaces in the filename with hyphens
+		$fileName = str_replace(' ', '-', $fileName);
+	
+		$newFileName = uniqid() . '-' . $fileName;
+		$destination = $uploadDir . $newFileName;
+	
+		// Move the uploaded file to the destination
+		if (move_uploaded_file($fileTmpPath, $destination)) {
+			$toolData['certificatePath'] = $newFileName; // Save the path for database storage
+		} else {
+			echo json_encode(['status' => false, 'message' => 'Failed to upload file']);
+			exit;
+		}
+	} else {
+		echo json_encode(['status' => false, 'message' => 'No file uploaded or upload error']);
+		exit;
+	}
+
+    // Insert data into database
+    $objsearchreq = new prime();
+    $result = $objsearchreq->stc_update_tandtdata($toolData);
+
+    // Return response
+    if ($result === "success") {
+        echo json_encode([
+            'status' => true,
+            'data' => [
+                'id' => mysqli_insert_id($objsearchreq->stc_dbs),
+                'title' => $toolData['toolName'],
+                'calibration_date' => $toolData['calibrationDate'],
+                'calibration_due' => $toolData['calibrationDue'],
+                'docs' => $toolData['certificatePath']
+            ]
+        ]);
+    } else {
+        echo json_encode(['status' => false, 'message' => 'Failed to save record.']);
+    }
+}
+
+// call fields for tbm
+if(isset($_POST['fetchToolsData'])){
+	$search=$_POST['search'];
+	$objsearchreq=new prime();
+	$opobjsearchreq=$objsearchreq->stc_call_tandtdata($search);
 	echo json_encode($opobjsearchreq);
 }
 ?>

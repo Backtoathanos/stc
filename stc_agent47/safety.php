@@ -590,21 +590,15 @@ if(isset($_SESSION["stc_agent_id"])){
                                         <div class="main-card mb-3 card">
                                             <div class="card-body"><h5 class="card-title">T&T Data</h5>
                                                 <div class="row">
-                                                    <div class="col-md-4">
-                                                        <div class="position-relative form-group">
-                                                            <label for="exampleEmail" class="">By Month</label>
-                                                            <input type="month" class="form-control safety-tandt-filter-by-month" value="<?php echo date("Y-m");?>">
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-8">
+                                                    <div class="col-md-12">
                                                         <div class="position-relative form-group">
                                                             <label for="exampleEmail" class="">By Tools Name</label>
-                                                            <input type="text" class="form-control safety-tandt-filter-by-supervisorname" placeholder="Enter Tools Name">
+                                                            <input type="text" class="form-control" placeholder="Enter Tools Name" id="tandtdatainput">
                                                         </div>
                                                     </div>
                                                     <div class="col-md-12">
                                                         <div class="position-relative form-group">
-                                                            <button class="form-control btn btn-primary safety-tandt-filter-by-search">Search</button>
+                                                            <button class="form-control btn btn-primary" id="tandtdatafind">Search</button>
                                                             <button class="form-control btn btn-success datacallmethod">Add</button>
                                                         </div>
                                                     </div>
@@ -627,16 +621,9 @@ if(isset($_SESSION["stc_agent_id"])){
                                                             <th width="10%" class="text-center">Certificate Attended</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody class="stc-safety-nearmiss-res-table">
+                                                    <tbody class="stc-safety-toolsTable-res-table">
                                                         <tr>
-                                                            <td>01</td>
-                                                            <td>Xyz</td>
-                                                            <td>10-12-2024</td>
-                                                            <td>21-12-2025</td>
-                                                            <td>
-                                                                <a target="_blank" href="https://stcassociate.com/stc_agent47/safety-capa-print-preview.php?capa_no=21" class="form-control btn btn-success">View</a>
-                                                                <a href="#" class="form-control btn btn-danger stc-safetycapa-delete" id="21">Delete</a>
-                                                            </td>
+                                                            <td>No records found..</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -2231,11 +2218,53 @@ if(isset($_SESSION["stc_agent_id"])){
     </script>
     <script>
         $(document).ready(function () {
+            $('#tandtdatafind').on('click', function (e) {
+                e.preventDefault();
+                var search=$('#tandtdatainput').val();
+                fetchToolsData(search);
+            });
+
+            function fetchToolsData(search) {
+                $.ajax({
+                    url: 'nemesis/stc_safety.php', // Update with the correct server-side script path
+                    type: 'POST',
+                    data: { fetchToolsData: 1, search:search },
+                    success: function (response) {
+                        let toolsData = JSON.parse(response);
+                        let tableBody = $('.stc-safety-toolsTable-res-table');
+                        tableBody.empty(); // Clear existing rows
+
+                        if (toolsData.length > 0) {
+                            toolsData.forEach(function (tool) {
+                                let row = `
+                                    <tr>
+                                        <td>${tool.id}</td>
+                                        <td>${tool.title}</td>
+                                        <td class="text-center">${tool.calibration_date}</td>
+                                        <td class="text-center">${tool.calibration_due}</td>
+                                        <td class="text-center">${tool.docs ? `<a href="docs/${tool.docs}" target="_blank">View</a>` : 'N/A'}</td>
+                                    </tr>
+                                `;
+                                tableBody.append(row);
+                            });
+                        } else {
+                            tableBody.append('<tr><td colspan="5">No records found</td></tr>');
+                        }
+                    },
+                    error: function () {
+                        alert('Failed to fetch data. Please try again.');
+                    }
+                });
+            }
+
+            // Call the function to fetch data on page load
+            fetchToolsData('');
+
             $('.datacallmethod').click(function(){
                 $('#toolsModal').modal('show');
             });
-
-            // Handle form submission
+            
+            // Handle form submission 
             $('#toolsForm').on('submit', function (e) {
                 e.preventDefault();
 
@@ -2244,38 +2273,48 @@ if(isset($_SESSION["stc_agent_id"])){
 
                 // AJAX request to send data
                 $.ajax({
-                    url: 'server-side-script.php', // Replace with your server-side script
+                    url: 'nemesis/stc_safety.php', // Replace with your server-side script
                     type: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
                     success: function (response) {
-                        // Assuming the server returns the added row as JSON
-                        let newRow = JSON.parse(response);
+                        try {
+                            let newRow = JSON.parse(response);
 
-                        // Append new row to the table
-                        $('#toolsTable').append(`
-                            <tr>
-                                <td>${newRow.sl_no}</td>
-                                <td>${newRow.tool_name}</td>
-                                <td>${newRow.calibration_date}</td>
-                                <td>${newRow.calibration_due}</td>
-                                <td>${newRow.certificate_attended || ''}</td>
-                                <td><button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#toolsModal">Add</button></td>
-                            </tr>
-                        `);
+                            if (newRow.status === true) {
+                                alert("Record Saved");
+                                // Append new row to the table
+                                $('.stc-safety-toolsTable-res-table').before(`
+                                    <tr>
+                                        <td>${newRow.data.id}</td>
+                                        <td>${newRow.data.title}</td>
+                                        <td class="text-center">${newRow.data.calibration_date}</td>
+                                        <td class="text-center">${newRow.data.calibration_due}</td>
+                                        <td class="text-center">${newRow.data.docs ? `<a href="docs/${newRow.data.docs}" target="_blank">View</a>` : 'N/A'}</td>
+                                    </tr>
+                                `);
 
-                        // Close modal
-                        $('#toolsModal').modal('hide');
+                                // Close modal
+                                $('#toolsModal').modal('hide');
 
-                        // Reset form
-                        $('#toolsForm')[0].reset();
+                                // Reset form
+                                $('#toolsForm')[0].reset();
+                            } else {
+                                alert("Record not saved. Please check your data and try again.");
+                            }
+                        } catch (error) {
+                            console.error("Error parsing response:", error);
+                            alert("An unexpected error occurred.");
+                        }
                     },
-                    error: function () {
-                        alert('Error saving data. Please try again.');
+                    error: function (xhr, status, error) {
+                        console.error("AJAX Error:", error);
+                        alert("Failed to save record.");
                     }
                 });
             });
+
         });
     </script>
 </body>
@@ -3556,7 +3595,7 @@ if(isset($_SESSION["stc_agent_id"])){
                 </button>
             </div>
             <div class="modal-body">
-                <form id="toolsForm">
+                <form id="toolsForm"  enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="toolName" class="form-label">Tools Name</label>
                         <input type="text" class="form-control" id="toolName" name="toolName" placeholder="Enter Tools Name" required>
@@ -3573,6 +3612,7 @@ if(isset($_SESSION["stc_agent_id"])){
                         <label for="certificate" class="form-label">Certificate Attended</label>
                         <input type="file" class="form-control" id="certificate" name="certificate">
                     </div>
+                    <input type="hidden" name="tandtdataaction">
                     <button type="submit" class="btn btn-success">Save</button>
                 </form>
             </div>
