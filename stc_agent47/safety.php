@@ -2267,7 +2267,7 @@ if(isset($_SESSION["stc_agent_id"])){
             // Handle form submission 
             $('#toolsForm').on('submit', function (e) {
                 e.preventDefault();
-
+                $(this).find('button').after('<p class="text-success wait-circle">Please Wait...</p>');
                 // Collect form data
                 let formData = new FormData(this);
 
@@ -2279,6 +2279,7 @@ if(isset($_SESSION["stc_agent_id"])){
                     processData: false,
                     contentType: false,
                     success: function (response) {
+                        $('.wait-circle').remove();
                         try {
                             let newRow = JSON.parse(response);
 
@@ -2309,6 +2310,7 @@ if(isset($_SESSION["stc_agent_id"])){
                         }
                     },
                     error: function (xhr, status, error) {
+                        $('.wait-circle').remove();
                         console.error("AJAX Error:", error);
                         alert("Failed to save record.");
                     }
