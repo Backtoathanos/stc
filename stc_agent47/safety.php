@@ -2301,7 +2301,7 @@ if(isset($_SESSION["stc_agent_id"])){
                                 // Reset form
                                 $('#toolsForm')[0].reset();
                             } else {
-                                alert("Record not saved. Please check your data and try again.");
+                                alert(newRow.message);
                             }
                         } catch (error) {
                             console.error("Error parsing response:", error);

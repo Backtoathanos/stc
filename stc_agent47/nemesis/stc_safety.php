@@ -155,7 +155,7 @@ if (isset($_POST['tandtdataaction'])) {
 
 	// Validate that calibrationDue is not less than calibrationDate
 	if ($calibrationDueTimestamp < $calibrationDateTimestamp) {
-		echo json_encode(['status' => false, 'message' => 'calibration Due cannot be less than calibration Date.']);
+		echo json_encode(['status' => false, 'message' => 'Calibration Due cannot be less than Calibration Date.']);
 		exit;
 	}
 
