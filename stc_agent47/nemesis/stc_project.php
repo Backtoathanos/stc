@@ -3299,7 +3299,7 @@ class pirates_supervisor extends tesseract{
 		}else{
 			$optimusprime.='
 				<tr>
-					<td colspan="5">No data found'.$query.'</td>
+					<td colspan="5">No data found</td>
 				</tr>
 			';
 		}
