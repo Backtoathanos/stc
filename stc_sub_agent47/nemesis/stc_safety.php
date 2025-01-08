@@ -773,7 +773,6 @@ class witcher_ppem extends tesseract{
 	}
 }
 
-
 class witcher_nearmiss extends tesseract{
 	// calll created nearmiss no
 	public function stc_hit_nearmiss_call_no(){
@@ -888,6 +887,20 @@ class witcher_nearmiss extends tesseract{
 		return $optimusprime;
 	}
 
+	// delete nearmiss
+	public function stc_delete_capa($capa_id){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			DELETE FROM `capa` WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $capa_id)."'
+		");
+		if($optimusprimequery){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
+
 	// call nearmiss
 	public function stc_call_nearmiss_fields($stc_nearmiss_no){
 		$optimusprime='';
@@ -944,6 +957,188 @@ class witcher_nearmiss extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $nearmiss_id)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcsafetyimages)."'
 			)
+		");
+		if($optimusprimequery){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
+}
+
+class witcher_capa extends tesseract{
+	// calll created nearmiss no
+	public function stc_hit_capa_call_no(){
+		$optimusprime='';
+		$date=date("Y-m-d H:i:s");
+		$optimusprimechecquery=mysqli_query($this->stc_dbs, "
+			SELECT `created_date` FROM `capa` WHERE `created_date`='".$date."' AND `created_by`='".$_SESSION['stc_agent_sub_id']."' ORDER BY `id` DESC LIMIT 0,1
+		");
+		$previousentrydate='';
+		foreach($optimusprimechecquery as $optimusprimechecrow){
+			$previousentrydate=$optimusprimechecrow['created_date'];
+		}
+		if(abs($previousentrydate==$date)){
+			$optimusprime='same';
+		}else{
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `capa`(
+					`created_date`, 
+					`created_by`
+				) VALUES (
+					'".$date."',
+					'".$_SESSION['stc_agent_sub_id']."'
+				)
+			");
+			if($optimusprimequery){
+				$optimusprimequery=mysqli_query($this->stc_dbs, "
+					SELECT `id` FROM `capa` WHERE `created_by`='".$_SESSION['stc_agent_sub_id']."' ORDER BY `id` DESC LIMIT 0,1
+				");
+				foreach($optimusprimequery as $optimusprimerow){
+					$optimusprime=$optimusprimerow['id'];
+				}
+			}else{
+				$optimusprime="not success";
+			}
+		}
+		return $optimusprime;
+	}
+
+	// call capa
+	public function stc_call_capa(){
+		$optimusprime='';
+		$query="
+			SELECT * FROM `capa` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`created_by`
+			WHERE `created_by`='".$_SESSION['stc_agent_sub_id']."'
+			ORDER BY DATE(`capa_date`) DESC
+		";
+		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$website=$_SERVER['SERVER_NAME'];
+				$website = $website=="localhost" ? '' : 'https://stcassociate.com/stc_agent47/';
+				$action_show='
+					<a target="_blank" href="'.$website.'safety-capa-print-preview.php?capa_no='.$optimusprimerow['id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetycapa-edit" id="'.$optimusprimerow['id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetycapa-delete" id="'.$optimusprimerow['id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['capa_date'])).'</td>
+						<td>'.$optimusprimerow['sitename'].'</td>
+						<td>'.$optimusprimerow['place'].'</td>
+						<td>'.$optimusprimerow['branch'].'</td>
+						<td>'.$optimusprimerow['stc_cust_pro_supervisor_fullname'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
+	// delete capa
+	public function stc_delete_capa($capa_id){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			DELETE FROM `capa` WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $capa_id)."'
+		");
+		if($optimusprimequery){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
+
+	// update nearmiss
+	public function stc_update_capa($request){
+		$optimusprime='';
+		$query="
+			UPDATE
+			    `capa`
+			SET
+			    `loc_id`						= '".mysqli_real_escape_string($this->stc_dbs, $request['location'])."',
+			    `sitename`						= '".mysqli_real_escape_string($this->stc_dbs, $request['sitename'])."',
+			    `place`							= '".mysqli_real_escape_string($this->stc_dbs, $request['place'])."',
+			    `branch`						= '".mysqli_real_escape_string($this->stc_dbs, $request['branch'])."',
+			    `capa_date`						= '".mysqli_real_escape_string($this->stc_dbs, $request['date'])."',
+				`person_observed`				= '".mysqli_real_escape_string($this->stc_dbs, $request['persionobserved'])."',
+				`designation_observed`			= '".mysqli_real_escape_string($this->stc_dbs, $request['designation'])."',
+				`nclocation`					= '".mysqli_real_escape_string($this->stc_dbs, $request['nclocation'])."',
+				`observe_date`					= '".mysqli_real_escape_string($this->stc_dbs, $request['obsdate'])."',
+				`tgtdate`						= '".mysqli_real_escape_string($this->stc_dbs, $request['tgtdate'])."',
+				`severity`						= '".mysqli_real_escape_string($this->stc_dbs, $request['severity'])."',
+				`nonconformanceobserved` 		= '".mysqli_real_escape_string($this->stc_dbs, $request['nonconformanceobserved'])."',
+				`res_personname` 				= '".mysqli_real_escape_string($this->stc_dbs, $request['res_personname'])."',
+				`res_persondesignation` 		= '".mysqli_real_escape_string($this->stc_dbs, $request['res_persondesignation'])."',
+				`res_personname2` 				= '".mysqli_real_escape_string($this->stc_dbs, $request['res_personname2'])."',
+				`res_persondesignation2` 		= '".mysqli_real_escape_string($this->stc_dbs, $request['res_persondesignation2'])."',
+				`res_personname3` 				= '".mysqli_real_escape_string($this->stc_dbs, $request['res_personname3'])."',
+				`res_persondesignation3` 		= '".mysqli_real_escape_string($this->stc_dbs, $request['res_persondesignation3'])."',
+				`rootcause` 					= '".mysqli_real_escape_string($this->stc_dbs, $request['rootcause'])."',
+				`corrective` 					= '".mysqli_real_escape_string($this->stc_dbs, $request['corrective'])."',
+				`preventive` 					= '".mysqli_real_escape_string($this->stc_dbs, $request['preventive'])."',
+				`compliancebysupengdate` 		= '".mysqli_real_escape_string($this->stc_dbs, $request['compliancebysupengdate'])."',
+				`compliancebysupengname` 		= '".mysqli_real_escape_string($this->stc_dbs, $request['compliancebysupengname'])."',
+				`reviewedbysodate` 				= '".mysqli_real_escape_string($this->stc_dbs, $request['reviewedbysodate'])."',
+				`reviewedbysoname` 				= '".mysqli_real_escape_string($this->stc_dbs, $request['reviewedbysoname'])."',
+				`reviewedbydirdate` 			= '".mysqli_real_escape_string($this->stc_dbs, $request['reviewedbydirdate'])."',
+				`reviewedbydirname` 			= '".mysqli_real_escape_string($this->stc_dbs, $request['reviewedbydirname'])."'
+
+			WHERE
+			    `id`='".mysqli_real_escape_string($this->stc_dbs, $request['stc_capa_no'])."'
+		";
+		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
+		if($optimusprimequery){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success".$query;
+		}
+		return $optimusprime;
+	}
+
+	// call nearmiss
+	public function stc_call_capa_fields($stc_capa_no){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `capa` WHERE `id`='".$stc_capa_no."'
+		");
+		foreach($optimusprimequery as $optimusprimerow){
+			$optimusprime=$optimusprimerow;
+		}
+		return $optimusprime;
+	}
+
+	// save image	
+	public function stc_save_capabefore_image($capa_id, $stcsafetyimages){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			UPDATE `capa` SET `beforeimage` = '".mysqli_real_escape_string($this->stc_dbs, $stcsafetyimages)."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $capa_id)."'
+		");
+		if($optimusprimequery){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
+
+	// save image	
+	public function stc_save_capaafter_image($capa_id, $stcsafetyimages){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			UPDATE `capa` SET `afterimage` = '".mysqli_real_escape_string($this->stc_dbs, $stcsafetyimages)."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $capa_id)."'
 		");
 		if($optimusprimequery){
 			$optimusprime="success";
@@ -2015,6 +2210,146 @@ if(isset($_POST['stc_safety_savetoolliste'])){
 
 	$objsearchreq=new witcher_toollist();
 	$opobjsearchreq=$objsearchreq->stc_save_tooollisttools($stc_toollist_no, $stc_toolddesc, $stc_toolqty, $stc_toolinuse, $stc_toolinrepair, $stc_tooldamaged);
+	echo $opobjsearchreq;
+}
+/*-------------------------------------For capa------------------------------------*/
+// add id to nearmiss
+if(isset($_POST['stc_safety_addcapa'])){
+	$objsearchreq=new witcher_capa();
+	if(empty($_SESSION['stc_agent_sub_id'])){
+		$opobjsearchreq="reload";
+	}else{
+		$opobjsearchreq=$objsearchreq->stc_hit_capa_call_no();
+	}
+	echo $opobjsearchreq;
+}
+
+// call capa 
+if(isset($_POST['stc_safety_callcapa'])){
+	$objsearchreq=new witcher_capa();
+	$opobjsearchreq=$objsearchreq->stc_call_capa();
+	echo $opobjsearchreq;
+}
+
+// delete capa
+if(isset($_POST['stc_safety_deletecapa'])){
+	$capa_id=$_POST['capa_id'];
+	$objsearchreq=new witcher_capa();
+	$opobjsearchreq=$objsearchreq->stc_delete_capa($capa_id);
+	echo $opobjsearchreq;
+}
+
+// call fields for capa
+if(isset($_POST['stc_safety_callcapafields'])){
+	$stc_capa_no=$_POST['stc_capa_no'];
+	$objsearchreq=new witcher_capa();
+	$opobjsearchreq=$objsearchreq->stc_call_capa_fields($stc_capa_no);
+	echo json_encode($opobjsearchreq);
+	// echo $opobjsearchreq;
+}
+
+// update save for nearmiss
+if(isset($_POST['stc_safety_updatecapa'])){
+	$stc_capa_no=$_POST['stc_capa_no'];
+	$location=$_POST['location'];
+	$sitename=$_POST['sitename'];
+	$place=$_POST['place'];
+	$branch=$_POST['branch'];
+	$date=$_POST['date'];
+	$persionobserved=$_POST['persionobserved'];
+	$designation=$_POST['designation'];
+	$nclocation=$_POST['nclocation'];
+	$obsdate=$_POST['obsdate'];
+	$tgtdate=$_POST['tgtdate'];
+	$severity=$_POST['severity'];
+	$nonconformanceobserved=$_POST['nonconformanceobserved'];
+	$res_personname=$_POST['res_personname'];
+	$res_persondesignation=$_POST['res_persondesignation'];
+	$res_personname2=$_POST['res_personname2'];
+	$res_persondesignation2=$_POST['res_persondesignation2'];
+	$res_personname3=$_POST['res_personname3'];
+	$res_persondesignation3=$_POST['res_persondesignation3'];
+	$rootcause=$_POST['rootcause'];
+	$corrective=$_POST['corrective'];
+	$preventive=$_POST['preventive'];
+	$compliancebysupengdate=$_POST['compliancebysupengdate'];
+	$compliancebysupengname=$_POST['compliancebysupengname'];
+	$reviewedbysodate=$_POST['reviewedbysodate'];
+	$reviewedbysoname=$_POST['reviewedbysoname'];
+	$reviewedbydirdate=$_POST['reviewedbydirdate'];
+	$reviewedbydirname=$_POST['reviewedbydirname'];
+
+	$request = array(
+		'stc_capa_no' => $stc_capa_no,
+		'location' => $location,
+		'sitename' => $sitename,
+		'place' => $place,
+		'branch' => $branch,
+		'date' => $date,
+		'persionobserved' => $persionobserved,
+		'designation' => $designation,
+		'nclocation' => $nclocation,
+		'obsdate' => $obsdate,
+		'tgtdate' => $tgtdate,
+		'severity' => $severity,
+		'nonconformanceobserved' => $nonconformanceobserved,
+		'res_personname' => $res_personname,
+		'res_persondesignation' => $res_persondesignation,
+		'res_personname2' => $res_personname2,
+		'res_persondesignation2' => $res_persondesignation2,
+		'res_personname3' => $res_personname3,
+		'res_persondesignation3' => $res_persondesignation3,
+		'rootcause' => $rootcause,
+		'corrective' => $corrective,
+		'preventive' => $preventive,
+		'compliancebysupengdate' => $compliancebysupengdate,
+		'compliancebysupengname' => $compliancebysupengname,
+		'reviewedbysodate' => $reviewedbysodate,
+		'reviewedbysoname' => $reviewedbysoname,
+		'reviewedbydirdate' => $reviewedbydirdate,
+		'reviewedbydirname' => $reviewedbydirname
+	);
+	$objsearchreq=new witcher_capa();
+	$opobjsearchreq=$objsearchreq->stc_update_capa($request);
+	echo $opobjsearchreq;
+}
+
+// save image
+if(isset($_POST['stc-safety-nearmiss-id'])){
+	$nearmiss_id=$_POST['stc-safety-nearmiss-id'];
+	$stcsafetyimages=$_FILES['stc-safety-nearmissimage-path']['name'];
+	$stcsafetytmpname=$_FILES['stc-safety-nearmissimage-path']['tmp_name'];
+	$objsearchreq=new witcher_nearmiss();
+	$opobjsearchreq=$objsearchreq->stc_save_nearmiss_image($nearmiss_id, $stcsafetyimages);
+	if($opobjsearchreq=="success"){
+		move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+	}
+	echo $opobjsearchreq;
+}
+
+// save image
+if(isset($_POST['stc-capabefore-no'])){
+	$capa_id=$_POST['stc-capabefore-no'];
+	$stcsafetyimages=$_FILES['before-image']['name'];
+	$stcsafetytmpname=$_FILES['before-image']['tmp_name'];
+	$objsearchreq=new witcher_capa();
+	$opobjsearchreq=$objsearchreq->stc_save_capabefore_image($capa_id, $stcsafetyimages);
+	if($opobjsearchreq=="success"){
+		move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+	}
+	echo $opobjsearchreq;
+}
+
+// save image
+if(isset($_POST['stc-capaafter-no'])){
+	$capa_id=$_POST['stc-capaafter-no'];
+	$stcsafetyimages=$_FILES['after-image']['name'];
+	$stcsafetytmpname=$_FILES['after-image']['tmp_name'];
+	$objsearchreq=new witcher_capa();
+	$opobjsearchreq=$objsearchreq->stc_save_capaafter_image($capa_id, $stcsafetyimages);
+	if($opobjsearchreq=="success"){
+		move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+	}
 	echo $opobjsearchreq;
 }
 

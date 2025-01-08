@@ -387,8 +387,33 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Corrective & Preventing Action comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body"><h5 class="card-title">Collective & Prevenive Action Report</h5>
+                                                <a href="#" class="form-control btn btn-success add-capa-reporting-modal">Add Collective & Prevenive Action Report</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Date.</th>
+                                                            <th class="text-center">Sitename.</th>
+                                                            <th class="text-center">Branch.</th>
+                                                            <th class="text-center">Place.</th>
+                                                            <th class="text-center">Created By.</th>
+                                                            <th width="10%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-capa-res-table">
+                                                        <tr>
+                                                            <td>Search Here</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -2158,6 +2183,251 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
         });
     </script>
+    <script>
+        $(document).ready(function(){  
+            // call nearmiss
+            call_capa();
+            function call_capa(){
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callcapa:1},
+                    success     : function(response_tbm){
+                        $('.stc-safety-capa-res-table').html(response_tbm);
+                    }
+                });
+            }
+
+            // delete nearmiss            
+            $('body').delegate('.stc-safetycapa-delete', 'click', function(e){
+                e.preventDefault();
+                var capa_id=$(this).attr("id");
+                if(confirm("Are you sure want to remove?")){
+                    $.ajax({
+                        url         : "nemesis/stc_safety.php",
+                        method      : "POST",
+                        data        : {stc_safety_deletecapa:1,capa_id:capa_id},
+                        success     : function(response_tbm){
+                            var response=response_tbm.trim();
+                            if(response=="success"){
+                                alert("Record Removed!!!");
+                                call_capa();
+                            }else{
+                                alert("Something went wrong, please check and try again.");
+                            }
+                        }
+                    });
+                }
+            });
+
+            function call_capa_fields(){
+                var stc_capa_no=$('.stc-capa-no').val();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_callcapafields:1,stc_capa_no:stc_capa_no},
+                    dataType    : "JSON",
+                    success     : function(response_vhl){
+                        // console.log(response_vhl);
+                        $('#stc-capa-location').val(response_vhl.loc_id);
+                        $('#stc-capa-sitename').val(response_vhl.sitename);
+                        $('#stc-capa-branch').val(response_vhl.branch);
+                        $('#stc-capa-place').val(response_vhl.place);
+                        $('#stc-capa-date').val(response_vhl.capa_date);
+                        $('#stc-capa-persionobserved').val(response_vhl.person_observed);
+                        $('#stc-capa-designation').val(response_vhl.designation_observed);
+                        $('#stc-capa-nclocation').val(response_vhl.nclocation);
+                        $('#stc-capa-obsdate').val(response_vhl.observe_date);
+                        $('#stc-capa-tgtdate').val(response_vhl.tgtdate);
+                        $('#stc-capa-severity').val(response_vhl.severity);
+                        $('#stc-capa-nonconformanceobserved').val(response_vhl.nonconformanceobserved);
+                        $('#stc-capa-res_personname').val(response_vhl.res_personname);
+                        $('#stc-capa-res_persondesignation').val(response_vhl.res_persondesignation);
+                        $('#stc-capa-res_personname2').val(response_vhl.res_personname2);
+                        $('#stc-capa-res_persondesignation2').val(response_vhl.res_persondesignation2);
+                        $('#stc-capa-res_personname3').val(response_vhl.res_personname3);
+                        $('#stc-capa-res_persondesignation3').val(response_vhl.res_persondesignation3);
+                        $('#stc-capa-rootcause').val(response_vhl.rootcause);
+                        $('#stc-capa-corrective').val(response_vhl.corrective);
+                        $('#stc-capa-preventive').val(response_vhl.preventive);
+                        $('#stc-capa-compliancebysupengdate').val(response_vhl.compliancebysupengdate);
+                        $('#stc-capa-compliancebysupengname').val(response_vhl.compliancebysupengname);
+                        $('#stc-capa-reviewedbysodate').val(response_vhl.reviewedbysodate);
+                        $('#stc-capa-reviewedbysoname').val(response_vhl.reviewedbysoname);
+                        $('#stc-capa-reviewedbydirdate').val(response_vhl.reviewedbydirdate);
+                        $('#stc-capa-reviewedbydirname').val(response_vhl.reviewedbydirname);
+                    }
+                });
+            }
+
+            // save data
+            $('body').delegate('.add-capa-reporting-modal', 'click', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_addcapa:1},
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="same"){
+                            alert("Can not add new capa at same day, you can only edit & delete on same day.");
+                        }else if(response=="reload"){
+                            window.location.reload();
+                        }else{
+                            call_capa();
+                            $('.bd-capa-modal-lg').modal('show');
+                            $('.stc-capa-no').val(response);
+                            $(".bd-capa-modal-lg input[type=text]").val('');
+                            $(".bd-capa-modal-lg select").val(0);
+                            $(".bd-capa-modal-lg textarea").val('');
+                            call_capa_fields();
+                        }
+                    }
+                });
+            });
+
+            // save capa
+            function save_capa(){
+                var stc_capa_no=$('.stc-capa-no').val();
+                var location=$('#stc-capa-location').val();
+                var sitename=$('#stc-capa-sitename').val();
+                var place=$('#stc-capa-place').val();
+                var branch=$('#stc-capa-branch').val();
+                var date=$('#stc-capa-date').val();
+                var persionobserved=$('#stc-capa-persionobserved').val();
+                var designation=$('#stc-capa-designation').val();
+                var nclocation=$('#stc-capa-nclocation').val();
+                var obsdate=$('#stc-capa-obsdate').val();
+                var tgtdate=$('#stc-capa-tgtdate').val();
+                var severity=$('#stc-capa-severity').val();
+                var nonconformanceobserved=$('#stc-capa-nonconformanceobserved').val();
+                var res_personname=$('#stc-capa-res_personname').val();
+                var res_persondesignation=$('#stc-capa-res_persondesignation').val();
+                var res_personname2=$('#stc-capa-res_personname2').val();
+                var res_persondesignation2=$('#stc-capa-res_persondesignation2').val();
+                var res_personname3=$('#stc-capa-res_personname3').val();
+                var res_persondesignation3=$('#stc-capa-res_persondesignation3').val();
+                var rootcause=$('#stc-capa-rootcause').val();
+                var corrective=$('#stc-capa-corrective').val();
+                var preventive=$('#stc-capa-preventive').val();
+                var compliancebysupengdate=$('#stc-capa-compliancebysupengdate').val();
+                var compliancebysupengname=$('#stc-capa-compliancebysupengname').val();
+                var reviewedbysodate=$('#stc-capa-reviewedbysodate').val();
+                var reviewedbysoname=$('#stc-capa-reviewedbysoname').val();
+                var reviewedbydirdate=$('#stc-capa-reviewedbydirdate').val();
+                var reviewedbydirname=$('#stc-capa-reviewedbydirname').val();
+                
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {
+                        stc_safety_updatecapa:1,
+                        stc_capa_no:stc_capa_no,
+                        location:location,
+                        sitename:sitename,
+                        place:place,
+                        branch:branch,
+                        date:date,
+                        persionobserved:persionobserved,
+                        designation:designation,
+                        nclocation:nclocation,
+                        obsdate:obsdate,
+                        tgtdate:tgtdate,
+                        severity:severity,
+                        nonconformanceobserved:nonconformanceobserved,
+                        res_personname:res_personname,
+                        res_persondesignation:res_persondesignation,
+                        res_personname2:res_personname2,
+                        res_persondesignation2:res_persondesignation2,
+                        res_personname3:res_personname3,
+                        res_persondesignation3:res_persondesignation3,
+                        rootcause:rootcause,
+                        corrective:corrective,
+                        preventive:preventive,
+                        compliancebysupengdate:compliancebysupengdate,
+                        compliancebysupengname:compliancebysupengname,
+                        reviewedbysodate:reviewedbysodate,
+                        reviewedbysoname:reviewedbysoname,
+                        reviewedbydirdate:reviewedbydirdate,
+                        reviewedbydirname:reviewedbydirname
+                    },
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                    }
+                });
+            }
+
+            // update
+            $('body').delegate('.stc-safetycapa-edit', 'click', function(e){
+                e.preventDefault();
+                var capa_id=$(this).attr("id");
+                $('.stc-capa-no').val(capa_id);
+                $('.bd-capa-modal-lg').modal('show');
+                call_capa_fields();
+            });
+
+            // update capa list
+            $('body').delegate('.stc-capa-fields', 'focusout', function(){
+                save_capa();
+                call_capa();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+            // update capa list
+            $('body').delegate('.stc-capa-dropdownfields', 'change', function(){
+                save_capa();
+                call_capa();
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            // image upload
+            $(document).on('submit', '#safety-capaimagebefore-upload-form', function() {
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "post",
+                    data        : new FormData(this),
+                    contentType : false,
+                    cache       : false,
+                    processData : false,
+                    success     : function(data){
+                        // console.log(data);
+                        data=data.trim();
+                        if(data=="success"){
+                            alert("Image added!!");
+                            call_nearmiss();
+                            $('#safety-capaimagebefore-upload-form')[0].reset();
+                        }
+                    }
+                });
+                return false;
+            });      
+
+            // image upload
+            $(document).on('submit', '#safety-capaimageafter-upload-form', function() {
+                $.ajax({
+                    url         : "nemesis/stc_safety.php",
+                    method      : "post",
+                    data        : new FormData(this),
+                    contentType : false,
+                    cache       : false,
+                    processData : false,
+                    success     : function(data){
+                        // console.log(data);
+                        data=data.trim();
+                        if(data=="success"){
+                            alert("Image added!!");
+                            call_nearmiss();
+                            $('#safety-capaimageafter-upload-form')[0].reset();
+                        }
+                    }
+                });
+                return false;
+            });            
+        });
+    </script>
 </body>
 </html>
 <div class="modal fade bd-tbt-box-meeting-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
@@ -3038,6 +3308,259 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <h5 class="card-title">Name & Signature</h5>
                                         <div class="position-relative form-group">
                                             <input type="text" class="form-control stc-nearmiss-fields" id="stc-nearmiss-namesignature" placeholder="Enter Name & Signature">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-capa-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">CAPA</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title" align="center">CAPA</h5>
+                                        <label>* fields are automatic saved when you switch</label>
+                                        <input type="hidden" class="stc-capa-no">
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">Location *</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control stc-capa-dropdownfields" id="stc-capa-location">
+                                                <option value="NA">Select</option>
+                                                <?php
+                                                    include_once("../MCU/db.php");
+                                                    $dept_qry = mysqli_query($con, "
+                                                        SELECT DISTINCT `stc_status_down_list_department_loc_id`, 
+                                                                        `stc_status_down_list_department_location`, 
+                                                                        `stc_status_down_list_department_dept`, 
+                                                                        `stc_cust_project_id`
+                                                        FROM `stc_cust_pro_attend_supervise`
+                                                        INNER JOIN `stc_cust_project` 
+                                                        ON `stc_cust_project_id` = `stc_cust_pro_attend_supervise_pro_id` 
+                                                        INNER JOIN `stc_status_down_list_department` 
+                                                        ON `stc_cust_project_id` = `stc_status_down_list_department_loc_id` 			
+                                                        WHERE `stc_cust_pro_attend_supervise_super_id` = '".mysqli_real_escape_string($con, $_SESSION['stc_agent_sub_id'])."'
+                                                        ORDER BY `stc_status_down_list_department_dept` ASC
+                                                    ");
+
+                                                    $place = '';
+                                                    $locarray = array();
+                                                    $locidarray = array();
+
+                                                    // Iterate over the department query results
+                                                    foreach($dept_qry as $dept_row) {
+                                                        $loc = $dept_row['stc_status_down_list_department_location']; // Correct field name to match your SELECT clause
+                                                        if (!in_array($loc, $locarray)) {
+                                                            $locarray[] = $loc;
+                                                            $locidarray[] = $dept_row['stc_status_down_list_department_loc_id'];
+                                                        }
+                                                        $place .= '<option value="'.$dept_row['stc_status_down_list_department_dept'].'">'.$dept_row['stc_status_down_list_department_dept'].'</option>';
+                                                    }
+
+                                                    // Output unique department locations
+                                                    foreach($locarray as $key=>$row) {                                                        
+                                                        echo '<option value="'.$locidarray[$key].'">'.$row.'</option>';
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Sitename *</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control stc-capa-dropdownfields" id="stc-capa-sitename">
+                                                <?php echo $place;?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Place *</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-capa-fields" id="stc-capa-place" placeholder="Enter Place">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Branch *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-branch" placeholder="Enter Branch">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Date *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="date" class="form-control stc-capa-fields" id="stc-capa-date" placeholder="Enter Date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">NAME OF PERSON OBSERVED *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-persionobserved" placeholder="Enter NAME OF PERSON OBSERVED">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">DESIGNATION *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-designation" placeholder="Enter DESIGNATION">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">N.C. LOCATION *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-nclocation" placeholder="Enter N.C. LOCATION	">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">OBSERVATION DATE	 *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="date" class="form-control stc-capa-fields" id="stc-capa-obsdate" placeholder="Enter OBSERVATION DATE	">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">TGT DATE COMPLIANCE *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="date" class="form-control stc-capa-fields" id="stc-capa-tgtdate" placeholder="Enter TGT DATE COMPLIANCE">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Severity *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-severity" placeholder="Enter Severity">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">DESCRIPTION OF NON-CONFORMANCE OBSERVED *</h5>
+                                        <div class="position-relative form-group">
+                                        <textarea class="form-control stc-capa-fields" id="stc-capa-nonconformanceobserved"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">RESPONSIBLE PERSON NAME *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-res_personname" placeholder="Enter RESPONSIBLE PERSON NAME">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">RESPONSIBLE PERSON DESIGNATION *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-res_persondesignation" placeholder="Enter RESPONSIBLE PERSON DESIGNATION">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">RESPONSIBLE PERSON NAME *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-res_personname2" placeholder="Enter RESPONSIBLE PERSON NAME">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">RESPONSIBLE PERSON DESIGNATION *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-res_persondesignation2" placeholder="Enter RESPONSIBLE PERSON DESIGNATION">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">RESPONSIBLE PERSON NAME *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-res_personname3" placeholder="Enter RESPONSIBLE PERSON NAME">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">RESPONSIBLE PERSON DESIGNATION *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-res_persondesignation3" placeholder="Enter RESPONSIBLE PERSON DESIGNATION">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">ROOT CAUSE ANALYSIS *</h5>
+                                        <div class="position-relative form-group">
+                                        <textarea class="form-control stc-capa-fields" id="stc-capa-rootcause" placeholder="Enter ROOT CAUSE ANALYSIS"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">CORRECTIVE ACTION *</h5>
+                                        <div class="position-relative form-group">
+                                        <textarea class="form-control stc-capa-fields" id="stc-capa-corrective" placeholder="Enter CORRECTIVE ACTION"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <h5 class="card-title">PREVENTIVE ACTION *</h5>
+                                        <div class="position-relative form-group">
+                                        <textarea class="form-control stc-capa-fields" id="stc-capa-preventive" placeholder="Enter PREVENTIVE ACTION"></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">COMPLIANCE BY (SUP/ENG) DATE *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="date" class="form-control stc-capa-fields" id="stc-capa-compliancebysupengdate" placeholder="Enter COMPLIANCE BY (SUP/ENG) DATE">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">COMPLIANCE BY (SUP/ENG) NAME *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-compliancebysupengname" placeholder="Enter COMPLIANCE BY (SUP/ENG) NAME">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">REVIEWED BY (SAFETY OFFICER) DATE *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="date" class="form-control stc-capa-fields" id="stc-capa-reviewedbysodate" placeholder="Enter REVIEWED BY (SAFETY OFFICER) DATE">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">REVIEWED BY (SAFETY OFFICER) NAME *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-reviewedbysoname" placeholder="Enter REVIEWED BY (SAFETY OFFICER) NAME">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">APPROVED BY (Director) NAME	DATE *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="text" class="form-control stc-capa-fields" id="stc-capa-reviewedbydirname" placeholder="Enter APPROVED BY (Director) NAME	DATE">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">APPROVED BY (Director) NAME *</h5>
+                                        <div class="position-relative form-group">
+                                        <input type="date" class="form-control stc-capa-fields" id="stc-capa-reviewedbydirdate" placeholder="Enter APPROVED BY (Director) NAME">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Before Image*</h5>
+                                        <div class="position-relative form-group">
+                                            <form id="safety-capaimagebefore-upload-form">
+                                                <input type="hidden" class="stc-capa-no" name="stc-capabefore-no">
+                                                <input type="file" class="form-control" name="before-image">
+                                                <input type="submit" class="btn btn-primary" value="Upload">
+                                            </form>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">After Image*</h5>
+                                        <div class="position-relative form-group">
+                                            <form id="safety-capaimageafter-upload-form">
+                                                <input type="hidden" class="stc-capa-no" name="stc-capaafter-no">
+                                                <input type="file" class="form-control" name="after-image">
+                                                <input type="submit" class="btn btn-primary" value="Upload">
+                                            </form>
                                         </div>
                                     </div>
                                 </div>

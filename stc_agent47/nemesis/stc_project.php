@@ -3253,6 +3253,59 @@ class pirates_supervisor extends tesseract{
 		return $optimusprime;
 	}
 
+	// call nearmiss
+	public function stc_call_capa($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$query="
+			SELECT * FROM `capa` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`created_by`
+			WHERE ".$supervise_rec." (
+				MONTH(`capa_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`capa_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`capa_date`) DESC
+		";
+		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
+		if(mysqli_num_rows($optimusprimequery)>0){
+			foreach($optimusprimequery as $optimusprimerow){
+				$website=$_SERVER['SERVER_NAME'];
+				$website = $website=="localhost" ? '' : 'https://stcassociate.com/stc_agent47/';
+				$action_show='
+					<a target="_blank" href="'.$website.'safety-capa-print-preview.php?capa_no='.$optimusprimerow['id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetycapa-edit" id="'.$optimusprimerow['id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetycapa-delete" id="'.$optimusprimerow['id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['capa_date'])).'</td>
+						<td>'.$optimusprimerow['sitename'].'</td>
+						<td>'.$optimusprimerow['place'].'</td>
+						<td>'.$optimusprimerow['branch'].'</td>
+						<td>'.$optimusprimerow['stc_cust_pro_supervisor_fullname'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found'.$query.'</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+
 	// call user collaborated
 	public function stc_user_collaborated($user_id){		
 		$blackpearl='';
@@ -3400,6 +3453,15 @@ if(isset($_POST['stc_safety_callnearmiss'])){
 	$supervise_name	= 	$_POST['supervise_name'];
 	$objsearchreq=new pirates_supervisor();
 	$opobjsearchreq=$objsearchreq->stc_call_nearmiss($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+
+// call nearmiss  safety
+if(isset($_POST['stc_safety_callcapa'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_capa($month, $supervise_name);
 	echo $opobjsearchreq;
 }
 

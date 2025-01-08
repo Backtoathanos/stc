@@ -1,3 +1,15 @@
+<?php 
+if(isset($_GET['capa_no'])){
+  
+    include "../MCU/db.php";
+    $checksafetyqry=mysqli_query($con, "
+      SELECT * FROM `capa` 
+      LEFT JOIN `stc_cust_pro_supervisor`
+      ON `stc_cust_pro_supervisor_id`=`created_by`
+      WHERE `id`='".$_GET['capa_no']."'
+    ");
+    $get_stc_safety=mysqli_fetch_assoc($checksafetyqry);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,17 +21,23 @@
       body{
         font-size: 12px;
       }
-        table, th, td {
-            border: 1px solid black;
+      table, th, td {
+          border: 1px solid black;
+      }
+      th, td {
+          padding: 5px;
+          text-align: left;
+      }
+      table {
+          border-collapse: collapse;
+          width: 100%;
+      }
+      @media print {
+        .container-fluid {
+          position:relative;
+          top:-30px;
         }
-        th, td {
-            padding: 5px;
-            text-align: left;
-        }
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
+      }
     </style>
 </head>
 <body>
@@ -40,7 +58,7 @@
         </div>
         <div class="row">
           <div class="col-3"><h3>SCP-01</h3></div>
-          <div class="col-6"><h3>CORRECTIVE AND PREVENTIVE ACTION REPORT</h3></div>
+          <div class="col-6"><h3 style="font-size:25px;">CORRECTIVE AND PREVENTIVE ACTION REPORT</h3></div>
         </div>
       </div>
     </div>
@@ -50,113 +68,103 @@
       <table class="table table-bordered">
           <thead>
               <tr>
-                  <th colspan="2">OFFICE / STORE / OTHERS</th>
-                  <th>PLACE</th>
-                  <th>BRANCH</th>
-                  <th>DATE</th>
+                  <th colspan="2" class="text-center">OFFICE / STORE / OTHERS <br> JOB SITE NAME</th>
+                  <th class="text-center">PLACE</th>
+                  <th class="text-center">BRANCH</th>
+                  <th colspan="2" class="text-center">DATE</th>
               </tr>
           </thead>
           <tbody>
               <tr>
-                  <td colspan="2">LDC</td>
-                  <td>TATA STEEL JSR</td>
-                  <td>JSR</td>
-                  <td>05.03.2024</td>
+                  <td colspan="2" class="text-center"><?php echo $get_stc_safety['sitename']; ?></td>
+                  <td class="text-center"><?php echo $get_stc_safety['place']; ?></td>
+                  <td class="text-center"><?php echo $get_stc_safety['branch']; ?></td>
+                  <td colspan="2" class="text-center"><?php echo date('d-m-Y', strtotime($get_stc_safety['capa_date'])); ?></td>
               </tr>
               <tr>
-                  <th colspan="3">PERSON OBSERVED NON-CONFORMANCE</th>
-                  <th colspan="2">NON-CONFORMANCE DETAILS</th>
+                  <th colspan="2" class="text-center">PERSON OBSERVED NON-CONFORMANCE</th>
+                  <th colspan="4" class="text-center">NON-CONFORMANCE DETAILS</th>
               </tr>
               <tr>
-                  <th>NAME OF PERSON OBSERVED</th>
-                  <th>DESIGNATION</th>
-                  <th>N.C. LOCATION</th>
-                  <th>OBSERVATION DATE</th>
-                  <th>TGT DATE COMPLIANCE</th>
+                  <th class="text-center">NAME OF PERSON OBSERVED</th>
+                  <th class="text-center">DESIGNATION</th>
+                  <th class="text-center">N.C. LOCATION</th>
+                  <th class="text-center">OBSERVATION DATE</th>
+                  <th class="text-center">TGT DATE COMPLIANCE</th>
+                  <th class="text-center">Severity</th>
               </tr>
               <tr>
-                  <td>MD JAMIL AKHTAR</td>
-                  <td>SUPERVISOR</td>
-                  <td>TOP OF THE FLOOR</td>
-                  <td>05.03.2024</td>
-                  <td>05.03.2024</td>
+                  <td><?php echo $get_stc_safety['person_observed']; ?></td>
+                  <td><?php echo $get_stc_safety['designation_observed']; ?></td>
+                  <td><?php echo $get_stc_safety['nclocation']; ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($get_stc_safety['observe_date'])); ?></td>
+                  <td><?php echo date('d-m-Y', strtotime($get_stc_safety['tgtdate'])); ?></td>
+                  <td><?php echo $get_stc_safety['severity']; ?></td>
               </tr>
               <tr>
-                  <td colspan="4">Severity</td>
-                  <td>4</td>
+                  <td colspan="4" rowspan="6">
+                    <span style="font-weight:bold;">DESCRIPTION OF NON-CONFORMANCE OBSERVED:</span><br>
+                    <?php echo $get_stc_safety['nonconformanceobserved']; ?>
+                  </td>
               </tr>
               <tr>
-                  <th colspan="3">DESCRIPTION OF NON-CONFORMANCE OBSERVED</th>
-                  <th colspan="2">PERSON RESPONSIBLE</th>
+              <td colspan="2" class="text-center">PERSON RESPONSIBLE</td>
               </tr>
               <tr>
-                  <td colspan="3">Boundary wall bricks found loose condition. It can cause the fall of bricks, leading to major injury or fatality.</td>
-                  <td>POSITION</td>
-                  <td>NAME</td>
+                <td>POSITION</td>
+                <td>NAME</td>
               </tr>
               <tr>
-                  <td colspan="3"></td>
-                  <td>TECHNICIAN</td>
-                  <td>B LAXMAN RAO</td>
+                  <td><?php echo $get_stc_safety['res_personname']; ?></td>
+                  <td><?php echo $get_stc_safety['res_persondesignation']; ?></td>
               </tr>
               <tr>
-                  <td colspan="3"></td>
-                  <td>SUPERVISOR</td>
-                  <td>MD JAMIL AKHTAR</td>
+                  <td><?php echo $get_stc_safety['res_personname2']; ?></td>
+                  <td><?php echo $get_stc_safety['res_persondesignation2']; ?></td>
               </tr>
               <tr>
-                  <td colspan="3"></td>
-                  <td>MANAGER</td>
-                  <td>SK DALIM</td>
+                  <td><?php echo $get_stc_safety['res_personname3']; ?></td>
+                  <td><?php echo $get_stc_safety['res_persondesignation3']; ?></td>
               </tr>
               <tr>
-                  <th colspan="5">ROOT CAUSE ANALYSIS</th>
+                  <td colspan="6"><span style="font-weight:bold;">ROOT CAUSE ANALYSIS (BY SUPERVISOR/ENGINEER RESPONSIBLE FOR N.C. AND REVIEWED BY BRANCH/SUPERVISOR WITH SAFETY OFFICER)</span> <br> <?php echo $get_stc_safety['rootcause']; ?> </td>
               </tr>
               <tr>
-                  <td colspan="5">Loose bricks due to old and joints crack.</td>
+                  <td colspan="6"><span style="font-weight:bold;">CORRECTIVE ACTION:-</span><?php echo $get_stc_safety['corrective']; ?></td>
               </tr>
               <tr>
-                  <th colspan="5">CORRECTIVE ACTION</th>
+                  <td colspan="6"><span style="font-weight:bold;">PREVENTIVE ACTION:-</span><?php echo $get_stc_safety['preventive']; ?></td>
               </tr>
               <tr>
-                  <td colspan="5">Remove loose bricks from the top of the floor.</td>
-              </tr>
-              <tr>
-                  <th colspan="5">PREVENTIVE ACTION</th>
-              </tr>
-              <tr>
-                  <td colspan="5">Inspect the area on a regular basis.</td>
-              </tr>
-              <tr>
-                  <th>SCPAR</th>
-                  <th>COMPLIANCE BY (SUP/ENG)</th>
-                  <th>REVIEWED BY (SAFETY OFFICER)</th>
-                  <th colspan="2">APPROVED BY (Director)</th>
+                <td>SCPAR</td>
+                <td colspan="2">COMPLIANCE BY (SUP/ENG)</td>
+                <td colspan="2">REVIEWED BY (SAFETY OFFICER)</td>
+                <td>APPROVED BY (Director)</td>
               </tr>
               <tr>
                   <td>Date</td>
-                  <td>05.03.2024</td>
-                  <td>06.03.2024</td>
-                  <td colspan="2">07.03.2024</td>
+                  <td colspan="2"><?php echo date('d-m-Y', strtotime($get_stc_safety['compliancebysupengdate'])); ?></td>
+                  <td colspan="2"><?php echo date('d-m-Y', strtotime($get_stc_safety['reviewedbysodate'])); ?></td>
+                  <td colspan="2"><?php echo date('d-m-Y', strtotime($get_stc_safety['reviewedbydirdate'])); ?></td>
               </tr>
               <tr>
                   <td>Sign</td>
-                  <td></td>
-                  <td></td>
                   <td colspan="2"></td>
+                  <td colspan="2"></td>
+                  <td></td>
               </tr>
               <tr>
                   <td>Name</td>
-                  <td>MD JAMIL AKHTAR</td>
-                  <td>NAUSHERWAN ALAM</td>
-                  <td colspan="2">SK SAFIKUL ISLAM</td>
+                  <td colspan="2"><?php echo $get_stc_safety['compliancebysupengname']; ?></td>
+                  <td colspan="2"><?php echo $get_stc_safety['reviewedbysoname']; ?></td>
+                  <td><?php echo $get_stc_safety['reviewedbydirname']; ?></td>
               </tr>
           </tbody>
       </table>
     </div>
     <div class="col-sm-2 col-md-2">
-      <div><img style="position:relative; top:10px; width:10cm;height:310px" src="https://stcassociate.com/stc_sub_agent47/safety_img/IMG_20250104_083331.jpg"><br><br><h4 class="text-center">Before</h4></div>
-      <div><img style="position:relative; top:10px; width:10cm;height:310px" src="https://stcassociate.com/stc_sub_agent47/safety_img/IMG_20250104_083331.jpg"><br><br><h4 class="text-center">After</h4></div>
+      <div><img style="position:relative; top:10px; width:10cm;height:280px" src="https://stcassociate.com/stc_sub_agent47/safety_img/<?php echo $get_stc_safety['beforeimage']; ?>"><br><br><h4 class="text-center">Before</h4></div>
+      <div><img style="position:relative; top:10px; width:10cm;height:280px" src="https://stcassociate.com/stc_sub_agent47/safety_img/<?php echo $get_stc_safety['afterimage']; ?>"><br><br><h4 class="text-center">After</h4></div>
     </div>
   </div>
 
@@ -170,3 +178,7 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<?php
+}
+?>
