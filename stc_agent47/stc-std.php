@@ -73,55 +73,56 @@ if(isset($_SESSION["stc_agent_id"])){
                                 <div class="col-md-12 col-xl-12"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
-                                            <h5>Location/Site Name :</h5><br>
-                                            <div class="card mb-3 widget-content">
-                                                <select class="btn btn-success form-control " id="stc-agent-sup-std-location-find">
-                                                    <option value="NA">Select</option>
-                                                    <?php
-                                                        include_once("../MCU/db.php");
-                                                        $query="
-                                                            SELECT DISTINCT `stc_status_down_list_plocation`
-                                                            FROM `stc_status_down_list`
-                                                            LEFT JOIN `stc_cust_pro_supervisor` 
-                                                            ON `stc_cust_pro_supervisor_id` = `stc_status_down_list_created_by`
-                                                            LEFT JOIN `stc_cust_pro_supervisor_collaborate` 
-                                                            ON `stc_cust_pro_supervisor_collaborate_userid` = `stc_status_down_list_created_by`
-                                                            WHERE (`stc_cust_pro_supervisor_collaborate_teamid` = '".$_SESSION['stc_agent_id']."' 
-                                                            OR `stc_cust_pro_supervisor_created_by` = '".$_SESSION['stc_agent_id']."') 
-                                                            AND `stc_status_down_list_plocation` <> '' 
-                                                            AND `stc_status_down_list_plocation` <> 'Select'
-                                                            ORDER BY `stc_status_down_list_plocation` ASC
-                                                        ";
-                                                        $dept_qry=mysqli_query($con, $query);
-                                                        foreach($dept_qry as $dept_row){
-                                                            echo '<option>'.$dept_row['stc_status_down_list_plocation'].'</option>';
-                                                        }
-                                                    ?>
-                                                </select> 
+                                            <div class="row">
+                                                <div class="col-md-12 col-xl-12">
+                                                    <h5>Location/Site Name :</h5><br>
+                                                    <select class="btn btn-success form-control " id="stc-agent-sup-std-location-find">
+                                                        <option value="NA">Select</option>
+                                                        <?php
+                                                            include_once("../MCU/db.php");
+                                                            $query="
+                                                                SELECT DISTINCT `stc_status_down_list_plocation`
+                                                                FROM `stc_status_down_list`
+                                                                LEFT JOIN `stc_cust_pro_supervisor` 
+                                                                ON `stc_cust_pro_supervisor_id` = `stc_status_down_list_created_by`
+                                                                LEFT JOIN `stc_cust_pro_supervisor_collaborate` 
+                                                                ON `stc_cust_pro_supervisor_collaborate_userid` = `stc_status_down_list_created_by`
+                                                                WHERE (`stc_cust_pro_supervisor_collaborate_teamid` = '".$_SESSION['stc_agent_id']."' 
+                                                                OR `stc_cust_pro_supervisor_created_by` = '".$_SESSION['stc_agent_id']."') 
+                                                                AND `stc_status_down_list_plocation` <> '' 
+                                                                AND `stc_status_down_list_plocation` <> 'Select'
+                                                                ORDER BY `stc_status_down_list_plocation` ASC
+                                                            ";
+                                                            $dept_qry=mysqli_query($con, $query);
+                                                            foreach($dept_qry as $dept_row){
+                                                                echo '<option>'.$dept_row['stc_status_down_list_plocation'].'</option>';
+                                                            }
+                                                        ?>
+                                                    </select> 
+                                                </div>
+                                                <div class="col-md-4 col-xl-4"> 
+                                                    <h5>Search by choice :</h5><br>
+                                                    <input type="text" class="form-control stc-agent-sup-search-field" placeholder="Search by choice">                                            
+                                                </div>
+                                                <div class="col-md-4 col-xl-4"> 
+                                                    <h5>Employee Type :</h5><br>
+                                                    <select class="form-control stc-agent-sup-emptype">
+                                                        <option value="NA">Select</option>
+                                                        <option value="Service Group">Service Group</option>
+                                                    </select>
+                                                </div>      
+                                                <div class="col-md-4 col-xl-4"> 
+                                                    <h5>Work Status :</h5><br>
+                                                    <select class="form-control stc-agent-sup-status">
+                                                        <option value="1">PLANNING</option>
+                                                        <option value="2">DOWN</option>
+                                                        <option value="3">WORK-IN-PROGRESS</option>
+                                                        <option value="4">WORK DONE</option>
+                                                        <option value="5">WORK COMPLETE</option>
+                                                        <option value="6">CLOSED</option>
+                                                    </select>                                      
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-8 col-xl-8">                                     
-                                    <div class="main-card mb-3 card">
-                                        <div class="card-body">
-                                            <h5>Search by choice :</h5><br>
-                                            <input type="text" class="form-control stc-agent-sup-search-field" placeholder="Search by choice">
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 col-xl-4"> 
-                                    <div class="main-card mb-3 card">
-                                        <div class="card-body">
-                                            <h5>Work Status :</h5><br>
-                                            <select class="form-control stc-agent-sup-status">
-                                                <option value="1">PLANNING</option>
-                                                <option value="2">DOWN</option>
-                                                <option value="3">WORK-IN-PROGRESS</option>
-                                                <option value="4">WORK DONE</option>
-                                                <option value="5">WORK COMPLETE</option>
-                                                <option value="6">CLOSED</option>
-                                            </select>
                                         </div>
                                     </div>
                                 </div>
@@ -241,6 +242,7 @@ if(isset($_SESSION["stc_agent_id"])){
                 $('.stc-datatable-filter-ul').hide();
                 var location_id=$('#stc-agent-sup-std-location-find').val();
                 var search=$('.stc-agent-sup-search-field').val();
+                var emptype=$('.stc-agent-sup-emptype').val();
                 var status=$('.stc-agent-sup-status').val();
                 if(location_id!="NA"){
                     $.ajax({
@@ -250,6 +252,7 @@ if(isset($_SESSION["stc_agent_id"])){
                             stc_down_list_hit:1,
                             location_id:location_id,
                             search:search,
+                            emptype:emptype,
                             status:status
                         },
                         success     : function(response_sdl){

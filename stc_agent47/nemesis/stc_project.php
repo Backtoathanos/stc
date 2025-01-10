@@ -2406,7 +2406,7 @@ class pirates_supervisor extends tesseract{
 	}
 
 	// call status down list
-	public function stc_call_status_down_list($location_id, $search, $status){
+	public function stc_call_status_down_list($location_id, $search, $emptype, $status){
 		$optimusprime='
 			<table class="table table-bordered table-responsive">
 				<thead>
@@ -2465,6 +2465,10 @@ class pirates_supervisor extends tesseract{
 					b.`stc_cpumpd_equipment_type` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR
 					b.`stc_cpumpd_equipment_number` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."'
 				)
+			";
+		}
+		if($emptype!="NA"){
+			$search_field=" AND `stc_cust_pro_supervisor_category`='".mysqli_real_escape_string($this->stc_dbs, $emptype)."'
 			";
 		}
 		$showbystatus="AND `stc_agents_id`=".$_SESSION['stc_agent_id'];
@@ -2609,8 +2613,10 @@ class pirates_supervisor extends tesseract{
 					WHERE
 					    `stc_cpumpd_id`='".$row['stc_status_down_list_equipment_type']."'
 				");
-				foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
-					$eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
+				if(mysqli_num_rows($stc_call_eqtypeqry)>0){
+					foreach($stc_call_eqtypeqry as $stc_call_eqtyperow){
+						$eq_type=$stc_call_eqtyperow['stc_cpumpd_equipment_type'];
+					}
 				}
 
 				$stc_call_eqnumberqry=mysqli_query($this->stc_dbs, "
@@ -2640,20 +2646,32 @@ class pirates_supervisor extends tesseract{
 
 				$job_type='';
 				$job_varities='';
-				if (!empty($row['stc_status_down_list_varities_id'])) {
+				if (!empty($row['stc_status_down_list_varities_id']) && $row['stc_status_down_list_varities_id']!="NA") {
+					// Split the string into an array using ',' as the delimiter
+					$values = explode(',', $row['stc_status_down_list_varities_id']);
+
+					// Remove 'NA' (case-insensitive) and empty values from the array
+					$filteredValues = array_filter($values, function ($value) {
+						return strtolower(trim($value)) !== 'na' && trim($value) !== '';
+					});
+
+					// Join the filtered values back into a comma-separated string
+					$processedValue = implode(',', $filteredValues);
 					$stc_call_jobtypeqry=mysqli_query($this->stc_dbs, "
-						SELECT `stc_status_down_list_job_type_title`, `stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_id` IN (".$row['stc_status_down_list_varities_id'].")
+						SELECT `stc_status_down_list_job_type_title`, `stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_id` IN (".$processedValue.")
 					");
 					$job_type_array = [];
 					$job_varities_array = [];
-					foreach($stc_call_jobtypeqry as $stc_call_jobtyperow){
-						// Add job_type to the array if it's not already there
-						if (!in_array($stc_call_jobtyperow['stc_status_down_list_job_type_title'], $job_type_array)) {
-							$job_type_array[] = $stc_call_jobtyperow['stc_status_down_list_job_type_title'];
-						}
-						// Add job_varities to the array if it's not already there
-						if (!in_array($stc_call_jobtyperow['stc_status_down_list_job_type_sub_title'], $job_varities_array)) {
-							$job_varities_array[] = $stc_call_jobtyperow['stc_status_down_list_job_type_sub_title'];
+					if(mysqli_num_rows($stc_call_jobtypeqry)>0){
+						foreach($stc_call_jobtypeqry as $stc_call_jobtyperow){
+							// Add job_type to the array if it's not already there
+							if (!in_array($stc_call_jobtyperow['stc_status_down_list_job_type_title'], $job_type_array)) {
+								$job_type_array[] = $stc_call_jobtyperow['stc_status_down_list_job_type_title'];
+							}
+							// Add job_varities to the array if it's not already there
+							if (!in_array($stc_call_jobtyperow['stc_status_down_list_job_type_sub_title'], $job_varities_array)) {
+								$job_varities_array[] = $stc_call_jobtyperow['stc_status_down_list_job_type_sub_title'];
+							}
 						}
 					}
 					$job_type = implode(', ', $job_type_array);
@@ -4397,9 +4415,10 @@ if(isset($_POST['js_search_ratings'])){
 if(isset($_POST['stc_down_list_hit'])){
 	$location_id=$_POST['location_id'];
 	$search=$_POST['search'];
+	$emptype=$_POST['emptype'];
 	$status=$_POST['status'];
 	$metabots=new pirates_supervisor();
-	$opmetabots=$metabots->stc_call_status_down_list($location_id, $search, $status);
+	$opmetabots=$metabots->stc_call_status_down_list($location_id, $search, $emptype, $status);
 	echo $opmetabots;
 }
 
