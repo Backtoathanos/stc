@@ -1,9 +1,8 @@
 <?php
-include "../../MCU/obdb.php";  // Include the database connectivity file
-
 header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST");
-header("Access-Control-Allow-Headers: Content-Type");
+header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("Access-Control-Allow-Headers: Origin, Content-Type, Accept, Authorization, X-Requested-With");
+include "../../MCU/obdb.php";  // Include the database connectivity file
 
 // Initialize the database connection
 $db = new tesseract();

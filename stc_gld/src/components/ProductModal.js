@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import axios from 'axios';
-import Swal from 'sweetalert2'; // Import SweetAlert2
 import './CustomerModal.css';
 
 const ProductModal = ({ show, handleClose, productId }) => {
     const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
-    const [{ ProductDetails }, setProductDetails] = useState('');
     const [productName, setProductName] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [productCategory, setProductCategory] = useState('');
@@ -21,13 +19,13 @@ const ProductModal = ({ show, handleClose, productId }) => {
     // Fetch customer options when the modal is shown
     useEffect(() => {
         if (show) {
-            axios.get('${API_BASE_URL}/index.php', {
+            axios.get(`${API_BASE_URL}/index.php`, {
                 params: { action: 'getProductDetails', productId: productId }
             })
                 .then(response => {
                     let product = response.data.product;
                     let productName=product.productName;
-                    if(product.subCategoryName!='OTHERS'){
+                    if(product.subCategoryName!=='OTHERS'){
                         productName=product.subCategoryName + ' ' + product.productName;
                     }
                     setProductName(productName);

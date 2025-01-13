@@ -16,7 +16,9 @@ export default function Dashboard() {
     useEffect(() => {
         document.title = "STC GLD || Inventory"; // Set the title
     }, []);
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? 'https://stcassociate.com/stc_gld/vanaheim'
+    : 'http://localhost/stc/stc_gld/vanaheim';
     const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);
 
