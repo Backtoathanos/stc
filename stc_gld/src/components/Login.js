@@ -13,7 +13,6 @@ export default function Login(){
     const API_BASE_URL = process.env.NODE_ENV === 'production'
     ? 'https://stcassociate.com/stc_gld/vanaheim'
     : 'http://localhost/stc/stc_gld/vanaheim';
-    console.log(API_BASE_URL);
     useEffect(() => {
         let login=localStorage.getItem("login");
         if(login){

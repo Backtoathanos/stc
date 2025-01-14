@@ -8,35 +8,41 @@ include "../../MCU/obdb.php";
 class prime extends tesseract{	
 
 	// check agents existance
-	public function stc_login($user,$pass){
-		$checkbumblebee=mysqli_query($this->stc_dbs, "
-			SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_category`, `stc_cust_pro_supervisor_contact`, `stc_cust_pro_supervisor_image` 
-			FROM `stc_cust_pro_supervisor` 
+	public function stc_login($user, $pass) {
+		$pass = trim($pass); // Trim input
+		$user = trim($user); // Trim input
+	
+		$checkbumblebee = mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, 
+				   `stc_cust_pro_supervisor_category`, `stc_cust_pro_supervisor_contact`, 
+				   `stc_cust_pro_supervisor_image`
+			FROM `stc_cust_pro_supervisor`
 			WHERE (
-				`stc_cust_pro_supervisor_contact`='".mysqli_real_escape_string($this->stc_dbs, $user)."' OR 
-				`stc_cust_pro_supervisor_whatsapp`='".mysqli_real_escape_string($this->stc_dbs, $user)."' OR 
-				`stc_cust_pro_supervisor_email`='".mysqli_real_escape_string($this->stc_dbs, $user)."'
-			) AND `stc_cust_pro_supervisor_password`='".mysqli_real_escape_string($this->stc_dbs, $pass)."'
+				`stc_cust_pro_supervisor_contact`='" . mysqli_real_escape_string($this->stc_dbs, $user) . "' OR 
+				`stc_cust_pro_supervisor_whatsapp`='" . mysqli_real_escape_string($this->stc_dbs, $user) . "' OR 
+				`stc_cust_pro_supervisor_email`='" . mysqli_real_escape_string($this->stc_dbs, $user) . "'
+			) AND BINARY `stc_cust_pro_supervisor_password`='" . mysqli_real_escape_string($this->stc_dbs, $pass) . "'
 			AND `stc_cust_pro_supervisor_status`=1
 		");
-		if(mysqli_num_rows($checkbumblebee)>0){
-			$user_details=mysqli_fetch_assoc($checkbumblebee);
-			$user_name=$user_details['stc_cust_pro_supervisor_fullname'];
-			$user_id=$user_details['stc_cust_pro_supervisor_id'];
-			$category=$user_details['stc_cust_pro_supervisor_category'];
-			// setcookie("agentsperforme", $user_id, time() +3600000);
-			// setcookie("agentsperformename", $user_name, time() + 3600000);
-			$_SESSION['stc_agent_sub_id']=$user_id;
-			$_SESSION['stc_agent_sub_name']=$user_name;
-			$_SESSION['stc_agent_sub_cont']=$user_details['stc_cust_pro_supervisor_contact'];
-			$_SESSION['stc_agent_sub_category']=$category;
-			$_SESSION['stc_agent_sub_image']=$user_details['stc_cust_pro_supervisor_image'];
-			$op="success";
-		}else{
-			$op="Please Check Username & Password Again.";
+	
+		if (!$checkbumblebee) {
+			die("Query Failed: " . mysqli_error($this->stc_dbs));
 		}
+	
+		if (mysqli_num_rows($checkbumblebee) > 0) {
+			$user_details = mysqli_fetch_assoc($checkbumblebee);
+			$_SESSION['stc_agent_sub_id'] = $user_details['stc_cust_pro_supervisor_id'];
+			$_SESSION['stc_agent_sub_name'] = $user_details['stc_cust_pro_supervisor_fullname'];
+			$_SESSION['stc_agent_sub_cont'] = $user_details['stc_cust_pro_supervisor_contact'];
+			$_SESSION['stc_agent_sub_category'] = $user_details['stc_cust_pro_supervisor_category'];
+			$_SESSION['stc_agent_sub_image'] = $user_details['stc_cust_pro_supervisor_image'];
+			$op = "success";
+		} else {
+			$op = "Please Check Username & Password Again.";
+		}
+	
 		return $op;
-	}
+	}	
 
 	public function stc_update_password($stc_ac_id, $stc_ac_pass, $stc_ac_repass, $stc_old_password) {
 		$op = '';

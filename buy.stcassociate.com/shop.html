@@ -9,7 +9,7 @@
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title  -->
-    <title>Amado - Furniture Ecommerce Template | Shop</title>
+    <title>STC Associates | Shop</title>
 
     <!-- Favicon  -->
     <link rel="icon" href="img/core-img/favicon.ico">
@@ -71,7 +71,7 @@
                 <ul>
                     <li><a href="index.html">Home</a></li>
                     <li class="active"><a href="shop.html">Shop</a></li>
-                    <li><a href="product-details.html">Product</a></li>
+                    <!-- <li><a href="product-details.html">Product</a></li> -->
                     <li><a href="cart.html">Cart</a></li>
                     <li><a href="checkout.html">Checkout</a></li>
                 </ul>
@@ -312,6 +312,7 @@
 
     <!-- ##### jQuery (Necessary for All JavaScript Plugins) ##### -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <!-- Popper js -->
     <script src="js/popper.min.js"></script>
     <!-- Bootstrap js -->
@@ -320,129 +321,145 @@
     <script src="js/plugins.js"></script>
     <!-- Active js -->
     <script src="js/active.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
 
     <script>
         $(document).ready(function() {
-        let currentPage = 1;
-        const perPage = 20; // Number of items per page
+            let currentPage = 1;
+            const perPage = 25; // Number of items per page
 
-        // Load products on page load
-        load_products('', currentPage);
+            // Load products on page load
+            load_products('', currentPage);
 
-        // Function to load products
-        function load_products(search, page) {
-            const url = new URL(window.location.href);
-            search = url.searchParams.get('search');
-            $.ajax({
-                url: 'api/index.php',
-                type: 'GET',
-                data: { search: search, page: page },
-                dataType: 'json',
-                success: function(data) {
-                    console.log(data);
-                    render_products(data); // Render products
-                    render_pagination(search, page); // Render pagination
-                },
-                error: function(xhr, status, error) {
-                    console.error("Error fetching products:", error);
-                }
-            });
-        }
+            // Function to load products
+            function load_products(search, page) {
+                const url = new URL(window.location.href);
+                search = url.searchParams.get('search');
+                $.ajax({
+                    url: 'api/index.php',
+                    type: 'GET',
+                    data: { search: search, page: page },
+                    dataType: 'json',
+                    success: function(data) {
+                        // console.log(data);
+                        render_products(data); // Render products
+                        render_pagination(search, page); // Render pagination
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching products:", error);
+                    }
+                });
+            }
 
-        // Function to render products
-        function render_products(products) {
-            let html = '';
-            products.forEach(product => {
-                var product_name = product.stc_product_name;
-                if(product.stc_sub_cat_name!="OTHERS"){
-                    product_name = product.stc_sub_cat_name + " " + product_name;
-                }
-                html += `
-                    <div class="col-12 col-sm-6 col-md-12 col-xl-6">
-                        <div class="single-product-wrapper">
-                            <div class="product-img">
-                                <img src="https://stcassociate.com/stc_symbiote/stc_product_image/${product.stc_product_image}" alt="${product_name}">
-                            </div>
-                            <div class="product-description d-flex align-items-center justify-content-between">
-                                <div class="product-meta-data">
-                                    <div class="line"></div>
-                                    <p class="product-price">₹${product.stc_product_id}</p>
-                                    <a href="product-details.html?product_id=${product.stc_product_id}">
-                                        <h6>${product_name}</h6>
-                                    </a>
+            // Function to render products
+            function render_products(products) {
+                let html = '';
+                products.forEach(product => {
+                    var product_name = product.stc_product_name;
+
+                    // Append subcategory name if it's not "OTHERS"
+                    if (product.stc_sub_cat_name !== "OTHERS") {
+                        product_name = product.stc_sub_cat_name + " " + product_name;
+                    }
+
+                    var title_pname=product_name;
+                    // Truncate product_name if its length is greater than 25
+                    if (product_name.length > 50) {
+                        product_name = product_name.substring(0, 50) + "...";
+                    }
+                    html += `
+                        <div class="col-12 col-sm-6 col-md-12 col-xl-6">
+                            <div class="single-product-wrapper">
+                                <div class="product-img">
+                                    <img src="https://stcassociate.com/stc_symbiote/stc_product_image/${product.stc_product_image}" alt="${product_name}"  style="height: 600px;">
                                 </div>
-                                <div class="ratings-cart text-right">
-                                    <div class="cart">
-                                        <a href="javascript:void(0)" class="add-to-cart" data-product-id="${product.stc_product_id}" title="Add to Cart">
-                                            <img src="img/core-img/cart.png" alt="">
+                                <div class="product-description d-flex align-items-center justify-content-between">
+                                    <div class="product-meta-data">
+                                        <div class="line"></div>
+                                        <p class="product-price">₹${product.rate}</p>
+                                        <a href="product-details.html?product_id=${product.stc_product_id}">
+                                            <h6 title="${title_pname}">${product_name}</h6>
                                         </a>
+                                    </div>
+                                    <div class="ratings-cart text-right">
+                                        <div class="cart">
+                                            <a href="javascript:void(0)" class="add-to-cart" data-product-id="${product.stc_product_id}" title="Add to Cart">
+                                                <img src="img/core-img/cart.png" alt="">
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                });
+                $('#product-container').html(html); // Insert product cards into the container
+            }
+
+            // Function to render pagination
+            function render_pagination(search, currentPage) {
+                let html = '';
+                for (let i = 1; i <= 20; i++) { // Adjust the number of pages as needed
+                    html += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="javascript:void(0)" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+                $('#pagination').html(html); // Insert pagination links
+
+                // Add click event for pagination links
+                $('#pagination .page-link').on('click', function() {
+                    const page = $(this).data('page');
+                    load_products(search, page); // Load products for the selected page
+                });
+            }
+            
+            // Add to Cart button click event
+            $(document).on('click', '.add-to-cart', function () {
+                const productId = $(this).data('product-id'); // Get the product ID
+                addToCart(productId); // Add the product to the cart
             });
-            $('#product-container').html(html); // Insert product cards into the container
-        }
 
-        // Function to render pagination
-        function render_pagination(search, currentPage) {
-            let html = '';
-            for (let i = 1; i <= 20; i++) { // Adjust the number of pages as needed
-                html += `
-                    <li class="page-item ${i === currentPage ? 'active' : ''}">
-                        <a class="page-link" href="javascript:void(0)" data-page="${i}">${i}</a>
-                    </li>
-                `;
-            }
-            $('#pagination').html(html); // Insert pagination links
+            // Function to add a product to the cart
+            function addToCart(productId) {
+                // Get the current cart from cookies
+                let cart = Cookies.get('cart');
 
-            // Add click event for pagination links
-            $('#pagination .page-link').on('click', function() {
-                const page = $(this).data('page');
-                load_products(search, page); // Load products for the selected page
-            });
-        }
-        
-        // Add to Cart button click event
-        $(document).on('click', '.add-to-cart', function() {
-            const productId = $(this).data('product-id'); // Get the product ID
-            addToCart(productId); // Add the product to the cart
-        });
+                // If the cart doesn't exist, initialize it as an empty array
+                if (!cart) {
+                    cart = [];
+                } else {
+                    try {
+                        // Parse the cart cookie (it's stored as a JSON string)
+                        cart = JSON.parse(cart);
+                    } catch (error) {
+                        console.error('Error parsing cart:', error);
+                        cart = []; // Reset the cart if parsing fails
+                    }
+                }
 
-        // Function to add a product to the cart
-        function addToCart(productId) {
-            // Get the current cart from cookies
-            let cart = Cookies.get('cart');
+                // Check if the product is already in the cart
+                if (!cart.includes(productId)) {
+                    // Add the product to the cart
+                    cart.push(productId);
 
-            // If the cart doesn't exist, initialize it as an empty array
-            if (!cart) {
-                cart = [];
-            } else {
-                // Parse the cart cookie (it's stored as a JSON string)
-                cart = JSON.parse(cart);
-            }
+                    // Save the updated cart back to cookies
+                    Cookies.set('cart', JSON.stringify(cart), { expires: 7 }); // Expires in 7 days
 
-            // Check if the product is already in the cart
-            if (!cart.includes(productId)) {
-                // Add the product ID to the cart
-                cart.push(productId);
+                    // Get the actual number of items in the cart
+                    const cart_count = cart.length;
 
-                // Save the updated cart back to cookies
-                Cookies.set('cart', JSON.stringify(cart), { expires: 7 }); // Expires in 7 days
+                    // Update the cart count in the UI
+                    $('.cart-nav').find('span').html("(" + cart_count + ")");
 
-                alert('Product added to cart!');
-            } else {
-                alert('Product is already in the cart!');
-            }
-
-            console.log('Current Cart:', cart);
-        }
-    });
-
-    
+                    // Show success message
+                    alert('Product added to cart!');
+                } else {
+                    // Show message if the product is already in the cart
+                    alert('Product is already in the cart!');
+                }
+            }        
+        });    
     </script>
 </body>
 

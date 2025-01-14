@@ -9,7 +9,7 @@
     <!-- The above 4 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
     <!-- Title  -->
-    <title>Amado - Furniture Ecommerce Template | Cart</title>
+    <title>STC Associates | Cart</title>
 
     <!-- Favicon  -->
     <link rel="icon" href="img/core-img/favicon.ico">
@@ -71,16 +71,15 @@
                 <ul>
                     <li><a href="index.html">Home</a></li>
                     <li><a href="shop.html">Shop</a></li>
-                    <li><a href="product-details.html">Product</a></li>
                     <li class="active"><a href="cart.html">Cart</a></li>
                     <li><a href="checkout.html">Checkout</a></li>
                 </ul>
             </nav>
             <!-- Button Group -->
-            <div class="amado-btn-group mt-30 mb-100">
+            <!-- <div class="amado-btn-group mt-30 mb-100">
                 <a href="#" class="btn amado-btn mb-15">%Discount%</a>
                 <a href="#" class="btn amado-btn active">New this week</a>
-            </div>
+            </div> -->
             <!-- Cart Menu -->
             <div class="cart-fav-search mb-100">
                 <a href="cart.html" class="cart-nav"><img src="img/core-img/cart.png" alt=""> Cart <span>(0)</span></a>
@@ -115,70 +114,7 @@
                                         <th>Quantity</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="cart_product_img">
-                                            <a href="#"><img src="img/bg-img/cart1.jpg" alt="Product"></a>
-                                        </td>
-                                        <td class="cart_product_desc">
-                                            <h5>White Modern Chair</h5>
-                                        </td>
-                                        <td class="price">
-                                            <span>$130</span>
-                                        </td>
-                                        <td class="qty">
-                                            <div class="qty-btn d-flex">
-                                                <p>Qty</p>
-                                                <div class="quantity">
-                                                    <span class="qty-minus" onclick="var effect = document.getElementById('qty'); var qty = effect.value; if( !isNaN( qty ) &amp;&amp; qty &gt; 1 ) effect.value--;return false;"><i class="fa fa-minus" aria-hidden="true"></i></span>
-                                                    <input type="number" class="qty-text" id="qty" step="1" min="1" max="300" name="quantity" value="1">
-                                                    <span class="qty-plus" onclick="var effect = document.getElementById('qty'); var qty = effect.value; if( !isNaN( qty )) effect.value++;return false;"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="cart_product_img">
-                                            <a href="#"><img src="img/bg-img/cart2.jpg" alt="Product"></a>
-                                        </td>
-                                        <td class="cart_product_desc">
-                                            <h5>Minimal Plant Pot</h5>
-                                        </td>
-                                        <td class="price">
-                                            <span>$10</span>
-                                        </td>
-                                        <td class="qty">
-                                            <div class="qty-btn d-flex">
-                                                <p>Qty</p>
-                                                <div class="quantity">
-                                                    <span class="qty-minus" onclick="var effect = document.getElementById('qty2'); var qty = effect.value; if( !isNaN( qty ) &amp;&amp; qty &gt; 1 ) effect.value--;return false;"><i class="fa fa-minus" aria-hidden="true"></i></span>
-                                                    <input type="number" class="qty-text" id="qty2" step="1" min="1" max="300" name="quantity" value="1">
-                                                    <span class="qty-plus" onclick="var effect = document.getElementById('qty2'); var qty = effect.value; if( !isNaN( qty )) effect.value++;return false;"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="cart_product_img">
-                                            <a href="#"><img src="img/bg-img/cart3.jpg" alt="Product"></a>
-                                        </td>
-                                        <td class="cart_product_desc">
-                                            <h5>Minimal Plant Pot</h5>
-                                        </td>
-                                        <td class="price">
-                                            <span>$10</span>
-                                        </td>
-                                        <td class="qty">
-                                            <div class="qty-btn d-flex">
-                                                <p>Qty</p>
-                                                <div class="quantity">
-                                                    <span class="qty-minus" onclick="var effect = document.getElementById('qty3'); var qty = effect.value; if( !isNaN( qty ) &amp;&amp; qty &gt; 1 ) effect.value--;return false;"><i class="fa fa-minus" aria-hidden="true"></i></span>
-                                                    <input type="number" class="qty-text" id="qty3" step="1" min="1" max="300" name="quantity" value="1">
-                                                    <span class="qty-plus" onclick="var effect = document.getElementById('qty3'); var qty = effect.value; if( !isNaN( qty )) effect.value++;return false;"><i class="fa fa-plus" aria-hidden="true"></i></span>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
+                                <tbody class="cart-items">
                                 </tbody>
                             </table>
                         </div>
@@ -187,12 +123,12 @@
                         <div class="cart-summary">
                             <h5>Cart Total</h5>
                             <ul class="summary-table">
-                                <li><span>subtotal:</span> <span>$140.00</span></li>
+                                <li><span>subtotal:</span> <span></span></li>
                                 <li><span>delivery:</span> <span>Free</span></li>
-                                <li><span>total:</span> <span>$140.00</span></li>
+                                <li><span>total:</span> <span></span></li>
                             </ul>
                             <div class="cart-btn mt-100">
-                                <a href="cart.html" class="btn amado-btn w-100">Checkout</a>
+                                <a href="javascript:void(0)" class="btn amado-btn w-100 checkout-page">Checkout</a>
                             </div>
                         </div>
                     </div>
@@ -209,8 +145,8 @@
                 <!-- Newsletter Text -->
                 <div class="col-12 col-lg-6 col-xl-7">
                     <div class="newsletter-text mb-100">
-                        <h2>Subscribe for a <span>25% Discount</span></h2>
-                        <p>Nulla ac convallis lorem, eget euismod nisl. Donec in libero sit amet mi vulputate consectetur. Donec auctor interdum purus, ac finibus massa bibendum nec.</p>
+                        <!-- <h2>Subscribe for a <span>25% Discount</span></h2>
+                        <p>Nulla ac convallis lorem, eget euismod nisl. Donec in libero sit amet mi vulputate consectetur. Donec auctor interdum purus, ac finibus massa bibendum nec.</p> -->
                     </div>
                 </div>
                 <!-- Newsletter Form -->
@@ -281,6 +217,7 @@
 
     <!-- ##### jQuery (Necessary for All JavaScript Plugins) ##### -->
     <script src="js/jquery/jquery-2.2.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <!-- Popper js -->
     <script src="js/popper.min.js"></script>
     <!-- Bootstrap js -->
@@ -289,6 +226,115 @@
     <script src="js/plugins.js"></script>
     <!-- Active js -->
     <script src="js/active.js"></script>
+    <script>
+        $(document).ready(function () {
+            // Get the cart from cookies
+            const cart = JSON.parse(Cookies.get('cart') || '[]');
+
+            if (cart.length > 0) {
+                // Send product IDs to the server to fetch product details
+                $.ajax({
+                    url: 'api/index.php', // Replace with your server endpoint
+                    type: 'POST',
+                    data: { show_carts: 1, product_ids: cart },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            // Clear existing rows
+                            $('.cart-items').empty();
+
+                            // Render each product in the cart
+                            response.products.forEach(product => {
+                                const row = `
+                                    <tr>
+                                        <td class="cart_product_img">
+                                            <a href="#"><img src="https://stcassociate.com/stc_symbiote/stc_product_image/${product.image}" alt="${product.name}" style="height: 200px;"></a>
+                                        </td>
+                                        <td class="cart_product_desc">
+                                            <h5>${product.name}</h5>
+                                        </td>
+                                        <td class="price">
+                                            <span>₹${product.rate}</span>
+                                        </td>
+                                        <td class="qty">
+                                            <div class="qty-btn d-flex">
+                                                <p>Qty</p>
+                                                <div class="quantity">
+                                                    <span class="qty-minus"><i class="fa fa-minus" aria-hidden="true"></i></span>
+                                                    <input type="number" class="qty-text" step="1" min="1" max="300" name="quantity" value="${product.quantity}">
+                                                    <span class="qty-plus"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                                $('.cart-items').append(row);
+                            });
+
+                            // Bind the updateQuantity function to the plus and minus buttons
+                            $('.qty-minus, .qty-plus').on('click', function () {
+                                const change = $(this).hasClass('qty-minus') ? -1 : 1; // Determine if it's a minus or plus button
+                                updateQuantity(this, change); // Call the updateQuantity function
+                            });
+
+                            // Update cart summary
+                            updateCartSummary(response.total);
+                        } else {
+                            alert('Failed to fetch cart products.');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        // console.error('AJAX Error:', error);
+                        alert('An error occurred while fetching cart products.');
+                    }
+                });
+            
+                $('body').delegate('.checkout-page', 'click', function () {
+                    var total=$('.summary-table li span').eq(5).text();
+                    Cookies.set('cart_total', total, { expires: 7 });
+                    window.location.href = 'checkout.html';
+                });
+            } else {
+                // If the cart is empty, show a message
+                $('.cart-items').html('<tr><td colspan="4" class="text-center">Your cart is empty.</td></tr>');
+                updateCartSummary(0);
+            }
+        });
+
+        // Function to update quantity
+        function updateQuantity(element, change) {
+            const input = $(element).siblings('input'); // Find the input element
+            let quantity = parseInt(input.val()) + change; // Update the quantity
+            if (quantity < 1) quantity = 1; // Ensure quantity is at least 1
+            if (quantity > 300) quantity = 300; // Ensure quantity is at most 300
+            input.val(quantity); // Update the input value
+
+            // Recalculate the cart total
+            updateCartTotal();
+        }
+
+        // Function to update cart total
+        function updateCartTotal() {
+            let total = 0;
+
+            // Loop through each row in the cart table
+            $('.cart-items tr').each(function () {
+                const price = parseFloat($(this).find('.price span').text().replace('₹', '')); // Get the price
+                const quantity = parseInt($(this).find('.qty input').val()); // Get the quantity
+                total += price * quantity; // Add to the total
+            });
+
+            // Update the cart summary
+            updateCartSummary(total);
+        }
+
+        // Function to update cart summary
+        function updateCartSummary(total) {
+            $('.summary-table li span').eq(1).text('₹' + total.toFixed(2)); // Subtotal
+            $('.summary-table li span').eq(3).text('Free'); // Delivery
+            $('.summary-table li span').eq(5).text('₹' + total.toFixed(2)); // Total
+        }
+    </script>
 
 </body>
 

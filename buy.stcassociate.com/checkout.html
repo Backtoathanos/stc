@@ -18,6 +18,25 @@
     <link rel="stylesheet" href="css/core-style.css">
     <link rel="stylesheet" href="style.css">
 
+    <style>
+        /* Ensure the dropdown is positioned correctly */
+        .nice-select {
+            position: relative; /* Ensure the dropdown is positioned relative to its container */
+            z-index: 1000; /* Ensure the dropdown is above other elements */
+        }
+
+        /* Style for the dropdown list */
+        .nice-select .list {
+            position: absolute; /* Position the dropdown absolutely */
+            width: 100%; /* Match the width of the parent */
+            max-height: 200px; /* Set a max height for scrolling */
+            overflow-y: auto; /* Enable scrolling */
+            background-color: white; /* Set a background color */
+            border: 1px solid #ccc; /* Add a border */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add a shadow for better visibility */
+            z-index: 1001; /* Ensure the dropdown is above other elements */
+        }
+    </style>
 </head>
 
 <body>
@@ -71,16 +90,15 @@
                 <ul>
                     <li><a href="index.html">Home</a></li>
                     <li><a href="shop.html">Shop</a></li>
-                    <li><a href="product-details.html">Product</a></li>
                     <li><a href="cart.html">Cart</a></li>
                     <li class="active"><a href="checkout.html">Checkout</a></li>
                 </ul>
             </nav>
             <!-- Button Group -->
-            <div class="amado-btn-group mt-30 mb-100">
+            <!-- <div class="amado-btn-group mt-30 mb-100">
                 <a href="#" class="btn amado-btn mb-15">%Discount%</a>
                 <a href="#" class="btn amado-btn active">New this week</a>
-            </div>
+            </div> -->
             <!-- Cart Menu -->
             <div class="cart-fav-search mb-100">
                 <a href="cart.html" class="cart-nav"><img src="img/core-img/cart.png" alt=""> Cart <span>(0)</span></a>
@@ -107,100 +125,75 @@
                                 <h2>Checkout</h2>
                             </div>
 
-                            <form action="#" method="post">
+                            <form action="#" id="checkoutForm" method="post">
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" id="first_name" value=""
-                                            placeholder="First Name" required>
+                                        <input type="text" class="form-control" id="first_name" value="" placeholder="First Name" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" id="last_name" value=""
-                                            placeholder="Last Name" required>
+                                        <input type="text" class="form-control" id="last_name" value="" placeholder="Last Name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <input type="email" class="form-control" id="email" placeholder="Email" value="">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <input type="number" class="form-control" id="phone_number" min="0" placeholder="Phone No" value="">
                                     </div>
                                     <div class="col-12 mb-3">
-                                        <input type="text" class="form-control" id="company" placeholder="Company Name"
-                                            value="">
+                                        <textarea class="form-control mb-3" id="street_address" rows="2" placeholder="Address"></textarea>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <input type="text" class="form-control" id="city" placeholder="City" value="">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <input type="text" class="form-control" id="zipCode" placeholder="Zip Code" value="">
                                     </div>
                                     <div class="col-12 mb-3">
-                                        <input type="email" class="form-control" id="email" placeholder="Email"
-                                            value="">
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <select class="w-100" id="country">
-                                            <option value="usa">United States</option>
-                                            <option value="uk">United Kingdom</option>
-                                            <option value="ger">Germany</option>
-                                            <option value="fra">France</option>
-                                            <option value="ind">India</option>
-                                            <option value="aus">Australia</option>
-                                            <option value="bra">Brazil</option>
-                                            <option value="cana">Canada</option>
+                                        <select class="w-100 state-show" id="state" required>
+                                            <option value="">State</option>
+                                            <option value="16">Jharkhand</option>
+                                            <option value="35">West Bengal</option>
                                         </select>
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <input type="text" class="form-control mb-3" id="street_address"
-                                            placeholder="Address" value="">
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <input type="text" class="form-control" id="city" placeholder="Town" value="">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <input type="text" class="form-control" id="zipCode" placeholder="Zip Code"
-                                            value="">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <input type="number" class="form-control" id="phone_number" min="0"
-                                            placeholder="Phone No" value="">
-                                    </div>
-                                    <div class="col-12 mb-3">
-                                        <textarea name="comment" class="form-control w-100" id="comment" cols="30"
-                                            rows="10" placeholder="Leave a comment about your order"></textarea>
                                     </div>
 
                                     <div class="col-12">
                                         <div class="custom-control custom-checkbox d-block mb-2">
                                             <input type="checkbox" class="custom-control-input" id="customCheck2">
-                                            <label class="custom-control-label" for="customCheck2">Create an
-                                                accout</label>
-                                        </div>
-                                        <div class="custom-control custom-checkbox d-block">
-                                            <input type="checkbox" class="custom-control-input" id="customCheck3">
-                                            <label class="custom-control-label" for="customCheck3">Ship to a different
-                                                address</label>
+                                            <label class="custom-control-label" for="customCheck2">Create an account</label>
                                         </div>
                                     </div>
                                 </div>
-                            </form>
                         </div>
                     </div>
                     <div class="col-12 col-lg-4">
                         <div class="cart-summary">
                             <h5>Cart Total</h5>
                             <ul class="summary-table">
-                                <li><span>subtotal:</span> <span>$140.00</span></li>
+                                <li><span>subtotal:</span> <span></span></li>
                                 <li><span>delivery:</span> <span>Free</span></li>
-                                <li><span>total:</span> <span>$140.00</span></li>
+                                <li><span>total:</span> <span></span></li>
                             </ul>
 
                             <div class="payment-method">
                                 <!-- Cash on delivery -->
                                 <div class="custom-control custom-checkbox mr-sm-2">
-                                    <input type="checkbox" class="custom-control-input" id="cod" checked>
+                                    <input type="checkbox" class="custom-control-input" id="cod" disabled checked>
                                     <label class="custom-control-label" for="cod">Cash on Delivery</label>
                                 </div>
                                 <!-- Paypal -->
-                                <div class="custom-control custom-checkbox mr-sm-2">
+                                <!-- <div class="custom-control custom-checkbox mr-sm-2">
                                     <input type="checkbox" class="custom-control-input" id="paypal">
                                     <label class="custom-control-label" for="paypal">Paypal <img class="ml-15"
                                             src="img/core-img/paypal.png" alt=""></label>
-                                </div>
+                                </div> -->
                             </div>
 
                             <div class="cart-btn mt-100">
-                                <a href="#" class="btn amado-btn w-100">Checkout</a>
+                                <button type="submit" class="btn amado-btn w-100">Checkout</a>
                             </div>
                         </div>
                     </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -214,9 +207,9 @@
                 <!-- Newsletter Text -->
                 <div class="col-12 col-lg-6 col-xl-7">
                     <div class="newsletter-text mb-100">
-                        <h2>Subscribe for a <span>25% Discount</span></h2>
+                        <!-- <h2>Subscribe for a <span>25% Discount</span></h2>
                         <p>Nulla ac convallis lorem, eget euismod nisl. Donec in libero sit amet mi vulputate
-                            consectetur. Donec auctor interdum purus, ac finibus massa bibendum nec.</p>
+                            consectetur. Donec auctor interdum purus, ac finibus massa bibendum nec.</p> -->
                     </div>
                 </div>
                 <!-- Newsletter Form -->
@@ -268,15 +261,6 @@
                                         <li class="nav-item">
                                             <a class="nav-link" href="shop.html">Shop</a>
                                         </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="product-details.html">Product</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="cart.html">Cart</a>
-                                        </li>
-                                        <li class="nav-item">
-                                            <a class="nav-link" href="checkout.html">Checkout</a>
-                                        </li>
                                     </ul>
                                 </div>
                             </nav>
@@ -290,6 +274,7 @@
 
     <!-- ##### jQuery (Necessary for All JavaScript Plugins) ##### -->
     <script src="js/jquery/jquery-2.2.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
     <!-- Popper js -->
     <script src="js/popper.min.js"></script>
     <!-- Bootstrap js -->
@@ -298,6 +283,87 @@
     <script src="js/plugins.js"></script>
     <!-- Active js -->
     <script src="js/active.js"></script>
+    <script>
+        $(document).ready(function () {
+            getState();
+
+            function getState() {
+                $.ajax({
+                    url: 'api/index.php',
+                    type: 'POST',
+                    data: { get_states: 1 },
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.status === 'success') {
+                            var states = response.data;
+
+                            // Clear existing options
+                            $('#state').html('<option value="">State</option>');
+                            $('.state-show .list').empty();
+
+                            // Append new options
+                            $.each(states, function (index, state) {
+                                // Add options to the <select> dropdown
+                                $('#state').append('<option value="' + state.id + '">' + state.name + '</option>');
+
+                                // Add <li> elements to the custom dropdown
+                                $('.state-show .list').append('<li data-value="' + state.id + '" class="option">' + state.name + '</li>');
+                            });
+
+                            // Reinitialize NiceSelect (if using the library)
+                            if ($.fn.niceSelect) {
+                                $('#state').niceSelect('update');
+                            }
+                        } else {
+                            console.error('Failed to fetch states:', response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX Error:', error);
+                    }
+                });
+            }
+
+            $('#checkoutForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent the form from submitting the traditional way
+
+                const cart = JSON.parse(Cookies.get('cart') || '[]');
+
+                const formData = {
+                    order_details_save: '1',
+                    first_name: $('#first_name').val(),
+                    last_name: $('#last_name').val(),
+                    email: $('#email').val(),
+                    phone_number: $('#phone_number').val(),
+                    street_address: $('#street_address').val(),
+                    city: $('#city').val(),
+                    zipCode: $('#zipCode').val(),
+                    state: $('#state').val(),
+                    cart_items: JSON.stringify(cart) // Convert cart to JSON string
+                };
+
+                $.ajax({
+                    url: 'api/index.php', // PHP script to handle the request
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        alert('Order placed successfully!');
+                        Cookies.remove('cart');
+                        window.location.href = 'thankyou.html';
+                        // Optionally, redirect the user or clear the cart
+                    },
+                    error: function(xhr, status, error) {
+                        alert('An error occurred while processing your order.');
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
+        // Get the current cart from cookies
+        let cart = Cookies.get('cart_total');
+        var cart_count = Cookies.get('cart_total') || '0';
+        $('.summary-table').find('span:eq(1), span:eq(5)').html(cart_count);
+    </script>
 </body>
 
 </html>

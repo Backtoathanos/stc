@@ -4,7 +4,11 @@ import axios from 'axios';
 import './CustomerModal.css';
 
 const ProductModal = ({ show, handleClose, productId }) => {
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const API_BASE_URL = process.env.NODE_ENV === 'production'
+    ? 'https://stcassociate.com/stc_gld/vanaheim'
+    : 'http://localhost/stc/stc_gld/vanaheim';
+    console.log(API_BASE_URL);
+    console.log(`${API_BASE_URL}/index.php?action=getProductDetails&productId=${productId}`);
     const [productName, setProductName] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [productCategory, setProductCategory] = useState('');
@@ -19,9 +23,7 @@ const ProductModal = ({ show, handleClose, productId }) => {
     // Fetch customer options when the modal is shown
     useEffect(() => {
         if (show) {
-            axios.get(`${API_BASE_URL}/index.php`, {
-                params: { action: 'getProductDetails', productId: productId }
-            })
+            axios.get(`${API_BASE_URL}/index.php?action=getProductDetails&productId=${productId}`)
                 .then(response => {
                     let product = response.data.product;
                     let productName=product.productName;

@@ -116,4 +116,13 @@
         });
     });
 
+
+    
+
+    // Get the current cart from cookies
+    let cart = Cookies.get('cart');
+    var cart_count = JSON.parse(Cookies.get('cart') || '[]');
+    $('.cart-nav').find('span').html("("+cart_count.length+")");
+    
+
 })(jQuery);
