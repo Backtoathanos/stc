@@ -4,6 +4,73 @@ date_default_timezone_set('Asia/Kolkata');
 include "../../MCU/obdb.php";
 
 class prime extends tesseract {
+// Search product with pagination
+    public function stc_landingpage_products($search, $page = 1, $perPage = 9) {
+        $results = array();
+
+        // Calculate offset for pagination
+        $offset = ($page - 1) * $perPage;
+
+        // Base query
+        $query = "SELECT DISTINCT `stc_product_id`, `stc_product_name`, `stc_sub_cat_name`, `stc_cat_name`, `stc_product_image` 
+                  FROM `stc_product` 
+                  LEFT JOIN `stc_category` ON `stc_cat_id` = `stc_product_cat_id` 
+                  LEFT JOIN `stc_sub_category` ON `stc_sub_cat_id` = `stc_product_sub_cat_id`";
+
+        // Add search condition if $search is not empty
+        if (!empty($search)) {
+            $query .= " WHERE `stc_product_name` LIKE ? OR `stc_product_desc` LIKE ?";
+        }
+
+        // Add sorting and limit with pagination
+        $query .= " ORDER BY `stc_product_name` ASC LIMIT ?, ?";
+
+        // Prepare the statement
+        $stmt = mysqli_prepare($this->stc_dbs, $query);
+        if (!$stmt) {
+            return array('error' => 'Failed to prepare the query.');
+        }
+
+        // Bind parameters
+        if (!empty($search)) {
+            $searchTerm = "%" . $search . "%";
+            mysqli_stmt_bind_param($stmt, "ssii", $searchTerm, $searchTerm, $offset, $perPage);
+        } else {
+            mysqli_stmt_bind_param($stmt, "ii", $offset, $perPage);
+        }
+
+        // Execute the query
+        if (!mysqli_stmt_execute($stmt)) {
+            return array('error' => 'Failed to execute the query.');
+        }
+
+        // Get the result
+        $result = mysqli_stmt_get_result($stmt);
+
+        // Fetch rows and store them in the $results array
+        while ($row = mysqli_fetch_assoc($result)) {
+            $query="
+                SELECT DISTINCT `stc_purchase_product_adhoc_rate` 
+                FROM `stc_purchase_product_adhoc` 
+                WHERE `stc_purchase_product_adhoc_productid`='".$row['stc_product_id']."' AND `stc_purchase_product_adhoc_rate`>0 LIMIT 1
+            ";
+            $sql_qry=mysqli_query($this->stc_dbs, $query);
+            $row['rate']=0;
+            if(mysqli_num_rows($sql_qry)>0){
+                $result2=mysqli_fetch_assoc($sql_qry);
+                $row['rate']=$result2['stc_purchase_product_adhoc_rate'];
+            }
+            if($row['stc_product_image']!=''){
+                $results[] = $row;
+            }
+        }
+
+        // Close the statement
+        mysqli_stmt_close($stmt);
+
+        // Return the results
+        return $results;
+    }
 
     // Search product with pagination
     public function stc_search_products($search, $page = 1, $perPage = 25) {
@@ -239,6 +306,71 @@ class prime extends tesseract {
         // Return success message
         return array('status' => 'success', 'message' => 'Order saved successfully.', 'data' => $output_array['cart_items']);
     }
+
+    public function stc_getProductByid($productId) {
+        // Base query to fetch product details
+        $query = "SELECT DISTINCT `stc_product_id`, `stc_product_name`, `stc_sub_cat_name`, `stc_cat_name`, `stc_product_image` 
+                  FROM `stc_product` 
+                  LEFT JOIN `stc_category` ON `stc_cat_id` = `stc_product_cat_id` 
+                  LEFT JOIN `stc_sub_category` ON `stc_sub_cat_id` = `stc_product_sub_cat_id`
+                  WHERE `stc_product_id` = ?";
+
+        // Prepare the statement
+        $stmt = $this->stc_dbs->prepare($query);
+        if (!$stmt) {
+            return ['status' => 'error', 'message' => 'Failed to prepare the query.'];
+        }
+
+        // Bind parameters
+        $stmt->bind_param('i', $productId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            $row = $result->fetch_assoc();
+
+            // Fetch product rate
+            $rateQuery = "SELECT DISTINCT `stc_purchase_product_adhoc_rate` 
+                          FROM `stc_purchase_product_adhoc` 
+                          WHERE `stc_purchase_product_adhoc_productid` = ? AND `stc_purchase_product_adhoc_rate` > 0 
+                          LIMIT 1";
+            $rateStmt = $this->stc_dbs->prepare($rateQuery);
+            $rateStmt->bind_param('i', $row['stc_product_id']);
+            $rateStmt->execute();
+            $rateResult = $rateStmt->get_result();
+
+            $row['rate'] = 0;
+            if ($rateResult->num_rows > 0) {
+                $rateRow = $rateResult->fetch_assoc();
+                $row['rate'] = $rateRow['stc_purchase_product_adhoc_rate'];
+            }
+
+            // Prepare response
+            $response = [
+                'status' => 'success',
+                'data' => [
+                    'product_id' => $row['stc_product_id'],
+                    'product_name' => $row['stc_product_name'],
+                    'product_price' => $row['rate'], // Use the fetched rate as the price
+                    'stock_status' => 'In Stock', // Assuming stock status is always available
+                    'product_description' => 'Product description', // Add description if available
+                    'images' => [$row['stc_product_image']] // Add more images if available
+                ]
+            ];
+
+            return $response;
+        } else {
+            return ['status' => 'error', 'message' => 'Product not found.'];
+        }
+    }
+}
+// Handle search request
+if (isset($_GET['searchlanidng']) && isset($_GET['page'])) {
+    $search = $_GET['searchlanidng'];
+    $page = intval($_GET['page']); // Current page number
+    $objlogin = new prime();
+    $opobjlogin = $objlogin->stc_landingpage_products($search, $page);
+    echo json_encode($opobjlogin);
 }
 
 // Handle search request
@@ -309,4 +441,13 @@ if (isset($_POST['order_details_save'])) {
     $opobjlogin = $objlogin->stc_save_orders($output_array);
     echo json_encode($opobjlogin);
 }
+
+// Handle search request
+if (isset($_GET['getProduct_byId']) && isset($_GET['productId'])) {
+    $productId = intval($_GET['productId']);
+    $objlogin = new prime();
+    $opobjlogin = $objlogin->stc_getProductByid($productId);
+    echo json_encode($opobjlogin);
+}
+
 ?>

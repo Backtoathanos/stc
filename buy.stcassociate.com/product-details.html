@@ -72,7 +72,6 @@
                     <li><a href="index.html">Home</a></li>
                     <li><a href="shop.html">Shop</a></li>
                     <li><a href="cart.html">Cart</a></li>
-                    <li><a href="checkout.html">Checkout</a></li>
                 </ul>
             </nav>
             <!-- Button Group -->
@@ -83,15 +82,8 @@
             <!-- Cart Menu -->
             <div class="cart-fav-search mb-100">
                 <a href="cart.html" class="cart-nav"><img src="img/core-img/cart.png" alt=""> Cart <span>(0)</span></a>
-                <a href="#" class="fav-nav"><img src="img/core-img/favorites.png" alt=""> Favourite</a>
+                <!-- <a href="#" class="fav-nav"><img src="img/core-img/favorites.png" alt=""> Favourite</a> -->
                 <a href="#" class="search-nav"><img src="img/core-img/search.png" alt=""> Search</a>
-            </div>
-            <!-- Social Button -->
-            <div class="social-info d-flex justify-content-between">
-                <a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a>
-                <a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a>
-                <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
             </div>
         </header>
         <!-- Header Area End -->
@@ -105,9 +97,8 @@
                         <nav aria-label="breadcrumb">
                             <ol class="breadcrumb mt-50">
                                 <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item"><a href="#">Furniture</a></li>
-                                <li class="breadcrumb-item"><a href="#">Chairs</a></li>
-                                <li class="breadcrumb-item active" aria-current="page">white modern chair</li>
+                                <!-- <li class="breadcrumb-item category"><a href="shop.html">Furniture</a></li> -->
+                                <li class="breadcrumb-item product-title active" aria-current="page">white modern chair</li>
                             </ol>
                         </nav>
                     </div>
@@ -121,7 +112,7 @@
                                     <li class="active" data-target="#product_details_slider" data-slide-to="0"
                                         style="background-image: url(img/product-img/pro-big-1.jpg);">
                                     </li>
-                                    <li data-target="#product_details_slider" data-slide-to="1"
+                                    <!-- <li data-target="#product_details_slider" data-slide-to="1"
                                         style="background-image: url(img/product-img/pro-big-2.jpg);">
                                     </li>
                                     <li data-target="#product_details_slider" data-slide-to="2"
@@ -129,7 +120,7 @@
                                     </li>
                                     <li data-target="#product_details_slider" data-slide-to="3"
                                         style="background-image: url(img/product-img/pro-big-4.jpg);">
-                                    </li>
+                                    </li> -->
                                 </ol>
                                 <div class="carousel-inner">
                                     <div class="carousel-item active">
@@ -138,7 +129,7 @@
                                                 alt="First slide">
                                         </a>
                                     </div>
-                                    <div class="carousel-item">
+                                    <!-- <div class="carousel-item">
                                         <a class="gallery_img" href="img/product-img/pro-big-2.jpg">
                                             <img class="d-block w-100" src="img/product-img/pro-big-2.jpg"
                                                 alt="Second slide">
@@ -155,7 +146,7 @@
                                             <img class="d-block w-100" src="img/product-img/pro-big-4.jpg"
                                                 alt="Fourth slide">
                                         </a>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -165,12 +156,12 @@
                             <!-- Product Meta Data -->
                             <div class="product-meta-data">
                                 <div class="line"></div>
-                                <p class="product-price">$180</p>
-                                <a href="product-details.html">
-                                    <h6>White Modern Chair</h6>
+                                <p class="product-price"></p>
+                                <a href="javascript:void(0)">
+                                    <h6 class="product-title">White Modern Chair</h6>
                                 </a>
                                 <!-- Ratings & Review -->
-                                <div class="ratings-review mb-15 d-flex align-items-center justify-content-between">
+                                <!-- <div class="ratings-review mb-15 d-flex align-items-center justify-content-between">
                                     <div class="ratings">
                                         <i class="fa fa-star" aria-hidden="true"></i>
                                         <i class="fa fa-star" aria-hidden="true"></i>
@@ -181,35 +172,36 @@
                                     <div class="review">
                                         <a href="#">Write A Review</a>
                                     </div>
-                                </div>
+                                </div> -->
                                 <!-- Avaiable -->
                                 <p class="avaibility"><i class="fa fa-circle"></i> In Stock</p>
                             </div>
 
                             <div class="short_overview my-5">
-                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid quae eveniet culpa
-                                    officia quidem mollitia impedit iste asperiores nisi reprehenderit consequatur,
-                                    autem, nostrum pariatur enim?</p>
+                                <!-- <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid quae eveniet culpa officia quidem mollitia impedit iste asperiores nisi reprehenderit consequatur, autem, nostrum pariatur enim?</p> -->
                             </div>
 
                             <!-- Add to Cart Form -->
-                            <form class="cart clearfix" method="post">
+                            <form class="cart clearfix" method="post" action="#">
                                 <div class="cart-btn d-flex mb-50">
                                     <p>Qty</p>
                                     <div class="quantity">
-                                        <span class="qty-minus"
-                                            onclick="var effect = document.getElementById('qty'); var qty = effect.value; if( !isNaN( qty ) &amp;&amp; qty &gt; 1 ) effect.value--;return false;"><i
-                                                class="fa fa-caret-down" aria-hidden="true"></i></span>
-                                        <input type="number" class="qty-text" id="qty" step="1" min="1" max="300"
-                                            name="quantity" value="1">
-                                        <span class="qty-plus"
-                                            onclick="var effect = document.getElementById('qty'); var qty = effect.value; if( !isNaN( qty )) effect.value++;return false;"><i
-                                                class="fa fa-caret-up" aria-hidden="true"></i></span>
+                                        <!-- Minus Button -->
+                                        <span class="qty-minus" onclick="adjustQuantity('qty', -1); return false;">
+                                            <i class="fa fa-caret-down" aria-hidden="true"></i>
+                                        </span>
+                                        <!-- Quantity Input -->
+                                        <input type="number" class="qty-text" id="qty" step="1" min="1" max="300" name="quantity" value="1">
+                                        <!-- Plus Button -->
+                                        <span class="qty-plus" onclick="adjustQuantity('qty', 1); return false;">
+                                            <i class="fa fa-caret-up" aria-hidden="true"></i>
+                                        </span>
                                     </div>
                                 </div>
-                                <button type="submit" name="addtocart" value="5" class="btn amado-btn">Add to
-                                    cart</button>
+                                <!-- Add to Cart Button -->
+                                <button type="submit" name="addtocart" value="5" class="btn amado-btn add-to-cart">Add to Cart</button>
                             </form>
+                            
 
                         </div>
                     </div>
@@ -312,6 +304,132 @@
     <script src="js/plugins.js"></script>
     <!-- Active js -->
     <script src="js/active.js"></script>
+    <script>
+        function adjustQuantity(inputId, change) {
+            const input = document.getElementById(inputId);
+            let qty = parseInt(input.value);
+    
+            // Adjust quantity within the allowed range
+            if (!isNaN(qty)) {
+                qty += change;
+                if (qty < 1) qty = 1; // Ensure minimum quantity is 1
+                if (qty > 300) qty = 300; // Ensure maximum quantity is 300
+                input.value = qty;
+            }
+        }
+        // Function to get query parameters from the URL
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // Get the product_id from the URL
+        const productId = getQueryParam('product_id');
+
+        $(document).ready(function() {
+            if (productId) {
+                console.log(productId);
+                $.ajax({
+                    url: 'api/index.php',
+                    type: 'GET',
+                    data: { getProduct_byId: 1, productId: productId },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            // Populate product details
+                            $('.product-title').text(response.data.product_name);
+                            $('.product-price').text('₹' + response.data.product_price);
+                            $('.avaibility').html(`<i class="fa fa-circle"></i> ${response.data.stock_status}`);
+                            $('.short_overview p').text(response.data.product_description);
+
+                            // Update product images
+                            const carouselIndicators = $('#product_details_slider .carousel-indicators');
+                            const carouselInner = $('#product_details_slider .carousel-inner');
+
+                            carouselIndicators.empty();
+                            carouselInner.empty();
+
+                            response.data.images.forEach((image, index) => {
+                                // Add carousel indicator
+                                carouselIndicators.append(`
+                                    <li data-target="#product_details_slider" data-slide-to="${index}" 
+                                        style="background-image: url(https://stcassociate.com/stc_symbiote/stc_product_image/${image});" ${index === 0 ? 'class="active"' : ''}>
+                                    </li>
+                                `);
+
+                                // Add carousel item
+                                carouselInner.append(`
+                                    <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                                        <a class="gallery_img" href="${image}">
+                                            <img class="d-block w-100" src="https://stcassociate.com/stc_symbiote/stc_product_image/${image}" alt="Slide ${index + 1}">
+                                        </a>
+                                    </div>
+                                `);
+                            });
+
+                            // Update add to cart button value
+                            $('.add-to-cart').val(response.data.product_id);
+                        } else {
+                            alert('Product not found.');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error fetching product details:', error);
+                        alert('An error occurred while fetching product details.');
+                    }
+                });
+            } else {
+                alert('Product ID is missing in the URL.');
+            }
+
+
+            // Add to Cart button click event
+            $(document).on('click', '.add-to-cart', function () {
+                const productId = $(this).data('product-id'); // Get the product ID
+                addToCart(productId); // Add the product to the cart
+            });
+
+            // Function to add a product to the cart
+            function addToCart(productId) {
+                // Get the current cart from cookies
+                let cart = Cookies.get('cart');
+
+                // If the cart doesn't exist, initialize it as an empty array
+                if (!cart) {
+                    cart = [];
+                } else {
+                    try {
+                        // Parse the cart cookie (it's stored as a JSON string)
+                        cart = JSON.parse(cart);
+                    } catch (error) {
+                        console.error('Error parsing cart:', error);
+                        cart = []; // Reset the cart if parsing fails
+                    }
+                }
+
+                // Check if the product is already in the cart
+                if (!cart.includes(productId)) {
+                    // Add the product to the cart
+                    cart.push(productId);
+
+                    // Save the updated cart back to cookies
+                    Cookies.set('cart', JSON.stringify(cart), { expires: 7 }); // Expires in 7 days
+
+                    // Get the actual number of items in the cart
+                    const cart_count = cart.length;
+
+                    // Update the cart count in the UI
+                    $('.cart-nav').find('span').html("(" + cart_count + ")");
+
+                    // Show success message
+                    alert('Product added to cart!');
+                } else {
+                    // Show message if the product is already in the cart
+                    alert('Product is already in the cart!');
+                }
+            }        
+        });    
+    </script>
 </body>
 
 </html>
