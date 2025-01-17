@@ -1332,7 +1332,7 @@ class pirates_project extends tesseract{
 
 	//show equipment details
 	public function stc_equipement_details_get($search){
-		$query=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_pro_supervisor_collaborate_userid` FROM `stc_agents`  LEFT JOIN `stc_cust_pro_supervisor_collaborate` ON `stc_agents_id`=`stc_cust_pro_supervisor_collaborate_managerid` OR `stc_agents_id`=`stc_cust_pro_supervisor_collaborate_teamid` WHERE `stc_agents_id`='".$_SESSION['stc_agent_id']."'");
+		$query=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_pro_supervisor_collaborate_userid` FROM `stc_agents` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` LEFT JOIN `stc_cust_pro_supervisor_collaborate` ON `stc_cust_pro_supervisor_id`=`stc_cust_pro_supervisor_collaborate_userid` WHERE `stc_agents_id`='".$_SESSION['stc_agent_id']."'");
 		$users='';
 		if(mysqli_num_rows($query)>0){
 			foreach($query as $rows){
