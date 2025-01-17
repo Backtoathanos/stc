@@ -71,23 +71,13 @@
                 <ul>
                     <li><a href="index.html">Home</a></li>
                     <li class="active"><a href="shop.html">Shop</a></li>
-                    <!-- <li><a href="product-details.html">Product</a></li> -->
-                    <li><a href="cart.html">Cart</a></li>
                 </ul>
             </nav>
             <!-- Cart Menu -->
             <div class="cart-fav-search mb-100">
                 <a href="cart.html" class="cart-nav"><img src="img/core-img/cart.png" alt=""> Cart <span>(0)</span></a>
-                <!-- <a href="#" class="fav-nav"><img src="img/core-img/favorites.png" alt=""> Favourite</a> -->
                 <a href="#" class="search-nav"><img src="img/core-img/search.png" alt=""> Search</a>
             </div>
-            <!-- Social Button -->
-            <!-- <div class="social-info d-flex justify-content-between">
-                <a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a>
-                <a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a>
-                <a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-            </div> -->
         </header>
         <!-- Header Area End -->
 
@@ -415,15 +405,22 @@
             
             // Add to Cart button click event
             $(document).on('click', '.add-to-cart', function () {
-                const productId = $(this).data('product-id'); // Get the product ID
-                addToCart(productId); // Add the product to the cart
+                const productId = parseInt($(this).data('product-id')); // Get the product ID
+                const quantity = 1; // Get the quantity from the input field
+                const rate = parseFloat($('.product-price').text().replace('₹', '')); // Get the rate from the product price
+
+                if (isNaN(rate) || rate <= 0) {
+                    alert('Invalid product rate.');
+                    return;
+                }
+                addToCart(productId, quantity, rate); // Add the product to the cart
             });
 
             // Function to add a product to the cart
-            function addToCart(productId) {
+            // Function to add a product to the cart
+            function addToCart(productId, quantity, rate) {
                 // Get the current cart from cookies
                 let cart = Cookies.get('cart');
-
                 // If the cart doesn't exist, initialize it as an empty array
                 if (!cart) {
                     cart = [];
@@ -431,6 +428,9 @@
                     try {
                         // Parse the cart cookie (it's stored as a JSON string)
                         cart = JSON.parse(cart);
+
+                        // Filter out null or invalid entries
+                        cart = cart.filter(item => item && typeof item === 'object' && item.productId);
                     } catch (error) {
                         console.error('Error parsing cart:', error);
                         cart = []; // Reset the cart if parsing fails
@@ -438,26 +438,32 @@
                 }
 
                 // Check if the product is already in the cart
-                if (!cart.includes(productId)) {
+                const existingProductIndex = cart.findIndex(item => item.productId === productId);
+
+                if (existingProductIndex === -1) {
                     // Add the product to the cart
-                    cart.push(productId);
-
-                    // Save the updated cart back to cookies
-                    Cookies.set('cart', JSON.stringify(cart), { expires: 7 }); // Expires in 7 days
-
-                    // Get the actual number of items in the cart
-                    const cart_count = cart.length;
-
-                    // Update the cart count in the UI
-                    $('.cart-nav').find('span').html("(" + cart_count + ")");
-
-                    // Show success message
-                    alert('Product added to cart!');
+                    cart.push({
+                        productId: productId,
+                        quantity: quantity,
+                        rate: rate
+                    });
                 } else {
-                    // Show message if the product is already in the cart
-                    alert('Product is already in the cart!');
+                    // Update the quantity if the product is already in the cart
+                    cart[existingProductIndex].quantity += quantity;
                 }
-            }        
+
+                // Save the updated cart back to cookies
+                Cookies.set('cart', JSON.stringify(cart), { expires: 7 }); // Expires in 7 days
+
+                // Get the actual number of items in the cart
+                const cart_count = cart.length;
+
+                // Update the cart count in the UI
+                $('.cart-nav').find('span').html("(" + cart_count + ")");
+
+                // Show success message
+                alert('Product added to cart!');
+            }
         });    
     </script>
 </body>

@@ -140,40 +140,42 @@ class prime extends tesseract {
         return $results;
     }
 
-    // products
-    public function stc_get_products($product_ids) {
+    public function stc_get_products($product_data) {
         // Initialize variables
         $products = [];
         $total = 0;
-
-        // Check if product IDs are provided
-        if (!empty($product_ids)) {
+    
+        // Check if product data is provided
+        if (!empty($product_data)) {
+            // Extract product IDs from the product data
+            $product_ids = array_column($product_data, 'productId');
+    
             // Create placeholders for the prepared statement
             $placeholders = implode(',', array_fill(0, count($product_ids), '?'));
-
+    
             // Base query to fetch product details and rate
             $query = "
+                SELECT 
+                    p.`stc_product_id`, 
+                    p.`stc_product_name`, 
+                    sc.`stc_sub_cat_name`, 
+                    c.`stc_cat_name`, 
+                    p.`stc_product_image`, 
+                    COALESCE(a.`stc_purchase_product_adhoc_rate`, 0) AS rate
+                FROM `stc_product` p
+                LEFT JOIN `stc_category` c ON c.`stc_cat_id` = p.`stc_product_cat_id`
+                LEFT JOIN `stc_sub_category` sc ON sc.`stc_sub_cat_id` = p.`stc_product_sub_cat_id`
+                LEFT JOIN (
                     SELECT 
-                        p.`stc_product_id`, 
-                        p.`stc_product_name`, 
-                        sc.`stc_sub_cat_name`, 
-                        c.`stc_cat_name`, 
-                        p.`stc_product_image`, 
-                        COALESCE(a.`stc_purchase_product_adhoc_rate`, 0) AS rate
-                    FROM `stc_product` p
-                    LEFT JOIN `stc_category` c ON c.`stc_cat_id` = p.`stc_product_cat_id`
-                    LEFT JOIN `stc_sub_category` sc ON sc.`stc_sub_cat_id` = p.`stc_product_sub_cat_id`
-                    LEFT JOIN (
-                        SELECT 
-                            `stc_purchase_product_adhoc_productid`, 
-                            MIN(`stc_purchase_product_adhoc_rate`) AS `stc_purchase_product_adhoc_rate`
-                        FROM `stc_purchase_product_adhoc`
-                        WHERE `stc_purchase_product_adhoc_rate` > 0
-                        GROUP BY `stc_purchase_product_adhoc_productid`
-                    ) a ON a.`stc_purchase_product_adhoc_productid` = p.`stc_product_id`
-                    WHERE p.`stc_product_id` IN ($placeholders)
-                ";
-
+                        `stc_purchase_product_adhoc_productid`, 
+                        MIN(`stc_purchase_product_adhoc_rate`) AS `stc_purchase_product_adhoc_rate`
+                    FROM `stc_purchase_product_adhoc`
+                    WHERE `stc_purchase_product_adhoc_rate` > 0
+                    GROUP BY `stc_purchase_product_adhoc_productid`
+                ) a ON a.`stc_purchase_product_adhoc_productid` = p.`stc_product_id`
+                WHERE p.`stc_product_id` IN ($placeholders)
+            ";
+    
             // Prepare the statement
             $stmt = mysqli_prepare($this->stc_dbs, $query);
             if (!$stmt) {
@@ -182,11 +184,11 @@ class prime extends tesseract {
                     'message' => 'Failed to prepare the SQL statement.'
                 ];
             }
-
+    
             // Bind parameters
             $types = str_repeat('i', count($product_ids)); // 'i' for integer
             mysqli_stmt_bind_param($stmt, $types, ...$product_ids);
-
+    
             // Execute the query
             if (!mysqli_stmt_execute($stmt)) {
                 return [
@@ -194,12 +196,18 @@ class prime extends tesseract {
                     'message' => 'Failed to execute the SQL statement.'
                 ];
             }
-
+    
             // Get the result
             $result = mysqli_stmt_get_result($stmt);
-
+    
             // Fetch rows and store them in the $products array
             while ($row = mysqli_fetch_assoc($result)) {
+                // Find the corresponding quantity from the product data
+                $product_info = array_filter($product_data, function ($item) use ($row) {
+                    return $item['productId'] == $row['stc_product_id'];
+                });
+                $quantity = !empty($product_info) ? reset($product_info)['quantity'] : 1; // Default to 1 if not found
+    
                 // Include only products with non-empty images
                 if (!empty($row['stc_product_image'])) {
                     $products[] = [
@@ -209,15 +217,15 @@ class prime extends tesseract {
                         'category' => $row['stc_cat_name'],
                         'image' => $row['stc_product_image'],
                         'rate' => $row['rate'],
-                        'quantity' => 1 // Default quantity
+                        'quantity' => $quantity // Use the quantity from the cart
                     ];
-                    $total += $row['rate']; // Add rate to the total
+                    $total += $row['rate'] * $quantity; // Add rate * quantity to the total
                 }
             }
-
+    
             // Close the statement
             mysqli_stmt_close($stmt);
-
+    
             // Return the results
             return [
                 'status' => 'success',
@@ -225,10 +233,10 @@ class prime extends tesseract {
                 'total' => $total
             ];
         } else {
-            // If no product IDs are provided
+            // If no product data is provided
             return [
                 'status' => 'failed',
-                'message' => 'No product IDs provided.'
+                'message' => 'No product data provided.'
             ];
         }
     }
@@ -269,20 +277,48 @@ class prime extends tesseract {
     // save orders
     public function stc_save_orders($output_array) {
         $results = array();
-
+    
+        // Check database connection
+        if (!$this->stc_dbs) {
+            return array('status' => 'error', 'message' => 'Database connection failed.');
+        }
+    
         // Loop through each cart item and insert into the database
-        foreach ($output_array['cart_items'] as $product_id) {
-            $query = "INSERT INTO `orders` (`first_name`, `last_name`, `email`, `phone_number`, `street_address`, `city`, `zipCode`, `state`, `product_id`, `created_at`) 
-                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
-
+        foreach ($output_array['cart_items'] as $item) {
+            $product_id = $item['productId']; // Product ID
+            $quantity = $item['quantity']; // Quantity
+            $rate = $item['rate']; // Rate
+    
+            // Validate input data
+            if (empty($product_id) || empty($quantity) || empty($rate)) {
+                return array('status' => 'error', 'message' => 'Invalid product data.');
+            }
+    
+            $query = "INSERT INTO `orders` (
+                          `first_name`, 
+                          `last_name`, 
+                          `email`, 
+                          `phone_number`, 
+                          `street_address`, 
+                          `city`, 
+                          `zipCode`, 
+                          `state`, 
+                          `product_id`, 
+                          `quantity`, 
+                          `rate`,  
+                          `status`, 
+                          `created_at`
+                      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())";
+    
             // Prepare the statement
             $stmt = mysqli_prepare($this->stc_dbs, $query);
             if (!$stmt) {
-                return array('status' => 'error', 'message' => 'Failed to prepare the query.');
+                $error = mysqli_error($this->stc_dbs); // Capture the SQL error
+                return array('status' => 'error', 'message' => 'Failed to prepare the query: ' . $error, 'data' => $item['quantity']);
             }
-
+            $status = 1;
             // Bind parameters
-            mysqli_stmt_bind_param($stmt, 'sssssssss', 
+            mysqli_stmt_bind_param($stmt, 'ssssssssiddi', 
                 $output_array['first_name'],
                 $output_array['last_name'],
                 $output_array['email'],
@@ -291,18 +327,22 @@ class prime extends tesseract {
                 $output_array['city'],
                 $output_array['zipCode'],
                 $output_array['state'],
-                $product_id
+                $product_id,
+                $quantity,
+                $rate,
+                $status
             );
-
+    
             // Execute the statement
             if (!mysqli_stmt_execute($stmt)) {
-                return array('status' => 'error', 'message' => 'Failed to execute the query.');
+                $error = mysqli_error($this->stc_dbs); // Capture the SQL error
+                return array('status' => 'error', 'message' => 'Failed to execute the query: ' . $error);
             }
-
+    
             // Close the statement
             mysqli_stmt_close($stmt);
         }
-
+    
         // Return success message
         return array('status' => 'success', 'message' => 'Order saved successfully.', 'data' => $output_array['cart_items']);
     }
@@ -384,18 +424,18 @@ if (isset($_GET['search']) && isset($_GET['page'])) {
 
 // Handle search request
 if (isset($_POST['show_carts'])) {
-    // Get product IDs from the request
-    $product_ids = $_POST['product_ids'];
+    // Get product data from the request
+    $product_data = json_decode($_POST['product_data'], true);
 
-    // Validate product IDs
-    if (!empty($product_ids) && is_array($product_ids)) {
+    // Validate product data
+    if (!empty($product_data) && is_array($product_data)) {
         $objlogin = new prime();
-        $response = $objlogin->stc_get_products($product_ids);
+        $response = $objlogin->stc_get_products($product_data);
         echo json_encode($response);
     } else {
         echo json_encode([
             'status' => 'failed',
-            'message' => 'Invalid product IDs.'
+            'message' => 'Invalid product data.'
         ]);
     }
 }

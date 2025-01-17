@@ -71,7 +71,6 @@
                 <ul>
                     <li><a href="index.html">Home</a></li>
                     <li><a href="shop.html">Shop</a></li>
-                    <li class="active"><a href="cart.html">Cart</a></li>
                 </ul>
             </nav>
             <!-- Button Group -->
@@ -222,13 +221,20 @@
         $(document).ready(function () {
             // Get the cart from cookies
             const cart = JSON.parse(Cookies.get('cart') || '[]');
-
+            console.log(cart);
             if (cart.length > 0) {
-                // Send product IDs to the server to fetch product details
+                // Prepare product data with quantities
+                const productData = cart.map(item => ({
+                    productId: item.productId,
+                    quantity: item.quantity,
+                    rate: item.rate
+                }));
+
+                // Send product IDs and quantities to the server to fetch product details
                 $.ajax({
                     url: 'api/index.php', // Replace with your server endpoint
                     type: 'POST',
-                    data: { show_carts: 1, product_ids: cart },
+                    data: { show_carts: 1, product_data: JSON.stringify(productData) }, // Send product data as JSON
                     dataType: 'json',
                     success: function (response) {
                         if (response.status === 'success') {
@@ -237,6 +243,7 @@
 
                             // Render each product in the cart
                             response.products.forEach(product => {
+                                // Find the corresponding quantity from the cart
                                 const row = `
                                     <tr>
                                         <td class="cart_product_img">
@@ -253,7 +260,7 @@
                                                 <p>Qty</p>
                                                 <div class="quantity">
                                                     <span class="qty-minus"><i class="fa fa-minus" aria-hidden="true"></i></span>
-                                                    <input type="number" class="qty-text" step="1" min="1" max="300" name="quantity" value="${product.quantity}">
+                                                    <input type="number" class="qty-text" step="1" min="1" product-id="${product.id}" max="300" name="quantity" value="${product.quantity}">
                                                     <span class="qty-plus"><i class="fa fa-plus" aria-hidden="true"></i></span>
                                                 </div>
                                             </div>
@@ -276,13 +283,13 @@
                         }
                     },
                     error: function (xhr, status, error) {
-                        // console.error('AJAX Error:', error);
+                        console.error('AJAX Error:', error);
                         alert('An error occurred while fetching cart products.');
                     }
                 });
-            
+
                 $('body').delegate('.checkout-page', 'click', function () {
-                    var total=$('.summary-table li span').eq(5).text();
+                    var total = $('.summary-table li span').eq(5).text();
                     Cookies.set('cart_total', total, { expires: 7 });
                     window.location.href = 'checkout.html';
                 });
@@ -297,10 +304,29 @@
         function updateQuantity(element, change) {
             const input = $(element).siblings('input'); // Find the input element
             let quantity = parseInt(input.val()) + change; // Update the quantity
+            let product_id=$(input).attr('product-id');
             if (quantity < 1) quantity = 1; // Ensure quantity is at least 1
             if (quantity > 300) quantity = 300; // Ensure quantity is at most 300
             input.val(quantity); // Update the input value
 
+            let cart = JSON.parse(Cookies.get('cart') || '[]');
+
+            // Find the product in the cart
+            const productIndex = cart.findIndex(item => item.productId == product_id); // Use loose equality
+
+            if (productIndex !== -1) {
+                // Update the quantity for the product
+                cart[productIndex].quantity = quantity;
+
+                // Save the updated cart back to cookies
+                Cookies.set('cart', JSON.stringify(cart), { expires: 7 });
+
+                // Show success message
+                alert('Quantity updated successfully!');
+            } else {
+                // If the product is not found in the cart
+                alert('Product not found in the cart.');
+            }
             // Recalculate the cart total
             updateCartTotal();
         }

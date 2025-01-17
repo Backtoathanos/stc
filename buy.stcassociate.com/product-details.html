@@ -71,7 +71,6 @@
                 <ul>
                     <li><a href="index.html">Home</a></li>
                     <li><a href="shop.html">Shop</a></li>
-                    <li><a href="cart.html">Cart</a></li>
                 </ul>
             </nav>
             <!-- Button Group -->
@@ -109,9 +108,9 @@
                         <div class="single_product_thumb">
                             <div id="product_details_slider" class="carousel slide" data-ride="carousel">
                                 <ol class="carousel-indicators">
-                                    <li class="active" data-target="#product_details_slider" data-slide-to="0"
+                                    <!-- <li class="active" data-target="#product_details_slider" data-slide-to="0"
                                         style="background-image: url(img/product-img/pro-big-1.jpg);">
-                                    </li>
+                                    </li> -->
                                     <!-- <li data-target="#product_details_slider" data-slide-to="1"
                                         style="background-image: url(img/product-img/pro-big-2.jpg);">
                                     </li>
@@ -123,12 +122,12 @@
                                     </li> -->
                                 </ol>
                                 <div class="carousel-inner">
-                                    <div class="carousel-item active">
+                                    <!-- <div class="carousel-item active">
                                         <a class="gallery_img" href="img/product-img/pro-big-1.jpg">
                                             <img class="d-block w-100" src="img/product-img/pro-big-1.jpg"
                                                 alt="First slide">
                                         </a>
-                                    </div>
+                                    </div> -->
                                     <!-- <div class="carousel-item">
                                         <a class="gallery_img" href="img/product-img/pro-big-2.jpg">
                                             <img class="d-block w-100" src="img/product-img/pro-big-2.jpg"
@@ -328,7 +327,6 @@
 
         $(document).ready(function() {
             if (productId) {
-                console.log(productId);
                 $.ajax({
                     url: 'api/index.php',
                     type: 'GET',
@@ -384,13 +382,27 @@
 
 
             // Add to Cart button click event
-            $(document).on('click', '.add-to-cart', function () {
-                const productId = $(this).data('product-id'); // Get the product ID
-                addToCart(productId); // Add the product to the cart
+            $(document).on('click', '.add-to-cart', function (e) {
+                e.preventDefault();
+                const productId = parseInt($(this).val()); // Get the product ID from the button value
+                const quantity = parseFloat($('#qty').val()); // Get the quantity from the input field
+                const rate = parseFloat($('.product-price').text().replace('₹', '')); // Get the rate from the product price
+
+                // Validate quantity and rate
+                if (isNaN(quantity) || quantity < 1) {
+                    alert('Invalid quantity.');
+                    return;
+                }
+                if (isNaN(rate) || rate <= 0) {
+                    alert('Invalid product rate.');
+                    return;
+                }
+                // Add the product to the cart with quantity and rate
+                addToCart(productId, quantity, rate);
             });
 
             // Function to add a product to the cart
-            function addToCart(productId) {
+            function addToCart(productId, quantity, rate) {
                 // Get the current cart from cookies
                 let cart = Cookies.get('cart');
 
@@ -401,6 +413,9 @@
                     try {
                         // Parse the cart cookie (it's stored as a JSON string)
                         cart = JSON.parse(cart);
+
+                        // Filter out null or invalid entries
+                        cart = cart.filter(item => item && typeof item === 'object' && item.productId);
                     } catch (error) {
                         console.error('Error parsing cart:', error);
                         cart = []; // Reset the cart if parsing fails
@@ -408,26 +423,32 @@
                 }
 
                 // Check if the product is already in the cart
-                if (!cart.includes(productId)) {
+                const existingProductIndex = cart.findIndex(item => item.productId === productId);
+
+                if (existingProductIndex === -1) {
                     // Add the product to the cart
-                    cart.push(productId);
-
-                    // Save the updated cart back to cookies
-                    Cookies.set('cart', JSON.stringify(cart), { expires: 7 }); // Expires in 7 days
-
-                    // Get the actual number of items in the cart
-                    const cart_count = cart.length;
-
-                    // Update the cart count in the UI
-                    $('.cart-nav').find('span').html("(" + cart_count + ")");
-
-                    // Show success message
-                    alert('Product added to cart!');
+                    cart.push({
+                        productId: productId,
+                        quantity: quantity,
+                        rate: rate
+                    });
                 } else {
-                    // Show message if the product is already in the cart
-                    alert('Product is already in the cart!');
+                    // Update the quantity if the product is already in the cart
+                    cart[existingProductIndex].quantity += quantity;
                 }
-            }        
+
+                // Save the updated cart back to cookies
+                Cookies.set('cart', JSON.stringify(cart), { expires: 7 }); // Expires in 7 days
+
+                // Get the actual number of items in the cart
+                const cart_count = cart.length;
+
+                // Update the cart count in the UI
+                $('.cart-nav').find('span').html("(" + cart_count + ")");
+
+                // Show success message
+                alert('Product added to cart!');
+            }
         });    
     </script>
 </body>
