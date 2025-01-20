@@ -3649,6 +3649,149 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		return $blackpearl;
 	}
 }
+
+// call items from requisition for item track
+class ragnarCallB2COrders extends tesseract{
+	// show b2corders
+	public function stc_call_B2COrders($searchQuery = '', $page = 1, $perPage = 10) {
+		// Calculate offset for pagination
+		$offset = ($page - 1) * $perPage;
+	
+		// Base query
+		$query = "
+			SELECT * FROM `orders`
+			LEFT JOIN `stc_product` ON product_id = stc_product_id
+			LEFT JOIN `stc_sub_category` ON stc_product_sub_cat_id = stc_sub_cat_id
+		";
+	
+		// Add search condition if search query is provided
+		if (!empty($searchQuery)) {
+			$query .= "
+				WHERE (email LIKE '%$searchQuery%'
+				OR first_name LIKE '%$searchQuery%'
+				OR last_name LIKE '%$searchQuery%'
+				OR phone_number LIKE '%$searchQuery%'
+				OR stc_product_name LIKE '%$searchQuery%')
+			";
+		}
+	
+		// Add order by and limit for pagination
+		$query .= " ORDER BY TIMESTAMP(`created_at`) DESC LIMIT $perPage OFFSET $offset";
+	
+		// Execute the query
+		$blackpearl_qry = mysqli_query($this->stc_dbs, $query);
+		$blackpearl = [];
+	
+		if (mysqli_num_rows($blackpearl_qry) > 0) {
+			$i = 0;
+			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$product_name = $blackpearl_row['stc_product_name'];
+				if ($blackpearl_row['stc_sub_cat_name'] != "OTHERS") {
+					$product_name = $blackpearl_row['stc_sub_cat_name'] . ' ' . $blackpearl_row['stc_product_name'];
+				}
+				$blackpearl_row['stc_product_name'] = $product_name;
+				$blackpearl_row['created_at'] = date('d-m-Y H:i:s a', strtotime($blackpearl_row['created_at']));
+				$blackpearl_row['rate'] = number_format($blackpearl_row['rate'], 2);
+				$blackpearl_row['quantity'] = number_format($blackpearl_row['quantity'], 2);
+				$blackpearl[] = $blackpearl_row;
+			}
+		}
+	
+		// Get total count for pagination
+		$countQuery = "SELECT COUNT(*) as total FROM `orders`";
+		if (!empty($searchQuery)) {
+			$countQuery .= "
+				WHERE (email LIKE '%$searchQuery%'
+				OR first_name LIKE '%$searchQuery%'
+				OR last_name LIKE '%$searchQuery%'
+				OR phone_number LIKE '%$searchQuery%')
+			";
+		}
+		$countResult = mysqli_query($this->stc_dbs, $countQuery);
+		$totalCount = mysqli_fetch_assoc($countResult)['total'];
+	
+		return [
+			'data' => $blackpearl,
+			'total' => $totalCount,
+			'page' => $page,
+			'perPage' => $perPage
+		];
+	}
+
+	public function stc_action_order($id, $status){	
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "
+			UPDATE `orders` SET `status`='".mysqli_real_escape_string($this->stc_dbs, $status)."', `handled_by`='".$_SESSION['stc_empl_id']."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'
+		");
+		$blackpearl="no";
+		if($blackpearl_qry){
+			$blackpearl="success";
+		}
+	
+		return $blackpearl;
+	}
+
+	public function stc_call_advanceorderlist(){
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "
+			SELECT 
+				p.`stc_product_id`, 
+				psc.`stc_sub_cat_name`, 
+				p.`stc_product_name`, 
+				p.`stc_product_unit`, 
+				COUNT(*) AS total_count
+			FROM (
+				SELECT `stc_cust_super_requisition_list_items_rec_list_pd_id` AS product_id
+				FROM `stc_cust_super_requisition_list_items_rec`
+				
+				UNION ALL
+				
+				SELECT `stc_cust_super_requisition_list_purchaser_pd_id` AS product_id
+				FROM `stc_cust_super_requisition_list_purchaser`
+			) AS combined
+			JOIN `stc_product` p ON combined.product_id = p.`stc_product_id`
+			JOIN `stc_sub_category` psc ON p.stc_product_sub_cat_id = psc.`stc_sub_cat_id`
+			GROUP BY p.`stc_product_id`, p.`stc_product_name`
+			HAVING COUNT(*) >= 50 ORDER BY total_count DESC;
+		");
+		$blackpearl = [];
+		while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+			$blackpearl_row['stc_product_name']=$blackpearl_row['stc_product_name'];
+			if($blackpearl_row['stc_sub_cat_name']!="OTHERS"){
+				$blackpearl_row['stc_product_name']=$blackpearl_row['stc_sub_cat_name'].' '.$blackpearl_row['stc_product_name'];
+			}
+			$query = mysqli_query($this->stc_dbs, "SELECT SUM(`stc_purchase_product_adhoc_qty`) AS total_qty FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid` = " . $blackpearl_row['stc_product_id']);
+			$result=mysqli_fetch_assoc($query);
+			$adhocQty=$result['total_qty'];
+			$query = mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = " . $blackpearl_row['stc_product_id']);
+			$result=mysqli_fetch_assoc($query);
+			$gldQty=$result['total_qty'];
+			$directqty=0;
+			$sql_qry=mysqli_query($this->stc_dbs, "
+				SELECT `stc_purchase_product_adhoc_id` 
+				FROM `stc_purchase_product_adhoc` 
+				WHERE `stc_purchase_product_adhoc_productid`='".$blackpearl_row['stc_product_id']."'
+			");
+			if(mysqli_num_rows($sql_qry)>0){
+				foreach($sql_qry as $sql_row){
+					$sql_qry2=mysqli_query($this->stc_dbs, "
+						SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
+						FROM `stc_cust_super_requisition_list_items_rec` 
+						WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`='".$sql_row['stc_purchase_product_adhoc_id']."'
+					");
+					if(mysqli_num_rows($sql_qry2)>0){
+						foreach($sql_qry2 as $sql_row2){
+							$directqty+=$sql_row2['stc_cust_super_requisition_list_items_rec_recqty'];
+						}
+					}
+				}
+			}
+			$remainingqty=$adhocQty - ($gldQty + $directqty);
+			$blackpearl_row['remaining_qty']=$remainingqty;
+			if($remainingqty<5){$blackpearl[] = $blackpearl_row;}
+			
+		}
+		return $blackpearl;
+	}
+}
 #<------------------------------------------------------------------------------------------------------>
 #<--------------------------------------Object sections of Order class---------------------------------->
 #<------------------------------------------------------------------------------------------------------>
@@ -4336,4 +4479,30 @@ if(isset($_POST['call_tool_trackertrack'])){
 	$odin_req_out=$odin_req->stc_tool_trackertrack_get($itt_id);
 	echo json_encode($odin_req_out);
 }
+#<-----------------Object section of b2corders Class------------------->
+if (isset($_POST['stc_call_B2COrders'])) {
+    $searchQuery = $_POST['search'] ?? '';
+    $page = $_POST['page'] ?? 1;
+    $perPage = $_POST['perPage'] ?? 10;
+
+    $odin_req = new ragnarCallB2COrders();
+    $odin_req_out = $odin_req->stc_call_B2COrders($searchQuery, $page, $perPage);
+    echo json_encode($odin_req_out);
+}
+
+if(isset($_POST['stc_action_order'])){
+	$id=$_POST['id'];
+	$status=$_POST['status'];
+	$odin_req=new ragnarCallB2COrders();
+	$odin_req_out=$odin_req->stc_action_order($id, $status);
+	echo json_encode($odin_req_out);
+}
+
+
+if(isset($_POST['stc_call_advanceorderlist'])){
+	$odin_req=new ragnarCallB2COrders();
+	$odin_req_out=$odin_req->stc_call_advanceorderlist();
+	echo json_encode($odin_req_out);
+}
+
 ?>
