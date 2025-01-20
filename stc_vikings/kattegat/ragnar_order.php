@@ -3750,7 +3750,7 @@ class ragnarCallB2COrders extends tesseract{
 			JOIN `stc_product` p ON combined.product_id = p.`stc_product_id`
 			JOIN `stc_sub_category` psc ON p.stc_product_sub_cat_id = psc.`stc_sub_cat_id`
 			GROUP BY p.`stc_product_id`, p.`stc_product_name`
-			HAVING COUNT(*) >= 50 ORDER BY total_count DESC;
+			HAVING COUNT(*) ORDER BY total_count DESC;
 		");
 		$blackpearl = [];
 		while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
