@@ -3750,7 +3750,7 @@ class ragnarCallB2COrders extends tesseract{
 			JOIN `stc_product` p ON combined.product_id = p.`stc_product_id`
 			JOIN `stc_sub_category` psc ON p.stc_product_sub_cat_id = psc.`stc_sub_cat_id`
 			GROUP BY p.`stc_product_id`, p.`stc_product_name`
-			HAVING COUNT(*) ORDER BY total_count DESC;
+			HAVING COUNT(*) >=10 ORDER BY p.`stc_product_name` ASC;
 		");
 		$blackpearl = [];
 		while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
@@ -3785,8 +3785,10 @@ class ragnarCallB2COrders extends tesseract{
 				}
 			}
 			$remainingqty=$adhocQty - ($gldQty + $directqty);
-			$blackpearl_row['remaining_qty']=$remainingqty;
-			if($remainingqty<5){$blackpearl[] = $blackpearl_row;}
+			if($remainingqty<5){
+				$blackpearl_row['remaining_qty']=number_format($remainingqty, 2);
+				$blackpearl[] = $blackpearl_row;
+			}
 			
 		}
 		return $blackpearl;

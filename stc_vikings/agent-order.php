@@ -2216,7 +2216,11 @@ include("kattegat/role_check.php");
             var data = '';
             var slno = 1;
             for (var i = 0; i < response.length; i++) {
-              data += '<tr><td>' + slno + '</td><td>' + response[i].stc_product_name + '</td><td class="text-right">' + response[i].remaining_qty + '</td><td class="text-center">' + response[i].stc_product_unit + '</td></tr>';
+              var color="#ff6d6d";
+              if(response[i].remaining_qty>0){
+                color="#78f37c";
+              }
+              data += '<tr><td>' + slno + '</td><td>' + response[i].stc_product_name + '</td><td class="text-right" style="background-color:' + color + '">' + response[i].remaining_qty + '</td><td class="text-center">' + response[i].stc_product_unit + '</td></tr>';
               slno++;
             }
             $('.stc-call-advanceorderlist').html(data);
