@@ -293,7 +293,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 $('.hide-col').hide();
                 if(equipmenttype=="Air Handling Unit" || equipmenttype=="VAM"){$('.AirHandlingUnit').show();}
                 if(equipmenttype=="Chilled Water Pump" || equipmenttype=="Chiller Unit"){$('.ChilledWaterPump').show();}
-                if(equipmenttype=="Condenser Water Pump"){$('.CondenserWaterPump').show();}
+                if(equipmenttype=="Condenser Water Pump" || equipmenttype=="Package Water Cool" || equipmenttype=="DX Plant"){$('.CondenserWaterPump').show();}
                 if(equipmenttype=="Cooling Tower"){$('.CoolingTower').show();}
                 if(equipmenttype=="Drinking Water Unit"){$('.drinkingWaterUnit').show();}
                 if(equipmenttype=="Package Air Conditioning" || equipmenttype=="VRF" || equipmenttype=="FCU" || equipmenttype=="Split AC" || equipmenttype=="Window AC" || equipmenttype=="Ductable Unit" ){$('.PackageAirConditioning').show();}
@@ -448,6 +448,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 <option data-slno="G0014" data-unit="SAC">Split AC</option>
                                                 <option data-slno="G0015" data-unit="WAC">Window AC</option>
                                                 <option data-slno="G0011" data-unit="VAM">VAM</option>
+                                                <option data-slno="G0016" data-unit="PWC">Package Water Cool</option>
+                                                <option data-slno="G0017" data-unit="DXP">DX Plant</option>
 
                                             </select>
                                         </div>
