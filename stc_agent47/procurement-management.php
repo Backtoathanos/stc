@@ -4,6 +4,9 @@ if(isset($_SESSION["stc_agent_id"]) && $_SESSION["stc_agent_role"]==2){
 }else{ 
     header('Location: ' . $_SERVER['HTTP_REFERER']);
 } 
+if(!isset($_SESSION["stc_agent_id"])){ 
+    header("Location:index.html"); 
+} 
 include_once("../MCU/db.php");
 ?> 
 <!doctype html>
@@ -412,6 +415,7 @@ include_once("../MCU/db.php");
                         itemstatus:itemstatus
                     },
                     success : function(requisition){
+                        call_requisition_appr_cart();
                         // console.log(requisition);
                         // alert(requisition);
                     }

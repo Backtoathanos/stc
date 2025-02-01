@@ -226,11 +226,12 @@ class procurement extends tesseract{
 	}
 
 	// item cart for placing  requisitions
-	public function stc_requisitionto_cart($cust_order_refr){
-		$transformers="";
-		$missminute="";
-		$date=date("Y-m-d H:i:s");
-		$reqplqry=mysqli_query($this->stc_dbs, "
+	public function stc_requisitionto_cart($cust_order_refr) {
+		$transformers = "Hmm!!! Something went wrong on order creation. Please contact STC support team.";
+		$date = date("Y-m-d H:i:s");
+	
+		// Insert into requisition combiner
+		$reqplqry = mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_requisition_combiner`(
 				`stc_requisition_combiner_refrence`, 
 				`stc_requisition_combiner_date`,
@@ -243,19 +244,13 @@ class procurement extends tesseract{
 				'1'
 			)
 		");
-		if($reqplqry){
-			$req_id=0;
-			$getreqplqry=mysqli_query($this->stc_dbs, "
-				SELECT 
-					MAX(`stc_requisition_combiner_id`) 
-					AS currentreqid
-				FROM `stc_requisition_combiner` 
-				ORDER BY `stc_requisition_combiner_id` DESC 
-			");
-			foreach($getreqplqry as $grprow){$req_id=$grprow['currentreqid'];}
-			foreach($_SESSION["stc_supervisor_req_final_cart_req_sess"] as $reqplqryrow){
-				$missminute='';
-				$reqplcomqry=mysqli_query($this->stc_dbs, "
+	
+		if ($reqplqry) {
+			$req_id = mysqli_insert_id($this->stc_dbs); // Get the last inserted ID
+	
+			// Process requisition items
+			foreach ($_SESSION["stc_supervisor_req_final_cart_req_sess"] as $reqplqryrow) {
+				$reqplcomqry = mysqli_query($this->stc_dbs, "
 					INSERT INTO `stc_requisition_combiner_req`(
 						`stc_requisition_combiner_req_comb_id`, 
 						`stc_requisition_combiner_req_requisition_id`
@@ -264,88 +259,39 @@ class procurement extends tesseract{
 						'".$reqplqryrow['req_id']."'
 					)
 				");
-				if($reqplcomqry){
-					$transformers="yes";
-				}else{
-					$transformers="no";
-				}
-
-				$updatereqstqry=mysqli_query($this->stc_dbs, "
+	
+				$updatereqstqry = mysqli_query($this->stc_dbs, "
 					UPDATE `stc_cust_super_requisition_list` 
 					SET `stc_cust_super_requisition_list_status`='4' 
 					WHERE `stc_cust_super_requisition_list_id`='".$reqplqryrow['req_id']."'
 				");
-
-				if($updatereqstqry){
-					$transformers="yes";
-				}else{
-					$transformers="no";
+	
+				if (!$reqplcomqry || !$updatereqstqry) {
+					return "no";
 				}
 			}
-
-			foreach($_SESSION['stc_supervisor_req_final_cart_req_item_sess'] as $custreqitemrow){
-				$missminute='';
-				$updatefinalqtqry=mysqli_query($this->stc_dbs, "
+	
+			// Process requisition item details
+			foreach ($_SESSION['stc_supervisor_req_final_cart_req_item_sess'] as $custreqitemrow) {
+				$updatefinalqtqry = mysqli_query($this->stc_dbs, "
 					UPDATE `stc_cust_super_requisition_list_items` 
 					SET `stc_cust_super_requisition_items_finalqty`='".$custreqitemrow['product_quantity']."', 
 					`stc_cust_super_requisition_list_items_status`='".$custreqitemrow['itemstatus']."' 
 					WHERE `stc_cust_super_requisition_list_id`='".$custreqitemrow['list_line_id']."'
-					AND `stc_cust_super_requisition_list_items_req_id`='".$custreqitemrow['list_id']."' 
+					AND `stc_cust_super_requisition_list_items_req_id`='".$custreqitemrow['list_id']."'
 				");
-
-				$req_id=$custreqitemrow['list_line_id'];
-				$getproduct_qry=mysqli_query($this->stc_dbs, "
-					SELECT `stc_cust_super_requisition_list_items_title`
-					FROM `stc_cust_super_requisition_list_items`
-					WHERE `stc_cust_super_requisition_list_id`='".$req_id."'
-				");
-				$pd_title='';
-				foreach($getproduct_qry as $getproduct_row){
-					$pd_title=$getproduct_row['stc_cust_super_requisition_list_items_title'];
+	
+				if (!$updatefinalqtqry) {
+					return "no";
 				}
-
-				$getproductinfo_qry=mysqli_query($this->stc_dbs, "
-					SELECT `stc_cust_super_requisition_list_purchaser_list_item_id`, `stc_cust_super_requisition_list_purchaser_pd_id`,`stc_cust_super_requisition_list_purchaser_mer_id`
-					FROM `stc_cust_super_requisition_list_items`
-					INNER JOIN `stc_cust_super_requisition_list_purchaser`
-					ON `stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_purchaser_list_item_id`
-					WHERE `stc_cust_super_requisition_list_items_title`='".mysqli_real_escape_string($this->stc_dbs, $pd_title)."'
-					ORDER BY `stc_cust_super_requisition_list_purchaser_id` DESC LIMIT 0,1
-				");
-				if(mysqli_num_rows($getproductinfo_qry)>0){					
-					$reqlineitem_id=$custreqitemrow['list_line_id'];
-					$pd_id=0;
-					$merch_id=0;
-					foreach($getproductinfo_qry as $getproductinfo_row){
-						$pd_id=$getproductinfo_row['stc_cust_super_requisition_list_purchaser_pd_id'];
-						$merch_id=$getproductinfo_row['stc_cust_super_requisition_list_purchaser_mer_id'];
-					}
-					$odinset_qry=mysqli_query($this->stc_dbs, "
-						INSERT INTO `stc_cust_super_requisition_list_purchaser`(
-							`stc_cust_super_requisition_list_purchaser_list_item_id`, 
-							`stc_cust_super_requisition_list_purchaser_pd_id`, 
-							`stc_cust_super_requisition_list_purchaser_mer_id`, 
-							`stc_cust_super_requisition_list_purchaser_created_by`
-						) VALUES (
-							'".mysqli_real_escape_string($this->stc_dbs, $reqlineitem_id)."',
-							'".mysqli_real_escape_string($this->stc_dbs, $pd_id)."',
-							'".mysqli_real_escape_string($this->stc_dbs, $merch_id)."',
-							'1'
-						)
-					");
-				}
-
-				if($updatefinalqtqry){
-					$transformers="yes";
-				}else{
-					$transformers="no";
-				}
-			}			
-		}else{
-			$transformers="Hmm!!! Something went wrong on order creation. Please contact STC support team.";
+			}
+	
+			$transformers = "yes"; // Success
 		}
+	
 		return $transformers;
 	}
+	
 
 	// remvoe requisition
 	public function stc_requisition_remove($req_id, $req_item_id){
@@ -473,23 +419,28 @@ if(isset($_POST['remove_req_sess_act'])){
 }
 
 // placed requisition to the stc
-if(isset($_POST['place_req_sess_act'])){
-	$cust_order_refr=$_POST['cust_order_refr'];
-	$out='';
-	$objrequipl=new procurement();
-	$outobjrequipl=$objrequipl->stc_requisitionto_cart($cust_order_refr);
-	if($outobjrequipl=="no"){
-		$out="Please recheck your requisition & try again.";
-	}else if(!isset($_SESSION['stc_agent_id'])){
-		$out="Please check ";
-	}else if($outobjrequipl=="yes"){
-		$out="Thankyou for your requisition #TeamSTC will start working on it soon.";
-		unset($_SESSION["stc_supervisor_req_final_cart_req_sess"]);
-		unset($_SESSION["stc_supervisor_req_final_cart_req_item_sess"]);
-	}else{
-		$out=$outobjrequipl;
-	}
-	echo $out;
+if (isset($_POST['place_req_sess_act'])) {
+    $cust_order_refr = $_POST['cust_order_refr'];
+    $out = '';
+
+    if (!isset($_SESSION['stc_agent_id'])) {
+        $out = "Please login";
+    } elseif (!isset($_SESSION["stc_supervisor_req_final_cart_req_sess"]) || !isset($_SESSION['stc_supervisor_req_final_cart_req_item_sess'])) {
+        $out = "Please recheck your requisition & try again.";
+    } else {
+        $objrequipl = new procurement();
+        $outobjrequipl = $objrequipl->stc_requisitionto_cart($cust_order_refr);
+
+        if ($outobjrequipl == "no") {
+            $out = "Please recheck your requisition & try again.";
+        } elseif ($outobjrequipl == "yes") {
+            $out = "Thank you for your requisition. #TeamSTC will start working on it soon.";
+            unset($_SESSION["stc_supervisor_req_final_cart_req_sess"], $_SESSION["stc_supervisor_req_final_cart_req_item_sess"]);
+        } else {
+            $out = $outobjrequipl;
+        }
+    }
+    echo $out;
 }
 
 // placed requisition to the stc
