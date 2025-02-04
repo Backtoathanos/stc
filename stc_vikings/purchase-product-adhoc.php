@@ -262,6 +262,7 @@ include("kattegat/role_check.php");
                                 <div class="row stc-view-product-row">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
+                                      <a class="btn btn-success" data-toggle="modal" data-target=".bd-modal-ledgershow" href="javascript:void(0)">View Ledger</a>
                                       <form action="" class="stc-view-product-form">
                                           <table class="table table-hover table-bordered">
                                             <thead>
@@ -890,6 +891,106 @@ include("kattegat/role_check.php");
             });  
           });   
 
+          $('.stc-adhocpofilter-find').on('click', function () {
+            // Get filter values
+            var dateFrom = $('.stc-poa-filterdatefrom').val();
+            var dateTo = $('.stc-poa-filterdateto').val();
+            var siteName = $('.stc-poa-filtersitename').val();
+
+            // Make AJAX request
+            $.ajax({
+              url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
+              type: 'GET', // or 'POST' depending on your API
+              data: {
+                stc_get_ledger: 1,
+                dateFrom: dateFrom,  // Ensure these are defined before use
+                dateTo: dateTo,
+                siteName: siteName
+              },
+              dataType: 'json',
+              success: function (response) {
+                // Clear existing table rows
+                $('.stc-call-view-poadhocledger-row').empty();
+
+                if (response && response.length > 0) {
+                  var total=0;
+                  $.each(response, function (index, item) {
+                    // Format date for better readability
+                    let formattedDate = new Date(item.stc_cust_super_requisition_list_date).toLocaleDateString('en-GB');
+
+                    var row = `<tr>
+                      <td>${index + 1}</td>
+                      <td>${formattedDate}</td>
+                      <td>${item.stc_cust_project_title}</td>
+                      <td>${item.stc_cust_pro_supervisor_fullname}</td>
+                      <td>${item.stc_purchase_product_adhoc_productid}</td>
+                      <td>${item.stc_cust_super_requisition_list_items_title}</td>
+                      <td>${item.stc_cust_super_requisition_list_items_unit}</td>
+                      <td class="text-right">${item.stc_cust_super_requisition_list_items_rec_recqty}</td>
+                      <td class="text-right">${item.stc_purchase_product_adhoc_rate}</td>
+                      <td class="text-right">${item.total}</td>
+                      <td class="text-right"><a class="btn showledgertr" href="javascript:void(0)" id="${index + 1}">View</a></td>
+                    </tr>
+                    <tr class="ledgeritemshow-${index + 1}" style="display:none;">
+                      <td></td>
+                      <td colspan="2"><input type="number" class="form-control stcledgeritemcodeupdate" Placeholder="Enter item code"></td>
+                      <td colspan="2"><input type="number" class="form-control stcledgerquantityupdate" Placeholder="Enter quantity"></td>
+                      <td><input type="submit" class="form-control stcledgeritemupdate" value="Save" id="${item.stc_cust_super_requisition_list_items_rec_id}" id2="${item.stc_purchase_product_adhoc_id}"></td>
+                    </tr>
+                    `;
+                    total+=parseFloat(item.total);
+                    $('.stc-call-view-poadhocledger-row').append(row);
+                  });
+                  var outrow = `
+                    <tr>
+                      <td colspan="9" class="text-right"> Total : </td>
+                      <td>${Number(total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>`;
+                    $('.stc-call-view-poadhocledger-row').append(outrow);
+                } else {
+                  $('.stc-call-view-poadhocledger-row').html('<tr><td colspan="10">No data found</td></tr>');
+                }
+              },
+              error: function (xhr, status, error) {
+                // console.error('Error fetching data:', error, xhr.responseText);
+                $('.stc-call-view-poadhocledger-row').html('<tr><td colspan="10">Error loading data</td></tr>');
+              }
+            });
+
+          });
+
+          $('body').delegate('.showledgertr', 'click', function(e){
+            var id=$(this).attr('id');
+            $('.ledgeritemshow-'+id).toggle();
+          });
+
+          
+
+
+
+
+          $('body').delegate('.stcledgeritemupdate', 'click', function(e){
+            var id=$(this).attr('id');
+            var id2=$(this).attr('id2');
+            var itemcode=$(this).parent().parent().find('.stcledgeritemcodeupdate').val();
+            var quantity=$(this).parent().parent().find('.stcledgerquantityupdate').val();
+            var rate=$(this).parent().parent().find('.stcledgerrateupdate').val();
+            $.ajax({
+              url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
+              type: 'POST', // or 'POST' depending on your API
+              data: {
+                stc_update_ledger: 1,
+                id: id,  // Ensure these are defined before use
+                itemcode: itemcode,  // Ensure these are defined before use
+                quantity: quantity
+              },
+              dataType: 'json',
+              success: function (response) {
+                alert("Item updated successfully.");
+              }
+            });
+          });
+
           
         });
     </script>
@@ -1200,6 +1301,86 @@ include("kattegat/role_check.php");
                       </div>
                     </div>
 
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="modal-footer">
+              <div class="row">
+                <div class="col-xl-6 col-md-6 col-sm-6">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-modal-ledgershow" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Product History</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card border-success mb-3 card-body">
+                    <table class="table table-hover table-bordered">
+                      <thead>
+                        <tr>
+                          <th scope="col" class="text-center">Date From/To</th>
+                          <th scope="col" class="text-center">Location </th>
+                          <th scope="col" class="text-center">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>
+                            <?php 
+                              $date = date("d-m-Y");
+                              $newDate = date('Y-m-d', strtotime($date)); 
+                              $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
+                            ?>   
+                            <input type="date" class="form-control stc-poa-filterdatefrom" <?php echo "value='$effectiveDate'";?>>
+                            <input type="date" class="form-control stc-poa-filterdateto" <?php echo "value='$newDate'";?>>
+                          </td>
+                          <td>
+                            <input type="text" class="form-control stc-poa-filtersitename" placeholder="Enter Sitename">
+                          </td>
+                          <td>
+                            <a class="btn btn-success stc-adhocpofilter-find" href="javascript:void(0)">Find</a>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card border-success mb-3 card-body">
+                    <table class="table table-hover table-bordered stc-purchase-view-table">
+                      <thead>
+                        <tr>
+                          <th>Sl No.</th>
+                          <th>Date</th>
+                          <th>Site Name</th>
+                          <th>Supervisors Name</th>
+                          <th>Item Code</th>
+                          <th>Product Name</th>
+                          <th>Unit</th>
+                          <th>Quantity</th>
+                          <th>Rate</th>
+                          <th>Total</th>
+                        </tr>
+                      </thead>
+                      <tbody class="stc-call-view-poadhocledger-row">
+                        <tr><td colspan="8">Search</td></tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>

@@ -2265,7 +2265,7 @@ include("kattegat/role_check.php");
                   var data = '';
                   var slno = (page - 1) * perPage + 1; // Calculate serial number
                   for (var i = 0; i < response.data.length; i++) {
-                      var total = parseFloat(response.data[i].quantity) * parseFloat(response.data[i].rate);
+                      var total = response.data[i].total;
                       var status = response.data[i].status == 1 ? 'Pending' : response.data[i].status == 2 ? 'Confirmed' : response.data[i].status == 3 ? 'Dispatched' : 'Delivered';
                       var action_btn = '';
                       if (response.data[i].status == 1) {
@@ -2274,7 +2274,7 @@ include("kattegat/role_check.php");
                       if (response.data[i].status == 2) {
                           action_btn = '<a href="javascript:void(0)" class="orderaction-handler" id="' + response.data[i].id + '" status="3" title="Dispatch order." style="font-size: 30px;"><i class="fa fa-truck"></i></a>';
                       }
-                      data += '<tr><td>' + slno + '</td><td>' + response.data[i].first_name + '</td><td>' + response.data[i].last_name + '</td><td class="text-center">' + response.data[i].email + '</td><td class="text-center">' + response.data[i].phone_number + '</td><td>' + response.data[i].street_address + '</td><td class="text-center">' + response.data[i].stc_product_id + '</td><td>' + response.data[i].stc_product_name + '</td><td class="text-right">' + response.data[i].quantity + '</td><td class="text-right">' + response.data[i].rate + '</td><td class="text-right">' + total.toFixed(2) + '</td><td class="text-center">' + response.data[i].created_at + '</td><td class="text-center">' + status + '</td><td class="text-center">' + action_btn + '</td></tr>';
+                      data += '<tr><td>' + slno + '</td><td>' + response.data[i].first_name + '</td><td>' + response.data[i].last_name + '</td><td class="text-center">' + response.data[i].email + '</td><td class="text-center">' + response.data[i].phone_number + '</td><td>' + response.data[i].street_address + '</td><td class="text-center">' + response.data[i].stc_product_id + '</td><td>' + response.data[i].stc_product_name + '</td><td class="text-right">' + response.data[i].quantity + '</td><td class="text-right">' + response.data[i].rate + '</td><td class="text-right">' + total + '</td><td class="text-center">' + response.data[i].created_at + '</td><td class="text-center">' + status + '</td><td class="text-center">' + action_btn + '</td></tr>';
                       slno++;
                   }
                   $('.stc-call-b2corders').html(data);

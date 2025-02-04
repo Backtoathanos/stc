@@ -2537,6 +2537,75 @@ class ragnarPurchaseAdhoc extends tesseract{
 		}
 		return $odin;
 	}
+	
+	public function stc_poadhoc_ledger($dateFrom, $dateTo, $siteName) {
+		$filter = '';
+		$query = "
+			SELECT DISTINCT
+				`stc_cust_super_requisition_list_items_rec_id`, 
+				`stc_purchase_product_adhoc_id`, 
+				L.`stc_cust_super_requisition_list_date`,
+				`stc_cust_pro_supervisor_fullname`, 
+				`stc_cust_project_title`, 
+				`stc_purchase_product_adhoc_productid`, 
+				I.`stc_cust_super_requisition_list_items_title`,
+				I.`stc_cust_super_requisition_list_items_unit`,
+				IFNULL(`stc_cust_super_requisition_list_items_rec_recqty`, 0) AS `stc_cust_super_requisition_list_items_rec_recqty`,
+				IFNULL(`stc_purchase_product_adhoc_rate`, 0) AS `stc_purchase_product_adhoc_rate`,
+				(IFNULL(`stc_cust_super_requisition_list_items_rec_recqty`, 0) * IFNULL(`stc_purchase_product_adhoc_rate`, 0)) AS `total`
+			FROM `stc_cust_super_requisition_list` L 
+			INNER JOIN `stc_cust_super_requisition_list_items` I ON L.`stc_cust_super_requisition_list_id` = I.`stc_cust_super_requisition_list_items_req_id` 
+			INNER JOIN `stc_cust_project` ON L.`stc_cust_super_requisition_list_project_id` = `stc_cust_project_id` 
+			INNER JOIN `stc_cust_pro_supervisor` ON L.`stc_cust_super_requisition_list_super_id` = `stc_cust_pro_supervisor_id` 
+			LEFT JOIN `stc_cust_super_requisition_list_items_rec` ON `stc_cust_super_requisition_list_items_rec_list_item_id` = I.`stc_cust_super_requisition_list_id`
+			LEFT JOIN `stc_purchase_product_adhoc` ON `stc_purchase_product_adhoc_id` = `stc_cust_super_requisition_list_items_rec_list_poaid`
+			WHERE 1=1
+		";
+	
+		// Add date filter if both dateFrom and dateTo are provided
+		if (!empty($dateFrom) && !empty($dateTo)) {
+			$query .= " AND (DATE(L.`stc_cust_super_requisition_list_date`) BETWEEN '" . mysqli_real_escape_string($this->stc_dbs, $dateFrom) . "' AND '" . mysqli_real_escape_string($this->stc_dbs, $dateTo) . "')";
+		}
+	
+		// Add siteName filter if provided
+		if (!empty($siteName)) {
+			$query .= " AND `stc_cust_project_title` REGEXP '" . mysqli_real_escape_string($this->stc_dbs, $siteName) . "'";
+		}
+	
+		// Order by date in descending order
+		$query .= " ORDER BY DATE(L.`stc_cust_super_requisition_list_date`) DESC";
+	
+		// Execute the query
+		$result = mysqli_query($this->stc_dbs, $query);
+	
+		// Check for errors in the query execution
+		if (!$result) {
+			return "Error executing query: " . mysqli_error($this->stc_dbs);
+		}
+	
+		// Fetch data
+		$odin = array();
+		if (mysqli_num_rows($result) > 0) {
+			while ($row = mysqli_fetch_assoc($result)) {
+				$row['stc_cust_super_requisition_list_items_rec_recqty'] = number_format($row['stc_cust_super_requisition_list_items_rec_recqty'], 2);
+				$row['stc_purchase_product_adhoc_rate'] = number_format($row['stc_purchase_product_adhoc_rate'], 2);
+				$row['total'] = number_format($row['total'], 2);
+				$odin[] = $row; // Add each row to the array
+			}
+		}
+	
+		return $odin;
+	}	
+	
+	public function stc_poadhoc_update_ledger($id, $itemcode, $quantity) {
+		if(!empty($itemcode)){
+			mysqli_query($this->stc_dbs, "UPDATE `stc_cust_super_requisition_list_items_rec` SET `stc_cust_super_requisition_list_items_rec_list_poaid`='$itemcode', `stc_cust_super_requisition_list_items_rec_recqty`='$quantity' WHERE `stc_cust_super_requisition_list_items_rec_id`='$id'");
+		}else{
+			mysqli_query($this->stc_dbs, "UPDATE `stc_cust_super_requisition_list_items_rec` SET `stc_cust_super_requisition_list_items_rec_recqty`='$quantity' WHERE `stc_cust_super_requisition_list_items_rec_id`='$id'");
+		}
+	
+		return "success";
+	}
 }
 #<------------------------------------------------------------------------------------------------------>
 #<--------------------------------------Object sections of Purchase class------------------------------->
@@ -3355,4 +3424,32 @@ if(isset($_POST['stc_po_adhoc_getprohistory'])){
 	$outbjornestocking=$bjornestocking->stc_poadhoc_rohistory($adhoc_id);
 	echo json_encode($outbjornestocking);
 }
+
+// show ledger
+if(isset($_GET['stc_get_ledger'])){
+	$dateFrom=$_GET['dateFrom'];
+	$dateTo=$_GET['dateTo'];
+	$siteName=$_GET['siteName'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_ledger($dateFrom, $dateTo, $siteName);
+	// echo $outbjornestocking;
+	echo json_encode($outbjornestocking);
+}
+
+// update ledger
+if(isset($_POST['stc_update_ledger'])){
+	$id=$_POST['id'];
+	$itemcode=$_POST['itemcode'];
+	$quantity=$_POST['quantity'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_update_ledger($id, $itemcode, $quantity);
+	// echo $outbjornestocking;
+	echo json_encode($outbjornestocking);
+}
+
+
+
+
+
+
 ?>

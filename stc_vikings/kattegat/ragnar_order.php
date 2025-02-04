@@ -3691,8 +3691,10 @@ class ragnarCallB2COrders extends tesseract{
 				}
 				$blackpearl_row['stc_product_name'] = $product_name;
 				$blackpearl_row['created_at'] = date('d-m-Y H:i:s a', strtotime($blackpearl_row['created_at']));
+				$total=$blackpearl_row['quantity'] * $blackpearl_row['rate'];
 				$blackpearl_row['rate'] = number_format($blackpearl_row['rate'], 2);
 				$blackpearl_row['quantity'] = number_format($blackpearl_row['quantity'], 2);
+				$blackpearl_row['total'] = number_format($total, 2);
 				$blackpearl[] = $blackpearl_row;
 			}
 		}
