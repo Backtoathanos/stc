@@ -325,6 +325,7 @@ include("kattegat/role_check.php");
                                           <table class="table table-hover table-bordered stc-purchase-view-table">
                                             <thead>
                                               <th>Sl No.</th>
+                                              <th>Adhoc Id</th>
                                               <th>Date</th>
                                               <th>Linked Product</th>
                                               <th>Product Name</th>
@@ -929,7 +930,7 @@ include("kattegat/role_check.php");
                       <td class="text-right">${item.stc_cust_super_requisition_list_items_rec_recqty}</td>
                       <td class="text-right">${item.stc_purchase_product_adhoc_rate}</td>
                       <td class="text-right">${item.total}</td>
-                      <td class="text-right"><a class="btn showledgertr" href="javascript:void(0)" id="${index + 1}">View</a></td>
+                      <td class="text-right"><a class="btn btn-info showledgertr" href="javascript:void(0)" id="${index + 1}">View</a></td>
                     </tr>
                     <tr class="ledgeritemshow-${index + 1}" style="display:none;">
                       <td></td>
@@ -975,6 +976,7 @@ include("kattegat/role_check.php");
             var itemcode=$(this).parent().parent().find('.stcledgeritemcodeupdate').val();
             var quantity=$(this).parent().parent().find('.stcledgerquantityupdate').val();
             var rate=$(this).parent().parent().find('.stcledgerrateupdate').val();
+            $(this).closest('tr').hide();
             $.ajax({
               url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
               type: 'POST', // or 'POST' depending on your API
@@ -1375,6 +1377,7 @@ include("kattegat/role_check.php");
                           <th>Quantity</th>
                           <th>Rate</th>
                           <th>Total</th>
+                          <th>Action</th>
                         </tr>
                       </thead>
                       <tbody class="stc-call-view-poadhocledger-row">

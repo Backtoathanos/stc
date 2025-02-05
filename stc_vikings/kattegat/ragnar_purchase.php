@@ -2293,6 +2293,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
+						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_id']."</td>
 						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
 						<td style='width: 180px;'>".$productog."</td>
 						<td class='text-center'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$product_name."</a></td>
@@ -2557,9 +2558,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 			INNER JOIN `stc_cust_super_requisition_list_items` I ON L.`stc_cust_super_requisition_list_id` = I.`stc_cust_super_requisition_list_items_req_id` 
 			INNER JOIN `stc_cust_project` ON L.`stc_cust_super_requisition_list_project_id` = `stc_cust_project_id` 
 			INNER JOIN `stc_cust_pro_supervisor` ON L.`stc_cust_super_requisition_list_super_id` = `stc_cust_pro_supervisor_id` 
+			INNER JOIN `stc_requisition_combiner_req` ON L.`stc_cust_super_requisition_list_id` = `stc_requisition_combiner_req_requisition_id` 
 			LEFT JOIN `stc_cust_super_requisition_list_items_rec` ON `stc_cust_super_requisition_list_items_rec_list_item_id` = I.`stc_cust_super_requisition_list_id`
 			LEFT JOIN `stc_purchase_product_adhoc` ON `stc_purchase_product_adhoc_id` = `stc_cust_super_requisition_list_items_rec_list_poaid`
-			WHERE 1=1
+			WHERE L.`stc_cust_super_requisition_list_status`>2
 		";
 	
 		// Add date filter if both dateFrom and dateTo are provided
