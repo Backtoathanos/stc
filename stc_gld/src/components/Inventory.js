@@ -17,8 +17,8 @@ export default function Dashboard() {
         document.title = "STC GLD || Inventory"; // Set the title
     }, []);
     const API_BASE_URL = process.env.NODE_ENV === 'production'
-    ? 'https://stcassociate.com/stc_gld/vanaheim'
-    : 'http://localhost/stc/stc_gld/vanaheim';
+        ? 'https://stcassociate.com/stc_gld/vanaheim'
+        : 'http://localhost/stc/stc_gld/vanaheim';
     const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);
 
@@ -32,31 +32,38 @@ export default function Dashboard() {
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
     const [filteredData, setFilteredData] = useState([]); // To handle filtered data
 
-    const fetchData = debounce((query = '') => {
-        if (query.length > 3 || query === '') {
-            setLoading(true);
-            // Send the search query as a parameter to the API
-            axios.get(`${API_BASE_URL}/getInventoryData.php?search=${query}`)
-                .then(response => {
-                    const resultData = response.data;
-                    if (Array.isArray(resultData)) {
-                        setData(resultData); // Ensure data is an array
-                    } else {
-                        setData([]); // If it's not an array, set it to an empty array
-                    }
-                    setLoading(false);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    setData([]); // Set to an empty array in case of error
-                    setLoading(false);
-                });
-        }
+    const [page, setPage] = useState(1); // Current page
+    const [limit, setLimit] = useState(10); // Rows per page
+    const [totalRows, setTotalRows] = useState(0); // Total records from API
+
+    // Fetch data from API with pagination
+    const fetchData = debounce((query = '', pageNum = 1, rowLimit = 10) => {
+        setLoading(true);
+        axios.get(`${API_BASE_URL}/getInventoryData.php`, {
+            params: { search: query, page: pageNum, limit: rowLimit }
+        })
+            .then(response => {
+                if (response.data && response.data.records) {
+                    setData(response.data.records);
+                    setTotalRows(response.data.total); // Assuming API returns total count
+                } else {
+                    setData([]);
+                    setTotalRows(0);
+                }
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                setData([]);
+                setTotalRows(0);
+                setLoading(false);
+            });
     }, 500);
 
+    // Fetch data on component mount, page change, search change
     useEffect(() => {
-        fetchData(search);
-    }, [search]);
+        fetchData(search, page, limit);
+    }, [search, page, limit]);
 
     // Define columns for DataTable
     const columns = [
@@ -128,7 +135,7 @@ export default function Dashboard() {
             selector: row => row.stc_rack_name,
             sortable: true,
             center: true
-        }, 
+        },
         {
             name: 'Unit',
             selector: row => row.stc_product_unit,
@@ -228,10 +235,19 @@ export default function Dashboard() {
                                             <DataTable
                                                 columns={columns}
                                                 data={data}
+                                                progressPending={loading}
                                                 pagination
+                                                paginationServer
+                                                paginationTotalRows={totalRows} // Total rows from API
+                                                paginationPerPage={limit} // Default rows per page
+                                                paginationRowsPerPageOptions={[10, 20, 50, 100]}
+                                                onChangePage={(newPage) => setPage(newPage)}
+                                                onChangeRowsPerPage={(newLimit, newPage) => {
+                                                    setLimit(newLimit);
+                                                    setPage(newPage);
+                                                }}
                                                 highlightOnHover
                                                 striped
-                                                className="data-table"  // Custom class for additional styling
                                             />
                                         )}
                                     </div>
