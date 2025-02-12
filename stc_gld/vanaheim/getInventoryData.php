@@ -96,8 +96,8 @@ foreach($result as $row){
             $row['rate_including_gst'] = number_format($row1['stc_product_grn_items_rate'], 2) ?? 0;
         }
     }
-    $row['rate_including_gst'] = "0.00";
-    $row['rate_including_percentage'] = "0.00";
+    if($row['rate_including_gst']==0){$row['rate_including_gst'] = "0.00";}
+        if($row['rate_including_percentage']==0){$row['rate_including_percentage'] = "0.00";}
 
     // Calculate remaining quantity
     $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = $product_id");
