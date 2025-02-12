@@ -42,7 +42,6 @@ if ($search !== '') {
                     )
                 )";
 }
-$cquery = "LIMIT $offset, $limit";
 $totalQuery = "SELECT COUNT(*) AS total FROM ($cquery) AS count_table"; // Count total rows
 $totalResult = mysqli_query($con, $totalQuery);
 $totalRow = mysqli_fetch_assoc($totalResult)['total'];

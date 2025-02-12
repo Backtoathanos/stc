@@ -19,6 +19,7 @@ export default function Dashboard() {
     const API_BASE_URL = process.env.NODE_ENV === 'production'
         ? 'https://stcassociate.com/stc_gld/vanaheim'
         : 'http://localhost/stc/stc_gld/vanaheim';
+    const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);
 
     const [data, setData] = useState([]);
