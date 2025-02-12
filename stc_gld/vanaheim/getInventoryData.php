@@ -27,7 +27,6 @@ $cquery = "
     LEFT JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id
     LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id 
     WHERE P.stc_product_avail = 1 
-    LIMIT $offset, $limit
 ";
 
 // Apply search filter
@@ -43,7 +42,7 @@ if ($search !== '') {
                     )
                 )";
 }
-
+$cquery = "LIMIT $offset, $limit";
 $totalQuery = "SELECT COUNT(*) AS total FROM ($cquery) AS count_table"; // Count total rows
 $totalResult = mysqli_query($con, $totalQuery);
 $totalRow = mysqli_fetch_assoc($totalResult)['total'];
