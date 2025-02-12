@@ -19,7 +19,6 @@ export default function Dashboard() {
     const API_BASE_URL = process.env.NODE_ENV === 'production'
         ? 'https://stcassociate.com/stc_gld/vanaheim'
         : 'http://localhost/stc/stc_gld/vanaheim';
-    const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);
 
     const [data, setData] = useState([]);
@@ -30,7 +29,6 @@ export default function Dashboard() {
     const [selectedProductRate, setSelectedProductRate] = useState(null);
     const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
-    const [filteredData, setFilteredData] = useState([]); // To handle filtered data
 
     const [page, setPage] = useState(1); // Current page
     const [limit, setLimit] = useState(10); // Rows per page

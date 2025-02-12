@@ -76,13 +76,28 @@ foreach($result as $row){
     $row['rate_including_gst'] = 0;
     $row['rate_including_percentage'] = 0;
     $row['stc_rack_name'] = '';
-    $query = mysqli_query($con, "SELECT `stc_rack_name`, `stc_purchase_product_adhoc_rate`, ROUND(ppa.stc_purchase_product_adhoc_rate * (1 + ".$row['stc_product_sale_percentage']." / 100), 2) AS rate_including_percentage FROM `stc_purchase_product_adhoc` AS ppa LEFT JOIN `stc_rack` ON ppa.`stc_purchase_product_adhoc_rackid`=`stc_rack_id`WHERE ppa.stc_purchase_product_adhoc_status=1 AND ppa.`stc_purchase_product_adhoc_productid` = $product_id ORDER BY ppa.`stc_purchase_product_adhoc_id` DESC LIMIT 1");
+    $query = mysqli_query($con, "SELECT `stc_rack_name` FROM `stc_purchase_product_adhoc` AS ppa LEFT JOIN `stc_rack` ON ppa.`stc_purchase_product_adhoc_rackid`=`stc_rack_id`WHERE ppa.stc_purchase_product_adhoc_status=1 AND ppa.`stc_purchase_product_adhoc_productid` = $product_id ORDER BY ppa.`stc_purchase_product_adhoc_id` DESC LIMIT 1");
     if ($query && mysqli_num_rows($query) > 0) {
         $row1 = mysqli_fetch_assoc($query);
-        $row['rate_including_gst'] = number_format($row1['stc_purchase_product_adhoc_rate'], 2) ?? 0;
-        $row['rate_including_percentage'] = number_format($row1['rate_including_percentage'], 2) ?? 0;
         $row['stc_rack_name'] = $row1['stc_rack_name'];
     }
+    $query = mysqli_query($con, "SELECT `stc_purchase_product_adhoc_rate`, ROUND(stc_purchase_product_adhoc_rate * (1 + ".$row['stc_product_sale_percentage']." / 100), 2) AS rate_including_percentage  FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid`=$product_id ORDER BY `stc_purchase_product_adhoc_id` DESC LIMIT 1");
+    if ($query && mysqli_num_rows($query) > 0) {
+        $row1 = mysqli_fetch_assoc($query);
+        $row['rate_including_percentage'] = number_format($row1['rate_including_percentage'], 2) ?? 0;
+        $row['rate_including_gst'] = number_format($row1['stc_purchase_product_adhoc_rate'], 2) ?? 0;
+    }
+
+    if($row['rate_including_gst']==0){
+        $query = mysqli_query($con, "SELECT `stc_product_grn_items_rate`, ROUND(stc_product_grn_items_rate * (1 + ".$row['stc_product_sale_percentage']." / 100), 2) AS rate_including_percentage  FROM `stc_product_grn_items` WHERE `stc_product_grn_items_product_id`=$product_id ORDER BY `stc_product_grn_items_id` DESC LIMIT 1");
+        if ($query && mysqli_num_rows($query) > 0) {
+            $row1 = mysqli_fetch_assoc($query);
+            $row['rate_including_percentage'] = number_format($row1['rate_including_percentage'], 2) ?? 0;
+            $row['rate_including_gst'] = number_format($row1['stc_product_grn_items_rate'], 2) ?? 0;
+        }
+    }
+    $row['rate_including_gst'] = "0.00";
+    $row['rate_including_percentage'] = "0.00";
 
     // Calculate remaining quantity
     $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = $product_id");
@@ -93,8 +108,7 @@ foreach($result as $row){
     $sql_qry = mysqli_query($con, "
         SELECT SUM(srec.stc_cust_super_requisition_list_items_rec_recqty) AS total_qty
         FROM stc_purchase_product_adhoc spa
-        JOIN stc_cust_super_requisition_list_items_rec srec 
-            ON srec.stc_cust_super_requisition_list_items_rec_list_poaid = spa.stc_purchase_product_adhoc_id
+        JOIN stc_cust_super_requisition_list_items_rec srec ON srec.stc_cust_super_requisition_list_items_rec_list_poaid = spa.stc_purchase_product_adhoc_id
         WHERE spa.stc_purchase_product_adhoc_productid = $product_id 
         AND spa.stc_purchase_product_adhoc_status = 1
     ");
