@@ -2286,6 +2286,16 @@ class ragnarPurchaseAdhoc extends tesseract{
 						$productog="<img src='../stc_symbiote/stc_product_image/".$pro_image."' style='height:80px;'>";
 					}
 				}
+
+				$sql_qry=mysqli_query($this->stc_dbs, "
+					SELECT * FROM `stc_shop` WHERE `adhoc_id`='".$odinrow['stc_purchase_product_adhoc_id']."'
+				");
+				$shop_details='';
+				if(mysqli_num_rows($sql_qry)>0){
+					foreach($sql_qry as $sql_row){
+						$shop_details.='<a href="javascript:void(0)" id="'.$sql_row['id'].'" class="remove-shop-item">'.$sql_row['shopname'].' '.$sql_row['qty'].'/'.$odinrow['stc_purchase_product_adhoc_unit'].'</a><br> ';
+					}
+				}
 				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				
 				$pro_rate='<input type="number" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
@@ -2304,6 +2314,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-right' style='width: 125px;'>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."".$pro_rate."</td>
 						<td class='text-right'>".number_format($stock, 2)."</td>
 						<td class='text-center' style='width: 180px;'>
+							".$shop_details."
+							<a href='javascript:void(0)' class='btn btn-primary input-shop-item' data-toggle='modal' data-target='.bd-showadhocshop-modal-lg' title='Add Item to Shop' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-plus'></i></a>
+						</td>
+						<td class='text-center' style='width: 180px;'>
 							<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' data-toggle='modal' data-target='.bd-showadhocdetails-modal-lg' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
 						</td>
 						<td class='text-center' style='width: 180px;'>".$odinrow['stc_purchase_product_adhoc_source']."</td>
@@ -2318,12 +2332,9 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-center'>".$status[$odinrow['stc_purchase_product_adhoc_status']]."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_remarks']."</td>
 						<td class='text-center'>
-								<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card' 
-								></i></a>
-								<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o' 
-								></i></a>
-								<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash' 
-								></i></a>
+							<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card'></i></a>
+							<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o'></i></a>
+							<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash'></i></a>
 						</td>
 					</tr>
 				";
@@ -2608,6 +2619,30 @@ class ragnarPurchaseAdhoc extends tesseract{
 	
 		return "success";
 	}
+	
+	public function stc_poadhoc_itemtoshop($id, $name, $quantity) {
+		$odin="no";
+		$date=date("Y-m-d H:i:s");		
+		$query=mysqli_query($this->stc_dbs, "INSERT INTO `stc_shop`(`adhoc_id`, `shopname`, `qty`, created_date, created_by) VALUES('".mysqli_real_escape_string($this->stc_dbs, $id)."', '".mysqli_real_escape_string($this->stc_dbs, $name)."', '".mysqli_real_escape_string($this->stc_dbs, $quantity)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."')"); 
+		
+		if($query){
+			$odin="yes";
+		}
+	
+		return $odin;
+	}	
+	
+	public function stc_poadhoc_itemtoshopremove($id) {
+		$odin="no";
+		$query=mysqli_query($this->stc_dbs, "DELETE FROM `stc_shop` WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'"); 
+		
+		if($query){
+			$odin="yes";
+		}
+	
+		return $odin;
+	}
+	
 }
 #<------------------------------------------------------------------------------------------------------>
 #<--------------------------------------Object sections of Purchase class------------------------------->
@@ -3449,9 +3484,22 @@ if(isset($_POST['stc_update_ledger'])){
 	echo json_encode($outbjornestocking);
 }
 
+if(isset($_POST['stc_addItemshop'])){
+	$id=$_POST['id'];
+	$name=$_POST['name'];
+	$quantity=$_POST['quantity'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_itemtoshop($id, $name, $quantity);
+	// echo $outbjornestocking;
+	echo json_encode($outbjornestocking);
+}
 
-
-
-
+if(isset($_POST['stc_removeItemshop'])){
+	$id=$_POST['id'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_itemtoshopremove($id);
+	// echo $outbjornestocking;
+	echo json_encode($outbjornestocking);
+}
 
 ?>

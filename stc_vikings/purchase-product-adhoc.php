@@ -335,6 +335,7 @@ include("kattegat/role_check.php");
                                               <th>Quantity</th>
                                               <th>Rate</th>
                                               <th>Stock</th>
+                                              <th>Shop</th>
                                               <th>Dispatched Details</th>
                                               <th>From Source (Supplier/Location)</th>
                                               <th>To Destination (Location)</th>
@@ -988,6 +989,51 @@ include("kattegat/role_check.php");
             });
           });
 
+          $('body').delegate('.input-shop-item', 'click', function(e){
+            var id=$(this).attr('id');
+            $('.stc-poadhocshop-id').val(id);
+          });
+
+          $('body').delegate('.stc-poadhoc-addtohshop-hit', 'click', function(e){
+            var id=$('.stc-poadhocshop-id').val();
+            var name=$('#stcpoadhocnameshop').val();
+            var quantity=$('#stcpoadhocquantityshop').val();
+            $.ajax({
+              url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
+              type: 'POST', // or 'POST' depending on your API
+              data: {
+                stc_addItemshop: 1,
+                id: id,  // Ensure these are defined before use
+                name: name,  // Ensure these are defined before use
+                quantity: quantity
+              },
+              dataType: 'json',
+              success: function (response) {
+                alert("Item saved successfully.");
+                $('.paginationbtn.active').click();
+              }
+            });
+          });
+          
+
+          $('body').delegate('.remove-shop-item', 'click', function(e){
+            var id=$(this).attr('id');
+            if(confirm("Are you sure want to remove item from this shop?")){
+              $.ajax({
+                url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
+                type: 'POST', // or 'POST' depending on your API
+                data: {
+                  stc_removeItemshop: 1,
+                  id: id
+                },
+                dataType: 'json',
+                success: function (response) {
+                  alert("Item deleted successfully.");
+                  $('.paginationbtn.active').click();
+                }
+              });
+            }
+          });
           
         });
     </script>
@@ -1385,6 +1431,63 @@ include("kattegat/role_check.php");
             </div>
 
 
+            <div class="modal-footer">
+              <div class="row">
+                <div class="col-xl-6 col-md-6 col-sm-6">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-showadhocshop-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-s ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Item to Shop</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5
+                      for="stcpoadhocnameshop"
+                      >Shop Name
+                    </h5>
+                    <input type="hidden" class="stc-poadhocshop-id">
+                    <input
+                      id="stcpoadhocnameshop"
+                      type="text"
+                      placeholder="Shop Name"
+                      class="form-control validate"
+                    />
+                  </div>
+                </div>
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5
+                      for="stcpoadhocquantityshop"
+                      >Quantity
+                    </h5>
+                    <input
+                      id="stcpoadhocquantityshop"
+                      type="number"
+                      placeholder="Quantity"
+                      class="form-control validate"
+                    />
+                  </div>
+                </div>
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <button type="button"  data-dismiss="modal" class="btn btn-success stc-poadhoc-addtohshop-hit">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="modal-footer">
               <div class="row">
                 <div class="col-xl-6 col-md-6 col-sm-6">
