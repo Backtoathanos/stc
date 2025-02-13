@@ -411,7 +411,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                             <label for="validationCustom02">Priority</label>
                                                             <select class="form-control" name="stc-sup-priority">
                                                                 <option value="1">Normal</option>
-                                                                <option value="2">Urgent</option>
+                                                                <!-- <option value="2">Urgent</option> -->
                                                             </select>
                                                             <div class="valid-feedback">
                                                                 Looks good!

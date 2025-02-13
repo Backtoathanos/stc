@@ -12,6 +12,7 @@ import axios from 'axios';
 import { debounce } from 'lodash';
 
 export default function Dashboard() {
+    // console.log("Hi");
     const location = useLocation();
     useEffect(() => {
         document.title = "STC GLD || Inventory"; // Set the title
