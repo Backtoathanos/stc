@@ -2602,7 +2602,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 			while ($row = mysqli_fetch_assoc($result)) {
 				$row['stc_cust_super_requisition_list_items_rec_recqty'] = number_format($row['stc_cust_super_requisition_list_items_rec_recqty'], 2);
 				$row['stc_purchase_product_adhoc_rate'] = number_format($row['stc_purchase_product_adhoc_rate'], 2);
-				$row['total'] = number_format($row['total'], 2);
+				$row['total'] = $row['total'];
 				$odin[] = $row; // Add each row to the array
 			}
 		}
