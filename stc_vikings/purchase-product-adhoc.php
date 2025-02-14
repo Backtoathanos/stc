@@ -930,7 +930,7 @@ include("kattegat/role_check.php");
                       <td>${item.stc_cust_super_requisition_list_items_unit}</td>
                       <td class="text-right">${item.stc_cust_super_requisition_list_items_rec_recqty}</td>
                       <td class="text-right">${item.stc_purchase_product_adhoc_rate}</td>
-                      <td class="text-right">${item.total}</td>
+                      <td class="text-right">${Number(item.total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                       <td class="text-right"><a class="btn btn-info showledgertr" href="javascript:void(0)" id="${index + 1}">View</a></td>
                     </tr>
                     <tr class="ledgeritemshow-${index + 1}" style="display:none;">
