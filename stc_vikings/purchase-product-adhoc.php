@@ -1182,8 +1182,8 @@ include("kattegat/role_check.php");
                       <thead>
                         <tr>
                           <th>Sl No</th>
-                          <th>Date</th>
                           <th>Requisition Number</th>
+                          <th>Date</th>
                           <th>Project Name</th>
                           <th>User Name</th>
                           <th>Dispatched Quantity</th>

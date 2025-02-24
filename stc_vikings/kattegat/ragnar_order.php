@@ -3685,6 +3685,31 @@ class ragnarCallB2COrders extends tesseract{
 		if (mysqli_num_rows($blackpearl_qry) > 0) {
 			$i = 0;
 			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$blackpearl_qrye = mysqli_query($this->stc_dbs, "SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_productid`, `stc_purchase_product_adhoc_qty` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid`= '".$blackpearl_row['product_id']."' AND `stc_purchase_product_adhoc_status`='1'");
+				if(mysqli_num_rows($blackpearl_qrye)==0){
+					$blackpearl_row['status'] = '4';
+				}else{
+					$gldQty = 0;
+					$directqty = 0;
+					$adhocqty = 0;
+					foreach($blackpearl_qrye as $blackpearl_row2){
+						$adhocqty+=$blackpearl_row2['stc_purchase_product_adhoc_qty'];
+						$query = mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = '".$blackpearl_row['product_id']."'");
+						$result = mysqli_fetch_assoc($query);
+						$gldQty = $result['total_qty'] ?? 0;
+						
+						$sql_qry = mysqli_query($this->stc_dbs, "
+							SELECT SUM(stc_cust_super_requisition_list_items_rec_recqty) AS total_qty stc_cust_super_requisition_list_items_rec stc_cust_super_requisition_list_items_rec_list_poaid WHERE spa.stc_cust_super_requisition_list_items_rec_list_poaid = '".$blackpearl_row['product_id']."'
+						");
+						if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {
+							$row1 = mysqli_fetch_assoc($sql_qry);
+							$directqty = $row1['total_qty'] ?? 0;
+						}
+					}
+					if($adhocqty - ($gldQty + $directqty)==0){
+						// $blackpearl_row['status'] = '4';
+					}
+				}
 				$product_name = $blackpearl_row['stc_product_name'];
 				if ($blackpearl_row['stc_sub_cat_name'] != "OTHERS") {
 					$product_name = $blackpearl_row['stc_sub_cat_name'] . ' ' . $blackpearl_row['stc_product_name'];
@@ -3727,6 +3752,32 @@ class ragnarCallB2COrders extends tesseract{
 		$blackpearl="no";
 		if($blackpearl_qry){
 			$blackpearl="success";
+			if($status==3){
+				// Fetch the updated order details
+				$orderQuery = mysqli_query($this->stc_dbs, "
+					SELECT `id`, `first_name`, `last_name`, `email`, `phone_number`, `street_address`, `city`, `zipCode`, `state`, `product_id`, `order_number`, `status`, `quantity`, `rate`, `handled_by`, `created_at` FROM `orders` WHERE `id`='" . mysqli_real_escape_string($this->stc_dbs, $id) . "'
+				");
+			
+				if (mysqli_num_rows($orderQuery) > 0) {
+					$orderData = mysqli_fetch_assoc($orderQuery);
+			
+					// Insert into gld_challan table
+					$insertChallanQuery = mysqli_query($this->stc_dbs, "
+						INSERT INTO `gld_challan` (`product_id`, `cust_id`, `challan_number`, `qty`, `rate`, `created_date`, `created_by`) 
+						VALUES (
+							'" . mysqli_real_escape_string($this->stc_dbs, $orderData['product_id']) . "',
+							'" . mysqli_real_escape_string($this->stc_dbs, $orderData['id']) . "',
+							'" . mysqli_real_escape_string($this->stc_dbs, $orderData['order_number']) . "',
+							'" . mysqli_real_escape_string($this->stc_dbs, $orderData['quantity']) . "',
+							'" . mysqli_real_escape_string($this->stc_dbs, $orderData['rate']) . "',
+							NOW(),
+							'" . $_SESSION['stc_empl_id'] . "'
+						)
+					");
+				} else {
+					echo "Order not found!";
+				}
+			}
 		}
 	
 		return $blackpearl;

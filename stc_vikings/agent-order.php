@@ -2274,6 +2274,9 @@ include("kattegat/role_check.php");
                       if (response.data[i].status == 2) {
                           action_btn = '<a href="javascript:void(0)" class="orderaction-handler" id="' + response.data[i].id + '" status="3" title="Dispatch order." style="font-size: 30px;"><i class="fa fa-truck"></i></a>';
                       }
+                      if (response.data[i].status == 4) {
+                          action_btn = 'Please buy item.';
+                      }
                       data += '<tr><td>' + slno + '</td><td>' + response.data[i].first_name + '</td><td>' + response.data[i].last_name + '</td><td class="text-center">' + response.data[i].email + '</td><td class="text-center">' + response.data[i].phone_number + '</td><td>' + response.data[i].street_address + '</td><td class="text-center">' + response.data[i].stc_product_id + '</td><td>' + response.data[i].stc_product_name + '</td><td class="text-right">' + response.data[i].quantity + '</td><td class="text-right">' + response.data[i].rate + '</td><td class="text-right">' + total + '</td><td class="text-center">' + response.data[i].created_at + '</td><td class="text-center">' + status + '</td><td class="text-center">' + action_btn + '</td></tr>';
                       slno++;
                   }

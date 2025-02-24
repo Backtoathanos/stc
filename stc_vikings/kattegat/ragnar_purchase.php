@@ -3400,6 +3400,7 @@ if(isset($_POST['stc_call_poadhoc'])){
 	$outbjornestocking=$bjornestocking->stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status, $page, $pageSize);
 	echo json_encode($outbjornestocking);
 }
+
 // call po adhoc
 if(isset($_POST['stc_call_poadhoc_details'])){
 	$poaid=$_POST['poaid'];
