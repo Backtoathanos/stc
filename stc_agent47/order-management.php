@@ -585,22 +585,24 @@ include_once("../MCU/db.php");
             // call req list items edit
             $('body').delegate('.remove_from_purchase', 'click', function(e){
                 e.preventDefault();
-                var req_id=$(this).attr("operat-ic");
-                var list_id=$(this).attr("list-id");
-                $.ajax({
-                    url         : "nemesis/stc_project.php",
-                    method      : "POST",
-                    data        : {
-                        stc_req_edit_item_delete:1,
-                        req_id:req_id,
-                        list_id:list_id
-                    }, 
-                    success     : function(response_items){
-                        // console.log(response_items);
-                        alert("Item Removed Successfully.");
-                        window.location.reload();
-                    }
-                });
+                if(confirm("Are you sure to remove this item?")){
+                    var req_id=$(this).attr("operat-ic");
+                    var list_id=$(this).attr("list-id");
+                    $.ajax({
+                        url         : "nemesis/stc_project.php",
+                        method      : "POST",
+                        data        : {
+                            stc_req_edit_item_delete:1,
+                            req_id:req_id,
+                            list_id:list_id
+                        }, 
+                        success     : function(response_items){
+                            // console.log(response_items);
+                            alert("Item Removed Successfully.");
+                            window.location.reload();
+                        }
+                    });
+                }
             });
 
             // update  req list items edit
