@@ -788,7 +788,7 @@ include("kattegat/role_check.php");
                             <tr>
                               <td>
                                 <div class="search-box">
-                                    <input type="text" id="searchInput" class="form-control" placeholder="Search by Product name, User email, name, or phone number">
+                                    <input type="text" id="searchInput" class="form-control" placeholder="Search by Product name, User email, name or phone number">
                                 </div>
                               </td>
                               <td><button id="searchButton" class="btn btn-primary" >Search</button></td>

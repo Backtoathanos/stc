@@ -161,6 +161,7 @@ include_once("../MCU/db.php");
                                                             <table class="mb-0 table table-hover table-bordered" id="stc-requis-table">
                                                                 <thead>
                                                                     <th class="text-center">Sl No</th>
+                                                                    <th class="text-center">Requisition No</th>
                                                                     <th class="text-center">Requisition Date</th>
                                                                     <th class="text-center">Requisition For</th>
                                                                     <th class="text-center">Requisition From</th>
@@ -171,7 +172,8 @@ include_once("../MCU/db.php");
                                                                     <th class="text-center">Remains Quantity</th>
                                                                     <th class="text-center">Status</th>
                                                                     <th class="text-center">Type</th>
-                                                                    <th class="text-center">Action</th>
+                                                                    <th class="text-center">ADD</th>
+                                                                    <th class="text-center">DELETE</th>
                                                                 </thead>
                                                                 <tbody>
                                                                 <?php 
@@ -216,15 +218,16 @@ include_once("../MCU/db.php");
                                                                         if(mysqli_num_rows($requissuperqry)!=0){
                                                                             foreach($requissuperqry as $requisrow){
                                                                                 $actionstatus="#";
+                                                                                $deletstatus="#";
                                                                                 if($requisrow['stc_cust_super_requisition_list_status']==1){
                                                                                     $actionstatus='
                                                                                         <a href="#" class="btn btn-primary add_to_purchase" atc-ic="'.$requisrow['item_list_id'].'"id="add_to_accept_cart'.$requisrow['item_list_id'].'" title="Approve" style="font-size: 35px;color: black;"><i class="fas fa-plus-circle"></i></a>
-                                                                                        <a href="#" class="btn btn-danger remove_from_purchase" operat-ic="'.$requisrow['item_list_id'].'"id="rem_from_accept_cart'.$requisrow['item_list_id'].'" style="font-size: 35px;color: black;display:none;"><i class="fas fa-trash" ></i></a>
+                                                                                    ';
+                                                                                    $deletstatus='
+                                                                                        <a href="#" class="btn btn-danger remove_from_purchase" operat-ic="'.$requisrow['item_list_id'].'" list-id="'.$requisrow['list_id'].'" id="rem_from_accept_cart'.$requisrow['item_list_id'].'" style="font-size: 35px;color: black;"><i class="fas fa-trash" ></i></a>
                                                                                     ';
                                                                                 }elseif($requisrow['stc_cust_super_requisition_list_status']==2){
                                                                                     // $actionstatus='<a href="#" class="btn btn-danger remove_from_purchase" operat-ic="'.$requisrow['item_list_id'].'"id="rem_from_accept_cart'.$requisrow['item_list_id'].'" style="font-size: 35px;color: black;"><i class="fas fa-trash" ></i></a>';
-                                                                                }else{
-                                                                                    $actionstatus='#';
                                                                                 }
                                                                                 $changedstatus='';
                                                                                 $pdid=0;
@@ -240,6 +243,7 @@ include_once("../MCU/db.php");
                                                                                     echo '
                                                                                         <tr id="'.$trid.'" class="tr-search-fromhere" '.$style.'>
                                                                                             <td class="text-center">'.$sl.'</td>
+                                                                                            <td>'.$requisrow['list_id'].'</td>
                                                                                             <td>'.date('d-m-Y h:i a', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'</td>
                                                                                             <td>'.$requisrow['stc_cust_project_title'].'</td>
                                                                                             <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'
@@ -262,6 +266,7 @@ include_once("../MCU/db.php");
                                                                                             </td>
                                                                                             <td class="text-center">'.$priority.'</td>
                                                                                             <td class="text-center">'.$actionstatus.'</td>
+                                                                                            <td class="text-center">'.$deletstatus.'</td>
                                                                                         </tr>
                                                                                     ';
                                                                                 }
@@ -573,6 +578,27 @@ include_once("../MCU/db.php");
                         // console.log(response_items);
                         $(".stc-super-own-name-text").val(response_items);
                         $('.stc-super-own-req-id-hidd').val(req_id);
+                    }
+                });
+            });
+
+            // call req list items edit
+            $('body').delegate('.remove_from_purchase', 'click', function(e){
+                e.preventDefault();
+                var req_id=$(this).attr("operat-ic");
+                var list_id=$(this).attr("list-id");
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_req_edit_item_delete:1,
+                        req_id:req_id,
+                        list_id:list_id
+                    }, 
+                    success     : function(response_items){
+                        // console.log(response_items);
+                        alert("Item Removed Successfully.");
+                        window.location.reload();
                     }
                 });
             });

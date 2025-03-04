@@ -160,7 +160,7 @@ include_once("../MCU/db.php");
                                                                                         </tr>
                                                                                     ";
                                                                                 }
-                                                                            }else{}
+                                                                            }
                                                                         ?>
                                                                         </tbody>                                                                   
                                                                     </table>

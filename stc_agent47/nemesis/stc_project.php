@@ -1936,6 +1936,27 @@ class pirates_supervisor extends tesseract{
 		return $blackpearl;
 	}
 
+	public function stc_delete_requisition_item($id, $list_id){
+		$blackpearl='';
+		$itemsqry=mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_super_requisition_list_id` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$list_id."'
+		");
+		if(mysqli_num_rows($itemsqry)>0){
+			$deleteqry=mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_super_requisition_list` WHERE `stc_cust_super_requisition_list_id`='".$list_id."'
+			");
+			if($deleteqry){
+				$blackpearl="yes";
+			}else{
+				$blackpearl="no";
+			}
+		}
+		$deleteqry=mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_id`='".$id."'
+		");
+		return $blackpearl;
+	}
+
 	// check item existance on supervisor order
 	public function stc_check_item_existance($odid){
 		$blackpearl="";
@@ -1965,14 +1986,15 @@ class pirates_supervisor extends tesseract{
 				`stc_cust_super_requisition_list_items_status`='".$itemstatus."'
 			WHERE `stc_cust_super_requisition_list_id`='".$item_id."'
 		");
-		$getapprqry=mysqli_query($this->stc_dbs, "
-			select `stc_cust_super_requisition_list_items_req_id` 
-			from stc_cust_super_requisition_list_items 
-			where stc_cust_super_requisition_list_id='".$item_id."'
-		");
-		$result=mysqli_fetch_assoc($getapprqry);
-		$req_id=$result['stc_cust_super_requisition_list_items_req_id'];
 		if($setapprqry){
+			$getapprqry=mysqli_query($this->stc_dbs, "
+				select `stc_cust_super_requisition_list_items_req_id` 
+				from stc_cust_super_requisition_list_items 
+				where stc_cust_super_requisition_list_id='".$item_id."'
+			");
+			$result=mysqli_fetch_assoc($getapprqry);
+			$req_id=$result['stc_cust_super_requisition_list_items_req_id'];
+
 			// check status from item
 			$checkquery=mysqli_query($this->stc_dbs, "
 				SELECT DISTINCT `stc_cust_super_requisition_list_items_status` 
@@ -4807,6 +4829,15 @@ if(isset($_POST['get_equipementdetails'])){
 	$id=$_POST['id'];
 	$metabots=new pirates_project();
 	$opmetabots=$metabots->stc_get_equipmentdetails($id);
+	echo json_encode($opmetabots);
+}
+
+// delete equipment details
+if(isset($_POST['stc_req_edit_item_delete'])){
+	$id=$_POST['req_id'];
+	$list_id=$_POST['list_id'];
+	$metabots=new pirates_supervisor();
+	$opmetabots=$metabots->stc_delete_requisition_item($id, $list_id);
 	echo json_encode($opmetabots);
 }
 ?>
