@@ -18,7 +18,9 @@ export default function Order() {
     useEffect(() => {
         document.title = "STC GLD || Order"; // Set the title
     }, []);
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const API_BASE_URL = process.env.NODE_ENV === 'production'
+        ? 'https://stcassociate.com/stc_gld/vanaheim'
+        : 'http://localhost/stc/stc_gld/vanaheim';
     const [showModal, setShowModal] = useState(false);
     const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);

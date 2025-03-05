@@ -18,7 +18,9 @@ export default function ChallanDashboard() {
         document.title = "STC GLD || Challan";
     }, []);
 
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const API_BASE_URL = process.env.NODE_ENV === 'production'
+        ? 'https://stcassociate.com/stc_gld/vanaheim'
+        : 'http://localhost/stc/stc_gld/vanaheim';
     const [showModal, setShowModal] = useState(false);
     const [showModal1, setShowModal1] = useState(false);
 

@@ -7,7 +7,9 @@ const PrintPreview = () => {
     const [challanDetails, setChallanDetails] = useState(null);
     const location = useLocation();
 
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const API_BASE_URL = process.env.NODE_ENV === 'production'
+        ? 'https://stcassociate.com/stc_gld/vanaheim'
+        : 'http://localhost/stc/stc_gld/vanaheim';
     
     // Function to extract query parameters
     const getQueryParams = (query) => {
