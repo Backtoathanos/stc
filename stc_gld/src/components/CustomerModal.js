@@ -10,7 +10,9 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
     ? productRate.replace(/,/g, "") 
     : productRate;
 
-    const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+    const API_BASE_URL = process.env.NODE_ENV === 'production'
+        ? 'https://stcassociate.com/stc_gld/vanaheim'
+        : 'http://localhost/stc/stc_gld/vanaheim';
     const [customerOptions, setCustomerOptions] = useState([]);
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [customerName, setCustomerName] = useState('');
