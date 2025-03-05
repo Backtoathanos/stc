@@ -224,6 +224,20 @@ include("kattegat/role_check.php");
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="col-md-12">
+                                        <div class="card-border mb-3 card card-body border-primary">
+                                            <h5
+                                              for="make"
+                                              >Available : <span><?php echo $stcretresult['stc_product_avail']==1?'Available':"Not Available";?></span></h5
+                                            >
+                                            <select
+                                              id="make"
+                                              class="custom-select tm-select-accounts"
+                                              name="available"
+                                            ><option <?php echo $stcretresult['stc_product_avail']==1?'selected ':"";?> value="1">Available</option><option <?php echo $stcretresult['stc_product_avail']==0?'selected ':"";?>value="0">Not Available</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                           <?php }?>
                                     <div class="col-md-12">
                                         <div class="col-md-12">

@@ -580,7 +580,7 @@ class ragnarProduct extends tesseract{
 
 	/*---------------------------- Edit product page-----------------------------*/
 	// edit product function
-	public function stc_update_product($product_id, $stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsncode, $stcpdpercentage, $stcpdunit, $stcpdgst, $stcpdbrand){
+	public function stc_update_product($product_id, $stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsncode, $stcpdpercentage, $stcpdunit, $stcpdgst, $stcpdbrand, $available){
 		$check_loki=mysqli_query($this->stc_dbs, "
 			SELECT `stc_product_name` FROM `stc_product` 
 			WHERE `stc_product_desc`		=	'".mysqli_real_escape_string($this->stc_dbs, $stcpddsc				)."'
@@ -603,7 +603,8 @@ class ragnarProduct extends tesseract{
 					`stc_product_hsncode`			='".mysqli_real_escape_string($this->stc_dbs, $stcpdhsncode		)."',
 					`stc_product_gst`				='".mysqli_real_escape_string($this->stc_dbs, $stcpdgst			)."',
 					`stc_product_sale_percentage`	='".mysqli_real_escape_string($this->stc_dbs, $stcpdpercentage	)."',
-					`stc_product_brand_id`			='".mysqli_real_escape_string($this->stc_dbs, $stcpdbrand		)."' 
+					`stc_product_brand_id`			='".mysqli_real_escape_string($this->stc_dbs, $stcpdbrand		)."',
+					`stc_product_avail`			='".mysqli_real_escape_string($this->stc_dbs, $available		)."' 
 				WHERE 
 					`stc_product_id`				='".mysqli_real_escape_string($this->stc_dbs, $product_id 		)."'
 			");
@@ -949,12 +950,13 @@ if(isset($_POST['stc_edit_product_hit'])){
 	$stcpdpercentage=$_POST['stcpdpercentage'];
 	$stcpdunit=strtoupper($_POST['stcpdunit']);
 	$stcpdbrand=strtoupper($_POST['stcpdbrand']);
+	$available=strtoupper($_POST['available']);
 	$stcpdgst=$_POST['stcpdgst'];
 	$objthor=new ragnarProduct();
 	if($stcpdcat=="NA" || $stcpdsubcat=="NA" || empty($stcpdname) || empty($stcpddsc)){
 		$out="Kid!!! Don't let any field empty otherwise i will cursed you out.";
 	}else{
-		$objthorout=$objthor->stc_update_product($product_id, $stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsncode, $stcpdpercentage, $stcpdunit, $stcpdgst, $stcpdbrand);
+		$objthorout=$objthor->stc_update_product($product_id, $stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsncode, $stcpdpercentage, $stcpdunit, $stcpdgst, $stcpdbrand, $available);
 		$out=$objthorout;
 	}
 	echo json_encode($objthorout);
