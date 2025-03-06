@@ -2576,22 +2576,22 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-agendaofmeet" placeholder="Enter agenda of the meeting"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">List of topics: (Strike out (X) the topic that has not been discussed./ विषय की सूचि : ( जिस विषय की चर्चा नहीं हुई है उसे काट ( X ) दें ! : *</h5>
                                     </div>                                    
-                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">1. Review and discuss the topic of the previous meeting/ पिछले मीटिंग के विषय का रिव्यु करें तथा उसकी चर्चा करें :</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointtone" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">2. Ask the employee about the near miss incident or accident of the past day and note down/ कर्मचारी से बीतें दिन के नियर मिस घटना या दुर्घटना के बारे में पूछें तथा नोट करें : *</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointtwo" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">3. Inform the employee about Green Strip, Red Strip, Orange Strip and Safety Alert Circular: Inform them about hazards and safe working conditions/ कर्मचारी को ग्रीन स्ट्रिप , रेड स्ट्रिप , ऑरेंज स्ट्रिप और सेफ्टी अलर्ट सकयुरलर की जानकारी दें :
                                         उन्हें खतरे तथा कार्यानुसार सुरक्षित स्थिति के बारे में बतायें : *</h5>
                                         <div class="position-relative form-group">
@@ -2604,13 +2604,13 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointfour" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">5. Remind employees of their personal responsibilities: proper PPE, housekeeping, tools and tackles, power equipment condition, 6 direction hazards, special requirements like work permit, no drinking, Safe behavior, Team work spirit, No dangerous architecture etc./ कर्मचारी को उनके व्यक्तिगत जिम्मेदारियां की याद दिलाये : उचित पीपीई , हाउसकीपिंग , टूल्स एंड टाकल्स , बिजली उपकरण की स्थिति, ६ दिशा के खतरे, विशेष ज़रूरत जैसे वर्क परमिट , मधपान निषेद ,सुरक्छित वयवहार ,टीम वर्क की भावना , कोई खतरनाक वास्तु इत्यादि : *</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointfive" placeholder="Enter text"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12 col-sm-12 col-xl-12" <?php if($_SESSION['stc_agent_sub_category']!="Safety Supervisor"){ echo 'style="display:none;"'; } ?>>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
                                         <h5 class="card-title">6. Share security written messages with employees/ सुरक्षा लिखित सन्देश कर्मचारी के साथ साझा करें : *</h5>
                                         <div class="position-relative form-group">
                                             <textarea class="form-control stc-tbtm-textfields" id="stc-tbtm-pointsix" placeholder="Enter text"></textarea>
