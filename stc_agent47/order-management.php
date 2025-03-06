@@ -658,7 +658,6 @@ include_once("../MCU/db.php");
                 <div class="col-sm-12 col-md-6 col-lg-6">
                 <select class="form-control stc-sup-priority">
                     <option value="1">Normal</option>
-                    <option value="2">Urgent</option>
                 </select>
                 </div>
                 <div class="col-sm-12 col-md-6 col-lg-6">
