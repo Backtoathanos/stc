@@ -1938,10 +1938,13 @@ class pirates_supervisor extends tesseract{
 
 	public function stc_delete_requisition_item($id, $list_id){
 		$blackpearl='';
+		$deleteqry=mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_id`='".$id."'
+		");
 		$itemsqry=mysqli_query($this->stc_dbs, "
 			SELECT `stc_cust_super_requisition_list_id` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$list_id."'
 		");
-		if(mysqli_num_rows($itemsqry)>0){
+		if(mysqli_num_rows($itemsqry)==0){
 			$deleteqry=mysqli_query($this->stc_dbs, "
 				DELETE FROM `stc_cust_super_requisition_list` WHERE `stc_cust_super_requisition_list_id`='".$list_id."'
 			");
@@ -1951,9 +1954,6 @@ class pirates_supervisor extends tesseract{
 				$blackpearl="no";
 			}
 		}
-		$deleteqry=mysqli_query($this->stc_dbs, "
-			DELETE FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_id`='".$id."'
-		");
 		return $blackpearl;
 	}
 

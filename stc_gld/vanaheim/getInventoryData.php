@@ -35,7 +35,7 @@ if ($search !== '') {
                     OR P.stc_product_id IN (
                         SELECT stc_purchase_product_adhoc_productid 
                         FROM stc_purchase_product_adhoc 
-                        WHERE stc_purchase_product_adhoc_status = 1 
+                        WHERE stc_purchase_product_adhoc_status = 1 AND P.stc_product_avail = 1
                         AND stc_purchase_product_adhoc_rackid IN (
                             SELECT stc_rack_id FROM stc_rack WHERE stc_rack_name LIKE '%$search%'
                         )
