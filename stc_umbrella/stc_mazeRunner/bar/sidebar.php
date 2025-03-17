@@ -54,6 +54,12 @@
                 <p>Student Attendance</p>
             </a>
           </li>
+          <li class="nav-item questions-management">
+            <a class="nav-link" href="./questions-management.php?questions-management=yes">
+                <i class="material-icons">edit_note</i>
+                <p>Questions Management</p>
+            </a>
+          </li>
           <!-- <li class="nav-item syllabus">
             <a class="nav-link" href="./syllabus.php?syllabus=yes">
                 <i class="material-icons">menu_book</i>

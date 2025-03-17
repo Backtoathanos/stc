@@ -1488,6 +1488,95 @@ class Yggdrasil extends tesseract{
 		return $odin;
 	}
 
+	public function stc_call_questions($class_id, $month){
+		// Extract the month and year from the input date
+		$months = date('m', strtotime($month));
+		$year = date('Y', strtotime($month));
+	
+		// Array to store the number of days in each month
+		$monthday_arr = array(
+			'01' => 31,
+			'02' => 28, // Note: This does not account for leap years
+			'03' => 31,
+			'04' => 30,
+			'05' => 31,
+			'06' => 30,
+			'07' => 31,
+			'08' => 31,
+			'09' => 30,
+			'10' => 31,
+			'11' => 30,
+			'12' => 31
+		);
+	
+		// Validate the number of days in the month
+		$validate = $monthday_arr[$months];
+		$monthday = '';
+		$counter = 0;
+	
+		// Generate the table headers for each day of the month
+		for ($i = 0; $i < $validate; $i++) {
+			$counter++;
+			$monthday .= '<th class="text-center long">' . $counter . '</th>';
+		}
+	
+		// Start building the HTML table
+		$odin = '
+			<table class="table table-hover table-bordered">
+				<thead>
+					<tr>
+						<th class="text-center headcol">Sl No</th>
+						<th class="text-center headcol">Class</th>
+						<th class="text-center headcol">Questions</th>
+					</tr>
+				</thead>
+				<tbody class="stc-schoolattendance-show">
+		';
+	
+		// Query to fetch the questions for the given class and month
+		$odinattendanceqry = mysqli_query($this->stc_dbs, "
+			SELECT `stc_school_lecture_question_id`, `stc_school_lecture_question_lectureid`, `stc_school_lecture_question_scheduleid`, `stc_school_class_title`, `stc_school_lecture_question_subid`, `stc_school_lecture_question_question`, `stc_school_lecture_question_status`, `stc_school_lecture_question_createdate`, `stc_school_lecture_question_createdby` 
+			FROM `stc_school_lecture_question` 
+			LEFT JOIN `stc_school_class` ON `stc_school_lecture_question_classid`=`stc_school_class_id`
+			WHERE `stc_school_lecture_question_classid` = '" . mysqli_real_escape_string($this->stc_dbs, $class_id) . "' 
+			AND MONTH(`stc_school_lecture_question_createdate`) = '" . mysqli_real_escape_string($this->stc_dbs, $months) . "' 
+			AND YEAR(`stc_school_lecture_question_createdate`) = '" . mysqli_real_escape_string($this->stc_dbs, $year) . "'
+			ORDER BY `stc_school_lecture_question_question` ASC
+		");
+	
+		// Check if there are any records
+		if (mysqli_num_rows($odinattendanceqry) > 0) {
+			$slno=0;
+			// Loop through the results and add them to the table
+			while ($row = mysqli_fetch_assoc($odinattendanceqry)) {
+				$slno++;
+				$odin .= '
+					<tr>
+						<td class="text-center">' . $slno . '</td>
+						<td class="text-center">' . $row['stc_school_class_title'] . '</td>
+						<td>' . $row['stc_school_lecture_question_question'] . '</td>
+					</tr>
+				';
+			}
+		} else {
+			// If no records are found, display a message
+			$colspan = $counter + 4; // Adjust colspan to include all columns
+			$odin .= "
+				<tr>
+					<td colspan='" . $colspan . "'>No record found.</td>
+				</tr>
+			";
+		}
+	
+		// Close the table
+		$odin .= "
+				</tbody>
+			</table>
+		";
+	
+		return $odin;
+	}
+
 	public function stc_call_pertstudent_details($student_id){
 		$odin_gquery=mysqli_query($this->stc_dbs, "
 			SELECT 
@@ -1955,5 +2044,19 @@ if(isset($_POST['stc_student_attendance_get'])){
 	}
 	echo json_encode($out);
 	
+}
+
+// call student attendance
+if(isset($_POST['stc_call_questions'])){
+	$class_id=$_POST['class_id'];
+	$month=$_POST['month'];
+	$out=array();
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out['reload']="reload";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out=$valkyrie->stc_call_questions($class_id, $month);
+	}
+	echo json_encode($out);
 }
 ?>
