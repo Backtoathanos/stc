@@ -1527,6 +1527,8 @@ class Yggdrasil extends tesseract{
 					<tr>
 						<th class="text-center headcol">Sl No</th>
 						<th class="text-center headcol">Class</th>
+						<th class="text-center headcol">Subject</th>
+						<th class="text-center headcol">Chapter</th>
 						<th class="text-center headcol">Questions</th>
 					</tr>
 				</thead>
@@ -1535,9 +1537,11 @@ class Yggdrasil extends tesseract{
 	
 		// Query to fetch the questions for the given class and month
 		$odinattendanceqry = mysqli_query($this->stc_dbs, "
-			SELECT `stc_school_lecture_question_id`, `stc_school_lecture_question_lectureid`, `stc_school_lecture_question_scheduleid`, `stc_school_class_title`, `stc_school_lecture_question_subid`, `stc_school_lecture_question_question`, `stc_school_lecture_question_status`, `stc_school_lecture_question_createdate`, `stc_school_lecture_question_createdby` 
+			SELECT `stc_school_lecture_question_id`, `stc_school_lecture_chapter`, `stc_school_lecture_question_scheduleid`, `stc_school_class_title`, `stc_school_subject_title`, `stc_school_lecture_question_question`, `stc_school_lecture_question_status`, `stc_school_lecture_question_createdate`, `stc_school_lecture_question_createdby` 
 			FROM `stc_school_lecture_question` 
 			LEFT JOIN `stc_school_class` ON `stc_school_lecture_question_classid`=`stc_school_class_id`
+			LEFT JOIN `stc_school_subject` ON `stc_school_lecture_question_subid`=`stc_school_subject_id`
+			LEFT JOIN `stc_school_lecture` ON `stc_school_lecture_question_lectureid`=`stc_school_lecture_id`
 			WHERE `stc_school_lecture_question_classid` = '" . mysqli_real_escape_string($this->stc_dbs, $class_id) . "' 
 			AND MONTH(`stc_school_lecture_question_createdate`) = '" . mysqli_real_escape_string($this->stc_dbs, $months) . "' 
 			AND YEAR(`stc_school_lecture_question_createdate`) = '" . mysqli_real_escape_string($this->stc_dbs, $year) . "'
@@ -1554,6 +1558,8 @@ class Yggdrasil extends tesseract{
 					<tr>
 						<td class="text-center">' . $slno . '</td>
 						<td class="text-center">' . $row['stc_school_class_title'] . '</td>
+						<td class="text-center">' . $row['stc_school_subject_title'] . '</td>
+						<td class="text-center">' . $row['stc_school_lecture_chapter'] . '</td>
 						<td>' . $row['stc_school_lecture_question_question'] . '</td>
 					</tr>
 				';
