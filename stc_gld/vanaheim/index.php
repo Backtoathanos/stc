@@ -124,7 +124,7 @@ function addCustomer($conn) {
 
         // Insert new customer if no existing customer is selected
         if (!$customerId) {
-            $query = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_city_id, gld_customer_state_id, gld_customer_address, agent_id) VALUES ('$customerName', '$customerContact', '65', '16', '$customerAddress')";
+            $query = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_city_id, gld_customer_state_id, gld_customer_address) VALUES ('$customerName', '$customerContact', '65', '16', '$customerAddress')";
             $conn->query($query);
             $customerId = $conn->insert_id;
         }

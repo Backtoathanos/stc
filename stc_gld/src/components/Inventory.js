@@ -32,17 +32,17 @@ export default function Dashboard() {
     const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
 
-    const [page, setPage] = useState(1); // Current page
+    const [page, setPage] = useState(0); // Current page
     const [limit, setLimit] = useState(10); // Rows per page
     const [totalRows, setTotalRows] = useState(0); // Total records from API
 
-    // Fetch data from API with pagination
-    const fetchData = debounce((query = '', pageNum = 1, rowLimit = 10) => {
+    const fetchData = debounce((query = '', pageNum = page, rowLimit = limit) => {
         setLoading(true);
         axios.get(`${API_BASE_URL}/getInventoryData.php`, {
             params: { search: query, page: pageNum, limit: rowLimit }
         })
             .then(response => {
+                console.log("Hi");
                 if (response.data && response.data.records) {
                     setData(response.data.records);
                     setTotalRows(response.data.total); // Assuming API returns total count
@@ -59,12 +59,18 @@ export default function Dashboard() {
                 setLoading(false);
             });
     }, 500);
-
+    
     // Fetch data on component mount, page change, search change
     useEffect(() => {
         fetchData(search, page, limit);
-    }, [search, page, limit]);
-
+    }, [search, page, limit]); // fetchData is called when search, page, or limit changes
+    
+    // Handle page change
+    const handlePageChange = (newPage) => {
+        console.log('Page changed to:', newPage);
+        setPage(newPage); // Update page state
+    };
+    
     // Define columns for DataTable
     const columns = [
         {
@@ -241,7 +247,7 @@ export default function Dashboard() {
                                                 paginationTotalRows={totalRows} // Total rows from API
                                                 paginationPerPage={limit} // Default rows per page
                                                 paginationRowsPerPageOptions={[10, 20, 50, 100]}
-                                                onChangePage={(newPage) => setPage(newPage)}
+                                                onChangePage={handlePageChange}
                                                 onChangeRowsPerPage={(newLimit, newPage) => {
                                                     setLimit(newLimit);
                                                     setPage(newPage);
