@@ -66,7 +66,7 @@ const PrintPreview = () => {
                         alt="Global Logo"
                         style={{ height: '100px', marginRight: '15px' }}
                     />
-                    <h2 style={{ margin: '0', padding: '0' }}>{queryParams.get('status') === 'billed' ? 'RCM' : 'Challan'}</h2>
+                    <h2 style={{ margin: '0', padding: '0' }}>{queryParams.get('status') === 'billed' ? 'Retail Invoice' : 'Challan'}</h2>
                 </div>
 
                 {/* Left and Right Aligned Sections */}
