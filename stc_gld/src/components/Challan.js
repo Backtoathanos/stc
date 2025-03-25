@@ -73,7 +73,7 @@ export default function ChallanDashboard() {
         setSelectedRows(newSelectedRows);
     };
     const handleAddPayment = (row) => {
-        const dues = (row.rate * row.qty) - row.paid_amount; // Calculate dues
+        const dues = ((row.rate * row.qty) - row.discount) - row.paid_amount; // Calculate dues
         setPaymentAmount(dues.toFixed(2)); // Set dues in paymentAmount with 2 decimal places
         setSelectedChallanForPayment(row); // Set the selected challan
         setShowModal(true); // Show the modal
@@ -145,7 +145,7 @@ export default function ChallanDashboard() {
             name: 'Action',
             selector: row => row.created_by,
             cell: row => {
-                const duesValue = ((row.rate * row.qty) - row.paid_amount).toFixed(2);
+                const duesValue = (((row.rate * row.qty) - row.discount) - row.paid_amount).toFixed(2);
                 
                 // Conditionally render button if dues are greater than 0
                 return duesValue > 0 ? (
@@ -235,6 +235,21 @@ export default function ChallanDashboard() {
             right: true
         },
         {
+            name: 'Discount',
+            selector: row => row.discount,
+            sortable: true,
+            right: true
+        },
+        {
+            name: 'Grand Total',
+            selector: row => {
+                const total = (row.rate * row.qty) - row.discount;
+                return total ? total.toFixed(2) : '0.00';  // Round to 2 decimal places
+            },
+            sortable: false,
+            right: true
+        },
+        {
             name: 'Paid Amount',
             selector: row => row.paid_amount,
             sortable: true,
@@ -242,11 +257,11 @@ export default function ChallanDashboard() {
         },
         {
             name: 'Dues',
-            selector: row => ((row.rate * row.qty) - row.paid_amount).toFixed(2),
+            selector: row => (((row.rate * row.qty) - row.discount) - row.paid_amount).toFixed(2),
             sortable: false,
             right: true,
             cell: row => {
-                const duesValue = ((row.rate * row.qty) - row.paid_amount).toFixed(2);
+                const duesValue = (((row.rate * row.qty) - row.discount) - row.paid_amount).toFixed(2);
                 return (
                     <span style={{ color: duesValue > 0 ? 'red' : 'black' }}>
                         {duesValue}

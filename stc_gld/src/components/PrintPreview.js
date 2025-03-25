@@ -10,7 +10,7 @@ const PrintPreview = () => {
     const API_BASE_URL = process.env.NODE_ENV === 'production'
         ? 'https://stcassociate.com/stc_gld/vanaheim'
         : 'http://localhost/stc/stc_gld/vanaheim';
-    
+
     // Function to extract query parameters
     const getQueryParams = (query) => {
         return new URLSearchParams(query);
@@ -30,9 +30,9 @@ const PrintPreview = () => {
         let challanNo = queryParams.get('challan_no') || 'default';
         let status = queryParams.get('status') || 'default';
         if (challanNo) {
-            let geturl=`${API_BASE_URL}/index.php?action=getChallanDetails&challan_no=${challanNo}&status=challan`;
-            if(status=="billed"){
-                geturl=`${API_BASE_URL}/index.php?action=getChallanDetails&challan_no=${challanNo}&status=billed`;
+            let geturl = `${API_BASE_URL}/index.php?action=getChallanDetails&challan_no=${challanNo}&status=challan`;
+            if (status == "billed") {
+                geturl = `${API_BASE_URL}/index.php?action=getChallanDetails&challan_no=${challanNo}&status=billed`;
             }
             // Fetch details of the selected challan
             axios.get(geturl)
@@ -55,7 +55,7 @@ const PrintPreview = () => {
         const year = String(date.getFullYear()).slice(-4); // Get last two digits of the year
         return `${day}/${month}/${year}`;
     };
-    
+
     return (
         <div className="print-preview-container">
             <header className="print-header" style={{ width: '100%', marginTop: '0px', padding: '0' }}>
@@ -96,7 +96,16 @@ const PrintPreview = () => {
                             <th className="text-center">Unit</th>
                             <th className="text-center">Quantity</th>
                             <th className="text-center">Rate</th>
-                            <th className="text-center">Amount</th>
+                            {queryParams.get('status') === 'billed' && (
+                                <>
+                                    <th className="text-center">Basic</th>
+                                    <th className="text-center">GST</th>
+                                    <th className="text-center">Amount</th>
+                                    <th className="text-center">Total</th>
+                                </>
+                            )}
+                            {queryParams.get('status') !== 'billed' && <th className="text-center">Amount</th>}
+                            <th className="text-center">Discount</th>
                             <th className="text-center">Dues</th>
                             <th className="text-center">Payment Mode</th>
                             <th className="text-center">Remarks</th>
@@ -105,33 +114,92 @@ const PrintPreview = () => {
                     <tbody>
                         {challanDetails.products && challanDetails.products.length > 0 ? (
                             <>
-                                {challanDetails.products.map((product, index) => (
-                                    <tr key={index}>
-                                        <td className="text-center">{index + 1}</td>
-                                        <td className="text-left">{product.product_name}</td>
-                                        <td className="text-left">{product.Rackid}</td>
-                                        <td className="text-center">{product.unit}</td>
-                                        <td className="text-right">{parseFloat(product.qty).toFixed(2)}</td>
-                                        <td className="text-right">{parseFloat(product.rate).toFixed(2)}</td>
-                                        <td className="text-right">{parseFloat(product.qty * product.rate).toFixed(2)}</td>
-                                        <td className="text-right">{parseFloat(product.dues).toFixed(2)}</td>
-                                        <td className="text-center">{product.payment_status == 1 ? "Credit" : product.payment_status == 2 ? "AC" : "Cash"}</td>
-                                        <td className="text-center"></td>
-                                    </tr>
-                                ))}
+                                {challanDetails.products.map((product, index) => {
+                                    // Calculate GST components
+                                    const basePrice = product.rate / (1 + (product.gst / 100));
+                                    const gstAmount = product.rate - basePrice;
+                                    const baseTotal = basePrice * product.qty;
+                                    const gstTotal = gstAmount * product.qty;
+                                    const itemTotal = product.rate * product.qty - product.discount;
+
+                                    const withoutgstrate=product.rate;
+
+                                    return (
+                                        <tr key={index}>
+                                            <td className="text-center">{index + 1}</td>
+                                            <td className="text-left">{product.product_name}</td>
+                                            <td className="text-left">{product.Rackid}</td>
+                                            <td className="text-center">{product.unit}</td>
+                                            <td className="text-right">{parseFloat(product.qty).toFixed(2)}</td>
+                                            {queryParams.get('status') !== 'billed' && <td className="text-right">{parseFloat(withoutgstrate).toFixed(2)}</td>}
+                                            {queryParams.get('status') !== 'billed' && <td className="text-right">{parseFloat(withoutgstrate * product.qty).toFixed(2)}</td>}
+                                            {queryParams.get('status') === 'billed' && (
+                                                <>
+                                                    <td className="text-right">{basePrice.toFixed(2)}</td>
+                                                    <td className="text-right">{baseTotal.toFixed(2)}</td>
+                                                    <td className="text-center">{product.gst}%</td>
+                                                    <td className="text-right">{gstTotal.toFixed(2)}</td>
+                                                    <td className="text-right">{itemTotal.toFixed(2)}</td>
+                                                </>
+                                            )}
+                                            <td className="text-right">{parseFloat(product.discount).toFixed(2)}</td>
+                                            <td className="text-right">{parseFloat(product.dues - product.discount).toFixed(2)}</td>
+                                            <td className="text-center">
+                                                {product.payment_status == 1 ? "Credit" : product.payment_status == 2 ? "AC" : "Cash"}
+                                            </td>
+                                            <td className="text-center"></td>
+                                        </tr>
+                                    );
+                                })}
 
                                 {/* Calculate totals */}
                                 <tr>
                                     <td className="text-right" colSpan="4"><strong>Total</strong></td>
                                     <td className="text-right">
-                                        <strong>{challanDetails.products.reduce((sum, product) => sum + parseFloat(product.qty), 0).toFixed(2)}</strong>
+                                        <strong>
+                                            {challanDetails.products.reduce((sum, product) =>
+                                                sum + parseFloat(product.qty), 0).toFixed(2)
+                                            }
+                                        </strong>
                                     </td>
                                     <td className="text-right"></td>
+                                    {queryParams.get('status') === 'billed' && (
+                                        <>
+                                            <td className="text-right">
+                                                <strong>
+                                                    {challanDetails.products.reduce((sum, product) => {
+                                                        const basePrice = product.rate / (1 + (product.gst / 100));
+                                                        return sum + (basePrice * product.qty);
+                                                    }, 0).toFixed(2)}
+                                                </strong>
+                                            </td>
+                                            <td className="text-center"></td>
+                                            <td className="text-right">
+                                                <strong>
+                                                    {challanDetails.products.reduce((sum, product) => {
+                                                        const basePrice = product.rate / (1 + (product.gst / 100));
+                                                        const gstAmount = product.rate - basePrice;
+                                                        return sum + (gstAmount * product.qty);
+                                                    }, 0).toFixed(2)}
+                                                </strong>
+                                            </td>
+                                        </>
+                                    )}
                                     <td className="text-right">
-                                        <strong>{challanDetails.products.reduce((sum, product) => sum + parseFloat(product.qty * product.rate), 0).toFixed(2)}</strong>
+                                        <strong>
+                                            {challanDetails.products.reduce((sum, product) =>
+                                                sum + parseFloat(product.rate * product.qty), 0).toFixed(2)
+                                            }
+                                        </strong>
                                     </td>
                                     <td className="text-right">
-                                        <strong>{challanDetails.products.reduce((sum, product) => sum + parseFloat(product.dues), 0).toFixed(2)}</strong>
+                                    </td>
+                                    <td className="text-right">
+                                        <strong>
+                                            {challanDetails.products.reduce((sum, product) =>
+                                                sum + parseFloat(product.dues - product.discount), 0).toFixed(2)
+                                            }
+                                        </strong>
                                     </td>
                                     <td className="text-center"><strong></strong></td>
                                     <td className="text-center"><strong></strong></td>
@@ -139,7 +207,9 @@ const PrintPreview = () => {
                             </>
                         ) : (
                             <tr>
-                                <td colSpan="4">No products available for this challan</td>
+                                <td colSpan={queryParams.get('status') === 'billed' ? 12 : 8}>
+                                    No products available for this challan
+                                </td>
                             </tr>
                         )}
                     </tbody>

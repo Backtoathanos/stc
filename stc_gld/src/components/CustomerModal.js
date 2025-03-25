@@ -6,9 +6,9 @@ import Swal from 'sweetalert2'; // Import SweetAlert2
 import './CustomerModal.css';
 
 const CustomerModal = ({ show, handleClose, productId, productRate, productQuantity }) => {
-    productRate = productRate && productRate.includes(",") 
-    ? productRate.replace(/,/g, "") 
-    : productRate;
+    productRate = productRate && productRate.includes(",")
+        ? productRate.replace(/,/g, "")
+        : productRate;
 
     const API_BASE_URL = process.env.NODE_ENV === 'production'
         ? 'https://stcassociate.com/stc_gld/vanaheim'
@@ -22,6 +22,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
     const [selecteAgent, setSelectedAgent] = useState(null);
     const [requisition, setRequisition] = useState();
     const [quantity, setQuantity] = useState(1);
+    const [discount, setDiscount] = useState(0);
     const [rate, setRate] = useState(productRate); // Start with the initial rate
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [quantityError, setQuantityError] = useState('');
@@ -126,6 +127,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             requisition: requisition,
             quantity: parsedQuantity, // Use the parsed quantity
             rate: parsedRate, // Use the parsed rate
+            discount: discount,
             id: customerId,
             name: customerName,
             contact: customerContact,
@@ -170,6 +172,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
         setCustomerAddress('');
         setRequisition('');
         setQuantity(1);
+        setDiscount(0);
         setRate(productRate); // Reset rate to the initial product rate
         setIsSubmitting(false); // Reset the submission state
         setQuantityError(''); // Clear quantity error
@@ -233,6 +236,18 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                             Available rate: {productRate}
                         </Form.Text>
                         {rateError && <div style={{ color: 'red' }}>{rateError}</div>} {/* Display rate error */}
+                    </Form.Group>
+
+                    <Form.Group controlId="formDiscount">
+                        <Form.Label>Discount</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={discount}
+                            onChange={e => setDiscount(e.target.value)}
+                            min="1"
+                            max={productQuantity} // Ensure the quantity doesn't exceed inventory
+                            placeholder="Enter Discount"
+                        />
                     </Form.Group>
 
                     <Form.Group controlId="formCustomerSelect">

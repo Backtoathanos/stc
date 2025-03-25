@@ -73,56 +73,56 @@ export default function ChallanDashboard() {
         setSelectedRows(newSelectedRows);
     };
     const handleAddPayment = (row) => {
-        const dues = (row.rate * row.qty) - row.paid_amount; // Calculate dues
+        const dues = ((row.rate * row.qty) - row.discount) - row.paid_amount; // Calculate dues
         setPaymentAmount(dues.toFixed(2)); // Set dues in paymentAmount with 2 decimal places
         setSelectedChallanForPayment(row); // Set the selected challan
         setShowModal(true); // Show the modal
     };    
-    const handleDelete = (id) => {
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you really want to delete this record? This process cannot be undone.",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // Make the API call to delete the record
-                axios.post(`${API_BASE_URL}/index.php?action=deleteChallan`, {
-                    id: id
-                })
-                .then(response => {
-                    // Handle successful deletion
-                    if(response.data.success) {
-                        Swal.fire(
-                            'Deleted!',
-                            'Your record has been deleted.',
-                            'success'
-                        );
-                        fetchData(search);
-                    } else {
-                        // Handle if the server responds with failure
-                        Swal.fire(
-                            'Failed!',
-                            'The record could not be deleted.',
-                            'error'
-                        );
-                    }
-                })
-                .catch(error => {
-                    // Handle error if the request fails
-                    Swal.fire(
-                        'Error!',
-                        'An error occurred while trying to delete the record.',
-                        'error'
-                    );
-                    console.error('Delete error:', error);
-                });
-            }
-        });
-    };
+    // const handleDelete = (id) => {
+    //     Swal.fire({
+    //         title: 'Are you sure?',
+    //         text: "Do you really want to delete this record? This process cannot be undone.",
+    //         icon: 'warning',
+    //         showCancelButton: true,
+    //         confirmButtonColor: '#3085d6',
+    //         cancelButtonColor: '#d33',
+    //         confirmButtonText: 'Yes, delete it!'
+    //     }).then((result) => {
+    //         if (result.isConfirmed) {
+    //             // Make the API call to delete the record
+    //             axios.post(`${API_BASE_URL}/index.php?action=deleteChallan`, {
+    //                 id: id
+    //             })
+    //             .then(response => {
+    //                 // Handle successful deletion
+    //                 if(response.data.success) {
+    //                     Swal.fire(
+    //                         'Deleted!',
+    //                         'Your record has been deleted.',
+    //                         'success'
+    //                     );
+    //                     fetchData(search);
+    //                 } else {
+    //                     // Handle if the server responds with failure
+    //                     Swal.fire(
+    //                         'Failed!',
+    //                         'The record could not be deleted.',
+    //                         'error'
+    //                     );
+    //                 }
+    //             })
+    //             .catch(error => {
+    //                 // Handle error if the request fails
+    //                 Swal.fire(
+    //                     'Error!',
+    //                     'An error occurred while trying to delete the record.',
+    //                     'error'
+    //                 );
+    //                 console.error('Delete error:', error);
+    //             });
+    //         }
+    //     });
+    // };
 
     // Define columns for DataTable
     const columns = [
@@ -145,7 +145,7 @@ export default function ChallanDashboard() {
             name: 'Action',
             selector: row => row.created_by,
             cell: row => {
-                const duesValue = ((row.rate * row.qty) - row.paid_amount).toFixed(2);
+                const duesValue = (((row.rate * row.qty) - row.discount) - row.paid_amount).toFixed(2);
 
                 // Conditionally render button if dues are greater than 0 and status is not 3
                 return duesValue > 0 && row.status !== 3 ? (
@@ -216,6 +216,21 @@ export default function ChallanDashboard() {
             right: true
         },
         {
+            name: 'Discount',
+            selector: row => row.discount,
+            sortable: true,
+            right: true
+        },
+        {
+            name: 'Grand Total',
+            selector: row => {
+                const total = (row.rate * row.qty) - row.discount;
+                return total ? total.toFixed(2) : '0.00';  // Round to 2 decimal places
+            },
+            sortable: false,
+            right: true
+        },
+        {
             name: 'Paid Amount',
             selector: row => row.paid_amount,
             sortable: true,
@@ -223,11 +238,11 @@ export default function ChallanDashboard() {
         },
         {
             name: 'Dues',
-            selector: row => ((row.rate * row.qty) - row.paid_amount).toFixed(2),
+            selector: row => (((row.rate * row.qty) - row.discount) - row.paid_amount).toFixed(2),
             sortable: false,
             right: true,
             cell: row => {
-                const duesValue = ((row.rate * row.qty) - row.paid_amount).toFixed(2);
+                const duesValue = (((row.rate * row.qty) - row.discount) - row.paid_amount).toFixed(2);
                 return (
                     <span style={{ color: duesValue > 0 ? 'red' : 'black' }}>
                         {duesValue}
