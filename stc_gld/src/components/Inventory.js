@@ -32,7 +32,7 @@ export default function Dashboard() {
     const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
 
-    const [page, setPage] = useState(0); // Current page
+    const [page, setPage] = useState(1); // Current page
     const [limit, setLimit] = useState(10); // Rows per page
     const [totalRows, setTotalRows] = useState(0); // Total records from API
 
