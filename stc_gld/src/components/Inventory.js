@@ -35,6 +35,7 @@ export default function Dashboard() {
     const [page, setPage] = useState(1); // Current page
     const [limit, setLimit] = useState(10); // Rows per page
     const [totalRows, setTotalRows] = useState(0); // Total records from API
+    const [currentPage, setCurrentPage] = useState(1);
 
     const fetchData = debounce((query = '', pageNum = page, rowLimit = limit) => {
         setLoading(true);
@@ -42,10 +43,10 @@ export default function Dashboard() {
             params: { search: query, page: pageNum, limit: rowLimit }
         })
             .then(response => {
-                console.log("Hi");
                 if (response.data && response.data.records) {
                     setData(response.data.records);
                     setTotalRows(response.data.total); // Assuming API returns total count
+                    setCurrentPage(pageNum);
                 } else {
                     setData([]);
                     setTotalRows(0);
@@ -59,18 +60,22 @@ export default function Dashboard() {
                 setLoading(false);
             });
     }, 500);
-    
+
     // Fetch data on component mount, page change, search change
     useEffect(() => {
         fetchData(search, page, limit);
     }, [search, page, limit]); // fetchData is called when search, page, or limit changes
-    
+
     // Handle page change
     const handlePageChange = (newPage) => {
-        console.log('Page changed to:', newPage);
-        setPage(newPage); // Update page state
+        setPage(newPage); // This will trigger the useEffect above
     };
-    
+
+    // Handle limit change
+    const handleLimitChange = (newLimit, newPage) => {
+        setLimit(newLimit);
+        setPage(newPage || 1); // Reset to page 1 if not specified
+    };
     // Define columns for DataTable
     const columns = [
         {
@@ -244,14 +249,12 @@ export default function Dashboard() {
                                                 progressPending={loading}
                                                 pagination
                                                 paginationServer
-                                                paginationTotalRows={totalRows} // Total rows from API
-                                                paginationPerPage={limit} // Default rows per page
+                                                paginationTotalRows={totalRows}
+                                                paginationPerPage={limit}
+                                                paginationDefaultPage={currentPage} // This is crucial!
                                                 paginationRowsPerPageOptions={[10, 20, 50, 100]}
                                                 onChangePage={handlePageChange}
-                                                onChangeRowsPerPage={(newLimit, newPage) => {
-                                                    setLimit(newLimit);
-                                                    setPage(newPage);
-                                                }}
+                                                onChangeRowsPerPage={handleLimitChange}
                                                 highlightOnHover
                                                 striped
                                             />

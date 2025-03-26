@@ -169,7 +169,7 @@ class ragnarProduct extends tesseract{
 			LEFT JOIN `stc_rack` ON `stc_rack_id`=`stc_product_rack_id` 
 			LEFT JOIN `stc_item_inventory` ON `stc_item_inventory_pd_id`=`stc_product_id`
 			LEFT JOIN `stc_brand` ON `stc_brand_id`=`stc_product_brand_id`
-			WHERE `stc_product_avail`='1' 
+			WHERE 1=1
 			".$category.$subcategory.$productname.$endfilterqry
 		);
 
