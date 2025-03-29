@@ -1395,19 +1395,19 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <div class="row">
                                                 <div class="col-md-3 col-xl-3 col-sm-3">
                                                     <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" value="0">
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" name="stc-gld-sale" value="0">
                                                         <label style="position:relative;">All</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3 col-xl-3 col-sm-3">
                                                     <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" value="1">
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" name="stc-gld-sale" value="1">
                                                         <label style="position:relative;">Dhatkidih</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-3 col-xl-3 col-sm-3">
                                                     <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" value="2">
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" name="stc-gld-sale" value="2">
                                                         <label style="position:relative;">Sehrabazar</label>
                                                     </div>
                                                 </div>
