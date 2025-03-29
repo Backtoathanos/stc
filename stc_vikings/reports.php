@@ -1390,6 +1390,30 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                 </div>
                                 <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-6">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                            <div class="row">
+                                                <div class="col-md-3 col-xl-3 col-sm-3">
+                                                    <div class="card-border mb-3 card-body border-success">
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" value="0">
+                                                        <label style="position:relative;">All</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-xl-3 col-sm-3">
+                                                    <div class="card-border mb-3 card-body border-success">
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" value="1">
+                                                        <label style="position:relative;">Dhatkidih</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-xl-3 col-sm-3">
+                                                    <div class="card-border mb-3 card-body border-success">
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" value="2">
+                                                        <label style="position:relative;">Sehrabazar</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                     <div class="col-xl-6 col-lg-6 col-md-6">
                                         <div class="card-border mb-3 card card-body border-success">
                                           <?php 
@@ -2554,6 +2578,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var beg_date=$('.stcgldbegdate').val();
                 var end_date=$('.stcgldenddate').val();
                 var stcgldsearch=$('.stcgldsearch').val();
+                var branch =$('.stc-gld-sale:checked').val();
                 $.ajax({
                     url     : "kattegat/ragnar_reports.php",
                     method  : "post",
@@ -2561,7 +2586,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         stc_find_gld_purchase_sale_reports:1,
                         beg_date:beg_date,
                         end_date:end_date,
-                        stcgldsearch:stcgldsearch
+                        stcgldsearch:stcgldsearch,
+                        branch:branch
                     },
                     success : function(response_sandp){
                         // console.log(response_sandp);

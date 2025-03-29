@@ -2791,10 +2791,20 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
       return $odin;
    }
 
-   public function stc_gld_call_sale($bjornebegdate, $bjorneenddate){
+   public function stc_gld_call_sale($bjornebegdate, $bjorneenddate, $branch){
       $grandtotal=0;
       $totaldues=0;
-      $check_loki=mysqli_query($this->stc_dbs, "
+      
+      $filter='';
+      if($branch>0){
+         if($branch==1){
+            $branch='Dhatkidih';
+         }elseif($branch==2){
+            $branch='Sehrabazar';
+         }
+         $filter="`stc_trading_user_location`='".$branch."' AND ";
+      }
+      $query="
          SELECT `id`, `stc_product_name`, `stc_sub_cat_name`, `stc_product_unit`, `gld_customer_title`, `challan_number`, `bill_number`, `qty`, `rate`, `paid_amount`, `payment_status`, `agent_id`, `status`, `created_date`, `stc_trading_user_name` 
          FROM `gld_challan`
          INNER JOIN `gld_customer` 
@@ -2805,9 +2815,10 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
          ON `stc_product_sub_cat_id` = `stc_sub_cat_id` 
          INNER JOIN `stc_trading_user` 
          ON `created_by` = `stc_trading_user_id`
-         WHERE `status`<>0 AND DATE(`created_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
+         WHERE ".$filter."`status`<>0 AND DATE(`created_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."' 
          AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."' ORDER BY TIMESTAMP(`created_date`) DESC
-      ");
+      ";
+      $check_loki=mysqli_query($this->stc_dbs, $query);
       $odin='
          <table class="mb-0 table table-bordered table-hover table-responsive" id="stc-reports-trading-pending-view">
             <thead>
@@ -4840,9 +4851,10 @@ if(isset($_POST['stc_find_gld_purchase_sale_reports'])){
    $bjornebegdate=date('Y-m-d',strtotime($_POST['beg_date']));
    $bjorneenddate=date('Y-m-d',strtotime($_POST['end_date']));
    $stcgldsearch=$_POST['stcgldsearch'];
+   $branch=$_POST['branch'];
 
    $bjornesale=new ragnarReportsViewTradingPurchaseSaleReports();
-   $out=$bjornesale->stc_gld_call_sale($bjornebegdate, $bjorneenddate);
+   $out=$bjornesale->stc_gld_call_sale($bjornebegdate, $bjorneenddate, $branch);
    echo $out;
 }
 #<----------------------------------Object sections of sandp reports class-------------------------------->
