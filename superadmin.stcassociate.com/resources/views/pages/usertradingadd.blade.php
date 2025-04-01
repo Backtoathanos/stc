@@ -77,6 +77,15 @@
                     </select>
                   </div>
                   <div class="form-group">
+                    <label for="state">Branch</label>
+                    <select class="form-control" id="branch" name="branch">
+                        <option value="NA">Select</option>
+                        <option value="Dhatkidih">Dhatkidih</option>
+                        <option value="Sehrabazar">Sehrabazar</option>
+                        <option value="Kolkata">Kolkata</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
                     <label for="state">State</label>
                     <select class="form-control" id="state" name="state">
                         <option value="NA">Select</option>

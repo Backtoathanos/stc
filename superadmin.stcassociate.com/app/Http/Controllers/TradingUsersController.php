@@ -47,6 +47,7 @@ class TradingUsersController extends Controller
             $user->stc_trading_user_pincode = $request->pincode;
             $user->stc_trading_user_password = $request->password;
             $user->stc_trading_user_status = $request->status;
+            $user->stc_trading_user_location = $request->branch;
             $user->stc_trading_user_created_by = 1;
             $user->save();
 
@@ -66,12 +67,12 @@ class TradingUsersController extends Controller
         $user->stc_trading_user_city_id = $request->city;
         $user->stc_trading_user_state_id = $request->state;
         $user->stc_trading_user_pincode = $request->pincode;
+        $user->stc_trading_user_location = $request->branch;
         if(!empty($request->password)){
             $user->stc_trading_user_password = $request->password;
         }    
         $user->stc_trading_user_status = $request->status;
         $user->stc_trading_user_created_by = 1;
-        $user->stc_trading_user_status = $request->status;
         $user->save();
 
         return redirect('/users/tradingusers')->with('success', 'Trading user updated successfully!');
