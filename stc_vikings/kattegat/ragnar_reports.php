@@ -2801,6 +2801,8 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
             $branch='Dhatkidih';
          }elseif($branch==2){
             $branch='Sehrabazar';
+         }elseif($branch==2){
+            $branch='Kolkata';
          }
          $filter="`stc_trading_user_location`='".$branch."' AND ";
       }

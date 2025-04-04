@@ -24,23 +24,14 @@ $cquery = "
         P.stc_product_sale_percentage,
         B.stc_brand_title
     FROM stc_product P
-    LEFT JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id
-    LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id 
+    INNER JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id
+    INNER JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id 
     WHERE P.stc_product_avail = 1 
 ";
 
 // Apply search filter
 if ($search !== '') {
-    $cquery .= " AND (P.stc_product_id='$search' OR P.stc_product_name LIKE '%$search%' 
-                    OR P.stc_product_id IN (
-                        SELECT stc_purchase_product_adhoc_productid 
-                        FROM stc_purchase_product_adhoc 
-                        WHERE stc_purchase_product_adhoc_status = 1 AND P.stc_product_avail = 1
-                        AND stc_purchase_product_adhoc_rackid IN (
-                            SELECT stc_rack_id FROM stc_rack WHERE stc_rack_name LIKE '%$search%'
-                        )
-                    )
-                )";
+    $cquery .= " AND (P.stc_product_id='$search' OR P.stc_product_name LIKE '%$search%' )";
 }
 $totalQuery = "SELECT COUNT(*) AS total FROM ($cquery) AS count_table"; // Count total rows
 $totalResult = mysqli_query($con, $totalQuery);

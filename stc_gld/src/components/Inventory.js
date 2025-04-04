@@ -38,27 +38,29 @@ export default function Dashboard() {
     const [currentPage, setCurrentPage] = useState(1);
 
     const fetchData = debounce((query = '', pageNum = page, rowLimit = limit) => {
-        setLoading(true);
-        axios.get(`${API_BASE_URL}/getInventoryData.php`, {
-            params: { search: query, page: pageNum, limit: rowLimit }
-        })
-            .then(response => {
-                if (response.data && response.data.records) {
-                    setData(response.data.records);
-                    setTotalRows(response.data.total); // Assuming API returns total count
-                    setCurrentPage(pageNum);
-                } else {
+        if(query.length === 0 || query.length > 4) {
+            setLoading(true);
+            axios.get(`${API_BASE_URL}/getInventoryData.php`, {
+                params: { search: query, page: pageNum, limit: rowLimit }
+            })
+                .then(response => {
+                    if (response.data && response.data.records) {
+                        setData(response.data.records);
+                        setTotalRows(response.data.total); // Assuming API returns total count
+                        setCurrentPage(pageNum);
+                    } else {
+                        setData([]);
+                        setTotalRows(0);
+                    }
+                    setLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
                     setData([]);
                     setTotalRows(0);
-                }
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                setData([]);
-                setTotalRows(0);
-                setLoading(false);
-            });
+                    setLoading(false);
+                });
+        }
     }, 500);
 
     // Fetch data on component mount, page change, search change

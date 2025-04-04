@@ -79,7 +79,7 @@ switch ($action) {
 
 // Function to fetch customers from the database
 function getCustomers($conn) {
-    $query = "SELECT gld_customer_id, gld_customer_cont_no, gld_customer_title FROM gld_customer order by `gld_customer_cont_no` asc";
+    $query = "SELECT gld_customer_id, gld_customer_cont_no, gld_customer_email, gld_customer_title FROM gld_customer order by `gld_customer_cont_no` asc";
     $result = $conn->query($query);
 
     $customers = [];
@@ -113,6 +113,7 @@ function addCustomer($conn) {
     $customerId = $data['id'];
     $customerName = $data['name'];
     $customerContact = $data['contact'];
+    $customerEmail = $data['email'];
     $customerAddress = $data['address'];
     $productId = $data['product_id'];
     $requisition = $data['requisition'];
@@ -125,7 +126,7 @@ function addCustomer($conn) {
 
         // Insert new customer if no existing customer is selected
         if (!$customerId) {
-            $query = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_city_id, gld_customer_state_id, gld_customer_address) VALUES ('$customerName', '$customerContact', '65', '16', '$customerAddress')";
+            $query = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_email, gld_customer_city_id, gld_customer_state_id, gld_customer_address) VALUES ('$customerName', '$customerContact', '$customerEmail', '65', '16', '$customerAddress')";
             $conn->query($query);
             $customerId = $conn->insert_id;
         }

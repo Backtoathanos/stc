@@ -17,12 +17,14 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [customerName, setCustomerName] = useState('');
     const [customerContact, setCustomerContact] = useState('');
+    const [customerEmail, setCustomerEmail] = useState('');
     const [customerAddress, setCustomerAddress] = useState('');
     const [agentOptions, setAgentOptions] = useState([]);
     const [selecteAgent, setSelectedAgent] = useState(null);
     const [requisition, setRequisition] = useState();
     const [quantity, setQuantity] = useState(1);
     const [discount, setDiscount] = useState(0);
+    const [pmargin, setPmargin] = useState(0);    
     const [rate, setRate] = useState(productRate); // Start with the initial rate
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [quantityError, setQuantityError] = useState('');
@@ -41,7 +43,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                     if (Array.isArray(response.data)) {
                         const options = response.data.map(gld_customer => ({
                             value: gld_customer.gld_customer_id,
-                            label: gld_customer.gld_customer_cont_no + ' - ' + gld_customer.gld_customer_title
+                            label: gld_customer.gld_customer_email + ' - ' + gld_customer.gld_customer_cont_no + ' - ' + gld_customer.gld_customer_title
                         }));
                         setCustomerOptions(options);
                     } else {
@@ -108,9 +110,17 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
 
         if (customerId == null) {
             if (customerName == "") {
-                setCustomerError(`Select customer.`);
+                setCustomerError(`Select customer or add new with new complete details.`);
                 return;
             }
+            if (customerContact == "") {
+                if (customerEmail == "") {
+                    setCustomerError(`Select customer or add new with new complete details.`);
+                    return;
+                }
+            }
+        } else {
+
         }
         const agentId = selecteAgent ? selecteAgent.value : 0;
 
@@ -122,15 +132,17 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
             return;  // Stop the function execution if no user_id cookie is found
         }
         const userId = userIdCookie.split('=')[1];
+        const finalcost=parseFloat(parsedRate) + parseFloat(pmargin);
         const customerData = {
             product_id: productId,
             requisition: requisition,
             quantity: parsedQuantity, // Use the parsed quantity
-            rate: parsedRate, // Use the parsed rate
+            rate: finalcost, // Use the parsed rate
             discount: discount,
             id: customerId,
             name: customerName,
             contact: customerContact,
+            email: customerEmail,
             address: customerAddress,
             userId: userId,
             agentId: agentId
@@ -169,10 +181,12 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
         setSelectedCustomer(null);
         setCustomerName('');
         setCustomerContact('');
+        setCustomerEmail('');
         setCustomerAddress('');
         setRequisition('');
         setQuantity(1);
         setDiscount(0);
+        setPmargin(0);
         setRate(productRate); // Reset rate to the initial product rate
         setIsSubmitting(false); // Reset the submission state
         setQuantityError(''); // Clear quantity error
@@ -238,6 +252,17 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                         {rateError && <div style={{ color: 'red' }}>{rateError}</div>} {/* Display rate error */}
                     </Form.Group>
 
+                    <Form.Group controlId="formPmargin">
+                        <Form.Label>Plus Margin</Form.Label>
+                        <Form.Control
+                            type="number"
+                            value={pmargin}
+                            onChange={e => setPmargin(e.target.value)}
+                            min="1"
+                            placeholder="Enter Plus Margin"
+                        />
+                    </Form.Group>
+
                     <Form.Group controlId="formDiscount">
                         <Form.Label>Discount</Form.Label>
                         <Form.Control
@@ -245,7 +270,6 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                             value={discount}
                             onChange={e => setDiscount(e.target.value)}
                             min="1"
-                            max={productQuantity} // Ensure the quantity doesn't exceed inventory
                             placeholder="Enter Discount"
                         />
                     </Form.Group>
@@ -279,10 +303,20 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                             <Form.Group controlId="formCustomerContact">
                                 <Form.Label>Contact</Form.Label>
                                 <Form.Control
-                                    type="text"
+                                    type="number"
                                     placeholder="Enter customer contact"
                                     value={customerContact}
                                     onChange={e => setCustomerContact(e.target.value)}
+                                />
+                            </Form.Group>
+
+                            <Form.Group controlId="formCustomerEmail">
+                                <Form.Label>Email</Form.Label>
+                                <Form.Control
+                                    type="email"
+                                    placeholder="Enter customer email"
+                                    value={customerEmail}
+                                    onChange={e => setCustomerEmail(e.target.value)}
                                 />
                             </Form.Group>
 

@@ -1393,22 +1393,28 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     <div class="col-xl-12 col-lg-12 col-md-6">
                                         <div class="card-border mb-3 card card-body border-success">
                                             <div class="row">
-                                                <div class="col-md-3 col-xl-3 col-sm-3">
+                                                <div class="col-md-2 col-xl-2 col-sm-2" style="background: linear-gradient(135deg, #6e8efb, #a777e3);" >
                                                     <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" name="stc-gld-sale" value="0">
-                                                        <label style="position:relative;">All</label>
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="all" name="stc-gld-sale" value="0">
+                                                        <label for="all" style="position:relative;font-size: 30px;top: 15px;">All</label>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3 col-xl-3 col-sm-3">
+                                                <div class="col-md-2 col-xl-2 col-sm-2" style="background: linear-gradient(135deg, #0cebeb, #20e3b2, #29ffc6);" >
                                                     <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" name="stc-gld-sale" value="1">
-                                                        <label style="position:relative;">Dhatkidih</label>
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="dhatkidih" name="stc-gld-sale" value="1">
+                                                        <label for="dhatkidih" style="position:relative;font-size: 30px;top: 15px;">Dhatkidih</label>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-3 col-xl-3 col-sm-3">
+                                                <div class="col-md-2 col-xl-2 col-sm-2" style="background: linear-gradient(135deg, #ff4e50, #f9d423);" >
                                                     <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" name="stc-gld-sale" value="2">
-                                                        <label style="position:relative;">Sehrabazar</label>
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="sehrabazar" name="stc-gld-sale" value="2">
+                                                        <label for="sehrabazar" style="position:relative;font-size: 30px;top: 15px;">Sehrabazar</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2 col-xl-2 col-sm-2" style="background: linear-gradient(135deg, #4776E6, #8E54E9, #d585ff);" >
+                                                    <div class="card-border mb-3 card-body border-success">
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="kolkata" name="stc-gld-sale" value="3">
+                                                        <label for="kolkata" style="position:relative;font-size: 30px;top: 15px;">Kolkata</label>
                                                     </div>
                                                 </div>
                                             </div>
