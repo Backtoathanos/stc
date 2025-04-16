@@ -3217,15 +3217,15 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 				`stc_cust_super_requisition_list_purchaser_qty`,
 				`stc_cust_super_requisition_items_type`
 			FROM `stc_cust_super_requisition_list_purchaser`
-			INNER JOIN `stc_product` 
+			LEFT JOIN `stc_product` 
 			ON `stc_product_id` =`stc_cust_super_requisition_list_purchaser_pd_id` 
-			INNER JOIN `stc_category` 
+			LEFT JOIN `stc_category` 
 			ON `stc_product_cat_id` =`stc_cat_id` 
-			INNER JOIN `stc_sub_category` 
+			LEFT JOIN `stc_sub_category` 
 			ON `stc_product_sub_cat_id` =`stc_sub_cat_id` 
-			INNER JOIN `stc_cust_super_requisition_list_items` 
+			LEFT JOIN `stc_cust_super_requisition_list_items` 
 			ON `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` =`stc_cust_super_requisition_list_purchaser_list_item_id`
-			INNER JOIN `stc_cust_super_requisition_list` 
+			LEFT JOIN `stc_cust_super_requisition_list` 
 			ON `stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` = `stc_cust_super_requisition_list_items_req_id` 
 			WHERE (
 				DATE(`stc_cust_super_requisition_list_date`) 
@@ -3236,15 +3236,27 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		   		`stc_product_name` ASC
 		");
 	    while ($item_rec =  mysqli_fetch_assoc($odin_getreqqry)){
-	    	if(isset($_SESSION["stc_track_req_item_sess"])) {  
-				$is_available = 0;
-				foreach($_SESSION["stc_track_req_item_sess"] as $keys => $values){  
-	        	     if($_SESSION["stc_track_req_item_sess"][$keys]['product_id'] == $item_rec['stc_product_id']){  
-	        	          $is_available++;  
-	        	          $_SESSION["stc_track_req_item_sess"][$keys]['product_qnty'] = $_SESSION["stc_track_req_item_sess"][$keys]['product_qnty'] + $item_rec['stc_cust_super_requisition_list_purchaser_qty']; 
-	        	     }  
-	        	}  
-				if($is_available < 1) {  
+			if($item_rec["stc_cust_super_requisition_list_purchaser_qty"]>0){
+				if(isset($_SESSION["stc_track_req_item_sess"])) {  
+					$is_available = 0;
+					foreach($_SESSION["stc_track_req_item_sess"] as $keys => $values){  
+						if($_SESSION["stc_track_req_item_sess"][$keys]['product_id'] == $item_rec['stc_product_id']){  
+							$is_available++;  
+							$_SESSION["stc_track_req_item_sess"][$keys]['product_qnty'] = $_SESSION["stc_track_req_item_sess"][$keys]['product_qnty'] + $item_rec['stc_cust_super_requisition_list_purchaser_qty']; 
+						}  
+					}  
+					if($is_available < 1) {  
+						$item_array = array(  
+							'product_id'				=>     $item_rec["stc_product_id"], 
+							'product_category'				=>     $item_rec["stc_cat_name"],
+							'product_sub_category'				=>     $item_rec["stc_sub_cat_name"],
+							'product_name'						=>     $item_rec["stc_product_name"],
+							'product_qnty'					=>     $item_rec["stc_cust_super_requisition_list_purchaser_qty"],
+							'product_type'				=>     $item_rec["stc_cust_super_requisition_items_type"]
+						);  
+						$_SESSION["stc_track_req_item_sess"][] = $item_array; 
+					}
+				}else{  
 					$item_array = array(  
 						'product_id'				=>     $item_rec["stc_product_id"], 
 						'product_category'				=>     $item_rec["stc_cat_name"],
@@ -3252,20 +3264,10 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 						'product_name'						=>     $item_rec["stc_product_name"],
 						'product_qnty'					=>     $item_rec["stc_cust_super_requisition_list_purchaser_qty"],
 						'product_type'				=>     $item_rec["stc_cust_super_requisition_items_type"]
-					);  
-					$_SESSION["stc_track_req_item_sess"][] = $item_array; 
-				}
-			}else{  
-				$item_array = array(  
-					'product_id'				=>     $item_rec["stc_product_id"], 
-					'product_category'				=>     $item_rec["stc_cat_name"],
-					'product_sub_category'				=>     $item_rec["stc_sub_cat_name"],
-					'product_name'						=>     $item_rec["stc_product_name"],
-					'product_qnty'					=>     $item_rec["stc_cust_super_requisition_list_purchaser_qty"],
-					'product_type'				=>     $item_rec["stc_cust_super_requisition_items_type"]
-				);   
-				$_SESSION["stc_track_req_item_sess"][] = $item_array;  
-			}  
+					);   
+					$_SESSION["stc_track_req_item_sess"][] = $item_array;  
+				}  
+			}
 	    }
 
 	    foreach($_SESSION["stc_track_req_item_sess"] as $fetch_row){
