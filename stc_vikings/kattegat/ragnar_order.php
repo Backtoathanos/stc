@@ -3217,15 +3217,15 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 				`stc_cust_super_requisition_list_purchaser_qty`,
 				`stc_cust_super_requisition_items_type`
 			FROM `stc_cust_super_requisition_list_purchaser`
-			LEFT JOIN `stc_product` 
+			INNER JOIN `stc_product` 
 			ON `stc_product_id` =`stc_cust_super_requisition_list_purchaser_pd_id` 
-			LEFT JOIN `stc_category` 
+			INNER JOIN `stc_category` 
 			ON `stc_product_cat_id` =`stc_cat_id` 
-			LEFT JOIN `stc_sub_category` 
+			INNER JOIN `stc_sub_category` 
 			ON `stc_product_sub_cat_id` =`stc_sub_cat_id` 
-			LEFT JOIN `stc_cust_super_requisition_list_items` 
+			INNER JOIN `stc_cust_super_requisition_list_items` 
 			ON `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` =`stc_cust_super_requisition_list_purchaser_list_item_id`
-			LEFT JOIN `stc_cust_super_requisition_list` 
+			INNER JOIN `stc_cust_super_requisition_list` 
 			ON `stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` = `stc_cust_super_requisition_list_items_req_id` 
 			WHERE (
 				DATE(`stc_cust_super_requisition_list_date`) 
