@@ -2807,7 +2807,7 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
          $filter="`stc_trading_user_location`='".$branch."' AND ";
       }
       $query="
-         SELECT `id`, `stc_product_name`, `stc_sub_cat_name`, `stc_product_unit`, `gld_customer_title`, `challan_number`, `bill_number`, `qty`, `rate`, `paid_amount`, `payment_status`, `agent_id`, `status`, `created_date`, `stc_trading_user_name` 
+         SELECT `id`, `stc_product_name`, `stc_sub_cat_name`, `stc_product_unit`, `gld_customer_title`, `challan_number`, `bill_number`, `qty`, `rate`, `paid_amount`, `discount`, `payment_status`, `agent_id`, `status`, `created_date`, `stc_trading_user_name` 
          FROM `gld_challan`
          INNER JOIN `gld_customer` 
          ON `cust_id` = `gld_customer_id` 
@@ -2845,7 +2845,7 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
       }else{
          foreach ($check_loki as $row) {
             $total=$row['qty'] * $row['rate'];
-            $due=$total - $row['paid_amount'];
+            $due=($total - $row['discount']) - $row['paid_amount'];
             $product_name=$row["stc_product_name"];
             if($row["stc_sub_cat_name"]!="OTHERS"){
                $product_name=$row["stc_sub_cat_name"].' '.$row["stc_product_name"];
