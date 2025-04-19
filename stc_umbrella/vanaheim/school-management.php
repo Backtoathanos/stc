@@ -926,15 +926,13 @@ class Yggdrasil extends tesseract{
 			    `stc_school_syllabus_id`,
 			    `stc_school_syllabus_title`,
 			    `stc_school_syllabus_chapter`,
-			    `stc_school_syllabus_lession`,
+			    `stc_school_syllabus_lesson`,
 			    `stc_school_syllabus_unit`,
-			    Date_FORMAT(`stc_school_syllabus_completedate`, '%d %M %Y') as stc_school_syllabus_completedate
+			    Date_FORMAT(`stc_school_syllabus_targetdate`, '%d %M %Y') as stc_school_syllabus_completedate
 			FROM
-			    `stc_school_syllabus_covered`
+			    `stc_school_syllabus`
 			WHERE
-			    `stc_school_syllabus_covered_class_id`='".mysqli_real_escape_string($this->stc_dbs, $class_id)."'
-			AND 
-			    `stc_school_syllabus_covered_subid`='".mysqli_real_escape_string($this->stc_dbs, $sub_id)."'
+			    `stc_school_syllabus_subject_id`='".mysqli_real_escape_string($this->stc_dbs, $sub_id)."'
 		");
 		$syllabus_details=array();
 		if(mysqli_num_rows($odinqry)>0){

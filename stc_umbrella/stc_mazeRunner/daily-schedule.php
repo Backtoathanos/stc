@@ -1065,7 +1065,7 @@ if($_SESSION['stc_school_user_for']==2){
           var syll_id = $(this).val();
           var lession_output = '<option value="NA">Select</option>';
           for(var i=0; i<sy_syllabus[0].length;i++){
-            lession_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_lession + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_lession + '</option>';
+            lession_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_lesson + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_lesson + '</option>';
           }
           $('#lession').html(lession_output);
         });
