@@ -648,12 +648,12 @@ class Yggdrasil extends tesseract{
 						<td class="text-center"><b>'.$odin_sturow['stc_school_class_title'].'</b></td>
 						<td class="text-center"><b>'.$odin_sturow['stc_school_subject_title'].'</b></td>
 						<td>
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="1"> 
-							<label for="'.$odin_sturow['stc_school_student_id'].'">Present</label>
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" checked class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="1"> 
+							<label for="p'.$odin_sturow['stc_school_student_id'].'">Present</label>
 						</td>
 						<td>
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="0"> 
-							<label for="'.$odin_sturow['stc_school_student_id'].'">Absent</label>
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="0"> 
+							<label for="a'.$odin_sturow['stc_school_student_id'].'">Absent</label>
 						</td>
 					</tr>
 				';
@@ -1124,7 +1124,9 @@ class Yggdrasil extends tesseract{
 						<td>'.date('d-m-Y', strtotime($row['stc_school_subject_createdate'])).'</td>
 						<td>'.$row['stc_school_user_fullName'].'</td>
 						<td>
-							<a href="school-management.php?school-management=yes&modal=access&id='.$row['stc_school_subject_id'].'" class="btn btn-success">Add Syllabus</a></td>
+							<a href="school-management.php?school-management=yes&modal=access&id='.$row['stc_school_subject_id'].'" class="btn btn-success">Add Syllabus</a>
+							<a href="school-management.php?school-management=yes&modal=accessview&id='.$row['stc_school_subject_id'].'" class="btn btn-success">View Syllabus</a>
+						</td>
 					</tr>
 				';
 			}
@@ -1713,6 +1715,37 @@ class Yggdrasil extends tesseract{
 		);
 		return $odin;
 	}
+
+	public function stc_call_syllabus($syllabus_id){
+		$odin='';
+		$odinattendanceqry=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_school_syllabus`
+			WHERE
+				`stc_school_syllabus_id`='".mysqli_real_escape_string($this->stc_dbs, $syllabus_id)."'
+    	");
+    	if(mysqli_num_rows($odinattendanceqry)>0){
+			$slno=0;
+			foreach($odinattendanceqry as $odinclassrow){
+				$slno++;
+				$odin.='
+					<tr>
+						<td class="headcol">'.$odinclassrow['stc_school_syllabus_title'].'</td>
+						<td class="headcol">'.$odinclassrow['stc_school_syllabus_chapter'].'</td>
+						<td class="headcol">'.$odinclassrow['stc_school_syllabus_lesson'].'</td>
+						<td class="headcol">'.$odinclassrow['stc_school_syllabus_unit'].'</td>
+						<td class="headcol">'.date('d-m-Y', strtotime($odinclassrow['stc_school_syllabus_targetdate'])).'</td>
+					</tr>
+				';
+			}
+    	}else{
+	    	$odin.="
+				<tr>
+					<td colspan='5'>No record found.</td>
+				</tr>
+			";
+		}
+		return $odin;
+	}
 }
 
 #<------------------------------------------------------------------------------------------>
@@ -2060,6 +2093,22 @@ if(isset($_POST['stc_call_questions'])){
 	}else{
 		$valkyrie=new Yggdrasil();
 		$out=$valkyrie->stc_call_questions($class_id, $month);
+	}
+	echo json_encode($out);
+}
+
+
+
+// call student attendance
+if(isset($_POST['stc_get_syllabus_details'])){
+	$syllabus_id=$_POST['syllabus_id'];
+	$out = ['status' => false, 'data' => []];
+	if(empty($_SESSION['stc_school_user_id'])){
+		$out['status']="reload";
+	}else{
+		$valkyrie=new Yggdrasil();
+		$out['status']="success";
+		$out['data']=$valkyrie->stc_call_syllabus($syllabus_id);
 	}
 	echo json_encode($out);
 }

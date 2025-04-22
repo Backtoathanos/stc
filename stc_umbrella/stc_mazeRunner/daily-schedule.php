@@ -933,7 +933,7 @@ if($_SESSION['stc_school_user_for']==2){
                 if(response=="reload"){
                   window.location.reload();
                 }else if(response=="success"){
-                  alert("Student attendance updated!!!");
+                  // alert("Student attendance updated!!!");
                 }else if(response=="duplicate"){
                   alert("Student attendance already updated!!!");
                 }else{
@@ -942,8 +942,6 @@ if($_SESSION['stc_school_user_for']==2){
                 }
               }
             });
-          }else{            
-            alert("Student attendance updated!!!");
           }
         });
 

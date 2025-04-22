@@ -649,8 +649,8 @@
                                           <th class="text-center"><b>Subject Id</b></th>
                                           <th class="text-center"><b>Subject Title</b></th>
                                           <th class="text-center"><b>Syllabus Details</b></th>
-                                          <th class="text-center"><b>Addd Date</b></th>
-                                          <th class="text-center"><b>Addd by</b></th>
+                                          <th class="text-center"><b>Add Date</b></th>
+                                          <th class="text-center"><b>Add by</b></th>
                                           <th class="text-center"><b>Action</b></th>
                                           </tr>
                                       </thead>
@@ -1233,8 +1233,15 @@
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
         const value = urlParams.get('modal');
+        
+        var syllabus_id=0;
         if(value=="access"){
           $('.stc-school-addsyllabus-res').modal('show');
+        }
+        if(value=="accessview"){
+          $('.stc-school-viewsyllabus-res').modal('show');
+          syllabus_id = urlParams.get('id');
+          load_syllabus_pert(syllabus_id)
         }
 
         // save syllabus
@@ -1464,6 +1471,27 @@
             });
           }
         });
+        
+        function load_syllabus_pert(syllabus_id){
+          $.ajax({  
+              url       : "../vanaheim/school-management.php",
+              method    : "POST",  
+              data      : {
+                stc_get_syllabus_details : 1,
+                syllabus_id:syllabus_id
+              },
+              dataType: `JSON`,
+              success   : function(response){
+                // console.log(response);
+                if(response.status=="success"){
+                  var syllabus=response.data;
+                  $('.show-syllabus-data').html(syllabus);
+                }else if(response.status="reload"){
+                  window.location.reload();
+                }
+              }
+            });
+        }
 
         $(document).on('click', '.stc-school-show-teach-btn', function(e){
           e.preventDefault();
@@ -1563,6 +1591,44 @@
           </div>
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto mt-3 mb-3">
             <button class="btn btn-success stc-school-sylsave-btn form-control">Save</button>  
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal bd-example-modal-xl stc-school-viewsyllabus-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">View Syllabus</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>        
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <div class="mb-3">
+              <table class="table table-bordered stc-school-syllabus-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Chapter</th>
+                    <th>Lesson</th>
+                    <th>Unit</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody class="show-syllabus-data">
+                  <tr>
+                    <td>Loading</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
