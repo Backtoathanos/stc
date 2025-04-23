@@ -1032,11 +1032,17 @@ if(empty(@$_SESSION['stc_school_user_id'])){
           call_syllabus_quest();
         });
 
-        $(document).on('click', '.scheduledaily', function(){
-          var id=$(this).val();
-          if(id=="NA"){
-            $('.stc-school-hidden-schedule-id').val(id);
-          }
+        $(document).on('click', '.scheduledaily', function() {            
+            var id = $(this).val();  
+            var class_id = $(this).find('option:selected').attr('class_id');
+            var sub_id = $(this).find('option:selected').attr('sub_id');
+            
+            if (id != "NA") {
+                $('.stc-school-hidden-schedule-id').val(id);
+                $('.stc-school-hidden-scclass-id').val(class_id);
+                $('.stc-school-hidden-scsub-id').val(sub_id);
+                call_syllabus_det();
+            }
         });
 
     });
@@ -1127,19 +1133,21 @@ if(empty(@$_SESSION['stc_school_user_id'])){
                     include_once("../../MCU/db.php");
                     $date = date('l');//Tuesday
                     $school_sql=mysqli_query($con, "
-                        SELECT `stc_school_teacher_schedule_id`, `stc_school_subject_title`, `stc_school_class_title`, `stc_school_teacher_schedule_period` FROM `stc_school_teacher_schedule` LEFT JOIN `stc_school_subject` ON `stc_school_teacher_schedule_subjectid`=`stc_school_subject_id` LEFT JOIN `stc_school_class` ON `stc_school_teacher_schedule_classid`=`stc_school_class_id` WHERE `stc_school_teacher_schedule_day`='".$date."' AND `stc_school_teacher_schedule_teacherid`='".$_SESSION['stc_school_teacher_id']."' ORDER BY `stc_school_teacher_schedule_period` ASC
+                        SELECT `stc_school_teacher_schedule_id`, `stc_school_subject_id`, `stc_school_class_id`, `stc_school_subject_title`, `stc_school_class_title`, `stc_school_teacher_schedule_period` FROM `stc_school_teacher_schedule` LEFT JOIN `stc_school_subject` ON `stc_school_teacher_schedule_subjectid`=`stc_school_subject_id` LEFT JOIN `stc_school_class` ON `stc_school_teacher_schedule_classid`=`stc_school_class_id` WHERE `stc_school_teacher_schedule_day`='".$date."' AND `stc_school_teacher_schedule_teacherid`='".$_SESSION['stc_school_teacher_id']."' ORDER BY `stc_school_teacher_schedule_period` ASC
                     ");
                     foreach($school_sql as $school_row){
                       $period=$school_row['stc_school_teacher_schedule_period'];
                       if($period==1){$period=$period."st";}
                       if($period==2){$period=$period."nd";}
                       if($period==3){$period=$period."rd";}
-                      if($period>3){$period=$period."th";}
-                      echo '<option value="'.$school_row['stc_school_teacher_schedule_id'].'">'.$school_row['stc_school_subject_title'].' | '.$period.' | '.$school_row['stc_school_class_title'].'</option>';
+                      if($period>3){$period=$period."th";}                      
+                      echo '<option value="'.$school_row['stc_school_teacher_schedule_id'].'" class_id="'.$school_row['stc_school_class_id'].'" sub_id="'.$school_row['stc_school_subject_id'].'">'.$school_row['stc_school_subject_title'].' | '.$period.' | '.$school_row['stc_school_class_title'].'</option>';
                     }
                   ?>
                 </select>
                 <input type="hidden" class="stc-school-hidden-schedule-id">
+                <input type="hidden" class="stc-school-hidden-scclass-id">
+                <input type="hidden" class="stc-school-hidden-scsub-id">
               </span>
             </div>
           </div>
