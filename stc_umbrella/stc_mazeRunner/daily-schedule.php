@@ -1168,8 +1168,6 @@ if($_SESSION['stc_school_user_for']==2){
                               <tr>
                                 <th class="text-center"><b>Student ID</b></th>
                                 <th class="text-center"><b>Student Name</b></th>
-                                <th class="text-center"><b>Class</b></th>
-                                <th class="text-center"><b>Subject</b></th>
                                 <th class="text-center" colspan="2"><b>Attendance</b></th>
                               </tr>
                             </thead>
