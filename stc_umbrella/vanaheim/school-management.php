@@ -644,6 +644,7 @@ class Yggdrasil extends tesseract{
 							<a href="#" class="btn btn-success stc-school-student-att-save" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'">Update</a> 
 						';
 				}
+				stc_call_school_student_save($odin_sturow['stc_school_student_id'], $odin_sturow['stc_school_subject_id'], $odin_sturow['stc_school_class_id'], 0, 1);
 				$recordstr.='
 					<tr>
 						<td class="text-center"><b>'.$odin_sturow['stc_school_student_studid'].'</b></td>
@@ -705,8 +706,7 @@ class Yggdrasil extends tesseract{
 		$endtime=date("H:i:s");
 		$hour=date("H");
 		$odin_studentgqry=mysqli_query($this->stc_dbs, "
-			SELECT 
-				`stc_school_student_attendance_id`
+			SELECT `stc_school_student_attendance_id`
 			FROM `stc_school_student_attendance`
 			WHERE `stc_school_student_attendance_status`='1' 
 			AND `stc_school_student_attendance_stuid`='".mysqli_real_escape_string($this->stc_dbs, $stc_stid)."'
