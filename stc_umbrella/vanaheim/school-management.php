@@ -1723,7 +1723,7 @@ class Yggdrasil extends tesseract{
 		$odinattendanceqry=mysqli_query($this->stc_dbs, "
 			SELECT * FROM `stc_school_syllabus`
 			WHERE
-				`stc_school_syllabus_id`='".mysqli_real_escape_string($this->stc_dbs, $syllabus_id)."'
+				`stc_school_syllabus_subject_id`='".mysqli_real_escape_string($this->stc_dbs, $syllabus_id)."'
     	");
     	if(mysqli_num_rows($odinattendanceqry)>0){
 			$slno=0;
