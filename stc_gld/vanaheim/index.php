@@ -273,7 +273,7 @@ function updateChallanBillNo($conn) {
         }
 
         // Get the last bill number and increment it by 1
-        $lastBillQuery = "SELECT MAX(`bill_number`) AS last_bill_number FROM `gld_challan`";
+        $lastBillQuery = "SELECT MAX(CAST(`bill_number` AS UNSIGNED)) AS last_bill_number FROM `gld_challan`";
         $billResult = $conn->query($lastBillQuery);
         $lastBillNumber = ($billResult && $billResult->num_rows > 0) ? (int)$billResult->fetch_assoc()['last_bill_number'] + 1 : 1;
 
