@@ -129,17 +129,33 @@ export default function ChallanDashboard() {
         {
             name: 'Select',
             cell: row => (
-                <input
-                    type="checkbox"
-                    className="form-control"
-                    checked={selectedRows.includes(row.id)}
-                    onChange={() => handleRowSelect(row)}
-                />
+                row.status < 3 ? (
+                    <input
+                        type="checkbox"
+                        className="form-control"
+                        checked={selectedRows.includes(row.id)}
+                        onChange={() => handleRowSelect(row)}
+                    />
+                ) : ""
             ),
             ignoreRowClick: true,
             allowOverflow: true,
             button: true,
             width: '50px'
+        }, 
+        {
+            name: 'Bill No',
+            selector: row => row.bill_number,
+            sortable: true,
+            center: true,
+            width: '100px'
+        }, 
+        {
+            name: 'Challan Number',
+            selector: row => row.challan_number,
+            sortable: true,
+            center: true,
+            width: '150px'
         },
         {
             name: 'Action',
