@@ -25,6 +25,7 @@ class dante extends tesseract {
 			$user_details = mysqli_fetch_assoc($checkbumblebee);
 			$op = "success";
 			$user_id = $user_details['stc_trading_user_id']; // Fetch user ID
+			$location = $user_details['stc_trading_user_location']; // Fetch user ID
 		} else {
 			$op = "Please Check Username & Password Again.";
 			$user_id = null; // Set to null in case of failure
@@ -33,7 +34,8 @@ class dante extends tesseract {
 		// Return both result and user ID
 		return array(
 			"result" => $op,
-			"user_id" => $user_id
+			"user_id" => $user_id,
+			"location" => $location
 		);
 	}
 }

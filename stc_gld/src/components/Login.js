@@ -80,9 +80,11 @@ export default function Login(){
             }).then((response) => response.json())
             .then((response) => {
                 if (response[0].result === "success") {
-                    const userId = response[0].user_id; // Get the user ID from response
+                    const userId = response[0].user_id; 
+                    const location = response[0].location;// Get the user ID from response
                     setMsg("Successfully logged in!!! Redirecting.");
-                    setCookie("user_id", userId, 7); // Set cookie with correct name
+                    setCookie("user_id", userId, 7);
+                    setCookie("location_stc", location, 7); // Set cookie with correct name
                     setTimeout(function () {
                         localStorage.setItem("login", true);
                         navigate("/dashboard");

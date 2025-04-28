@@ -106,7 +106,38 @@ foreach($result as $row){
         $row1 = mysqli_fetch_assoc($sql_qry);
         $directqty = $row1['total_qty'] ?? 0;
     }
+    
+    $location_stc='';
+    if (isset($_COOKIE['location_stc'])) {
+        $location_stc = $_COOKIE['location_stc'];
+    }
+    $lot = array();
+    $sql_qry = mysqli_query($con, "
+        SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM stc_purchase_product_adhoc spa WHERE spa.stc_purchase_product_adhoc_productid = $product_id AND spa.stc_purchase_product_adhoc_status = 1
+    ");
+    if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {
+        // $row1 = mysqli_fetch_assoc($sql_qry);
+        foreach($sql_qry as $row1){
+            $adhoc_id = $row1['stc_purchase_product_adhoc_id'];
+            $sql_qry2 = mysqli_query($con, "
+                SELECT `shopname` FROM stc_shop WHERE adhoc_id = $adhoc_id
+            ");
+            if($sql_qry2 && mysqli_num_rows($sql_qry2) > 0){
+                foreach($sql_qry2 as $row2){
+                    if($location_stc == $row2['shopname']){
+                        $lot[] = array(
+                            'adhoc_id' => $row1['stc_purchase_product_adhoc_id'],
+                            'qty' => $row1['stc_purchase_product_adhoc_qty'],
+                            'shopname' => $row1['shopname']
+                        );
 
+                    }
+                }
+            }
+
+        }
+    }
+    $row['lot'] = $lot;
     $remainingqty = $row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
     $row['stc_item_inventory_pd_qty'] = number_format(max($remainingqty, 0), 2);
 
