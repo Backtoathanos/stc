@@ -25,7 +25,7 @@ $cquery = "
         B.stc_brand_title
     FROM stc_product P
     INNER JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id
-    INNER JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id 
+    LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id 
     WHERE P.stc_product_avail = 1 
 ";
 
