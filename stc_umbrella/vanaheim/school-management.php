@@ -644,7 +644,7 @@ class Yggdrasil extends tesseract{
 							<a href="#" class="btn btn-success stc-school-student-att-save" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'">Update</a> 
 						';
 				}
-				stc_call_school_student_save($odin_sturow['stc_school_student_id'], $odin_sturow['stc_school_subject_id'], $odin_sturow['stc_school_class_id'], 0, 1);
+				$this->stc_call_school_student_save($odin_sturow['stc_school_student_id'], $odin_sturow['stc_school_subject_id'], $odin_sturow['stc_school_class_id'], 0, 1);
 				$recordstr.='
 					<tr>
 						<td class="text-center"><b>'.$odin_sturow['stc_school_student_studid'].'</b></td>
