@@ -1163,17 +1163,8 @@ if($_SESSION['stc_school_user_for']==2){
                         <input type="hidden" class="stc-school-hidden-scsub-id">
                         <!-- <h5>School Attendance</h5> -->
                         <div class="mb-3 stc-stuattendance-table">
-                          <table class="table table-hover table-bordered">
-                            <thead>
-                              <tr>
-                                <th class="text-center"><b>Student ID</b></th>
-                                <th class="text-center"><b>Student Name</b></th>
-                                <th class="text-center" colspan="2"><b>Attendance</b></th>
-                              </tr>
-                            </thead>
-                            <tbody class="stc-show-student-nested-show">
-                              
-                            </tbody>
+                          <table class="table table-hover table-bordered stc-show-student-nested-show">
+                            
                           </table>
                         </div>
                       </div>   
