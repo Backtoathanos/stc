@@ -536,27 +536,20 @@ class Yggdrasil extends tesseract{
 			    `stc_school_student_lastname`,
 			    `stc_school_class_title`,
 			    `stc_school_subject_title`
-			FROM
-			    `stc_school_student`
-			LEFT JOIN
-			    `stc_school_teacher_schedule`
-			ON
-			    `stc_school_student_classroomid`=`stc_school_teacher_schedule_classid`
-			LEFT JOIN
-			    `stc_school_class`
-			ON
-			    `stc_school_class_id`=`stc_school_teacher_schedule_classid`
-			LEFT JOIN
-			    `stc_school_subject`
-			ON
-			    `stc_school_subject_id`=`stc_school_teacher_schedule_subjectid`
-			WHERE
-			    `stc_school_teacher_schedule_id`='".mysqli_real_escape_string($this->stc_dbs, $schedule_id)."'
+			FROM `stc_school_student`
+			LEFT JOIN `stc_school_teacher_schedule`
+			ON `stc_school_student_classroomid`=`stc_school_teacher_schedule_classid`
+			LEFT JOIN `stc_school_class`
+			ON `stc_school_class_id`=`stc_school_teacher_schedule_classid`
+			LEFT JOIN `stc_school_subject`
+			ON `stc_school_subject_id`=`stc_school_teacher_schedule_subjectid`
+			WHERE `stc_school_teacher_schedule_id`='".mysqli_real_escape_string($this->stc_dbs, $schedule_id)."'
 		");
 		$headerstr='';
 		$recordstr='';
 		if(mysqli_num_rows($odin_stuqry)>0){
 			foreach($odin_stuqry as $odin_sturow){
+				$this->stc_call_school_student_save($odin_sturow['stc_school_student_id'], $odin_sturow['stc_school_subject_id'], $odin_sturow['stc_school_class_id'], 0, 1);
 				$headerstr='<tr><th><b>Class</b></th><td class="text-center"><b>'.$odin_sturow['stc_school_class_title'].'</b></td><th><b>Subject</b></th>
 				<td class="text-center"><b>'.$odin_sturow['stc_school_subject_title'].'</b></td></tr>';
 				$check_rec=mysqli_query($this->stc_dbs, "
@@ -568,24 +561,35 @@ class Yggdrasil extends tesseract{
 					AND `stc_school_student_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
 				");
 				$updatebtn='#';
-				if(mysqli_num_rows($check_rec)==0){	
-					$updatebtn='
-							<a href="#" class="btn btn-success stc-school-student-att-save" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'">Update</a> 
-						';
-				}
-				$this->stc_call_school_student_save($odin_sturow['stc_school_student_id'], $odin_sturow['stc_school_subject_id'], $odin_sturow['stc_school_class_id'], 0, 1);
-				$recordstr.='
-					<tr>
-						<td class="text-center"><b>'.$odin_sturow['stc_school_student_studid'].'</b></td>
-						<td class="text-left"><b>'.$odin_sturow['stc_school_student_firstname'].' '.$odin_sturow['stc_school_student_lastname'].'</b></td>
+				$attendance='
 						<td style="background:green">
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" checked class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="1"> 
 							<label for="p'.$odin_sturow['stc_school_student_id'].'">Present</label>
 						</td>
 						<td style="background:red">
 							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="0"> 
 							<label for="a'.$odin_sturow['stc_school_student_id'].'">Absent</label>
 						</td>
+				';
+				if(mysqli_num_rows($check_rec)==0){	
+					$updatebtn='
+							<a href="#" class="btn btn-success stc-school-student-att-save" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'">Update</a> 
+						';
+					$attendance='
+						<td style="background:green">
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="1"> 
+							<label for="p'.$odin_sturow['stc_school_student_id'].'">Present</label>
+						</td>
+						<td style="background:red">
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" checked class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="0"> 
+							<label for="a'.$odin_sturow['stc_school_student_id'].'">Absent</label>
+						</td>
+					';
+				}
+				$recordstr.='
+					<tr>
+						<td class="text-center"><b>'.$odin_sturow['stc_school_student_studid'].'</b></td>
+						<td class="text-left"><b>'.$odin_sturow['stc_school_student_firstname'].' '.$odin_sturow['stc_school_student_lastname'].'</b></td>
+						'.$attendance.'
 					</tr>
 				';
 			}
@@ -600,16 +604,16 @@ class Yggdrasil extends tesseract{
 		
 		$odin='
 			<thead>
-			'.$headerstr.'
-                              <tr>
-                                <th class="text-center"><b>Student ID</b></th>
-                                <th class="text-center"><b>Student Name</b></th>
-                                <th class="text-center" colspan="2"><b>Attendance</b></th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              '.$recordstr.'
-                            </tbody>
+				'.$headerstr.'
+        		<tr>
+        		  <th class="text-center"><b>Student ID</b></th>
+        		  <th class="text-center"><b>Student Name</b></th>
+        		  <th class="text-center" colspan="2"><b>Attendance</b></th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        	  '.$recordstr.'
+        	</tbody>
 		';
 		return $odin;
 	}
@@ -647,7 +651,8 @@ class Yggdrasil extends tesseract{
 		$recordstr='';
 		if(mysqli_num_rows($odin_stuqry)>0){
 			foreach($odin_stuqry as $odin_sturow){
-				$headerstr='<tr><th>Class</th><td class="text-center"><b>'.$odin_sturow['stc_school_class_title'].'</b></td><th>Subject</th>
+				$this->stc_call_school_student_save($odin_sturow['stc_school_student_id'], $odin_sturow['stc_school_subject_id'], $odin_sturow['stc_school_class_id'], 0, 1);
+				$headerstr='<tr><th><b>Class</b></th><td class="text-center"><b>'.$odin_sturow['stc_school_class_title'].'</b></td><th><b>Subject</b></th>
 				<td class="text-center"><b>'.$odin_sturow['stc_school_subject_title'].'</b></td></tr>';
 				$check_rec=mysqli_query($this->stc_dbs, "
 					SELECT `stc_school_student_attendance_id` FROM`stc_school_student_attendance` 
@@ -658,23 +663,35 @@ class Yggdrasil extends tesseract{
 					AND `stc_school_student_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
 				");
 				$updatebtn='#';
-				if(mysqli_num_rows($check_rec)==0){	
-					$updatebtn='
-							<a href="#" class="btn btn-success stc-school-student-att-save" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'">Update</a> 
-						';
-				}
-				$recordstr.='
-					<tr>
-						<td class="text-center"><b>'.$odin_sturow['stc_school_student_studid'].'</b></td>
-						<td class="text-left"><b>'.$odin_sturow['stc_school_student_firstname'].' '.$odin_sturow['stc_school_student_lastname'].'</b></td>
+				$attendance='
 						<td style="background:green">
-							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" checked class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="1"> 
 							<label for="p'.$odin_sturow['stc_school_student_id'].'">Present</label>
 						</td>
 						<td style="background:red">
 							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="0"> 
 							<label for="a'.$odin_sturow['stc_school_student_id'].'">Absent</label>
 						</td>
+				';
+				if(mysqli_num_rows($check_rec)==0){	
+					$updatebtn='
+							<a href="#" class="btn btn-success stc-school-student-att-save" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'">Update</a> 
+						';
+					$attendance='
+						<td style="background:green">
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" id="p'.$odin_sturow['stc_school_student_id'].'" class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="1"> 
+							<label for="p'.$odin_sturow['stc_school_student_id'].'">Present</label>
+						</td>
+						<td style="background:red">
+							<input type="radio" name="stu-attendancecombo'.$odin_sturow['stc_school_student_id'].'" id="a'.$odin_sturow['stc_school_student_id'].'" checked class="stc-attend-check stc-school-stu-attendance-but'.$odin_sturow['stc_school_student_id'].'" subid="'.$odin_sturow['stc_school_subject_id'].'" classid="'.$odin_sturow['stc_school_class_id'].'" id="'.$odin_sturow['stc_school_student_id'].'" value="0"> 
+							<label for="a'.$odin_sturow['stc_school_student_id'].'">Absent</label>
+						</td>
+					';
+				}
+				$recordstr.='
+					<tr>
+						<td class="text-center"><b>'.$odin_sturow['stc_school_student_studid'].'</b></td>
+						<td class="text-left"><b>'.$odin_sturow['stc_school_student_firstname'].' '.$odin_sturow['stc_school_student_lastname'].'</b></td>
+						'.$attendance.'
 					</tr>
 				';
 			}
@@ -685,20 +702,19 @@ class Yggdrasil extends tesseract{
 				</tr>
 			';
 		}
-
 		
 		$odin='
 			<thead>
-			'.$headerstr.'
-                              <tr>
-                                <th class="text-center"><b>Student ID</b></th>
-                                <th class="text-center"><b>Student Name</b></th>
-                                <th class="text-center" colspan="2"><b>Attendance</b></th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              '.$recordstr.'
-                            </tbody>
+				'.$headerstr.'
+        		<tr>
+        		  <th class="text-center"><b>Student ID</b></th>
+        		  <th class="text-center"><b>Student Name</b></th>
+        		  <th class="text-center" colspan="2"><b>Attendance</b></th>
+        		</tr>
+        	</thead>
+        	<tbody>
+        	  '.$recordstr.'
+        	</tbody>
 		';
 		return $odin;
 	}
