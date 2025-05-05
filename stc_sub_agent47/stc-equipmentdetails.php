@@ -65,12 +65,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <th class="text-center">LOCATION</th>
                                                         <th class="text-center">DEPARTMENT</th>
                                                         <th class="text-center">AREA</th>
+                                                        <th class="text-center">SUB LOCATION</th>
                                                         <th class="text-center">EQUIPMENT NAME</th>
+                                                        <th class="text-center">EQUIPMENT TYPE</th>
                                                         <th class="text-center">EQUIPMENT NO</th>
-                                                        <th class="text-center">MODEL NO</th>
-                                                        <th class="text-center">CAPACITY</th>
-                                                        <th class="text-center">CREATED DATE</th>
-                                                        <th class="text-center">CREATED BY</th>
                                                         <th class="text-center">ACTION</th>
                                                     </tr>
                                                 </thead>
@@ -187,7 +185,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         var slno=0;
                         for (var i = 0; i < response.length; i++) {
                             slno++;
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_no + '</td><td>' + response[i].model_no + '</td><td>' + response[i].capacity + '</td><td class="text-center">' + response[i].created_date + '</td><td class="text-center">' + response[i].stc_cust_pro_supervisor_fullname + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";
@@ -203,14 +201,16 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var location = $('.ed-department').find('option:selected').attr('project-id');
                 var department = $('.ed-department').val();
                 var area = $('.ed-area').val();
+                var sublocation = $('.ed-sublocation').val();
                 var equipment_name = $('.ed-equipment-name').val();
                 // Get the selected option
                 var selectedOption = $('.ed-equipment-name').find(':selected');
-
+                
                 // Get the data attributes
                 var slno = selectedOption.data('slno');
                 var unit = selectedOption.data('unit');
 
+                var equipment_type = $('.ed-equipment-type').val();
                 var equipment_no = $('.ed-equipment-no').val();
                 var model_no = $('.ed-model-no').val();
                 var capacity = $('.ed-capacity').val();
@@ -220,8 +220,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         save_equipementdetails: 1,
                         location: location,
                         area: area,
+                        sublocation:sublocation,
                         department: department,
                         equipment_name: equipment_name,
+                        equipment_type:equipment_type,
                         slno: slno,
                         unit: unit,
                         equipment_no: equipment_no,
@@ -289,7 +291,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             // to edit modal show
             $('body').delegate('.ed-editequipment', 'click', function(e){
                 var id=$(this).attr('id');
-                var equipmenttype=$(this).closest('tr').find('td:eq(4)').html();
+                var equipmenttype=$(this).closest('tr').find('td:eq(5)').html();
                 $('.hide-col').hide();
                 if(equipmenttype=="Air Handling Unit" || equipmenttype=="VAM"){$('.AirHandlingUnit').show();}
                 if(equipmenttype=="Chilled Water Pump" || equipmenttype=="Chiller Unit"){$('.ChilledWaterPump').show();}
@@ -386,6 +388,83 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 });
                 $('#capacity').closest('.col-md-6').after(data);
             }
+
+            const equipmentOptions = {
+                "CHILLER UNIT": [
+                    "CENTRIFUGAL CHILLER",
+                    "RECIPROCATIG CHILLER",
+                    "SCREW CHILLER",
+                    "SCROLL CHILLER"
+                ],
+                "D/W CHILLER UNIT": [
+                    "RECIPROCATIG CHILLER",
+                    "SCREW CHILLER",
+                    "SCROLL CHILLER"
+                ],
+                "CONDENSER WATER PUMP": [
+                    "CENTRIFUGAL",
+                    "MULTI-STAGE",
+                    "DISPLACEMET",
+                    "SCREW TYPE"
+                ],
+                "CHILLER WATER PUMP": [
+                    "CENTRIFUGAL",
+                    "MULTI-STAGE",
+                    "DISPLACEMET",
+                    "SCREW TYPE"
+                ],
+                "PRIMARY D/W PUMP": [
+                    "CENTRIFUGAL",
+                    "MULTI-STAGE",
+                    "DISPLACEMET",
+                    "SCREW TYPE"
+                ],
+                "SECONDARY D/W PUMP": [
+                    "CENTRIFUGAL",
+                    "MULTI-STAGE",
+                    "DISPLACEMET",
+                    "SCREW TYPE"
+                ],
+                "COOLING TOWER": [
+                    "NATURAL DRAFT",
+                    "FORCED DRAFT",
+                    "INDUCED DRAFT"
+                ],
+                "AIR HANDLING UNIT": [
+                    "NORMAL",
+                    "HRW AHU",
+                    "AAHU",
+                    "DX AHU"
+                ],
+                "PACKAGE UNIT": [
+                    "AIR COOLED",
+                    "WATER COOLED"
+                ],
+                "VARIABLE REFRIGERNT FLOW": [
+                    "AIR COOLED"
+                ],
+                "VARIABLE AIR VOLUME": [],
+                "CASSETTEE UNIT": [],
+                "FAN COIL UNIT": [],
+                "CEILLING SUSPENDED UNIT": [],
+                "DUCTABLE SPLIT UNIT": [],
+                "WINDOW AC": [],
+                "SPLIT AC": []
+            };
+            $('.ed-equipment-name').on('change', function () {
+                const selected = $(this).val();
+                const $typeSelect = $('.ed-equipment-type');
+                $typeSelect.empty(); // clear previous options
+
+                if (equipmentOptions[selected] && equipmentOptions[selected].length > 0) {
+                    $typeSelect.append('<option value="">Select Type</option>');
+                    $.each(equipmentOptions[selected], function (index, type) {
+                        $typeSelect.append('<option value="' + type + '">' + type + '</option>');
+                    });
+                } else {
+                    $typeSelect.append('<option value="">No types available</option>');
+                }
+            });
         });
     </script>
 </body>
@@ -429,28 +508,45 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         </div>
                                     </div>
                                     <div class="col-md-6">
+                                        <h5>Sub Location</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <input type="text" class="form-control ed-sublocation" placeholder="Enter sub location">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
                                         <h5>Equipment Name</h5><br>
                                         <div class="card mb-3 widget-content">
                                             <select class="form-control ed-equipment-name">
                                                 <option value="NA">Select</option>
-                                                <option data-slno="G008" data-unit="AHU" value="Air Handling Unit" >Air Handling Unit</option>
-                                                <option data-slno="G003" data-unit="CHWP" value="Chilled Water Pump" >Chilled Water Pump</option>
-                                                <option data-slno="G002" data-unit="CNWP" value="Condenser Water Pump" >Condenser Water Pump</option>
-                                                <option data-slno="G007" data-unit="CT" value="Cooling Tower" >Cooling Tower</option>
-                                                <option data-slno="G009" data-unit="PAC" value="Package Air Conditioning" >Package Air Conditioning</option>
-                                                <option data-slno="G005" data-unit="PDWP" value="Primary Drinking Water pump" >Primary Drinking Water pump</option>
-                                                <option data-slno="G006" data-unit="SDWP" value="Secondary Drinking Water pump" >Secondary Drinking Water pump</option>
-                                                <option data-slno="G001" data-unit="CU" value="Chiller Unit" >Chiller Unit</option>
-                                                <option data-slno="G004" data-unit="SCWP">Secondary Chilled Water Pump</option>
-                                                <option data-slno="G0010" data-unit="VRF">VRF</option>
-                                                <option data-slno="G0012" data-unit="FCU">FCU</option>
-                                                <option data-slno="G0013" data-unit="DU">Ductable Unit</option>
-                                                <option data-slno="G0014" data-unit="SAC">Split AC</option>
-                                                <option data-slno="G0015" data-unit="WAC">Window AC</option>
+                                                <option data-slno="G008" data-unit="AHU" value="AIR HANDLING UNIT" >AIR HANDLING UNIT</option>
+                                                <option data-slno="G003" data-unit="CHWP" value="CHILLER WATER PUMP" >CHILLER WATER PUMP</option>
+                                                <option data-slno="G002" data-unit="CNWP" value="CONDENSER WATER PUMP" >CONDENSER WATER PUMP</option>
+                                                <option data-slno="G007" data-unit="CT" value="COOLING TOWER" >COOLING TOWER</option>
+                                                <option data-slno="G009" data-unit="PAC" value="PACKAGE UNIT" >PACKAGE UNIT</option>
+                                                <option data-slno="G005" data-unit="PDWP" value="PRIMARY D/W PUMP" >PRIMARY D/W PUMP</option>
+                                                <option data-slno="G006" data-unit="SDWP" value="SECONDARY D/W PUMP" >SECONDARY D/W PUMP</option>
+                                                <option data-slno="G001" data-unit="DWCU" value="D/W CHILLER UNIT" >D/W CHILLER UNIT</option>
+                                                <option data-slno="G004" data-unit="SCWP">SECONDARY CHILLED WATER PUMP</option>
+                                                <option data-slno="G0010" data-unit="VRF">VARIABLE REFRIGERNT FLOW</option>
+                                                <option data-slno="G0012" data-unit="FCU">FAN COIL UNIT</option>
+                                                <option data-slno="G0013" data-unit="DU">DUCTABLE SPLIT UNIT</option>
+                                                <option data-slno="G0014" data-unit="SAC">SPLIT AC</option>
+                                                <option data-slno="G0015" data-unit="WAC">WINDOW AC</option>
                                                 <option data-slno="G0011" data-unit="VAM">VAM</option>
-                                                <option data-slno="G0016" data-unit="PWC">Package Water Cool</option>
-                                                <option data-slno="G0017" data-unit="DXP">DX Plant</option>
+                                                <option data-slno="G0016" data-unit="VAV">VARIABLE AIR VOLUME</option>
+                                                <option data-slno="G0017" data-unit="CSU">CEILLING SUSPENDED UNIT</option>
+                                                <option data-slno="G0018" data-unit="CTTU">CASSETTEE UNIT</option>
+                                                <option data-slno="G0019" data-unit="CU">CHILLER UNIT</option>
 
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5>Equipment TYPE</h5><br>
+                                        <div class="card mb-3 widget-content">
+                                            <!-- <input type="text" class="form-control ed-equipment-type" placeholder="Enter equipment type"> -->
+                                            <select class="form-control ed-equipment-type">
+                                                <option value="">Select Equipment Name First</option>
                                             </select>
                                         </div>
                                     </div>
