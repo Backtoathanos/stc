@@ -62,12 +62,10 @@ if(isset($_SESSION["stc_agent_id"])){
                                                         <th class="text-center">LOCATION</th>
                                                         <th class="text-center">DEPARTMENT</th>
                                                         <th class="text-center">AREA</th>
+                                                        <th class="text-center">SUB LOCATION</th>
                                                         <th class="text-center">EQUIPMENT NAME</th>
+                                                        <th class="text-center">EQUIPMENT TYPE</th>
                                                         <th class="text-center">EQUIPMENT NO</th>
-                                                        <th class="text-center">MODEL NO</th>
-                                                        <th class="text-center">CAPACITY</th>
-                                                        <th class="text-center">CREATED DATE</th>
-                                                        <th class="text-center">CREATED BY</th>
                                                         <th class="text-center">ACTION</th>
                                                     </tr>
                                                 </thead>
@@ -148,7 +146,7 @@ if(isset($_SESSION["stc_agent_id"])){
                         var slno=0;
                         for (var i = 0; i < response.length; i++) {
                             slno++;
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_no + '</td><td>' + response[i].model_no + '</td><td>' + response[i].capacity + '</td><td class="text-center">' + response[i].created_date + '</td><td class="text-center">' + response[i].stc_cust_pro_supervisor_fullname + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-eye"></i></a</td></tr>';
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";

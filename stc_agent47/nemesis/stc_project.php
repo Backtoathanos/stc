@@ -1344,7 +1344,7 @@ class pirates_project extends tesseract{
 			}
 		}
 		// Initialize the base query
-		$baseQuery = "SELECT `id`, `area`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `model_no`, `capacity`, `equipment_name`, `equipment_no`, `stc_cust_pro_supervisor_fullname`, `created_date` FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id` = `equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id` = `equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by` = `stc_cust_pro_supervisor_id`";
+		$baseQuery = "SELECT `id`, `area`, `sub_location`, `equipment_type`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `model_no`, `capacity`, `equipment_name`, `equipment_no`, `stc_cust_pro_supervisor_fullname`, `created_date` FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id` = `equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id` = `equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by` = `stc_cust_pro_supervisor_id`";
 
 		// Initialize filter array
 		$filters = [];
