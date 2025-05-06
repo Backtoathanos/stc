@@ -448,7 +448,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 "CASSETTEE UNIT": [],
                 "FAN COIL UNIT": [],
                 "CEILLING SUSPENDED UNIT": [],
-                "DUCTABLE SPLIT UNIT": [],
+                "DUCTABLE SPLIT UNIT": [
+                    "Water Cooled",
+                    "Air Cooled",
+                ],
                 "WINDOW AC": [],
                 "SPLIT AC": []
             };
