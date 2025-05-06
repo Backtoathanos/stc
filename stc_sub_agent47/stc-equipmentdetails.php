@@ -434,7 +434,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     "NORMAL",
                     "HRW AHU",
                     "AAHU",
-                    "DX AHU"
+                    "DX AHU",
+                    "EMERSON AHU"
                 ],
                 "PACKAGE UNIT": [
                     "AIR COOLED",
