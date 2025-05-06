@@ -38,7 +38,7 @@ export default function Dashboard() {
     const [currentPage, setCurrentPage] = useState(1);
 
     const fetchData = debounce((query = '', pageNum = page, rowLimit = limit) => {
-        if(query.length === 0 || query.length > 4) {
+        if(query.length === 0 || query.length >= 3) {
             setLoading(true);
             axios.get(`${API_BASE_URL}/getInventoryData.php`, {
                 params: { search: query, page: pageNum, limit: rowLimit }
