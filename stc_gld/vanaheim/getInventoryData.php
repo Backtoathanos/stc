@@ -31,7 +31,7 @@ $cquery = "
 
 // Apply search filter
 if ($search !== '') {
-    $cquery .= " AND (P.stc_product_id='$search' OR P.stc_product_name LIKE '%$search%' )";
+    $cquery .= " AND (P.stc_product_id='$search' OR P.stc_product_name LIKE '%$search%' OR P.stc_product_desc LIKE '%$search%' )";
 }
 $totalQuery = "SELECT COUNT(*) AS total FROM ($cquery) AS count_table"; // Count total rows
 $totalResult = mysqli_query($con, $totalQuery);
