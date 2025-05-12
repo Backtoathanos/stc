@@ -216,13 +216,18 @@ include("kattegat/role_check.php");
                                           for="destination"
                                           >To (Destination/Location)
                                         </h5>
-                                        <input
-                                          id="destination"
+                                        
+                                        <select 
+                                          class="custom-select form-control"
                                           name="destination"
-                                          type="text"
-                                          placeholder="To (Destination/Location)"
-                                          class="form-control validate"
-                                        />
+                                          id="destination"
+                                          >
+                                          <option value="NA">Select Destination</option>
+                                          <option >MANGO 17 NO GODOWN</option>
+                                          <option >PARDIH GODOWN</option>
+                                          <option >RAMGARH GODOWN</option>
+                                          <option >DHATKIDIH GODOWN</option>
+                                        </select>
                                       </div>
                                     </div>
                                     <div class="col-xl-12 col-md-12 col-sm-12">
@@ -291,16 +296,6 @@ include("kattegat/role_check.php");
                                                     class="form-control"
                                                     placeholder="Source/destination (Location)" 
                                                   >
-                                                  <select 
-                                                    class="custom-select form-control"
-                                                    id="tc-poa-searchbydourcedestination"
-                                                    >
-                                                    <option value="NA">Select Destination</option>
-                                                    <option >MANGO 17 NO GODOWN</option>
-                                                    <option >PARDIH GODOWN</option>
-                                                    <option >RAMGARH GODOWN</option>
-                                                    <option >DHATKIDIH GODOWN</option>
-                                                  </select>
                                                 </td>
                                                 <td>
                                                   <input 
