@@ -291,6 +291,16 @@ include("kattegat/role_check.php");
                                                     class="form-control"
                                                     placeholder="Source/destination (Location)" 
                                                   >
+                                                  <select 
+                                                    class="custom-select form-control"
+                                                    id="tc-poa-searchbydourcedestination"
+                                                    >
+                                                    <option value="NA">Select Destination</option>
+                                                    <option >MANGO 17 NO GODOWN</option>
+                                                    <option >PARDIH GODOWN</option>
+                                                    <option >RAMGARH GODOWN</option>
+                                                    <option >DHATKIDIH GODOWN</option>
+                                                  </select>
                                                 </td>
                                                 <td>
                                                   <input 
