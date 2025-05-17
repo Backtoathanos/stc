@@ -557,7 +557,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     <div class="col-md-6">
                                         <h5>Equipment No</h5><br>
                                         <div class="card mb-3 widget-content">
-                                            <input type="text" class="form-control ed-equipment-no" placeholder="Enter equipment no">
+                                            <input type="number" class="form-control ed-equipment-no" placeholder="Enter equipment no">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
