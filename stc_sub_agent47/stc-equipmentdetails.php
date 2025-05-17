@@ -185,7 +185,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         var slno=0;
                         for (var i = 0; i < response.length; i++) {
                             slno++;
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center"><a href="#" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";
@@ -292,9 +292,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.ed-editequipment', 'click', function(e){
                 var id=$(this).attr('id');
                 var equipmenttype=$(this).closest('tr').find('td:eq(5)').html();
+                
                 $('.hide-col').hide();
                 if(equipmenttype=="Air Handling Unit" || equipmenttype=="VAM"){$('.AirHandlingUnit').show();}
-                if(equipmenttype=="Chilled Water Pump" || equipmenttype=="Chiller Unit"){$('.ChilledWaterPump').show();}
+                if(equipmenttype=="CHILLER WATER PUMP" || equipmenttype=="Chilled Water Pump" || equipmenttype=="Chiller Unit"){$('.ChilledWaterPump').show();}
                 if(equipmenttype=="Condenser Water Pump" || equipmenttype=="Package Water Cool" || equipmenttype=="DX Plant"){$('.CondenserWaterPump').show();}
                 if(equipmenttype=="Cooling Tower"){$('.CoolingTower').show();}
                 if(equipmenttype=="Drinking Water Unit"){$('.drinkingWaterUnit').show();}
@@ -303,7 +304,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 if(equipmenttype=="Secondary Drinking Water pump"){$('.SecondaryDrinkingWaterPump').show();}
                 if(equipmenttype=="Unit Input"){$('.unitInputs').show();}
                 $('.ed-equipment-id').remove();
-                $('#capacity').before('<input type="hidden" class="ed-equipment-id" value="' + id + '">');
+                $('#capacity').before('<input type="hidden" class="ed-equipment-id" value="' + id + '">');console.log(equipmenttype);
                 $.ajax({
                     url         : "nemesis/stc_product.php",
                     method      : "POST",
@@ -314,6 +315,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     dataType    : "JSON",
                     success     : function(response){
                         $('#capacity').val(response[0].capacity);
+                        
                         $.each(fields, function(index, field) {$('#' + field).val(response[0][field]);});
                     }
                 });
@@ -361,15 +363,26 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
             get_fields(fields, labels);
             function get_fields(fields, labels){
-                var unitInputs = ['make_name','compressor_qty','each_of_capacity','max_load','min_load','inlet_temp','outlet_temp','delta_t','current_rating_max','min_fuse_rating','max_fuse_rating','inlet_pressure','outlet_pressure','delta_p'];
-                var drinkingWaterUnit = ['make_name', 'compressor_qty', 'each_of_capacity', 'max_load', 'min_load', 'equipment_serial_no', 'refrigerant_type', 'control', 'current_rating_max'];
-                var CoolingTower = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'header_size', 'fan_blade_size', 'fan_blade_qty', 'equipment_serial_no', 'coupling_type'];
-                var CondenserWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'motor_make_name'];
-                var ChilledWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'motor_make_name'];
-                var SecondaryDrinkingWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
-                var PrimaryDrinkingWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
-                var AirHandlingUnit = ['ahu_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'ahu_filter_type', 'ahu_v_belt_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'ahu_filter_size', 'ahu_filter_qty', 'ahu_v_belt_qty'];
-                var PackageAirConditioning = ['make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'filter_type', 'v_belt_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'filter_size', 'filter_qty', 'v_belt_qty'];
+                // var unitInputs = ['make_name','compressor_qty','each_of_capacity','max_load','min_load','inlet_temp','outlet_temp','delta_t','current_rating_max','min_fuse_rating','max_fuse_rating','inlet_pressure','outlet_pressure','delta_p'];
+                // var drinkingWaterUnit = ['make_name', 'compressor_qty', 'each_of_capacity', 'max_load', 'min_load', 'equipment_serial_no', 'refrigerant_type', 'control', 'current_rating_max'];
+                // var CoolingTower = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'header_size', 'fan_blade_size', 'fan_blade_qty', 'equipment_serial_no', 'coupling_type'];
+                // var CondenserWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'motor_make_name'];
+                // var ChilledWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'motor_make_name'];
+                // var SecondaryDrinkingWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
+                // var PrimaryDrinkingWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
+                // var AirHandlingUnit = ['ahu_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'ahu_filter_type', 'ahu_v_belt_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'ahu_filter_size', 'ahu_filter_qty', 'ahu_v_belt_qty'];
+                // var PackageAirConditioning = ['make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'filter_type', 'v_belt_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'filter_size', 'filter_qty', 'v_belt_qty'];
+                
+                var AirHandlingUnit = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'ahu_filter_type', 'ahu_make_name', 'ahu_v_belt_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'ahu_filter_size', 'ahu_filter_qty', 'ahu_v_belt_qty'];
+                var ChilledWaterPump = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'pump_make_name', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
+                var CondenserWaterPump = [...ChilledWaterPump]; // same structure
+                var CoolingTower = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'header_size', 'fan_blade_size', 'fan_blade_qty', 'equipment_serial_no', 'bearing_size', 'pulley_size', 'v_belt_size', 'make_name', 'coupling_size', 'coupling_type'];
+                var PackageAirConditioning = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'filter_type', 'make_name', 'v_belt_size', 'compressor_qty', 'each_of_capacity', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'filter_size', 'filter_qty', 'v_belt_qty', 'refrigerant_type', 'control'];
+                var PrimaryDrinkingWaterPump = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'pump_make_name', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
+                var SecondaryDrinkingWaterPump = [...PrimaryDrinkingWaterPump]; // same structure
+                var drinkingWaterUnit = ['compressor_qty', 'each_of_capacity', 'max_load', 'min_load', 'make_name', 'equipment_serial_no', 'refrigerant_type', 'control', 'current_rating_max', 'min_load', 'max_fuse_rating'];
+                var unitInputs = ['compressor_qty', 'each_of_capacity', 'max_load', 'min_load', 'make_name', 'inlet_temp', 'outlet_temp', 'delta_t', 'equipment_serial_no', 'refrigerant_type', 'control', 'current_rating_max', 'min', 'max_fuse_rating', 'inlet_pressure', 'outlet_pressure', 'delta_p'];
+
 
 
                 var data = '';
