@@ -442,34 +442,36 @@ include_once("../MCU/db.php");
             // add to purchase
             $('body').delegate('.add_to_purchase', 'click', function(e){
                 e.preventDefault();
-                var item_id=$(this).attr("atc-ic");
-                var itemqty=$('.stc-sup-appr-qty'+item_id).val();
-                var itemreqqty=$('.stc-sup-req-qty'+item_id).val();
-                var itemstatus=$('.stc-sup-items-status'+item_id).val();
-                if((itemqty > 0) && (itemreqqty >= itemqty)){
-                    // $(this).css('display','none');
-                    $.ajax({
-                        url : "nemesis/stc_project.php",
-                        method : "POST",
-                        data : {
-                            stc_addtopurchase:1,
-                            item_id:item_id,
-                            itemqty:itemqty,
-                            itemstatus:itemstatus
-                        },
-                        success : function(requisition){
-                            // console.log(requisition);
-                            if(requisition.trim()=="success"){
-                                alert("Your requisition is sent. Thankyou and be patience from procurement approval.");
-                                $('#stc-req-tr-'+item_id).toggle('500');
-                                // $('#stc-req-tr-'+item_id).remove();
-                            }else{
-                                alert("Something went wrong. Please check and try again.");
+                if(confirm("Are you sure to proceed this item?")){
+                    var item_id=$(this).attr("atc-ic");
+                    var itemqty=$('.stc-sup-appr-qty'+item_id).val();
+                    var itemreqqty=$('.stc-sup-req-qty'+item_id).val();
+                    var itemstatus=$('.stc-sup-items-status'+item_id).val();
+                    if((itemqty > 0) && (itemreqqty >= itemqty)){
+                        // $(this).css('display','none');
+                        $.ajax({
+                            url : "nemesis/stc_project.php",
+                            method : "POST",
+                            data : {
+                                stc_addtopurchase:1,
+                                item_id:item_id,
+                                itemqty:itemqty,
+                                itemstatus:itemstatus
+                            },
+                            success : function(requisition){
+                                // console.log(requisition);
+                                if(requisition.trim()=="success"){
+                                    alert("Your requisition is sent. Thankyou and be patience from procurement approval.");
+                                    $('#stc-req-tr-'+item_id).toggle('500');
+                                    // $('#stc-req-tr-'+item_id).remove();
+                                }else{
+                                    alert("Something went wrong. Please check and try again.");
+                                }
                             }
-                        }
-                    });
-                }else{
-                    alert("Invalid quantity.");
+                        });
+                    }else{
+                        alert("Invalid quantity.");
+                    }
                 }
             });
 

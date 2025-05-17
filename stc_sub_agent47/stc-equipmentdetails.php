@@ -292,19 +292,18 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             $('body').delegate('.ed-editequipment', 'click', function(e){
                 var id=$(this).attr('id');
                 var equipmenttype=$(this).closest('tr').find('td:eq(5)').html();
-                
                 $('.hide-col').hide();
-                if(equipmenttype=="Air Handling Unit" || equipmenttype=="VAM"){$('.AirHandlingUnit').show();}
-                if(equipmenttype=="CHILLER WATER PUMP" || equipmenttype=="Chilled Water Pump" || equipmenttype=="Chiller Unit"){$('.ChilledWaterPump').show();}
-                if(equipmenttype=="Condenser Water Pump" || equipmenttype=="Package Water Cool" || equipmenttype=="DX Plant"){$('.CondenserWaterPump').show();}
-                if(equipmenttype=="Cooling Tower"){$('.CoolingTower').show();}
-                if(equipmenttype=="Drinking Water Unit"){$('.drinkingWaterUnit').show();}
-                if(equipmenttype=="Package Air Conditioning" || equipmenttype=="VRF" || equipmenttype=="FCU" || equipmenttype=="Split AC" || equipmenttype=="Window AC" || equipmenttype=="Ductable Unit" ){$('.PackageAirConditioning').show();}
-                if(equipmenttype=="Primary Drinking Water pump"){$('.PrimaryDrinkingWaterPump').show();}
-                if(equipmenttype=="Secondary Drinking Water pump"){$('.SecondaryDrinkingWaterPump').show();}
-                if(equipmenttype=="Unit Input"){$('.unitInputs').show();}
+                if(equipmenttype=="AIR HANDLING UNIT" || equipmenttype=="VAM"){$('.AirHandlingUnit').show();}
+                if(equipmenttype=="CHILLER WATER PUMP" || equipmenttype=="CHILLER WATER PUMP"){$('.ChilledWaterPump').show();}
+                if(equipmenttype=="CONDENSER WATER PUMP" || equipmenttype=="Package Water Cool" || equipmenttype=="DX Plant"){$('.CondenserWaterPump').show();}
+                if(equipmenttype=="COOLING TOWER"){$('.CoolingTower').show();}
+                if(equipmenttype=="D/W CHILLER UNIT"){$('.drinkingWaterUnit').show();}
+                if(equipmenttype=="PACKAGE UNIT" || equipmenttype=="VRF" || equipmenttype=="FCU" || equipmenttype=="Split AC" || equipmenttype=="Window AC" || equipmenttype=="Ductable Unit" ){$('.PackageAirConditioning').show();}
+                if(equipmenttype=="PRIMARY D/W PUMP"){$('.PrimaryDrinkingWaterPump').show();}
+                if(equipmenttype=="SECONDARY D/W PUMP"){$('.SecondaryDrinkingWaterPump').show();}
+                if(equipmenttype=="CHILLER UNIT"){$('.unitInputs').show();}
                 $('.ed-equipment-id').remove();
-                $('#capacity').before('<input type="hidden" class="ed-equipment-id" value="' + id + '">');console.log(equipmenttype);
+                $('#capacity').before('<input type="hidden" class="ed-equipment-id" value="' + id + '">');
                 $.ajax({
                     url         : "nemesis/stc_product.php",
                     method      : "POST",
