@@ -73,10 +73,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 }
                                             ?>
                                             <div class="row">
-                                                <div class="col-lg-3 col-md-3">
-                                                    <h5>Month :</h5>
-                                                    <input type="month" class="form-control" id="stc-agent-sup-std-month-find" value="<?php echo $date=date("Y-m"); ?>">
-                                                </div>
                                                 <div class="col-lg-7 col-md-7">
                                                     <h5>Department :</h5>
                                                     <select class="form-control" id="stc-agent-sup-std-location-find">
@@ -107,6 +103,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <option value="4">Work Done</option> 
                                                         <option value="6">Close</option>                                                   
                                                     </select>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3">
+                                                    <h5>Month :</h5>
+                                                    <input type="month" class="form-control" id="stc-agent-sup-std-month-find">
                                                 </div>
                                                 <div class="col-lg-12 col-md-12">
                                                     <a href="#" class="form-control btn btn-success stc-std-list-show-hit">Search</a>

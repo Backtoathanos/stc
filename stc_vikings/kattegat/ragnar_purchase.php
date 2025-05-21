@@ -3365,27 +3365,67 @@ if(isset($_POST['stc_stocking_send_hit'])){
 
 #<--------------------------------------Object sections of Po adhoc class------------------------------->
 // save po
-if(isset($_POST['stc_po_adhoc_save'])){
-	$itemname=$_POST['itemname'];
-	$quantity=$_POST['quantity'];
-	$rate=$_POST['rate'];
-	$unit=$_POST['unit'];
-	$rack=$_POST['rack'];
-	$condition=$_POST['condition'];
-	$source=$_POST['source'];
-	$destination=$_POST['destination'];
-	$remarks=$_POST['remarks'];
+if(isset($_POST['stc_po_adhoc_save'])) {
+    // Check session first
+    if(empty($_SESSION['stc_empl_id'])) {
+        echo json_encode("Please Login");
+        exit;
+    }
 
-	if($rack=="NA"){
-		echo "Please Select Rack!!!";
-	}else if(empty($_SESSION['stc_empl_id'])){
-		echo "Please Login";
-	}else{
-		$objloki=new ragnarPurchaseAdhoc();
-		$objlokiout=$objloki->stc_po_adhoc_save($itemname, $quantity, $rate, $unit, $rack, $condition, $source, $destination, $remarks);
-		echo json_encode($objlokiout);
-		// echo $objlokiout;
-	}		
+    // Initialize response
+    $response = "No valid items to save";
+    
+    // Check if items data exists
+    if(isset($_POST['items']) && is_array($_POST['items'])) {
+        $items = $_POST['items'];
+        $objloki = new ragnarPurchaseAdhoc();
+        $successCount = 0;
+        $errorMessages = [];
+        
+        foreach($items as $index => $item) {
+            // Validate required fields for each item
+            if(empty($item['itemname']) || empty($item['quantity']) || empty($item['rate'])) {
+                $errorMessages[] = "Row ".($index+1).": Missing required fields";
+                continue;
+            }
+            
+            // Validate rack
+            if($item['rack'] == "NA") {
+                $errorMessages[] = "Row ".($index+1).": Please select a rack";
+                continue;
+            }
+            
+            // Process the item
+            $objlokiout = $objloki->stc_po_adhoc_save(
+                $item['itemname'], 
+                $item['quantity'], 
+                $item['rate'], 
+                $item['unit'] ?? '', 
+                $item['rack'], 
+                $item['condition'] ?? '', 
+                $item['sourcerack'] ?? '', 
+                $item['destination'] ?? '', 
+                $item['remarks'] ?? ''
+            );
+            
+            if($objlokiout === "success") { // Assuming your method returns true on success
+                $successCount++;
+            } else {
+                $errorMessages[] = "Row ".($index+1).": ".$objlokiout;
+            }
+        }
+        
+        if($successCount > 0) {
+            $response = ($successCount == count($items)) ? "success" : "Partial success - ".$successCount." of ".count($items)." items saved";
+        }
+        
+        if(!empty($errorMessages)) {
+            $response .= $successCount."\n".implode("\n", $errorMessages);
+        }
+    }
+    
+    echo json_encode($response);
+    exit;
 }
 
 // call po adhoc

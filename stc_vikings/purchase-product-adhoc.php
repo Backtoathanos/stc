@@ -94,164 +94,133 @@ include("kattegat/role_check.php");
                                     </div>
                                 </div>                                
                                 <div class="row">
-                                    <div class="col-xl-12 col-md-12 col-sm-12">
-                                      <form action="" class="stc-add-poadhoc-product-form">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="itemname"
-                                          >Item Name
-                                        </h5>
-                                        <textarea
-                                          id="itemname"
-                                          name="itemname"
-                                          type="text"
-                                          placeholder="Item Name"
-                                          class="form-control validate"
-                                        ></textarea>
-                                      </div>
-                                    </div>
-                                    <div class="col-xl-3 col-md-3 col-sm-12">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="unit"
-                                          >Unit
-                                        </h5>
-                                        <input
-                                          id="unit"
-                                          name="unit"
-                                          type="text"
-                                          placeholder="Unit"
-                                          class="form-control validate"
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-xl-3 col-md-3 col-sm-12">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="quantity"
-                                          >Quantity
-                                        </h5>
-                                        <input
-                                          id="quantity"
-                                          name="quantity"
-                                          type="number"
-                                          placeholder="Quantity"
-                                          class="form-control validate"
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-xl-3 col-md-3 col-sm-12">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="rate"
-                                          >Rate
-                                        </h5>
-                                        <input
-                                          id="rate"
-                                          name="rate"
-                                          type="number"
-                                          placeholder="Rate"
-                                          class="form-control validate"
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-xl-3 col-md-3 col-sm-12">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="rack"
-                                          >Rack
-                                        </h5>
-                                        <select 
-                                          id="rack"
-                                          name="rack"
-                                          class="form-control validate"
-                                        ><option value="NA">Select</option>
-                                          <?php
-                                            include_once("../MCU/db.php");
-                                            $rackqry=mysqli_query($con, "
-                                              SELECT `stc_rack_id`, `stc_rack_name` FROM `stc_rack` ORDER BY `stc_rack_name` ASC
-                                            ");
-                                            foreach($rackqry as $rackqrow){
-                                              echo '<option value="'.$rackqrow['stc_rack_id'].'">'.$rackqrow['stc_rack_name'].'</option>';
-                                            }
-                                          ?>
-                                        </select>
-                                      </div>
-                                    </div>
-                                    <div class="col-xl-2 col-md-2 col-sm-12">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="condition"
-                                          >Condition
-                                        </h5>
-                                        <select 
-                                          id="condition"
-                                          name="condition"
-                                          class="form-control validate"
-                                        ><option value="NA">Select</option>
-                                        <option value="Bad">Bad</option>
-                                        <option value="Broken">Broken</option>
-                                        <option value="Good">Good</option>
-                                        </select>
-                                      </div>
-                                    </div>
-                                    <div class="col-xl-5 col-md-5 col-sm-12">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="source"
-                                          >From (Source/Location)
-                                        </h5>
-                                        <input
-                                          id="source"
-                                          name="sourcerack"
-                                          type="text"
-                                          placeholder="From (Source/Location)"
-                                          class="form-control validate"
-                                        />
-                                      </div>
-                                    </div>
-                                    <div class="col-xl-5 col-md-5 col-sm-12">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="destination"
-                                          >To (Destination/Location)
-                                        </h5>
-                                        
-                                        <select 
-                                          class="custom-select form-control"
-                                          name="destination"
-                                          id="destination"
-                                          >
-                                          <option value="NA">Select Destination</option>
-                                          <option >MANGO 17 NO GODOWN</option>
-                                          <option >PARDIH GODOWN</option>
-                                          <option >RAMGARH GODOWN</option>
-                                          <option >DHATKIDIH GODOWN</option>
-                                        </select>
-                                      </div>
-                                    </div>
-                                    <div class="col-xl-12 col-md-12 col-sm-12">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <h5
-                                          for="remarks"
-                                          >Remarks
-                                        </h5>
-                                        <textarea
-                                          id="remarks"
-                                          name="remarks"
-                                          type="text"
-                                          placeholder="Remarks"
-                                          class="form-control validate"
-                                        ></textarea>
-                                      </div>
-                                    </div>
-                                    <div class="col-xl-12 col-md-12 col-sm-12">
-                                      <div class="card-border mb-3 card card-body border-success">
-                                        <button class="btn btn-primary stc-poadhoc-save">Save</button>
-                                      </div>
-                                    </div>
-                                  </form>
-                                </div>
+    <div class="col-xl-12 col-md-12 col-sm-12">
+        <form action="" class="stc-add-poadhoc-product-form">
+            <div class="card-border mb-3 card card-body border-success">
+                <table class="table table-bordered" id="itemsTable">
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Unit</th>
+                            <th>Quantity</th>
+                            <th>Rate</th>
+                            <th>Rack</th>
+                            <th>Condition</th>
+                            <th>From (Source/Location)</th>
+                            <th>To (Destination/Location)</th>
+                            <th>Remarks</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="item-row">
+                            <td>
+                                <textarea
+                                    name="itemname[]"
+                                    type="text"
+                                    placeholder="Item Name"
+                                    class="form-control validate"
+                                    required
+                                ></textarea>
+                            </td>
+                            <td>
+                                <input
+                                    name="unit[]"
+                                    type="text"
+                                    placeholder="Unit"
+                                    class="form-control validate"
+                                />
+                            </td>
+                            <td>
+                                <input
+                                    name="quantity[]"
+                                    type="number"
+                                    placeholder="Quantity"
+                                    class="form-control validate"
+                                    required
+                                />
+                            </td>
+                            <td>
+                                <input
+                                    name="rate[]"
+                                    type="number"
+                                    placeholder="Rate"
+                                    class="form-control validate"
+                                    required
+                                />
+                            </td>
+                            <td>
+                                <select 
+                                    name="rack[]"
+                                    class="form-control validate"
+                                >
+                                    <option value="NA">Select</option>
+                                    <?php
+                                        include_once("../MCU/db.php");
+                                        $rackqry=mysqli_query($con, "
+                                            SELECT `stc_rack_id`, `stc_rack_name` FROM `stc_rack` ORDER BY `stc_rack_name` ASC
+                                        ");
+                                        foreach($rackqry as $rackqrow){
+                                            echo '<option value="'.$rackqrow['stc_rack_id'].'">'.$rackqrow['stc_rack_name'].'</option>';
+                                        }
+                                    ?>
+                                </select>
+                            </td>
+                            <td>
+                                <select 
+                                    name="condition[]"
+                                    class="form-control validate"
+                                >
+                                    <option value="NA">Select</option>
+                                    <option value="Bad">Bad</option>
+                                    <option value="Broken">Broken</option>
+                                    <option value="Good">Good</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input
+                                    name="sourcerack[]"
+                                    type="text"
+                                    placeholder="From (Source/Location)"
+                                    class="form-control validate"
+                                />
+                            </td>
+                            <td>
+                                <select 
+                                    class="custom-select form-control"
+                                    name="destination[]"
+                                >
+                                    <option value="NA">Select Destination</option>
+                                    <option>MANGO 17 NO GODOWN</option>
+                                    <option>PARDIH GODOWN</option>
+                                    <option>RAMGARH GODOWN</option>
+                                    <option>DHATKIDIH GODOWN</option>
+                                </select>
+                            </td>
+                            <td>
+                                <textarea
+                                    name="remarks[]"
+                                    type="text"
+                                    placeholder="Remarks"
+                                    class="form-control validate"
+                                ></textarea>
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-danger remove-row">Remove</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="text-right mb-3">
+                    <button type="button" class="btn btn-success" id="addRow">Add Another Row</button>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary stc-poadhoc-save">Save All Items</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
                             </div>
                             <div class="tab-pane tabs-animation fade show active" id="tab-content-2" role="tabpanel">
                                 <div class="row">
@@ -504,49 +473,80 @@ include("kattegat/role_check.php");
             });
           });
 
-          // save po adhoc
+          // Add new row
+          $('#addRow').click(function() {
+              var newRow = $('.item-row:first').clone();
+              newRow.find('input, textarea').val('');
+              newRow.find('select').prop('selectedIndex', 0);
+              $('#itemsTable tbody').append(newRow);
+          });
+          
+          // Remove row
+          $('body').delegate('.remove-row', 'click', function() {
+              if($('#itemsTable tbody tr').length > 1) {
+                  $(this).closest('tr').remove();
+              } else {
+                  alert("You need to have at least one item row.");
+              }
+          });
+          
           $('body').delegate('.stc-poadhoc-save', 'click', function(e){
-            e.preventDefault();
-            var itemname=$('#itemname').val();
-            var quantity=$('#quantity').val();
-            var rate=$('#rate').val();
-            var unit=$('#unit').val();
-            var rack=$('#rack').val();
-            var condition=$('#condition').val();
-            var source=$('#source').val();
-            var destination=$('#destination').val();
-            var remarks=$('#remarks').val();
-            if(itemname!='' && quantity!=0 && rate!=0){
-              $.ajax({
-                url     : "kattegat/ragnar_purchase.php",
-                method  : "POST",
-                data    : {
-                  stc_po_adhoc_save:1,
-                  itemname:itemname,
-                  quantity:quantity,
-                  rate:rate,
-                  unit:unit,
-                  rack:rack,
-                  condition:condition,
-                  source:source,
-                  destination:destination,
-                  remarks:remarks
-                },
-                dataType : "JSON",
-                success : function(response_items){
-                  var response=response_items;
-                  if(response=="success"){
-                    alert("Purchase Order Adhoc saved successfully.");
-                    $(".stc-add-poadhoc-product-form")[0].reset();
-                    $('.paginationbtn.active').click();
-                  }else{
-                    alert("Something went wrong please check and try again.");
+              e.preventDefault();
+              
+              // Collect all form data
+              var formData = [];
+              var isValid = true;
+              
+              $('#itemsTable tbody tr').each(function(index) {
+                  var row = $(this);
+                  var itemData = {
+                      itemname: row.find('[name="itemname[]"]').val(),
+                      quantity: row.find('[name="quantity[]"]').val(),
+                      rate: row.find('[name="rate[]"]').val(),
+                      unit: row.find('[name="unit[]"]').val(),
+                      rack: row.find('[name="rack[]"]').val(),
+                      condition: row.find('[name="condition[]"]').val(),
+                      sourcerack: row.find('[name="sourcerack[]"]').val(),
+                      destination: row.find('[name="destination[]"]').val(),
+                      remarks: row.find('[name="remarks[]"]').val()
+                  };
+                  
+                  // Validate required fields for this row
+                  if(itemData.itemname && itemData.quantity && itemData.rate) {
+                      formData.push(itemData);
+                  } else if(index === 0) {
+                      // Only show error for first row if empty
+                      isValid = false;
+                      alert('Please fill all required fields in at least the first row.');
+                      return false; // Exit the each loop
                   }
-                }
               });
-            }else{
-              alert('Please update required fields.');
-            }
+              
+              if(!isValid || formData.length === 0) {
+                  return;
+              }
+              
+              $.ajax({
+                  url: "kattegat/ragnar_purchase.php",
+                  method: "POST",
+                  data: {
+                      stc_po_adhoc_save: 1,
+                      items: formData
+                  },
+                  dataType: "JSON",
+                  success: function(response){
+                      if(response === "success") {
+                          alert("Purchase Order Adhoc saved successfully.");
+                          $(".stc-add-poadhoc-product-form")[0].reset();
+                          $('.paginationbtn.active').click();
+                      } else {
+                          alert(response || "Something went wrong please check and try again.");
+                      }
+                  },
+                  error: function(xhr, status, error) {
+                      alert("Error: " + error);
+                  }
+              });
           });
           
           // add recieving modal

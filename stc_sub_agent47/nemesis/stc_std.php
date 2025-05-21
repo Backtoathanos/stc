@@ -403,6 +403,10 @@ class transformers extends tesseract{
 		';
 		$montha=date('m', strtotime($month));
 		$year=date('Y', strtotime($month));
+		$filter='';
+		if($month!=""){
+			$filter = "AND MONTH(`stc_status_down_list_date`)='".mysqli_real_escape_string($this->stc_dbs, $montha)."' AND YEAR(`stc_status_down_list_date`)='".mysqli_real_escape_string($this->stc_dbs, $year)."'";
+		}
 		$optimusprimeqry=mysqli_query($this->stc_dbs, "
 			SELECT DISTINCT `stc_cust_pro_supervisor_created_by`
 			FROM `stc_status_down_list` 
@@ -410,9 +414,7 @@ class transformers extends tesseract{
 			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
 			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."' 
 			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' 
-			AND MONTH(`stc_status_down_list_date`)='".mysqli_real_escape_string($this->stc_dbs, $montha)."' 
-			AND YEAR(`stc_status_down_list_date`)='".mysqli_real_escape_string($this->stc_dbs, $year)."' 
-		");
+		".$filter);
 		$manager = "";
 		if(mysqli_num_rows($optimusprimeqry)>0){
 			$manager = "AND (";
@@ -473,8 +475,7 @@ class transformers extends tesseract{
 			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
 			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
 			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' 
-			AND MONTH(`stc_status_down_list_date`)='".mysqli_real_escape_string($this->stc_dbs, $montha)."'
-			AND YEAR(`stc_status_down_list_date`)='".mysqli_real_escape_string($this->stc_dbs, $year)."'   
+			".$filter." 
 			".$manager."
 			ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
 		";
