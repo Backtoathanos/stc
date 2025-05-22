@@ -414,27 +414,35 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     "SCROLL CHILLER"
                 ],
                 "CONDENSER WATER PUMP": [
+                    "SPLIT CASE",
+                    "BUSTER PUMP",
                     "CENTRIFUGAL",
                     "MULTI-STAGE",
-                    "DISPLACEMET",
+                    "DISPLACEMENT",
                     "SCREW TYPE"
                 ],
                 "CHILLER WATER PUMP": [
+                    "SPLIT CASE",
+                    "BUSTER PUMP",
                     "CENTRIFUGAL",
                     "MULTI-STAGE",
-                    "DISPLACEMET",
+                    "DISPLACEMENT",
                     "SCREW TYPE"
                 ],
                 "PRIMARY D/W PUMP": [
+                    "SPLIT CASE",
+                    "BUSTER PUMP",
                     "CENTRIFUGAL",
                     "MULTI-STAGE",
-                    "DISPLACEMET",
+                    "DISPLACEMENT",
                     "SCREW TYPE"
                 ],
                 "SECONDARY D/W PUMP": [
+                    "SPLIT CASE",
+                    "BUSTER PUMP",
                     "CENTRIFUGAL",
                     "MULTI-STAGE",
-                    "DISPLACEMET",
+                    "DISPLACEMENT",
                     "SCREW TYPE"
                 ],
                 "COOLING TOWER": [

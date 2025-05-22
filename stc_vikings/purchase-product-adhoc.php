@@ -114,7 +114,7 @@ include("kattegat/role_check.php");
                     </thead>
                     <tbody>
                         <tr class="item-row">
-                            <td>
+                            <td style="width: 330px;">
                                 <textarea
                                     name="itemname[]"
                                     type="text"
@@ -197,7 +197,7 @@ include("kattegat/role_check.php");
                                     <option>DHATKIDIH GODOWN</option>
                                 </select>
                             </td>
-                            <td>
+                            <td style="width: 330px;">
                                 <textarea
                                     name="remarks[]"
                                     type="text"
