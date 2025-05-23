@@ -124,8 +124,8 @@ include("kattegat/role_check.php");
                                                     <thead>
                                                         <tr>
                                                             <th>Item Name</th>
-                                                            <th>Unit</th>
                                                             <th>Quantity</th>
+                                                            <th>Unit</th>
                                                             <th>Rate</th>
                                                             <th>Rack</th>
                                                             <th>Condition</th>
