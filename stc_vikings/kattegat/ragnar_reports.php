@@ -1524,6 +1524,7 @@ class ragnarReportsViewRequiReports extends tesseract{
             `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
             DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
             `stc_cust_super_requisition_list_items_req_id`,
+            `stc_cust_project_title`,
             `stc_cust_super_requisition_list_items_title`,
             `stc_cust_super_requisition_list_items_unit`,
             `stc_cust_super_requisition_list_items_reqqty`,
@@ -1533,6 +1534,8 @@ class ragnarReportsViewRequiReports extends tesseract{
          FROM `stc_cust_super_requisition_list_items`
          INNER JOIN `stc_cust_super_requisition_list` 
          ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+         INNER JOIN `stc_cust_project` 
+         ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
             INNER JOIN `stc_requisition_combiner_req` 
             ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` 
             INNER JOIN `stc_requisition_combiner` 
@@ -1704,6 +1707,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                      <td>
                         '.$challaninfo.'
                      </td>
+                     <td>'.$requisitionrow['stc_cust_project_title'].'</td>
                      <td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
                      <td>'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
                      <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
@@ -1755,6 +1759,7 @@ class ragnarReportsViewRequiReports extends tesseract{
             `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
             DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
             `stc_cust_super_requisition_list_items_req_id`,
+            `stc_cust_project_title`,
             `stc_cust_super_requisition_list_items_title`,
             `stc_cust_super_requisition_list_items_unit`,
             `stc_cust_super_requisition_list_items_reqqty`,
@@ -1764,14 +1769,14 @@ class ragnarReportsViewRequiReports extends tesseract{
          FROM `stc_cust_super_requisition_list_items`
          INNER JOIN `stc_cust_super_requisition_list` 
          ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
-            INNER JOIN `stc_requisition_combiner_req` 
-            ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` 
-            INNER JOIN `stc_requisition_combiner` 
-            ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id` 
+         INNER JOIN `stc_cust_project` 
+         ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
+         INNER JOIN `stc_requisition_combiner_req` 
+         ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` 
+         INNER JOIN `stc_requisition_combiner` 
+         ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id` 
          WHERE 
             `stc_cust_super_requisition_items_finalqty`!=0
-         AND 
-            `stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_projeid)."'
          AND (
             DATE(`stc_cust_super_requisition_list_date`) 
             BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $stc_begdate)."'
@@ -1902,6 +1907,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                                 <td>
                                     '.$challaninfo.'
                                 </td>
+                                <td>'.$requisitionrow['stc_cust_project_title'].'</td>
                                 <td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
                                 <td>'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
                                 <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
@@ -4767,15 +4773,23 @@ if(isset($_POST['stc_pending_reports_req'])){
    $end_date = strtotime($stc_enddate);
    $out='';
       $objloki=new ragnarReportsViewRequiReports();
-      if(empty($stc_begdate) || empty($stc_enddate) || $stc_custid=='NA' || $stc_agentid=='NA' || $stc_projeid=='NA'){
+      if((empty($stc_begdate) && empty($stc_enddate)) && $stc_custid=='NA'){
          $out='
             <tr>
                <td colspan="10">Dont late any fields empty</td>
             </tr>
          ';
       }else{
-         $opobjloki=$objloki->stc_get_supervisors_pending_records($stc_begdate, $stc_enddate, $stc_custid, $stc_agentid, $stc_projeid);
-         $out.=$opobjloki;
+         if($stc_begdate!=$stc_enddate){
+         $out='
+            <tr>
+               <td colspan="10">Date will be same for pending list.</td>
+            </tr>
+         ';
+         }else{
+            $opobjloki=$objloki->stc_get_supervisors_pending_records($stc_begdate, $stc_enddate, $stc_custid, $stc_agentid, $stc_projeid);
+            $out.=$opobjloki;
+         }
       }
    echo $out;
 }

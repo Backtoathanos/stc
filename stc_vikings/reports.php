@@ -379,6 +379,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <th class="text-center" width="10%">Comb PR Date &<br>No</th>
                                                 <th class="text-center" width="10%">PR Date &<br>No</th>
                                                 <th class="text-center" width="10%">Challan Date &<br>No</th>
+                                                <th class="text-center">Site Name</th>
                                                 <th class="text-center">Item Desc</th>
                                                 <th class="text-center">Unit</th>
                                                 <th class="text-center">PR Qty</th>
