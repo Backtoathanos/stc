@@ -1777,7 +1777,7 @@ class ragnarReportsViewRequiReports extends tesseract{
          ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id` 
          WHERE 
             `stc_cust_super_requisition_items_finalqty`!=0
-         AND `stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_projeid)."'
+         AND `stc_cust_project_cust_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_custid)."'
          AND (
             DATE(`stc_cust_super_requisition_list_date`) 
             BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $stc_begdate)."'
