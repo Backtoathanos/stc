@@ -53,7 +53,30 @@ include("kattegat/role_check.php");
       #dropdown-search {
         margin-bottom: 10px;
       }
+      .searchable-dropdown {
+          position: relative;
+          display: inline-block;
+          width: 100%;
+      }
 
+      .dropdown-options {
+          position: absolute;
+          background-color: #fff;
+          border: 1px solid #ddd;
+          width: 100%;
+          max-height: 200px;
+          overflow-y: auto;
+          z-index: 1000;
+      }
+
+      .dropdown-item {
+          padding: 8px 12px;
+          cursor: pointer;
+      }
+
+      .dropdown-item:hover {
+          background-color: #f5f5f5;
+      }
     </style>
 </head>
 <body>
@@ -94,133 +117,149 @@ include("kattegat/role_check.php");
                                     </div>
                                 </div>                                
                                 <div class="row">
-    <div class="col-xl-12 col-md-12 col-sm-12">
-        <form action="" class="stc-add-poadhoc-product-form">
-            <div class="card-border mb-3 card card-body border-success">
-                <table class="table table-bordered" id="itemsTable">
-                    <thead>
-                        <tr>
-                            <th>Item Name</th>
-                            <th>Unit</th>
-                            <th>Quantity</th>
-                            <th>Rate</th>
-                            <th>Rack</th>
-                            <th>Condition</th>
-                            <th>From (Source/Location)</th>
-                            <th>To (Destination/Location)</th>
-                            <th>Remarks</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="item-row">
-                            <td style="width: 330px;">
-                                <textarea
-                                    name="itemname[]"
-                                    type="text"
-                                    placeholder="Item Name"
-                                    class="form-control validate"
-                                    required
-                                ></textarea>
-                            </td>
-                            <td>
-                                <input
-                                    name="unit[]"
-                                    type="text"
-                                    placeholder="Unit"
-                                    class="form-control validate"
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    name="quantity[]"
-                                    type="number"
-                                    placeholder="Quantity"
-                                    class="form-control validate"
-                                    required
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    name="rate[]"
-                                    type="number"
-                                    placeholder="Rate"
-                                    class="form-control validate"
-                                    required
-                                />
-                            </td>
-                            <td>
-                                <select 
-                                    name="rack[]"
-                                    class="form-control validate"
-                                >
-                                    <option value="NA">Select</option>
-                                    <?php
-                                        include_once("../MCU/db.php");
-                                        $rackqry=mysqli_query($con, "
-                                            SELECT `stc_rack_id`, `stc_rack_name` FROM `stc_rack` ORDER BY `stc_rack_name` ASC
-                                        ");
-                                        foreach($rackqry as $rackqrow){
-                                            echo '<option value="'.$rackqrow['stc_rack_id'].'">'.$rackqrow['stc_rack_name'].'</option>';
-                                        }
-                                    ?>
-                                </select>
-                            </td>
-                            <td>
-                                <select 
-                                    name="condition[]"
-                                    class="form-control validate"
-                                >
-                                    <option value="NA">Select</option>
-                                    <option value="Bad">Bad</option>
-                                    <option value="Broken">Broken</option>
-                                    <option value="Good">Good</option>
-                                </select>
-                            </td>
-                            <td>
-                                <input
-                                    name="sourcerack[]"
-                                    type="text"
-                                    placeholder="From (Source/Location)"
-                                    class="form-control validate"
-                                />
-                            </td>
-                            <td>
-                                <select 
-                                    class="custom-select form-control"
-                                    name="destination[]"
-                                >
-                                    <option value="NA">Select Destination</option>
-                                    <option>MANGO 17 NO GODOWN</option>
-                                    <option>PARDIH GODOWN</option>
-                                    <option>RAMGARH GODOWN</option>
-                                    <option>DHATKIDIH GODOWN</option>
-                                </select>
-                            </td>
-                            <td style="width: 330px;">
-                                <textarea
-                                    name="remarks[]"
-                                    type="text"
-                                    placeholder="Remarks"
-                                    class="form-control validate"
-                                ></textarea>
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-danger remove-row">Remove</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="text-right mb-3">
-                    <button type="button" class="btn btn-success" id="addRow">Add Another Row</button>
-                </div>
-                <div class="text-center">
-                    <button type="submit" class="btn btn-primary stc-poadhoc-save">Save All Items</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
+                                    <div class="col-xl-12 col-md-12 col-sm-12">
+                                        <form action="" class="stc-add-poadhoc-product-form">
+                                            <div class="card-border mb-3 card card-body border-success">
+                                                <table class="table table-bordered" id="itemsTable">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Item Name</th>
+                                                            <th>Unit</th>
+                                                            <th>Quantity</th>
+                                                            <th>Rate</th>
+                                                            <th>Rack</th>
+                                                            <th>Condition</th>
+                                                            <th>From (Source/Location)</th>
+                                                            <th>To (Destination/Location)</th>
+                                                            <th>Remarks</th>
+                                                            <th>Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="item-row">
+                                                            <td style="width: 330px;">
+                                                                <textarea
+                                                                    name="itemname[]"
+                                                                    type="text"
+                                                                    placeholder="Item Name"
+                                                                    class="form-control validate"
+                                                                    required
+                                                                ></textarea>
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    name="quantity[]"
+                                                                    type="number"
+                                                                    placeholder="Quantity"
+                                                                    class="form-control validate"
+                                                                    required
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    name="unit[]"
+                                                                    type="text"
+                                                                    placeholder="Unit"
+                                                                    class="form-control validate"
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    name="rate[]"
+                                                                    type="number"
+                                                                    placeholder="Rate"
+                                                                    class="form-control validate"
+                                                                    required
+                                                                />
+                                                            </td>
+                                                            <td>
+                                                                <select 
+                                                                    name="rack[]"
+                                                                    class="form-control validate"
+                                                                >
+                                                                    <option value="NA">Select</option>
+                                                                    <?php
+                                                                        include_once("../MCU/db.php");
+                                                                        $rackqry=mysqli_query($con, "
+                                                                            SELECT `stc_rack_id`, `stc_rack_name` FROM `stc_rack` ORDER BY `stc_rack_name` ASC
+                                                                        ");
+                                                                        foreach($rackqry as $rackqrow){
+                                                                            echo '<option value="'.$rackqrow['stc_rack_id'].'">'.$rackqrow['stc_rack_name'].'</option>';
+                                                                        }
+                                                                    ?>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <select 
+                                                                    name="condition[]"
+                                                                    class="form-control validate"
+                                                                >
+                                                                    <option value="NA">Select</option>
+                                                                    <option value="Bad">Bad</option>
+                                                                    <option value="Broken">Broken</option>
+                                                                    <option value="Good">Good</option>
+                                                                </select>
+                                                            </td>
+                                                            <td>
+                                                                <div class="searchable-dropdown">
+                                                                    <input 
+                                                                        name="sourcerack[]" 
+                                                                        type="text" 
+                                                                        placeholder="From (Source/Location)" 
+                                                                        class="form-control validate search-input"
+                                                                        autocomplete="off"
+                                                                    />
+                                                                    <div class="dropdown-options" style="display: none;"></div>
+                                                                    <!-- Hidden select to store the actual value -->
+                                                                    <select name="sourcerack_value[]" style="display: none;">
+                                                                        <option value="NA">Select</option>
+                                                                        <?php
+                                                                            $rackqry=mysqli_query($con, "
+                                                                                SELECT DISTINCT `stc_purchase_product_adhoc_source` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_source`<>''
+                                                                            ");
+                                                                            foreach($rackqry as $rackqrow){
+                                                                                echo '<option value="'.$rackqrow['stc_purchase_product_adhoc_source'].'">'.$rackqrow['stc_purchase_product_adhoc_source'].'</option>';
+                                                                            }
+                                                                        ?>
+                                                                    </select>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <select 
+                                                                    class="custom-select form-control"
+                                                                    name="destination[]"
+                                                                >
+                                                                    <option value="NA">Select Destination</option>
+                                                                    <option>MANGO 17 NO GODOWN</option>
+                                                                    <option>PARDIH GODOWN</option>
+                                                                    <option>RAMGARH GODOWN</option>
+                                                                    <option>DHATKIDIH GODOWN</option>
+                                                                </select>
+                                                            </td>
+                                                            <td style="width: 330px;">
+                                                                <textarea
+                                                                    name="remarks[]"
+                                                                    type="text"
+                                                                    placeholder="Remarks"
+                                                                    class="form-control validate"
+                                                                ></textarea>
+                                                            </td>
+                                                            <td>
+                                                                <button type="button" class="btn btn-danger remove-row">Remove</button>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="text-right mb-3">
+                                                    <button type="button" class="btn btn-success" id="addRow">Add Another Row</button>
+                                                </div>
+                                                <div class="text-center">
+                                                    <button type="submit" class="btn btn-primary stc-poadhoc-save">Save All Items</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
                             <div class="tab-pane tabs-animation fade show active" id="tab-content-2" role="tabpanel">
                                 <div class="row">
@@ -346,6 +385,64 @@ include("kattegat/role_check.php");
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function(){
+          // Get all options from the hidden select when page loads
+          var options = [];
+          $('select[name="sourcerack_value[]"] option').each(function() {
+              options.push({
+                  value: $(this).val(),
+                  text: $(this).text()
+              });
+          });
+
+          // Handle input events
+          $('.search-input').on('input focus', function() {
+              var searchTerm = $(this).val().toUpperCase();
+              var $dropdown = $(this).next('.dropdown-options');
+              var $hiddenSelect = $(this).nextAll('select[name="sourcerack_value[]"]');
+              
+              // Filter options
+              var filteredOptions = options.filter(function(option) {
+                  return option.text.toUpperCase().includes(searchTerm) || 
+                        option.value.toUpperCase().includes(searchTerm);
+              });
+
+              // Build dropdown HTML
+              var dropdownHTML = '';
+              filteredOptions.forEach(function(option) {
+                  dropdownHTML += `<div class="dropdown-item" data-value="${option.value}">${option.text}</div>`;
+              });
+
+              // Update dropdown
+              $dropdown.html(dropdownHTML).show();
+
+              // Hide if empty input
+              if (searchTerm === '') {
+                  $dropdown.hide();
+              }
+          });
+
+          // Handle click on dropdown items
+          $(document).on('click', '.dropdown-item', function() {
+              var value = $(this).data('value');
+              var text = $(this).text();
+              var $container = $(this).closest('.searchable-dropdown');
+              
+              // Update visible input field
+              $container.find('.search-input').val(text);
+              
+              // Update hidden select value
+              $container.find('select[name="sourcerack_value[]"]').val(value);
+              
+              // Hide dropdown
+              $container.find('.dropdown-options').hide();
+          });
+
+          // Hide dropdown when clicking outside
+          $(document).on('click', function(e) {
+              if (!$(e.target).closest('.searchable-dropdown').length) {
+                  $('.dropdown-options').hide();
+              }
+          });
 
           $('#dropdown-search').on('input', function() {
             var searchTerm = $(this).val().toLowerCase();
