@@ -3911,8 +3911,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                   <td title="Books" class="text-right">'.number_format($book, 2).'</td>
                   <td title="Transportation" class="text-right">'.number_format($transport, 2).'</td>
                   <td title="Donation" class="text-right">'.number_format($donation, 2).'</td>
-                  <td title="Donation" class="text-right">'.number_format($dayboarding, 2).'</td>
-                  <td title="Donation" class="text-right">'.number_format($neat, 2).'</td>
+                  <td title="Day Boarding" class="text-right">'.number_format($dayboarding, 2).'</td>
+                  <td title="NEET" class="text-right">'.number_format($neat, 2).'</td>
                   <td title="Others" class="text-right">'.number_format($others, 2).'</td>
                   <td title="Cashback" class="text-right">'.number_format($cashback, 2).'</td>
                   <td title="D Staff Salary" class="text-right">'.number_format($dsal, 2).'</td>
@@ -3940,6 +3940,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                <th class="text-center"><b>Books</b></th>
                <th class="text-center"><b>Transportation</b></th>
                <th class="text-center"><b>Donation</b></th>
+               <th class="text-center"><b>Day Boarding</b></th>
+               <th class="text-center"><b>NEET</b></th>
                <th class="text-center"><b>Others</b></th>
                <th class="text-center"><b>Cashback</b></th>
                <th class="text-center"><b>D Staff Salary</b></th>
