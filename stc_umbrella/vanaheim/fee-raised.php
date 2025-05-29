@@ -7,7 +7,7 @@ include "../../MCU/obdb.php";
 /*------------------------------------------------------------------------------------------------*/
 class Yggdrasil extends tesseract{
 	// stc call request
-	public function stc_save_school_fee($stcwhichschool, $stcschoolmonthlyfee, $stcschooladmissionfee, $stcschoolbooks, $stcschooltransporation, $stcschooldonation, $stcschooldayboarding, $stcschoolneatcoll, $stcschooldssalary, $stcschooltsalary, $stcschoolvfuel, $stcschoolvmaint, $stcschoolelectricity, $stcschoolcanteen, $stcschoolothercharges, $stcschoolcashback, $stcschoolexpenses, $stcschoolremarks){
+	public function stc_save_school_fee($stcwhichschool, $stcschoolmonthlyfee, $stcschooladmissionfee, $stcschoolreadmissionfee, $stcschoolbooks, $stcschooltransporation, $stcschooldonation, $stcschooldayboarding, $stcschoolneatcoll, $stcschooldssalary, $stcschooltsalary, $stcschoolvfuel, $stcschoolvmaint, $stcschoolelectricity, $stcschoolcanteen, $stcschoolothercharges, $stcschoolcashback, $stcschoolexpenses, $stcschoolmaintcost, $stcschoolprojectcost, $stcschoolremarks){
 		$odin='';
 		$date=date("Y-m-d");
 		$set_loki=mysqli_query($this->stc_dbs, "
@@ -16,6 +16,7 @@ class Yggdrasil extends tesseract{
 				`stc_school_fee_which_school`,
 				`stc_school_fee_monthly_fee`,
 				`stc_school_fee_admission_fee`,
+				`stc_school_fee_readmission_fee`,
 				`stc_school_fee_book_charge`,
 				`stc_school_fee_transportation`,
 				`stc_school_fee_donation`,
@@ -30,6 +31,8 @@ class Yggdrasil extends tesseract{
 				`stc_school_fee_others`,
 				`stc_school_fee_cashback`,
 				`stc_school_fee_expense`,
+				`stc_school_fee_maint_cost`,
+				`stc_school_fee_project_cost`,
 				`stc_school_fee_remarks`,
 				`stc_school_fee_created_by`
 			)VALUES(
@@ -37,6 +40,7 @@ class Yggdrasil extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $stcwhichschool)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolmonthlyfee)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschooladmissionfee)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolreadmissionfee)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolbooks)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschooltransporation)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschooldonation)."',
@@ -50,7 +54,9 @@ class Yggdrasil extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolcanteen)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolothercharges)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolcashback)."',				
-				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolexpenses)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolexpenses)."',				
+				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolmaintcost)."',				
+				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolprojectcost)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stcschoolremarks)."',
 				'".$_SESSION['stc_school_user_id']."'
 			)
@@ -72,7 +78,8 @@ class Yggdrasil extends tesseract{
 						<th class="text-center"><b>School</b></th>
 						<th class="text-center"><b>Date</b></th>
 						<th class="text-center"><b>Monthly Fee</b></th>
-						<th class="text-center"><b>Admission Fee</b></th>
+						<th class="text-center"><b>New Admission Fee</b></th>
+						<th class="text-center"><b>Re Admission Fee</b></th>
 						<th class="text-center"><b>Books</b></th>
 						<th class="text-center"><b>Transportation</b></th>
 						<th class="text-center"><b>Donation</b></th>
@@ -86,6 +93,8 @@ class Yggdrasil extends tesseract{
 						<th class="text-center"><b>Vehicle Maintenance</b></th>
 						<th class="text-center"><b>Electricity</b></th>
 						<th class="text-center"><b>Canteen</b></th>
+						<th class="text-center"><b>Maintenance Cost</b></th>
+						<th class="text-center"><b>Project Cost</b></th>
 						<th class="text-center"><b>Other Expenses</b></th>
 						<th class="text-center"><b>Total</b></th>
 						<th class="text-center"><b>Remarks</b></th>
@@ -107,6 +116,7 @@ class Yggdrasil extends tesseract{
 		if(mysqli_num_rows($odin_get_req_qry)>0){
 			$maxmonthfee=0;
 			$maxadmfee=0;
+			$maxreadmissionfee=0;
 			$maxbook=0;
 			$maxtransport=0;
 			$maxdonation=0;
@@ -121,11 +131,14 @@ class Yggdrasil extends tesseract{
 			$maxelectricity=0;
 			$maxcanteen=0;
 			$maxexpense=0;
+			$maxmaintcost=0;
+			$maxprojectcost=0;
 			$maxtotal=0;
 			foreach($odin_get_req_qry as $req_row){
 				$school='';
 				$monthfee=0;
 				$admmfee=0;
+				$readmissionfee=0;
 				$book=0;
 				$transport=0;
 				$donation=0;
@@ -140,6 +153,8 @@ class Yggdrasil extends tesseract{
 				$electricity=0;
 				$canteen=0;
 				$expense=0;
+				$maintcost=0;
+				$projectcost=0;
 				$remarks=0;
 
 				$odin_getstudentqry=mysqli_query($this->stc_dbs, "
@@ -147,6 +162,7 @@ class Yggdrasil extends tesseract{
                         `stc_school_fee_which_school`,
                         `stc_school_fee_monthly_fee`,
                         `stc_school_fee_admission_fee`,
+						`stc_school_fee_readmission_fee`,
                         `stc_school_fee_book_charge`,
                         `stc_school_fee_transportation`,
                         `stc_school_fee_donation`,
@@ -161,6 +177,8 @@ class Yggdrasil extends tesseract{
                         `stc_school_fee_electricity`,
 						`stc_school_fee_canteen`,
                         `stc_school_fee_expense`,
+						`stc_school_fee_maint_cost`,
+						`stc_school_fee_project_cost`,
                         `stc_school_fee_remarks`
                     FROM
                         `stc_school_fee`
@@ -175,6 +193,7 @@ class Yggdrasil extends tesseract{
 					$school=$odin_getstudentrow['stc_school_fee_which_school'];
 					$monthfee=$odin_getstudentrow['stc_school_fee_monthly_fee'];
 					$admmfee=$odin_getstudentrow['stc_school_fee_admission_fee'];
+					$readmissionfee=$odin_getstudentrow['stc_school_fee_readmission_fee'];
 					$book=$odin_getstudentrow['stc_school_fee_book_charge'];
 					$transport=$odin_getstudentrow['stc_school_fee_transportation'];
 					$donation=$odin_getstudentrow['stc_school_fee_donation'];
@@ -189,12 +208,15 @@ class Yggdrasil extends tesseract{
 					$others=$odin_getstudentrow['stc_school_fee_others'];
 					$cashback=$odin_getstudentrow['stc_school_fee_cashback'];
 					$expense=$odin_getstudentrow['stc_school_fee_expense'];
+					$maintcost=$odin_getstudentrow['stc_school_fee_maint_cost'];
+					$projectcost=$odin_getstudentrow['stc_school_fee_project_cost'];
 					$remarks=$odin_getstudentrow['stc_school_fee_remarks'];
 				}
 
-				$total= $monthfee + $admmfee + $book + $transport + $donation + $dayboarding + $neat + $others + $cashback - ($expense + $dsal + $ssal + $vfuel + $electricity + $canteen + $vmaint);
+				$total= $monthfee + $admmfee + $readmissionfee + $book + $transport + $donation + $dayboarding + $neat + $others + $cashback - ($maintcost + $projectcost + $expense + $dsal + $ssal + $vfuel + $electricity + $canteen + $vmaint);
 				$maxmonthfee+=$monthfee;
 				$maxadmfee+=$admmfee;
+				$maxreadmissionfee+=$readmissionfee;
 				$maxbook+=$book;
 				$maxtransport+=$transport;
 				$maxdonation+=$donation;
@@ -209,12 +231,15 @@ class Yggdrasil extends tesseract{
 				$maxelectricity+=$electricity;
 				$maxcanteen+=$canteen;
 				$maxexpense+=$expense;
+				$maxmaintcost+=$maintcost;
+				$maxprojectcost+=$projectcost;
 				$odin.='
 					<tr>
 						<td class="text-center">'.$school.'</td>
 						<td class="text-center">'.date('d-m-Y', strtotime($req_row['stc_school_fee_date'])).'</td>
 						<td class="text-right">'.number_format($monthfee, 2).'</td>
 						<td class="text-right">'.number_format($admmfee, 2).'</td>
+						<td class="text-right">'.number_format($readmissionfee, 2).'</td>
 						<td class="text-right">'.number_format($book, 2).'</td>
 						<td class="text-right">'.number_format($transport, 2).'</td>
 						<td class="text-right">'.number_format($donation, 2).'</td>
@@ -228,6 +253,8 @@ class Yggdrasil extends tesseract{
 						<td class="text-right">'.number_format($vmaint, 2).'</td>
 						<td class="text-right">'.number_format($electricity, 2).'</td>
 						<td class="text-right">'.number_format($canteen, 2).'</td>
+						<td class="text-right">'.number_format($maintcost, 2).'</td>
+						<td class="text-right">'.number_format($projectcost, 2).'</td>
 						<td class="text-right">'.number_format($expense, 2).'</td>
 						<td class="text-right">'.number_format($total, 2).'</td>
 						<td class="text-right">'.$remarks.'</td>
@@ -240,6 +267,7 @@ class Yggdrasil extends tesseract{
 					<td class="text-right" colspan="2">Total :</td>
 					<td class="text-right">'.number_format($maxmonthfee, 2).'</td>
 					<td class="text-right">'.number_format($maxadmfee, 2).'</td>
+					<td class="text-right">'.number_format($maxreadmissionfee, 2).'</td>
 					<td class="text-right">'.number_format($maxbook, 2).'</td>
 					<td class="text-right">'.number_format($maxtransport, 2).'</td>
 					<td class="text-right">'.number_format($maxdonation, 2).'</td>
@@ -253,6 +281,8 @@ class Yggdrasil extends tesseract{
 					<td class="text-right">'.number_format($maxvmaint, 2).'</td>
 					<td class="text-right">'.number_format($maxelectricity, 2).'</td>
 					<td class="text-right">'.number_format($maxcanteen, 2).'</td>
+					<td class="text-right">'.number_format($maxmaintcost, 2).'</td>
+					<td class="text-right">'.number_format($maxprojectcost, 2).'</td>
 					<td class="text-right">'.number_format($maxexpense, 2).'</td>
 					<td class="text-right">'.number_format($maxtotal, 2).'</td>
 					<td class="text-right"></td>
@@ -280,12 +310,13 @@ class Yggdrasil extends tesseract{
 						<th class="text-center"><b>School</b></th>
 						<th class="text-center"><b>Date</b></th>
 						<th class="text-center"><b>Monthly Fee</b></th>
-						<th class="text-center"><b>Admission Fee</b></th>
+						<th class="text-center"><b>New Admission Fee</b></th>
+						<th class="text-center"><b>Re Admission Fee</b></th>
 						<th class="text-center"><b>Books</b></th>
 						<th class="text-center"><b>Transportation</b></th>
 						<th class="text-center"><b>Donation</b></th>
 						<th class="text-center"><b>Day Boarding</b></th>
-						<th class="text-center"><b>Neat</b></th>
+						<th class="text-center"><b>NEET</b></th>
 						<th class="text-center"><b>Others</b></th>
 						<th class="text-center"><b>Cashback</b></th>
 						<th class="text-center"><b>D Staff Salary</b></th>
@@ -294,6 +325,8 @@ class Yggdrasil extends tesseract{
 						<th class="text-center"><b>Vehicle Maintenance</b></th>
 						<th class="text-center"><b>Electricity</b></th>
 						<th class="text-center"><b>Canteen</b></th>
+						<th class="text-center"><b>Maintenance Cost</b></th>
+						<th class="text-center"><b>Project Cost</b></th>
 						<th class="text-center"><b>Other Expenses</b></th>
 						<th class="text-center"><b>Total</b></th>
 						<th class="text-center"><b>Remarks</b></th>
@@ -315,6 +348,7 @@ class Yggdrasil extends tesseract{
 		if(mysqli_num_rows($odin_get_req_qry)>0){
 			$maxmonthfee=0;
 			$maxadmfee=0;
+			$maxreadmissionfee=0;
 			$maxbook=0;
 			$maxtransport=0;
 			$maxdonation=0;
@@ -329,11 +363,14 @@ class Yggdrasil extends tesseract{
 			$maxelectricity=0;
 			$maxcanteen=0;
 			$maxexpense=0;
+			$maxmaintcost=0;
+			$maxprojectcost=0;
 			$maxtotal=0;
 			foreach($odin_get_req_qry as $req_row){
 				$school='';
 				$monthfee=0;
 				$admmfee=0;
+				$readmissionfee=0;
 				$book=0;
 				$transport=0;
 				$donation=0;
@@ -348,6 +385,8 @@ class Yggdrasil extends tesseract{
 				$electricity=0;
 				$canteen=0;
 				$expense=0;
+				$maintcost=0;
+				$projectcost=0;
 				$remarks=0;
 
 				$odin_getstudentqry=mysqli_query($this->stc_dbs, "
@@ -355,6 +394,7 @@ class Yggdrasil extends tesseract{
                         `stc_school_fee_which_school`,
                         `stc_school_fee_monthly_fee`,
                         `stc_school_fee_admission_fee`,
+						`stc_school_fee_readmission_fee`,
                         `stc_school_fee_book_charge`,
                         `stc_school_fee_transportation`,
                         `stc_school_fee_donation`,
@@ -369,6 +409,8 @@ class Yggdrasil extends tesseract{
                         `stc_school_fee_electricity`,
 						`stc_school_fee_canteen`,
                         `stc_school_fee_expense`,
+						`stc_school_fee_maint_cost`,
+						`stc_school_fee_project_cost`,
                         `stc_school_fee_remarks`
                     FROM
                         `stc_school_fee`
@@ -383,6 +425,7 @@ class Yggdrasil extends tesseract{
 					$school=$odin_getstudentrow['stc_school_fee_which_school'];
 					$monthfee=$odin_getstudentrow['stc_school_fee_monthly_fee'];
 					$admmfee=$odin_getstudentrow['stc_school_fee_admission_fee'];
+					$readmissionfee=$odin_getstudentrow['stc_school_fee_readmission_fee'];
 					$book=$odin_getstudentrow['stc_school_fee_book_charge'];
 					$transport=$odin_getstudentrow['stc_school_fee_transportation'];
 					$donation=$odin_getstudentrow['stc_school_fee_donation'];
@@ -397,12 +440,15 @@ class Yggdrasil extends tesseract{
 					$others=$odin_getstudentrow['stc_school_fee_others'];
 					$cashback=$odin_getstudentrow['stc_school_fee_cashback'];
 					$expense=$odin_getstudentrow['stc_school_fee_expense'];
+					$maintcost=$odin_getstudentrow['stc_school_fee_maint_cost'];
+					$projectcost=$odin_getstudentrow['stc_school_fee_project_cost'];
 					$remarks=$odin_getstudentrow['stc_school_fee_remarks'];
 				}
 
-				$total= $monthfee + $admmfee + $book + $transport + $donation + $dayboarding + $neat + $others + $cashback - ($expense + $dsal + $ssal + $vfuel + $electricity + $canteen + $vmaint);
+				$total= $monthfee + $admmfee + $readmissionfee + $book + $transport + $donation + $dayboarding + $neat + $others + $cashback - ($maintcost + $projectcost + $expense + $dsal + $ssal + $vfuel + $electricity + $canteen + $vmaint);
 				$maxmonthfee+=$monthfee;
 				$maxadmfee+=$admmfee;
+				$maxreadmissionfee+=$readmissionfee;
 				$maxbook+=$book;
 				$maxtransport+=$transport;
 				$maxdonation+=$donation;
@@ -417,12 +463,15 @@ class Yggdrasil extends tesseract{
 				$maxelectricity+=$electricity;
 				$maxcanteen+=$canteen;
 				$maxexpense+=$expense;
+				$maxmaintcost+=$maintcost;
+				$maxprojectcost+=$projectcost;
 				$odin.='
 					<tr>
 						<td class="text-center">'.$school.'</td>
 						<td class="text-center">'.date('d-m-Y', strtotime($req_row['stc_school_fee_date'])).'</td>
 						<td class="text-right">'.number_format($monthfee, 2).'</td>
 						<td class="text-right">'.number_format($admmfee, 2).'</td>
+						<td class="text-right">'.number_format($readmissionfee, 2).'</td>
 						<td class="text-right">'.number_format($book, 2).'</td>
 						<td class="text-right">'.number_format($transport, 2).'</td>
 						<td class="text-right">'.number_format($donation, 2).'</td>
@@ -436,6 +485,8 @@ class Yggdrasil extends tesseract{
 						<td class="text-right">'.number_format($vmaint, 2).'</td>
 						<td class="text-right">'.number_format($electricity, 2).'</td>
 						<td class="text-right">'.number_format($canteen, 2).'</td>
+						<td class="text-right">'.number_format($maintcost, 2).'</td>
+						<td class="text-right">'.number_format($projectcost, 2).'</td>
 						<td class="text-right">'.number_format($expense, 2).'</td>
 						<td class="text-right">'.number_format($total, 2).'</td>
 						<td class="text-right">'.$remarks.'</td>
@@ -448,6 +499,7 @@ class Yggdrasil extends tesseract{
 					<td class="text-right" colspan="2">Total :</td>
 					<td class="text-right">'.number_format($maxmonthfee, 2).'</td>
 					<td class="text-right">'.number_format($maxadmfee, 2).'</td>
+					<td class="text-right">'.number_format($maxreadmissionfee, 2).'</td>
 					<td class="text-right">'.number_format($maxbook, 2).'</td>
 					<td class="text-right">'.number_format($maxtransport, 2).'</td>
 					<td class="text-right">'.number_format($maxdonation, 2).'</td>
@@ -461,6 +513,8 @@ class Yggdrasil extends tesseract{
 					<td class="text-right">'.number_format($maxvmaint, 2).'</td>
 					<td class="text-right">'.number_format($maxelectricity, 2).'</td>
 					<td class="text-right">'.number_format($maxcanteen, 2).'</td>
+					<td class="text-right">'.number_format($maxmaintcost, 2).'</td>
+					<td class="text-right">'.number_format($maxprojectcost, 2).'</td>
 					<td class="text-right">'.number_format($maxexpense, 2).'</td>
 					<td class="text-right">'.number_format($maxtotal, 2).'</td>
 					<td class="text-right"></td>
@@ -558,6 +612,7 @@ if(isset($_POST['save_school_fee_action'])){
 	$stcwhichschool 			= $_POST['stcwhichschool'];
 	$stcschoolmonthlyfee 		= $_POST['stcschoolmonthlyfee'];
 	$stcschooladmissionfee 		= $_POST['stcschooladmissionfee'];
+	$stcschoolreadmissionfee 	= $_POST['stcschoolreadmissionfee'];
 	$stcschoolbooks 			= $_POST['stcschoolbooks'];
 	$stcschooltransporation 	= $_POST['stcschooltransporation'];
 	$stcschooldonation 			= $_POST['stcschooldonation'];
@@ -572,6 +627,8 @@ if(isset($_POST['save_school_fee_action'])){
 	$stcschoolothercharges 		= $_POST['stcschoolothercharges'];
 	$stcschoolcashback 			= $_POST['stcschoolcashback'];
 	$stcschoolexpenses 			= $_POST['stcschoolexpenses'];
+	$stcschoolmaintcost 		= $_POST['stcschoolmaintcost'];
+	$stcschoolprojectcost 		= $_POST['stcschoolprojectcost'];
 	$stcschoolremarks 			= $_POST['stcschoolremarks'];
 
 	$valkyrie=new Yggdrasil();
@@ -580,7 +637,7 @@ if(isset($_POST['save_school_fee_action'])){
 	}else if(empty($stcwhichschool)){
 		$out='empty';
 	}else{
-		$lokiheck=$valkyrie->stc_save_school_fee($stcwhichschool, $stcschoolmonthlyfee, $stcschooladmissionfee, $stcschoolbooks, $stcschooltransporation, $stcschooldonation, $stcschooldayboarding, $stcschoolneatcoll, $stcschooldssalary, $stcschooltsalary, $stcschoolvfuel, $stcschoolvmaint, $stcschoolelectricity, $stcschoolcanteen, $stcschoolothercharges, $stcschoolcashback, $stcschoolexpenses, $stcschoolremarks);
+		$lokiheck=$valkyrie->stc_save_school_fee($stcwhichschool, $stcschoolmonthlyfee, $stcschooladmissionfee, $stcschoolreadmissionfee, $stcschoolbooks, $stcschooltransporation, $stcschooldonation, $stcschooldayboarding, $stcschoolneatcoll, $stcschooldssalary, $stcschooltsalary, $stcschoolvfuel, $stcschoolvmaint, $stcschoolelectricity, $stcschoolcanteen, $stcschoolothercharges, $stcschoolcashback, $stcschoolexpenses, $stcschoolmaintcost, $stcschoolprojectcost, $stcschoolremarks);
 		$out=$lokiheck;
 	}
 	echo $out;

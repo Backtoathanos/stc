@@ -484,13 +484,27 @@ if($_SESSION['stc_school_user_for']>3){
                                   <div class="mb-3">
                                     <h5
                                       for="name"
-                                      >Admission Fee
+                                      >New Admission Fee
                                     </h5>
                                     <input
                                       name="stcschooladmissionfee"
                                       type="number"
                                       class="form-control validate stcschooladmissionfee"
-                                      placeholder="Enter Admission Fee"
+                                      placeholder="Enter New Admission Fee"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-6 col-lg-6">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Re Admission Fee
+                                    </h5>
+                                    <input
+                                      name="stcschoolreadmissionfee"
+                                      type="number"
+                                      class="form-control validate stcschoolreadmissionfee"
+                                      placeholder="Enter RE Admission Fee"
                                     />
                                   </div>
                                 </div>
@@ -689,6 +703,34 @@ if($_SESSION['stc_school_user_for']>3){
                                       type="number"
                                       class="form-control validate stcschoolcanteen"
                                       placeholder="Enter Canteen Amount"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Maintenance Cost
+                                    </h5>
+                                    <input
+                                      name="stcschoolmaintcost"
+                                      type="number"
+                                      class="form-control validate stcschoolmaintcost"
+                                      placeholder="Enter Maintenance Cost"
+                                    />
+                                  </div>
+                                </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Project Cost
+                                    </h5>
+                                    <input
+                                      name="stcschoolprojectcost"
+                                      type="number"
+                                      class="form-control validate stcschoolprojectcost"
+                                      placeholder="Enter Project Cost"
                                     />
                                   </div>
                                 </div>
@@ -916,6 +958,7 @@ if($_SESSION['stc_school_user_for']>3){
           var stcwhichschool                =  $('.stcwhichschool').val();
           var stcschoolmonthlyfee           =  $('.stcschoolmonthlyfee').val();
           var stcschooladmissionfee         =  $('.stcschooladmissionfee').val();
+          var stcschoolreadmissionfee       =  $('.stcschoolreadmissionfee').val();
           var stcschoolbooks                =  $('.stcschoolbooks').val();
           var stcschooltransporation        =  $('.stcschooltransporation').val();
           var stcschooldonation             =  $('.stcschooldonation').val();
@@ -930,6 +973,8 @@ if($_SESSION['stc_school_user_for']>3){
           var stcschoolelectricity          =  $('.stcschoolelectricity').val();
           var stcschoolcanteen              =  $('.stcschoolcanteen').val();
           var stcschoolexpenses             =  $('.stcschoolexpenses').val();
+          var stcschoolmaintcost            =  $('.stcschoolmaintcost').val();
+          var stcschoolprojectcost          =  $('.stcschoolprojectcost').val();
           var stcschoolremarks              =  $('.stcschoolremarks').val();
           $.ajax({  
             url       : "../vanaheim/fee-raised.php",
@@ -938,6 +983,7 @@ if($_SESSION['stc_school_user_for']>3){
               stcwhichschool:stcwhichschool,
               stcschoolmonthlyfee:stcschoolmonthlyfee,
               stcschooladmissionfee:stcschooladmissionfee,
+              stcschoolreadmissionfee:stcschoolreadmissionfee,
               stcschoolbooks:stcschoolbooks,
               stcschooltransporation:stcschooltransporation,
               stcschooldonation:stcschooldonation,
@@ -952,6 +998,8 @@ if($_SESSION['stc_school_user_for']>3){
               stcschoolelectricity:stcschoolelectricity,
               stcschoolcanteen:stcschoolcanteen,
               stcschoolexpenses:stcschoolexpenses,
+              stcschoolmaintcost:stcschoolmaintcost,
+              stcschoolprojectcost:stcschoolprojectcost,
               stcschoolremarks:stcschoolremarks,
               save_school_fee_action : 1
             },
@@ -962,6 +1010,7 @@ if($_SESSION['stc_school_user_for']>3){
               if(response=="Record saved successfully."){
                 $('.stcschoolmonthlyfee').val('');
                 $('.stcschooladmissionfee').val('');
+                $('.stcschoolreadmissionfee').val('');
                 $('.stcschoolbooks').val('');
                 $('.stcschooltransporation').val('');
                 $('.stcschooldonation').val('');
@@ -976,6 +1025,8 @@ if($_SESSION['stc_school_user_for']>3){
                 $('.stcschoolelectricity').val('');
                 $('.stcschoolcanteen').val('');
                 $('.stcschoolexpenses').val('');
+                $('.stcschoolmaintcost').val('');
+                $('.stcschoolprojectcost').val('');
                 $('.stcschoolremarks').val('');
                 $("#stcschoolreached").prop('disabled', false);
                 alert(data);

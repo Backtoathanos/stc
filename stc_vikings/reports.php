@@ -1060,7 +1060,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                     <th class="text-center"><b>School</b></th>
                                                     <th class="text-center"><b>Date</b></th>
                                                     <th class="text-center"><b>Monthly Fee</b></th>
-                                                    <th class="text-center"><b>Admission Fee</b></th>
+                                                    <th class="text-center"><b>New Admission Fee</b></th>
+                                                    <th class="text-center"><b>Re Admission Fee</b></th>
                                                     <th class="text-center"><b>Books</b></th>
                                                     <th class="text-center"><b>Transportation</b></th>
                                                     <th class="text-center"><b>Donation</b></th>
@@ -1074,6 +1075,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                     <th class="text-center"><b>Vehicle Maintenance</b></th>
                                                     <th class="text-center"><b>Electricity</b></th>
                                                     <th class="text-center"><b>Canteen</b></th>
+                                                    <th class="text-center"><b>Maintenance Cost</b></th>
+                                                    <th class="text-center"><b>Project Cost</b></th>
                                                     <th class="text-center"><b>Other Expenses</b></th>
                                                     <th class="text-center"><b>Total</b></th>
                                                     <th class="text-center"><b>Remarks</b></th>
@@ -2503,75 +2506,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 $('.itemqtyshow').val(itemqty);
                 $('.itemunitshow').val(itemunit);
                 $('.itempriorityshow').val(itempriority);
-            });
-
-            var filter_school = {};
-            $('.hidden-fee-excel-section').hide();
-            
-            //school checklbox filter
-            function get_filter(class_name){
-                var filter = [];
-                $('.' + class_name + ':checked').each(function(){
-                   filter.push($(this).val()); 
-                });
-                return filter;
-            }
-            //set school to cookies            
-            $('body').delegate('.common_selector', 'click', function(){
-               // e.preventDefault();
-                if($(this).hasClass('stcsfchool')){
-                    filter_school['school'] = get_filter('stcsfchool');
-                }
-                
-            });
-            // call school canteen
-            $('body').delegate('.stcs-schoolfee-hit', 'click', function(e){
-                // e.preventDefault();
-                $('.hidden-fee-excel-section').show();
-                var beg_date=$('.stcsfbegdate').val();
-                var end_date=$('.stcsfenddate').val();
-                var school_n=filter_school['school'];
-                $.ajax({
-                    url     : "kattegat/ragnar_reports.php",
-                    method  : "post",
-                    data    : {
-                        stc_find_school_fee_reports:1,
-                        beg_date:beg_date,
-                        end_date:end_date,
-                        school_name:school_n
-                    },
-                    success : function(response_sandp){
-                        // console.log(response_sandp);
-                        $('.stc-reports-school-fee-view').html(response_sandp);
-                    }
-                });
-                
-            });
-
-            // create excel
-            $('body').delegate('.stc-fee-exportexcel-hit', 'click', function(e){
-                e.preventDefault();
-                $("#stc-school-name-table").table2excel({
-                    filename: "stc-fee-reports.xls"
-                });
-            });
-
-            // call attendance
-            $('body').delegate('.stc-school-att-find', 'click', function(e){
-                e.preventDefault();
-                var stc_school_month = $('.stc-school-month').val();
-                $.ajax({
-                    url     : "kattegat/ragnar_reports.php",
-                    method  : "post",
-                    data    : {
-                        stc_find_school_attendance:1,
-                        stc_school_month:stc_school_month
-                    },
-                    success : function(response_sandp){
-                        // console.log(response_sandp);
-                        $('.stc-show-school-attendance').html(response_sandp);
-                    }
-                });
             });
         });
     </script>

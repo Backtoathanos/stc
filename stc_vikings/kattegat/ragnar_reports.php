@@ -3740,6 +3740,7 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
          ");
          $prevmaxmonthfee=0;
          $prevmaxadmfee=0;
+         $prevmaxreadmfee=0;
          $prevmaxbook=0;
          $prevmaxtransport=0;
          $prevmaxdonation=0;
@@ -3752,6 +3753,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
          $prevmaxelectricity=0;
          $prevmaxcanteen=0;
          $prevmaxexpense=0;
+         $prevmaxmaintcost=0;
+         $prevmaxprojectcost=0;
          $prevmaxtotal=0;
          foreach($odin_get_prevreq_qry as $odin_get_prevreq_row){
             $odin_getstudentqry=mysqli_query($this->stc_dbs, "
@@ -3774,6 +3777,7 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
          // current situtations
          $maxmonthfee=0;
          $maxadmfee=0;
+         $maxreadmfee=0;
          $maxbook=0;
          $maxtransport=0;
          $maxdonation=0;
@@ -3788,11 +3792,14 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
          $maxelectricity=0;
          $maxcanteen=0;
          $maxexpense=0;
+         $maxmaintcost=0;
+         $maxprojectcost=0;
          $maxtotal=0;
          foreach($odin_get_req_qry as $req_row){
             $school='';
             $monthfee=0;
             $admmfee=0;
+            $readmfee=0;
             $book=0;
             $transport=0;
             $donation=0;
@@ -3806,6 +3813,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
             $vmaint=0;
             $electricity=0;
             $canteen=0;
+            $maintcost=0;
+            $projectcost=0;
             $expense=0;
             $remarks='';
             $user='';
@@ -3815,6 +3824,7 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                    `stc_school_fee_which_school`,
                    `stc_school_fee_monthly_fee`,
                    `stc_school_fee_admission_fee`,
+                   `stc_school_fee_readmission_fee`,
                    `stc_school_fee_book_charge`,
                    `stc_school_fee_transportation`,
                    `stc_school_fee_donation`,
@@ -3829,6 +3839,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                    `stc_school_fee_electricity`,
                    `stc_school_fee_canteen`,
                    `stc_school_fee_expense`,
+                   `stc_school_fee_maint_cost`,
+                   `stc_school_fee_project_cost`,
                    `stc_school_fee_remarks`,
                    `stc_school_user_fullName`
                FROM
@@ -3848,6 +3860,7 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                $school=$odin_getstudentrow['stc_school_fee_which_school'];
                $monthfee=$odin_getstudentrow['stc_school_fee_monthly_fee'];
                $admmfee=$odin_getstudentrow['stc_school_fee_admission_fee'];
+               $readmfee=$odin_getstudentrow['stc_school_fee_readmission_fee'];
                $book=$odin_getstudentrow['stc_school_fee_book_charge'];
                $transport=$odin_getstudentrow['stc_school_fee_transportation'];
                $donation=$odin_getstudentrow['stc_school_fee_donation'];
@@ -3862,13 +3875,16 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                $others=$odin_getstudentrow['stc_school_fee_others'];
                $cashback=$odin_getstudentrow['stc_school_fee_cashback'];
                $expense=$odin_getstudentrow['stc_school_fee_expense'];
+               $maintcost=$odin_getstudentrow['stc_school_fee_maint_cost'];
+               $projectcost=$odin_getstudentrow['stc_school_fee_project_cost'];
                $remarks=$odin_getstudentrow['stc_school_fee_remarks'];
                $user=$odin_getstudentrow['stc_school_user_fullName'];
             }
 
-            $total= $monthfee + $admmfee + $book + $transport + $donation + $dayboarding + $neat + $others + $cashback;
+            $total= $monthfee + $admmfee + $readmfee + $book + $transport + $donation + $dayboarding + $neat + $others + $cashback;
             $maxmonthfee+=$monthfee;
             $maxadmfee+=$admmfee;
+            $maxreadmfee+=$readmfee;
             $maxbook+=$book;
             $maxtransport+=$transport;
             $maxdonation+=$donation;
@@ -3883,12 +3899,15 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
             $maxelectricity+=$electricity;
             $maxcanteen+=$canteen;
             $maxexpense+=$expense;
+            $maxmaintcost+=$maintcost;
+            $maxprojectcost+=$projectcost;
             $odin.='
                <tr>
                   <td title="date" class="text-center">'.$school.'</td>
                   <td title="date" class="text-center">'.date('d-m-Y', strtotime($req_row['stc_school_fee_date'])).'</td>
                   <td title="Monthly Fee" class="text-right">'.number_format($monthfee, 2).'</td>
-                  <td title="Admission Fee" class="text-right">'.number_format($admmfee, 2).'</td>
+                  <td title="New Admission Fee" class="text-right">'.number_format($admmfee, 2).'</td>
+                  <td title="Re Admission Fee" class="text-right">'.number_format($readmfee, 2).'</td>
                   <td title="Books" class="text-right">'.number_format($book, 2).'</td>
                   <td title="Transportation" class="text-right">'.number_format($transport, 2).'</td>
                   <td title="Donation" class="text-right">'.number_format($donation, 2).'</td>
@@ -3902,6 +3921,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                   <td title="Vehicle Maintenance" class="text-right">'.number_format($vmaint, 2).'</td>
                   <td title="Electricity" class="text-right">'.number_format($electricity, 2).'</td>
                   <td title="Canteen" class="text-right">'.number_format($canteen, 2).'</td>
+                  <td title="Maintenance Cost" class="text-right">'.number_format($maintcost, 2).'</td>
+                  <td title="Project Cost" class="text-right">'.number_format($projectcost, 2).'</td>
                   <td title="Other Expense" class="text-right">'.number_format($expense, 2).'</td>
                   <td title="Total" class="text-right">'.number_format($total, 2).'</td>
                   <td title="Temarks" class="text-right">'.$remarks.'</td>
@@ -3914,7 +3935,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
             <tr style="font-size: 20px;font-weight: bold;">
                <td class="text-right" colspan="2">Label :</td>
                <th class="text-center"><b>Monthly Fee</b></th>
-               <th class="text-center"><b>Admission Fee</b></th>
+               <th class="text-center"><b>New Admission Fee</b></th>
+               <th class="text-center"><b>Re Admission Fee</b></th>
                <th class="text-center"><b>Books</b></th>
                <th class="text-center"><b>Transportation</b></th>
                <th class="text-center"><b>Donation</b></th>
@@ -3926,6 +3948,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                <th class="text-center"><b>Vehicle Maintenance</b></th>
                <th class="text-center"><b>Electricity</b></th>
                <th class="text-center"><b>Canteen</b></th>
+               <th class="text-center"><b>Maintenance Cost</b></th>
+               <th class="text-center"><b>Project Cost</b></th>
                <th class="text-center"><b>Other Expenses</b></th>
             </tr>
 
@@ -3933,6 +3957,7 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                <td class="text-right" colspan="2">Total :</td>
                <td class="text-right">'.number_format($maxmonthfee, 2).'</td>
                <td class="text-right">'.number_format($maxadmfee, 2).'</td>
+               <td class="text-right">'.number_format($maxreadmfee, 2).'</td>
                <td class="text-right">'.number_format($maxbook, 2).'</td>
                <td class="text-right">'.number_format($maxtransport, 2).'</td>
                <td class="text-right">'.number_format($maxdonation, 2).'</td>
@@ -3946,6 +3971,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                <td class="text-right">'.number_format($maxvmaint, 2).'</td>
                <td class="text-right">'.number_format($maxelectricity, 2).'</td>
                <td class="text-right">'.number_format($maxcanteen, 2).'</td>
+               <td class="text-right">'.number_format($maxmaintcost, 2).'</td>
+               <td class="text-right">'.number_format($maxprojectcost, 2).'</td>
                <td class="text-right">'.number_format($maxexpense, 2).'</td>
                <td class="text-right" colspan="2"></td>
             </tr>
@@ -3975,11 +4002,15 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
          ';
          $odin.='
             <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Admission Fee Amount :</td>
+               <td class="text-right" colspan="2">Total New Admission Fee Amount :</td>
                <td class="text-right">'.number_format($maxadmfee, 2).'</td>
-               <td class="text-right" colspan="2">Total Teachers Salary :</td>
-               <td class="text-right">'.number_format($maxssal, 2).'</td>
-               <td class="text-right" colspan="10"></td>
+               <td class="text-right" rowspan="2" colspan="2">Total Teachers Salary :</td>
+               <td class="text-right" rowspan="2">'.number_format($maxssal, 2).'</td>
+               <td class="text-right" rowspan="2" colspan="10"></td>
+            </tr>
+            <tr style="font-size: 20px;font-weight: bold;">
+               <td class="text-right" colspan="2">Total Re Admission Fee Amount :</td>
+               <td class="text-right">'.number_format($maxreadmfee, 2).'</td>
             </tr>
          ';
          $odin.='
@@ -4013,6 +4044,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
             <tr style="font-size: 20px;font-weight: bold;">
                <td class="text-right" colspan="2">Total Day Boarding Amount :</td>
                <td class="text-right">'.number_format($maxdayboarding, 2).'</td>
+               <td class="text-right" colspan="2">Total Maintenance Cost :</td>
+               <td class="text-right">'.number_format($maxmaintcost, 2).'</td>
                <td class="text-right" colspan="10"></td>
             </tr>
          ';
@@ -4020,6 +4053,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
             <tr style="font-size: 20px;font-weight: bold;">
                <td class="text-right" colspan="2">Total NEET Amount :</td>
                <td class="text-right">'.number_format($maxneat, 2).'</td>
+               <td class="text-right" colspan="2">Total Project Cost :</td>
+               <td class="text-right">'.number_format($maxprojectcost, 2).'</td>
                <td class="text-right" colspan="10"></td>
             </tr>
          ';
@@ -4047,12 +4082,13 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
                <td class="text-right" colspan="2">Total Income Amount :</td>
                <td class="text-right">'.number_format($totalprevmonthincome + $maxtotal, 2).'</td>
                <td class="text-right" colspan="2">Total Expenditure Amount :</td>
-               <td class="text-right">'.number_format(($maxexpense + $maxdsal + $maxssal + $maxvfuel + $maxvmaint + $maxelectricity + $maxcanteen), 2).'</td>
+               <td class="text-right">'.number_format(($maxmaintcost + $maxprojectcost + $maxexpense + $maxdsal + $maxssal + $maxvfuel + $maxvmaint + $maxelectricity + $maxcanteen), 2).'</td>
                <td class="text-right" colspan="10"></td>
             </tr>
+
          ';
 
-         $tcharges = $prevtcharges + $maxexpense + $maxdsal + $maxssal + $maxvfuel + $maxvmaint + $maxelectricity + $maxcanteen;
+         $tcharges = $prevtcharges + $maxmaintcost + $maxprojectcost + $maxexpense + $maxdsal + $maxssal + $maxvfuel + $maxvmaint + $maxelectricity + $maxcanteen;
          $texpanses = $totalprevmonthincome + $prevtexpanses + $maxtotal;
          $grandtotal = $texpanses - $tcharges;
 
