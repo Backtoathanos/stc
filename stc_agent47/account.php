@@ -1,16 +1,36 @@
-<?php  
-session_start(); 
-if(isset($_SESSION["stc_agent_id"])){ 
-    // if(time()-$_SESSION["login_time_stamp"] >600)   
-    // { 
-    //     session_unset(); 
-    //     session_destroy(); 
-    //     header("Location:index.html"); 
-    // } 
-}else{ 
-    header("Location:index.html"); 
+<?php
+session_start();
+
+// Set session and cookie parameters
+$session_duration = 24 * 60; // 24 minutes (cPanel limit)
+$cookie_duration = 7 * 24 * 60 * 60; // 7 days in seconds
+
+// If session exists
+if(isset($_SESSION["stc_agent_id"])) {
+    // Check if remember cookie exists, if not set it
+    if(!isset($_COOKIE["stc_agent_remember"])) {
+        setcookie("stc_agent_remember", $_SESSION["stc_agent_id"], time() + $cookie_duration, "/");
+        setcookie("stc_agent_name", $_SESSION["stc_agent_name"], time() + $cookie_duration, "/");
+        setcookie("stc_agent_role", $_SESSION["stc_agent_role"], time() + $cookie_duration, "/");
+    }
 } 
-?> 
+// If session doesn't exist but cookie does
+elseif(isset($_COOKIE["stc_agent_remember"])) {
+    // Restore session from cookie
+    $_SESSION["stc_agent_id"] = $_COOKIE["stc_agent_remember"];
+    $_SESSION["stc_agent_name"] = $_COOKIE["stc_agent_name"];
+    $_SESSION["stc_agent_role"] = $_COOKIE["stc_agent_role"];
+    // Optionally refresh the cookie
+    setcookie("stc_agent_remember", $_COOKIE["stc_agent_remember"], time() + $cookie_duration, "/");
+    setcookie("stc_agent_name", $_COOKIE["stc_agent_name"], time() + $cookie_duration, "/");
+    setcookie("stc_agent_role", $_COOKIE["stc_agent_role"], time() + $cookie_duration, "/");
+}
+// Neither session nor cookie exists
+else {
+    header("Location: index.html");
+    exit();
+}
+?>
 <!doctype html>
 <html lang="en">
 

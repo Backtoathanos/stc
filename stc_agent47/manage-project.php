@@ -10,14 +10,20 @@ if(isset($_SESSION["stc_agent_id"])) {
     // Check if remember cookie exists, if not set it
     if(!isset($_COOKIE["stc_agent_remember"])) {
         setcookie("stc_agent_remember", $_SESSION["stc_agent_id"], time() + $cookie_duration, "/");
+        setcookie("stc_agent_name", $_SESSION["stc_agent_name"], time() + $cookie_duration, "/");
+        setcookie("stc_agent_role", $_SESSION["stc_agent_role"], time() + $cookie_duration, "/");
     }
 } 
 // If session doesn't exist but cookie does
 elseif(isset($_COOKIE["stc_agent_remember"])) {
     // Restore session from cookie
     $_SESSION["stc_agent_id"] = $_COOKIE["stc_agent_remember"];
+    $_SESSION["stc_agent_name"] = $_COOKIE["stc_agent_name"];
+    $_SESSION["stc_agent_role"] = $_COOKIE["stc_agent_role"];
     // Optionally refresh the cookie
     setcookie("stc_agent_remember", $_COOKIE["stc_agent_remember"], time() + $cookie_duration, "/");
+    setcookie("stc_agent_name", $_COOKIE["stc_agent_name"], time() + $cookie_duration, "/");
+    setcookie("stc_agent_role", $_COOKIE["stc_agent_role"], time() + $cookie_duration, "/");
 }
 // Neither session nor cookie exists
 else {
