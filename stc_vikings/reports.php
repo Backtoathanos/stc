@@ -157,17 +157,17 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                             echo '
                             <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-7" data-toggle="tab" href="#tab-content-7">
-                                    <span>School Canteen</span>
+                                    <span>Schools Canteen</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-8" data-toggle="tab" href="#tab-content-8">
-                                    <span>School Fee</span>
+                                    <span>Schools Fee</span>
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a role="tab" class="nav-link" id="tab-11" data-toggle="tab" href="#tab-content-11">
-                                    <span>School Attendance</span>
+                                    <span>Schools Attendance</span>
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -192,7 +192,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View Merchant Ledger
+                                              >Merchant Ledger
                                             </h5>
                                         </div>
                                     </div>
@@ -281,7 +281,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View Customer Agent Requisitions
+                                              >Customer Agent Requisitions
                                             </h5>
                                         </div>
                                     </div>
@@ -371,7 +371,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-xl-12 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success"><div style="width: 1000px;overflow-x: auto; white-space: nowrap;">
+                                        <div class="card-border mb-3 card card-body border-success"><div style="width: auto;overflow-x: auto; white-space: nowrap;">
                                           <table class="mb-0 table table-bordered" id="stc-reports-requisition-pending-view">
                                             <thead>
                                             <tr>
@@ -423,7 +423,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View Material Requisition Details
+                                              >Material Requisition Details
                                             </h5>
                                         </div>
                                     </div>
@@ -601,7 +601,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View Customer Agent Project Details
+                                              >Customer Agent Project Details
                                             </h5>
                                         </div>
                                     </div>
@@ -690,7 +690,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View STC Electronics Purchase & Sale
+                                              >STC Electronics Purchase & Sale
                                             </h5>
                                         </div>
                                     </div>
@@ -794,7 +794,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View STC Trading Purchase & Sale
+                                              >STC Trading Purchase & Sale
                                             </h5>
                                         </div>
                                     </div>
@@ -897,7 +897,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View STC School Canteen
+                                              >STC Schools Canteen
                                             </h5>
                                         </div>
                                     </div>
@@ -978,7 +978,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View STC School Fee
+                                              >STC Schools Fee <a href="javascript:void(0)" data-toggle="modal" data-target=".stc-school-fee-addmonthlytarget-modal" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> Add Monthly Target</a>
                                             </h5>
                                         </div>
                                     </div>
@@ -1006,33 +1006,29 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>     
                                     <div class="col-md-12 col-xl-12 col-sm-12"> 
                                         <div class="card-border mb-3 card card-body border-success">
-                                            <div class="row">
-                                                <div class="col-lg-6 col-md-6 col-sm-12">
-                                                    <div class="row">
-                                                        <div class="col-md-3 col-xl-3 col-sm-3">
-                                                            <div class="card-border mb-3 card-body border-success">
-                                                                <input type="checkbox" class="material-icons form-control common_selector stcsfchool" value="SGMS">
-                                                                <label style="position:relative;">SGMS</label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-3 col-xl-3 col-sm-3">
-                                                            <div class="card-border mb-3 card-body border-success">
-                                                                <input type="checkbox" class="material-icons form-control common_selector stcsfchool" value="SHS">
-                                                                <label style="position:relative;">SHS</label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-3 col-xl-3 col-sm-3">
-                                                            <div class="card-border mb-3 card-body border-success">
-                                                                <input type="checkbox" class="material-icons form-control common_selector stcsfchool" value="SIS">
-                                                                <label style="position:relative;">SIS</label>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-3 col-xl-3 col-sm-3">
-                                                            <div class="card-border mb-3 card-body border-success">
-                                                                <input type="checkbox" class="material-icons form-control common_selector stcsfchool" value="SMS">
-                                                                <label style="position:relative;">SMS</label>
-                                                            </div>
-                                                        </div>
+                                            <div class="row">                                                        
+                                                <div class="col-md-3 col-xl-3 col-sm-12" style="background: linear-gradient(135deg, #6e8efb, #a777e3);" >
+                                                    <div class="card-border mb-3 card-body border-success">
+                                                        <input type="checkbox" class="material-icons form-control common_selector stcsfchool" style="width:50px;" value="SGMS">
+                                                        <label for="all" style="position:relative;font-size: 30px;top: 15px;">SGMS</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-xl-3 col-sm-12" style="background: linear-gradient(135deg, #0cebeb, #20e3b2, #29ffc6);" >
+                                                    <div class="card-border mb-3 card-body border-success">
+                                                        <input type="checkbox" class="material-icons form-control common_selector stcsfchool" style="width:50px;" value="SHS">
+                                                        <label for="dhatkidih" style="position:relative;font-size: 30px;top: 15px;">SHS</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-xl-3 col-sm-12" style="background: linear-gradient(135deg, #ff4e50, #f9d423);" >
+                                                    <div class="card-border mb-3 card-body border-success">
+                                                        <input type="checkbox" class="material-icons form-control common_selector stcsfchool" style="width:50px;" value="SIS">
+                                                        <label for="sehrabazar" style="position:relative;font-size: 30px;top: 15px;">SIS</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-xl-3 col-sm-12" style="background: linear-gradient(135deg, #4776E6, #8E54E9, #d585ff);" >
+                                                    <div class="card-border mb-3 card-body border-success">
+                                                        <input type="checkbox" class="material-icons form-control common_selector stcsfchool" style="width:50px;" value="SMS">
+                                                        <label for="kolkata" style="position:relative;font-size: 30px;top: 15px;">SMS</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1053,8 +1049,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         </div>
                                     </div>
                                     <div class="col-md-12 col-xl-12 col-sm-12"> 
-                                        <div class="card-border mb-3 card card-body border-success"><div style="width: 1000px;overflow-x: auto; white-space: nowrap;">
-                                          <table class="mb-0 table table-bordered table-hover table-striped" id="stc-school-name-table">
+                                        <div class="card-border mb-3 card card-body border-success">
+                                          <table class="mb-0 table table-bordered table-hover table-striped SchoolFeeListTable" id="stc-school-name-table" style="display:none;">
                                             <thead>
                                                 <tr>
                                                     <th class="text-center"><b>School</b></th>
@@ -1099,7 +1095,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 </td>
                                               </tr>
                                             </tbody>
-                                          </table></div>
+                                          </table>
+                                          <button class="mb-2 mr-2 btn btn-success btn-block SchoolFeeListTableBtn">
+                                            <i class="metismenu-icon pe-7s-search"></i> Show List Table</i></button>
+                                          <div class="stc-reports-school-feesummary-view"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -1111,7 +1110,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View STC Groceries Purchase & Sale
+                                              >STC Groceries Purchase & Sale
                                             </h5>
                                         </div>
                                     </div>
@@ -1214,7 +1213,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View Status Down List
+                                              >Status Down List
                                             </h5>
                                         </div>
                                     </div>
@@ -1345,7 +1344,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View E-Permit Attendance
+                                              >E-Permit Attendance
                                             </h5>
                                         </div>
                                     </div>
@@ -1388,7 +1387,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="card-border mb-3 card card-body border-success">
                                             <h5
                                               for="description" align="center"
-                                              >View GLD Sale
+                                              >GLD Sale
                                             </h5>
                                         </div>
                                     </div>
@@ -2324,9 +2323,13 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         end_date:end_date,
                         school_name:school_n
                     },
+                    dataType : "JSON",
                     success : function(response_sandp){
                         // console.log(response_sandp);
-                        $('.stc-reports-school-fee-view').html(response_sandp);
+                        $('.SchoolFeeListTable').hide();
+                        $('.SchoolFeeListTableBtn').show();
+                        $('.stc-reports-school-fee-view').html(response_sandp.list_table);
+                        $('.stc-reports-school-feesummary-view').html(response_sandp.summary_table);
                     }
                 });
                 
@@ -2391,6 +2394,43 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         $('.show-attendance-epermitdetails').html(response_sandp);
                     }
                 });
+            });
+
+            $('body').delegate('.stc-school-fee-addmonthlytarget-save', 'click', function(e){
+                var stc_school=$('.stc-school-fee-addmonthlytarget-school').val();
+                var stc_target=$('.stc-school-fee-addmonthlytarget').val();
+                var stc_label=$('.stc-school-fee-addmonthlylabel').val();
+                var stc_month=$('.stc-school-fee-addmonthlymonth').val();
+                if(stc_school=="NA" || stc_target=="" || stc_target==0){
+                    alert("Please select school and enter target.");
+                }else{
+                    $.ajax({
+                        url     : "kattegat/ragnar_reports.php",
+                        method  : "post",
+                        data    : {
+                            stc_school_fee_add_monthly_target:1,
+                            stc_school:stc_school,
+                            stc_label:stc_label,
+                            stc_month:stc_month,
+                            stc_target:stc_target
+                        },
+                        success : function(response){
+                            if(response.trim() == "success"){
+                                alert("Target added successfully.");
+                                $('.stc-school-fee-addmonthlytarget-school').val("NA");
+                                $('.stc-school-fee-addmonthlytarget').val("");
+                                $('.stc-school-fee-addmonthlylabel').val("");
+                                $('.stc-school-fee-addmonthlymonth').val("");
+                            }else{
+                                alert("Failed to add target.");
+                            }
+                        }
+                    });
+                }
+            });
+            $('body').delegate('.SchoolFeeListTableBtn', 'click', function(e){
+                $('.SchoolFeeListTable').show();
+                $(this).hide();
             });
             
         });
@@ -3093,6 +3133,67 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                 
                                 <table class="table table-bordered table-hover show-attendance-epermitdetails">
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade stc-school-fee-addmonthlytarget-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Add Monthly Target</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xl-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">School</h5>
+                                <div class="position-relative form-group">
+                                    <select class="form-control stc-school-fee-addmonthlytarget-school">
+                                        <option value="NA">Select School</option>
+                                        <option value="SGMS">SGMS</option>
+                                        <option value="SHS">SHS</option>
+                                        <option value="SIS">SIS</option>
+                                        <option value="SMS">SMS</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Label</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="form-control stc-school-fee-addmonthlylabel" placeholder="Enter Label"> 
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Month</h5>
+                                <div class="position-relative form-group">
+                                    <input type="month" class="form-control stc-school-fee-addmonthlymonth" placeholder="Enter Month"> 
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Target Amount</h5>
+                                <div class="position-relative form-group">
+                                    <input type="number" class="form-control stc-school-fee-addmonthlytarget" placeholder="Enter Target Amount"> 
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <div class="position-relative form-group">
+                                    <button type="submit" class="form-control btn btn-success stc-school-fee-addmonthlytarget-save">Save</button>
+                                </div>
                             </div>
                         </div>
                     </div>

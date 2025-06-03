@@ -1556,6 +1556,7 @@ class ragnarReportsViewRequiReports extends tesseract{
             DATE(`stc_requisition_combiner_date`) as stc_req_comb_date,
             `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
             DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
+            `stc_cust_project_title`,
             `stc_cust_super_requisition_list_items_req_id`,
             `stc_cust_super_requisition_list_items_title`,
             `stc_cust_super_requisition_list_items_unit`,
@@ -1566,6 +1567,8 @@ class ragnarReportsViewRequiReports extends tesseract{
          FROM `stc_cust_super_requisition_list_items`
          INNER JOIN `stc_cust_super_requisition_list` 
          ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+         INNER JOIN `stc_cust_project` 
+         ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
             INNER JOIN `stc_requisition_combiner_req` 
             ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` 
             INNER JOIN `stc_requisition_combiner` 
@@ -3675,441 +3678,290 @@ class ragnarReportsViewSchoolCanteenReports extends tesseract{
 
 class ragnarReportsViewSchoolFeeReports extends tesseract{
    // call fee
-   public function stc_school_call_fee($bjornebegdate, $bjorneenddate, $bjorneschool){
-            
-      if($bjorneschool==""){
-         $school_attr='';
-      }else{
-            $school_attr='(';
-            $count_filter=count($bjorneschool);
-            $incountfilter=0;
-            foreach($bjorneschool as $bjorneschoolrow){
-                $addor='';
-                $incountfilter++;
-                if($count_filter==4){
-                    $addor='OR';
-                }elseif($count_filter==3){
-                    $addor='OR';
-                }elseif($count_filter==2){
-                    $addor='OR';
-                }
-                $count_filter = $count_filter - 1;
-              $school_attr.="`stc_school_fee_which_school`='".$bjorneschoolrow."' ".$addor;
-            }
-            $school_attr.=') AND';
-        }
-      $odin='';
-      $odin_get_req_qry=mysqli_query($this->stc_dbs, "
-         SELECT 
+   public function stc_school_call_fee($bjornebegdate, $bjorneenddate, $bjorneschool) {
+    // Initialize variables
+    $list_table = '';
+    $summary_table = '';
+    $school_attr = '';
+    
+    // Build school filter condition
+    if (!empty($bjorneschool)) {
+        $school_conditions = array_map(function($school) {
+            return "`stc_school_fee_which_school`='".mysqli_real_escape_string($this->stc_dbs, $school)."'";
+        }, $bjorneschool);
+        
+        $school_attr = '('.implode(' OR ', $school_conditions).') AND ';
+    }
+    
+    // Get current period records
+    $current_query = "
+        SELECT 
             `stc_school_fee_id`,
-             `stc_school_fee_which_school`,
-             `stc_school_fee_date`
-         FROM
-             `stc_school_fee`
-         WHERE ".$school_attr."(
-            DATE(`stc_school_fee_date`) 
-            BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
+            `stc_school_fee_which_school`,
+            `stc_school_fee_date`
+        FROM `stc_school_fee`
+        WHERE {$school_attr}(
+            DATE(`stc_school_fee_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
             AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."'
-         )
-         ORDER BY DATE(`stc_school_fee_date`) DESC
-      ");
-      if(mysqli_num_rows($odin_get_req_qry)>0){
-         $prevtcharges=0;
-         $prevtexpanses=0;
-         $totalprevmonthincome=0;
-         // $date = date("d-m-Y", strtotime($bjornebegdate));
-         $calculatedate = date('Y-m-d', strtotime("-1 months", strtotime($bjornebegdate)));
-         $year = date("Y", strtotime($calculatedate));
-         $month = date("m", strtotime($calculatedate));
-         $day = 1;
-         $combinedtodate=$day.'-'.$month.'-'.$year;
-         $effectiveDate = date('Y-m-d', strtotime($combinedtodate));
-         $odin_get_prevreq_qry=mysqli_query($this->stc_dbs, "
+        )
+        ORDER BY DATE(`stc_school_fee_date`) DESC
+    ";
+    
+    $odin_get_req_qry = mysqli_query($this->stc_dbs, $current_query);
+    
+    if (mysqli_num_rows($odin_get_req_qry) > 0) {
+        // Get previous month closing balance
+        $calculatedate = date('Y-m-d', strtotime("-1 months", strtotime($bjornebegdate)));
+        $year = date("Y", strtotime($calculatedate));
+        $month = date("m", strtotime($calculatedate));
+        $effectiveDate = date('Y-m-d', strtotime("01-{$month}-{$year}"));
+        
+        $prev_query = "
             SELECT 
-               `stc_school_month_closing_id`,
-                `stc_school_fee_which_school`,
-                `stc_school_month_closing_date`
-            FROM
-                `stc_school_month_closing`
-            WHERE ".$school_attr."(
-               DATE(`stc_school_month_closing_date`) 
-               BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $effectiveDate)."'
-               AND '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
+                `stc_school_month_closing_value`
+            FROM `stc_school_month_closing`
+            WHERE {$school_attr}(
+                DATE(`stc_school_month_closing_date`) 
+                BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $effectiveDate)."'
+                AND '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
             )
             ORDER BY DATE(`stc_school_month_closing_date`) DESC
-         ");
-         $prevmaxmonthfee=0;
-         $prevmaxadmfee=0;
-         $prevmaxreadmfee=0;
-         $prevmaxbook=0;
-         $prevmaxtransport=0;
-         $prevmaxdonation=0;
-         $prevmaxother=0;
-         $prevmaxcashback=0;
-         $prevmaxdsal=0;
-         $prevmaxssal=0;
-         $prevmaxvfuel=0;
-         $prevmaxvmaint=0;
-         $prevmaxelectricity=0;
-         $prevmaxcanteen=0;
-         $prevmaxexpense=0;
-         $prevmaxmaintcost=0;
-         $prevmaxprojectcost=0;
-         $prevmaxtotal=0;
-         foreach($odin_get_prevreq_qry as $odin_get_prevreq_row){
-            $odin_getstudentqry=mysqli_query($this->stc_dbs, "
-               SELECT 
-                   `stc_school_month_closing_value`
-               FROM
-                   `stc_school_month_closing`
-               WHERE
-                  `stc_school_month_closing_id`='".mysqli_real_escape_string($this->stc_dbs, $odin_get_prevreq_row['stc_school_month_closing_id'])."'
-               AND 
-                  `stc_school_fee_which_school`='".mysqli_real_escape_string($this->stc_dbs, $odin_get_prevreq_row['stc_school_fee_which_school'])."'
-               ORDER BY DATE(`stc_school_month_closing_date`) DESC
-            ");
-
-            foreach($odin_getstudentqry as $odin_getstudentrow){
-               $totalprevmonthincome+=$odin_getstudentrow['stc_school_month_closing_value'];
-            }
-         }
-
-         // current situtations
-         $maxmonthfee=0;
-         $maxadmfee=0;
-         $maxreadmfee=0;
-         $maxbook=0;
-         $maxtransport=0;
-         $maxdonation=0;
-         $maxdayboarding=0;
-         $maxneat=0;
-         $maxother=0;
-         $maxcashback=0;
-         $maxdsal=0;
-         $maxssal=0;
-         $maxvfuel=0;
-         $maxvmaint=0;
-         $maxelectricity=0;
-         $maxcanteen=0;
-         $maxexpense=0;
-         $maxmaintcost=0;
-         $maxprojectcost=0;
-         $maxtotal=0;
-         foreach($odin_get_req_qry as $req_row){
-            $school='';
-            $monthfee=0;
-            $admmfee=0;
-            $readmfee=0;
-            $book=0;
-            $transport=0;
-            $donation=0;
-            $dayboarding=0;
-            $neat=0;
-            $others=0;
-            $cashback=0;
-            $dsal=0;
-            $ssal=0;
-            $vfuel=0;
-            $vmaint=0;
-            $electricity=0;
-            $canteen=0;
-            $maintcost=0;
-            $projectcost=0;
-            $expense=0;
-            $remarks='';
-            $user='';
-
-            $odin_getstudentqry=mysqli_query($this->stc_dbs, "
-               SELECT 
-                   `stc_school_fee_which_school`,
-                   `stc_school_fee_monthly_fee`,
-                   `stc_school_fee_admission_fee`,
-                   `stc_school_fee_readmission_fee`,
-                   `stc_school_fee_book_charge`,
-                   `stc_school_fee_transportation`,
-                   `stc_school_fee_donation`,
-                   `stc_school_fee_dayboarding`,
-                   `stc_school_fee_neat`,
-                   `stc_school_fee_others`,
-                   `stc_school_fee_cashback`,
-                   `stc_school_fee_dstaffsal`,
-                   `stc_school_fee_teacherssal`,
-                   `stc_school_fee_vehiclefuel`,
-                   `stc_school_fee_vehiclemaintenance`,
-                   `stc_school_fee_electricity`,
-                   `stc_school_fee_canteen`,
-                   `stc_school_fee_expense`,
-                   `stc_school_fee_maint_cost`,
-                   `stc_school_fee_project_cost`,
-                   `stc_school_fee_remarks`,
-                   `stc_school_user_fullName`
-               FROM
-                   `stc_school_fee`
-                INNER JOIN 
-                    `stc_school` 
-                ON 
-                    `stc_school_fee_created_by`=`stc_school_user_id`
-               WHERE
-                        `stc_school_fee_id`='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_fee_id'])."'
-               AND 
-                  `stc_school_fee_which_school`='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_fee_which_school'])."'
-               ORDER BY DATE(`stc_school_fee_date`) DESC
-            ");
-
-            foreach($odin_getstudentqry as $odin_getstudentrow){
-               $school=$odin_getstudentrow['stc_school_fee_which_school'];
-               $monthfee=$odin_getstudentrow['stc_school_fee_monthly_fee'];
-               $admmfee=$odin_getstudentrow['stc_school_fee_admission_fee'];
-               $readmfee=$odin_getstudentrow['stc_school_fee_readmission_fee'];
-               $book=$odin_getstudentrow['stc_school_fee_book_charge'];
-               $transport=$odin_getstudentrow['stc_school_fee_transportation'];
-               $donation=$odin_getstudentrow['stc_school_fee_donation'];
-               $dayboarding=$odin_getstudentrow['stc_school_fee_dayboarding'];
-               $neat=$odin_getstudentrow['stc_school_fee_neat'];
-               $dsal=$odin_getstudentrow['stc_school_fee_dstaffsal'];
-               $ssal=$odin_getstudentrow['stc_school_fee_teacherssal'];
-               $vfuel=$odin_getstudentrow['stc_school_fee_vehiclefuel'];
-               $vmaint=$odin_getstudentrow['stc_school_fee_vehiclemaintenance'];
-               $electricity=$odin_getstudentrow['stc_school_fee_electricity'];
-               $canteen=$odin_getstudentrow['stc_school_fee_canteen'];
-               $others=$odin_getstudentrow['stc_school_fee_others'];
-               $cashback=$odin_getstudentrow['stc_school_fee_cashback'];
-               $expense=$odin_getstudentrow['stc_school_fee_expense'];
-               $maintcost=$odin_getstudentrow['stc_school_fee_maint_cost'];
-               $projectcost=$odin_getstudentrow['stc_school_fee_project_cost'];
-               $remarks=$odin_getstudentrow['stc_school_fee_remarks'];
-               $user=$odin_getstudentrow['stc_school_user_fullName'];
-            }
-
-            $total= $monthfee + $admmfee + $readmfee + $book + $transport + $donation + $dayboarding + $neat + $others + $cashback;
-            $maxmonthfee+=$monthfee;
-            $maxadmfee+=$admmfee;
-            $maxreadmfee+=$readmfee;
-            $maxbook+=$book;
-            $maxtransport+=$transport;
-            $maxdonation+=$donation;
-            $maxdayboarding+=$dayboarding;
-            $maxneat+=$neat;
-            $maxother+=$others;
-            $maxcashback+=$cashback;
-            $maxdsal+=$dsal;
-            $maxssal+=$ssal;
-            $maxvfuel+=$vfuel;
-            $maxvmaint+=$vmaint;
-            $maxelectricity+=$electricity;
-            $maxcanteen+=$canteen;
-            $maxexpense+=$expense;
-            $maxmaintcost+=$maintcost;
-            $maxprojectcost+=$projectcost;
-            $odin.='
-               <tr>
-                  <td title="date" class="text-center">'.$school.'</td>
-                  <td title="date" class="text-center">'.date('d-m-Y', strtotime($req_row['stc_school_fee_date'])).'</td>
-                  <td title="Monthly Fee" class="text-right">'.number_format($monthfee, 2).'</td>
-                  <td title="New Admission Fee" class="text-right">'.number_format($admmfee, 2).'</td>
-                  <td title="Re Admission Fee" class="text-right">'.number_format($readmfee, 2).'</td>
-                  <td title="Books" class="text-right">'.number_format($book, 2).'</td>
-                  <td title="Transportation" class="text-right">'.number_format($transport, 2).'</td>
-                  <td title="Donation" class="text-right">'.number_format($donation, 2).'</td>
-                  <td title="Day Boarding" class="text-right">'.number_format($dayboarding, 2).'</td>
-                  <td title="NEET" class="text-right">'.number_format($neat, 2).'</td>
-                  <td title="Others" class="text-right">'.number_format($others, 2).'</td>
-                  <td title="Cashback" class="text-right">'.number_format($cashback, 2).'</td>
-                  <td title="D Staff Salary" class="text-right">'.number_format($dsal, 2).'</td>
-                  <td title="Teachers Salary" class="text-right">'.number_format($ssal, 2).'</td>
-                  <td title="Vehicle Fuels" class="text-right">'.number_format($vfuel, 2).'</td>
-                  <td title="Vehicle Maintenance" class="text-right">'.number_format($vmaint, 2).'</td>
-                  <td title="Electricity" class="text-right">'.number_format($electricity, 2).'</td>
-                  <td title="Canteen" class="text-right">'.number_format($canteen, 2).'</td>
-                  <td title="Maintenance Cost" class="text-right">'.number_format($maintcost, 2).'</td>
-                  <td title="Project Cost" class="text-right">'.number_format($projectcost, 2).'</td>
-                  <td title="Other Expense" class="text-right">'.number_format($expense, 2).'</td>
-                  <td title="Total" class="text-right">'.number_format($total, 2).'</td>
-                  <td title="Temarks" class="text-right">'.$remarks.'</td>
-                  <td title="Created By" class="text-right">'.$user.'</td>
-               </tr>
+        ";
+        
+        $odin_get_prevreq_qry = mysqli_query($this->stc_dbs, $prev_query);
+        
+        $totalprevmonthincome = 0;
+        while ($prev_row = mysqli_fetch_assoc($odin_get_prevreq_qry)) {
+            $totalprevmonthincome += $prev_row['stc_school_month_closing_value'];
+        }
+        
+        // Initialize totals
+        $totals = [
+            'monthfee' => 0, 'admfee' => 0, 'readmfee' => 0, 'book' => 0,
+            'transport' => 0, 'donation' => 0, 'dayboarding' => 0, 'neat' => 0,
+            'other' => 0, 'cashback' => 0, 'dsal' => 0, 'ssal' => 0, 'vfuel' => 0,
+            'vmaint' => 0, 'electricity' => 0, 'canteen' => 0, 'expense' => 0,
+            'maintcost' => 0, 'projectcost' => 0, 'total' => 0
+        ];
+        
+        // Process current records
+        while ($req_row = mysqli_fetch_assoc($odin_get_req_qry)) {
+            $detail_query = "
+                SELECT 
+                    `stc_school_fee_which_school`, `stc_school_fee_monthly_fee`,
+                    `stc_school_fee_admission_fee`, `stc_school_fee_readmission_fee`,
+                    `stc_school_fee_book_charge`, `stc_school_fee_transportation`,
+                    `stc_school_fee_donation`, `stc_school_fee_dayboarding`,
+                    `stc_school_fee_neat`, `stc_school_fee_others`, `stc_school_fee_cashback`,
+                    `stc_school_fee_dstaffsal`, `stc_school_fee_teacherssal`,
+                    `stc_school_fee_vehiclefuel`, `stc_school_fee_vehiclemaintenance`,
+                    `stc_school_fee_electricity`, `stc_school_fee_canteen`,
+                    `stc_school_fee_expense`, `stc_school_fee_maint_cost`,
+                    `stc_school_fee_project_cost`, `stc_school_fee_remarks`,
+                    `stc_school_user_fullName`
+                FROM `stc_school_fee`
+                INNER JOIN `stc_school` 
+                    ON `stc_school_fee_created_by`=`stc_school_user_id`
+                WHERE `stc_school_fee_id`='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_fee_id'])."'
+                AND `stc_school_fee_which_school`='".mysqli_real_escape_string($this->stc_dbs, $req_row['stc_school_fee_which_school'])."'
+            ";
+            
+            $detail_result = mysqli_query($this->stc_dbs, $detail_query);
+            $detail_row = mysqli_fetch_assoc($detail_result);
+            
+            $current_total = $detail_row['stc_school_fee_monthly_fee'] + $detail_row['stc_school_fee_admission_fee'] + 
+                            $detail_row['stc_school_fee_readmission_fee'] + $detail_row['stc_school_fee_book_charge'] + 
+                            $detail_row['stc_school_fee_transportation'] + $detail_row['stc_school_fee_donation'] + 
+                            $detail_row['stc_school_fee_dayboarding'] + $detail_row['stc_school_fee_neat'] + 
+                            $detail_row['stc_school_fee_others'] + $detail_row['stc_school_fee_cashback'];
+            
+            // Add to list table
+            $list_table .= '
+                <tr>
+                    <td class="text-center">'.$detail_row['stc_school_fee_which_school'].'</td>
+                    <td class="text-center">'.date('d-m-Y', strtotime($req_row['stc_school_fee_date'])).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_monthly_fee'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_admission_fee'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_readmission_fee'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_book_charge'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_transportation'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_donation'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_dayboarding'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_neat'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_others'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_cashback'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_dstaffsal'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_teacherssal'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_vehiclefuel'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_vehiclemaintenance'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_electricity'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_canteen'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_maint_cost'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_project_cost'], 2).'</td>
+                    <td class="text-right">'.number_format($detail_row['stc_school_fee_expense'], 2).'</td>
+                    <td class="text-right">'.number_format($current_total, 2).'</td>
+                    <td class="text-right">'.$detail_row['stc_school_fee_remarks'].'</td>
+                    <td class="text-right">'.$detail_row['stc_school_user_fullName'].'</td>
+                </tr>
             ';
-            $maxtotal+=$total;
-         }
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Label :</td>
-               <th class="text-center"><b>Monthly Fee</b></th>
-               <th class="text-center"><b>New Admission Fee</b></th>
-               <th class="text-center"><b>Re Admission Fee</b></th>
-               <th class="text-center"><b>Books</b></th>
-               <th class="text-center"><b>Transportation</b></th>
-               <th class="text-center"><b>Donation</b></th>
-               <th class="text-center"><b>Day Boarding</b></th>
-               <th class="text-center"><b>NEET</b></th>
-               <th class="text-center"><b>Others</b></th>
-               <th class="text-center"><b>Cashback</b></th>
-               <th class="text-center"><b>D Staff Salary</b></th>
-               <th class="text-center"><b>Teachers Salary</b></th>
-               <th class="text-center"><b>Vehicle Fuels</b></th>
-               <th class="text-center"><b>Vehicle Maintenance</b></th>
-               <th class="text-center"><b>Electricity</b></th>
-               <th class="text-center"><b>Canteen</b></th>
-               <th class="text-center"><b>Maintenance Cost</b></th>
-               <th class="text-center"><b>Project Cost</b></th>
-               <th class="text-center"><b>Other Expenses</b></th>
-            </tr>
-
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total :</td>
-               <td class="text-right">'.number_format($maxmonthfee, 2).'</td>
-               <td class="text-right">'.number_format($maxadmfee, 2).'</td>
-               <td class="text-right">'.number_format($maxreadmfee, 2).'</td>
-               <td class="text-right">'.number_format($maxbook, 2).'</td>
-               <td class="text-right">'.number_format($maxtransport, 2).'</td>
-               <td class="text-right">'.number_format($maxdonation, 2).'</td>
-               <td class="text-right">'.number_format($maxdayboarding, 2).'</td>
-               <td class="text-right">'.number_format($maxneat, 2).'</td>
-               <td class="text-right">'.number_format($maxother, 2).'</td>
-               <td class="text-right">'.number_format($maxcashback, 2).'</td>
-               <td class="text-right">'.number_format($maxdsal, 2).'</td>
-               <td class="text-right">'.number_format($maxssal, 2).'</td>
-               <td class="text-right">'.number_format($maxvfuel, 2).'</td>
-               <td class="text-right">'.number_format($maxvmaint, 2).'</td>
-               <td class="text-right">'.number_format($maxelectricity, 2).'</td>
-               <td class="text-right">'.number_format($maxcanteen, 2).'</td>
-               <td class="text-right">'.number_format($maxmaintcost, 2).'</td>
-               <td class="text-right">'.number_format($maxprojectcost, 2).'</td>
-               <td class="text-right">'.number_format($maxexpense, 2).'</td>
-               <td class="text-right" colspan="2"></td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 25px;font-weight: bold;background: rgb(9,9,121);background: radial-gradient(circle, rgb(255 149 164) 27%, rgb(192 188 255) 53%, rgb(140 231 249) 100%);">
-               <td class="text-center" colspan="3">Income <i class="fa fa-arrow-down"></i></td>
-               <td class="text-center" colspan="3">Expenditure <i class="fa fa-arrow-down"></i></td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Previous Total Income :</td>
-               <td class="text-right">'.number_format($totalprevmonthincome, 2).'</td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Monthly Fee Amount :</td>
-               <td class="text-right">'.number_format($maxmonthfee, 2).'</td>
-               <td class="text-right" colspan="2">Total D Staff Salary :</td>
-               <td class="text-right">'.number_format($maxdsal, 2).'</td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total New Admission Fee Amount :</td>
-               <td class="text-right">'.number_format($maxadmfee, 2).'</td>
-               <td class="text-right" rowspan="2" colspan="2">Total Teachers Salary :</td>
-               <td class="text-right" rowspan="2">'.number_format($maxssal, 2).'</td>
-               <td class="text-right" rowspan="2" colspan="10"></td>
-            </tr>
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Re Admission Fee Amount :</td>
-               <td class="text-right">'.number_format($maxreadmfee, 2).'</td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Books Amount:</td>
-               <td class="text-right">'.number_format($maxbook, 2).'</td>
-               <td class="text-right" colspan="2">Total Vehicle Fuel Amount :</td>
-               <td class="text-right">'.number_format($maxvfuel, 2).'</td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Transportation Amount :</td>
-               <td class="text-right">'.number_format($maxtransport, 2).'</td>
-               <td class="text-right" colspan="2">Total Vehicle Maintenance Amount :</td>
-               <td class="text-right">'.number_format($maxvmaint, 2).'</td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Donation Amount :</td>
-               <td class="text-right">'.number_format($maxdonation, 2).'</td>
-               <td class="text-right" colspan="2">Total Electricity Expenses Amount :</td>
-               <td class="text-right">'.number_format($maxelectricity, 2).'</td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Day Boarding Amount :</td>
-               <td class="text-right">'.number_format($maxdayboarding, 2).'</td>
-               <td class="text-right" colspan="2">Total Maintenance Cost :</td>
-               <td class="text-right">'.number_format($maxmaintcost, 2).'</td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total NEET Amount :</td>
-               <td class="text-right">'.number_format($maxneat, 2).'</td>
-               <td class="text-right" colspan="2">Total Project Cost :</td>
-               <td class="text-right">'.number_format($maxprojectcost, 2).'</td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-         ';
-
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Other Charges Amount :</td>
-               <td class="text-right">'.number_format($maxother, 2).'</td>
-               <td class="text-right" colspan="2">Total Canteen Expenses Amount :</td>
-               <td class="text-right">'.number_format($maxcanteen, 2).'</td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Cashback Amount :</td>
-               <td class="text-right">'.number_format($maxcashback, 2).'</td>
-               <td class="text-right" colspan="2">Total Other Expenses Amount :</td>
-               <td class="text-right">'.number_format($maxexpense, 2).'</td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-         ';
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="2">Total Income Amount :</td>
-               <td class="text-right">'.number_format($totalprevmonthincome + $maxtotal, 2).'</td>
-               <td class="text-right" colspan="2">Total Expenditure Amount :</td>
-               <td class="text-right">'.number_format(($maxmaintcost + $maxprojectcost + $maxexpense + $maxdsal + $maxssal + $maxvfuel + $maxvmaint + $maxelectricity + $maxcanteen), 2).'</td>
-               <td class="text-right" colspan="10"></td>
-            </tr>
-
-         ';
-
-         $tcharges = $prevtcharges + $maxmaintcost + $maxprojectcost + $maxexpense + $maxdsal + $maxssal + $maxvfuel + $maxvmaint + $maxelectricity + $maxcanteen;
-         $texpanses = $totalprevmonthincome + $prevtexpanses + $maxtotal;
-         $grandtotal = $texpanses - $tcharges;
-
-         $odin.='
-            <tr style="font-size: 20px;font-weight: bold;">
-               <td class="text-right" colspan="5">Grand Total (Inc Previous Month) = '.number_format($texpanses, 2).' - '.number_format($tcharges, 2).' = '.number_format($grandtotal, 2).'</td>
-               <td class="text-right" colspan="2"></td>
-            </tr>
-         ';
-
-      }else{
-         $odin.='
+            
+            // Update totals
+            $totals['monthfee'] += $detail_row['stc_school_fee_monthly_fee'];
+            $totals['admfee'] += $detail_row['stc_school_fee_admission_fee'];
+            $totals['readmfee'] += $detail_row['stc_school_fee_readmission_fee'];
+            $totals['book'] += $detail_row['stc_school_fee_book_charge'];
+            $totals['transport'] += $detail_row['stc_school_fee_transportation'];
+            $totals['donation'] += $detail_row['stc_school_fee_donation'];
+            $totals['dayboarding'] += $detail_row['stc_school_fee_dayboarding'];
+            $totals['neat'] += $detail_row['stc_school_fee_neat'];
+            $totals['other'] += $detail_row['stc_school_fee_others'];
+            $totals['cashback'] += $detail_row['stc_school_fee_cashback'];
+            $totals['dsal'] += $detail_row['stc_school_fee_dstaffsal'];
+            $totals['ssal'] += $detail_row['stc_school_fee_teacherssal'];
+            $totals['vfuel'] += $detail_row['stc_school_fee_vehiclefuel'];
+            $totals['vmaint'] += $detail_row['stc_school_fee_vehiclemaintenance'];
+            $totals['electricity'] += $detail_row['stc_school_fee_electricity'];
+            $totals['canteen'] += $detail_row['stc_school_fee_canteen'];
+            $totals['expense'] += $detail_row['stc_school_fee_expense'];
+            $totals['maintcost'] += $detail_row['stc_school_fee_maint_cost'];
+            $totals['projectcost'] += $detail_row['stc_school_fee_project_cost'];
+            $totals['total'] += $current_total;
+        }
+        
+        // Get fee target
+        $school_list = "'" . implode("','", $bjorneschool) . "'";
+        $target_query = "
+            SELECT `target_amount` FROM `stc_school_feetarget`
+            WHERE `school` IN ({$school_list})
+        ";
+        $target_result = mysqli_query($this->stc_dbs, $target_query);
+        
+        $fee_target = 0;
+        while ($target_row = mysqli_fetch_assoc($target_result)) {
+            $fee_target += $target_row['target_amount'];
+        }
+        
+        // Calculate balance and grand total
+        $balance_amount = $totals['monthfee'] - $fee_target;
+        $colorAlert = $balance_amount < 0 ? 'style="color: #cf0000;"' : '';
+        
+        $total_expenditure = $totals['dsal'] + $totals['ssal'] + $totals['vfuel'] + 
+                            $totals['vmaint'] + $totals['electricity'] + $totals['canteen'] + 
+                            $totals['maintcost'] + $totals['projectcost'] + $totals['expense'];
+        
+        $grand_total = ($totalprevmonthincome + $totals['total']) - $total_expenditure;
+        
+        // Build summary table
+        $summary_table = '
+            <table class="table table-bordered">
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">Previous Total Income:</td>
+                    <td class="text-right">'.number_format($totalprevmonthincome, 2).'</td>
+                    <td class="text-right" colspan="2">Total D Staff Salary:</td>
+                    <td class="text-right">'.number_format($totals['dsal'], 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">
+                        Total Monthly Fee Amount:<br/>
+                        Monthly Fee Target:<br/>
+                        Balance:
+                    </td>
+                    <td class="text-right">
+                        '.number_format($totals['monthfee'], 2).'<br/>
+                        '.number_format($fee_target, 2).'<br/>
+                        <span '.$colorAlert.'>'.number_format($balance_amount, 2).'</span><br/>
+                    </td>
+                    <td class="text-right" colspan="2">Total Teachers Salary:</td>
+                    <td class="text-right">'.number_format($totals['ssal'], 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">Total New Admission Fee Amount:</td>
+                    <td class="text-right">'.number_format($totals['admfee'], 2).'</td>
+                    <td class="text-right" colspan="2">Total Vehicle Fuel Amount:</td>
+                    <td class="text-right">'.number_format($totals['vfuel'], 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">Total Re Admission Fee Amount:</td>
+                    <td class="text-right">'.number_format($totals['readmfee'], 2).'</td>
+                    <td class="text-right" colspan="2">Total Vehicle Maintenance Amount:</td>
+                    <td class="text-right">'.number_format($totals['vmaint'], 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">Total Books Amount:</td>
+                    <td class="text-right">'.number_format($totals['book'], 2).'</td>
+                    <td class="text-right" colspan="2">Total Electricity Expenses Amount:</td>
+                    <td class="text-right">'.number_format($totals['electricity'], 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">Total Transportation Amount:</td>
+                    <td class="text-right">'.number_format($totals['transport'], 2).'</td>
+                    <td class="text-right" colspan="2">Total Maintenance Cost:</td>
+                    <td class="text-right">'.number_format($totals['maintcost'], 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">Total Donation Amount:</td>
+                    <td class="text-right">'.number_format($totals['donation'], 2).'</td>
+                    <td class="text-right" colspan="2">Total Project Cost:</td>
+                    <td class="text-right">'.number_format($totals['projectcost'], 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">Total Day Boarding Amount:</td>
+                    <td class="text-right">'.number_format($totals['dayboarding'], 2).'</td>
+                    <td class="text-right" colspan="2">Total Canteen Expenses Amount:</td>
+                    <td class="text-right">'.number_format($totals['canteen'], 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">Total NEET Amount:</td>
+                    <td class="text-right">'.number_format($totals['neat'], 2).'</td>
+                    <td class="text-right" colspan="2">Total Other Expenses Amount:</td>
+                    <td class="text-right">'.number_format($totals['expense'], 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">Total Other Charges Amount:</td>
+                    <td class="text-right">'.number_format($totals['other'], 2).'</td>
+                    <td class="text-right" colspan="2">Total Expenditure Amount:</td>
+                    <td class="text-right">'.number_format($total_expenditure, 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="2">Total Cashback Amount:</td>
+                    <td class="text-right">'.number_format($totals['cashback'], 2).'</td>
+                    <td class="text-right" colspan="2">Total Income Amount:</td>
+                    <td class="text-right">'.number_format($totalprevmonthincome + $totals['total'], 2).'</td>
+                </tr>
+                
+                <tr style="font-size: 20px;font-weight: bold;">
+                    <td class="text-right" colspan="5">
+                        Grand Total (Inc Previous Month) = '.number_format($totalprevmonthincome + $totals['total'], 2).' - 
+                        '.number_format($total_expenditure, 2).' = 
+                        '.number_format($grand_total, 2).'
+                    </td>
+                    <td class="text-right" colspan="2"></td>
+                </tr>
+            </table>
+        ';
+    } else {
+        $list_table = '
             <tr>
-               <td colspan="10" class="text-center">No Records Found!!!</td>
+                <td colspan="24" class="text-center">No Records Found!!!</td>
             </tr>
-         ';
-      }
-      return $odin;
-   }
+        ';
+    }
+    
+    return [
+        'list_table' => $list_table,
+        'summary_table' => $summary_table
+    ];
+}
 
    // call attendance
    public function stc_school_call_attendance($stc_school_month){
@@ -4683,6 +4535,19 @@ class ragnarReportsViewEPermitAttReports extends tesseract{
       ';
       return $ivar;
    }
+
+   public function stc_save_monthlytarget($school, $label, $target, $month){
+      $school = mysqli_real_escape_string($this->stc_dbs, $school);
+      $label = mysqli_real_escape_string($this->stc_dbs, $label);
+      $target = mysqli_real_escape_string($this->stc_dbs, $target);
+      $month = mysqli_real_escape_string($this->stc_dbs, $month);
+      $query = "INSERT INTO `stc_school_feetarget` (`school`, `label`, `target_amount`, `month`, `created_by`) VALUES ('$school', '$label', '$target', '$month', '".$_SESSION['stc_empl_id']."')";
+      if(mysqli_query($this->stc_dbs, $query)){
+         return 'success';
+      } else {
+         return 'Error saving target: ' . mysqli_error($this->stc_dbs);
+      }
+   }
 }
 #<--------------------------------------------------------------------------------------------------------->
 #<--------------------------------------Object sections of reports class----------------------------------->
@@ -4963,7 +4828,7 @@ if(isset($_POST['stc_find_school_fee_reports'])){
    $bjorneschoolfee=new ragnarReportsViewSchoolFeeReports();
 
    $out=$bjorneschoolfee->stc_school_call_fee($bjornebegdate, $bjorneenddate, $bjorneschool);
-   echo $out;
+   echo json_encode($out);
 }
 
 // call school fee
@@ -5037,6 +4902,21 @@ if(isset($_POST['stc_find_epermit_attendance_details'])){
    $bjorneschoolfee=new ragnarReportsViewEPermitAttReports();
 
    $out=$bjorneschoolfee->stc_epermit_call_attendance_details($stc_epermit_month);
+   echo $out;
+}
+
+// call school fee
+if(isset($_POST['stc_school_fee_add_monthly_target'])){
+   $out='';
+
+   $school=$_POST['stc_school'];
+   $label=$_POST['stc_label'];
+   $target=$_POST['stc_target'];
+   $month=$_POST['stc_month'];
+
+   $bjorneschoolfee=new ragnarReportsViewEPermitAttReports();
+
+   $out=$bjorneschoolfee->stc_save_monthlytarget($school, $label, $target, $month);
    echo $out;
 }
 ?>

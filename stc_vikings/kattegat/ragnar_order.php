@@ -2120,7 +2120,6 @@ class ragnarRequisitionPertView extends tesseract{
 						<th class="text-center">ID<br>Date</th>
 						<th class="text-center">From</th>
 						<th class="text-center">For</th>
-						<th class="text-center">Accepted By</th>
 						<th class="text-center" style="width: 20%;">Items Desc</th>
 						<th class="text-center">Unit</th>
 						<th class="text-center">Ordered Qty</th> 
@@ -2141,6 +2140,7 @@ class ragnarRequisitionPertView extends tesseract{
 				`stc_cust_super_requisition_list_date`,
 				`stc_cust_project_title`,
 				`stc_cust_pro_supervisor_fullname`,
+				`stc_cust_pro_supervisor_contact`,
 				`stc_agents_name`,
 				`stc_cust_super_requisition_list_status`,
 				I.`stc_cust_super_requisition_list_id` as list_item_id,
@@ -2235,13 +2235,9 @@ class ragnarRequisitionPertView extends tesseract{
 				
 				$lokiout.= '
 					<tr>
-						 <td class="text-center">
-						 	'.$requisrow['list_id'].'<br>
-						 	'.date('d-m-Y', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'
-						 </td>
-						 <td class="text-center">'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
+						 <td class="text-center"> '.$requisrow['list_id'].'<br> '.date('d-m-Y h:i A', strtotime($requisrow['stc_cust_super_requisition_list_date'])).' </td>
+						 <td class="text-center">'.$requisrow['stc_cust_pro_supervisor_fullname'].'<br>'.$requisrow['stc_cust_pro_supervisor_contact'].'</td>
 						 <td>'.$requisrow['stc_cust_project_title'].'</td>
-						 <td class="text-center">'.$requisrow['stc_agents_name'].'</td>
 						 <td>'.$requisrow['stc_cust_super_requisition_list_items_title'].'</td>
 						 <td class="text-center">'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
 						 <td class="text-right">'.number_format($requisrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
