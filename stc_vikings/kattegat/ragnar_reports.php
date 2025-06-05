@@ -1680,9 +1680,9 @@ class ragnarReportsViewRequiReports extends tesseract{
             }else{
                $stcpendingqty=number_format($stcpendingqty, 2);
             }
-                $cosump_bal_qty = $stcrecievedqty - $stcconsumedqty;
-                $stcbalqtymark = '';
-                if($cosump_bal_qty>0){
+            $cosump_bal_qty = $stcrecievedqty - $stcconsumedqty;
+            $stcbalqtymark = '';
+            if($stcpendingqty>0){
                $stcbalqtymark='
                   <p class="form-control" style="
                       background: #ffd81a;
@@ -1692,7 +1692,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   </b>
                ';
             }else{
-               $stcbalqtymark=number_format($cosump_bal_qty, 2);
+               $stcbalqtymark=number_format($stcpendingqty, 2);
             }
             $optimusprime.='
                   <tr>
