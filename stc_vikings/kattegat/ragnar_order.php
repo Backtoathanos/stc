@@ -2118,6 +2118,7 @@ class ragnarRequisitionPertView extends tesseract{
 			<table class="table table-hover table-bordered">
 				<thead>
 					<tr>
+						<th class="text-center">Sl No</th>
 						<th class="text-center">ID<br>Date</th>
 						<th class="text-center">From</th>
 						<th class="text-center">For</th>
@@ -2170,6 +2171,7 @@ class ragnarRequisitionPertView extends tesseract{
 			ORDER BY L.`stc_cust_super_requisition_list_id` DESC
 		");
 		if(mysqli_num_rows($requissuperqry)!=0){
+			$slno=0;
 			foreach($requissuperqry as $requisrow){
 				if($requisrow['stc_cust_super_requisition_list_status']==1){
 				    $reqstatus="PROCESS";
@@ -2224,8 +2226,9 @@ class ragnarRequisitionPertView extends tesseract{
 					$apprpd_qty=$lokigetappritemrow['stc_appr_qty'];
 				}
 				$checkqty=$requisrow["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
+				
+					// <a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
 				$actiondeliver='
-					<a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
 					<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>
 					<a class="stc_add_togld" style="font-size:25px;color:black;" title="Add to GLD" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-shopping-cart"></i></a>
 				';
@@ -2250,10 +2253,11 @@ class ragnarRequisitionPertView extends tesseract{
 					WHERE `item_id`='".$list_item_id."'
 					ORDER BY `id` DESC
 				");
-				$log='<a href="#" data-toggle="modal" data-target=".bd-log-modal-lg" class="btn btn-info btn-sm stc-sup-requisition-viewlog-modal-btn">	 
+				$log='';
+				if(mysqli_num_rows($query)>0){
+					$log='<a href="#" data-toggle="modal" data-target=".bd-log-modal-lg" class="btn btn-info btn-sm stc-sup-requisition-viewlog-modal-btn">	 
 							View Log
 						</a>';
-				if(mysqli_num_rows($query)>0){
 					foreach($query as $row){
 						$log.='
 							<div style="display:none;border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-family: "Segoe UI", sans-serif; box-shadow: 0 1px 2px rgba(0,0,0,0.05); background-color: #fff;">
@@ -2268,8 +2272,10 @@ class ragnarRequisitionPertView extends tesseract{
 						';
 					}
 				}
+				$slno++;
 				$lokiout.= '
 					<tr>
+						 <td class="text-center"> '.$slno.' </td>
 						 <td class="text-center"> '.$requisrow['list_id'].'<br> '.date('d-m-Y h:i A', strtotime($requisrow['stc_cust_super_requisition_list_date'])).' </td>
 						 <td class="text-center">'.$requisrow['stc_cust_pro_supervisor_fullname'].'<br>'.$requisrow['stc_cust_pro_supervisor_contact'].'</td>
 						 <td>'.$requisrow['stc_cust_project_title'].'</td>
