@@ -2443,7 +2443,7 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
          ORDER BY DATE(`stc_trading_purchase_date`) DESC
       ");
       $odin='
-         <table class="mb-0 table table-bordered table-responsive" id="stc-reports-trading-pending-view">
+         <table class="mb-0 table table-bordered table-responsive stc-trading-purchasesale-table" id="stc-reports-trading-pending-view">
             <thead>
               <tr>
                 <th class="text-center" scope="col">Party Name</th>
@@ -2619,7 +2619,7 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
          ORDER BY DATE(`stc_trading_sale_date`) DESC
       ");
       $odin='
-         <table class="mb-0 table table-bordered table-hover table-responsive" id="stc-reports-trading-pending-view">
+         <table class="mb-0 table table-bordered table-hover table-responsive stc-trading-purchasesale-table" id="stc-reports-trading-pending-view">
             <thead>
               <tr>
                <th class="text-center" scope="col">Party Name</th>
@@ -2804,6 +2804,8 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
    public function stc_gld_call_sale($bjornebegdate, $bjorneenddate, $branch){
       $grandtotal=0;
       $totaldues=0;
+      $totaldiscounted=0;
+      $totaldiscountedamt=0;
       
       $filter='';
       if($branch>0){
@@ -2843,6 +2845,8 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
                <th class="text-center" scope="col">Unit</th>
                <th class="text-center" scope="col">Rate</th>
                <th class="text-center" scope="col">Amount</th>
+               <th class="text-center" scope="col">Discount</th>
+               <th class="text-center" scope="col">Total Amount</th>
                <th class="text-center" scope="col">Due Amount</th> 
                <th class="text-center" scope="col">Created By</th> 
               </tr>
@@ -2856,6 +2860,8 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
          foreach ($check_loki as $row) {
             $total=$row['qty'] * $row['rate'];
             $due=($total - $row['discount']) - $row['paid_amount'];
+            $totaldiscounted+=$total - $row['discount'];
+            $totaldiscountedamt+=$row['discount'];
             $product_name=$row["stc_product_name"];
             if($row["stc_sub_cat_name"]!="OTHERS"){
                $product_name=$row["stc_sub_cat_name"].' '.$row["stc_product_name"];
@@ -2887,7 +2893,13 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
                        <b>'.number_format($total, 2).'</b>
                      </td>
                      <td class="text-right">
-                        '.$due.'
+                       <b>'.number_format($row['discount'], 2).'</b>
+                     </td>
+                     <td class="text-right">
+                       <b>'.number_format($totaldiscounted, 2).'</b>
+                     </td>
+                     <td class="text-right">
+                        '.number_format($due, 2).'
                      </td>
                      <td>
                        <b>'.$row["stc_trading_user_name"].'</b>
@@ -2910,8 +2922,18 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
                   <td class="text-center" colspan="7"></td>
                </tr>
                <tr>
+                  <td class="text-right" colspan="9">Total Discount :</td>
+                  <td class="text-right"><b>'.number_format(($totaldiscountedamt), 2).'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+               <tr>
+                  <td class="text-right" colspan="9">Total Amount :</td>
+                  <td class="text-right"><b>'.number_format(($totaldiscounted), 2).'</b></td>
+                  <td class="text-center" colspan="7"></td>
+               </tr>
+               <tr>
                   <td class="text-right" colspan="9">Total Recieved :</td>
-                  <td class="text-right"><b>'.number_format(($grandtotal - $totaldues), 2).'</b></td>
+                  <td class="text-right"><b>'.number_format(($totaldiscounted - $totaldues), 2).'</b></td>
                   <td class="text-center" colspan="7"></td>
                </tr>
                <tr>

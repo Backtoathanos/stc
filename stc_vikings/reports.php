@@ -851,7 +851,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     </div>
                                     <div class="col-md-12 col-xl-12 col-sm-12"> 
                                         <div class="card-border mb-3 card card-body border-success stc-reports-trading-purchasesale-view">
-                                          <table class="mb-0 table table-bordered ">
+                                          <table class="mb-0 table table-bordered stc-trading-purchasesale-table">
                                             <thead>
                                                 <tr>
                                                     <th scope="col">Party Name</th>
@@ -1398,7 +1398,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <div class="row">
                                                 <div class="col-md-2 col-xl-2 col-sm-2" style="background: linear-gradient(135deg, #6e8efb, #a777e3);" >
                                                     <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="all" name="stc-gld-sale" value="0">
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="all" name="stc-gld-sale" checked value="0">
                                                         <label for="all" style="position:relative;font-size: 30px;top: 15px;">All</label>
                                                     </div>
                                                 </div>
@@ -2184,8 +2184,15 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     },
                     success : function(response_sandp){
                         // console.log(response_sandp);
-                        $('.stc-reports-trading-purchasesale-view').html(response_sandp);
+                        $('.stc-reports-trading-purchasesale-view').html('<input type="text" class="form-control stc-reports-trading-purchasesale-search" placeholder="Search by Party Name, Material Details, Invoice/Challan No, Payment Mode, Remarks, Order By">' + response_sandp);
                     }
+                });
+            });
+            $('body').delegate('.stc-reports-trading-purchasesale-search', 'keyup', function () {
+                var value = $(this).val().toLowerCase();
+                console.log('Hi');
+                $('.stc-trading-purchasesale-table tbody tr').filter(function () {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                 });
             });
 
