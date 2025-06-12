@@ -1936,23 +1936,38 @@ class pirates_supervisor extends tesseract{
 		return $blackpearl;
 	}
 
-	public function stc_delete_requisition_item($id, $list_id){
+	//reject requisition item
+	public function stc_delete_requisition_item($id, $list_id, $reason){
 		$blackpearl='';
+		
 		$deleteqry=mysqli_query($this->stc_dbs, "
-			DELETE FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_id`='".$id."'
+			UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`=5, `stc_cust_super_requisition_list_items_approved_qty`=0 WHERE `stc_cust_super_requisition_list_id`='".$id."'
 		");
-		$itemsqry=mysqli_query($this->stc_dbs, "
-			SELECT `stc_cust_super_requisition_list_id` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_req_id`='".$list_id."'
-		");
-		if(mysqli_num_rows($itemsqry)==0){
+		if($deleteqry){
 			$deleteqry=mysqli_query($this->stc_dbs, "
-				DELETE FROM `stc_cust_super_requisition_list` WHERE `stc_cust_super_requisition_list_id`='".$list_id."'
+				UPDATE `stc_cust_super_requisition_list` SET `stc_cust_super_requisition_list_status`=1 WHERE `stc_cust_super_requisition_list_id`='".$list_id."'
 			");
-			if($deleteqry){
-				$blackpearl="yes";
-			}else{
-				$blackpearl="no";
-			}
+			
+			$title="Rejected";
+			$message="Rejected by ".$_SESSION['stc_agent_name']." on ".date('d-m-Y h:i A').".<br/>Reason: ".$reason;
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, 
+					`title`, 
+					`message`, 
+					`status`, 
+					`created_by`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+					'1',
+					'".$_SESSION['stc_agent_id']."'
+				)
+			");
+			$blackpearl="yes";
+		}else{
+			$blackpearl="no";
 		}
 		return $blackpearl;
 	}
@@ -1978,11 +1993,12 @@ class pirates_supervisor extends tesseract{
 	// add to purchase
 	public function stc_add_to_purchase($item_id, $itemqty, $itemstatus){
 		$blackpearl='';
-		$itemstatus = $itemstatus == 1 ? 2 : 0;
+		$itemstatus = $itemstatus == 1 ? 2 : 1;
 		$setapprqry=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_cust_super_requisition_list_items` 
 			SET 
 				`stc_cust_super_requisition_list_items_approved_qty`='".$itemqty."',
+				`stc_cust_super_requisition_list_items_acceptby`='".$_SESSION['stc_agent_id']."',
 				`stc_cust_super_requisition_list_items_status`='".$itemstatus."'
 			WHERE `stc_cust_super_requisition_list_id`='".$item_id."'
 		");
@@ -2008,11 +2024,25 @@ class pirates_supervisor extends tesseract{
 					$setapprqry=mysqli_query($this->stc_dbs, "
 						UPDATE `stc_cust_super_requisition_list` SET `stc_cust_super_requisition_list_status`='2' WHERE `stc_cust_super_requisition_list_id`='".$req_id."'
 					");
-					$setapprqry=mysqli_query($this->stc_dbs, "
-						UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`='1' WHERE `stc_cust_super_requisition_list_id`='".$item_id."'
-					");
 				}
 			}
+			$title="Approved";
+			$message="Approved by ".$_SESSION['stc_agent_name']." on ".date('d-m-Y h:i A')." Quanitiy: ".$itemqty;
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, 
+					`title`, 
+					`message`, 
+					`status`, 
+					`created_by`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $item_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+					'1',
+					'".$_SESSION['stc_agent_id']."'
+				)
+			");
 			$blackpearl="success";
 		}else{
 			$blackpearl="not";
@@ -4836,8 +4866,9 @@ if(isset($_POST['get_equipementdetails'])){
 if(isset($_POST['stc_req_edit_item_delete'])){
 	$id=$_POST['req_id'];
 	$list_id=$_POST['list_id'];
+	$reason=$_POST['reason'];
 	$metabots=new pirates_supervisor();
-	$opmetabots=$metabots->stc_delete_requisition_item($id, $list_id);
+	$opmetabots=$metabots->stc_delete_requisition_item($id, $list_id, $reason);
 	echo json_encode($opmetabots);
 }
 ?>

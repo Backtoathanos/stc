@@ -1200,13 +1200,14 @@ class ragnarRequisitionView extends tesseract{
 						<tr>
 							<td class="no">'.$sl.'</td>
 							<td class="text-left">
-							'.$badgeurgent.'
+							'.$ivarreqitemrow['stc_cust_super_requisition_list_items_title'].'
 								<input 
 									type="text" 
 									class="form-control stc-update-requis-material-name stc-update-requis-material-name-hit" 
 									placeholder="Please Enter Item Name" 
 									value="'.htmlspecialchars($ivarreqitemrow['stc_cust_super_requisition_list_items_title']).'"
 									id="'.$ivarreqitemrow['stc_cust_super_requisition_list_id'].'"
+									style="display:none;"
 								>
 							</td>
 							<td class="unit">
@@ -2129,6 +2130,7 @@ class ragnarRequisitionPertView extends tesseract{
 						<th class="text-center">Status</th>   
 						<th class="text-center">Priority</th>  
 						<th class="text-center">Action</th>
+						<th class="text-center">Log</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -2187,9 +2189,13 @@ class ragnarRequisitionPertView extends tesseract{
 				}
 				$status='';
 				if($requisrow["stc_cust_super_requisition_list_items_status"]==1){
-					$status='By GST';
-				}else{
-					$status='By Normal';
+					$status='Ordered';
+				}else if($requisrow["stc_cust_super_requisition_list_items_status"]==2){
+					$status='Accepted';
+				}else if($requisrow["stc_cust_super_requisition_list_items_status"]==3){
+					$status='Approved';
+				}else if($requisrow["stc_cust_super_requisition_list_items_status"]==4){
+					$status='Dispatched';
 				}
 				$getdispatchedtransformers=mysqli_query($this->stc_dbs, "
 					SELECT 
@@ -2223,7 +2229,7 @@ class ragnarRequisitionPertView extends tesseract{
 					<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>
 					<a class="stc_add_togld" style="font-size:25px;color:black;" title="Add to GLD" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-shopping-cart"></i></a>
 				';
-				$actiondeliver=$requisrow["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver : "";
+				$actiondeliver=$requisrow["stc_cust_super_requisition_list_items_approved_qty"]>$dispatchedgqty ? $actiondeliver.'<a class="req-recieving-Modal" title="Recieving" style="font-size:25px;color:black;" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-hand-grab-o"></i></a>' : '<a class="req-recieving-Modal" title="Recieving" style="font-size:25px;color:black;" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-hand-grab-o"></i></a>';
 				$lokigetappritemqry=mysqli_query($this->stc_dbs, "
 					SELECT `id`, `requisition_list_id`, `status`, `created_by`, `created_date` FROM `stc_requisition_gld` WHERE `requisition_list_id`='".$requisrow['list_item_id']."'
 				");
@@ -2233,6 +2239,35 @@ class ragnarRequisitionPertView extends tesseract{
 				$priority=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
 				$bgcolor=$requisrow['stc_cust_super_requisition_items_priority']==2 ? "style='background:#ffb0b0;'" : "";
 				
+				$list_item_id=$requisrow['list_item_id'];
+				$query=mysqli_query($this->stc_dbs, "
+					SELECT 
+						`title`, 
+						`message`, 
+						`created_by`, 
+						`created_date`
+					FROM `stc_cust_super_requisition_list_items_log` 
+					WHERE `item_id`='".$list_item_id."'
+					ORDER BY `id` DESC
+				");
+				$log='<a href="#" data-toggle="modal" data-target=".bd-log-modal-lg" class="btn btn-info btn-sm stc-sup-requisition-viewlog-modal-btn">	 
+							View Log
+						</a>';
+				if(mysqli_num_rows($query)>0){
+					foreach($query as $row){
+						$log.='
+							<div style="display:none;border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px 16px; margin: 12px 0; font-family: "Segoe UI", sans-serif; box-shadow: 0 1px 2px rgba(0,0,0,0.05); background-color: #fff;">
+								<div style="display: flex; justify-content: space-between; align-items: center;">
+									<span style="font-weight: 600; color: #212121; font-size: 16px;">'.$row['title'].'</span>
+									<span style="font-size: 12px; color: #757575;">'.date('d-m-Y h:i A', strtotime($row['created_date'])).'</span>
+								</div>
+								<div style="margin-top: 4px; font-size: 14px; color: #424242;">
+									'.$row['message'].'
+								</div>
+							</div>
+						';
+					}
+				}
 				$lokiout.= '
 					<tr>
 						 <td class="text-center"> '.$requisrow['list_id'].'<br> '.date('d-m-Y h:i A', strtotime($requisrow['stc_cust_super_requisition_list_date'])).' </td>
@@ -2247,6 +2282,7 @@ class ragnarRequisitionPertView extends tesseract{
 						 <td>'.$status.'</td>
 						 <td class="text-center" '.$bgcolor.'>'.$priority.'</td>
 						 <td>'.$actiondeliver.'</td>
+						 <td>'.$log.'</td>
 					</tr>
 				';
 			}
@@ -2264,6 +2300,25 @@ class ragnarRequisitionPertView extends tesseract{
 				</tbody>
 			</table>
 		';
+		return $lokiout;
+	}
+
+	public function stc_view_agents_requist_dispatch($stc_repid, $stc_repitemid){
+		$lokiout='';
+		$sqlqry=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_cust_super_requisition_list_items_rec` LEFT JOIN `stc_purchase_product_adhoc` ON `stc_cust_super_requisition_list_items_rec_list_poaid`=`stc_purchase_product_adhoc_id` WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$stc_repid."' AND `stc_cust_super_requisition_list_items_rec_list_id`='".$stc_repitemid."'
+		");
+		if(mysqli_num_rows($sqlqry)!=0){
+			foreach($sqlqry as $sqlrow){
+         	  $lokiout.='<tr>';
+         	  $lokiout.='<td class="text-center">'.date('d-m-Y h:i A', strtotime($sqlrow['stc_cust_super_requisition_list_items_rec_date'])).'</td>';
+         	  $lokiout.='<td>'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</td>';
+         	  $lokiout.='<td class="text-right">'.number_format($sqlrow['stc_cust_super_requisition_list_items_rec_recqty'], 2).'</td>';
+         	  $lokiout.='<td class="text-center">'.$sqlrow['stc_purchase_product_adhoc_unit'].'</td>';
+         	  $lokiout.='<td><a href="javascript:void(0)" id='.$sqlrow['stc_cust_super_requisition_list_items_rec_id'].' title="Remove" class="removeitemsfromdispatch" style="font-size:25px;color:black;"><i class="fas fa-trash"></i></a></td>';
+         	  $lokiout.='</tr>';
+         	}
+		}
 		return $lokiout;
 	}
 
@@ -3096,10 +3151,28 @@ class ragnarRequisitionPertAdd extends tesseract{
 				UPDATE
 					`stc_cust_super_requisition_list_items`
 				SET
-					`stc_cust_super_requisition_list_items_status` = 2
+					`stc_cust_super_requisition_list_items_status` = 4
 				WHERE
 					`stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."'
 				AND `stc_cust_super_requisition_list_items_req_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_req_item_id)."'
+			");
+			
+			$title="Dispatched";
+			$message="Dispatched by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A'). " <br> Quantity :".$dispatch_qty;
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, 
+					`title`, 
+					`message`, 
+					`status`, 
+					`created_by`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+					'1',
+					'".$_SESSION['stc_empl_id']."'
+				)
 			");
 			if($gamoraupdateqry){
 				$loki="Item dispatched successfully.";
@@ -3150,6 +3223,33 @@ class ragnarRequisitionPertAdd extends tesseract{
 			$loki = "Record already exists.";
 		}
 
+		return $loki;
+	}
+
+	public function stc_ag_req_remove_dispatched($stc_req_id){
+		$loki = '';
+		$gamorarecgoqry = mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_super_requisition_list_items_rec_list_item_id` FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."'
+		");
+		if(mysqli_num_rows($gamorarecgoqry) > 0){
+			$req_id= mysqli_fetch_assoc($gamorarecgoqry)['stc_cust_super_requisition_list_items_rec_list_item_id'];
+			$check_dispatched = mysqli_query($this->stc_dbs, "
+				SELECT `stc_cust_super_requisition_rec_items_fr_supervisor_id` 
+				FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
+				WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid` = '".mysqli_real_escape_string($this->stc_dbs, $req_id)."' 
+			");
+			if($check_dispatched && mysqli_num_rows($check_dispatched) > 0){
+				return "This item has already been dispatched. You cannot remove it.";
+			}
+		}
+		$gamorarecgoqry = mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."'
+		");
+		if ($gamorarecgoqry) {
+			$loki = "success";
+		} else {
+			$loki = "Hmmm!!! Something went wrong. Please try again later.";
+		}
 		return $loki;
 	}
 }
@@ -4250,6 +4350,16 @@ if(isset($_POST['call_requist_sub'])){
 	// echo $objlokiout;
 }
 
+// call perticular order records
+if(isset($_POST['call_requistdispatch_sub'])){
+	$stc_repid=$_POST['repid'];
+	$stc_repitemid=$_POST['repitemid'];
+	$objloki=new ragnarRequisitionPertView();
+	$objlokiout=$objloki->stc_view_agents_requist_dispatch($stc_repid, $stc_repitemid);
+	echo json_encode($objlokiout);
+	// echo $objlokiout;
+}
+
 // add challan items to sale product_id
 if(isset($_POST['stceditsaleaction'])){
 	$bjornefiltercatout=$_POST['phpfiltercatout'];
@@ -4378,6 +4488,14 @@ if(isset($_POST['stc_gld_hit'])){
 	$stc_req_id=$_POST['stc_req_id'];
 	$raven=new ragnarRequisitionPertAdd();
 	$outraven=$raven->stc_ag_req_gld($stc_req_id);
+	// echo json_encode($outraven);
+	echo $outraven;
+}
+
+if(isset($_POST['stc_remove_dispatched'])){
+	$stc_req_id=$_POST['stc_req_id'];
+	$raven=new ragnarRequisitionPertAdd();
+	$outraven=$raven->stc_ag_req_remove_dispatched($stc_req_id);
 	// echo json_encode($outraven);
 	echo $outraven;
 }

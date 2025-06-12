@@ -51,6 +51,15 @@ include_once("../MCU/db.php");
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="./main.css" rel="stylesheet">
     <!-- <link href="assets/css/style.css" rel="stylesheet"> -->
+    <style> 
+        .fade:not(.show) {
+          opacity: 10;
+        }    
+
+        .close-tag-beg{
+            display: none;
+        }
+    </style>
     <style>        
         .close-tag-beg{
             display: none;
@@ -231,10 +240,10 @@ include_once("../MCU/db.php");
                                                                     <table class="mb-0 table table-hover table-bordered stc-pro-req-table">
                                                                         <thead>
                                                                             <th># <input type="checkbox" class="form-control master-checkbox" title="Select All" style="width:40px;"></th>
-                                                                            <th class="text-center">Requisition ID</th>
-                                                                            <th class="text-center">Requisition Date</th>
+                                                                            <th class="text-center">Requisition ID & Date</th>
                                                                             <th class="text-center">Requisition From</th>
                                                                             <th class="text-center">Requisition For</th>
+                                                                            <th class="text-center">Approved By</th>
                                                                             <th class="text-center">Item Description</th>
                                                                             <th class="text-center">Unit</th>
                                                                             <th class="text-center">Requis Qty</th>
@@ -242,6 +251,7 @@ include_once("../MCU/db.php");
                                                                             <th class="text-center">Requis Remains Qty</th>
                                                                             <th class="text-center">Requisition Status</th>
                                                                             <th class="text-center">Priority</th>
+                                                                            <th class="text-center">Type</th>
                                                                             <th class="text-center">Action</th>
                                                                         </thead>
                                                                         <tbody>
@@ -258,7 +268,9 @@ include_once("../MCU/db.php");
                                                                                         `stc_cust_super_requisition_list_items_approved_qty`,
                                                                                         `stc_cust_super_requisition_items_finalqty`,
                                                                                         `stc_cust_super_requisition_list_status`,
-                                                                                        `stc_cust_super_requisition_items_priority`
+                                                                                        `stc_cust_super_requisition_items_priority`,
+                                                                                        `stc_cust_super_requisition_items_type`,
+                                                                                        `stc_agents_name`
                                                                                     FROM `stc_cust_super_requisition_list_items` I
                                                                                     INNER JOIN `stc_cust_super_requisition_list` L
                                                                                     ON `stc_cust_super_requisition_list_items_req_id`=L.`stc_cust_super_requisition_list_id`
@@ -266,6 +278,8 @@ include_once("../MCU/db.php");
                                                                                     ON `stc_cust_pro_supervisor_id`=L.`stc_cust_super_requisition_list_super_id`
                                                                                     INNER JOIN `stc_cust_project`
                                                                                     ON `stc_cust_project_id`=L.`stc_cust_super_requisition_list_project_id`
+                                                                                    LEFT JOIN `stc_agents` A
+                                                                                    ON A.`stc_agents_id`=I.`stc_cust_super_requisition_list_items_acceptby`
                                                                                     WHERE L.`stc_cust_super_requisition_list_status`='2' 
                                                                                     ORDER BY TIMESTAMP(`stc_cust_super_requisition_list_date`) DESC                                                                                   
                                                                                 ");
@@ -273,11 +287,11 @@ include_once("../MCU/db.php");
                                                                                     foreach($requissuperqry as $requisrow){
                                                                                         $reqstatus='';
                                                                                         if($requisrow['stc_cust_super_requisition_list_status']==1){
-                                                                                            $reqstatus="PROCESS";
+                                                                                            $reqstatus="Ordered";
                                                                                         }elseif($requisrow['stc_cust_super_requisition_list_status']==2){
-                                                                                            $reqstatus="PASSED";
-                                                                                        }else{
-                                                                                            $reqstatus="ACCEPTED";
+                                                                                            $reqstatus="Accepted";
+                                                                                        }elseif($requisrow['stc_cust_super_requisition_list_status']==3){
+                                                                                            $reqstatus="Approved";
                                                                                         }
 
                                                                                         $recqtyoperations=mysqli_query($con, "
@@ -295,10 +309,10 @@ include_once("../MCU/db.php");
                                                                                         echo '
                                                                                             <tr>
                                                                                                 <td class="text-center"><input type="checkbox" class="form-control select-req" style="width:40px;"></td>
-                                                                                                <td class="text-center">'.$requisrow['list_id'].'</td>
-                                                                                                <td class="text-center">'.date('d-m-Y', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'</td>
+                                                                                                <td class="text-center">'.$requisrow['list_id'].' <br/> '.date('d-m-Y h:i A', strtotime($requisrow['stc_cust_super_requisition_list_date'])).'</td>
                                                                                                 <td class="text-center">'.$requisrow['stc_cust_pro_supervisor_fullname'].'</td>
                                                                                                 <td class="text-center">'.$requisrow['stc_cust_project_title'].'</td>
+                                                                                                <td class="text-center">'.$requisrow['stc_agents_name'].'</td>
                                                                                                 <td>'.$requisrow['stc_cust_super_requisition_list_items_title'].'</td>
                                                                                                 <td class="text-center">'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
                                                                                                 <td class="text-right">'.number_format($requisrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
@@ -309,9 +323,10 @@ include_once("../MCU/db.php");
                                                                                                 <td class="text-right">'.number_format($recoprqty, 2).'</td>
                                                                                                 <td class="text-center">'.$reqstatus.'</td>
                                                                                                 <td class="text-center" '.$bgcolor.'>'.$priority.'</td>
+                                                                                                <td class="text-center">'.$requisrow['stc_cust_super_requisition_items_type'].'</td>
                                                                                                 <td class="text-center">
-                                                                                                    <a class="btn btn-success form-control add_to_accept_cart" id="'.$requisrow['list_item_id'].'" req-id="'.$requisrow['list_id'].'" style="font-size: 20px;"><i class="fas fa-check-circle"></i></a>
-                                                                                                    <a class="btn btn-danger form-control removerequisitionwithitems" id="'.$requisrow['list_item_id'].'" req-id="'.$requisrow['list_id'].'" style="font-size: 20px;"><i class="fas fa-trash"></i></a>
+                                                                                                    <a class="btn btn-success form-control add_to_accept_cart" title="Approve" id="'.$requisrow['list_item_id'].'" req-id="'.$requisrow['list_id'].'" style="font-size: 20px;"><i class="fas fa-check-circle"></i></a>
+                                                                                                    <a href="#" class="btn btn-danger form-control remove_from_purchase" operat-ic="'.$requisrow['list_item_id'].'" list-id="'.$requisrow['list_id'].'" title="Reject" id="rem_from_accept_cart'.$requisrow['list_item_id'].'" style="font-size: 20px;"><i class="fas fa-ban" ></i></a>
                                                                                                 </td>
                                                                                             </tr>
                                                                                         ';
@@ -363,7 +378,9 @@ include_once("../MCU/db.php");
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
+    <!-- <script src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
     <script>
         $(document).ready(function(){
@@ -441,6 +458,43 @@ include_once("../MCU/db.php");
                         call_requisition_appr_cart();
                         // console.log(requisition);
                         // alert(requisition);
+                    }
+                });
+            });
+
+            
+
+            var req_id=0;
+            var list_id=0;
+            // call req list items edit
+            $('body').delegate('.remove_from_purchase', 'click', function(e){
+                e.preventDefault();
+                if(confirm("Are you sure to reject this item?")){
+                    req_id=$(this).attr("operat-ic");
+                    list_id=$(this).attr("list-id");
+                    $('.rejectionmodalbtn').click();
+                }
+            });
+            $('body').delegate('.remove_from_purchase_finally', 'click', function(e){
+                e.preventDefault();
+                var reason=$('.reason-text').val();
+                if(reason.trim()==""){
+                    alert("Please enter reason for rejection.");
+                    return false;
+                }
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_req_edit_item_delete:1,
+                        req_id:req_id,
+                        list_id:list_id,
+                        reason:reason
+                    }, 
+                    success     : function(response_items){
+                        // console.log(response_items);
+                        alert("Item Rejected Successfully.");
+                        window.location.reload();
                     }
                 });
             });
@@ -560,5 +614,31 @@ include_once("../MCU/db.php");
             
         });
     </script>
+    <a href="#" data-toggle="modal" data-target="#stc-sup-requisition-rejection-modal" class="rejectionmodalbtn" style="display: none;"></a>
 </body>
 </html>
+<div class="modal fade" id="stc-sup-requisition-rejection-modal" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">Reason for Rejection</h4>
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <h4>Reason :</h4>
+                    <textarea class="form-control reason-text" placeholder="Enter reason for rejection." rows="5"></textarea></br>
+                </div>
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <input type="hidden" class="stc-super-own-req-id-hidd">
+                    <button class="btn btn-success remove_from_purchase_finally" href="Javascript:void(0)">Send</button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

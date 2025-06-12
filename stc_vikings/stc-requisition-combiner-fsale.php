@@ -213,6 +213,14 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             }
           });
         }
+        
+
+            $('body').delegate('.stc-sup-requisition-viewlog-modal-btn', 'click',function(e){
+                var data=$(this).parent().html();
+                $('.items-log-display').html(data);
+                $('.items-log-display').find('div').show();
+                $('.items-log-display').find('a').remove();
+            });
 
         var jsreqbegdate='';
         var jsreqenddate='';
@@ -349,6 +357,27 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           $('.res-product-Modal').modal("show");
           $('#stc-req-list-id-rep').val(repid);
           $('#stc-req-list-item-id-rep').val(repitemid);
+        });
+        
+        $('body').delegate('.req-recieving-Modal', 'click', function(e){
+          e.preventDefault();
+          repid=$(this).attr("id");
+          repitemid=$(this).attr("list-id");
+          $('.recieving-modal').modal("show");
+          $.ajax({
+            url       : "kattegat/ragnar_order.php",
+            method    : 'POST',
+            data      : {
+              call_requistdispatch_sub:1,
+              repid:repid,
+              repitemid:repitemid
+            },
+            dataType  : 'JSON',
+            success:function(req){
+              // console.log(req);
+              $('.show-requisitiondispatched-items').html(req);
+            }
+          });
         });
 
         var jsfiltercat;
@@ -575,6 +604,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                   var response=response_dis.trim();
                   if(response=="Item dispatched successfully."){
                     alert(response_dis);
+                      stc_call_ag_order(url_param);
                     // call_pert_requisition(req_id);
                     $('.res-product-Modal-cash-close').modal("hide");
                   }else{
@@ -604,6 +634,34 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var response=response_dis.trim();
                 if(response=="success"){
                   alert("Item added to GLD.");
+                }else{
+                  alert(response_dis);
+                  // window.location.reload();
+                }
+              }
+            });
+          }
+        });
+        
+        $('body').delegate('.removeitemsfromdispatch', 'click', function(e){
+          e.preventDefault();
+          var req_id=$(this).attr('id');
+          if(confirm("Are you sure want remove this item?")){
+            $('.removeit').removeAttr('class');
+            $(this).closest('tr').attr('class', 'removeit');
+            $.ajax({
+              url       : "kattegat/ragnar_order.php",
+              method    :'POST',
+              data      : {
+                stc_remove_dispatched:1,
+                stc_req_id:req_id
+              },
+              success   : function(response_dis){
+                var response=response_dis.trim();
+                if(response=="success"){
+                  stc_call_ag_order(url_param);
+                  $('.removeit').remove();
+                  alert("Item Removed successfully.");
                 }else{
                   alert(response_dis);
                   // window.location.reload();
@@ -910,4 +968,79 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     </div>
   </div>
 </div>
+
+<div class="modal fade  recieving-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Recieving Items</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <div class="row">
+              <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                <input type="hidden" id="stc-req-list-item-id-rep2" value="0";>
+                <input type="hidden" id="stc-req-list-id-rep2" value="0";>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                <div class="card-border mb-3 card card-body border-success">
+                  <h5 for="poadhocitem">
+                    Item
+                  </h5>
+                  <table class="table table-bordered table-hover">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Item</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Unit</th>
+                        <th class="text-center">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody class="show-requisitiondispatched-items"></tbody>
+                    </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- modal call end -->
+ 
+<div class="modal fade bd-log-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Items Log</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"> 
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5 class="card-title">View Items Log</h5>
+                                <div class="items-log-display"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

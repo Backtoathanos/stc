@@ -10,13 +10,43 @@ class witcher_supervisor extends tesseract{
 	// call tbm
 	public function stc_call_tbm(){
 		$optimusprime='';
+		$tbm_id='';
+		$query=mysqli_query($this->stc_dbs, "
+			SELECT 
+				DISTINCT sas.stc_cust_pro_attend_supervise_pro_id
+			FROM 
+				stc_agents sa
+			INNER JOIN 
+				stc_cust_pro_supervisor sps 
+				ON sps.stc_cust_pro_supervisor_created_by = sa.stc_agents_id
+			INNER JOIN 
+				stc_cust_pro_attend_supervise sas 
+				ON sas.stc_cust_pro_attend_supervise_super_id = sps.stc_cust_pro_supervisor_id
+			WHERE 
+				sps.stc_cust_pro_supervisor_id = '".$_SESSION['stc_agent_sub_id']."'
+		");
+		if(mysqli_num_rows($query)>0){
+			foreach($query as $row){
+				$tbm_id = $tbm_id==""?$row['stc_cust_pro_attend_supervise_pro_id']:$tbm_id.','.$row['stc_cust_pro_attend_supervise_pro_id'];
+			}
+		}
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			SELECT * FROM `stc_safetytbm` 
 			LEFT JOIN `stc_cust_pro_supervisor`
 			ON `stc_cust_pro_supervisor_id`=`stc_safetytbm_created_by`
-			WHERE `stc_safetytbm_created_by`='".$_SESSION['stc_agent_sub_id']."' 
+			WHERE `stc_safetytbm_loc_id` IN (".$tbm_id.") 
 			ORDER BY DATE(`stc_safetytbm_date`) DESC
 		");
+		if($_SESSION['stc_agent_sub_category']!='Safety Supervisor'){
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				SELECT * FROM `stc_safetytbm` 
+				LEFT JOIN `stc_cust_pro_supervisor`
+				ON `stc_cust_pro_supervisor_id`=`stc_safetytbm_created_by`
+				WHERE `stc_safetytbm_created_by`='".$_SESSION['stc_agent_sub_id']."' 
+				ORDER BY DATE(`stc_safetytbm_date`) DESC
+			");
+
+		}
 		if(mysqli_num_rows($optimusprimequery)>0){
 			foreach($optimusprimequery as $optimusprimerow){
 				$optimusprimeimgqry=mysqli_query($this->stc_dbs, "
