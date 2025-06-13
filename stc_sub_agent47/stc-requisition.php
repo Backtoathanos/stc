@@ -478,40 +478,47 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <ul id="desc-suggestion-box" class="list-group mt-1" style="position: absolute; z-index: 9999; display: none; width: 100%; max-height: 200px; overflow-y: auto;"></ul>
 
                                             <?php
-                                                include_once("../MCU/db.php");
-                                                $query = "SELECT DISTINCT `stc_cust_super_requisition_list_items_title` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_title`<>'' ORDER BY `stc_cust_super_requisition_list_items_title` ASC";
-                                                $result = mysqli_query($con, $query);
-                                                $items = [];
-                                                if(mysqli_num_rows($result) > 0){
-                                                    while($row = mysqli_fetch_assoc($result)){
-                                                        $items[] = $row['stc_cust_super_requisition_list_items_title'];
-                                                    }
-                                                }
+                                                // include_once("../MCU/db.php");
+                                                // $query = "SELECT DISTINCT `stc_cust_super_requisition_list_items_title` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_title`<>'' ORDER BY `stc_cust_super_requisition_list_items_title` ASC";
+                                                // $result = mysqli_query($con, $query);
+                                                // $items = [];
+                                                // if(mysqli_num_rows($result) > 0){
+                                                //     while($row = mysqli_fetch_assoc($result)){
+                                                //         $items[] = $row['stc_cust_super_requisition_list_items_title'];
+                                                //     }
+                                                // }
                                             ?>
                                             
-                                                <script>
-                                                const items = <?php echo json_encode($items); ?>;
-
+                                            <script>
                                                 $(document).ready(function(){
                                                     $("#stc-sup-desc").on("keyup", function(){
                                                         const search = $(this).val().toLowerCase().trim();
-                                                        let matched = items.filter(item => item.toLowerCase().includes(search));
-                                                        let html = "";
 
                                                         if(search.length === 0){
                                                             $("#desc-suggestion-box").hide();
                                                             return;
                                                         }
+                                                        if(search.length>3){
+                                                            $.ajax({
+                                                                url         : "nemesis/stc_agcart.php",
+                                                                method      : "POST",
+                                                                data: { stc_search_items:1, search: search },
+                                                                success: function(response){
+                                                                    const items = JSON.parse(response);
+                                                                    let html = "";
 
-                                                        if(matched.length > 0){
-                                                            matched.forEach(item => {
-                                                                html += `<li class="list-group-item list-group-item-action desc-option" style="cursor:pointer;background: #e9e560;">${item}</li>`;
+                                                                    if(items.length > 0){
+                                                                        items.forEach(item => {
+                                                                            html += `<li class="list-group-item list-group-item-action desc-option" style="cursor:pointer;background: #e9e560;">${item}</li>`;
+                                                                        });
+                                                                    } else {
+                                                                        html = `<li class="list-group-item list-group-item-warning text-center" id="add-new-item" style="cursor:pointer;background: #e9e560;">+ Add New</li>`;
+                                                                    }
+
+                                                                    $("#desc-suggestion-box").html(html).show();
+                                                                }
                                                             });
-                                                        } else {
-                                                            html = `<li class="list-group-item list-group-item-warning text-center" id="add-new-item" style="cursor:pointer;background: #e9e560;">+ Add New</li>`;
                                                         }
-
-                                                        $("#desc-suggestion-box").html(html).show();
                                                     });
 
                                                     $(document).on("click", ".desc-option", function(){
@@ -521,7 +528,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
                                                     $(document).on("click", "#add-new-item", function(){
                                                         $("#desc-suggestion-box").hide();
-                                                        // You can optionally trigger a toast or other UI interaction here
+                                                        // Optionally handle "Add New" click here
                                                     });
 
                                                     $(document).click(function(e){

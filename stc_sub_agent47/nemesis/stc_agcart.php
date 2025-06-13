@@ -866,6 +866,19 @@ class witcher_supervisor extends tesseract{
 		}
 		return $odin;
 	}
+
+	public function stc_search_item($search){
+		$odin=[];
+		$query=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT `stc_cust_super_requisition_list_items_title` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_title`<>'' AND `stc_cust_super_requisition_list_items_title` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' ORDER BY `stc_cust_super_requisition_list_items_title` ASC
+		");
+		if(mysqli_num_rows($query)>0){
+			while($row=mysqli_fetch_assoc($query)){
+				$odin[] = $row['stc_cust_super_requisition_list_items_title'];
+			}
+		}
+		return $odin;
+	}
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -1199,5 +1212,13 @@ if(isset($_POST['stc_req_edit_item_update'])){
 	$odin_req=new witcher_supervisor();
 	$odin_req_out=$odin_req->stc_change_req_item_update($req_item_id, $req_item_name, $req_item_unit, $req_item_type);
 	echo $odin_req_out;
+}
+
+// update item
+if(isset($_POST['stc_search_items'])){
+	$search=$_POST['search'];
+	$odin_req=new witcher_supervisor();
+	$odin_req_out=$odin_req->stc_search_item($search);
+	echo json_encode($odin_req_out);
 }
 ?>
