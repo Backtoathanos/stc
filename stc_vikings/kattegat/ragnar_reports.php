@@ -2896,7 +2896,7 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
                        <b>'.number_format($row['discount'], 2).'</b>
                      </td>
                      <td class="text-right">
-                       <b>'.number_format($totaldiscounted, 2).'</b>
+                       <b>'.number_format($total - $row['discount'], 2).'</b>
                      </td>
                      <td class="text-right">
                         '.number_format($due, 2).'
