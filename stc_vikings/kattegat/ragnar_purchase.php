@@ -2172,7 +2172,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$odin='';
 		$filter='';
 		if($itemname!=""){
-			$filter.="AND (`stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_desc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."')";
+			$filter.="AND (`stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_desc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."')";
 		}
 		if($sourcedestination!=""){
 			$filter.="
