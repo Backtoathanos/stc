@@ -338,7 +338,6 @@ include("kattegat/role_check.php");
                                           <table class="table table-hover table-bordered stc-purchase-view-table">
                                             <thead>
                                               <th>Sl No.</th>
-                                              <th>Action</th>
                                               <th>Adhoc Id</th>
                                               <th>Date</th>
                                               <th>Linked Product</th>
@@ -361,6 +360,7 @@ include("kattegat/role_check.php");
                                               <th>Updated Date</th>
                                               <th>Status</th>
                                               <th>Remarks</th>
+                                              <th>Action</th>
                                             </thead>
                                             <tbody class="stc-call-view-poadhoc-row">
                                               <tr><td colspan="8">Search</td></tr>
@@ -458,67 +458,180 @@ include("kattegat/role_check.php");
           });
 
           
-          var currentPage = 1;
-          var pageSize = 10;
+          // Pagination Module
+          const Pagination = (function() {
+              // Configuration
+              const config = {
+                  pageSize: 10,
+                  visiblePages: 5, // Number of visible page buttons (odd number works best)
+                  container: '#pagination',
+                  tableRowContainer: '.stc-call-view-poadhoc-row',
+                  apiEndpoint: 'kattegat/ragnar_purchase.php',
+                  btnStyles: {
+                      normal: {
+                          padding: '5px 10px',
+                          margin: '0 2px',
+                          background: '#c3ffe3',
+                          color: 'black',
+                          border: '1px solid #ddd',
+                          borderRadius: '3px',
+                          cursor: 'pointer'
+                      },
+                      active: {
+                          background: '#4caf50',
+                          color: 'white',
+                          fontWeight: 'bold'
+                      }
+                  }
+              };
 
-          // call merchant for purchase
-          function loadTableData(page) {
-            $.ajax({
-              url: "kattegat/ragnar_purchase.php",
-              method: "POST",
-              data: {
-                stc_call_poadhoc: 1,
-                itemname: $('#stc-poa-searchbyitem').val(),
-                sourcedestination: $('#tc-poa-searchbydourcedestination').val(),
-                byrack: $('.tc-poa-searchbyrack').val(),
-                status: $('.stc-po-status-in').val(),
-                page: page,
-                pageSize: pageSize
-              },
-              dataType : "JSON",
-              success: function(data) {
-                $('.stc-call-view-poadhoc-row').html(data.odin);
-                // Update pagination controls
-                updatePagination(data.count_num);
+              // State
+              let currentPage = 1;
+              let totalRecords = 0;
+              let isLoading = false;
+
+              // DOM Elements
+              const $pagination = $(config.container);
+              const $tableRowContainer = $(config.tableRowContainer);
+
+              // Private methods
+              function createButton(text, clickHandler, isActive = false) {
+                  const styles = isActive ? 
+                      {...config.btnStyles.normal, ...config.btnStyles.active} : 
+                      config.btnStyles.normal;
+                  
+                  return $('<a>', {
+                      href: 'javascript:void(0)',
+                      class: 'pagination-btn',
+                      text: text,
+                      click: clickHandler
+                  }).css(styles);
               }
-            });
-          }
 
-          function updatePagination(data) {
-            var totalPages = Math.ceil(parseInt(data) / pageSize);
-            $('#pagination').empty();
-
-            for (var i = 1; i <= totalPages; i++) {
-              var pageLink = $(
-                '<a href="javascript:void(0)" class="paginationbtn" style="padding: 5px; margin: 0px; background: #c3ffe3; border: 1px solid grey;">' + 
-                i + 
-                '</a>'
-              );
-
-              // Highlight the current page
-              if (i === currentPage) {
-                pageLink.css({
-                  background: "#4caf50", // Highlight background color (green in this case)
-                  color: "white"        // Font color
-                });
-                pageLink.addClass('active');
+              function showLoading() {
+                  $tableRowContainer.html('<div class="loading-indicator">Loading data...</div>');
               }
 
-              pageLink.click(function(e) {
-                e.preventDefault();
-                // Update currentPage
-                currentPage = parseInt($(this).text());
+              function handleAjaxError() {
+                  $tableRowContainer.html('<div class="error-message">Error loading data. Please try again.</div>');
+              }
 
-                // Load table data for the selected page
-                loadTableData(currentPage);
-              });
+              // Public methods
+              return {
+                  init: function() {
+                      this.loadData(currentPage);
+                  },
 
-              $('#pagination').append(pageLink);
-            }
-          }
+                  loadData: function(page) {
+                      if (isLoading) return;
+                      
+                      currentPage = page;
+                      isLoading = true;
+                      showLoading();
 
-          // Initial data load
-          // loadTableData(currentPage);
+                      $.ajax({
+                          url: config.apiEndpoint,
+                          method: "POST",
+                          data: {
+                              stc_call_poadhoc: 1,
+                              itemname: $('#stc-poa-searchbyitem').val(),
+                              sourcedestination: $('#tc-poa-searchbydourcedestination').val(),
+                              byrack: $('.tc-poa-searchbyrack').val(),
+                              status: $('.stc-po-status-in').val(),
+                              page: page,
+                              pageSize: config.pageSize
+                          },
+                          dataType: "JSON",
+                          success: (data) => {
+                              $tableRowContainer.html(data.odin);
+                              totalRecords = data.count_num;
+                              this.updatePagination();
+                          },
+                          error: handleAjaxError,
+                          complete: () => {
+                              isLoading = false;
+                          }
+                      });
+                  },
+
+                  updatePagination: function() {
+                      const totalPages = Math.ceil(totalRecords / config.pageSize);
+                      $pagination.empty();
+
+                      if (totalPages <= 1) {
+                          return; // Don't show pagination for single page
+                      }
+
+                      // Calculate page range to display
+                      let startPage = Math.max(1, currentPage - Math.floor(config.visiblePages / 2));
+                      let endPage = Math.min(totalPages, startPage + config.visiblePages - 1);
+
+                      // Adjust if we're at the end
+                      if (endPage - startPage + 1 < config.visiblePages) {
+                          startPage = Math.max(1, endPage - config.visiblePages + 1);
+                      }
+
+                      // Previous button
+                      if (currentPage > 1) {
+                          $pagination.append(
+                              createButton('« Prev', () => {
+                                  this.loadData(currentPage - 1);
+                              })
+                          );
+                      }
+
+                      // First page and ellipsis
+                      if (startPage > 1) {
+                          $pagination.append(createButton('1', () => this.loadData(1)));
+                          if (startPage > 2) {
+                              $pagination.append('<span style="margin: 0 5px;">...</span>');
+                          }
+                      }
+
+                      // Page numbers
+                      for (let i = startPage; i <= endPage; i++) {
+                          $pagination.append(
+                              createButton(i, () => {
+                                  this.loadData(i);
+                              }, i === currentPage)
+                          );
+                      }
+
+                      // Last page and ellipsis
+                      if (endPage < totalPages) {
+                          if (endPage < totalPages - 1) {
+                              $pagination.append('<span style="margin: 0 5px;">...</span>');
+                          }
+                          $pagination.append(
+                              createButton(totalPages, () => {
+                                  this.loadData(totalPages);
+                              })
+                          );
+                      }
+
+                      // Next button
+                      if (currentPage < totalPages) {
+                          $pagination.append(
+                              createButton('Next »', () => {
+                                  this.loadData(currentPage + 1);
+                              })
+                          );
+                      }
+                  },
+
+                  refresh: function() {
+                      this.loadData(currentPage);
+                  }
+              };
+          })();
+
+          Pagination.init();
+
+          // Example of how to refresh when search criteria changes
+          $('#stc-poa-searchbyitem, #tc-poa-searchbydourcedestination, .tc-poa-searchbyrack, .stc-po-status-in').on('change', function() {
+              Pagination.loadData(1); // Reset to first page when filters change
+          });
+
           var browserWidth = $(window).width();
 
           // Define the threshold for tablet and mobile (e.g., 992px as a common breakpoint)

@@ -2303,12 +2303,6 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
-						<td class='text-center'>
-							<a href='javascript:void(0)' class='btn btn-secondary update-purchased-lineitems' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Update Status'><i class='fa fa-check-square'></i></a>
-							<!--<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card'></i></a>-->
-							<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o'></i></a>
-							<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash'></i></a>
-						</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_id']."</td>
 						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
 						<td style='width: 180px;'>".$productog."</td>
@@ -2334,6 +2328,12 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_updated_date']))."</td>
 						<td class='text-center'>".$status[$odinrow['stc_purchase_product_adhoc_status']]."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_remarks']."</td>
+						<td class='text-center'>
+							<a href='javascript:void(0)' class='btn btn-secondary update-purchased-lineitems' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Update Status'><i class='fa fa-check-square'></i></a>
+							<!--<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card'></i></a>-->
+							<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o'></i></a>
+							<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash'></i></a>
+						</td>
 					</tr>
 				";
 			}
