@@ -5,10 +5,10 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 include "../../MCU/db.php";
 
-// Get query parameters
 $search = isset($_GET['search']) ? mysqli_real_escape_string($con, $_GET['search']) : '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 10;
+$location_stc = $_GET['location'];
 $offset = ($page - 1) * $limit;
 
 // Base query for products
@@ -42,6 +42,7 @@ $cquery .= " ORDER BY P.stc_product_name ASC LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($con, $cquery);
 
+$lot = array(); // Initialize as empty array
 $data = [];
 foreach($result as $row){
     $product_id = $row['stc_product_id'];
@@ -53,10 +54,7 @@ foreach($result as $row){
 
     // Fetch inventory quantity
     $row['stc_item_inventory_pd_qty'] = 0;
-    $query = mysqli_query($con, "SELECT SUM(`stc_purchase_product_adhoc_qty`) AS stc_item_inventory_pd_qty 
-                                 FROM `stc_purchase_product_adhoc` 
-                                 WHERE stc_purchase_product_adhoc_status=1 
-                                 AND `stc_purchase_product_adhoc_productid` = $product_id");
+    $query = mysqli_query($con, "SELECT SUM(`stc_purchase_product_adhoc_qty`) AS stc_item_inventory_pd_qty FROM `stc_purchase_product_adhoc` WHERE stc_purchase_product_adhoc_status=1 AND `stc_purchase_product_adhoc_productid` = $product_id");
     if ($query && mysqli_num_rows($query) > 0) {
         $row1 = mysqli_fetch_assoc($query);
         $row['stc_item_inventory_pd_qty'] = $row1['stc_item_inventory_pd_qty'] ?? 0;
@@ -96,54 +94,54 @@ foreach($result as $row){
     
     $directqty = 0;
     $sql_qry = mysqli_query($con, "
-        SELECT SUM(srec.stc_cust_super_requisition_list_items_rec_recqty) AS total_qty
-        FROM stc_purchase_product_adhoc spa
-        JOIN stc_cust_super_requisition_list_items_rec srec ON srec.stc_cust_super_requisition_list_items_rec_list_poaid = spa.stc_purchase_product_adhoc_id
-        WHERE spa.stc_purchase_product_adhoc_productid = $product_id 
-        AND spa.stc_purchase_product_adhoc_status = 1
+        SELECT SUM(srec.stc_cust_super_requisition_list_items_rec_recqty) AS total_qty FROM stc_purchase_product_adhoc spa JOIN stc_cust_super_requisition_list_items_rec srec ON srec.stc_cust_super_requisition_list_items_rec_list_poaid = spa.stc_purchase_product_adhoc_id WHERE spa.stc_purchase_product_adhoc_productid = $product_id  AND spa.stc_purchase_product_adhoc_status = 1
     ");
     if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {
         $row1 = mysqli_fetch_assoc($sql_qry);
         $directqty = $row1['total_qty'] ?? 0;
     }
     
-    $location_stc='';
-    if (isset($_COOKIE['location_stc'])) {
-        $location_stc = $_COOKIE['location_stc'];
-    }
-    $lot = array();
-    $sql_qry = mysqli_query($con, "
-        SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM stc_purchase_product_adhoc spa WHERE spa.stc_purchase_product_adhoc_productid = $product_id AND spa.stc_purchase_product_adhoc_status = 1
-    ");
+    $qty=0;
+    $sql_qry = mysqli_query($con, "SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM stc_purchase_product_adhoc spa WHERE spa.stc_purchase_product_adhoc_productid = $product_id AND spa.stc_purchase_product_adhoc_status = 1");
     if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {
-        // $row1 = mysqli_fetch_assoc($sql_qry);
-        foreach($sql_qry as $row1){
+        foreach($sql_qry as $row1) {
             $adhoc_id = $row1['stc_purchase_product_adhoc_id'];
-            $sql_qry2 = mysqli_query($con, "
-                SELECT `shopname` FROM stc_shop WHERE adhoc_id = $adhoc_id
-            ");
-            if($sql_qry2 && mysqli_num_rows($sql_qry2) > 0){
-                foreach($sql_qry2 as $row2){
-                    if($location_stc == $row2['shopname']){
-                        $lot[] = array(
+            $sql_qry2 = mysqli_query($con, "SELECT `shopname`, `qty` FROM stc_shop WHERE adhoc_id = $adhoc_id");
+            
+            if($sql_qry2 && mysqli_num_rows($sql_qry2) > 0) {
+                foreach($sql_qry2 as $row2) {
+                    if($location_stc == $row2['shopname']) {
+                        $qty+= $row2['qty'];
+                        // Push matching lots into the array
+                        $row['lot'] = array(
                             'adhoc_id' => $row1['stc_purchase_product_adhoc_id'],
                             'qty' => $row1['stc_purchase_product_adhoc_qty'],
-                            'shopname' => $row1['shopname']
+                            'shopname' => $row2['shopname']
                         );
-
                     }
                 }
             }
-
         }
-    }
-    $row['lot'] = $lot;
-    $remainingqty = $row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
-    $row['stc_item_inventory_pd_qty'] = number_format(max($remainingqty, 0), 2);
+    }    
 
+    if($qty>0){
+        $remainingqty = $row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
+        $sql_qry = mysqli_query($con, "SELECT `qty`, `stc_trading_user_location` FROM `gld_challan` INNER JOIN `stc_trading_user` ON `stc_trading_user_id`=`created_by` WHERE `product_id` = $product_id");
+        if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {  
+            $qtydispatch=0;          
+            foreach($sql_qry as $row1){
+                if($row1['stc_trading_user_location'] == $location_stc){
+                    $qtydispatch += $row1['qty'];
+                }
+            }
+        }
+        $qty = $qty - $qtydispatch;
+        $row['stc_item_inventory_pd_qty'] = $qty;
+    }else{
+        $row['stc_item_inventory_pd_qty'] = 0;
+    }
     $data[] = $row;
 }
-
 // Return data as JSON with pagination metadata
 echo json_encode([
     'records' => $data,

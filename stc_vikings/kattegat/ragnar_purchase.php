@@ -2303,6 +2303,12 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
+						<td class='text-center'>
+							<a href='javascript:void(0)' class='btn btn-secondary update-purchased-lineitems' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Update Status'><i class='fa fa-check-square'></i></a>
+							<!--<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card'></i></a>-->
+							<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o'></i></a>
+							<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash'></i></a>
+						</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_id']."</td>
 						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."</td>
 						<td style='width: 180px;'>".$productog."</td>
@@ -2317,9 +2323,6 @@ class ragnarPurchaseAdhoc extends tesseract{
 							".$shop_details."
 							<a href='javascript:void(0)' class='btn btn-primary input-shop-item' data-toggle='modal' data-target='.bd-showadhocshop-modal-lg' title='Add Item to Shop' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-plus'></i></a>
 						</td>
-						<td class='text-center' style='width: 180px;'>
-							<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' data-toggle='modal' data-target='.bd-showadhocdetails-modal-lg' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
-						</td>
 						<td class='text-center' style='width: 180px;'>".$odinrow['stc_purchase_product_adhoc_source']."</td>
 						<td class='text-center' style='width: 180px;'>".$odinrow['stc_purchase_product_adhoc_destination']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_condition']."</td>
@@ -2331,11 +2334,6 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td>".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_updated_date']))."</td>
 						<td class='text-center'>".$status[$odinrow['stc_purchase_product_adhoc_status']]."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_remarks']."</td>
-						<td class='text-center'>
-							<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card'></i></a>
-							<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o'></i></a>
-							<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash'></i></a>
-						</td>
 					</tr>
 				";
 			}
@@ -2635,6 +2633,17 @@ class ragnarPurchaseAdhoc extends tesseract{
 	public function stc_poadhoc_itemtoshopremove($id) {
 		$odin="no";
 		$query=mysqli_query($this->stc_dbs, "DELETE FROM `stc_shop` WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'"); 
+		
+		if($query){
+			$odin="yes";
+		}
+	
+		return $odin;
+	}
+
+	public function stc_update_adhoc_item_status($id)	 {
+		$odin="no";
+		$query = mysqli_query($this->stc_dbs, "UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_status` = IF(`stc_purchase_product_adhoc_status` = 1, 2, 1) WHERE `stc_purchase_product_adhoc_id` = '".mysqli_real_escape_string($this->stc_dbs, $id)."'");
 		
 		if($query){
 			$odin="yes";
@@ -3539,6 +3548,14 @@ if(isset($_POST['stc_removeItemshop'])){
 	$id=$_POST['id'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
 	$outbjornestocking=$bjornestocking->stc_poadhoc_itemtoshopremove($id);
+	// echo $outbjornestocking;
+	echo json_encode($outbjornestocking);
+}
+
+if(isset($_POST['stc_changestatus'])){
+	$id=$_POST['id'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_update_adhoc_item_status($id);
 	// echo $outbjornestocking;
 	echo json_encode($outbjornestocking);
 }

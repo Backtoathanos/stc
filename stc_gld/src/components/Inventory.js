@@ -36,12 +36,39 @@ export default function Dashboard() {
     const [limit, setLimit] = useState(10); // Rows per page
     const [totalRows, setTotalRows] = useState(0); // Total records from API
     const [currentPage, setCurrentPage] = useState(1);
+    function getCookie(name) {
+        // 1. Encode the cookie name to handle special characters
+        const encodedName = encodeURIComponent(name) + "=";
+        
+        // 2. Split all cookies into an array
+        const cookies = document.cookie.split(';');
+        
+        // 3. Loop through cookies to find the matching one
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i];
+            
+            // 4. Remove leading whitespace
+            while (cookie.charAt(0) === ' ') {
+            cookie = cookie.substring(1);
+            }
+            
+            // 5. Check if this cookie starts with our encoded name
+            if (cookie.indexOf(encodedName) === 0) {
+            // 6. Return the decoded value
+            return decodeURIComponent(cookie.substring(encodedName.length, cookie.length));
+            }
+        }
+        
+        // 7. Return null if not found
+        return null;
+    }
 
+    const locationcookie = getCookie("location_stc");
     const fetchData = debounce((query = '', pageNum = page, rowLimit = limit) => {
         if(query.length === 0 || query.length >= 3) {
             setLoading(true);
             axios.get(`${API_BASE_URL}/getInventoryData.php`, {
-                params: { search: query, page: pageNum, limit: rowLimit }
+                params: { search: query, page: pageNum, limit: rowLimit, location: locationcookie }
             })
                 .then(response => {
                     if (response.data && response.data.records) {

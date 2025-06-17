@@ -187,9 +187,14 @@ const PrintPreview = () => {
                                     )}
                                     <td className="text-right">
                                         <strong>
-                                            {challanDetails.products.reduce((sum, product) =>
+                                            {queryParams.get('status') === 'billed' && (challanDetails.products.reduce((sum, product) =>
+                                                sum + parseFloat(product.rate * product.qty) - product.discount, 0).toFixed(2)
+                                            )}
+                                        </strong>
+                                        <strong>
+                                            {queryParams.get('status') !== 'billed' && (challanDetails.products.reduce((sum, product) =>
                                                 sum + parseFloat(product.rate * product.qty), 0).toFixed(2)
-                                            }
+                                            )}
                                         </strong>
                                     </td>
                                     <td className="text-right">

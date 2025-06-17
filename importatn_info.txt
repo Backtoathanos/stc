@@ -1,0 +1,111 @@
+mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('".."') 
+
+create table stc_requisition_gld(
+	id int not null primary key auto_increment,
+    requisition_list_id int not null,
+    status int not null,
+	created_by int not null, 
+	created_date timestamp default CURRENT_TIMESTAMP
+)
+
+ALTER TABLE `gld_challan` ADD `adhoc_id` INT NOT NULL AFTER `product_id`;
+
+create table capa(
+	id int not null primary key auto_increment,
+    loc_id int not null,
+    sitename varchar(90),
+    place varchar(90),
+    branch varchar(90),
+    capa_date varchar(50),
+    person_observed varchar(90),
+    designation_observed varchar(90),
+    nclocation varchar(90),
+    observe_date varchar(90),
+    tgtdate varchar(90),
+    severity varchar(20),
+    nonconformanceobserved text,
+    res_personname varchar(90),
+    res_persondesignation varchar(90),
+    res_personname2 varchar(90),
+    res_persondesignation2 varchar(90),
+    res_personname3 varchar(90),
+    res_persondesignation3 varchar(90),
+    rootcause text,
+    corrective text,
+    preventive text,
+    compliancebysupengdate varchar(50),
+    compliancebysupengname varchar(50),
+    reviewedbysodate varchar(50),
+    reviewedbysoname varchar(50),
+    reviewedbydirdate varchar(50),
+    reviewedbydirname varchar(50),
+    beforeimage varchar(200),
+    afterimage varchar(200),
+    created_date timestamp not null,
+    created_by int not null
+)
+
+
+CREATE TABLE orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(15) NOT NULL,
+    street_address TEXT NOT NULL,
+    city VARCHAR(50) NOT NULL,
+    zipCode VARCHAR(10) NOT NULL,
+    state VARCHAR(50) NOT NULL,
+    product_id int NOT NULL,
+    order_number INT NOT NULL,
+    status INT NOT NULL,
+    quantity FLOAT NOT NULL,
+    rate FLOAT NOT NULL,
+    handled_by INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+ALTER TABLE `orders` ADD `status` INT NOT NULL AFTER `product_id`;
+ALTER TABLE `orders` ADD `quantity` FLOAT NOT NULL AFTER `product_id`, ADD `rate` FLOAT NOT NULL AFTER `quantity`;
+ALTER TABLE `orders` ADD `handled_by` INT NOT NULL AFTER `status`;
+ALTER TABLE `orders` ADD `order_number` INT NOT NULL AFTER `state`;
+
+
+create table stc_shop(
+	id int not null primary key auto_increment,
+    shopname varchar(90) not null,
+    adhoc_id int not null,
+    qty float not null,
+    created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by int not null
+)
+
+ALTER TABLE `gld_challan` ADD `discount` FLOAT NOT NULL AFTER `rate`;
+
+create table stc_cust_super_requisition_list_items_log (
+	id int not null primary key auto_increment,
+    item_id int not null,
+    title varchar(90),
+    message text not null,
+    status int not null,
+    created_date timestamp not null default CURRENT_TIMESTAMP,
+    created_by int not null
+)ALTER TABLE `stc_cust_super_requisition_list_items` ADD `stc_cust_super_requisition_list_items_acceptby` INT NOT NULL AFTER `stc_cust_super_requisition_items_finalqty`;
+
+			$title="Ordered";
+			$message="Ordered by ".$_SESSION['stc_agent_sub_name']." on ".date('d-m-Y h:i A');
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, 
+					`title`, 
+					`message`, 
+					`status`, 
+					`created_by`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $last_itemid)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+					'1',
+					'".$_SESSION['stc_agent_sub_id']."'
+				)
+			");

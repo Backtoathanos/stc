@@ -338,6 +338,7 @@ include("kattegat/role_check.php");
                                           <table class="table table-hover table-bordered stc-purchase-view-table">
                                             <thead>
                                               <th>Sl No.</th>
+                                              <th>Action</th>
                                               <th>Adhoc Id</th>
                                               <th>Date</th>
                                               <th>Linked Product</th>
@@ -349,7 +350,6 @@ include("kattegat/role_check.php");
                                               <th>Rate</th>
                                               <th>Stock</th>
                                               <th>Shop</th>
-                                              <th>Dispatched Details</th>
                                               <th>From Source (Supplier/Location)</th>
                                               <th>To Destination (Location)</th>
                                               <th>Condition</th>
@@ -361,7 +361,6 @@ include("kattegat/role_check.php");
                                               <th>Updated Date</th>
                                               <th>Status</th>
                                               <th>Remarks</th>
-                                              <th>Action</th>
                                             </thead>
                                             <tbody class="stc-call-view-poadhoc-row">
                                               <tr><td colspan="8">Search</td></tr>
@@ -1135,6 +1134,26 @@ include("kattegat/role_check.php");
                 }
               });
             }
+          });          
+          
+
+          $('body').delegate('.update-purchased-lineitems', 'click', function(e){
+            var id=$(this).attr('id');
+            if(confirm("Are you sure want to change status of this Item?")){
+              $.ajax({
+                url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
+                type: 'POST', // or 'POST' depending on your API
+                data: {
+                  stc_changestatus: 1,
+                  id: id
+                },
+                dataType: 'json',
+                success: function (response) {
+                  alert("Item updated successfully.");
+                  $('.paginationbtn.active').click();
+                }
+              });
+            }
           });
           
         });
@@ -1561,12 +1580,11 @@ include("kattegat/role_check.php");
                       >Shop Name
                     </h5>
                     <input type="hidden" class="stc-poadhocshop-id">
-                    <input
+                    <select
                       id="stcpoadhocnameshop"
-                      type="text"
                       placeholder="Shop Name"
                       class="form-control validate"
-                    />
+                    ><option>Dhatkidih</option><option>Kolkata</option><option>Sehrabazar</option></select>
                   </div>
                 </div>
                 <div class="col-xl-12 col-md-12 col-sm-12">
