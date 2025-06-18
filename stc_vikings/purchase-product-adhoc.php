@@ -628,24 +628,24 @@ include("kattegat/role_check.php");
               Pagination.loadData(1); // Reset to first page when filters change
           });
 
-          var browserWidth = $(window).width();
+          // var browserWidth = $(window).width();
 
-          // Define the threshold for tablet and mobile (e.g., 992px as a common breakpoint)
-          var tabletMobileBreakpoint = 992;
-          var leftPanelWidth = 400;
+          // // Define the threshold for tablet and mobile (e.g., 992px as a common breakpoint)
+          // var tabletMobileBreakpoint = 992;
+          // var leftPanelWidth = 400;
 
-          // Calculate final width based on conditions
-          var formWidth = browserWidth > tabletMobileBreakpoint ? browserWidth - leftPanelWidth : browserWidth;
+          // // Calculate final width based on conditions
+          // var formWidth = browserWidth > tabletMobileBreakpoint ? browserWidth - leftPanelWidth : browserWidth;
 
-          // Set the width of the form
-          $('.stc-view-purchase-order-form').css('width', formWidth + 'px');
+          // // Set the width of the form
+          // $('.stc-view-purchase-order-form').css('width', formWidth + 'px');
 
-          // Optional: Update the form width on window resize
-          $(window).resize(function () {
-              browserWidth = $(window).width();
-              formWidth = browserWidth > tabletMobileBreakpoint ? browserWidth - leftPanelWidth : browserWidth;
-              $('.stc-view-purchase-order-form').css('width', formWidth + 'px');
-          });
+          // // Optional: Update the form width on window resize
+          // $(window).resize(function () {
+          //     browserWidth = $(window).width();
+          //     formWidth = browserWidth > tabletMobileBreakpoint ? browserWidth - leftPanelWidth : browserWidth;
+          //     $('.stc-view-purchase-order-form').css('width', formWidth + 'px');
+          // });
 
           // Event listener for pagination links
           $('body').delegate('#pagination a', 'click', function(e) {
