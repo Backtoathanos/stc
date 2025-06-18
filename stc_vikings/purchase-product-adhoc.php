@@ -334,12 +334,11 @@ include("kattegat/role_check.php");
                                 <div class="row stc-view-purchase-row">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
-                                      <form action="" class="stc-view-purchase-order-form" style="overflow-x:auto;">
+                                      <form action="" class="stc-view-purchase-order-form" style="overflow-x: auto; width: 100%;">
                                           <table class="table table-hover table-bordered stc-purchase-view-table">
                                             <thead>
                                               <th>Sl No.</th>
-                                              <th>Adhoc Id</th>
-                                              <th>Date</th>
+                                              <th>Adhoc_Id <br>Date</th>
                                               <th>Linked Product</th>
                                               <th>Product Name</th>
                                               <th>Item Name</th>
@@ -349,15 +348,11 @@ include("kattegat/role_check.php");
                                               <th>Rate</th>
                                               <th>Stock</th>
                                               <th>Shop</th>
-                                              <th>From Source (Supplier/Location)</th>
-                                              <th>To Destination (Location)</th>
+                                              <th>From Source (Supplier/Location)<br>To Destination (Location)</th>
                                               <th>Condition</th>
-                                              <th>Payment Term</th>
-                                              <th>Received By</th>
-                                              <th>Created By</th>
-                                              <th>Created Date</th>
-                                              <th>Updated By</th>
-                                              <th>Updated Date</th>
+                                              <th>Received_By</th>
+                                              <th>Created_By<br>Created_Date</th>
+                                              <th>Updated_By<br>Updated_Date</th>
                                               <th>Status</th>
                                               <th>Remarks</th>
                                               <th>Action</th>
@@ -457,7 +452,7 @@ include("kattegat/role_check.php");
             });
           });
 
-          
+          let pagenumber=0;
           // Pagination Module
           const Pagination = (function() {
               // Configuration
@@ -527,6 +522,7 @@ include("kattegat/role_check.php");
                       
                       currentPage = page;
                       isLoading = true;
+                      pagenumber = page;
                       showLoading();
 
                       $.ajax({
@@ -627,7 +623,7 @@ include("kattegat/role_check.php");
 
           Pagination.init();
 
-          // Example of how to refresh when search criteria changes
+          // Example of how to refresh when search criteria changescurrentPage
           $('#stc-poa-searchbyitem, #tc-poa-searchbydourcedestination, .tc-poa-searchbyrack, .stc-po-status-in').on('change', function() {
               Pagination.loadData(1); // Reset to first page when filters change
           });
@@ -655,14 +651,14 @@ include("kattegat/role_check.php");
           $('body').delegate('#pagination a', 'click', function(e) {
             e.preventDefault();
             currentPage = parseInt($(this).text());
-            loadTableData(currentPage);
+            Pagination.loadData(currentPage);
           });
 
           // Event listener for search button
           $('body').delegate('.stc-adhocpo-find', 'click', function(e) {
             e.preventDefault();
             currentPage = 1; // Reset page to 1 on search
-            loadTableData(currentPage);
+            Pagination.loadData(currentPage);
           });
 
           
@@ -747,7 +743,7 @@ include("kattegat/role_check.php");
                       if(response === "success") {
                           alert("Purchase Order Adhoc saved successfully.");
                           $(".stc-add-poadhoc-product-form")[0].reset();
-                          $('.paginationbtn.active').click();
+                          Pagination.loadData(pagenumber);
                       } else {
                           alert(response || "Something went wrong please check and try again.");
                       }
@@ -781,7 +777,7 @@ include("kattegat/role_check.php");
                 if(response=="success"){
                   alert("Purchase Order Adhoc receiving saved successfully.");
                   $('#stcpoadhocreceivedby').val("");
-                  $('.paginationbtn.active').click();
+                  Pagination.loadData(pagenumber);
                 }else{
                   alert("Something went wrong please check and try again.");
                 }
@@ -804,7 +800,7 @@ include("kattegat/role_check.php");
                   if(response=="success"){
                     alert("Purchase Order Adhoc deleted successfully.");
                     $('#stcpoadhocreceivedby').val("");
-                    $('.paginationbtn.active').click();
+                    Pagination.loadData(pagenumber);
                   }else if(response=="invalid"){
                     alert("Item cannot delete, Either its already sold or some of quantity sold.");
                   }else{
@@ -849,7 +845,7 @@ include("kattegat/role_check.php");
                 if(response=="success"){
                   alert("Item Name Updated Successfully.");
                   $('#stcpoadhoceitemname').val("");
-                  $('.paginationbtn.active').click();
+                  Pagination.loadData(pagenumber);
                 }else{
                   alert("Something went wrong please check and try again.");
                 }
@@ -857,9 +853,16 @@ include("kattegat/role_check.php");
             });  
           });  
           
+          $('body').delegate('.img-inputbtnshow', 'click', function(e){
+            $(this).parent().find('.img-idrateinput').toggle();
+            $(this).parent().find('.img-inputratebtn').toggle();
+          });
+
           $('body').delegate('.img-inputbtn', 'click', function(e){
             var adhoc_id=$(this).attr('id');
             var img_id=$(this).parent().find('.img-idinput').val();
+            $(this).parent().find('.img-idrateinput').toggle();
+            $(this).parent().find('.img-inputratebtn').toggle();
             $.ajax({
               url     : "kattegat/ragnar_purchase.php",
               method  : "POST",
@@ -872,7 +875,7 @@ include("kattegat/role_check.php");
                 var response=response_items.trim();
                 if(response=="success"){
                   alert("Item Name Updated Successfully.");
-                  $('.paginationbtn.active').click();
+                  Pagination.loadData(pagenumber);
                 }else{
                   alert("Something went wrong please check and try again.");
                 }
@@ -894,7 +897,7 @@ include("kattegat/role_check.php");
                 var response=response_items.trim();
                 if(response=="success"){
                   alert("Rate Updated Successfully.");
-                  $('.paginationbtn.active').click();
+                  Pagination.loadData(pagenumber);
                 }else{
                   alert("Something went wrong please check and try again.");
                 }
@@ -1198,7 +1201,7 @@ include("kattegat/role_check.php");
               },
               dataType: 'json',
               success: function (response) {
-                alert("Item updated successfully.");
+                alert("Item updated successfully.");Pagination.loadData(pagenumber);
               }
             });
           });
@@ -1224,7 +1227,7 @@ include("kattegat/role_check.php");
               dataType: 'json',
               success: function (response) {
                 alert("Item saved successfully.");
-                $('.paginationbtn.active').click();
+                Pagination.loadData(pagenumber);
               }
             });
           });
@@ -1243,7 +1246,7 @@ include("kattegat/role_check.php");
                 dataType: 'json',
                 success: function (response) {
                   alert("Item deleted successfully.");
-                  $('.paginationbtn.active').click();
+                  Pagination.loadData(pagenumber);
                 }
               });
             }
@@ -1263,7 +1266,7 @@ include("kattegat/role_check.php");
                 dataType: 'json',
                 success: function (response) {
                   alert("Item updated successfully.");
-                  $('.paginationbtn.active').click();
+                  Pagination.loadData(pagenumber);
                 }
               });
             }

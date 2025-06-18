@@ -213,6 +213,12 @@
                                 </li>
                             </ul>
                         </li>
+                        <li>
+                            <a href="summary.php?page=summary" class="summary">
+                                <i class="metismenu-icon pe-7s-note2"></i>
+                                Summary
+                            </a>
+                        </li>
                         <!-- Reports -->
                         <li>
                             <a href="reports.php?page=reports" class="reports">

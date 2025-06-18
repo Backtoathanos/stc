@@ -211,7 +211,7 @@ if(isset($_GET['requi_id'])){
           #logo_print_pre{
             position: relative;
             float: right;
-            right: -150px;
+            right: -180px;
           }
           
           .stc-table-req{
@@ -265,15 +265,15 @@ if(isset($_GET['requi_id'])){
           <div class="row">
             <!-- table -->
             <div class="col-xl-12 col-lg-12 col-md-12">
-              <table class="table table-bordered stc-table-req" style="color: black;">
-                    <tr>
-                        <th class="text-center">#</th>
-                        <th class="text-center">SITE NAME</th>
-                        <th class="text-center" width="70%" class="text-left">----------------------------------------------------ITEMS DESCRIPTIONS--------------------------------------------------</th>
-                        <th class="text-center">UNIT</th>
-                        <th class="text-center">QTY</th>
-                        <th class="text-center">----SIGNATURE----</th>
-                        <th class="text-center">--------DATE--------</th>
+              <table class="stc-table-req" style="color: black;">
+                    <tr style="border:1px solid black;">
+                        <th style="border:1px solid black;" class="text-center">#</th>
+                        <th style="border:1px solid black;" class="text-center">SITE NAME</th>
+                        <th style="border:1px solid black;" class="text-center" width="70%" class="text-left">----------------------------------------------------ITEMS DESCRIPTIONS--------------------------------------------------</th>
+                        <th style="border:1px solid black;" class="text-center">UNIT</th>
+                        <th style="border:1px solid black;" class="text-center">QTY</th>
+                        <th style="border:1px solid black;" class="text-center">----SIGNATURE----</th>
+                        <th style="border:1px solid black;" class="text-center">--------DATE--------</th>
                     </tr>
                     <?php
                         $sl=0;
@@ -335,18 +335,18 @@ if(isset($_GET['requi_id'])){
                             if($dispatchqty>0){
                               $sl++;
                             ?>
-                            <tr>
-                              <td class="no"><?php echo $sl;?></td>
-                              <td class="text-left"><?php echo $sitename;?></td>
-                              <td class="text-left">
+                            <tr style="border:1px solid black;">
+                              <td style="border:1px solid black;"><?php echo $sl;?></td>
+                              <td style="border:1px solid black;" class="text-left"><?php echo $sitename;?></td>
+                              <td style="border:1px solid black;" class="text-left">
                                 <h6>
                                   <?php echo nl2br($row['stc_cust_super_requisition_list_items_title']).' '.$priority;?>
                                 </h6>
                               </td>
-                              <td class="unit"><?php echo $row['stc_cust_super_requisition_list_items_unit'];?></td>
-                              <td class="qty"><?php echo number_format($dispatchqty, 2);?></td>
-                              <td class="text-center"><?php echo $supervisorname;?></td>
-                              <td class="text-center"></td>
+                              <td style="border:1px solid black;" class="unit"><?php echo $row['stc_cust_super_requisition_list_items_unit'];?></td>
+                              <td style="border:1px solid black;" class="qty"><?php echo number_format($dispatchqty, 2);?></td>
+                              <td style="border:1px solid black;" class="text-center"><?php echo $supervisorname;?></td>
+                              <td style="border:1px solid black;" class="text-center"></td>
                             </tr>
                             <?php
                             }

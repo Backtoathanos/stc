@@ -199,13 +199,7 @@ if(isset($_GET['requi_id'])){
           #logo_print_pre{
             margin-top: 6px;
             float: right;
-            margin-right: 0px;
-          }
-
-          #logo_print_pre{
-            margin-top: 6px;
-            float: right;
-            margin-right: 0px;
+            margin-right: -180px;
           }
       }
     </style>
@@ -251,109 +245,109 @@ if(isset($_GET['requi_id'])){
           <div class="row">
             <!-- table -->
             <div class="col-xl-12 col-lg-12 col-md-12">
-              <table class="table table-bordered" style="color: black;">
-             <?php 
-              $stcrqsitequery=mysqli_query($con, "
-                SELECT DISTINCT
-                  `stc_requisition_combiner_req_comb_id`,
-                  `stc_cust_super_requisition_list_id`,
-                  `stc_cust_project_title`
-                FROM `stc_requisition_combiner_req` 
-                INNER JOIN `stc_cust_super_requisition_list` 
-                ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list_id` 
-                INNER JOIN `stc_cust_project` 
-                ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
-                WHERE `stc_requisition_combiner_req_comb_id`='".$_GET['requi_id']."'
-              ");
-              if(mysqli_num_rows($stcrqsitequery)>0){
-                foreach($stcrqsitequery as $reqprrow){
-             ?>
-                  <tr>
-                    <td align="center">
-                      <?php echo $reqprrow['stc_cust_super_requisition_list_id'];?>
-                    </td>
-                    <td colspan="4" align="center">
-                      <?php echo $reqprrow['stc_cust_project_title'];?>
-                    </td>
-                  </tr>
-                  <!-- <thead> -->
-                    <tr>
-                        <th class="text-center">#</th>
-                        <th class="text-center" width="70%" class="text-left">----------------------------------------------------ITEMS DESCRIPTIONS--------------------------------------------------</th>
-                        <th class="text-center">UNIT</th>
-                        <th class="text-center">QTY</th>
-                        <th class="text-center">MERCHANT</th>
-                    </tr>
-                    <?php
-                        $sl=0;
-                        $total=0;
-                        $totalgst=0;
-                        $mtype='';
-                        $currentrequisition=mysqli_query($con, "
-                          SELECT 
-                              `stc_cust_super_requisition_list_id`,
-                              `stc_cust_super_requisition_list_items_title`,
-                              `stc_cust_super_requisition_list_items_unit`,
-                              `stc_cust_super_requisition_list_items_approved_qty`
-                            FROM `stc_cust_super_requisition_list_items`
-                            WHERE `stc_cust_super_requisition_list_items_req_id`='".$reqprrow['stc_cust_super_requisition_list_id']."'
-                        ");
-                        foreach($currentrequisition as $row){
-                            $get_merchant=mysqli_query($con, "
-                              SELECT
-                                  `stc_merchant_name`,
-                                  `stc_cust_super_requisition_list_purchaser_qty`
-                              FROM
-                                  `stc_cust_super_requisition_list_purchaser`
-                              INNER JOIN 
-                                  `stc_merchant` 
-                              ON 
-                                  `stc_merchant_id` = `stc_cust_super_requisition_list_purchaser_mer_id`
-                              WHERE
-                                  `stc_cust_super_requisition_list_purchaser_list_item_id` = '".mysqli_real_escape_string($con, $row['stc_cust_super_requisition_list_id'])."'
-                            ");
-                            $merchant='';
-                            $aprrv_qty=0;
-                            if(mysqli_num_rows($get_merchant)>0){
-                              foreach($get_merchant as $get_merchant_row){
-                                $merchant=$get_merchant_row['stc_merchant_name'];
-                                $aprrv_qty=$get_merchant_row['stc_cust_super_requisition_list_purchaser_qty'];
-                              }
-                            }else{
-                              $aprrv_qty=$row['stc_cust_super_requisition_list_items_approved_qty'];
-                            }
-                            $sl++;
-                            if($aprrv_qty!=0){
-                            ?>
-                            <tr>
-                              <td class="no"><?php echo $sl;?></td>
-                              <td class="text-left">
-                                <h6>
-                                  <?php echo nl2br($row['stc_cust_super_requisition_list_items_title']);?>
-                                </h6>
-                              </td>
-                              <td class="unit"><?php echo $row['stc_cust_super_requisition_list_items_unit'];?></td>
-                              <td class="qty"><?php echo number_format($aprrv_qty, 2);?></td>
-                              <td class="text-center"><?php echo $merchant;?></td>
-                            </tr>
-                            <?php
-                              
-                            }
-                        }
-                    ?>
-              <?php 
-                }
-              }else{
+              <table style="border:1px solid black;">
+                <?php 
+                  $stcrqsitequery=mysqli_query($con, "
+                    SELECT DISTINCT
+                      `stc_requisition_combiner_req_comb_id`,
+                      `stc_cust_super_requisition_list_id`,
+                      `stc_cust_project_title`
+                    FROM `stc_requisition_combiner_req` 
+                    INNER JOIN `stc_cust_super_requisition_list` 
+                    ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list_id` 
+                    INNER JOIN `stc_cust_project` 
+                    ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
+                    WHERE `stc_requisition_combiner_req_comb_id`='".$_GET['requi_id']."'
+                  ");
+                  if(mysqli_num_rows($stcrqsitequery)>0){
+                    foreach($stcrqsitequery as $reqprrow){
                 ?>
-                  <tr>
-                    <td colspan="4" align="center">
-                      No Requisition Found
-                    </td>
-                  </tr>
-                <?php
-              }
-              ?>
-                  </table>
+                      <tr style="border:1px solid black;">
+                        <td style="border:1px solid black;"align="center">
+                          <?php echo $reqprrow['stc_cust_super_requisition_list_id'];?>
+                        </td>
+                        <td style="border:1px solid black;"colspan="4" align="center">
+                          <?php echo $reqprrow['stc_cust_project_title'];?>
+                        </td>
+                      </tr>
+                      <!-- <thead> -->
+                        <tr style="border:1px solid black;">
+                            <th style="border:1px solid black;" class="text-center">#</th>
+                            <th style="border:1px solid black;" class="text-center" width="70%" class="text-left">----------------------------------------------------ITEMS DESCRIPTIONS--------------------------------------------------</th>
+                            <th style="border:1px solid black;" class="text-center">UNIT</th>
+                            <th style="border:1px solid black;" class="text-center">QTY</th>
+                            <th style="border:1px solid black;" class="text-center">MERCHANT</th>
+                        </tr>
+                        <?php
+                            $sl=0;
+                            $total=0;
+                            $totalgst=0;
+                            $mtype='';
+                            $currentrequisition=mysqli_query($con, "
+                              SELECT 
+                                  `stc_cust_super_requisition_list_id`,
+                                  `stc_cust_super_requisition_list_items_title`,
+                                  `stc_cust_super_requisition_list_items_unit`,
+                                  `stc_cust_super_requisition_list_items_approved_qty`
+                                FROM `stc_cust_super_requisition_list_items`
+                                WHERE `stc_cust_super_requisition_list_items_req_id`='".$reqprrow['stc_cust_super_requisition_list_id']."'
+                            ");
+                            foreach($currentrequisition as $row){
+                                $get_merchant=mysqli_query($con, "
+                                  SELECT
+                                      `stc_merchant_name`,
+                                      `stc_cust_super_requisition_list_purchaser_qty`
+                                  FROM
+                                      `stc_cust_super_requisition_list_purchaser`
+                                  INNER JOIN 
+                                      `stc_merchant` 
+                                  ON 
+                                      `stc_merchant_id` = `stc_cust_super_requisition_list_purchaser_mer_id`
+                                  WHERE
+                                      `stc_cust_super_requisition_list_purchaser_list_item_id` = '".mysqli_real_escape_string($con, $row['stc_cust_super_requisition_list_id'])."'
+                                ");
+                                $merchant='';
+                                $aprrv_qty=0;
+                                if(mysqli_num_rows($get_merchant)>0){
+                                  foreach($get_merchant as $get_merchant_row){
+                                    $merchant=$get_merchant_row['stc_merchant_name'];
+                                    $aprrv_qty=$get_merchant_row['stc_cust_super_requisition_list_purchaser_qty'];
+                                  }
+                                }else{
+                                  $aprrv_qty=$row['stc_cust_super_requisition_list_items_approved_qty'];
+                                }
+                                $sl++;
+                                if($aprrv_qty!=0){
+                                ?>
+                                <tr style="border:1px solid black;">
+                                  <td style="border:1px solid black;"><?php echo $sl;?></td>
+                                  <td class="text-left" style="border:1px solid black;">
+                                    <h6>
+                                      <?php echo nl2br($row['stc_cust_super_requisition_list_items_title']);?>
+                                    </h6>
+                                  </td style="border:1px solid black;">
+                                  <td class="unit" style="border:1px solid black;"><?php echo $row['stc_cust_super_requisition_list_items_unit'];?></td>
+                                  <td class="qty" style="border:1px solid black;"><?php echo number_format($aprrv_qty, 2);?></td>
+                                  <td class="text-center" style="border:1px solid black;"><?php echo $merchant;?></td>
+                                </tr>
+                                <?php
+                                  
+                                }
+                            }
+                        ?>
+                  <?php 
+                    }
+                  }else{
+                    ?>
+                      <tr>
+                        <td colspan="4" align="center">
+                          No Requisition Found
+                        </td>
+                      </tr>
+                    <?php
+                  }
+                  ?>
+              </table>
             </div>
           </div>
         </div>
