@@ -2305,10 +2305,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-center'>".$slno."</td>
 						<td style='width: 180px; font-family: Arial, sans-serif; padding: 8px;'>
 							<div style='font-weight: bold; color: #34495e;'>
-								🆔 ".$odinrow['stc_purchase_product_adhoc_id']."
-							</div>
-							<div style='font-weight: bold; color: #2980b9; margin-top: 5px;'>
-								📅 ".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_created_date']))."
+								".$odinrow['stc_purchase_product_adhoc_id']."
 							</div>
 						</td>
 						<td style='width: 180px;'>".$productog."</td>
@@ -2322,6 +2319,9 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-center' style='width: 180px;'>
 							".$shop_details."
 							<a href='javascript:void(0)' class='btn btn-primary input-shop-item' data-toggle='modal' data-target='.bd-showadhocshop-modal-lg' title='Add Item to Shop' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-plus'></i></a>
+						</td>
+						<td class='text-center' style='width: 180px;'>
+							<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' data-toggle='modal' data-target='.bd-showadhocdetails-modal-lg' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
 						</td>
 						<td style='width: 180px; font-family: Arial, sans-serif; padding: 8px;'>
 							<div style='font-weight: bold; color: #2c3e50;'>➤ ".$odinrow['stc_purchase_product_adhoc_source']."</div>

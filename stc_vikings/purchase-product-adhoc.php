@@ -338,7 +338,7 @@ include("kattegat/role_check.php");
                                           <table class="table table-hover table-bordered stc-purchase-view-table">
                                             <thead>
                                               <th>Sl No.</th>
-                                              <th>Adhoc_Id <br>Date</th>
+                                              <th>Adhoc_Id</th>
                                               <th>Linked Product</th>
                                               <th>Product Name</th>
                                               <th>Item Name</th>
@@ -348,6 +348,7 @@ include("kattegat/role_check.php");
                                               <th>Rate</th>
                                               <th>Stock</th>
                                               <th>Shop</th>
+                                              <th>Dispatch Details</th>
                                               <th>From Source (Supplier/Location)<br>To Destination (Location)</th>
                                               <th>Condition</th>
                                               <th>Received_By</th>
@@ -624,9 +625,9 @@ include("kattegat/role_check.php");
           Pagination.init();
 
           // Example of how to refresh when search criteria changescurrentPage
-          $('#stc-poa-searchbyitem, #tc-poa-searchbydourcedestination, .tc-poa-searchbyrack, .stc-po-status-in').on('change', function() {
-              Pagination.loadData(1); // Reset to first page when filters change
-          });
+          // $('#stc-poa-searchbyitem, #tc-poa-searchbydourcedestination, .tc-poa-searchbyrack, .stc-po-status-in').on('change', function() {
+          //     Pagination.loadData(1); // Reset to first page when filters change
+          // });
 
           // var browserWidth = $(window).width();
 

@@ -987,31 +987,76 @@ if(isset($_POST['order_add'])){
 /*-----------------------------------------------------------------------------------*/
 /*---------------------------------For list items------------------------------------*/
 /*-----------------------------------------------------------------------------------*/
+if(isset($_POST['stc-sup-hit'])) {
+    $out = '';
+    $site = $_POST['load_cust_sup_site'];
+    $sdlno = $_POST['stc-sup-sdlnumber'];
+    
+    // Initialize arrays with posted data or empty arrays if not set
+    $descriptions = $_POST['stc-sup-desc'] ?? [];
+    $quantities = $_POST['stc-sup-qty'] ?? [];
+    $units = $_POST['stc-sup-unit'] ?? [];
+    $types = $_POST['stc-sup-type'] ?? [];
+    $priorities = $_POST['stc-sup-priority'] ?? [];
 
-if(isset($_POST['stc-sup-hit'])){
-	$out='';
-	$site=$_POST['load_cust_sup_site'];
-	$desc=$_POST['stc-sup-desc'];
-	$qty=$_POST['stc-sup-qty'];
-	$unit=$_POST['stc-sup-unit'];
-	$type=$_POST['stc-sup-type'];
-	$priority=$_POST['stc-sup-priority'];
-	$sdlno=$_POST['stc-sup-sdlnumber'];
+    $bumblebee = new witcher_supervisor();
+    $megatron = new witcher_supervisor();
 
-	$bumblebee=new witcher_supervisor();
-	$megatron=new witcher_supervisor();
-
-	if(empty($_SESSION['stc_agent_sub_id'])){
-		$out="logout";
-	}else{
-		$out=$bumblebee->stc_requisition_add($site, $desc, $qty, $unit, $type, $priority, $sdlno);
-		if($out=="success"){
-		    $out="Thank You!!!Your Order Will Be Placed ASAP.";
-		}else{
-		    $out="Something went wrong Please check & try again.";
-		}
-	}
-	echo $out;
+    if(empty($_SESSION['stc_agent_sub_id'])) {
+        $out = "logout";
+    } else {
+        // Validate we have the same number of items for each field
+        $itemCount = count($descriptions);
+        if($itemCount == count($quantities) && 
+           $itemCount == count($units) && 
+           $itemCount == count($types) && 
+           $itemCount == count($priorities)) {
+            
+            $successCount = 0;
+            $errorMessages = [];
+            
+            // Process each item
+            for($i = 0; $i < $itemCount; $i++) {
+                $desc = trim($descriptions[$i]);
+                $qty = trim($quantities[$i]);
+                $unit = trim($units[$i]);
+                $type = trim($types[$i]);
+                $priority = trim($priorities[$i]);
+                
+                // Basic validation for each item
+                if(empty($desc) || empty($qty) || $unit == "NA" || $type == "NA") {
+                    $errorMessages[] = "Item " . ($i+1) . " has missing/invalid data";
+                    continue;
+                }
+                
+                $result = $bumblebee->stc_requisition_add($site, $desc, $qty, $unit, $type, $priority, $sdlno);
+                
+                if($result == "success") {
+                    $successCount++;
+                } else {
+                    $errorMessages[] = "Failed to add item " . ($i+1) . ": " . $desc;
+                }
+            }
+            
+            // Prepare output message based on results
+            if($successCount == $itemCount) {
+                $out = "Thank You!!! Your " . $successCount . " item(s) have been added to the requisition.";
+            } elseif($successCount > 0) {
+                $out = "Partially completed: " . $successCount . " of " . $itemCount . " items added successfully. ";
+                if(!empty($errorMessages)) {
+                    $out .= " Issues: " . implode(", ", $errorMessages);
+                }
+            } else {
+                $out = "Failed to add any items. ";
+                if(!empty($errorMessages)) {
+                    $out .= "Errors: " . implode(", ", $errorMessages);
+                }
+            }
+        } else {
+            $out = "Error: Mismatched data counts in submitted items";
+        }
+    }
+    echo $out;
 }
 // if(isset($_POST['stc-sup-hit'])){
 	// if(empty($_POST["stc-sup-desc"])){
