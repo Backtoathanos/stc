@@ -15,7 +15,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Reports - STC</title>
+    <title>Summary - STC</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <meta name="description" content="">
     <meta name="msapplication-tap-highlight" content="no">
@@ -115,7 +115,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         <div class="workflow-step">
                             <div class="workflow-box active">
                                 <div class="step-title">DCP</div>
-                                <div class="step-subtitle">Demand Collection</div>
+                                <div class="step-subtitle">Defective Corrective Preventive</div>
                             </div>
                         </div>
                         
@@ -124,7 +124,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         <div class="workflow-step">
                             <div class="workflow-box">
                                 <div class="step-title">TBM</div>
-                                <div class="step-subtitle">Tender Benchmark</div>
+                                <div class="step-subtitle">Tools Box Meetings</div>
                             </div>
                         </div>
                         
@@ -132,8 +132,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         
                         <div class="workflow-step">
                             <div class="workflow-box">
-                                <div class="step-title">Requisition</div>
-                                <div class="step-subtitle">Purchase Request</div>
+                                <div class="step-title">Requisitions</div>
+                                <div class="step-subtitle">Purchase Requests</div>
                             </div>
                         </div>
                         
@@ -141,8 +141,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         
                         <div class="workflow-step">
                             <div class="workflow-box">
-                                <div class="step-title">Dispatch</div>
-                                <div class="step-subtitle">Material Dispatch</div>
+                                <div class="step-title">Dispatches</div>
+                                <div class="step-subtitle">Material Dispatch & Receipts</div>
                             </div>
                         </div>
                         
@@ -150,8 +150,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         
                         <div class="workflow-step">
                             <div class="workflow-box">
-                                <div class="step-title">Receiving</div>
-                                <div class="step-subtitle">Material Receipt</div>
+                                <div class="step-title">Receivings</div>
+                                <div class="step-subtitle">Material Receivings</div>
                             </div>
                         </div>
                         
@@ -159,8 +159,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         
                         <div class="workflow-step">
                             <div class="workflow-box">
-                                <div class="step-title">Consumption</div>
-                                <div class="step-subtitle">Material Usage</div>
+                                <div class="step-title">Consumptions</div>
+                                <div class="step-subtitle">Consumed Materials</div>
                             </div>
                         </div>
                     </div>

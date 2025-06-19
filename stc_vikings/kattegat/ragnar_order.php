@@ -3659,13 +3659,25 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 			SELECT * FROM `stc_tooldetails` 
 			LEFT JOIN `stc_user` ON `stc_tooldetails`.`created_by` = `stc_user`.`stc_user_id` 
 			".$search."
+			ORDER BY `id` DESC
 			LIMIT $offset, $limit
 		");
 	
 		$blackpearl = [];
 		if(mysqli_num_rows($blackpearl_qry) > 0){
+			$i=0;
 			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
-				$blackpearl[] = $blackpearl_row;
+				$blackpearl[$i] = $blackpearl_row;
+				$blackpearl[$i]['created_dates'] = $blackpearl_row['created_date'] == '' ? '' : date('d-m-Y', strtotime($blackpearl_row['created_date']));
+				$id=$blackpearl_row['id'];
+				$blackpearl_qry2 = mysqli_query($this->stc_dbs, "
+					SELECT id FROM `stc_tooldetails_track` WHERE `toolsdetails_id` = '".mysqli_real_escape_string($this->stc_dbs, $id)."' 
+				");
+				$blackpearl[$i]['status'] = 'Inactive';
+				if(mysqli_num_rows($blackpearl_qry2) > 0){
+					$blackpearl[$i]['status'] = 'Active';
+				}
+				$i++;
 			}
 		}
 	
