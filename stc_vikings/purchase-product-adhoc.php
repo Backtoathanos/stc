@@ -814,8 +814,8 @@ include("kattegat/role_check.php");
           
           $('body').delegate('.edit-itemname', 'click', function(e){
             var item_name=$(this).html();
-            var item_rack = $(this).closest('tr').find('td:eq(6)').html().trim();
-            var item_unit=$(this).closest('tr').find('td:eq(7)').html();
+            var item_rack = $(this).closest('tr').find('td:eq(5)').html().trim();
+            var item_unit=$(this).closest('tr').find('td:eq(6)').html();
             var item_id=$(this).attr("id");
             $('#edit-pro-id').remove();
             $('#stcpoadhoceitemname').val(item_name);
