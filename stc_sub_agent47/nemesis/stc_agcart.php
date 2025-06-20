@@ -462,7 +462,7 @@ class witcher_supervisor extends tesseract{
 							<a href="javascript:void(0)" data-toggle="modal" data-target="#stc-sup-requisition-item-edit-modal" class="btn btn-success edit-req-item" id="'.$requisitioni_row['list_item_id'].'" style="font-size: 15px;color: black;"><i class="fas fa-edit"></i></a>
 					';
 				}
-				if($requisitioni_row['stc_cust_super_requisition_items_finalqty']==0){
+				if($requisitioni_row['stc_cust_super_requisition_list_items_approved_qty']==0){
 					$action.='
 						<a href="#" class="btn btn-danger remove_from_purchase" list_id="'.$requisitioni_row['list_id'].'" item_id="'.$requisitioni_row['list_item_id'].'" style="font-size: 15px;color: black;"><i class="fas fa-trash"></i></a>
 					';
