@@ -232,7 +232,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     <!-- Rest of your content -->
                     <div class="app-page-title">
                         <div id="dcp-tag" class="tab-content">
-                            <div class="row desctitlesdl">
+                            <div class="row desctitlesdl" style="position:absolute;overflow: auto;">
                                 <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
                                         <h5
@@ -723,7 +723,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             
             function call_tbm(location, month, supervise_name){
                 $.ajax({
-                    url         : "../stc_agent47/nemesis/stc_project.php",
+                    url         : "kattegat/ragnar_summary.php",
                     method      : "POST",
                     data        : {stc_safety_calltbm:1, location:location, month:month, supervise_name:supervise_name},
                     success     : function(response_tbm){
@@ -739,121 +739,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 $(this).after('<img src="' + img_src + '" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">');
                 $(this).hide();
             });
-
-            
-            function call_tbm_fields(){
-                var stc_tbm_no=$('.stc-tbm-no').val();
-                $.ajax({
-                    url         : "../stc_agent47/nemesis/stc_safety.php",
-                    method      : "POST",
-                    data        : {stc_safety_calltbmfields:1,stc_tbm_no:stc_tbm_no},
-                    dataType    : "JSON",
-                    success     : function(response_tbm){
-                        // console.log(response_tbm);
-                        $('#stc-tbtm-date').val(response_tbm.tbm.stc_safetytbm_date);
-                        $('#stc-tbtm-time').val(response_tbm.tbm.stc_safetytbm_time);
-                        $('#stc-tbtm-place').val(response_tbm.tbm.stc_safetytbm_place);
-                        $('#stc-tbtm-agendaofmeet').val(response_tbm.tbm.stc_safetytbm_agendaofmeet);
-                        $('#stc-tbtm-pointtone').val(response_tbm.tbm.stc_safetytbm_ptone);
-                        $('#stc-tbtm-pointtwo').val(response_tbm.tbm.stc_safetytbm_pttwo);
-                        $('#stc-tbtm-pointthree').val(response_tbm.tbm.stc_safetytbm_ptthree);
-                        $('#stc-tbtm-pointfour').val(response_tbm.tbm.stc_safetytbm_ptfour);
-                        $('#stc-tbtm-pointfive').val(response_tbm.tbm.stc_safetytbm_ptfive);
-                        $('#stc-tbtm-pointsix').val(response_tbm.tbm.stc_safetytbm_ptsix);
-                        $('#stc-tbtm-suggestionsio').val(response_tbm.tbm.stc_safetytbm_remarks);
-                        $('#stc-tbtm-entryname').val(response_tbm.tbm.stc_safetytbm_entry_name);
-                        $('#stc-tbtm-designation').val(response_tbm.tbm.stc_safetytbm_designation);
-                        $('#stc-tbtm-gatepassno').val(response_tbm.tbm.stc_safetytbm_gatepass_no);
-                        var tbm_entry=response_tbm.tbm_gateentry;
-                        var tbm_entry_out='';
-                        if(tbm_entry!=undefined){
-                            if(tbm_entry.length>0){
-                                var sl=0;
-                                for(var i=0; i<tbm_entry.length; i++){
-                                    sl++;
-                                    tbm_entry_out+='<tr><td>' + sl + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_workpermitno + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_shift + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_time + '</td><td>' + tbm_entry[i].stc_safetytbm_gateentry_supeng_name + '</td></tr>';
-                                }
-                            }else{
-                                tbm_entry_out+='<tr><td>Empty record</td></td>';
-                            }
-                        }else{
-                            tbm_entry_out+='<tr><td>Empty record</td></td>';
-                        }
-                        $('.stc-safety-gentry-show-table').html(tbm_entry_out);
-
-                        var tbm_responsibilities=response_tbm.tbm_responsibility;
-                        var tbm_responsibilities_out='';
-                        if(tbm_responsibilities!=undefined){
-                            if(tbm_responsibilities.length>0){
-                                var sl=0;
-                                for(var i=0; i<tbm_responsibilities.length; i++){
-                                    sl++;
-                                    tbm_responsibilities_out+='<tr><td>' + sl + '</td><td>' + tbm_responsibilities[i].stc_safetytbm_responsibilities_item + '</td><td>' + tbm_responsibilities[i].stc_safetytbm_responsibilities_responsibilities + '</td><td>' + tbm_responsibilities[i].stc_safetytbm_responsibilities_targetdate + '</td></tr>';
-                                }
-                            }else{
-                                tbm_responsibilities_out+='<tr><td>Empty record</td></td>';
-                            }
-                        }else{
-                            tbm_responsibilities_out+='<tr><td>Empty record</td></td>';
-                        }
-                        $('.stc-tbtm-res-show-table').html(tbm_responsibilities_out);
-
-                        var tbm_ppe_checklist=response_tbm.tbm_ppe_checklist;
-                        var tbm_ppe_checklist_out='';                        
-                        if(tbm_ppe_checklist!=undefined){
-                            if(tbm_ppe_checklist.length>0){
-                                var sl=0;
-                                for(var i=0; i<tbm_ppe_checklist.length; i++){                                
-                                    sl++;
-                                    var hardhat='X';
-                                    var SafetyGoggle='X';
-                                    var NoseMask='X';
-                                    var HandGloves='X';
-                                    var FR_Jacket_Trouser='X';
-                                    var SafetyShoes='X';
-                                    var earplug='X';
-                                    var legguard='X';
-                                    var PhysicallyfitforDuty='X';
-                                    if(tbm_ppe_checklist[i].stc_safetytbm_checklist_hardhat==1){
-                                        hardhat='<i class="fa fa-check" aria-hidden="true"></i>';
-                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_SafetyGoggle==1){
-                                        SafetyGoggle='<i class="fa fa-check" aria-hidden="true"></i>';
-                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_NoseMask==1){
-                                        NoseMask='<i class="fa fa-check" aria-hidden="true"></i>';
-                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_HandGloves==1){
-                                        HandGloves='<i class="fa fa-check" aria-hidden="true"></i>';
-                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_FR_Jacket_Trouser==1){
-                                        FR_Jacket_Trouser='<i class="fa fa-check" aria-hidden="true"></i>';
-                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_SafetyShoes==1){
-                                        SafetyShoes='<i class="fa fa-check" aria-hidden="true"></i>';
-                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_earplug==1){
-                                        earplug='<i class="fa fa-check" aria-hidden="true"></i>';
-                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_legguard==1){
-                                        legguard='<i class="fa fa-check" aria-hidden="true"></i>';
-                                    }if(tbm_ppe_checklist[i].stc_safetytbm_checklist_PhysicallyfitforDuty==1){
-                                        PhysicallyfitforDuty='<i class="fa fa-check" aria-hidden="true"></i>';
-                                    }
-                                    tbm_ppe_checklist_out+='<tr><td>' + sl + '</td><td>' + tbm_ppe_checklist[i].stc_safetytbm_checklist_empname + '</td><td class="text-center">' + hardhat + '</td><td class="text-center">' + SafetyGoggle + '</td><td class="text-center">' + NoseMask + '</td><td class="text-center">' + HandGloves + '</td><td class="text-center">' + FR_Jacket_Trouser + '</td><td class="text-center">' + SafetyShoes + '</td><td class="text-center">' + earplug + '</td><td class="text-center">' + legguard + '</td><td class="text-center">' + PhysicallyfitforDuty + '</td><td class="text-center"></td></tr>';
-                                }
-                            }else{
-                                tbm_ppe_checklist_out+='<tr><td>Empty record</td></td>';
-                            }
-                        }else{
-                            tbm_ppe_checklist_out+='<tr><td>Empty record</td></td>';
-                        }
-                        $('.stc-tbtm-ppe-checklist-show-table').html(tbm_ppe_checklist_out);
-                    }
-                });
-            }
-            
-            // filter tbm checkbox
-            function get_filter(class_name){
-                var filter = [];
-                $('.' + class_name + ':checked').each(function(){
-                   filter.push($(this).val()); 
-                });
-                return filter;
-            }
         });
     </script>
 </body>
