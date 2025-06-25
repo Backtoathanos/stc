@@ -309,7 +309,7 @@ function getDistinctChallanNos($conn) {
 
 // function to get distinct challans
 function getDistinctBillNos($conn) {
-    $query = "SELECT DISTINCT bill_number FROM gld_challan WHERE (status='2' OR status='3') AND bill_number<>'' ORDER BY TIMESTAMP(created_date) DESC";
+    $query = "SELECT DISTINCT bill_number FROM gld_challan WHERE (status = '2' OR status = '3') AND bill_number <> '' ORDER BY CAST(bill_number AS UNSIGNED) DESC;";
     $result = $conn->query($query);
 
     $challanNos = [];
