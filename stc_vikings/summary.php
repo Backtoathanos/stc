@@ -204,7 +204,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         <div class="workflow-arrow">→</div>
                         
                         <div class="workflow-step">
-                            <div class="workflow-box">
+                            <div class="workflow-box" data-target="#dispatches-tag">
                                 <div class="step-title">Dispatches</div>
                                 <div class="step-subtitle">Material Dispatch & Receipts</div>
                             </div>
@@ -260,7 +260,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <tr>
                                                         <th class="text-center">SL NO</th>
                                                         <th class="text-center">DATE</th>
-                                                        <th class="text-center">LOCATION</th>
+                                                        <th class="text-center">LOCATION/PROJECT</th>
                                                         <th class="text-center">EQUIPMENT DETAILS</th>
                                                         <th class="text-center">QTY</th>
                                                         <th class="text-center">CAPACITY</th>
@@ -348,6 +348,176 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 </tbody>
                                             </table>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="requisition-tag" class="tab-content">
+                            <div class="row">
+                                <div class="col-xl-12 col-lg-12 col-md-12">
+                                    <div class="card-border mb-3 card card-body border-success">
+                                        <h5
+                                          for="description" align="center"
+                                          >Material Requisition Details
+                                        </h5>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+                                    <div class="card-border mb-3 card card-body border-success">
+                                        <h5
+                                          for="stc-mrd-from"
+                                          >From
+                                        </h5>
+                                        <input 
+                                            type="date"
+                                            id="stc-mrd-from"
+                                            class="custom-select stc-mrd-from"
+                                            value="<?php echo date('Y-m-d', strtotime('- 15 days', strtotime(date('d-m-Y'))));?>"
+                                            name="stc-mrd-from"
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-xl-3 col-lg-3 col-md-3 col-sm-12">
+                                    <div class="card-border mb-3 card card-body border-success">
+                                        <h5
+                                          for="stc-mrd-to"
+                                          >To
+                                        </h5>
+                                        <input 
+                                            type="date"
+                                            id="stc-mrd-to"
+                                            class="custom-select stc-mrd-to"
+                                            value="<?php echo date('Y-m-d');?>"
+                                            name="stc-mrd-to"
+                                        >
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12">
+                                    <div class="card-border mb-3 card card-body border-success">
+                                        <h5
+                                          for="stc-mrd-tojob"
+                                          >Type of Job
+                                        </h5>
+                                        <select
+                                          id="stc-mrd-tojob"
+                                          class="custom-select stc-mrd-tojob"
+                                          name="stc-mrd-tojob"
+                                        ><option value="NA">Select</option>
+                                        <option value="1">Project</option>
+                                        <option value="2">Service</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
+                                    <div class="card-border mb-3 card card-body border-success">
+                                        <h5
+                                          for="stc-mrd-customer"
+                                          >Customer Name
+                                        </h5>
+                                        <select
+                                          id="stc-mrd-customer"
+                                          class="custom-select stc-select-customer"
+                                          name="stc-mrd-customer"
+                                        ><option value="NA">Please Select Customer</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
+                                    <div class="card-border mb-3 card card-body border-success">
+                                        <h5
+                                          for="stc-mrd-location"
+                                          >Location
+                                        </h5>
+                                        <select
+                                          id="stc-mrd-location"
+                                          class="custom-select stc-mrd-lcoation"
+                                          name="stc-mrd-location"
+                                        ><option value="NA">Please Select Customer First</option>
+                                        </select>
+                                    </div>
+                                </div>       
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-md-12 department-section">
+                                    <div class="card-border mb-3 card card-body border-success">
+                                        <h5
+                                          for="stc-mrd-dept"
+                                          >Department
+                                        </h5>
+                                        <select
+                                          id="stc-mrd-dept"
+                                          class="custom-select stc-mrd-dept"
+                                          name="stc-mrd-dept"
+                                        ><option value="NA">Please Select Location First</option>
+                                        </select>
+                                    </div>
+                                </div>            
+                                <div class="col-xl-6 col-lg-6 col-md-6 col-md-12">
+                                    <div class="card-border mb-3 card card-body border-success">
+                                        <h5
+                                          for="stc-mrd-tomaterial"
+                                          >Type of Material
+                                        </h5>
+                                        <select
+                                          id="stc-mrd-tomaterial"
+                                          class="custom-select stc-mrd-tomaterial"
+                                          name="stc-mrd-tomaterial"
+                                        ><option value="NA">Select</option>
+                                        <option>Tools</option>
+                                        <option>PPE</option>
+                                        <option>Consumable</option>
+                                        <option>Supply</option>
+                                        <option>Storeset</option>
+                                        </select>
+                                    </div>
+                                </div>                         
+                                <div class="col-md-10 col-xl-10 col-sm-12"> 
+                                    <div class="card-border mb-3 card card-body border-success">
+                                        <button class="mb-2 mr-2 btn btn-success btn-block stc-mrd-hit">
+                                            <i class="metismenu-icon pe-7s-search"></i> Find
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 col-xl-2 col-sm-12 hidden-project-excel-section"> 
+                                    <div class="card-border mb-3 card card-body border-success">
+                                        <button class="mb-2 mr-2 btn btn-success btn-block stc-mrd-exportexcel-hit" data-type="excel">
+                                            <i class="fa fa-file-excel-o"></i> Export Excel
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-xl-12 col-sm-12"> 
+                                    <div class="card-border mb-3 card card-body border-success">
+                                      <table class="mb-0 table table-bordered" id="stc-reports-mrd-view">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">Project Name</th>
+                                            <th class="text-center">Req No.</th>
+                                            <th class="text-center">Date</th>
+                                            <th class="text-center">Item Description</th>
+                                            <th class="text-center">Unit</th>
+                                            <th class="text-center">Supervisor Request. Qty</th>
+                                            <th class="text-center">Manager Appr. Qty</th>
+                                            <th class="text-center">E-Proc Appr. Qty</th>
+                                            <th class="text-center">Priority</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="stc-reports-mrd-view">
+                                          <tr>
+                                            <td colspan="2">
+                                              <button type="button" class="btn btn-primary projbegbuttoninvsearch" style="float:right;">
+                                                <i class="fas fa-arrow-left"></i>
+                                              </button>
+                                              <input type="hidden" class="projbegvalueinputsearch" value="0">
+                                            </td>
+                                            <td colspan="11">
+                                              <button type="button" class="btn btn-primary projendbuttoninvsearch">
+                                                <i class="fas fa-arrow-right"></i>
+                                              </button>
+                                              <input type="hidden" class="projendvalueinputsearch" value="30">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
                                     </div>
                                 </div>
                             </div>
@@ -741,6 +911,145 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             });
         });
     </script>
+    <!-- mrd detailsfor requisitions -->
+     
+    <!-- mrd -->    
+    <script>
+        $(document).ready(function(){
+            // call customer
+            call_customer();
+            function call_customer(){
+              $.ajax({
+                url     : "kattegat/ragnar_reports.php",
+                method  : "POST",
+                data    : {Stc_customer_reporsts_call_customer:1}, 
+                success : function(data){
+                  $('.stc-select-customer').html(data);
+                }
+              });
+            }
+            $('body').delegate('#stc-mrd-tojob', 'change', function(e){
+                e.preventDefault();
+                var tojob = $(this).val();
+                if(tojob == "1"){
+                    $('.department-section').hide();
+                }else{
+                   $('.department-section').show();
+                }
+            });
+
+            // call location for mrd
+            $('body').delegate('#stc-mrd-customer', 'change', function(e){
+                e.preventDefault();
+                var customer_id = $(this).val();
+                var tojob = $('#stc-mrd-tojob').val();
+                $.ajax({
+                    url     : "kattegat/ragnar_summary.php",
+                    method  : "post",
+                    data    : {
+                        stc_mrd_call_location:1,
+                        customer_id:customer_id,
+                        tojob:tojob
+                    },
+                    success : function(response){
+                        // console.log(response);
+                        $('#stc-mrd-location').html(response);
+                    }
+                });
+            });
+
+            // call department for mrd
+            $('body').delegate('#stc-mrd-location', 'change', function(e){
+                e.preventDefault();
+                var location = $(this).val();
+                $.ajax({
+                    url     : "kattegat/ragnar_reports.php",
+                    method  : "post",
+                    data    : {
+                        stc_mrd_call_dept:1,
+                        location:location
+                    },
+                    success : function(response){
+                        // console.log(response);
+                        $('#stc-mrd-dept').html(response);
+                    }
+                });
+            });
+
+            // call find for mrd
+            $('body').delegate('.stc-mrd-hit', 'click', function (e) {
+                e.preventDefault();
+                var page = 1;
+                get_mrd(page);
+            });
+
+            function get_mrd(page){
+                var from = $("#stc-mrd-from").val();
+                var to = $("#stc-mrd-to").val();
+                var tojob = $("#stc-mrd-tojob").val();
+                var customer = $("#stc-mrd-customer").val();
+                var location = $("#stc-mrd-location").val();
+                var dept = $("#stc-mrd-dept option:selected").text();
+                var pro_id = $("#stc-mrd-dept").val();
+                var tomaterial = $("#stc-mrd-tomaterial").val();
+                var page = page || 1; // Current page, default to 1
+                var limit = 25; // Number of records per page
+
+                if (from !== "" && to !== "") {
+                    $.ajax({
+                        url: "kattegat/ragnar_summary.php",
+                        method: "post",
+                        data: {
+                            stc_mrd_call_mrd: 1,
+                            from: from,
+                            to: to,
+                            tojob: tojob,
+                            customer: customer,
+                            location: location,
+                            dept: dept,
+                            pro_id: pro_id,
+                            tomaterial: tomaterial,
+                            page: page,
+                            limit: limit
+                        },
+                        dataType: "JSON",
+                        success: function (response) {
+                            $('.stc-reports-mrd-view').html(response);
+                        }
+                    });
+                } else {
+                    alert("Please select a date.");
+                }
+            }
+
+            $('body').delegate('.stc-mrd-page', 'click', function (e) {
+                e.preventDefault();
+                var page = $(this).data('page');
+                get_mrd(page);
+                // $('.stc-mrd-hit').data('page', page).trigger('click'); // Trigger the main search with updated page
+            });
+
+
+            $('body').delegate('.showmrd-details', 'click', function(e){
+                var reqid=$(this).attr('reqnumber');
+                var reqdate=$(this).attr('reqdate');
+                var reqraisedby=$(this).attr('reqraisedby');
+                var reqraisedfrom=$(this).attr('reqraisedfrom');
+                var itemdesc=$(this).attr('itemdesc');
+                var itemqty=$(this).attr('itemqty');
+                var itemunit=$(this).attr('itemunit');
+                var itempriority=$(this).attr('itempriority');
+                $('.reqnumbershow').val(reqid);
+                $('.reqdateshow').val(reqdate);
+                $('.reqraisedbyshow').val(reqraisedby);
+                $('.reqraisedfromshow').val(reqraisedfrom);
+                $('.itemdescshow').val(itemdesc);
+                $('.itemqtyshow').val(itemqty);
+                $('.itemunitshow').val(itemunit);
+                $('.itempriorityshow').val(itempriority);
+            });
+        });
+    </script>
 </body>
 </html>
 <!-- search filter for status down list -->
@@ -842,4 +1151,78 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             </div>
         </div>
     </div>
+</div>
+<div class="modal fade bd-example-modal-xl stc-mrdmodal-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Material Requisition Details</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xl-12">
+                <div class="main-card mb-3 card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12 col-xl-6 mb-4">
+                                <h5 class="card-title">Requisition Number</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="reqnumbershow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-xl-6 mb-4">
+                                <h5 class="card-title">Requisition Date</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="reqdateshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Requisition Raised By (User Name)</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="reqraisedbyshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Requisition Raised From (Location)</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="reqraisedfromshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Item Description</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="itemdescshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-xl-6 mb-4">
+                                <h5 class="card-title">Item Quantity</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="itemqtyshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-sm-12 col-xl-6 mb-4">
+                                <h5 class="card-title">Item Unit</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="itemunitshow" disabled>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12 col-xl-12 mb-4">
+                                <h5 class="card-title">Priority</h5>
+                                <div class="position-relative form-group">
+                                    <input type="text" class="itempriorityshow" disabled>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
