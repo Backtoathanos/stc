@@ -557,8 +557,6 @@ class Yggdrasil extends tesseract{
 					WHERE `stc_school_student_attendance_status`='3' 
 					AND `stc_school_student_attendance_stuid`='".$odin_sturow['stc_school_student_id']."'
 					AND `stc_school_student_attendance_classid`='".$odin_sturow['stc_school_class_id']."'
-					AND `stc_school_student_attendance_subid`='".$odin_sturow['stc_school_subject_id']."'
-					AND `stc_school_student_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
 				");
 				$updatebtn='#';
 				$attendance='
@@ -659,8 +657,6 @@ class Yggdrasil extends tesseract{
 					WHERE `stc_school_student_attendance_status`='3' 
 					AND `stc_school_student_attendance_stuid`='".$odin_sturow['stc_school_student_id']."'
 					AND `stc_school_student_attendance_classid`='".$odin_sturow['stc_school_class_id']."'
-					AND `stc_school_student_attendance_subid`='".$odin_sturow['stc_school_subject_id']."'
-					AND `stc_school_student_attendance_createdby`='".$_SESSION['stc_school_user_id']."'
 				");
 				$updatebtn='#';
 				$attendance='

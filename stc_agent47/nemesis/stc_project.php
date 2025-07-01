@@ -1941,7 +1941,7 @@ class pirates_supervisor extends tesseract{
 		$blackpearl='';
 		
 		$deleteqry=mysqli_query($this->stc_dbs, "
-			UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`=5, `stc_cust_super_requisition_list_items_approved_qty`=0 WHERE `stc_cust_super_requisition_list_id`='".$id."'
+			UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`=6, `stc_cust_super_requisition_list_items_approved_qty`=0 WHERE `stc_cust_super_requisition_list_id`='".$id."'
 		");
 		if($deleteqry){
 			$deleteqry=mysqli_query($this->stc_dbs, "

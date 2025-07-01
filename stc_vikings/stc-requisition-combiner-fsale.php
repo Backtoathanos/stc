@@ -584,11 +584,20 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           var orderqty=parseFloat($('#stc-req-list-item-id-orderqty').val(), 10);
           var poadhocitem=$('#poadhocitem').val();
           var balanced_qty=parseInt($('#poadhocitem option:selected').attr('qty'));
-          if((dispatch_qnty>orderqty)){
-            alert("Invalid quantity.");
-          }else if((dispatch_qnty>balanced_qty)){
-            alert("Invalid quantity.");
+          var balanced_qty2=$('.stcbalancedqty').val();
+          var validated=0;
+          if($('#searchInput').val()==''){
+            validated=1;
           }else{
+            if((dispatch_qnty>orderqty)){
+              validated=0;
+              alert("Invalid quantity.");
+            }else if((dispatch_qnty>balanced_qty2)){
+              validated=0;
+              alert("Invalid quantity.");
+            }
+          }
+          if(validated==1){
             // if(orderqty!="0.00"){
               $.ajax({
                 url       : "kattegat/ragnar_order.php",
