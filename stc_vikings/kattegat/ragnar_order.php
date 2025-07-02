@@ -3526,6 +3526,7 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 			}else{
 				$blackpearl .= '<a href="javascript:void(0)" class="page-link2" data-page="' . $i . '">' . $i . '</a> ';
 			}
+			if($i==10){break;}
 		}
 		$blackpearl .= "</td></tr>";
 	

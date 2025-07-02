@@ -1852,6 +1852,7 @@ include("kattegat/role_check.php");
           }
         });
       }
+      item_tracker_call('', 1);
       function item_tracker_call(searchTerm, page = 1) {
         $.ajax({
           url: "kattegat/ragnar_order.php",

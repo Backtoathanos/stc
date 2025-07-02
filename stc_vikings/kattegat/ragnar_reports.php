@@ -3854,7 +3854,8 @@ class ragnarReportsViewSchoolFeeReports extends tesseract{
         $school_list = "'" . implode("','", $bjorneschool) . "'";
         $target_query = "
             SELECT `target_amount` FROM `stc_school_feetarget`
-            WHERE `school` IN ({$school_list})
+            WHERE `school` IN ({$school_list}) AND DATE (`created_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornebegdate)."'
+            AND '".mysqli_real_escape_string($this->stc_dbs, $bjorneenddate)."
         ";
         $target_result = mysqli_query($this->stc_dbs, $target_query);
         
