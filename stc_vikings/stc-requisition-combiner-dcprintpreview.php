@@ -289,6 +289,7 @@ if(isset($_GET['requi_id'])){
                     <tr>
                         <th class="text-center">#</th>
                         <th class="text-center" width="70%" class="text-left">----------------------------------------------------ITEMS DESCRIPTIONS--------------------------------------------------</th>
+                        <th class="text-center">RACK</th>
                         <th class="text-center">UNIT</th>
                         <th class="text-center">QTY</th>
                         <th class="text-center">----SIGNATURE----</th>

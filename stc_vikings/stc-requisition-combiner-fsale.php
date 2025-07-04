@@ -362,8 +362,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         $('body').delegate('.req-recieving-Modal', 'click', function(e){
           e.preventDefault();
           repid=$(this).attr("id");
-          repitemid=$(this).attr("list-id");
-          $('.recieving-modal').modal("show");
+          repitemid=$(this).attr("list-id");         
           $.ajax({
             url       : "kattegat/ragnar_order.php",
             method    : 'POST',
@@ -376,6 +375,31 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             success:function(req){
               // console.log(req);
               $('.show-requisitiondispatched-items').html(req);
+            }
+          });
+          $('.recieving-modal').modal("show");
+        });
+
+        $('body').delegate('.updaterecadhoc', 'click', function(e){
+          var repid=$(this).attr("id");
+          var adhoc_id=$(this).prev().val();
+          repitemid=repitemid;
+          $.ajax({
+            url       : "kattegat/ragnar_order.php",
+            method    : 'POST',
+            data      : {
+              update_adhoc_id_rec:1,
+              adhoc_id:adhoc_id,
+              repid:repid
+            },
+            dataType  : 'JSON',
+            success:function(req){
+              // console.log(req);
+              if(req=="Success"){
+                alert("Updated successfully!! Please reload modal to see changes.");
+              }else{
+                alert(req);
+              }
             }
           });
         });

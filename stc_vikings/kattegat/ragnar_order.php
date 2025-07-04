@@ -2316,14 +2316,34 @@ class ragnarRequisitionPertView extends tesseract{
 		");
 		if(mysqli_num_rows($sqlqry)!=0){
 			foreach($sqlqry as $sqlrow){
+				$result="";
+				if($sqlrow['stc_cust_super_requisition_list_items_rec_list_poaid']==0){
+					$result="-";
+				}
+				$desc=$sqlrow['stc_purchase_product_adhoc_itemdesc'].'<input type="number" class="form-control set-adhoc-id" placeholder="Enter Adhoc ID"><a href="javascript:void(0)" id='.$sqlrow['stc_cust_super_requisition_list_items_rec_id'].' title="Remove" class="updaterecadhoc btn btn-primary">Save</a>';
          	  $lokiout.='<tr>';
          	  $lokiout.='<td class="text-center">'.date('d-m-Y h:i A', strtotime($sqlrow['stc_cust_super_requisition_list_items_rec_date'])).'</td>';
-         	  $lokiout.='<td>'.$sqlrow['stc_purchase_product_adhoc_itemdesc'].'</td>';
-         	  $lokiout.='<td class="text-right">'.number_format($sqlrow['stc_cust_super_requisition_list_items_rec_recqty'], 2).'</td>';
+         	  $lokiout.='<td>'.$desc.'</td>';
+         	  $lokiout.='<td class="text-right">'.$result.number_format($sqlrow['stc_cust_super_requisition_list_items_rec_recqty'], 2).'</td>';
          	  $lokiout.='<td class="text-center">'.$sqlrow['stc_purchase_product_adhoc_unit'].'</td>';
          	  $lokiout.='<td><a href="javascript:void(0)" id='.$sqlrow['stc_cust_super_requisition_list_items_rec_id'].' title="Remove" class="removeitemsfromdispatch" style="font-size:25px;color:black;"><i class="fas fa-trash"></i></a></td>';
          	  $lokiout.='</tr>';
          	}
+		}
+		return $lokiout;
+	}
+	public function stc_update_req_rec_adhoc_id($stc_repid, $stc_adhoc_id){
+		$lokiout='';
+		$sqlqry=mysqli_query($this->stc_dbs, "
+			UPDATE `stc_cust_super_requisition_list_items_rec` 
+			SET `stc_cust_super_requisition_list_items_rec_list_poaid`='".mysqli_real_escape_string($this->stc_dbs, $stc_adhoc_id)."'
+			WHERE `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_repid)."'
+		");
+		if($sqlqry){
+			$lokiout='Success';
+
+		}else{
+			$lokiout='Hmmm!!! Something went wrong on updating adhoc ID.';
 		}
 		return $lokiout;
 	}
@@ -4375,6 +4395,16 @@ if(isset($_POST['call_requistdispatch_sub'])){
 	$stc_repitemid=$_POST['repitemid'];
 	$objloki=new ragnarRequisitionPertView();
 	$objlokiout=$objloki->stc_view_agents_requist_dispatch($stc_repid, $stc_repitemid);
+	echo json_encode($objlokiout);
+	// echo $objlokiout;
+}
+
+// call perticular order records
+if(isset($_POST['update_adhoc_id_rec'])){
+	$stc_repid=$_POST['repid'];
+	$stc_adhoc_id=$_POST['adhoc_id'];
+	$objloki=new ragnarRequisitionPertView();
+	$objlokiout=$objloki->stc_update_req_rec_adhoc_id($stc_repid, $stc_adhoc_id);
 	echo json_encode($objlokiout);
 	// echo $objlokiout;
 }

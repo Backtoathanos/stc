@@ -268,89 +268,80 @@ if(isset($_GET['requi_id'])){
               <table class="stc-table-req" style="color: black;">
                     <tr style="border:1px solid black;">
                         <th style="border:1px solid black;" class="text-center">#</th>
-                        <th style="border:1px solid black;" class="text-center">SITE NAME</th>
-                        <th style="border:1px solid black;" class="text-center" width="70%" class="text-left">----------------------------------------------------ITEMS DESCRIPTIONS--------------------------------------------------</th>
+                        <th style="border:1px solid black;" class="text-center">----------------SITE NAME----------------</th>
+                        <th style="border:1px solid black;" class="text-center" width="70%" class="text-left">---------------------------------------ITEMS DESCRIPTIONS-----------------------------</th>
+                        <th style="border:1px solid black;" class="text-center">RACK</th>
                         <th style="border:1px solid black;" class="text-center">UNIT</th>
                         <th style="border:1px solid black;" class="text-center">QTY</th>
                         <th style="border:1px solid black;" class="text-center">----SIGNATURE----</th>
                         <th style="border:1px solid black;" class="text-center">--------DATE--------</th>
                     </tr>
                     <?php
-                        $sl=0;
-                        $total=0;
-                        $totalgst=0;
-                        $mtype='';
-                        $datefilter='';
-                        if(isset($_GET['begdate']) && isset($_GET['enddate'])){
-                          $begdate=date('Y-m-d', strtotime($_GET['begdate']));
-                          $enddate=date('Y-m-d', strtotime($_GET['enddate']));
-                          $datefilter="
-                            AND DATE(`stc_cust_super_requisition_list_items_rec_date`) BETWEEN '".$begdate."' AND '".$enddate."'
-                          ";
-                        }
-                        $currentrequisition=mysqli_query($con, "
-                          SELECT DISTINCT
-                              `stc_cust_super_requisition_list_id`,
-                              `stc_cust_super_requisition_list_items_req_id`,
-                              `stc_cust_super_requisition_list_items_title`,
-                              `stc_cust_super_requisition_list_items_unit`,
-                              `stc_cust_super_requisition_items_priority`
-                            FROM `stc_cust_super_requisition_list_items`
-                            INNER JOIN `stc_requisition_combiner_req`
-                            ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list_items_req_id`
-                            WHERE `stc_requisition_combiner_req_comb_id`='".$_GET['requi_id']."'
-                        ");
-                        foreach($currentrequisition as $row){
-                            $priority=$row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "";
+                      $sl = 0;
+                      $begdate = isset($_GET['begdate']) ? date('Y-m-d', strtotime($_GET['begdate'])) : '';
+                      $enddate = isset($_GET['enddate']) ? date('Y-m-d', strtotime($_GET['enddate'])) : '';
+                      $datefilter = ($begdate && $enddate) ? "AND DATE(rrec.stc_cust_super_requisition_list_items_rec_date) BETWEEN '$begdate' AND '$enddate'" : '';
 
-                            $dispatchqty=0;
-                            $recqry=mysqli_query($con, "
-                              SELECT sum(`stc_cust_super_requisition_list_items_rec_recqty`) as qty
-                              FROM `stc_cust_super_requisition_list_items_rec`
-                              WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".$row['stc_cust_super_requisition_list_id']."'
-                              AND `stc_cust_super_requisition_list_items_rec_recqty`!=0
-                              ".$datefilter."
-                            ");
-                            if(mysqli_num_rows($recqry)>0){
-                              $response_rec=mysqli_fetch_assoc($recqry);
-                              $dispatchqty=$response_rec['qty'];
-                            }
-                            $recqry=mysqli_query($con, "
-                              SELECT `stc_cust_project_title` FROM `stc_cust_super_requisition_list` INNER JOIN `stc_cust_project` ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id` WHERE `stc_cust_super_requisition_list_id`='".$row['stc_cust_super_requisition_list_items_req_id']."'
-                            ");
-                            $supervisorname='';
-                            if(mysqli_num_rows($recqry)>0){
-                              $response_rec=mysqli_fetch_assoc($recqry);
-                              $sitename=$response_rec['stc_cust_project_title'];
-                            }
-                            $recqry=mysqli_query($con, "
-                              SELECT `stc_cust_pro_supervisor_fullname` FROM `stc_cust_super_requisition_list` INNER JOIN `stc_cust_pro_supervisor` ON `stc_cust_super_requisition_list_super_id`=`stc_cust_pro_supervisor_id` WHERE `stc_cust_super_requisition_list_id`='".$row['stc_cust_super_requisition_list_items_req_id']."'
-                            ");
-                            $supervisorname='';
-                            if(mysqli_num_rows($recqry)>0){
-                              $response_rec=mysqli_fetch_assoc($recqry);
-                              $supervisorname=$response_rec['stc_cust_pro_supervisor_fullname'];
-                            }
+                      $query = mysqli_query($con, "
+                          SELECT 
+                              items.stc_cust_super_requisition_list_id,
+                              items.stc_cust_super_requisition_list_items_req_id,
+                              items.stc_cust_super_requisition_list_items_title,
+                              items.stc_cust_super_requisition_list_items_unit,
+                              items.stc_cust_super_requisition_items_priority,
+                              proj.stc_cust_project_title,
+                              sup.stc_cust_pro_supervisor_fullname,
+                              IFNULL(SUM(rrec.stc_cust_super_requisition_list_items_rec_recqty), 0) AS dispatchqty
+                          FROM stc_cust_super_requisition_list_items AS items
+                          INNER JOIN stc_requisition_combiner_req AS comb 
+                              ON comb.stc_requisition_combiner_req_requisition_id = items.stc_cust_super_requisition_list_items_req_id
+                          LEFT JOIN stc_cust_super_requisition_list AS req 
+                              ON req.stc_cust_super_requisition_list_id = items.stc_cust_super_requisition_list_items_req_id
+                          LEFT JOIN stc_cust_project AS proj 
+                              ON proj.stc_cust_project_id = req.stc_cust_super_requisition_list_project_id
+                          LEFT JOIN stc_cust_pro_supervisor AS sup 
+                              ON sup.stc_cust_pro_supervisor_id = req.stc_cust_super_requisition_list_super_id
+                          LEFT JOIN stc_cust_super_requisition_list_items_rec AS rrec 
+                              ON rrec.stc_cust_super_requisition_list_items_rec_list_item_id = items.stc_cust_super_requisition_list_id 
+                              AND rrec.stc_cust_super_requisition_list_items_rec_recqty != 0
+                              $datefilter
+                          WHERE comb.stc_requisition_combiner_req_comb_id = '".$_GET['requi_id']."'
+                          GROUP BY items.stc_cust_super_requisition_list_id
+                      ");
 
-                            if($dispatchqty>0){
+                      while($row = mysqli_fetch_assoc($query)) {
+                          if($row['dispatchqty'] > 0) {
                               $sl++;
-                            ?>
-                            <tr style="border:1px solid black;">
-                              <td style="border:1px solid black;"><?php echo $sl;?></td>
-                              <td style="border:1px solid black;" class="text-left"><?php echo $sitename;?></td>
-                              <td style="border:1px solid black;" class="text-left">
-                                <h6>
-                                  <?php echo nl2br($row['stc_cust_super_requisition_list_items_title']).' '.$priority;?>
-                                </h6>
-                              </td>
-                              <td style="border:1px solid black;" class="unit"><?php echo $row['stc_cust_super_requisition_list_items_unit'];?></td>
-                              <td style="border:1px solid black;" class="qty"><?php echo number_format($dispatchqty, 2);?></td>
-                              <td style="border:1px solid black;" class="text-center"><?php echo $supervisorname;?></td>
-                              <td style="border:1px solid black;" class="text-center"></td>
-                            </tr>
-                            <?php
-                            }
-                        }
+                              $priority = ($row['stc_cust_super_requisition_items_priority'] == 2) ? "Urgent" : "";
+                              $query2=mysqli_query($con, "
+                                  SELECT 
+                                      stc_rack_name
+                                  FROM stc_purchase_product_adhoc
+                                  INNER JOIN `stc_rack`
+                                  ON stc_purchase_product_adhoc_rackid = stc_rack_id
+                                  INNER JOIN `stc_cust_super_requisition_list_items_rec`
+                                  ON stc_purchase_product_adhoc_id = stc_cust_super_requisition_list_items_rec_list_poaid
+                                  WHERE stc_cust_super_requisition_list_items_rec_list_item_id = '".$row['stc_cust_super_requisition_list_id']."'
+                              ");
+                              $rack = mysqli_num_rows($query2)>0?mysqli_fetch_assoc($query2): array('stc_rack_name' => 'N/A');
+                              $rack = $rack['stc_rack_name'];
+                      ?>
+                      <tr style="border:1px solid black;">
+                          <td style="border:1px solid black;"><?php echo $sl; ?></td>
+                          <td style="border:1px solid black;" class="text-left"><?php echo $row['stc_cust_project_title']; ?></td>
+                          <td style="border:1px solid black;" class="text-left">
+                              <h6><?php echo nl2br($row['stc_cust_super_requisition_list_items_title']) . ' ' . $priority; ?></h6>
+                          </td>
+                          <td style="border:1px solid black;" class="unit"><?php echo $rack;?></td>
+                          <td style="border:1px solid black;" class="unit"><?php echo $row['stc_cust_super_requisition_list_items_unit']; ?></td>
+                          <td style="border:1px solid black;" class="qty"><?php echo number_format($row['dispatchqty'], 2); ?></td>
+                          <td style="border:1px solid black;" class="text-center"><?php echo $row['stc_cust_pro_supervisor_fullname']; ?></td>
+                          <td style="border:1px solid black;" class="text-center"></td>
+                      </tr>
+                      <?php
+                          }
+                      }
+
                     ?>
                   </table>
             </div>
