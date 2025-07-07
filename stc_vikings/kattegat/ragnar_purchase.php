@@ -2127,11 +2127,12 @@ class ragnarGRNAdd extends tesseract{
 class ragnarPurchaseAdhoc extends tesseract{
 
 	// save po adhoc trigger
-	public function stc_po_adhoc_save($itemname, $quantity, $rate, $unit, $rack, $condition, $source, $destination, $remarks){	
+	public function stc_po_adhoc_save($itemcode, $itemname, $quantity, $rate, $unit, $rack, $condition, $source, $destination, $remarks){	
 		$odin='';
 		$date=date("Y-m-d H:i:s");		
 		$lokipo=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_purchase_product_adhoc`(
+				`stc_purchase_product_adhoc_productid`,
 				`stc_purchase_product_adhoc_itemdesc`,
 				`stc_purchase_product_adhoc_qty`,
 				`stc_purchase_product_adhoc_rate`,
@@ -2145,6 +2146,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_created_by`,
 				`stc_purchase_product_adhoc_created_date`
 			)VALUES(
+				'".mysqli_real_escape_string($this->stc_dbs, $itemcode)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $itemname)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $quantity)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $rate)."',
@@ -3426,6 +3428,7 @@ if(isset($_POST['stc_po_adhoc_save'])) {
             
             // Process the item
             $objlokiout = $objloki->stc_po_adhoc_save(
+                $item['itemcode'], 
                 $item['itemname'], 
                 $item['quantity'], 
                 $item['rate'], 

@@ -123,20 +123,27 @@ include("kattegat/role_check.php");
                                                 <table class="table table-bordered" id="itemsTable">
                                                     <thead>
                                                         <tr>
+                                                            <th>Item Code</th>
                                                             <th>Item Name</th>
-                                                            <th>Quantity</th>
-                                                            <th>Unit</th>
-                                                            <th>Rate</th>
-                                                            <th>Rack</th>
+                                                            <th>Quantity</br>Unit</th>
+                                                            <th>Rate</br>Rack</th>
                                                             <th>Condition</th>
-                                                            <th>From (Source/Location)</th>
-                                                            <th>To (Destination/Location)</th>
+                                                            <th>From (Source/Location)<br>To (Destination/Location)</th>
                                                             <th>Remarks</th>
                                                             <th>Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <tr class="item-row">
+                                                            <td style="width: 100px;">
+                                                                <input
+                                                                    name="itemcode[]"
+                                                                    type="number"
+                                                                    placeholder="Item Code"
+                                                                    class="form-control validate"
+                                                                    required
+                                                                />
+                                                            </td>
                                                             <td style="width: 330px;">
                                                                 <textarea
                                                                     name="itemname[]"
@@ -154,8 +161,6 @@ include("kattegat/role_check.php");
                                                                     class="form-control validate"
                                                                     required
                                                                 />
-                                                            </td>
-                                                            <td>
                                                                 <input
                                                                     name="unit[]"
                                                                     type="text"
@@ -171,8 +176,6 @@ include("kattegat/role_check.php");
                                                                     class="form-control validate"
                                                                     required
                                                                 />
-                                                            </td>
-                                                            <td>
                                                                 <select 
                                                                     name="rack[]"
                                                                     class="form-control validate"
@@ -223,8 +226,7 @@ include("kattegat/role_check.php");
                                                                         ?>
                                                                     </select>
                                                                 </div>
-                                                            </td>
-                                                            <td>
+                                                                          </br>
                                                                 <select 
                                                                     class="custom-select form-control"
                                                                     name="destination[]"
@@ -706,6 +708,7 @@ include("kattegat/role_check.php");
               $('#itemsTable tbody tr').each(function(index) {
                   var row = $(this);
                   var itemData = {
+                      itemcode: row.find('[name="itemcode[]"]').val(),
                       itemname: row.find('[name="itemname[]"]').val(),
                       quantity: row.find('[name="quantity[]"]').val(),
                       rate: row.find('[name="rate[]"]').val(),
