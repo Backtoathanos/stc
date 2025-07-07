@@ -165,219 +165,385 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                             </div>
                         </div><?php 
                                 if($_SESSION["stc_empl_role"]>5){
-                            echo '
-                        <div class="row">
-                            <div class="col-md-12 col-xl-12">
-                                <div class="card-border mb-3 card card-body border-success" style="font-size: 15px;">
+                                    echo '
                                     <div class="row">
                                         <div class="col-md-12 col-xl-12">
-                                            <div class="card mb-3 widget-content bg-midnight-bloom" style="background-image: linear-gradient(-20deg, #d4eeff 0%, #fdb8b5 100%) !important;">
-                                                <div class="widget-heading">Month : </div>
-                                                <div class="widget-subheading">
-                                                    <select class="form-control stc-dash-month">
-                                                        <option value="1">January</option>
-                                                        <option value="2">February</option>
-                                                        <option value="3">March</option>
-                                                        <option value="4">April</option>
-                                                        <option value="5">May</option>
-                                                        <option value="6">June</option>
-                                                        <option value="7">July</option>
-                                                        <option value="8">August</option>
-                                                        <option value="9">September</option>
-                                                        <option value="10">October</option>
-                                                        <option value="11">November</option>
-                                                        <option value="12">December</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-xl-6">
-                                            <div class="card mb-3 widget-content bg-midnight-bloom">
-                                                <div class="widget-content-wrapper text-white">
-                                                    <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Electronics Summary
-                                                        </div>
-                                                        <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="toelecpurchase">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="toelecsale">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="toelecexpenses">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="toeleccpaid">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="toelecsdues">
-                                                                <div class="loader"></div>
-                                                            </span>
+                                            <div class="card mb-4 border-success shadow-sm">
+                                                <div class="card-body p-4" style="font-size: 15px;">
+                                                    <!-- Month Selector Card -->
+                                                    <div class="row mb-4">
+                                                        <div class="col-md-12">
+                                                            <div class="card border-0" style="background: linear-gradient(-20deg, #d4eeff 0%, #fdb8b5 100%);">
+                                                                <div class="card-body py-3">
+                                                                    <div class="d-flex align-items-center justify-content-between">
+                                                                        <h5 class="mb-0 font-weight-bold text-dark">Select Month:</h5>
+                                                                        <select class="form-control stc-dash-month w-50 border-0 shadow-sm" style="background: rgba(255,255,255,0.7);">
+                                                                            <option value="1">January</option>
+                                                                            <option value="2">February</option>
+                                                                            <option value="3">March</option>
+                                                                            <option value="4">April</option>
+                                                                            <option value="5">May</option>
+                                                                            <option value="6">June</option>
+                                                                            <option value="7">July</option>
+                                                                            <option value="8">August</option>
+                                                                            <option value="9">September</option>
+                                                                            <option value="10">October</option>
+                                                                            <option value="11">November</option>
+                                                                            <option value="12">December</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-xl-6">
-                                            <div class="card mb-3 widget-content bg-midnight-bloom">
-                                                <div class="widget-content-wrapper text-white">
-                                                    <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Electronics Summary</div>
-                                                        <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="toelecmpaid">
-                                                                <div class="loader"></div>
-                                                            </span>
+
+                                                    <!-- Summary Cards Row -->
+                                                    <div class="row">
+                                                        <div class="col-md-12">
+                                                            <div class="card border-0" style="background: linear-gradient(-20deg, #d4eeff 0%, #ad9aff 100%);">
+                                                                <div class="card-body py-3">
+                                                                    <div class="d-flex align-items-center justify-content-between">
+                                                                        <h5 class="mb-0 font-weight-bold text-center text-dark">STC TRADING</h5>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="widget-subheading">Purchase Dues &nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="toelecmdues">
-                                                                <div class="loader"></div>
-                                                            </span>
+                                                        <!-- Purchase Summary -->
+                                                        <div class="col-md-4 mb-3">
+                                                            <div class="card h-200 border-0 shadow-sm bg-primary text-white">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title font-weight-bold mb-4">Purchase Summary</h5>
+                                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                                        <span>Total Purchase:</span>
+                                                                        <span class="font-weight-bold">
+                                                                            <i class="fas fa-rupee-sign mr-1"></i>
+                                                                            <span class="totrapurchase">
+                                                                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                                        <span>Vendor Payment:</span>
+                                                                        <span class="font-weight-bold">
+                                                                            <i class="fas fa-rupee-sign mr-1"></i>
+                                                                            <span class="totrampaid">
+                                                                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                        <span>Vendor Dues:</span>
+                                                                        <span class="font-weight-bold">
+                                                                            <i class="fas fa-rupee-sign mr-1"></i>
+                                                                            <span class="totramdues">
+                                                                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-xl-6">
-                                            <div class="card mb-3 widget-content bg-mixed-hopes">
-                                                <div class="widget-content-wrapper text-white">
-                                                    <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Trading Summary</div>
-                                                        <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totrapurchase">
-                                                                <div class="loader"></div>
-                                                            </span>
+
+                                                        <!-- Sales Summary -->
+                                                        <div class="col-md-4 mb-3">
+                                                            <div class="card h-200 border-0 shadow-sm bg-success text-white">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title font-weight-bold mb-4">Sales Summary</h5>
+                                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                                        <span>Total Sale:</span>
+                                                                        <span class="font-weight-bold">
+                                                                            <i class="fas fa-rupee-sign mr-1"></i>
+                                                                            <span class="totrasale">
+                                                                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                                                        <span>Received Payments:</span>
+                                                                        <span class="font-weight-bold">
+                                                                            <i class="fas fa-rupee-sign mr-1"></i>
+                                                                            <span class="totracpaid">
+                                                                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                        <span>Dues:</span>
+                                                                        <span class="font-weight-bold">
+                                                                            <i class="fas fa-rupee-sign mr-1"></i>
+                                                                            <span class="totrasdues">
+                                                                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
-                                                        <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totrasale">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totraexpenses">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totracpaid">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totrasdues">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-xl-6">
-                                            <div class="card mb-3 widget-content bg-mixed-hopes">
-                                                <div class="widget-content-wrapper text-white">
-                                                    <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Trading Summary</div>
-                                                        <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totrampaid">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading">Purchase Dues &nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="totramdues">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-xl-6">
-                                            <div class="card mb-3 widget-content bg-midnight-bloom">
-                                                <div class="widget-content-wrapper text-white">
-                                                    <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Groceries Summary</div>
-                                                        <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togrospurchase">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togrossale">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togrosexpenses">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togroscpaid">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togrossdues">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 col-xl-6">
-                                            <div class="card mb-3 widget-content bg-midnight-bloom">
-                                                <div class="widget-content-wrapper text-white">
-                                                    <div class="widget-content-left">
-                                                        <div class="widget-heading">STC Groceries Summary</div>
-                                                        <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togrosmpaid">
-                                                                <div class="loader"></div>
-                                                            </span>
-                                                        </div>
-                                                        <div class="widget-subheading">Purchase Dues &nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                                            <i class="fa fa-rupee-sign"></i>
-                                                            <span class="togrosmdues">
-                                                                <div class="loader"></div>
-                                                            </span>
+
+                                                        <!-- Expenses Summary -->
+                                                        <div class="col-md-4 mb-3">
+                                                            <div class="card h-200 border-0 shadow-sm bg-info text-white">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title font-weight-bold mb-4">Expenses Summary</h5>
+                                                                    <div class="d-flex justify-content-between align-items-center">
+                                                                        <span>Total Expenses:</span>
+                                                                        <span class="font-weight-bold">
+                                                                            <i class="fas fa-rupee-sign mr-1"></i>
+                                                                            <span class="totraexpenses">
+                                                                                <div class="spinner-border spinner-border-sm" role="status"></div>
+                                                                            </span>
+                                                                        </span>
+                                                                    </div>
+                                                                    <!-- Optional: Add more expense metrics here if needed -->
+                                                                    <div class="mt-4 pt-2" style="border-top: 1px solid rgba(255,255,255,0.2);">
+                                                                        <small class="text-white-50">Updated monthly</small>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                            ';
+
+                                    <style>
+                                        .card {
+                                            transition: all 0.3s ease;
+                                            border-radius: 10px;
+                                        }
+                                        .card:hover {
+                                            transform: translateY(-3px);
+                                            box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+                                        }
+                                        .stc-dash-month {
+                                            transition: all 0.3s ease;
+                                        }
+                                        .stc-dash-month:focus {
+                                            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+                                        }
+                                            .h-200 {
+                                                height: 200px !important;
+                                            }
+                                        .bg-primary { background-color: #4e73df !important; }
+                                        .bg-success { background-color: #1cc88a !important; }
+                                        .bg-info { background-color: #36b9cc !important; }
+                                    </style>
+                                    ';
                                 }
+                        //     echo '
+                        // <div class="row">
+                        //     <div class="col-md-12 col-xl-12">
+                        //         <div class="card-border mb-3 card card-body border-success" style="font-size: 15px;">
+                        //             <div class="row">
+                        //                 <div class="col-md-12 col-xl-12">
+                        //                     <div class="card mb-3 widget-content bg-midnight-bloom" style="background-image: linear-gradient(-20deg, #d4eeff 0%, #fdb8b5 100%) !important;">
+                        //                         <div class="widget-heading">Month : </div>
+                        //                         <div class="widget-subheading">
+                        //                             <select class="form-control stc-dash-month">
+                        //                                 <option value="1">January</option>
+                        //                                 <option value="2">February</option>
+                        //                                 <option value="3">March</option>
+                        //                                 <option value="4">April</option>
+                        //                                 <option value="5">May</option>
+                        //                                 <option value="6">June</option>
+                        //                                 <option value="7">July</option>
+                        //                                 <option value="8">August</option>
+                        //                                 <option value="9">September</option>
+                        //                                 <option value="10">October</option>
+                        //                                 <option value="11">November</option>
+                        //                                 <option value="12">December</option>
+                        //                             </select>
+                        //                         </div>
+                        //                     </div>
+                        //                 </div>
+                        //                 <div class="col-md-6 col-xl-6">
+                        //                     <div class="card mb-3 widget-content bg-midnight-bloom">
+                        //                         <div class="widget-content-wrapper text-white">
+                        //                             <div class="widget-content-left">
+                        //                                 <div class="widget-heading">STC Electronics Summary
+                        //                                 </div>
+                        //                                 <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="toelecpurchase">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="toelecsale">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="toelecexpenses">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="toeleccpaid">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="toelecsdues">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                             </div>
+                        //                         </div>
+                        //                     </div>
+                        //                 </div>
+                        //                 <div class="col-md-6 col-xl-6">
+                        //                     <div class="card mb-3 widget-content bg-midnight-bloom">
+                        //                         <div class="widget-content-wrapper text-white">
+                        //                             <div class="widget-content-left">
+                        //                                 <div class="widget-heading">STC Electronics Summary</div>
+                        //                                 <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="toelecmpaid">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading">Purchase Dues &nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="toelecmdues">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                             </div>
+                        //                         </div>
+                        //                     </div>
+                        //                 </div>
+                        //                 <div class="col-md-6 col-xl-6">
+                        //                     <div class="card mb-3 widget-content bg-mixed-hopes">
+                        //                         <div class="widget-content-wrapper text-white">
+                        //                             <div class="widget-content-left">
+                        //                                 <div class="widget-heading">STC Trading Summary</div>
+                        //                                 <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="totrapurchase">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="totrasale">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="totraexpenses">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="totracpaid">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="totrasdues">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                             </div>
+                        //                         </div>
+                        //                     </div>
+                        //                 </div>
+                        //                 <div class="col-md-6 col-xl-6">
+                        //                     <div class="card mb-3 widget-content bg-mixed-hopes">
+                        //                         <div class="widget-content-wrapper text-white">
+                        //                             <div class="widget-content-left">
+                        //                                 <div class="widget-heading">STC Trading Summary</div>
+                        //                                 <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="totrampaid">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading">Purchase Dues &nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="totramdues">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                             </div>
+                        //                         </div>
+                        //                     </div>
+                        //                 </div>
+                        //                 <div class="col-md-6 col-xl-6">
+                        //                     <div class="card mb-3 widget-content bg-midnight-bloom">
+                        //                         <div class="widget-content-wrapper text-white">
+                        //                             <div class="widget-content-left">
+                        //                                 <div class="widget-heading">STC Groceries Summary</div>
+                        //                                 <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="togrospurchase">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="togrossale">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="togrosexpenses">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="togroscpaid">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="togrossdues">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                             </div>
+                        //                         </div>
+                        //                     </div>
+                        //                 </div>
+                        //                 <div class="col-md-6 col-xl-6">
+                        //                     <div class="card mb-3 widget-content bg-midnight-bloom">
+                        //                         <div class="widget-content-wrapper text-white">
+                        //                             <div class="widget-content-left">
+                        //                                 <div class="widget-heading">STC Groceries Summary</div>
+                        //                                 <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="togrosmpaid">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                                 <div class="widget-subheading">Purchase Dues &nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        //                                     <i class="fa fa-rupee-sign"></i>
+                        //                                     <span class="togrosmdues">
+                        //                                         <div class="loader"></div>
+                        //                                     </span>
+                        //                                 </div>
+                        //                             </div>
+                        //                         </div>
+                        //                     </div>
+                        //                 </div>
+                        //             </div>
+                        //         </div>
+                        //     </div>
+                        // </div>
+                        //     ';
+                        //         }
                             ?>
                         <!-- <div class="row">
                             <div class="col-md-12 col-xl-12 col-lg-12 col-sm-12">
