@@ -100,7 +100,7 @@ foreach($result as $row){
         $row1 = mysqli_fetch_assoc($sql_qry);
         $directqty = $row1['total_qty'] ?? 0;
     }
-    if($location_stc=="root"){
+    if($location_stc=="Root"){
         $remainingqty = $row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
         if($remainingqty>0){
             $row['stc_item_inventory_pd_qty'] = $remainingqty;
