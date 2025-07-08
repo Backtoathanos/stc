@@ -100,45 +100,53 @@ foreach($result as $row){
         $row1 = mysqli_fetch_assoc($sql_qry);
         $directqty = $row1['total_qty'] ?? 0;
     }
+    if($location_stc=="root"){
+        $remainingqty = $row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
+        if($remainingqty>0){
+            $row['stc_item_inventory_pd_qty'] = $remainingqty;
+        }else{
+            $row['stc_item_inventory_pd_qty'] = 0;
+        }
+    }else{
     
-    $qty=0;
-    $sql_qry = mysqli_query($con, "SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM stc_purchase_product_adhoc spa WHERE spa.stc_purchase_product_adhoc_productid = $product_id AND spa.stc_purchase_product_adhoc_status = 1");
-    if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {
-        foreach($sql_qry as $row1) {
-            $adhoc_id = $row1['stc_purchase_product_adhoc_id'];
-            $sql_qry2 = mysqli_query($con, "SELECT `shopname`, `qty` FROM stc_shop WHERE adhoc_id = $adhoc_id");
-            
-            if($sql_qry2 && mysqli_num_rows($sql_qry2) > 0) {
-                foreach($sql_qry2 as $row2) {
-                    if($location_stc == $row2['shopname']) {
-                        $qty+= $row2['qty'];
-                        // Push matching lots into the array
-                        $row['lot'] = array(
-                            'adhoc_id' => $row1['stc_purchase_product_adhoc_id'],
-                            'qty' => $row1['stc_purchase_product_adhoc_qty'],
-                            'shopname' => $row2['shopname']
-                        );
+        $qty=0;
+        $sql_qry = mysqli_query($con, "SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM stc_purchase_product_adhoc spa WHERE spa.stc_purchase_product_adhoc_productid = $product_id AND spa.stc_purchase_product_adhoc_status = 1");
+        if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {
+            foreach($sql_qry as $row1) {
+                $adhoc_id = $row1['stc_purchase_product_adhoc_id'];
+                $sql_qry2 = mysqli_query($con, "SELECT `shopname`, `qty` FROM stc_shop WHERE adhoc_id = $adhoc_id");
+                
+                if($sql_qry2 && mysqli_num_rows($sql_qry2) > 0) {
+                    foreach($sql_qry2 as $row2) {
+                        if($location_stc == $row2['shopname']) {
+                            $qty+= $row2['qty'];
+                            // Push matching lots into the array
+                            $row['lot'] = array(
+                                'adhoc_id' => $row1['stc_purchase_product_adhoc_id'],
+                                'qty' => $row1['stc_purchase_product_adhoc_qty'],
+                                'shopname' => $row2['shopname']
+                            );
+                        }
                     }
                 }
             }
-        }
-    }    
-
-    if($qty>0){
-        $remainingqty = $row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
-        $sql_qry = mysqli_query($con, "SELECT `qty`, `stc_trading_user_location` FROM `gld_challan` INNER JOIN `stc_trading_user` ON `stc_trading_user_id`=`created_by` WHERE `product_id` = $product_id");
-        if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {  
-            $qtydispatch=0;          
-            foreach($sql_qry as $row1){
-                if($row1['stc_trading_user_location'] == $location_stc){
-                    $qtydispatch += $row1['qty'];
+        }    
+        if($qty>0){
+            $remainingqty = $row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
+            $sql_qry = mysqli_query($con, "SELECT `qty`, `stc_trading_user_location` FROM `gld_challan` INNER JOIN `stc_trading_user` ON `stc_trading_user_id`=`created_by` WHERE `product_id` = $product_id");
+            if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {  
+                $qtydispatch=0;          
+                foreach($sql_qry as $row1){
+                    if($row1['stc_trading_user_location'] == $location_stc){
+                        $qtydispatch += $row1['qty'];
+                    }
                 }
             }
+            $qty = $qty - $qtydispatch;
+            $row['stc_item_inventory_pd_qty'] = $qty;
+        }else{
+            $row['stc_item_inventory_pd_qty'] = 0;
         }
-        $qty = $qty - $qtydispatch;
-        $row['stc_item_inventory_pd_qty'] = $qty;
-    }else{
-        $row['stc_item_inventory_pd_qty'] = 0;
     }
     $data[] = $row;
 }
