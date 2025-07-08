@@ -802,6 +802,7 @@ class witcher_supervisor extends tesseract{
 		$odin_getitemqry = mysqli_query($this->stc_dbs, "
 			SELECT 
 				`stc_cust_super_requisition_list_items_title`,
+				`stc_cust_super_requisition_list_items_reqqty`,
 				`stc_cust_super_requisition_list_items_unit`,
 				`stc_cust_super_requisition_items_type`
 			FROM `stc_cust_super_requisition_list_items` 
@@ -812,6 +813,7 @@ class witcher_supervisor extends tesseract{
 			// Option 1: Add as associative array item (title + unit in one row)
 			$odin[] = [
 				'title' => $odin_getitemrow['stc_cust_super_requisition_list_items_title'],
+				'quantity' => $odin_getitemrow['stc_cust_super_requisition_list_items_reqqty'],
 				'unit'  => $odin_getitemrow['stc_cust_super_requisition_list_items_unit'],
 				'type'  => $odin_getitemrow['stc_cust_super_requisition_items_type']
 			];
@@ -821,13 +823,14 @@ class witcher_supervisor extends tesseract{
 	}
 
 	// update rewq line items
-	public function stc_change_req_item_update($req_item_id, $req_item_name, $req_item_unit, $req_item_type){
+	public function stc_change_req_item_update($req_item_id, $req_item_name, $req_item_quantity, $req_item_unit, $req_item_type){
 		$odin='';
 		$odin_requpdateqry=mysqli_query($this->stc_dbs, "
 			UPDATE
 			    `stc_cust_super_requisition_list_items`
 			SET
 			    `stc_cust_super_requisition_list_items_title` = '".mysqli_real_escape_string($this->stc_dbs, $req_item_name)."',
+			    `stc_cust_super_requisition_list_items_reqqty` = '".mysqli_real_escape_string($this->stc_dbs, $req_item_quantity)."',
 			    `stc_cust_super_requisition_list_items_unit` = '".mysqli_real_escape_string($this->stc_dbs, $req_item_unit)."',
 			    `stc_cust_super_requisition_items_type` = '".mysqli_real_escape_string($this->stc_dbs, $req_item_type)."',
 			    `stc_cust_super_requisition_list_items_status` = '1'
@@ -1252,10 +1255,11 @@ if(isset($_POST['stc_req_edit_item_show'])){
 if(isset($_POST['stc_req_edit_item_update'])){
 	$req_item_id=$_POST['req_item_id'];
 	$req_item_name=$_POST['req_item_name'];
+	$req_item_quantity=$_POST['req_item_quantity'];
 	$req_item_unit=$_POST['req_item_unit'];
 	$req_item_type=$_POST['req_item_type'];
 	$odin_req=new witcher_supervisor();
-	$odin_req_out=$odin_req->stc_change_req_item_update($req_item_id, $req_item_name, $req_item_unit, $req_item_type);
+	$odin_req_out=$odin_req->stc_change_req_item_update($req_item_id, $req_item_name, $req_item_quantity, $req_item_unit, $req_item_type);
 	echo $odin_req_out;
 }
 

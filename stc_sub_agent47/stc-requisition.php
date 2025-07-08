@@ -492,6 +492,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     success     : function(response_items){
                         // console.log(response_items);
                         $(".stc-super-own-name-text").val(response_items[0].title);
+                        $(".stc-super-own-quantity").val(response_items[0].quantity);
                         $(".stc-super-own-unit").val(response_items[0].unit);                        
                         $(".stc-super-own-type").val(response_items[0].type);
                         $('.stc-super-own-req-id-hidd').val(req_id);
@@ -504,6 +505,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 e.preventDefault();
                 var req_item_id=$('.stc-super-own-req-id-hidd').val();
                 var req_item_name=$('.stc-super-own-name-text').val();
+                var req_item_quantity=$(".stc-super-own-quantity").val();
                 var req_item_unit=$('.stc-super-own-unit').val();
                 var req_item_type=$('.stc-super-own-type').val();
                 $.ajax({
@@ -513,6 +515,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         stc_req_edit_item_update:1,
                         req_item_id:req_item_id,
                         req_item_name:req_item_name,
+                        req_item_quantity:req_item_quantity,
                         req_item_unit:req_item_unit,
                         req_item_type:req_item_type
                     }, 
@@ -757,6 +760,12 @@ $(document).ready(function() {
                 </div>
                 <div class="col-sm-12 col-md-6 col-lg-6">
                    <input type="text" class="form-control stc-super-own-name-text">
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                    <h4>Quantity :</h4>
+                </div>
+                <div class="col-sm-12 col-md-6 col-lg-6">
+                   <input type="text" class="form-control stc-super-own-quantity">
                 </div>
                 <div class="col-sm-12 col-md-6 col-lg-6">
                     <h4>Item Unit :</h4>
