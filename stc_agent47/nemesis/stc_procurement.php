@@ -276,7 +276,7 @@ class procurement extends tesseract{
 				$updatefinalqtqry = mysqli_query($this->stc_dbs, "
 					UPDATE `stc_cust_super_requisition_list_items` 
 					SET `stc_cust_super_requisition_items_finalqty`='".$custreqitemrow['product_quantity']."', 
-					`stc_cust_super_requisition_list_items_status`='".$custreqitemrow['itemstatus']."' 
+					`stc_cust_super_requisition_list_items_status`='3' 
 					WHERE `stc_cust_super_requisition_list_id`='".$custreqitemrow['list_line_id']."'
 					AND `stc_cust_super_requisition_list_items_req_id`='".$custreqitemrow['list_id']."'
 				");
