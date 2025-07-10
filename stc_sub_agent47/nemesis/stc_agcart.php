@@ -375,23 +375,23 @@ class witcher_supervisor extends tesseract{
 			foreach($requisitioni_qry as $requisitioni_row){
 				$reqstaus='';
 				if($requisitioni_row['stc_cust_super_requisition_list_items_status']==1){
-					$reqstaus='Ordered';
+					$reqstaus='<span style="background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px;">Ordered</span>';
 				}elseif($requisitioni_row['stc_cust_super_requisition_list_items_status']==2){
-					$reqstaus='Approved';
+					$reqstaus='<span style="background-color: #2ecc71; color: white; padding: 2px 6px; border-radius: 3px;">Approved</span>';
 				}elseif($requisitioni_row['stc_cust_super_requisition_list_items_status']==3){
-					$reqstaus='Accepted';
+					$reqstaus='<span style="background-color: #27ae60; color: white; padding: 2px 6px; border-radius: 3px;">Accepted</span>';
 				}elseif($requisitioni_row['stc_cust_super_requisition_list_items_status']==4){
-					$reqstaus='Dispatched';
+					$reqstaus='<span style="background-color: #f39c12; color: white; padding: 2px 6px; border-radius: 3px;">Dispatched</span>';
 				}elseif($requisitioni_row['stc_cust_super_requisition_list_items_status']==5){
-					$reqstaus='Received';
+					$reqstaus='<span style="background-color: #16a085; color: white; padding: 2px 6px; border-radius: 3px;">Received</span>';
 				}elseif($requisitioni_row['stc_cust_super_requisition_list_items_status']==6){
-					$reqstaus='Rejected';
+					$reqstaus='<span style="background-color: #e74c3c; color: white; padding: 2px 6px; border-radius: 3px;">Rejected</span>';
 				}elseif($requisitioni_row['stc_cust_super_requisition_list_items_status']==7){
-					$reqstaus='Canceled';
+					$reqstaus='<span style="background-color: #95a5a6; color: white; padding: 2px 6px; border-radius: 3px;">Canceled</span>';
 				}elseif($requisitioni_row['stc_cust_super_requisition_list_items_status']==8){
-					$reqstaus='Returned';
+					$reqstaus='<span style="background-color: #9b59b6; color: white; padding: 2px 6px; border-radius: 3px;">Returned</span>';
 				}else{
-					$reqstaus='Closed';
+					$reqstaus='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
 				}
 
 				$priority = $requisitioni_row['stc_cust_super_requisition_items_priority']==2 ? "Urgent" : "Normal";
@@ -518,7 +518,7 @@ class witcher_supervisor extends tesseract{
 						<td class="text-right">'.number_format($sumbalanceqty, 2).'</td>
 						<td class="text-right">'.number_format($consrecievingqty, 2).'</td>
 						<td class="text-right">'.number_format($stockqty, 2).'</td>
-						<td>'.$reqstaus.'</td>
+						<td class="text-center">'.$reqstaus.'</td>
 						<td>'.$priority.'</td>
 						<td>'.$requisitioni_row['stc_cust_super_requisition_items_type'].'</td>
 						<td class="text-center">'.$action.'</td>
