@@ -470,7 +470,7 @@ include_once("../MCU/db.php");
                     var itemqty=$('.stc-sup-appr-qty'+item_id).val();
                     var itemreqqty=$('.stc-sup-req-qty'+item_id).val();
                     var itemstatus=1;
-                    if((itemqty > 0) && (itemreqqty >= itemqty)){
+                    if((parseFloat(itemqty) > 0) && (parseFloat(itemreqqty) >= parseFloat(itemqty))){
                         // $(this).css('display','none');
                         $.ajax({
                             url : "nemesis/stc_project.php",
