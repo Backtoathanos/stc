@@ -88,7 +88,10 @@ foreach($result as $row){
         if($row['rate_including_percentage']==0){$row['rate_including_percentage'] = "0.00";}
 
     // Calculate remaining quantity
-    $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = $product_id");
+    $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty, `stc_trading_user_location` FROM `gld_challan` INNER JOIN `stc_trading_user` ON `stc_trading_user_id`=`created_by` WHERE `product_id` = $product_id AND `stc_trading_user_location` = '$location_stc'"); 
+    if($location_stc=="Root"){
+        $query = mysqli_query($con, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = $product_id");
+    }
     $result = mysqli_fetch_assoc($query);
     $gldQty = $result['total_qty'] ?? 0;
     
@@ -132,6 +135,7 @@ foreach($result as $row){
             }
         }    
         if($qty>0){
+            $qtydispatch=0;          
             $remainingqty = $row['stc_item_inventory_pd_qty'] - ($gldQty + $directqty);
             $sql_qry = mysqli_query($con, "SELECT `qty`, `stc_trading_user_location` FROM `gld_challan` INNER JOIN `stc_trading_user` ON `stc_trading_user_id`=`created_by` WHERE `product_id` = $product_id");
             if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {  
