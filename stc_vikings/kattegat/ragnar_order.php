@@ -2189,15 +2189,26 @@ class ragnarRequisitionPertView extends tesseract{
 				if(mysqli_num_rows($chursql)==0){
 					$badgeurgent="";
 				}
+
 				$status='';
-				if($requisrow["stc_cust_super_requisition_list_items_status"]==1){
-					$status='Ordered';
-				}else if($requisrow["stc_cust_super_requisition_list_items_status"]==2){
-					$status='Accepted';
-				}else if($requisrow["stc_cust_super_requisition_list_items_status"]==3){
-					$status='Approved';
-				}else if($requisrow["stc_cust_super_requisition_list_items_status"]==4){
-					$status='Dispatched';
+				if($requisrow['stc_cust_super_requisition_list_items_status']==1){
+					$status='<span style="background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px;">Ordered</span>';
+				}elseif($requisrow['stc_cust_super_requisition_list_items_status']==2){
+					$status='<span style="background-color: #2ecc71; color: white; padding: 2px 6px; border-radius: 3px;">Approved</span>';
+				}elseif($requisrow['stc_cust_super_requisition_list_items_status']==3){
+					$status='<span style="background-color: #27ae60; color: white; padding: 2px 6px; border-radius: 3px;">Accepted</span>';
+				}elseif($requisrow['stc_cust_super_requisition_list_items_status']==4){
+					$status='<span style="background-color: #f39c12; color: white; padding: 2px 6px; border-radius: 3px;">Dispatched</span>';
+				}elseif($requisrow['stc_cust_super_requisition_list_items_status']==5){
+					$status='<span style="background-color: #16a085; color: white; padding: 2px 6px; border-radius: 3px;">Received</span>';
+				}elseif($requisrow['stc_cust_super_requisition_list_items_status']==6){
+					$status='<span style="background-color: #e74c3c; color: white; padding: 2px 6px; border-radius: 3px;">Rejected</span>';
+				}elseif($requisrow['stc_cust_super_requisition_list_items_status']==7){
+					$status='<span style="background-color: #95a5a6; color: white; padding: 2px 6px; border-radius: 3px;">Canceled</span>';
+				}elseif($requisrow['stc_cust_super_requisition_list_items_status']==8){
+					$status='<span style="background-color: #9b59b6; color: white; padding: 2px 6px; border-radius: 3px;">Returned</span>';
+				}else{
+					$status='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
 				}
 				$getdispatchedtransformers=mysqli_query($this->stc_dbs, "
 					SELECT 
@@ -2285,7 +2296,7 @@ class ragnarRequisitionPertView extends tesseract{
 						 <td class="text-right">'.number_format($apprpd_qty, 2).'</td>
 						 <td align="right">'.number_format($dispatchedgqty, 2).'</td>
 						 <td align="right">'.number_format($dispatchedgqty, 2).'</td>
-						 <td>'.$status.'</td>
+						 <td class="text-center">'.$status.'</td>
 						 <td class="text-center" '.$bgcolor.'>'.$priority.'</td>
 						 <td>'.$actiondeliver.'</td>
 						 <td>'.$log.'</td>
@@ -3255,19 +3266,23 @@ class ragnarRequisitionPertAdd extends tesseract{
 	public function stc_ag_req_remove_dispatched($stc_req_id){
 		$loki = '';
 		$gamorarecgoqry = mysqli_query($this->stc_dbs, "
-			SELECT `stc_cust_super_requisition_list_items_rec_list_item_id` FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."'
+			SELECT `stc_cust_super_requisition_list_items_rec_list_item_id`, `stc_cust_super_requisition_list_items_rec_list_item_id`, `stc_cust_super_requisition_list_items_rec_status` FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."'
 		");
 		if(mysqli_num_rows($gamorarecgoqry) > 0){
-			$req_id= mysqli_fetch_assoc($gamorarecgoqry)['stc_cust_super_requisition_list_items_rec_list_item_id'];
+			$result=mysqli_fetch_assoc($gamorarecgoqry);
+			$rec_id= $result['stc_cust_super_requisition_list_items_rec_list_item_id'];
+			$rec_statusid= $result['stc_cust_super_requisition_list_items_rec_status'];
+			$rec_itemid= $result['stc_cust_super_requisition_list_items_rec_list_item_id'];
 			$check_dispatched = mysqli_query($this->stc_dbs, "
 				SELECT `stc_cust_super_requisition_rec_items_fr_supervisor_id` 
 				FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
-				WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid` = '".mysqli_real_escape_string($this->stc_dbs, $req_id)."' 
+				WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid` = '".mysqli_real_escape_string($this->stc_dbs, $rec_id)."' 
 			");
-			if($check_dispatched && mysqli_num_rows($check_dispatched) > 0){
-				return "This item has already been dispatched. You cannot remove it.";
+			if($rec_statusid!=2 && $check_dispatched && mysqli_num_rows($check_dispatched) > 0){
+				return "This item has already been dispatched. You cannot remove it.".mysqli_fetch_assoc($gamorarecgoqry);
 			}
 		}
+		mysqli_query($this->stc_dbs, "DELETE FROM `stc_cust_super_requisition_rec_items_fr_supervisor` WHERE`stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".mysqli_real_escape_string($this->stc_dbs, $rec_itemid)."'");
 		$gamorarecgoqry = mysqli_query($this->stc_dbs, "
 			DELETE FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."'
 		");

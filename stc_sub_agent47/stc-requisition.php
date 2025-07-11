@@ -499,6 +499,25 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     }
                 });
             });
+            $('body').delegate('.return-req-item', 'click', function(e){
+                e.preventDefault();
+                var req_id=$(this).attr("id");
+                if(confirm("Are you sure to return this item?")){
+                    $.ajax({
+                        url         : "nemesis/stc_agcart.php",
+                        method      : "POST",
+                        data        : {
+                            stc_req_return_item_show:1,
+                            req_id:req_id
+                        }, 
+                        dataType: "JSON",
+                        success     : function(response_items){
+                            alert('Item Returned Successfully.');
+                            $('.stc-sup-req-search').click();
+                        }
+                    });
+                }
+            });
 
             // update  req list items edit
             $('body').delegate('.stc-super-own-edit-btn', 'click', function(e){

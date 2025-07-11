@@ -71,7 +71,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                               <tbody>
                                                 <tr>
                                                   <td>
-                                                    <input type="text" class="form-control" id="searchInput" placeholder="Search here..">
+                                                    <input type="text" class="form-control" id="searchInputforTable" placeholder="Search here..">
                                                   </td>
                                                 </tr>
                                               </tbody>
@@ -168,7 +168,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     </script>
     <script>      
       $(document).ready(function(){
-        $("#searchInput").on("keyup", function() {
+        $("#searchInputforTable").on("keyup", function() {
             var value = $(this).val().toLowerCase();
             $(".stc-view-ag-requisition-form table tbody tr").filter(function() {
                 $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
@@ -619,6 +619,8 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             }else if((dispatch_qnty>balanced_qty2)){
               validated=0;
               alert("Invalid quantity.");
+            }else{
+              validated=1;
             }
           }
           if(validated==1){

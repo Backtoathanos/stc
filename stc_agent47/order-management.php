@@ -267,7 +267,7 @@ include_once("../MCU/db.php");
                                                                                 $style=$requisrow['stc_cust_super_requisition_items_priority']==2 ? 'style="background:#ffa5a5;color:black"' : "";
                                                                                 if($requisrow['stc_cust_super_requisition_list_items_status']==1){
                                                                                     $sl++;
-                                                                                    $status=$requisrow['stc_cust_super_requisition_list_items_status']==1? "Ordered" : "Approved";
+                                                                                    $status=$requisrow['stc_cust_super_requisition_list_items_status']==1? '<span style="background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px;">Ordered</span>' : '<span style="background-color: #2ecc71; color: white; padding: 2px 6px; border-radius: 3px;">Approved</span>';
                                                                                     echo '
                                                                                         <tr id="'.$trid.'" class="tr-search-fromhere" '.$style.'>
                                                                                             <td class="text-center">'.$sl.'</td>

@@ -109,3 +109,5 @@ create table stc_cust_super_requisition_list_items_log (
 					'".$_SESSION['stc_agent_sub_id']."'
 				)
 			");
+
+            ALTER TABLE `stc_cust_super_requisition_list_items_rec` ADD `stc_cust_super_requisition_list_items_rec_status` INT NOT NULL AFTER `stc_cust_super_requisition_list_items_rec_recqty`;

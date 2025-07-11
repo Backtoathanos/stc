@@ -452,6 +452,7 @@ class witcher_supervisor extends tesseract{
 							stc-req-item-id="'.$requisitioni_row['list_item_id'].'"
 							stc-req-item-checkqty="'.$requisitioni_row['stc_cust_super_requisition_items_finalqty'].'"
 							stc-req-id="'.$requisitioni_row['list_id'].'"
+							title="Add Recieving"
 							class="btn btn-info btn-sm stc-sup-requisition-rece-modal-btn">	 
 							Recieving
 						</a>
@@ -459,12 +460,20 @@ class witcher_supervisor extends tesseract{
 				}
 				if($requisitioni_row['stc_cust_super_requisition_list_items_status']==1 || $requisitioni_row['stc_cust_super_requisition_list_items_status']==6){
 					$action.='
-							<a href="javascript:void(0)" data-toggle="modal" data-target="#stc-sup-requisition-item-edit-modal" class="btn btn-success edit-req-item" id="'.$requisitioni_row['list_item_id'].'" style="font-size: 15px;color: black;"><i class="fas fa-edit"></i></a>
+							<a href="javascript:void(0)" data-toggle="modal" data-target="#stc-sup-requisition-item-edit-modal" class="btn btn-success edit-req-item"
+							title="Edit"
+							id="'.$requisitioni_row['list_item_id'].'" style="font-size: 15px;color: black;"><i class="fas fa-edit"></i></a>
 					';
 				}
 				if($requisitioni_row['stc_cust_super_requisition_list_items_approved_qty']==0){
 					$action.='
-						<a href="#" class="btn btn-danger remove_from_purchase" list_id="'.$requisitioni_row['list_id'].'" item_id="'.$requisitioni_row['list_item_id'].'" style="font-size: 15px;color: black;"><i class="fas fa-trash"></i></a>
+						<a href="#" class="btn btn-danger remove_from_purchase" list_id="'.$requisitioni_row['list_id'].'" item_id="'.$requisitioni_row['list_item_id'].'" title="Delete" style="font-size: 15px;color: black;"><i class="fas fa-trash"></i></a>
+					';
+				}
+
+				if($requisitioni_row['stc_cust_super_requisition_list_items_status']==5){
+					$action.='
+							<a href="javascript:void(0)" data-toggle="modal" class="btn btn-danger return-req-item" id="'.$requisitioni_row['list_item_id'].'" title="Return" style="background-color:#ffd34e; font-size: 15px;color: black;"><i class="fas fa-undo"></i></a>
 					';
 				}
 				$log='
@@ -472,6 +481,7 @@ class witcher_supervisor extends tesseract{
 							href="#" 
 							data-toggle="modal"
 							data-target=".bd-log-modal-lg"
+							title="View Log"
 							class="btn btn-info btn-sm stc-sup-requisition-viewlog-modal-btn">	 
 							View Log
 						</a>
@@ -882,6 +892,41 @@ class witcher_supervisor extends tesseract{
 		}
 		return $odin;
 	}
+
+	public function stc_return_item($req_id){
+		$odin='';
+		$query=mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_super_requisition_list_items_rec_id` FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`= '".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
+		");
+		if(mysqli_num_rows($query)>0){
+			while($row=mysqli_fetch_assoc($query)){
+				mysqli_query($this->stc_dbs, "UPDATE `stc_cust_super_requisition_list_items_rec` SET `stc_cust_super_requisition_list_items_rec_status`='2' WHERE `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_items_rec_id'])."'");
+				
+			}
+			mysqli_query($this->stc_dbs, "UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`='8' WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'");
+			
+			$title="Returned";
+			$message="Returned by ".$_SESSION['stc_agent_sub_name']." on ".date('d-m-Y h:i A');
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, 
+					`title`, 
+					`message`, 
+					`status`, 
+					`created_by`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $req_item_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+					'1',
+					'".$_SESSION['stc_agent_sub_id']."'
+				)
+			");
+			$odin='success';
+		}
+		return $odin;
+	}
+	
 }
 
 /*-----------------------------------------------------------------------------------*/
@@ -1268,6 +1313,14 @@ if(isset($_POST['stc_search_items'])){
 	$search=$_POST['search'];
 	$odin_req=new witcher_supervisor();
 	$odin_req_out=$odin_req->stc_search_item($search);
+	echo json_encode($odin_req_out);
+}
+
+// call req items for edit
+if(isset($_POST['stc_req_return_item_show'])){
+	$req_id=$_POST['req_id'];
+	$odin_req=new witcher_supervisor();
+	$odin_req_out=$odin_req->stc_return_item($req_id);
 	echo json_encode($odin_req_out);
 }
 ?>
