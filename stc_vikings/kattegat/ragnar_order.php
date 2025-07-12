@@ -2125,8 +2125,6 @@ class ragnarRequisitionPertView extends tesseract{
 						<th class="text-center" style="width: 20%;">Items Desc</th>
 						<th class="text-center">Unit</th>
 						<th class="text-center">Ordered Qty</th> 
-						<th class="text-center">Approved Qty</th> 
-						<th class="text-center">GST Qty</th>  
 						<th class="text-center">Dispatched Qty</th> 
 						<th class="text-center">Status</th>   
 						<th class="text-center">Priority</th>  
@@ -2293,8 +2291,6 @@ class ragnarRequisitionPertView extends tesseract{
 						 <td>'.$requisrow['stc_cust_super_requisition_list_items_title'].'</td>
 						 <td class="text-center">'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
 						 <td class="text-right">'.number_format($requisrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
-						 <td class="text-right">'.number_format($apprpd_qty, 2).'</td>
-						 <td align="right">'.number_format($dispatchedgqty, 2).'</td>
 						 <td align="right">'.number_format($dispatchedgqty, 2).'</td>
 						 <td class="text-center">'.$status.'</td>
 						 <td class="text-center" '.$bgcolor.'>'.$priority.'</td>
@@ -3196,21 +3192,7 @@ class ragnarRequisitionPertAdd extends tesseract{
 			
 			$title="Dispatched";
 			$message="Dispatched by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A'). " <br> Quantity :".$dispatch_qty;
-			$optimusprimequery=mysqli_query($this->stc_dbs, "
-				INSERT INTO `stc_cust_super_requisition_list_items_log`(
-					`item_id`, 
-					`title`, 
-					`message`, 
-					`status`, 
-					`created_by`
-				) VALUES (
-					'".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
-					'1',
-					'".$_SESSION['stc_empl_id']."'
-				)
-			");
+			$this->stc_generate_log($stc_req_id, $title, $message);
 			if($gamoraupdateqry){
 				$loki="Item dispatched successfully.";
 			}else{
@@ -3219,6 +3201,35 @@ class ragnarRequisitionPertAdd extends tesseract{
 		}else{
 			$loki="Hmmm!!! Something went wrong. Dispatched not done properly.";
 		}
+		return $loki;
+	}
+	
+	public function stc_generate_log($stc_req_id, $title, $message){
+		$loki = '';
+		$date = date("Y-m-d H:i:s");
+		
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_super_requisition_list_items_log`(
+				`item_id`, 
+				`title`, 
+				`message`, 
+				`status`, 
+				`created_by`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+				'1',
+				'".$_SESSION['stc_empl_id']."'
+			)
+		");
+
+		if ($optimusprimequery) {
+			$loki = "Log entry created successfully.";
+		} else {
+			$loki = "Failed to create log entry.";
+		}
+
 		return $loki;
 	}
 	

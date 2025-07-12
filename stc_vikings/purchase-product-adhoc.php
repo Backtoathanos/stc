@@ -277,6 +277,7 @@ include("kattegat/role_check.php");
                                 <div class="row stc-view-product-row">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
+                                      <a class="btn btn-secondary" data-toggle="modal" data-target=".bd-modal-inventoryshow" href="javascript:void(0)">View Inventory</a>
                                       <a class="btn btn-success" data-toggle="modal" data-target=".bd-modal-ledgershow" href="javascript:void(0)">View Ledger</a>
                                       <form action="" class="stc-view-product-form">
                                           <table class="table table-hover table-bordered">
@@ -819,6 +820,7 @@ include("kattegat/role_check.php");
             var item_name=$(this).html();
             var item_rack = $(this).closest('tr').find('td:eq(5)').html().trim();
             var item_unit=$(this).closest('tr').find('td:eq(6)').html();
+            var item_qty=$(this).closest('tr').find('td:eq(7)').html();
             var item_id=$(this).attr("id");
             $('#edit-pro-id').remove();
             $('#stcpoadhoceitemname').val(item_name);
@@ -826,6 +828,7 @@ include("kattegat/role_check.php");
               return $(this).text().trim() === item_rack;
             }).prop('selected', true);
             $('#stcpoadhoceitemunit').val(item_unit);
+            $('#stcpoadhoceitemqty').val(item_qty);
             $('#stc-poadhocedit-id').val(item_id);
           });
           
@@ -834,6 +837,7 @@ include("kattegat/role_check.php");
             var adhoc_name=$('#stcpoadhoceitemname').val();
             var adhoc_rack=$('#stcpoadhoceitemrack').val();
             var adhoc_unit=$('#stcpoadhoceitemunit').val();
+            var adhoc_qty=$('#stcpoadhoceitemqty').val();
             $.ajax({
               url     : "kattegat/ragnar_purchase.php",
               method  : "POST",
@@ -842,7 +846,8 @@ include("kattegat/role_check.php");
                 adhoc_id:adhoc_id,
                 adhoc_name:adhoc_name,
                 adhoc_rack:adhoc_rack,
-                adhoc_unit:adhoc_unit
+                adhoc_unit:adhoc_unit,
+                adhoc_qty:adhoc_qty
               },
               success : function(response_items){
                 var response=response_items.trim();
@@ -1275,6 +1280,44 @@ include("kattegat/role_check.php");
               });
             }
           });
+
+          function loadData(page = 1, search = '') {
+              $.ajax({
+                   url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
+                  method: 'POST',
+                  data: {
+                      stc_getinventory: 1,
+                      page: page,
+                      searchKey: search
+                  },
+                  success: function(response) {
+                      const res = JSON.parse(response);
+                      $('#dataContainer').html(res.html);
+                      $('#paginations').html(res.pagination);
+                  }
+              });
+          }
+
+          // Initial Load
+          loadData();
+
+          // Search
+          $('#searchKey').on('keyup', function () {
+              const search = $(this).val();
+              if(search.length >= 3 || search.length === 0) {
+                  loadData(1, search);
+              } else {
+                  loadData(1);
+              }
+          });
+
+          // Pagination Click
+          $(document).on('click', '.pagination_link', function () {
+              const page = $(this).data('page');
+              const search = $('#searchKey').val();
+              loadData(page, search);
+          });
+
           
         });
     </script>
@@ -1370,6 +1413,20 @@ include("kattegat/role_check.php");
                     </div>
                   </div>
                 </div>
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5
+                      for=""
+                      >Item Quantity
+                    </h5>
+                    <input
+                      id="stcpoadhoceitemqty"
+                      type="text"
+                      placeholder="Edit Quantity"
+                      class="form-control validate"
+                    />
+                  </div>
+                </div>    
                 <div class="col-xl-12 col-md-12 col-sm-12">
                   <div class="card-border mb-3 card card-body border-success">
                     <h5
@@ -1728,6 +1785,70 @@ include("kattegat/role_check.php");
                 </div>
               </div>
             </div>
+            <div class="modal-footer">
+              <div class="row">
+                <div class="col-xl-6 col-md-6 col-sm-6">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-modal-inventoryshow" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl ">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Inventories</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+              <div class="row">
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card border-success mb-3 card-body">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Warehouse</h5>
+                    <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
+                        <li class="nav-item">
+                            <a role="tab" class="nav-link active" id="tab-modal-1" data-toggle="tab" href="#tab-content-modal-1">
+                                <span>Warehouse</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a role="tab" class="nav-link" id="tab-modal-2" data-toggle="tab" href="#tab-content-modal-2">
+                                <span>Dhatkidih</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a role="tab" class="nav-link" id="tab-modal-3" data-toggle="tab" href="#tab-content-modal-3">
+                                <span>Kolkata</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane tabs-animation fade active" id="tab-content-modal-1" role="tabpanel">
+                          <input type="text" id="searchKey" placeholder="Search product..." />
+                          <div id="dataContainer"></div>
+                          <div id="paginations"></div>
+                        </div>
+                        <div class="tab-pane tabs-animation fade" id="tab-content-modal-2" role="tabpanel">
+                          <input type="text" id="searchKey" placeholder="Search product..." />
+                          <div id="dataContainer2">I am Dhatkidih Shop, will coming soon</div>
+                          <div id="paginations2"></div>
+                        </div>
+                        <div class="tab-pane tabs-animation fade" id="tab-content-modal-3" role="tabpanel">
+                          <input type="text" id="searchKey" placeholder="Search product..." />
+                          <div id="dataContainer3">I am Kolkata Shop, will coming soon</div>
+                          <div id="paginations3"></div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
             <div class="modal-footer">
               <div class="row">
                 <div class="col-xl-6 col-md-6 col-sm-6">

@@ -2305,7 +2305,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
-						<td style='width: 180px; font-family: Arial, sans-serif; padding: 8px;'>
+						<td class='text-center' style='width: 180px; font-family: Arial, sans-serif; padding: 8px;'>
 							<div style='font-weight: bold; color: #34495e;'>
 								".$odinrow['stc_purchase_product_adhoc_id']."
 							</div>
@@ -2425,10 +2425,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}
 
 	// update po adhoc item name
-	public function stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit){
+	public function stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty){
 		$odin='';
 		$checkqry=mysqli_query($this->stc_dbs, "
-			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."', `stc_purchase_product_adhoc_unit`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_unit)."', `stc_purchase_product_adhoc_rackid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_rack)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."', `stc_purchase_product_adhoc_qty`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_qty)."', `stc_purchase_product_adhoc_unit`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_unit)."', `stc_purchase_product_adhoc_rackid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_rack)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
 		");
 		if($checkqry){
 			$odin='success';
@@ -2673,6 +2673,154 @@ class ragnarPurchaseAdhoc extends tesseract{
 	
 		return $odin;
 	}
+	
+	public function getPaginatedProducts($page, $search) {
+		$limit = 25;
+		$offset = ($page - 1) * $limit;
+
+		$searchQuery = "";
+		if (!empty($search)) {
+			$searchEscaped = mysqli_real_escape_string($this->stc_dbs, $search);
+			$searchQuery = " AND (P.stc_product_name LIKE '%$searchEscaped%' OR B.stc_brand_title LIKE '%$searchEscaped%' OR S.stc_sub_cat_name LIKE '%$searchEscaped%')";
+		}
+
+		// Main data with subquery to calculate remaining qty
+		$baseSql = "
+			FROM stc_product P
+			INNER JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id
+			INNER JOIN stc_category C ON P.stc_product_cat_id = C.stc_cat_id
+			LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id 
+			LEFT JOIN (
+				SELECT 
+					stc_purchase_product_adhoc_productid AS product_id,
+					SUM(stc_purchase_product_adhoc_qty) AS total_stock
+				FROM stc_purchase_product_adhoc
+				WHERE stc_purchase_product_adhoc_status = 1
+				GROUP BY stc_purchase_product_adhoc_productid
+			) AS stock ON stock.product_id = P.stc_product_id
+			LEFT JOIN (
+				SELECT product_id, SUM(qty) AS total_challan
+				FROM gld_challan
+				GROUP BY product_id
+			) AS challan ON challan.product_id = P.stc_product_id
+			LEFT JOIN (
+				SELECT spa.stc_purchase_product_adhoc_productid AS product_id, SUM(srec.stc_cust_super_requisition_list_items_rec_recqty) AS total_direct
+				FROM stc_purchase_product_adhoc spa
+				JOIN stc_cust_super_requisition_list_items_rec srec ON srec.stc_cust_super_requisition_list_items_rec_list_poaid = spa.stc_purchase_product_adhoc_id
+				WHERE spa.stc_purchase_product_adhoc_status = 1
+				GROUP BY spa.stc_purchase_product_adhoc_productid
+			) AS direct ON direct.product_id = P.stc_product_id
+			WHERE P.stc_product_avail = 1
+			AND (IFNULL(stock.total_stock, 0) - IFNULL(challan.total_challan, 0) - IFNULL(direct.total_direct, 0)) > 0
+			$searchQuery
+		";
+
+		// Count query
+		$countSql = "SELECT COUNT(DISTINCT P.stc_product_id) as total $baseSql";
+		$countResult = mysqli_query($this->stc_dbs, $countSql);
+		$totalData = mysqli_fetch_assoc($countResult);
+		$totalRows = $totalData['total'];
+		$totalPages = ceil($totalRows / $limit);
+
+		// Actual data
+		$query = "
+			SELECT DISTINCT
+				P.stc_product_id, 
+				P.stc_product_name, 
+				S.stc_sub_cat_name, 
+				C.stc_cat_name,
+				B.stc_brand_title,
+				P.stc_product_unit, 
+				P.stc_product_image, 
+				P.stc_product_gst,
+				P.stc_product_sale_percentage,
+				IFNULL(stock.total_stock, 0) AS total_stock,
+				IFNULL(challan.total_challan, 0) AS total_challan,
+				IFNULL(direct.total_direct, 0) AS total_direct,
+				(IFNULL(stock.total_stock, 0) - IFNULL(challan.total_challan, 0) - IFNULL(direct.total_direct, 0)) AS remainingqty
+			$baseSql
+			LIMIT $offset, $limit
+		";
+
+		$result = mysqli_query($this->stc_dbs, $query);
+		$html = '
+			<table class="table table-bordered">
+				<tr>
+					<th class="text-center">Item Code</th>
+					<th class="text-center">Name</th>
+					<th class="text-center">Category</th>
+					<th class="text-center">Brand</th>
+					<th class="text-center">Stock Qty</th>
+					<th class="text-center">Unit</th>
+					<th class="text-center">Rate</th>
+					<th class="text-center">Total</th>
+				</tr>
+		';
+
+		while ($row = mysqli_fetch_assoc($result)) {
+			$product_id = $row['stc_product_id'];
+			$remainingqty = $row['remainingqty'];
+
+			// Rate logic (kept as is from your original)
+			$rate_gst = 0;
+			$rate_percentage = 0;
+
+			$rateQry = mysqli_query($this->stc_dbs, "
+				SELECT stc_purchase_product_adhoc_rate, 
+					ROUND(stc_purchase_product_adhoc_rate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
+				FROM stc_purchase_product_adhoc 
+				WHERE stc_purchase_product_adhoc_productid = $product_id
+				ORDER BY stc_purchase_product_adhoc_id DESC LIMIT 1
+			");
+			if ($rateQry && mysqli_num_rows($rateQry)) {
+				$r = mysqli_fetch_assoc($rateQry);
+				$rate_gst = $r['stc_purchase_product_adhoc_rate'];
+				$rate_percentage = $r['rate_with_margin'];
+			}
+
+			// If not available, fallback to GRN rate
+			if ($rate_gst == 0) {
+				$rateQry = mysqli_query($this->stc_dbs, "
+					SELECT stc_product_grn_items_rate,
+						ROUND(stc_product_grn_items_rate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
+					FROM stc_product_grn_items 
+					WHERE stc_product_grn_items_product_id = $product_id
+					ORDER BY stc_product_grn_items_id DESC LIMIT 1
+				");
+				if ($rateQry && mysqli_num_rows($rateQry)) {
+					$r = mysqli_fetch_assoc($rateQry);
+					$rate_gst = $r['stc_product_grn_items_rate'];
+					$rate_percentage = $r['rate_with_margin'];
+				}
+			}
+
+			// Prepare product name
+			$row['stc_product_name'] = $row['stc_sub_cat_name'] != "OTHERS" ? $row['stc_sub_cat_name'] . " " . $row['stc_product_name'] : $row['stc_product_name'];
+			$total = $remainingqty * $rate_gst;
+
+			$html .= "<tr>
+						<td>{$row['stc_product_id']}</td>
+						<td>{$row['stc_product_name']}</td>
+						<td>{$row['stc_cat_name']}</td>
+						<td>{$row['stc_brand_title']}</td>
+						<td class='text-right'>".number_format($remainingqty, 2)."</td>
+						<td class='text-right'>{$row['stc_product_unit']}</td>
+						<td class='text-right'>".number_format($rate_gst, 2)."</td>
+						<td class='text-right'>".number_format($total, 2)."</td>
+					</tr>";
+		}
+		$html .= '</table>';
+
+		// Pagination buttons
+		$pagination = '<div>';
+		for ($i = 1; $i <= $totalPages; $i++) {
+			$pagination .= "<button class='pagination_link' data-page='{$i}'>{$i}</button> ";
+		}
+		$pagination .= '</div>';
+
+		return ['html' => $html, 'pagination' => $pagination];
+	}
+
 	
 }
 #<------------------------------------------------------------------------------------------------------>
@@ -3504,8 +3652,9 @@ if(isset($_POST['stc_po_adhoc_update'])){
 	$adhoc_name=$_POST['adhoc_name'];
 	$adhoc_rack=$_POST['adhoc_rack'];
 	$adhoc_unit=$_POST['adhoc_unit'];
+	$adhoc_qty=$_POST['adhoc_qty'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit);
+	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty);
 	echo $outbjornestocking;
 }
 
@@ -3581,6 +3730,15 @@ if(isset($_POST['stc_changestatus'])){
 	$outbjornestocking=$bjornestocking->stc_update_adhoc_item_status($id);
 	// echo $outbjornestocking;
 	echo json_encode($outbjornestocking);
+}
+
+if(isset($_POST['stc_getinventory'])){
+    $page = $_POST['page'] ?? 1;
+    $search = $_POST['searchKey'] ?? '';
+
+    $bjornestocking = new ragnarPurchaseAdhoc();
+    $result = $bjornestocking->getPaginatedProducts($page, $search);
+    echo json_encode($result);
 }
 
 ?>
