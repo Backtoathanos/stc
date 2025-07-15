@@ -39,7 +39,6 @@ $totalRow = mysqli_fetch_assoc($totalResult)['total'];
 
 // Apply pagination
 $cquery .= " ORDER BY P.stc_product_name ASC LIMIT $limit OFFSET $offset";
-echo $cquery;
 $result = mysqli_query($con, $cquery);
 
 $lot = array(); // Initialize as empty array
