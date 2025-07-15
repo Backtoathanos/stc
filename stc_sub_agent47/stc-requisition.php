@@ -238,33 +238,37 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     validated = false;
                 }
                 
-                // Validate each row
-                $('#requisition-table tbody tr').each(function(index) {
-                    var desc = $(this).find('.stc-sup-desc').val();
-                    var qty = $(this).find('.stc-sup-qty').val();
-                    var unit = $(this).find('.stc-sup-unit').val();
-                    var type = $(this).find('.stc-sup-type').val();
+                // Validate each item card
+                $('.item-card').each(function(index) {
+                    var card = $(this);
+                    var desc = card.find('.stc-sup-desc').val();
+                    var qty = card.find('.stc-sup-qty').val();
+                    var unit = card.find('.stc-sup-unit').val();
+                    var type = card.find('.stc-sup-type').val();
+                    
+                    // Clear previous validations for this card
+                    card.find('.text-validation').remove();
                     
                     if (desc == "") {
-                        $(this).find('.stc-sup-desc').after('<span class="text-validation text-danger">Enter Description</span>');
+                        card.find('.stc-sup-desc').after('<span class="text-validation text-danger">Enter Description</span>');
                         validated = false;
                     }
                     if (qty == "" || qty == 0) {
-                        $(this).find('.stc-sup-qty').after('<span class="text-validation text-danger">Enter Quantity</span>');
+                        card.find('.stc-sup-qty').after('<span class="text-validation text-danger">Enter Quantity</span>');
                         validated = false;
                     }
                     if (unit == "NA") {
-                        $(this).find('.stc-sup-unit').after('<span class="text-validation text-danger">Select Unit</span>');
+                        card.find('.stc-sup-unit').after('<span class="text-validation text-danger">Select Unit</span>');
                         validated = false;
                     }
                     if (type == "NA") {
-                        $(this).find('.stc-sup-type').after('<span class="text-validation text-danger">Select Type</span>');
+                        card.find('.stc-sup-type').after('<span class="text-validation text-danger">Select Type</span>');
                         validated = false;
                     }
                 });
                 
-                if (validated == false) {
-                    alert("Please fill all the required fields in all rows.");
+                if (!validated) {
+                    alert("Please fill all the required fields in all items.");
                     return false;
                 }
                 
@@ -278,14 +282,20 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 formData.delete('stc-sup-type[]');
                 formData.delete('stc-sup-priority[]');
                 
-                // Add row-specific data with proper array notation
-                $('#requisition-table tbody tr').each(function(index) {
-                    formData.append('stc-sup-desc[]', $(this).find('.stc-sup-desc').val());
-                    formData.append('stc-sup-qty[]', $(this).find('.stc-sup-qty').val());
-                    formData.append('stc-sup-unit[]', $(this).find('.stc-sup-unit').val());
-                    formData.append('stc-sup-type[]', $(this).find('.stc-sup-type').val());
-                    formData.append('stc-sup-priority[]', $(this).find('.stc-sup-priority').val());
+                // Add card-specific data with proper array notation
+                $('.item-card').each(function(index) {
+                    var card = $(this);
+                    formData.append('stc-sup-desc[]', card.find('.stc-sup-desc').val());
+                    formData.append('stc-sup-qty[]', card.find('.stc-sup-qty').val());
+                    formData.append('stc-sup-unit[]', card.find('.stc-sup-unit').val());
+                    formData.append('stc-sup-type[]', card.find('.stc-sup-type').val());
+                    formData.append('stc-sup-priority[]', card.find('.stc-sup-priority').val());
                 });
+                
+                // Show loading state
+                var submitBtn = $(this).find('button[type="submit"]');
+                var originalBtnText = submitBtn.html();
+                submitBtn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Processing...');
                 
                 // Submit via AJAX
                 $.ajax({
@@ -295,76 +305,52 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     contentType: false,
                     processData: false,
                     success: function(response) {
+                        // Restore button state
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+                        
                         if (response.trim() == 'logout') {
                             window.location.reload();
+                            return;
                         }
                         
                         // Show success message
                         alert(response);
-                        
-                        // Reset form (optional - you might want to keep the items for multiple submissions)
-                        $('#requisition-table tbody').html(`
-                            <tr>
-                                <td>
-                                    <input type="text" class="form-control stc-sup-desc" name="stc-sup-desc[]" placeholder="Enter Item Name" required>
-                                    <ul class="list-group mt-1 desc-suggestion-box" style="position: absolute; z-index: 9999; display: none; width: 100%; max-height: 200px; overflow-y: auto;"></ul>
-                                </td>
-                                <td><input type="number" class="form-control stc-sup-qty" name="stc-sup-qty[]" placeholder="Qty" required></td>
-                                <td>
-                                    <select class="form-control stc-sup-unit" name="stc-sup-unit[]">
-                                        <option value="NA">SELECT</option>
-                                        <option value="BAG">BAG</option>
-                                        <option value="BOTTLE">BOTTLE</option>
-                                        <option value="BOX">BOX</option>
-                                        <option value="BUNDLE">BUNDLE</option>
-                                        <option value="CASE">CASE</option>
-                                        <option value="CBM">CBM</option>
-                                        <option value="COIL">COIL</option>
-                                        <option value="FEET">FEET</option>
-                                        <option value="JAR">JAR</option>
-                                        <option value="KGS">KGS</option>
-                                        <option value="LOT">LOT</option>
-                                        <option value="LTR">LTR</option>
-                                        <option value="MTR">MTR</option>
-                                        <option value="MTS">MTS</option>
-                                        <option value="NOS">NOS</option>
-                                        <option value="PAIR">PAIR</option>
-                                        <option value="PKT">PKT</option>
-                                        <option value="ROLL">ROLL</option>
-                                        <option value="SET">SET</option>
-                                        <option value="SQFT">SQFT</option>
-                                        <option value="SQMT">SQMT</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select class="form-control stc-sup-type" name="stc-sup-type[]">
-                                        <option value="NA">SELECT</option>
-                                        <option value="Consumable">CONSUMABLE</option>
-                                        <option value="PPE">PPE</option>
-                                        <option value="Supply">SUPPPLY</option>
-                                        <option value="Tools & Tackles">TOOLS & TACKLES</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <select class="form-control stc-sup-priority" name="stc-sup-priority[]">
-                                        <option value="1">Normal</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <button type="button" class="btn btn-success btn-sm add-row"><i class="fa fa-plus"></i></button>
-                                    <button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa fa-minus"></i></button>
-                                </td>
-                            </tr>
-                        `);
-                        
-                        // If you want to keep the form as is after submission, remove the reset code above
-                        // and just show the success message
+                        resetForm();
+                        show_Dailylist();
                     },
                     error: function(xhr, status, error) {
-                        alert("An error occurred: " + error);
+                        // Restore button state
+                        submitBtn.prop('disabled', false).html(originalBtnText);
+                        
+                        // Show error message with better UX
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error!',
+                            text: 'An error occurred: ' + error,
+                            confirmButtonText: 'OK'
+                        });
                     }
                 });
             });
+
+            // Function to reset the form
+            function resetForm() {
+                // Clear all item cards except the first one
+                $('.items-container').html($('.item-card:first').clone());
+                
+                // Reset the first card
+                var firstCard = $('.item-card:first');
+                firstCard.find('input').val('');
+                firstCard.find('select').val('NA');
+                firstCard.find('.stc-sup-priority').val('1');
+                firstCard.find('.desc-suggestion-box').hide().empty();
+                
+                // Reset site selection if needed
+                // $('#load_cust_sup_site').val('NA');
+                
+                // Scroll to top
+                $('html, body').animate({ scrollTop: 0 }, 500);
+            }
 
             // // remove requisition items from cart
             // $('body').delegate('.removlistitems', 'click', function(e){
@@ -566,39 +552,32 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-md-12 col-sm-12 col-xl-12">
+                    <div class="col-12">
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <form class="stc-sup-form-create" novalidate>
-                                    <div class="form-row">
-                                        <div class="col-md-12 col-xl-12"> 
-                                <h5 class="card-title">Select Site</h5>
-                                            <select class="btn btn-success form-control load_cust_agents" id="load_cust_sup_site" name="load_cust_sup_site">
-                                                <option>No Customers Found!!!</option>
-                                            </select> 
-                                        </div>
+                                    <div class="form-group">
+                                        <h5 class="card-title">Select Site</h5>
+                                        <select class="form-control load_cust_agents" id="load_cust_sup_site" name="load_cust_sup_site">
+                                            <option>No Customers Found!!!</option>
+                                        </select> 
                                     </div>
                                     
-                                    <div class="table-responsive mt-3">
-                                        <table class="table table-bordered" id="requisition-table">
-                                            <thead class="thead-light">
-                                                <tr>
-                                                    <th>Item Description</th>
-                                                    <th>Quantity</th>
-                                                    <th>Unit</th>
-                                                    <th>Type</th>
-                                                    <th>Priority</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>
+                                    <div class="items-container mt-4">
+                                        <div class="card item-card mb-3">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-5 col-sm-12 mb-3">
+                                                        <label>Item Description</label>
                                                         <input type="text" class="form-control stc-sup-desc" name="stc-sup-desc[]" placeholder="Enter Item Name" required>
                                                         <ul class="list-group mt-1 desc-suggestion-box" style="position: absolute; z-index: 9999; display: none; width: 100%; max-height: 200px; overflow-y: auto;"></ul>
-                                                    </td>
-                                                    <td><input type="number" class="form-control stc-sup-qty" name="stc-sup-qty[]" placeholder="Qty" required></td>
-                                                    <td>
+                                                    </div>
+                                                    <div class="col-md-2 col-sm-6 col-6 mb-3">
+                                                        <label>Quantity</label>
+                                                        <input type="number" class="form-control stc-sup-qty" name="stc-sup-qty[]" placeholder="Qty" required>
+                                                    </div>
+                                                    <div class="col-md-2 col-sm-6 col-6 mb-3">
+                                                        <label>Unit</label>
                                                         <select class="form-control stc-sup-unit" name="stc-sup-unit[]">
                                                             <option value="NA">SELECT</option>
                                                             <option value="BAG">BAG</option>
@@ -623,8 +602,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                             <option value="SQFT">SQFT</option>
                                                             <option value="SQMT">SQMT</option>
                                                         </select>
-                                                    </td>
-                                                    <td>
+                                                    </div>
+                                                    <div class="col-md-2 col-sm-6 col-6 mb-3">
+                                                        <label>Type</label>
                                                         <select class="form-control stc-sup-type" name="stc-sup-type[]">
                                                             <option value="NA">SELECT</option>
                                                             <option value="Consumable">CONSUMABLE</option>
@@ -632,24 +612,28 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                             <option value="Supply">SUPPPLY</option>
                                                             <option value="Tools & Tackles">TOOLS & TACKLES</option>
                                                         </select>
-                                                    </td>
-                                                    <td>
+                                                    </div>
+                                                    <div class="col-md-1 col-sm-6 col-6 mb-3">
+                                                        <label>Priority</label>
                                                         <select class="form-control stc-sup-priority" name="stc-sup-priority[]">
                                                             <option value="1">Normal</option>
                                                         </select>
-                                                    </td>
-                                                    <td>
-                                                        <button type="button" class="btn btn-success btn-sm add-row"><i class="fa fa-plus"></i></button>
-                                                        <button type="button" class="btn btn-danger btn-sm remove-row"><i class="fa fa-minus"></i></button>
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="text-right">
+                                                    <button type="button" class="btn btn-danger btn-sm remove-item"><i class="fa fa-minus"></i> Remove</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="text-center mb-3">
+                                        <button type="button" class="btn btn-success btn-lg add-item"><i class="fa fa-plus"></i> Add Another Item</button>
                                     </div>
                                     
                                     <input type="hidden" name="stc-sup-hit">
                                     <input type="hidden" class="stc-sup-sdlnumber" name="stc-sup-sdlnumber">
-                                    <button class="btn btn-primary" type="submit">Submit Requisition</button>
+                                    <button class="btn btn-primary btn-block" type="submit">Submit Requisition</button>
                                 </form>
                             </div>
                         </div>
@@ -665,22 +649,27 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
 <script>
 $(document).ready(function() {
-    // Add new row
-    $(document).on('click', '.add-row', function() {
-        var newRow = $('#requisition-table tbody tr:first').clone();
-        newRow.find('input').val('');
-        newRow.find('select').val('NA');
-        newRow.find('.stc-sup-priority').val('1');
-        newRow.find('.desc-suggestion-box').hide().empty();
-        $('#requisition-table tbody').append(newRow);
+    // Add new item card
+    $(document).on('click', '.add-item', function() {
+        var newCard = $('.item-card:first').clone();
+        newCard.find('input').val('');
+        newCard.find('select').val('NA');
+        newCard.find('.stc-sup-priority').val('1');
+        newCard.find('.desc-suggestion-box').hide().empty();
+        $('.items-container').append(newCard);
+        
+        // Scroll to the new card
+        $('html, body').animate({
+            scrollTop: newCard.offset().top - 20
+        }, 500);
     });
     
-    // Remove row
-    $(document).on('click', '.remove-row', function() {
-        if ($('#requisition-table tbody tr').length > 1) {
-            $(this).closest('tr').remove();
+    // Remove item card
+    $(document).on('click', '.remove-item', function() {
+        if ($('.item-card').length > 1) {
+            $(this).closest('.item-card').remove();
         } else {
-            alert("You cannot delete the last row!");
+            alert("You need at least one item!");
         }
     });
     
@@ -719,7 +708,7 @@ $(document).ready(function() {
     
     // Select suggestion
     $(document).on("click", ".desc-option", function(){
-        const inputField = $(this).closest('td').find('.stc-sup-desc');
+        const inputField = $(this).closest('.col-md-5').find('.stc-sup-desc');
         inputField.val($(this).text());
         $(this).closest('.desc-suggestion-box').hide();
     });

@@ -2681,7 +2681,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$searchQuery = "";
 		if (!empty($search)) {
 			$searchEscaped = mysqli_real_escape_string($this->stc_dbs, $search);
-			$searchQuery = " AND (P.stc_product_name LIKE '%$searchEscaped%' OR B.stc_brand_title LIKE '%$searchEscaped%' OR S.stc_sub_cat_name LIKE '%$searchEscaped%')";
+			$searchQuery = " AND (P.stc_product_name LIKE '%$searchEscaped%' OR P.stc_product_desc LIKE '%$searchEscaped%' OR B.stc_brand_title LIKE '%$searchEscaped%' OR S.stc_sub_cat_name LIKE '%$searchEscaped%')";
 		}
 
 		// Main data with subquery to calculate remaining qty
