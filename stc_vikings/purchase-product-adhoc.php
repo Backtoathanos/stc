@@ -1280,42 +1280,74 @@ include("kattegat/role_check.php");
               });
             }
           });
-
-          function loadData(page = 1, search = '') {
+          var inv_type='warehouse';
+          function loadInventories(page = 1, search = '', inv_type = 'warehouse') {
               $.ajax({
                    url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
                   method: 'POST',
                   data: {
                       stc_getinventory: 1,
                       page: page,
-                      searchKey: search
+                      searchKey: search,
+                      inv_type: inv_type
                   },
                   success: function(response) {
                       const res = JSON.parse(response);
-                      $('#dataContainer').html(res.html);
-                      $('#paginations').html(res.pagination);
+                      if(inv_type=="warehouse"){
+                        $('#dataContainer').html(res.html);
+                        $('#paginations').html(res.pagination);
+                      } else if(inv_type=="Dhatkidih"){
+                        $('#dataContainer2').html(res.html);
+                        $('#paginations2').html(res.pagination);
+                      } else if(inv_type=="Kolkata"){
+                        $('#dataContainer3').html(res.html);
+                        $('#paginations3').html(res.pagination);
+                      } else if(inv_type=="Sehrabazar"){
+                        $('#dataContainer4').html(res.html);
+                        $('#paginations4').html(res.pagination);
+                      }
                   }
               });
           }
 
           // Initial Load
-          loadData();
+          loadInventories();
 
           // Search
-          $('#searchKey').on('keyup', function () {
+          $('.searchKey').on('keyup', function () {
               const search = $(this).val();
+              $('.searchKey').val(search);
+              inv_type = $('.InvTypeBtns').attr('type');
               if(search.length >= 3 || search.length === 0) {
-                  loadData(1, search);
+                  loadInventories(1, search, inv_type);
               } else {
-                  loadData(1);
+                  loadInventories(1);
               }
           });
 
           // Pagination Click
           $(document).on('click', '.pagination_link', function () {
               const page = $(this).data('page');
-              const search = $('#searchKey').val();
-              loadData(page, search);
+              const search = $('.searchKey').val();
+              inv_type = $('.InvTypeBtns').attr('type');
+              loadInventories(1, search, inv_type);
+          });
+          $(document).on('click', '.InvTypeBtns', function () {
+              inv_type = $(this).attr('type');
+              let search = '';
+              if(inv_type == 'warehouse'){
+                search=$('.searchKey').val();
+              }
+              if(inv_type == 'Dhatkidih'){
+                search=$('.searchKey').val();
+              }
+              if(inv_type == 'Kolkata'){
+                search=$('.searchKey').val();
+              }
+              if(inv_type == 'Sehrabazar'){
+                search=$('.searchKey').val();
+              }
+              loadInventories(1, search, inv_type);
           });
 
           
@@ -1808,39 +1840,49 @@ include("kattegat/role_check.php");
               <div class="row">
                 <div class="col-xl-12 col-md-12 col-sm-12">
                   <div class="card border-success mb-3 card-body">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Warehouse</h5>
+                    <h5 class="modal-title" id="exampleModalLongTitle">Warehouses & Branches</h5>
                     <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">
                         <li class="nav-item">
-                            <a role="tab" class="nav-link active" id="tab-modal-1" data-toggle="tab" href="#tab-content-modal-1">
+                            <a role="tab" type="warehouse" class="nav-link InvTypeBtns active" id="tab-modal-1" data-toggle="tab" href="#tab-content-modal-1">
                                 <span>Warehouse</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a role="tab" class="nav-link" id="tab-modal-2" data-toggle="tab" href="#tab-content-modal-2">
+                            <a role="tab" type="Dhatkidih" class="nav-link InvTypeBtns" id="tab-modal-2" data-toggle="tab" href="#tab-content-modal-2">
                                 <span>Dhatkidih</span>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a role="tab" class="nav-link" id="tab-modal-3" data-toggle="tab" href="#tab-content-modal-3">
+                            <a role="tab" type="Kolkata" class="nav-link InvTypeBtns" id="tab-modal-3" data-toggle="tab" href="#tab-content-modal-3">
                                 <span>Kolkata</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a role="tab" type="Sehrabazar" class="nav-link InvTypeBtns" id="tab-modal-4" data-toggle="tab" href="#tab-content-modal-4">
+                                <span>Sehrabazar</span>
                             </a>
                         </li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane tabs-animation fade active" id="tab-content-modal-1" role="tabpanel">
-                          <input type="text" id="searchKey" placeholder="Search product..." />
+                          <input type="text" class="searchKey" placeholder="Search product..." />
                           <div id="dataContainer"></div>
                           <div id="paginations"></div>
                         </div>
                         <div class="tab-pane tabs-animation fade" id="tab-content-modal-2" role="tabpanel">
-                          <input type="text" id="searchKey" placeholder="Search product..." />
+                          <input type="text" class="searchKey" placeholder="Search product..." />
                           <div id="dataContainer2">I am Dhatkidih Shop, will coming soon</div>
                           <div id="paginations2"></div>
                         </div>
                         <div class="tab-pane tabs-animation fade" id="tab-content-modal-3" role="tabpanel">
-                          <input type="text" id="searchKey" placeholder="Search product..." />
+                          <input type="text" class="searchKey" placeholder="Search product..." />
                           <div id="dataContainer3">I am Kolkata Shop, will coming soon</div>
                           <div id="paginations3"></div>
+                        </div>
+                        <div class="tab-pane tabs-animation fade" id="tab-content-modal-4" role="tabpanel">
+                          <input type="text" class="searchKey" placeholder="Search product..." />
+                          <div id="dataContainer4">I am Sehrabazar Shop, will coming soon</div>
+                          <div id="paginations4"></div>
                         </div>
                     </div>
                   </div>

@@ -2756,58 +2756,61 @@ class ragnarPurchaseAdhoc extends tesseract{
 					<th class="text-center">Total</th>
 				</tr>
 		';
+		if(mysqli_num_rows($result) > 0) {
+			while ($row = mysqli_fetch_assoc($result)) {
+				$product_id = $row['stc_product_id'];
+				$remainingqty = $row['remainingqty'];
 
-		while ($row = mysqli_fetch_assoc($result)) {
-			$product_id = $row['stc_product_id'];
-			$remainingqty = $row['remainingqty'];
+				// Rate logic (kept as is from your original)
+				$rate_gst = 0;
+				$rate_percentage = 0;
 
-			// Rate logic (kept as is from your original)
-			$rate_gst = 0;
-			$rate_percentage = 0;
-
-			$rateQry = mysqli_query($this->stc_dbs, "
-				SELECT stc_purchase_product_adhoc_rate, 
-					ROUND(stc_purchase_product_adhoc_rate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
-				FROM stc_purchase_product_adhoc 
-				WHERE stc_purchase_product_adhoc_productid = $product_id
-				ORDER BY stc_purchase_product_adhoc_id DESC LIMIT 1
-			");
-			if ($rateQry && mysqli_num_rows($rateQry)) {
-				$r = mysqli_fetch_assoc($rateQry);
-				$rate_gst = $r['stc_purchase_product_adhoc_rate'];
-				$rate_percentage = $r['rate_with_margin'];
-			}
-
-			// If not available, fallback to GRN rate
-			if ($rate_gst == 0) {
 				$rateQry = mysqli_query($this->stc_dbs, "
-					SELECT stc_product_grn_items_rate,
-						ROUND(stc_product_grn_items_rate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
-					FROM stc_product_grn_items 
-					WHERE stc_product_grn_items_product_id = $product_id
-					ORDER BY stc_product_grn_items_id DESC LIMIT 1
+					SELECT stc_purchase_product_adhoc_rate, 
+						ROUND(stc_purchase_product_adhoc_rate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
+					FROM stc_purchase_product_adhoc 
+					WHERE stc_purchase_product_adhoc_productid = $product_id
+					ORDER BY stc_purchase_product_adhoc_id DESC LIMIT 1
 				");
 				if ($rateQry && mysqli_num_rows($rateQry)) {
 					$r = mysqli_fetch_assoc($rateQry);
-					$rate_gst = $r['stc_product_grn_items_rate'];
+					$rate_gst = $r['stc_purchase_product_adhoc_rate'];
 					$rate_percentage = $r['rate_with_margin'];
 				}
+
+				// If not available, fallback to GRN rate
+				if ($rate_gst == 0) {
+					$rateQry = mysqli_query($this->stc_dbs, "
+						SELECT stc_product_grn_items_rate,
+							ROUND(stc_product_grn_items_rate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
+						FROM stc_product_grn_items 
+						WHERE stc_product_grn_items_product_id = $product_id
+						ORDER BY stc_product_grn_items_id DESC LIMIT 1
+					");
+					if ($rateQry && mysqli_num_rows($rateQry)) {
+						$r = mysqli_fetch_assoc($rateQry);
+						$rate_gst = $r['stc_product_grn_items_rate'];
+						$rate_percentage = $r['rate_with_margin'];
+					}
+				}
+
+				// Prepare product name
+				$row['stc_product_name'] = $row['stc_sub_cat_name'] != "OTHERS" ? $row['stc_sub_cat_name'] . " " . $row['stc_product_name'] : $row['stc_product_name'];
+				$total = $remainingqty * $rate_gst;
+
+				$html .= "<tr>
+							<td>{$row['stc_product_id']}</td>
+							<td>{$row['stc_product_name']}</td>
+							<td>{$row['stc_cat_name']}</td>
+							<td>{$row['stc_brand_title']}</td>
+							<td class='text-right'>".number_format($remainingqty, 2)."</td>
+							<td class='text-right'>{$row['stc_product_unit']}</td>
+							<td class='text-right'>".number_format($rate_gst, 2)."</td>
+							<td class='text-right'>".number_format($total, 2)."</td>
+						</tr>";
 			}
-
-			// Prepare product name
-			$row['stc_product_name'] = $row['stc_sub_cat_name'] != "OTHERS" ? $row['stc_sub_cat_name'] . " " . $row['stc_product_name'] : $row['stc_product_name'];
-			$total = $remainingqty * $rate_gst;
-
-			$html .= "<tr>
-						<td>{$row['stc_product_id']}</td>
-						<td>{$row['stc_product_name']}</td>
-						<td>{$row['stc_cat_name']}</td>
-						<td>{$row['stc_brand_title']}</td>
-						<td class='text-right'>".number_format($remainingqty, 2)."</td>
-						<td class='text-right'>{$row['stc_product_unit']}</td>
-						<td class='text-right'>".number_format($rate_gst, 2)."</td>
-						<td class='text-right'>".number_format($total, 2)."</td>
-					</tr>";
+		} else {
+			$html .= "<tr><td colspan='8' class='text-center'>No records found.</td></tr>";
 		}
 		$html .= '</table>';
 
@@ -2819,6 +2822,103 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$pagination .= '</div>';
 
 		return ['html' => $html, 'pagination' => $pagination];
+	}
+
+	public function getPaginatedProducts2($page, $search, $inv_type){
+		$limit = 25;
+		$offset = ($page - 1) * $limit;
+		$totalPages=0;
+		$searchQuery = "";
+		
+		$query = "SELECT DISTINCT P.stc_product_id, P.stc_product_name, S.stc_sub_cat_name,  C.stc_cat_name, P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image,   0 as remainingqty, P.stc_product_gst, P.stc_product_sale_percentage, B.stc_brand_title FROM stc_product P INNER JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id INNER JOIN stc_category C ON P.stc_product_cat_id = C.stc_cat_id LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id INNER JOIN `stc_purchase_product_adhoc` ON `stc_purchase_product_adhoc_productid`=P.stc_product_id INNER JOIN `stc_shop` ON `stc_purchase_product_adhoc_id`=`adhoc_id` WHERE P.stc_product_avail = 1 AND `shopname` = '".mysqli_real_escape_string($this->stc_dbs, $inv_type)."'";
+
+		if ($search) $query .= " AND (P.stc_product_id='$search' OR P.stc_product_name LIKE '%$search%' OR P.stc_product_desc LIKE '%$search%')";
+		// echo $query;
+		$result = mysqli_query($this->stc_dbs, $query);
+		$html = '
+			<table class="table table-bordered">
+				<tr>
+					<th class="text-center">Item Code</th>
+					<th class="text-center">Name</th>
+					<th class="text-center">Category</th>
+					<th class="text-center">Brand</th>
+					<th class="text-center">Stock Qty</th>
+					<th class="text-center">Unit</th>
+					<th class="text-center">Rate</th>
+					<th class="text-center">Total</th>
+				</tr>
+		';
+		if ($result && mysqli_num_rows($result) > 0) {	
+			while ($row = mysqli_fetch_assoc($result)) {
+				$product_id = $row['stc_product_id'];
+
+				// get quantity from shop
+				$shopQtyQuery = mysqli_query($this->stc_dbs, "SELECT SUM(qty) AS total_qty FROM stc_shop INNER JOIN `stc_purchase_product_adhoc` ON `stc_purchase_product_adhoc_id`=adhoc_id WHERE stc_purchase_product_adhoc_productid = $product_id AND `shopname` = '".mysqli_real_escape_string($this->stc_dbs, $inv_type)."'");
+				$shopQtyRow = mysqli_fetch_assoc($shopQtyQuery);
+				$row['remainingqty'] = $shopQtyRow['total_qty'] ?? 0;
+				$remainingqty = $row['remainingqty'];
+
+				// Rate logic (kept as is from your original)
+				$rate_gst = 0;
+				$rate_percentage = 0;
+
+				$rateQry = mysqli_query($this->stc_dbs, "
+					SELECT stc_purchase_product_adhoc_rate, 
+						ROUND(stc_purchase_product_adhoc_rate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
+					FROM stc_purchase_product_adhoc 
+					WHERE stc_purchase_product_adhoc_productid = $product_id
+					ORDER BY stc_purchase_product_adhoc_id DESC LIMIT 1
+				");
+				if ($rateQry && mysqli_num_rows($rateQry)) {
+					$r = mysqli_fetch_assoc($rateQry);
+					$rate_gst = $r['stc_purchase_product_adhoc_rate'];
+					$rate_percentage = $r['rate_with_margin'];
+				}
+
+				// If not available, fallback to GRN rate
+				if ($rate_gst == 0) {
+					$rateQry = mysqli_query($this->stc_dbs, "
+						SELECT stc_product_grn_items_rate,
+							ROUND(stc_product_grn_items_rate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
+						FROM stc_product_grn_items 
+						WHERE stc_product_grn_items_product_id = $product_id
+						ORDER BY stc_product_grn_items_id DESC LIMIT 1
+					");
+					if ($rateQry && mysqli_num_rows($rateQry)) {
+						$r = mysqli_fetch_assoc($rateQry);
+						$rate_gst = $r['stc_product_grn_items_rate'];
+						$rate_percentage = $r['rate_with_margin'];
+					}
+				}
+
+				// Prepare product name
+				$row['stc_product_name'] = $row['stc_sub_cat_name'] != "OTHERS" ? $row['stc_sub_cat_name'] . " " . $row['stc_product_name'] : $row['stc_product_name'];
+				$total = $remainingqty * $rate_gst;
+
+				$html .= "<tr>
+							<td>{$row['stc_product_id']}</td>
+							<td>{$row['stc_product_name']}</td>
+							<td>{$row['stc_cat_name']}</td>
+							<td>{$row['stc_brand_title']}</td>
+							<td class='text-right'>".number_format($remainingqty, 2)."</td>
+							<td class='text-right'>{$row['stc_product_unit']}</td>
+							<td class='text-right'>".number_format($rate_gst, 2)."</td>
+							<td class='text-right'>".number_format($total, 2)."</td>
+						</tr>";
+			}
+		} else {
+			$html .= "<tr><td colspan='8' class='text-center'>No records found.</td></tr>";
+		}
+		$html .= '</table>';
+
+		// Pagination buttons
+		$pagination = '<div>';
+		for ($i = 1; $i <= $totalPages; $i++) {
+			$pagination .= "<button class='pagination_link' data-page='{$i}'>{$i}</button> ";
+		}
+		$pagination .= '</div>';
+
+		return ['html' => $html, 'query' => $query, 'pagination' => $pagination];
 	}
 
 	
@@ -3735,10 +3835,16 @@ if(isset($_POST['stc_changestatus'])){
 if(isset($_POST['stc_getinventory'])){
     $page = $_POST['page'] ?? 1;
     $search = $_POST['searchKey'] ?? '';
+    $inv_type = $_POST['inv_type'] ?? '';
 
     $bjornestocking = new ragnarPurchaseAdhoc();
-    $result = $bjornestocking->getPaginatedProducts($page, $search);
-    echo json_encode($result);
+	if($inv_type=='warehouse'){
+		$result = $bjornestocking->getPaginatedProducts($page, $search);
+		echo json_encode($result);
+	}else{
+		$result = $bjornestocking->getPaginatedProducts2($page, $search, $inv_type);
+		echo json_encode($result);
+	}
 }
 
 ?>
