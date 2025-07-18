@@ -14,6 +14,12 @@ export default function Sidebar({ activeRoute }) {
                             <p>Dashboard</p>
                         </Link>
                     </li>
+                    <li className={`nav-item ${activeRoute === 'requisitions' ? 'active' : ''}`}>
+                        <Link to="/requisitions" className="nav-link">
+                            <i className="material-icons">assignment</i>
+                            <p>Requisitions</p>
+                        </Link>
+                    </li>
                     <li className={`nav-item ${activeRoute === 'inventory' ? 'active' : ''}`}>
                         <Link to="/inventory" className="nav-link">
                             <i className="material-icons">content_paste</i>

@@ -72,6 +72,35 @@ switch ($action) {
         setChallanRequisition($conn);
         break;
 
+    case 'addRequisition':
+        addRequisition($conn);
+        break;
+    case 'editRequisition':
+        editRequisition($conn);
+        break;
+    case 'deleteRequisition':
+        deleteRequisition($conn);
+        break;
+
+    case 'updateRequisitionStatus':
+        updateRequisitionStatus($conn);
+        break;
+
+    case 'transferProduct':
+        transferProduct($conn);
+        break;
+
+    case 'createRack':
+        createRack($conn);
+        break;
+    case 'updateProductRack':
+        updateProductRack($conn);
+        break;
+
+    case 'getRacks':
+        getRacks($conn);
+        break;
+
     default:
         echo json_encode(['error' => 'Invalid API action', 'fault' => $_GET['action']]);
         break;
@@ -133,7 +162,7 @@ function addCustomer($conn) {
         $date = date('Y-m-d H:i:s');
         $adhoc_id=0;
         // Link customer to the product and set the quantity
-        $query = $conn->query("SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid`='$productId' AND `stc_purchase_product_adhoc_status`=1 ORDER BY `stc_purchase_product_adhoc_id` ASC");
+        $query = $conn->query("SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM `stc_purchase_product_adhoc` INNER JOIN `stc_shop` ON `stc_purchase_product_adhoc_id`=`adhoc_id` WHERE `stc_purchase_product_adhoc_productid`='$productId' AND `stc_purchase_product_adhoc_status`=1 ORDER BY `stc_purchase_product_adhoc_id` ASC");
         while ($row = $query->fetch_assoc()) {
             $delivered=0;
             $sql_qry=$conn->query("
@@ -452,82 +481,94 @@ function deleteChallan($conn) {
     }
 }
 
-// get requisitions details
-function getRequisitions($conn) {
-
-    $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
-
-    $query = "
-        SELECT 
-            `id`, 
-            `requisition_list_id`, 
-            I.`stc_cust_super_requisition_list_items_title`, 
-            I.`stc_cust_super_requisition_items_finalqty`, 
-            `stc_cust_project_title`, 
-            `stc_cust_pro_supervisor_fullname`, 
-            `stc_cust_pro_supervisor_contact`,
-            `status`
-        FROM `stc_requisition_gld` 
-        LEFT JOIN `stc_cust_super_requisition_list_items` I ON `requisition_list_id` = I.`stc_cust_super_requisition_list_id` 
-        LEFT JOIN `stc_cust_super_requisition_list` L ON I.`stc_cust_super_requisition_list_items_req_id` = L.`stc_cust_super_requisition_list_id` 
-        LEFT JOIN `stc_cust_pro_supervisor` ON L.`stc_cust_super_requisition_list_super_id` = `stc_cust_pro_supervisor_id` 
-        LEFT JOIN `stc_cust_project` ON L.`stc_cust_super_requisition_list_project_id` = `stc_cust_project_id` 
-        WHERE `status` = 1
-    ";
-
-    if ($search != '') {
-        $query .= " AND (
-            `stc_cust_project_title` LIKE ? OR 
-            `stc_cust_super_requisition_list_items_title` LIKE ? OR 
-            `stc_cust_pro_supervisor_fullname` LIKE ? OR 
-            `stc_cust_pro_supervisor_contact` LIKE ?
-        )";
+// Add a new requisition
+function addRequisition($conn) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $name = trim($conn->real_escape_string($data['name']));
+    $quantity = floatval($data['quantity']);
+    $unit = $conn->real_escape_string($data['unit']);
+    $remarks = $conn->real_escape_string($data['remarks']);
+    if($name == '' || $quantity == 0 || $unit == '') {
+        echo json_encode(['success' => false, 'error' => 'Please fill all the fields']);
+        return;
     }
-
-    if ($stmt = $conn->prepare($query)) {
-        if ($search != '') {
-            $searchWildcard = '%' . $search . '%';
-            $stmt->bind_param("ssss", $searchWildcard, $searchWildcard, $searchWildcard, $searchWildcard);
-        }
-
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows > 0) {
-            $productDetails = $result->fetch_all(MYSQLI_ASSOC); // Fetch all matching rows
-             // Apply number_format to the `stc_cust_super_requisition_items_finalqty` column
-            foreach ($productDetails as &$product) {
-                $query=mysqli_query($conn, "SELECT DISTINCT `stc_cust_super_requisition_list_purchaser_pd_id`, `stc_product_name` FROM `stc_cust_super_requisition_list_purchaser` LEFT JOIN `stc_product` ON `stc_cust_super_requisition_list_purchaser_pd_id`=`stc_product_id` WHERE `stc_cust_super_requisition_list_purchaser_list_item_id`='".$product['requisition_list_id']."'");
-                if(mysqli_num_rows($query)>0){
-                    foreach($query as $row){
-                        $product['stc_product_id'] = $row['stc_cust_super_requisition_list_purchaser_pd_id'];
-                        $product['stc_product_name'] = $row['stc_product_name'];
-                    }
-                }
-                if (isset($product['stc_cust_super_requisition_items_finalqty'])) {
-                    $product['stc_cust_super_requisition_items_finalqty'] = number_format($product['stc_cust_super_requisition_items_finalqty'], 2);
-                }
-            }
-            echo json_encode([
-                'success' => true, 
-                'products' => $productDetails, 
-                'message' => 'Product details fetched successfully.'
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false, 
-                'message' => 'No details found for the selected product.'
-            ]);
-        }
-
-        $stmt->close();
-    } else {
+    // Check for existing requisition with same name and status < 2
+    $checkQuery = "SELECT id, status FROM gld_requisitions WHERE name='$name' AND status < 2 LIMIT 1";
+    $checkResult = $conn->query($checkQuery);
+    if ($checkResult && $checkResult->num_rows > 0) {
+        $row = $checkResult->fetch_assoc();
         echo json_encode([
-            'success' => false, 
-            'message' => 'Failed to prepare query.'
+            'success' => false,
+            'error' => 'A requisition with this name is already raised.',
+            'status' => $row['status'],
+            'message' => 'Already raised requisition. Please contact by telephone.'
         ]);
+        return;
     }
-
+    $query = "INSERT INTO gld_requisitions (name, quantity, unit, remarks, status) VALUES ('$name', $quantity, '$unit', '$remarks', 1)";
+    if ($conn->query($query)) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => $conn->error]);
+    }
+}
+// Edit an existing requisition
+function editRequisition($conn) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $id = intval($data['id']);
+    $name = $conn->real_escape_string($data['name']);
+    $quantity = floatval($data['quantity']);
+    $unit = $conn->real_escape_string($data['unit']);
+    $remarks = $conn->real_escape_string($data['remarks']);
+    $query = "UPDATE gld_requisitions SET name='$name', quantity=$quantity, unit='$unit', remarks='$remarks' WHERE id=$id";
+    if ($conn->query($query)) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => $conn->error]);
+    }
+}
+// Delete a requisition
+function deleteRequisition($conn) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $id = intval($data['id']);
+    $query = "DELETE FROM gld_requisitions WHERE id=$id";
+    if ($conn->query($query)) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => $conn->error]);
+    }
+}
+// View (list) requisitions (update getRequisitions)
+function getRequisitions($conn) {
+    $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
+    $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+    $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+    $offset = ($page - 1) * $limit;
+    $where = "";
+    if ($search !== '') {
+        $where = "WHERE name LIKE '%$search%' OR unit LIKE '%$search%' OR remarks LIKE '%$search%'";
+    }
+    $query = "SELECT * FROM gld_requisitions $where ORDER BY id DESC LIMIT $offset, $limit";
+    $result = $conn->query($query);
+    $records = [];
+    while ($row = $result->fetch_assoc()) {
+        // Map status to text for frontend
+        $statusText = '';
+        switch ((int)$row['status']) {
+            case 1: $statusText = 'Request'; break;
+            case 2: $statusText = 'Accepted'; break;
+            case 3: $statusText = 'Dispatched'; break;
+            case 4: $statusText = 'Received'; break;
+            default: $statusText = 'Unknown';
+        }
+        $row['status_text'] = $statusText;
+        $records[] = $row;
+    }
+    // Get total count for pagination
+    $countQuery = "SELECT COUNT(*) as total FROM gld_requisitions $where";
+    $countResult = $conn->query($countQuery);
+    $total = $countResult->fetch_assoc()['total'];
+    echo json_encode(['records' => $records, 'total' => $total]);
 }
 // set requisitions details
 function setChallanRequisition($conn) {
@@ -619,6 +660,139 @@ function setChallanRequisition($conn) {
     } else {
         echo json_encode(['success' => false, 'message' => 'Invalid product ID']);
     }
+}
+
+function updateRequisitionStatus($conn) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $id = intval($data['id']);
+    $status = intval($data['status']);
+    $query = "UPDATE gld_requisitions SET status=$status WHERE id=$id";
+    if ($conn->query($query)) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => $conn->error]);
+    }
+}
+
+function transferProduct($conn) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $product_id = $conn->real_escape_string($data['product_id']);
+    $existingbranch = $conn->real_escape_string($data['existingbranch']);
+    $branch = $conn->real_escape_string($data['branch']);
+    $transfer_qty = isset($data['transfer_qty']) ? floatval($data['transfer_qty']) : null; // For scenario 2
+
+    // Find all adhoc records for this product and branch
+    $query = "SELECT a.stc_purchase_product_adhoc_id, s.qty FROM stc_purchase_product_adhoc a INNER JOIN stc_shop s ON a.stc_purchase_product_adhoc_id = s.adhoc_id WHERE a.stc_purchase_product_adhoc_productid = '$product_id' AND s.shopname = '$existingbranch' GROUP BY a.stc_purchase_product_adhoc_id";
+    
+    $result = $conn->query($query);
+    if ($result && $result->num_rows > 0) {
+        $success = true;
+        $message = 'Product transferred successfully.';
+        $total_available = 0;
+        $adhoc_records = [];
+        
+        // First calculate total available quantity across all adhoc records
+        while ($row = $result->fetch_assoc()) {
+            $adhoc_id = $row['stc_purchase_product_adhoc_id'];
+            $shop_qty = $row['qty'];
+            
+            // Get total challan qty for this adhoc_id and branch
+            $getchallan = $conn->query("SELECT SUM(qty) as qty FROM gld_challan INNER JOIN stc_trading_user ON created_by = stc_trading_user_id WHERE stc_trading_user_location = '$existingbranch' AND adhoc_id = '$adhoc_id'");
+            $challanqty = $getchallan ? floatval($getchallan->fetch_assoc()['qty']) : 0;
+            $available = $shop_qty - $challanqty;
+            
+            if ($available > 0) {
+                $total_available += $available;
+                $adhoc_records[] = ['adhoc_id' => $adhoc_id,'available_qty' => $available
+                ];
+            }
+        }
+        
+        // Check if we have enough quantity to transfer
+        if ($transfer_qty !== null && $transfer_qty > $total_available) {
+            echo json_encode(['success' => false, 'error' => 'Not enough quantity available for transfer.']);
+            return;
+        }
+        
+        $qty_to_transfer = ($transfer_qty !== null) ? $transfer_qty : $total_available;
+        $remaining_qty = $qty_to_transfer;
+        
+        // Process each adhoc record to transfer the quantity
+        foreach ($adhoc_records as $record) {
+            if ($remaining_qty <= 0) break;
+            
+            $adhoc_id = $record['adhoc_id'];
+            $adhoc_available = $record['available_qty'];
+            $qty_from_this_adhoc = min($adhoc_available, $remaining_qty);
+            
+            // Get all shop entries for this adhoc_id and branch, ordered by qty DESC
+            $getRows = $conn->query("SELECT * FROM stc_shop WHERE shopname = '$existingbranch' AND qty > 0 AND adhoc_id = '$adhoc_id' ORDER BY qty DESC");
+            
+            $adhoc_remaining = $qty_from_this_adhoc;
+            
+            while ($getRows && $row = $getRows->fetch_assoc()) {
+                if ($adhoc_remaining <= 0) break;
+                
+                $id = $row['id']; // Assuming there's an id column
+                $availableQty = $row['qty'];
+                $transfer_amount = min($availableQty, $adhoc_remaining);
+                
+                // Reduce quantity from existing branch
+                $conn->query("UPDATE stc_shop SET qty = qty - $transfer_amount WHERE id = '$id'");
+                
+                // Add quantity to new branch
+                $conn->query("INSERT INTO stc_shop (shopname, qty, adhoc_id, rack_id, remarks) 
+                             VALUES ('$branch', $transfer_amount, '$adhoc_id', '0', 'Transferred from $existingbranch')");
+                
+                $adhoc_remaining -= $transfer_amount;
+                $remaining_qty -= $transfer_amount;
+            }
+        }
+        
+        echo json_encode(['success' => $success, 'message' => $message, 'transferred_qty' => $qty_to_transfer]);
+    } else {
+        echo json_encode(['success' => false, 'error' => 'No record found for this product and branch.']);
+    }
+}
+
+function createRack($conn) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $rack_name = $conn->real_escape_string($data['rack_name']);
+    $locationcookie = $conn->real_escape_string($data['locationcookie']);
+    $query = "INSERT INTO stc_rack (stc_rack_name, stc_rack_location) VALUES ('$rack_name', '$locationcookie')";
+    if ($conn->query($query)) {
+        $id = $conn->insert_id;
+        $conn->query("DELETE FROM stc_shop WHERE stc_rack_name = ''");
+        echo json_encode(['success' => true, 'id' => $id, 'name' => $rack_name]);
+    } else {
+        echo json_encode(['success' => false, 'error' => $conn->error]);
+    }
+}
+
+function updateProductRack($conn) {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $product_id = intval($data['product_id']);
+    $rack_id = intval($data['rack_id']);
+    $locationcookie = $conn->real_escape_string($data['locationcookie']);
+    $query = "UPDATE stc_shop SET rack_id = $rack_id WHERE adhoc_id IN (SELECT stc_purchase_product_adhoc_id FROM stc_purchase_product_adhoc WHERE stc_purchase_product_adhoc_productid = $product_id) AND shopname = '$locationcookie'";
+    if ($conn->query($query)) {
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => $conn->error]);
+    }
+}
+
+function getRacks($conn) {
+    $racks = [];
+    $locationcookie = isset($_GET['locationcookie']) ? $_GET['locationcookie'] : '';
+    $rack_query = $conn->query("SELECT stc_rack_id, stc_rack_name FROM stc_rack WHERE stc_rack_location = '$locationcookie' ORDER BY stc_rack_name ASC");
+    while ($rack = $rack_query->fetch_assoc()) {
+        $racks[] = [
+            'id' => $rack['stc_rack_id'],
+            'name' => $rack['stc_rack_name']
+        ];
+    }
+    echo json_encode(['racks' => $racks]);
 }
 
 ?>

@@ -34,8 +34,8 @@ foreach($result as $row) {
     // Get inventory quantity
     $row['stc_item_inventory_pd_qty'] = getInventoryQty($con, $product_id);
     
-    // Get rack name and rates
-    $row = getRackAndRates($con, $row, $product_id);
+    
+    $row = getRackAndRates($con, $row, $product_id, $location_stc);
     
     // Calculate remaining quantity
     $row = calculateRemainingQty($con, $row, $product_id, $location_stc);
@@ -51,11 +51,17 @@ function getInventoryQty($con, $product_id) {
     return ($query && mysqli_num_rows($query)) ? mysqli_fetch_assoc($query)['qty'] ?? 0 : 0;
 }
 
-function getRackAndRates($con, $row, $product_id) {
+function getRackAndRates($con, $row, $product_id, $location_stc) {
     // Get rack name
     $rack_query = mysqli_query($con, "SELECT `stc_rack_name` FROM `stc_purchase_product_adhoc` AS ppa LEFT JOIN `stc_rack` ON ppa.`stc_purchase_product_adhoc_rackid`=`stc_rack_id`WHERE ppa.stc_purchase_product_adhoc_status=1 AND ppa.`stc_purchase_product_adhoc_productid` = $product_id ORDER BY ppa.`stc_purchase_product_adhoc_id` DESC LIMIT 1");
     $row['stc_rack_name'] = ($rack_query && mysqli_num_rows($rack_query)) ? mysqli_fetch_assoc($rack_query)['stc_rack_name'] : '';
-    
+    // Get rack name and rates only for Root
+    if ($location_stc != "Root") {
+        $rack_query = mysqli_query($con, "SELECT `stc_rack_name` FROM `stc_shop` AS S INNER JOIN `stc_purchase_product_adhoc` ON `stc_purchase_product_adhoc_id`=`adhoc_id` LEFT JOIN `stc_rack` R ON S.`rack_id`=`stc_rack_id`WHERE S.`shopname` = '$location_stc' AND `stc_purchase_product_adhoc_productid` = {$product_id} ORDER BY S.`id` DESC LIMIT 1");
+        if ($rack_query && mysqli_num_rows($rack_query)) {
+            $row['stc_rack_name'] = mysqli_fetch_assoc($rack_query)['stc_rack_name'];
+        }
+    }
     // Get rates
     $rate_query = mysqli_query($con, "SELECT `stc_purchase_product_adhoc_rate`,  ROUND(stc_purchase_product_adhoc_rate * (1 + ".$row['stc_product_sale_percentage']." / 100), 2) AS rate_with_percent   FROM `stc_purchase_product_adhoc`  WHERE `stc_purchase_product_adhoc_productid`=$product_id  ORDER BY `stc_purchase_product_adhoc_id` DESC LIMIT 1");
     
@@ -110,10 +116,9 @@ function getDirectQty($con, $product_id) {
 function getLocationQty($con, $product_id, $location) {
     $qty = 0;
     $query = mysqli_query($con, "SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM stc_purchase_product_adhoc spa WHERE spa.stc_purchase_product_adhoc_productid = $product_id AND spa.stc_purchase_product_adhoc_status = 1");
-    
     if ($query && mysqli_num_rows($query)) {
         foreach($query as $item) {
-            $shop_query = mysqli_query($con, "SELECT `shopname`, `qty` FROM stc_shop WHERE adhoc_id = {$item['stc_purchase_product_adhoc_id']}");
+            $shop_query = mysqli_query($con, "SELECT `shopname`, `qty`, `rack_id` FROM stc_shop WHERE adhoc_id = {$item['stc_purchase_product_adhoc_id']}");
             if ($shop_query && mysqli_num_rows($shop_query)) {
                 foreach($shop_query as $shop) {
                     if ($location == $shop['shopname']) {
@@ -123,13 +128,9 @@ function getLocationQty($con, $product_id, $location) {
                             $row['lot'] = [
                                 'adhoc_id' => $item['stc_purchase_product_adhoc_id'],
                                 'qty' => $item['stc_purchase_product_adhoc_qty'],
-                                'shopname' => $shop['shopname']
+                                'shopname' => $shop['shopname'],
+                                'rack_id' => $shop['rack_id']
                             ];
-                            // Get rack name for this lot
-                            $rack_query = mysqli_query($con, "SELECT `stc_rack_name` FROM `stc_purchase_product_adhoc` AS ppa LEFT JOIN `stc_rack` ON ppa.`stc_purchase_product_adhoc_rackid`=`stc_rack_id`WHERE ppa.stc_purchase_product_adhoc_status=1 AND ppa.`stc_purchase_product_adhoc_id` = {$item['stc_purchase_product_adhoc_id']} ORDER BY ppa.`stc_purchase_product_adhoc_id` DESC LIMIT 1");
-                            if ($rack_query && mysqli_num_rows($rack_query)) {
-                                $row['stc_rack_name'] = mysqli_fetch_assoc($rack_query)['stc_rack_name'];
-                            }
                         }
                     }
                 }

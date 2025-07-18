@@ -111,3 +111,15 @@ create table stc_cust_super_requisition_list_items_log (
 			");
 
             ALTER TABLE `stc_cust_super_requisition_list_items_rec` ADD `stc_cust_super_requisition_list_items_rec_status` INT NOT NULL AFTER `stc_cust_super_requisition_list_items_rec_recqty`;
+CREATE TABLE `gld_requisitions` (
+  `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `name` VARCHAR(255) NOT NULL,
+  `quantity` DECIMAL(10,2) NOT NULL,
+  `unit` VARCHAR(50) NOT NULL,
+  `remarks` TEXT,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+ALTER TABLE `gld_requisitions` ADD `status` INT NOT NULL AFTER `remarks`;
+ALTER TABLE `stc_shop` ADD `rack_id` INT NOT NULL AFTER `qty`, ADD `remarks` TEXT NOT NULL AFTER `rack_id`;
+ALTER TABLE `stc_rack` ADD `stc_rack_location` VARCHAR(100) NOT NULL AFTER `stc_rack_name`;

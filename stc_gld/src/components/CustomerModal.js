@@ -87,10 +87,10 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
         const parsedQuantity = parseFloat(quantity);
         const parsedRate = parseFloat(sanitizedRate);
 
-        // Validation: Check if entered quantity exceeds available inventory or is invalid
-        if (isNaN(parsedQuantity) || parsedQuantity <= 0 || parsedQuantity > productQuantity) {
-            if (isNaN(parsedQuantity) || parsedQuantity <= 0) {
-                setQuantityError('Invalid Quantity. Quantity must be greater than 0.');
+        // Validation: Check if entered quantity is less than 0 or exceeds available inventory or is invalid
+        if (isNaN(parsedQuantity) || parsedQuantity < 0 || parsedQuantity > productQuantity) {
+            if (isNaN(parsedQuantity) || parsedQuantity < 0) {
+                setQuantityError('Invalid Quantity. Quantity cannot be less than 0.');
             } else if (parsedQuantity > productQuantity) {
                 setQuantityError(`Entered quantity (${parsedQuantity}) exceeds available inventory (${productQuantity}).`);
             }
@@ -163,6 +163,7 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                 // Reset fields after successful submission
                 resetForm();
                 handleClose(); // Close the modal after showing the alert
+                window.location.reload();
 
                 Swal.fire({
                     icon: 'success',
@@ -226,14 +227,14 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
                             type="number"
                             value={quantity}
                             onChange={e => setQuantity(e.target.value)}
-                            min="1"
+                            min={0}
                             max={productQuantity} // Ensure the quantity doesn't exceed inventory
                             placeholder="Enter Quantity"
                         />
                         <Form.Text className="text-muted">
                             Available quantity: {productQuantity}
                         </Form.Text>
-                        {quantityError && <div style={{ color: 'red' }}>{quantityError}</div>} {/* Display quantity error */}
+                        {quantityError && <div style={{ color: 'red' }}>{quantityError}</div>}
                     </Form.Group>
 
                     <Form.Group controlId="formRate">

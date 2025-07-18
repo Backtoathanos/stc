@@ -333,9 +333,7 @@ export default function ChallanDashboard() {
                                 title: 'Success',
                                 text: response.data.message
                             }).then(() => {
-                                // Reload data after success
-                                fetchData();  // Fetch updated challan data
-                                getChallan();
+                                window.location.reload();
                             });
                         })
                         .catch(error => {

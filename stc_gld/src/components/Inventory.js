@@ -10,6 +10,9 @@ import { RotatingLines } from 'react-loader-spinner'; // Importing spinner from 
 import './Datatable.css';
 import axios from 'axios';
 import { debounce } from 'lodash';
+import { Modal, Button, Form } from 'react-bootstrap';
+import Swal from 'sweetalert2';
+import { FaEdit } from 'react-icons/fa';
 
 export default function Dashboard() {
     // console.log("Hi");
@@ -174,7 +177,21 @@ export default function Dashboard() {
             name: 'Rack',
             selector: row => row.stc_rack_name,
             sortable: true,
-            center: true
+            center: true,
+            cell: row => (
+                locationcookie !== 'Root' ? (
+                    <Button
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, backgroundColor: 'rgb(155 216 143)', color: '#000000', fontWeight: 'bold' }}
+                        onClick={() => handleOpenRackModal(row)}
+                        title="Edit Rack"
+                    >
+                        <FaEdit style={{ color: 'rgb(129 10 255)', fontSize: '18px' }} />
+                        <span>{row.stc_rack_name}</span>
+                    </Button>
+                ) : (
+                    <span>{row.stc_rack_name}</span>
+                )
+            )
         },
         {
             name: 'Unit',
@@ -222,21 +239,236 @@ export default function Dashboard() {
             sortable: false,
             center: true,
             cell: row => (
-                <a
-                    href="#"
-                    className="btn btn-primary"
-                    onClick={() => {
-                        setSelectedProductId(row.stc_product_id);
-                        setSelectedProductRate(row.rate_including_gst);
-                        setSelectedProductQuantity(row.stc_item_inventory_pd_qty);
-                        setModalShow(true);
-                    }}
-                >
-                    Add
-                </a>
+                <>
+                    {row.stc_item_inventory_pd_qty > 0 && (
+                        <Button
+                            variant="info"
+                            size="sm"
+                            style={{ marginRight: 8 }}
+                            onClick={() => handleOpenTransferModal(row)}
+                        >
+                            Transfer
+                        </Button>
+                    )}
+                    {row.stc_item_inventory_pd_qty === 0 ? (
+                        <Button
+                            variant="warning"
+                            size="sm"
+                            onClick={() => handleOpenRequisitionModal(row)}
+                        >
+                            Add Requisition
+                        </Button>
+                    ) : (
+                        <a
+                            href="#"
+                            className="btn btn-primary"
+                            onClick={() => {
+                                setSelectedProductId(row.stc_product_id);
+                                setSelectedProductRate(row.rate_including_gst);
+                                setSelectedProductQuantity(row.stc_item_inventory_pd_qty);
+                                setModalShow(true);
+                            }}
+                        >
+                            Add
+                        </a>
+                    )}
+                </>
             )
         }
     ];
+
+    const [showRequisitionModal, setShowRequisitionModal] = useState(false);
+    const [requisitionFields, setRequisitionFields] = useState({ name: '', unit: '', quantity: '', remarks: '' });
+    const [requisitionLoading, setRequisitionLoading] = useState(false);
+    const [modalError, setModalError] = useState('');
+
+    const handleOpenRequisitionModal = (row) => {
+        setRequisitionFields({
+            name: row.stc_product_name,
+            unit: row.stc_product_unit,
+            quantity: '',
+            remarks: ''
+        });
+        setShowRequisitionModal(false); // Ensure modal is closed first
+        setTimeout(() => setShowRequisitionModal(true), 50); // Open after state reset
+    };
+
+    const handleRequisitionFieldChange = (e) => {
+        setRequisitionFields({ ...requisitionFields, [e.target.name]: e.target.value });
+    };
+
+    const handleAddRequisition = () => {
+        setRequisitionLoading(true);
+        setModalError('');
+        if (parseFloat(requisitionFields.quantity) < 0) {
+            setModalError('Quantity cannot be less than 0.');
+            setRequisitionLoading(false);
+            return;
+        }
+        axios.post(`${API_BASE_URL}/index.php?action=addRequisition`, requisitionFields)
+            .then((response) => {
+                if (response.data && response.data.success === false && response.data.error) {
+                    setModalError(response.data.message || response.data.error);
+                    return;
+                }
+                setShowRequisitionModal(false);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Requisition added successfully.',
+                    confirmButtonText: 'OK'
+                });
+            })
+            .catch(error => {
+                setModalError('Error saving requisition');
+                console.error(error);
+            })
+            .finally(() => setRequisitionLoading(false));
+    };
+
+    const statusLabelMap = {
+        1: 'Pending',
+        2: 'Approved',
+        3: 'In Transit',
+        4: 'Completed'
+    };
+    const statusColorMap = {
+        1: '#ffc107', // yellow
+        2: '#17a2b8', // blue
+        3: '#fd7e14', // orange
+        4: '#28a745', // green
+        default: '#6c757d' // gray
+    };
+
+    const [showTransferModal, setShowTransferModal] = useState(false);
+    const [transferProductId, setTransferProductId] = useState(null);
+    const [transferBranch, setTransferBranch] = useState('');
+    const [transferError, setTransferError] = useState('');
+    const branchOptions = [
+        { value: 'Dhatkidih', label: 'Dhatkidih' },
+        { value: 'Kolkata', label: 'Kolkata' },
+        { value: 'Sehrabazar', label: 'Sehrabazar' }
+    ];
+
+    const handleOpenTransferModal = (row) => {
+        setTransferProductId(row.stc_product_id);
+        setTransferBranch('');
+        setTransferError('');
+        setShowTransferModal(true);
+    };
+
+    const handleTransfer = () => {
+        setTransferError('');
+        if (!transferBranch) {
+            setTransferError('Please select a branch.');
+            return;
+        }
+        const existingbranch=getCookie("location_stc");
+        axios.post(`${API_BASE_URL}/index.php?action=transferProduct`, {
+            product_id: transferProductId,
+            branch: transferBranch,
+            existingbranch: existingbranch
+        })
+            .then((response) => {
+                if (response.data && response.data.success === false && response.data.error) {
+                    setTransferError(response.data.message || response.data.error);
+                    return;
+                }
+                setShowTransferModal(false);
+                fetchData(search, page, limit);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Product transferred successfully.',
+                    confirmButtonText: 'OK'
+                });
+            })
+            .catch(error => {
+                setTransferError('Error transferring product');
+                console.error(error);
+            });
+    };
+
+    const [showRackModal, setShowRackModal] = useState(false);
+    const [rackProductId, setRackProductId] = useState(null);
+    const [rackAdhocId, setRackAdhocId] = useState(null);
+    const [rackList, setRackList] = useState([]);
+    const [selectedRack, setSelectedRack] = useState('');
+    const [newRackName, setNewRackName] = useState('');
+    const [rackError, setRackError] = useState('');
+    const [rackLoading, setRackLoading] = useState(false);
+
+    const handleOpenRackModal = (row) => {
+        setRackProductId(row.stc_product_id);
+        setRackAdhocId(row.adhoc_id || row.stc_purchase_product_adhoc_id || null);
+        setSelectedRack(row.rack_id || '');
+        setNewRackName('');
+        setRackError('');
+        setShowRackModal(true);
+        setRackLoading(true);
+        axios.get(`${API_BASE_URL}/index.php?action=getRacks`, {
+            params: {
+                locationcookie: locationcookie
+            }
+        })
+            .then(res => {
+                setRackList(res.data.racks || []);
+                setRackLoading(false);
+            })
+            .catch(() => setRackLoading(false));
+    };
+
+    const handleSaveRack = () => {
+        setRackError('');
+        if (!selectedRack && !newRackName) {
+            setRackError('Please select or enter a rack name.');
+            return;
+        }
+        setRackLoading(true);
+        if (newRackName) {
+            // Create new rack first
+            axios.post(`${API_BASE_URL}/index.php?action=createRack`, { locationcookie:locationcookie,rack_name: newRackName })
+                .then(res => {
+                    if (res.data && res.data.success) {
+                        setSelectedRack(res.data.id);
+                        handleUpdateRack(res.data.id);
+                    } else {
+                        setRackError(res.data.error || 'Failed to create rack.');
+                        setRackLoading(false);
+                    }
+                })
+                .catch(() => {
+                    setRackError('Failed to create rack.');
+                    setRackLoading(false);
+                });
+        } else {
+            handleUpdateRack(selectedRack);
+        }
+    };
+
+    const handleUpdateRack = (rackId) => {
+        axios.post(`${API_BASE_URL}/index.php?action=updateProductRack`, {
+            locationcookie:locationcookie,
+            rack_id: rackId,
+            product_id: rackProductId
+        })
+            .then(res => {
+                if (res.data && res.data.success) {
+                    setShowRackModal(false);
+                    fetchData(search, page, limit);
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Rack updated successfully.',
+                        confirmButtonText: 'OK'
+                    });
+                } else {
+                    setRackError(res.data.error || 'Failed to update rack.');
+                }
+            })
+            .catch(() => setRackError('Failed to update rack.'))
+            .finally(() => setRackLoading(false));
+    };
 
     return (
         <div className="wrapper ">
@@ -313,6 +545,128 @@ export default function Dashboard() {
                 handleClose={() => setSecondModalOpen(false)}
                 productId={selectedProductId}
             />
+            <Modal show={showRequisitionModal} onHide={() => setShowRequisitionModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Add Requisition</Modal.Title>
+                </Modal.Header>
+                <Form onSubmit={e => { e.preventDefault(); if (!requisitionLoading) handleAddRequisition(); }}>
+                    <Modal.Body>
+                        {modalError && <div style={{ color: 'red', marginBottom: 10 }}>{modalError}</div>}
+                        <Form.Group controlId="formProductName">
+                            <Form.Label>Product Name</Form.Label>
+                            <Form.Control type="text" value={requisitionFields.name} readOnly />
+                        </Form.Group>
+                        <Form.Group controlId="formUnit">
+                            <Form.Label>Unit</Form.Label>
+                            <Form.Control type="text" value={requisitionFields.unit} readOnly />
+                        </Form.Group>
+                        <Form.Group controlId="formQuantity">
+                            <Form.Label>Quantity</Form.Label>
+                            <Form.Control
+                                type="number"
+                                name="quantity"
+                                value={requisitionFields.quantity}
+                                onChange={handleRequisitionFieldChange}
+                                placeholder="Enter quantity"
+                                min={0}
+                                required
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="formRemarks">
+                            <Form.Label>Remarks</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                name="remarks"
+                                value={requisitionFields.remarks}
+                                onChange={handleRequisitionFieldChange}
+                                placeholder="Enter remarks"
+                            />
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setShowRequisitionModal(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="primary" type="submit" disabled={requisitionLoading}>
+                            {requisitionLoading ? 'Saving...' : 'Add Requisition'}
+                        </Button>
+                    </Modal.Footer>
+                </Form>
+            </Modal>
+            <Modal show={showTransferModal} onHide={() => setShowTransferModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Transfer Product</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {transferError && <div style={{ color: 'red', marginBottom: 10 }}>{transferError}</div>}
+                    <Form.Group controlId="formBranch">
+                        <Form.Label>Select Branch</Form.Label>
+                        <Form.Control
+                            as="select"
+                            value={transferBranch}
+                            onChange={e => setTransferBranch(e.target.value)}
+                        >
+                            <option value="">Select branch</option>
+                            {branchOptions.map(opt => (
+                                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowTransferModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handleTransfer}>
+                        Submit
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+            <Modal show={showRackModal} onHide={() => setShowRackModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Rack</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {rackError && <div style={{ color: 'red', marginBottom: 10 }}>{rackError}</div>}
+                    {rackLoading ? (
+                        <div>Loading racks...</div>
+                    ) : (
+                        <>
+                            <Form.Group controlId="formRackSelect">
+                                <Form.Label>Select Rack</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    value={selectedRack}
+                                    onChange={e => setSelectedRack(e.target.value)}
+                                >
+                                    <option value="">Select rack</option>
+                                    {rackList.map(rack => (
+                                        <option key={rack.id} value={rack.id}>{rack.name}</option>
+                                    ))}
+                                </Form.Control>
+                            </Form.Group>
+                            <div style={{ margin: '10px 0', textAlign: 'center' }}>or</div>
+                            <Form.Group controlId="formNewRack">
+                                <Form.Label>Add New Rack</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={newRackName}
+                                    onChange={e => setNewRackName(e.target.value)}
+                                    placeholder="Enter new rack name"
+                                />
+                            </Form.Group>
+                        </>
+                    )}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowRackModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={handleSaveRack} disabled={rackLoading}>
+                        Save
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </div>
     );
 }
