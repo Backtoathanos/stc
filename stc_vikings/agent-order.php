@@ -98,6 +98,11 @@ include("kattegat/role_check.php");
                 <span>B2C Orders</span>
               </a>
             </li>
+            <li class="nav-item">
+              <a role="tab" class="nav-link" id="tab-10" data-toggle="tab" href="#tab-content-10">
+                <span>GLD Requisitions</span>
+              </a>
+            </li>
           </ul>
           <div class="tab-content">
             <div class="tab-pane tabs-animation fade" id="tab-content-1" role="tabpanel">
@@ -822,6 +827,50 @@ include("kattegat/role_check.php");
                               </tr>
                             </tbody>
                           </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="tab-pane tabs-animation fade" id="tab-content-10" role="tabpanel">
+              <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5 align="center">GLD Requisitions</h5>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success" style="overflow-x: auto; white-space: nowrap;">
+                    <div class="row mb-2">
+                      <div class="col-md-4">
+                        <input type="text" id="gld-requisition-search" class="form-control" placeholder="Search by name, unit, remarks...">
+                      </div>
+                      <div class="col-md-2">
+                        <button class="btn btn-primary" id="gld-requisition-search-btn">Search</button>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                        <table class="table table-hover table-bordered" id="gld-requisition-table">
+                          <thead>
+                            <tr>
+                              <th class="text-center">Branch</th>
+                              <th class="text-center">Product Name</th>
+                              <th class="text-center">Requested Quantity</th>
+                              <th class="text-center">Unit</th>
+                              <th class="text-center">Remarks</th>
+                              <th class="text-center">Status</th>
+                              <th class="text-center">Action</th>
+                            </tr>
+                          </thead>
+                                                     <tbody class="gld-requisition-table-body">
+                             <tr><td colspan="7">Loading...</td></tr>
+                           </tbody>
+                        </table>
+                        <div class="gld-requisition-pagination"></div>
                       </div>
                     </div>
                   </div>
@@ -2342,6 +2391,162 @@ include("kattegat/role_check.php");
       });
     });
   </script>
+  <script>
+$(document).ready(function () {
+  // GLD Requisitions Tab Logic
+  function loadGLDRequisitions(page = 1, search = '') {
+    $('.gld-requisition-table-body').html('<tr><td colspan="6">Loading...</td></tr>');
+    $.ajax({
+      url: 'kattegat/ragnar_order.php',
+      method: 'POST',
+      data: {
+        stc_call_gld_requisitions: 1,
+        page: page,
+        search: search,
+        limit: 10
+      },
+      dataType: 'json',
+      success: function (response) {
+        var rows = '';
+        if (response.records && response.records.length > 0) {
+          response.records.forEach(function (item) {
+            var actionButton = '';
+            if (item.status == 1) {
+              actionButton = '<a href="#" class="btn btn-success btn-sm gld-approve-btn" data-id="' + item.id + '" title="Approve"><i class="fa fa-check"></i> Approve</a>';
+            } else if (item.status == 2) {
+              actionButton = '<a href="#" class="btn btn-primary btn-sm gld-dispatch-btn" data-id="' + item.id + '" title="Dispatch"><i class="fa fa-shipping-fast"></i> Dispatch</a>';
+            } else {
+              actionButton = '<span class="text-muted">No Action</span>';
+            }
+            
+            // Create status badge with color
+            var statusBadge = '';
+            switch(parseInt(item.status)) {
+              case 1:
+                statusBadge = '<span class="badge badge-warning" style="background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-clock-o"></i> ' + item.status_text + '</span>';
+                break;
+              case 2:
+                statusBadge = '<span class="badge badge-info" style="background-color: #17a2b8; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-check-circle"></i> ' + item.status_text + '</span>';
+                break;
+              case 3:
+                statusBadge = '<span class="badge badge-primary" style="background-color: #007bff; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-shipping-fast"></i> ' + item.status_text + '</span>';
+                break;
+              case 4:
+                statusBadge = '<span class="badge badge-success" style="background-color: #28a745; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-check-double"></i> ' + item.status_text + '</span>';
+                break;
+              default:
+                statusBadge = '<span class="badge badge-secondary" style="background-color: #6c757d; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-question-circle"></i> ' + item.status_text + '</span>';
+            }
+            
+            rows += '<tr>' +
+              '<td>' + item.stc_trading_user_location + '</td>' +
+              '<td>' + item.name + '</td>' +
+              '<td>' + item.quantity + '</td>' +
+              '<td>' + item.unit + '</td>' +
+              '<td>' + (item.remarks || '') + '</td>' +
+              '<td class="text-center">' + statusBadge + '</td>' +
+              '<td class="text-center">' + actionButton + '</td>' +
+              '</tr>';
+          });
+        } else {
+          rows = '<tr><td colspan="7">No requisitions found.</td></tr>';
+        }
+        $('.gld-requisition-table-body').html(rows);
+        // Pagination
+        var total = response.total || 0;
+        var perPage = 10;
+        var totalPages = Math.ceil(total / perPage);
+        var pagination = '';
+        if (totalPages > 1) {
+          for (var i = 1; i <= totalPages; i++) {
+            if (i == page) {
+              pagination += '<span class="btn btn-sm btn-success mx-1">' + i + '</span>';
+            } else {
+              pagination += '<a href="#" class="btn btn-sm btn-outline-primary mx-1 gld-requisition-page-link" data-page="' + i + '">' + i + '</a>';
+            }
+          }
+        }
+        $('.gld-requisition-pagination').html(pagination);
+      },
+      error: function () {
+        $('.gld-requisition-table-body').html('<tr><td colspan="7">Error loading data.</td></tr>');
+      }
+    });
+  }
+  // Load on tab show
+  $('a#tab-10').on('shown.bs.tab', function () {
+    loadGLDRequisitions(1, '');
+  });
+  // Also load if page is loaded with this tab active
+  if ($('a#tab-10').hasClass('active')) {
+    loadGLDRequisitions(1, '');
+  }
+  // Search
+  $('#gld-requisition-search-btn').on('click', function () {
+    var search = $('#gld-requisition-search').val();
+    loadGLDRequisitions(1, search);
+  });
+  $('#gld-requisition-search').on('keyup', function (e) {
+    if (e.keyCode === 13) {
+      var search = $(this).val();
+      loadGLDRequisitions(1, search);
+    }
+  });
+  // Pagination
+  $('body').on('click', '.gld-requisition-page-link', function (e) {
+    e.preventDefault();
+    var page = $(this).data('page');
+    var search = $('#gld-requisition-search').val();
+    loadGLDRequisitions(page, search);
+  });
+  
+  // Approve button click
+  $('body').on('click', '.gld-approve-btn', function (e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    if (confirm('Are you sure you want to approve this requisition?')) {
+      updateGLDRequisitionStatus(id, 2);
+    }
+  });
+  
+  // Dispatch button click
+  $('body').on('click', '.gld-dispatch-btn', function (e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    if (confirm('Are you sure you want to dispatch this requisition?')) {
+      updateGLDRequisitionStatus(id, 3);
+    }
+  });
+  
+  // Function to update status
+  function updateGLDRequisitionStatus(id, status) {
+    $.ajax({
+      url: 'kattegat/ragnar_order.php',
+      method: 'POST',
+      data: {
+        stc_update_gld_requisition_status: 1,
+        id: id,
+        status: status
+      },
+      dataType: 'json',
+      success: function (response) {
+        if (response.success) {
+          alert(response.message);
+          // Reload the current page to show updated data
+          var currentPage = $('.gld-requisition-page-link.btn-success').text() || 1;
+          var search = $('#gld-requisition-search').val();
+          loadGLDRequisitions(currentPage, search);
+        } else {
+          alert('Error: ' + response.message);
+        }
+      },
+      error: function () {
+        alert('Error updating status. Please try again.');
+      }
+    });
+  }
+});
+</script>
 </body>
 
 </html>

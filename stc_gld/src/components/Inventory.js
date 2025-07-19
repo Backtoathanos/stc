@@ -293,8 +293,10 @@ export default function Dashboard() {
         setTimeout(() => setShowRequisitionModal(true), 50); // Open after state reset
     };
 
+    const userIdCookie = document.cookie.split('; ').find(row => row.startsWith('user_id='));
+    const userId = userIdCookie.split('=')[1];
     const handleRequisitionFieldChange = (e) => {
-        setRequisitionFields({ ...requisitionFields, [e.target.name]: e.target.value });
+        setRequisitionFields({ ...requisitionFields, [e.target.name]: e.target.value, userId: userId });
     };
 
     const handleAddRequisition = () => {

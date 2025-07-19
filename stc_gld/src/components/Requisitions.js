@@ -34,10 +34,12 @@ export default function Requisitions() {
     const [modalError, setModalError] = useState('');
     const currentRoute = location.pathname === "/requisitions" ? "requisitions" : "dashboard";
 
+    const userIdCookie = document.cookie.split('; ').find(row => row.startsWith('user_id='));
+    const userId = userIdCookie.split('=')[1];
     const fetchData = debounce((query = '', pageNum = page, rowLimit = limit) => {
         setLoading(true);
         axios.get(`${API_BASE_URL}/index.php?action=getRequisitions`, {
-            params: { search: query, page: pageNum, limit: rowLimit }
+            params: { search: query, page: pageNum, limit: rowLimit, userId:userId }
         })
             .then(response => {
                 if (response.data && response.data.records) {
@@ -73,7 +75,6 @@ export default function Requisitions() {
     const handleModalFieldChange = (e) => {
         setModalFields({ ...modalFields, [e.target.name]: e.target.value });
     };
-
     const handleAddOrEdit = () => {
         setModalLoading(true);
         setModalError('');
@@ -85,7 +86,8 @@ export default function Requisitions() {
         const action = editId ? 'editRequisition' : 'addRequisition';
         axios.post(`${API_BASE_URL}/index.php?action=${action}`, {
             ...modalFields,
-            id: editId
+            id: editId,
+            userId: userId
         })
             .then((response) => {
                 if (response.data && response.data.success === false && response.data.error) {

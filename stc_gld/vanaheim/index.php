@@ -488,6 +488,7 @@ function addRequisition($conn) {
     $quantity = floatval($data['quantity']);
     $unit = $conn->real_escape_string($data['unit']);
     $remarks = $conn->real_escape_string($data['remarks']);
+    $userId=$data['userId'] ?? 0;
     if($name == '' || $quantity == 0 || $unit == '') {
         echo json_encode(['success' => false, 'error' => 'Please fill all the fields']);
         return;
@@ -505,7 +506,7 @@ function addRequisition($conn) {
         ]);
         return;
     }
-    $query = "INSERT INTO gld_requisitions (name, quantity, unit, remarks, status) VALUES ('$name', $quantity, '$unit', '$remarks', 1)";
+    $query = "INSERT INTO gld_requisitions (name, quantity, unit, remarks, status, created_by) VALUES ('$name', $quantity, '$unit', '$remarks', 1, $userId)";
     if ($conn->query($query)) {
         echo json_encode(['success' => true]);
     } else {
@@ -543,12 +544,13 @@ function getRequisitions($conn) {
     $search = isset($_GET['search']) ? $conn->real_escape_string($_GET['search']) : '';
     $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
     $limit = isset($_GET['limit']) ? intval($_GET['limit']) : 10;
+    $userId=$_GET['userId'] ?? 0;
     $offset = ($page - 1) * $limit;
     $where = "";
     if ($search !== '') {
-        $where = "WHERE name LIKE '%$search%' OR unit LIKE '%$search%' OR remarks LIKE '%$search%'";
+        $where = "AND (name LIKE '%$search%' OR unit LIKE '%$search%' OR remarks LIKE '%$search%')";
     }
-    $query = "SELECT * FROM gld_requisitions $where ORDER BY id DESC LIMIT $offset, $limit";
+    $query = "SELECT * FROM gld_requisitions WHERE created_by=$userId $where ORDER BY id DESC LIMIT $offset, $limit";
     $result = $conn->query($query);
     $records = [];
     while ($row = $result->fetch_assoc()) {

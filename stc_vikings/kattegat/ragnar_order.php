@@ -4011,6 +4011,63 @@ class ragnarCallB2COrders extends tesseract{
 		return $blackpearl;
 	}
 }
+
+class ragnarCallGLDRequisitions extends tesseract{
+	
+	public function stc_call_gld_requisitions($search = '', $page = 1, $limit = 10, $offset = 0){
+		$where = "";
+		if($search != ''){
+			$where = "WHERE name LIKE '%".mysqli_real_escape_string($this->stc_dbs, $search)."%' 
+					  OR unit LIKE '%".mysqli_real_escape_string($this->stc_dbs, $search)."%' 
+					  OR remarks LIKE '%".mysqli_real_escape_string($this->stc_dbs, $search)."%'";
+		}
+		
+		// Get total count for pagination
+		$countQuery = "SELECT COUNT(*) as total FROM gld_requisitions  INNER JOIN stc_trading_user ON gld_requisitions.created_by = stc_trading_user.stc_trading_user_id ".$where;
+		$countResult = mysqli_query($this->stc_dbs, $countQuery);
+		$total = mysqli_fetch_assoc($countResult)['total'];
+		
+		// Get records with pagination
+		$query = "SELECT * FROM gld_requisitions INNER JOIN stc_trading_user ON gld_requisitions.created_by = stc_trading_user.stc_trading_user_id ".$where." ORDER BY id DESC LIMIT $offset, $limit";
+		$result = mysqli_query($this->stc_dbs, $query);
+		
+		$records = [];
+		while($row = mysqli_fetch_assoc($result)){
+			// Map status to text for frontend
+			$statusText = '';
+			switch((int)$row['status']){
+				case 1: $statusText = 'Request'; break;
+				case 2: $statusText = 'Accepted'; break;
+				case 3: $statusText = 'Dispatched'; break;
+				case 4: $statusText = 'Received'; break;
+				default: $statusText = 'Unknown';
+			}
+			$row['status_text'] = $statusText;
+			$records[] = $row;
+		}
+		
+		return [
+			'records' => $records,
+			'total' => $total,
+			'page' => $page,
+			'limit' => $limit,
+			'total_pages' => ceil($total / $limit)
+		];
+	}
+	
+	public function stc_update_gld_requisition_status($id, $status){
+		if($id <= 0 || $status <= 0){
+			return ['success' => false, 'message' => 'Invalid parameters'];
+		}
+		
+		$query = "UPDATE gld_requisitions SET status = $status WHERE id = $id";
+		if(mysqli_query($this->stc_dbs, $query)){
+			return ['success' => true, 'message' => 'Status updated successfully'];
+		} else {
+			return ['success' => false, 'message' => 'Failed to update status'];
+		}
+	}
+}
 #<------------------------------------------------------------------------------------------------------>
 #<--------------------------------------Object sections of Order class---------------------------------->
 #<------------------------------------------------------------------------------------------------------>
@@ -4752,4 +4809,23 @@ if(isset($_POST['stc_call_advanceorderlist'])){
 	echo json_encode($odin_req_out);
 }
 
-?>
+#<-----------------Object section of GLD Requisitions Class------------------->
+if(isset($_POST['stc_call_gld_requisitions'])){
+	$search = isset($_POST['search']) ? $_POST['search'] : '';
+	$page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+	$limit = isset($_POST['limit']) ? (int)$_POST['limit'] : 10;
+	$offset = ($page - 1) * $limit;
+	
+	$odin_req = new ragnarCallGLDRequisitions();
+	$odin_req_out = $odin_req->stc_call_gld_requisitions($search, $page, $limit, $offset);
+	echo json_encode($odin_req_out);
+}
+
+if(isset($_POST['stc_update_gld_requisition_status'])){
+	$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+	$status = isset($_POST['status']) ? (int)$_POST['status'] : 0;
+	
+	$odin_req = new ragnarCallGLDRequisitions();
+	$odin_req_out = $odin_req->stc_update_gld_requisition_status($id, $status);
+	echo json_encode($odin_req_out);
+}
