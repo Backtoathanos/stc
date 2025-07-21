@@ -681,6 +681,124 @@ class sceptor extends tesseract{
 		return $groceries_array;
 	}
 
+    // INVENTORY-WISE MONTHLY/YEARLY PURCHASED & SOLD SUMMARY
+    public function stc_inventory_summary($month, $year) {
+        $summary = array();
+        // Get all products
+        $products = mysqli_query($this->stc_dbs, "SELECT stc_product_id, stc_product_name, stc_product_unit FROM stc_product");
+        while ($product = mysqli_fetch_assoc($products)) {
+            $product_id = $product['stc_product_id'];
+            $product_name = $product['stc_product_name'];
+            $product_unit = $product['stc_product_unit'];
+            // Purchased amount for this product
+            $purchase_q = mysqli_query($this->stc_dbs, "
+                SELECT SUM(stc_product_grn_items_qty * stc_product_grn_items_rate) as purchased
+                FROM stc_product_grn_items
+                INNER JOIN stc_product_grn ON stc_product_grn_id = stc_product_grn_items_grn_order_id
+                WHERE stc_product_grn_items_product_id = '$product_id'
+                  AND MONTH(stc_product_grn_date) = '$month'
+                  AND YEAR(stc_product_grn_date) = '$year'
+            ");
+            $purchase = mysqli_fetch_assoc($purchase_q);
+            $purchased = $purchase['purchased'] ? floatval($purchase['purchased']) : 0;
+            // Sold amount for this product
+            $sold_q = mysqli_query($this->stc_dbs, "
+                SELECT SUM(stc_sale_product_items_product_qty * stc_sale_product_items_product_sale_rate) as sold
+                FROM stc_sale_product_items
+                INNER JOIN stc_sale_product ON stc_sale_product_id = stc_sale_product_items_sale_product_id
+                WHERE stc_sale_product_items_product_id = '$product_id'
+                  AND MONTH(stc_sale_product_bill_date) = '$month'
+                  AND YEAR(stc_sale_product_bill_date) = '$year'
+            ");
+            $sold = mysqli_fetch_assoc($sold_q);
+            $soldamt = $sold['sold'] ? floatval($sold['sold']) : 0;
+            $summary[] = array(
+                'product_id' => $product_id,
+                'product_name' => $product_name,
+                'unit' => $product_unit,
+                'purchased' => $purchased,
+                'sold' => $soldamt
+            );
+        }
+        return $summary;
+    }
+
+    // INVENTORY SUMMARY CARDS (not product-wise)
+    public function stc_inventory_summary_cards($month, $year) {
+        $result = [
+            'total_purchase' => 0,
+            'vendor_payment' => 0,
+            'vendor_dues' => 0,
+            'total_sale' => 0,
+            'received_payments' => 0,
+            'sale_dues' => 0,
+            'expenses' => 0
+        ];
+        // Total Purchase
+        $purchase_q = mysqli_query($this->stc_dbs, "
+            SELECT SUM(stc_product_grn_items_qty * stc_product_grn_items_rate) as purchased
+            FROM stc_product_grn_items
+            INNER JOIN stc_product_grn ON stc_product_grn_id = stc_product_grn_items_grn_order_id
+            WHERE MONTH(stc_product_grn_date) = '$month' AND YEAR(stc_product_grn_date) = '$year'
+        ");
+        $purchase = mysqli_fetch_assoc($purchase_q);
+        $result['total_purchase'] = $purchase['purchased'] ? floatval($purchase['purchased']) : 0;
+        // Vendor Payment (simulate as 0.00 for now)
+        $result['vendor_payment'] = 0.00;
+        // Vendor Dues = Purchase - Payment
+        $result['vendor_dues'] = $result['total_purchase'] - $result['vendor_payment'];
+        // Total Sale
+        $sale_q = mysqli_query($this->stc_dbs, "
+            SELECT SUM(stc_sale_product_items_product_qty * stc_sale_product_items_product_sale_rate) as sold
+            FROM stc_sale_product_items
+            INNER JOIN stc_sale_product ON stc_sale_product_id = stc_sale_product_items_sale_product_id
+            WHERE MONTH(stc_sale_product_bill_date) = '$month' AND YEAR(stc_sale_product_bill_date) = '$year'
+        ");
+        $sale = mysqli_fetch_assoc($sale_q);
+        $result['total_sale'] = $sale['sold'] ? floatval($sale['sold']) : 0;
+        // Received Payments (simulate as 0.00 for now)
+        $result['received_payments'] = 0.00;
+        // Sale Dues = Sale - Received
+        $result['sale_dues'] = $result['total_sale'] - $result['received_payments'];
+        // Expenses (simulate as 0.00 for now)
+        $result['expenses'] = 0.00;
+        return $result;
+    }
+
+    // GLD summary for dashboard
+    public function stc_gld($month) {
+        $year = date('Y');
+        // Total Purchased
+        $purchase_q = mysqli_query($this->stc_dbs, "
+            SELECT SUM(stc_purchase_product_adhoc_qty * stc_purchase_product_adhoc_rate) as purchased
+            FROM stc_purchase_product_adhoc
+            WHERE MONTH(stc_purchase_product_adhoc_created_date) = '$month' AND YEAR(stc_purchase_product_adhoc_created_date) = '$year'
+        ");
+        $purchase = mysqli_fetch_assoc($purchase_q);
+        $total_purchase = $purchase['purchased'] ? floatval($purchase['purchased']) : 0;
+        // Total Sold (join to get rate +5%)
+        $sold_q = mysqli_query($this->stc_dbs, "
+            SELECT SUM(s.stc_cust_super_requisition_list_items_rec_recqty * (a.stc_purchase_product_adhoc_rate * 1.05)) as sold
+            FROM stc_cust_super_requisition_list_items_rec s
+            INNER JOIN stc_purchase_product_adhoc a ON s.stc_cust_super_requisition_list_items_rec_list_poaid = a.stc_purchase_product_adhoc_id
+            WHERE MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'
+        ");
+        $sold = mysqli_fetch_assoc($sold_q);
+        $total_sale = $sold['sold'] ? floatval($sold['sold']) : 0;
+
+        $locations = [];
+        $sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, SUM(qty * rate) as amount FROM gld_challan INNER JOIN stc_trading_user ON created_by=stc_trading_user_id WHERE MONTH(created_date)='$month' AND YEAR(created_date)='$year' GROUP BY stc_trading_user_location");
+		if(mysqli_num_rows($sql)>0){
+			while($row = mysqli_fetch_assoc($sql)){
+				$locations[] = [
+					'location' => $row['stc_trading_user_location'],
+					'amount' => floatval($row['amount'])
+				];
+			}
+		}
+
+        return array('total_purchase' => $total_purchase, 'total_sale' => $total_sale, 'locations' => $locations);
+    }
 }
 
 #<------------------------------------------------------------------------------->
@@ -712,8 +830,9 @@ if(isset($_POST["dashboard"])){
 	$opobjstcelec=$objstcelecpaid->stc_electronics($month);
 	$opobjstctra=$objstctrapaid->stc_trading($month);
 	$opobjstcgro=$objstcgropaid->stc_groceries($month);
+	$opobjstcgld=$objstcgropaid->stc_gld($month);
 
-	$cursedyouout=array($opobjtitems, $opobjinventory, $opobjtmerchant, $opobjtcustomer, $opobjtpurchased, $opobjtsoled, $opobjmerdue, $opobjcustdue, $opobjstcelec, $opobjstctra, $opobjstcgro);
+	$cursedyouout=array($opobjtitems, $opobjinventory, $opobjtmerchant, $opobjtcustomer, $opobjtpurchased, $opobjtsoled, $opobjmerdue, $opobjcustdue, $opobjstcelec, $opobjstctra, $opobjstcgro, $opobjstcgld);
 
 	echo json_encode($cursedyouout);
 	// echo $cursedyouout;
@@ -733,5 +852,27 @@ if(isset($_POST["dashboard"])){
 // 	header('Content-type: application/json');
 // 	echo json_encode($opobjchartsmonth);
 // 	// echo $opobjchartsmonth;
+// }
+
+// API endpoint for inventory-wise summary
+// if(isset($_POST["dashboard_inventory_summary"])){
+//     $month = isset($_POST['month']) ? $_POST['month'] : date('m');
+//     $year = isset($_POST['year']) ? $_POST['year'] : date('Y');
+//     $obj = new sceptor();
+//     $result = $obj->stc_inventory_summary($month, $year);
+//     header('Content-Type: application/json');
+//     echo json_encode($result);
+//     exit;
+// }
+
+// API endpoint for inventory summary cards
+// if(isset($_POST["dashboard_inventory_summary_cards"])){
+//     $month = isset($_POST['month']) ? $_POST['month'] : date('m');
+//     $year = isset($_POST['year']) ? $_POST['year'] : date('Y');
+//     $obj = new sceptor();
+//     $result = $obj->stc_inventory_summary_cards($month, $year);
+//     header('Content-Type: application/json');
+//     echo json_encode($result);
+//     exit;
 // }
 ?>

@@ -307,6 +307,40 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         </div>
                                     </div>
 
+                                    <!-- GLD Summary Cards Section -->
+                                    <div class="row mt-4">
+                                      <div class="col-md-12">
+                                        <div class="card border-0 shadow-sm" style="background: linear-gradient(-20deg, #e0f7fa 0%, #80deea 100%);">
+                                          <div class="card-body">
+                                            <h5 class="card-title font-weight-bold mb-4 text-dark">
+                                              <i class="fa fa-cubes"></i> GLD Summary
+                                            </h5>
+                                            <div class="row mb-3">
+                                              <div class="col-md-6">
+                                                <div class="alert alert-info mb-0"><b>Total Purchase:</b> <span class="gld-total-purchase">--</span></div>
+                                              </div>
+                                              <div class="col-md-6">
+                                                <div class="alert alert-primary mb-0"><b>Total Sale:</b> <span class="gld-total-sale">--</span></div>
+                                              </div>
+                                            </div>
+                                            <div class="table-responsive">
+                                              <table class="table table-bordered table-hover mb-0" id="gld-summary-table">
+                                                <thead class="thead-dark">
+                                                  <tr>
+                                                    <th>Branch/Location</th>
+                                                    <th>Amount (₹)</th>
+                                                  </tr>
+                                                </thead>
+                                                <tbody>
+                                                  <!-- Data will be injected here -->
+                                                </tbody>
+                                              </table>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+
                                     <style>
                                         .card {
                                             transition: all 0.3s ease;
@@ -630,7 +664,22 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         $('.togrosmdues').html(data[10]['grospdues']);
                         $('.togrossdues').html(data[10]['grossdues']);
                         $('.togrosexpenses').html(data[10]['grosexpense']);
-                        // $('.toelecmpaid').html(data[8]);
+                        // GLD summary
+                        var gld = data[11] || {};
+                        $('.gld-total-purchase').text(gld.total_purchase !== undefined ? parseFloat(gld.total_purchase).toLocaleString('en-IN', {minimumFractionDigits:2}) : '--');
+                        $('.gld-total-sale').text(gld.total_sale !== undefined ? parseFloat(gld.total_sale).toLocaleString('en-IN', {minimumFractionDigits:2}) : '--');
+                        var gldRows = '';
+                        if(Array.isArray(gld.locations) && gld.locations.length > 0) {
+                          $.each(gld.locations, function(i, item) {
+                            gldRows += '<tr>' +
+                              '<td>' + item.location + '</td>' +
+                              '<td><span class="badge badge-pill badge-info" style="font-size:14px;">₹ ' + parseFloat(item.amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
+                              '</tr>';
+                          });
+                        } else {
+                          gldRows = '<tr><td colspan="2" class="text-center text-muted">No data found for this period.</td></tr>';
+                        }
+                        $('#gld-summary-table tbody').html(gldRows);
                     }
                 });
             }
@@ -704,6 +753,46 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     }
                 });
             };
+
+            // Fetch inventory summary on load and on month change
+            function fetchInventorySummary(month, year) {
+              $('#inventory-summary-loader').show();
+              $('#inventory-summary-table tbody').html('<tr><td colspan="4" class="text-center"><div class="spinner-border spinner-border-sm text-warning" role="status"></div> Loading...</td></tr>');
+              $.ajax({
+                url: 'kattegat/ragnar_lothbrok.php',
+                method: 'POST',
+                data: {dashboard_inventory_summary: 1, month: month, year: year},
+                dataType: 'json',
+                success: function(data) {
+                  $('#inventory-summary-loader').hide();
+                  var rows = '';
+                  if(data.length === 0) {
+                    rows = '<tr><td colspan="4" class="text-center text-muted">No data found for this period.</td></tr>';
+                  } else {
+                    $.each(data, function(i, item) {
+                      rows += '<tr>' +
+                        '<td>' + item.product_name + '</td>' +
+                        '<td>' + item.unit + '</td>' +
+                        '<td><span class="badge badge-pill badge-warning" style="font-size:14px;">₹ ' + parseFloat(item.purchased).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
+                        '<td><span class="badge badge-pill badge-dark" style="font-size:14px;">₹ ' + parseFloat(item.sold).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
+                      '</tr>';
+                    });
+                  }
+                  $('#inventory-summary-table tbody').html(rows);
+                },
+                error: function() {
+                  $('#inventory-summary-loader').hide();
+                  $('#inventory-summary-table tbody').html('<tr><td colspan="4" class="text-center text-danger">Error loading data.</td></tr>');
+                }
+              });
+            }
+            // Initial load
+            fetchInventorySummary(month, d.getFullYear());
+            // On month change
+            $('body').on('change', '.stc-dash-month', function() {
+              month = $(this).val();
+              fetchInventorySummary(month, d.getFullYear());
+            });
         });
     </script>
 </body>
