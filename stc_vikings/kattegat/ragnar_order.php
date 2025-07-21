@@ -2205,6 +2205,8 @@ class ragnarRequisitionPertView extends tesseract{
 					$status='<span style="background-color: #95a5a6; color: white; padding: 2px 6px; border-radius: 3px;">Canceled</span>';
 				}elseif($requisrow['stc_cust_super_requisition_list_items_status']==8){
 					$status='<span style="background-color: #9b59b6; color: white; padding: 2px 6px; border-radius: 3px;">Returned</span>';
+				}elseif($requisrow['stc_cust_super_requisition_list_items_status']==9){
+					$status='<span style="background-color:rgb(255, 47, 47); color: white; padding: 2px 6px; border-radius: 3px;">Pending</span>';
 				}else{
 					$status='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
 				}
@@ -2238,6 +2240,7 @@ class ragnarRequisitionPertView extends tesseract{
 				
 					// <a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
 				$actiondeliver='
+					<a class="btn-change-status" data-toggle="modal" data-target="#statusRemarkModal" style="font-size:25px;color:black;" status="'.$requisrow['stc_cust_super_requisition_list_items_status'].'" title="Update to pending" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-clock-o"></i></a>
 					<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>
 					<a class="stc_add_togld" style="font-size:25px;color:black;" title="Add to GLD" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-shopping-cart"></i></a>
 				';
@@ -4066,6 +4069,39 @@ class ragnarCallGLDRequisitions extends tesseract{
 		} else {
 			return ['success' => false, 'message' => 'Failed to update status'];
 		}
+	}	
+
+	public function stc_update_requisition_status($id, $status, $remarks){
+		if($id <= 0 || $status <= 0){
+			return ['success' => false, 'message' => 'Invalid parameters'];
+		}
+		
+		$query = "UPDATE stc_cust_super_requisition_list_items SET stc_cust_super_requisition_list_items_status = $status WHERE stc_cust_super_requisition_list_id = $id";
+		if(mysqli_query($this->stc_dbs, $query)){
+			$title="Pending";
+			$message="Pending by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A'). " <br> Reason :".$remarks;
+			
+			$date = date("Y-m-d H:i:s");
+		
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, 
+					`title`, 
+					`message`, 
+					`status`, 
+					`created_by`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+					'1',
+					'".$_SESSION['stc_empl_id']."'
+				)
+			");
+			return ['success' => true, 'message' => 'Status updated successfully'];
+		} else {
+			return ['success' => false, 'message' => 'Failed to update status'];
+		}
 	}
 }
 #<------------------------------------------------------------------------------------------------------>
@@ -4829,3 +4865,14 @@ if(isset($_POST['stc_update_gld_requisition_status'])){
 	$odin_req_out = $odin_req->stc_update_gld_requisition_status($id, $status);
 	echo json_encode($odin_req_out);
 }
+
+if(isset($_POST['update_requisition_status'])){
+	$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+	$status = $_POST['status'];
+	$remarks = $_POST['remarks'];
+	
+	$odin_req = new ragnarCallGLDRequisitions();
+	$odin_req_out = $odin_req->stc_update_requisition_status($id, $status, $remarks);
+	echo json_encode($odin_req_out);
+}
+

@@ -745,6 +745,66 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         });
       });
     </script>
+    <!-- Status Change Modal -->
+    <div class="modal fade" id="statusRemarkModal" tabindex="-1" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Add Remarks for Pending</h5>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+            <textarea class="form-control" id="statusRemarkInput" placeholder="Enter remarks"></textarea>
+            <input type="hidden" id="statusChangeId">
+            <input type="hidden" id="statusChangeTo">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="saveStatusRemark">Save</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      $(document).ready(function(){
+        var preq_id = 0;
+        // Delegate click for status change button
+        $('body').on('click', '.btn-change-status', function() {
+          preq_id = $(this).attr('id');
+          var status = $(this).attr('status');
+          $('#statusChangeId').val(preq_id);
+          $('#statusRemarkInput').val('');
+        });
+        // Save status and remarks
+        $('#saveStatusRemark').on('click', function() {
+          var remarks = $('#statusRemarkInput').val();
+          preq_id=$('#statusChangeId').val();
+          if(remarks.trim() === '') {
+            alert('Please enter remarks for pending status.');
+            return;
+          }
+          changeStatus(preq_id, 9, remarks);
+        });
+        function changeStatus(preq_id, status, remarks) {
+          $.ajax({
+            url: 'kattegat/ragnar_order.php',
+            method: 'POST',
+            data: { update_requisition_status: 1, id: preq_id, status: status, remarks: remarks },
+            dataType  : 'JSON',
+            success: function(response) {
+              // console.log(response);
+              if(response.success=="true"){
+                alert(response.message);
+              }else{
+                alert(response.message);
+                location.reload();
+              }
+              // Optionally reload the table or update the row
+            }
+          });
+        }
+      });
+    </script>
 </body>
 </html>
 

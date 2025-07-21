@@ -323,22 +323,46 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                               <div class="col-md-6">
                                                 <div class="alert alert-primary mb-0"><b>Total Sale:</b> <span class="gld-total-sale">--</span></div>
                                               </div>
-                                            </div>
-                                            <div class="table-responsive">
-                                              <table class="table table-bordered table-hover mb-0" id="gld-summary-table">
-                                                <thead class="thead-dark">
-                                                  <tr>
-                                                    <th>Branch/Location</th>
-                                                    <th>Amount (₹)</th>
-                                                  </tr>
-                                                </thead>
-                                                <tbody>
-                                                  <!-- Data will be injected here -->
-                                                </tbody>
-                                              </table>
-                                            </div>
-                                            <div class="mt-4">
-                                              <canvas id="gldDonutChart" width="400" height="220"></canvas>
+                                                <div class="col-md-6">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered table-hover mb-0" id="gld-summary-table">
+                                                            <thead class="thead-dark">
+                                                            <tr>
+                                                                <th>Branch/Location</th>
+                                                                <th>Amount (₹)</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <!-- Data will be injected here -->
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered table-hover mb-0" id="gld-summary-table">
+                                                            <thead class="thead-dark">
+                                                            <tr>
+                                                                <th>Branch/Location</th>
+                                                                <th>Amount (₹)</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <!-- Data will be injected here -->
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="mt-4">
+                                                        <canvas id="gldDonutChart" width="400" height="220"></canvas>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-8">
+                                                    <div class="mt-4">
+                                                        <canvas id="gldBarChart" width="400" height="220"></canvas>
+                                                    </div>
+                                                </div>
                                             </div>
                                           </div>
                                         </div>
@@ -630,6 +654,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
 
             stc_dashboard_reload(month);
             var gldDonutChartInstance = null;
+            var gldBarChartInstance = null;
             function stc_dashboard_reload(month){
                 $.ajax({
                     url         : "kattegat/ragnar_lothbrok.php",
@@ -680,7 +705,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                           $.each(gld.locations, function(i, item) {
                             gldRows += '<tr>' +
                               '<td>' + item.location + '</td>' +
-                              '<td><span class="badge badge-pill badge-info" style="font-size:14px;">₹ ' + parseFloat(item.amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
+                              '<td class="text-right"><span class="badge badge-pill badge-info" style="font-size:14px;">₹ ' + parseFloat(item.amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
                               '</tr>';
                             donutLabels.push(item.location);
                             donutData.push(item.amount);
@@ -690,10 +715,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         }
                         $('#gld-summary-table tbody').html(gldRows);
                         // Render Donut Chart
-                        var ctx = document.getElementById('gldDonutChart').getContext('2d');
+                        var ctxDonut = document.getElementById('gldDonutChart').getContext('2d');
                         if(gldDonutChartInstance) { gldDonutChartInstance.destroy(); }
                         if(donutLabels.length > 0) {
-                          gldDonutChartInstance = new Chart(ctx, {
+                          gldDonutChartInstance = new Chart(ctxDonut, {
                             type: 'doughnut',
                             data: {
                               labels: donutLabels,
@@ -714,7 +739,43 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                             }
                           });
                         } else {
-                          ctx.clearRect(0, 0, 400, 220);
+                          ctxDonut.clearRect(0, 0, 400, 220);
+                        }
+                        // Render Bar Chart
+                        var ctxBar = document.getElementById('gldBarChart').getContext('2d');
+                        if(gldBarChartInstance) { gldBarChartInstance.destroy(); }
+                        if(donutLabels.length > 0) {
+                          gldBarChartInstance = new Chart(ctxBar, {
+                            type: 'bar',
+                            data: {
+                              labels: donutLabels,
+                              datasets: [{
+                                label: 'Amount (₹)',
+                                data: donutData,
+                                backgroundColor: [
+                                  '#42a5f5', '#66bb6a', '#ffa726', '#ab47bc', '#ec407a', '#ff7043', '#26a69a', '#d4e157', '#8d6e63', '#789262'
+                                ],
+                                borderWidth: 2
+                              }]
+                            },
+                            options: {
+                              responsive: true,
+                              plugins: {
+                                legend: { display: false },
+                                title: { display: true, text: 'GLD Branch-wise Bar Chart' }
+                              },
+                              scales: {
+                                y: {
+                                  beginAtZero: true,
+                                  ticks: {
+                                    callback: function(value) { return '₹ ' + value.toLocaleString('en-IN'); }
+                                  }
+                                }
+                              }
+                            }
+                          });
+                        } else {
+                          ctxBar.clearRect(0, 0, 400, 220);
                         }
                     }
                 });
