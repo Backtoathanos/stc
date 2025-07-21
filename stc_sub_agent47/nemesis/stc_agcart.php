@@ -390,6 +390,8 @@ class witcher_supervisor extends tesseract{
 					$reqstaus='<span style="background-color: #95a5a6; color: white; padding: 2px 6px; border-radius: 3px;">Canceled</span>';
 				}elseif($requisitioni_row['stc_cust_super_requisition_list_items_status']==8){
 					$reqstaus='<span style="background-color: #9b59b6; color: white; padding: 2px 6px; border-radius: 3px;">Returned</span>';
+				}elseif($requisitioni_row['stc_cust_super_requisition_list_items_status']==9){
+					$reqstaus='<span style="background-color:rgb(255, 47, 47); color: white; padding: 2px 6px; border-radius: 3px;">Pending</span>';
 				}else{
 					$reqstaus='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
 				}
