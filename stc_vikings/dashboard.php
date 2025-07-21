@@ -48,6 +48,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           100% { transform: rotate(360deg); }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
@@ -335,6 +336,9 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                   <!-- Data will be injected here -->
                                                 </tbody>
                                               </table>
+                                            </div>
+                                            <div class="mt-4">
+                                              <canvas id="gldDonutChart" width="400" height="220"></canvas>
                                             </div>
                                           </div>
                                         </div>
@@ -625,6 +629,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             });
 
             stc_dashboard_reload(month);
+            var gldDonutChartInstance = null;
             function stc_dashboard_reload(month){
                 $.ajax({
                     url         : "kattegat/ragnar_lothbrok.php",
@@ -669,17 +674,48 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         $('.gld-total-purchase').text(gld.total_purchase !== undefined ? parseFloat(gld.total_purchase).toLocaleString('en-IN', {minimumFractionDigits:2}) : '--');
                         $('.gld-total-sale').text(gld.total_sale !== undefined ? parseFloat(gld.total_sale).toLocaleString('en-IN', {minimumFractionDigits:2}) : '--');
                         var gldRows = '';
+                        var donutLabels = [];
+                        var donutData = [];
                         if(Array.isArray(gld.locations) && gld.locations.length > 0) {
                           $.each(gld.locations, function(i, item) {
                             gldRows += '<tr>' +
                               '<td>' + item.location + '</td>' +
                               '<td><span class="badge badge-pill badge-info" style="font-size:14px;">₹ ' + parseFloat(item.amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
                               '</tr>';
+                            donutLabels.push(item.location);
+                            donutData.push(item.amount);
                           });
                         } else {
                           gldRows = '<tr><td colspan="2" class="text-center text-muted">No data found for this period.</td></tr>';
                         }
                         $('#gld-summary-table tbody').html(gldRows);
+                        // Render Donut Chart
+                        var ctx = document.getElementById('gldDonutChart').getContext('2d');
+                        if(gldDonutChartInstance) { gldDonutChartInstance.destroy(); }
+                        if(donutLabels.length > 0) {
+                          gldDonutChartInstance = new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                              labels: donutLabels,
+                              datasets: [{
+                                data: donutData,
+                                backgroundColor: [
+                                  '#42a5f5', '#66bb6a', '#ffa726', '#ab47bc', '#ec407a', '#ff7043', '#26a69a', '#d4e157', '#8d6e63', '#789262'
+                                ],
+                                borderWidth: 2
+                              }]
+                            },
+                            options: {
+                              responsive: true,
+                              plugins: {
+                                legend: { position: 'bottom' },
+                                title: { display: true, text: 'GLD Branch-wise Distribution' }
+                              }
+                            }
+                          });
+                        } else {
+                          ctx.clearRect(0, 0, 400, 220);
+                        }
                     }
                 });
             }
