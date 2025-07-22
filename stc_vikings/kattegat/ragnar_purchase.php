@@ -2293,11 +2293,14 @@ class ragnarPurchaseAdhoc extends tesseract{
 					SELECT * FROM `stc_shop` WHERE `adhoc_id`='".$odinrow['stc_purchase_product_adhoc_id']."'
 				");
 				$shop_details='';
+				$shop_qty=0;
 				if(mysqli_num_rows($sql_qry)>0){
 					foreach($sql_qry as $sql_row){
-						$shop_details.='<a href="javascript:void(0)" id="'.$sql_row['id'].'" class="remove-shop-item">'.$sql_row['shopname'].' '.$sql_row['qty'].'/'.$odinrow['stc_purchase_product_adhoc_unit'].'</a><br> ';
+						$shop_qty+=$sql_row['qty'];
+						$shop_details.='<span><a href="stc-print-preview-transferchallan.php?transfer_id='.$sql_row['id'].'" id="'.$sql_row['id'].'" target="_blank" title="Print Challan"><i class="fa fa-print"></i></a>'.$sql_row['shopname'].'_'.number_format($sql_row['qty'], 2).'/'.$odinrow['stc_purchase_product_adhoc_unit'].'</span><a href="javascript:void(0)" title="Remove Item" id="'.$sql_row['id'].'" class="remove-shop-item"><i class="fa fa-trash"></i></a></span><br> ';
 					}
 				}
+				$stock=$stock-$shop_qty;
 				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				
 				$pro_rate='<input type="number" style="display:none" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" style="display:none" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
