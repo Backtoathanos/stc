@@ -4062,12 +4062,102 @@ class ragnarCallGLDRequisitions extends tesseract{
 		if($id <= 0 || $status <= 0){
 			return ['success' => false, 'message' => 'Invalid parameters'];
 		}
-		
-		$query = "UPDATE gld_requisitions SET status = $status WHERE id = $id";
-		if(mysqli_query($this->stc_dbs, $query)){
-			return ['success' => true, 'message' => 'Status updated successfully'];
+		if($status==1){			
+			$query = "UPDATE gld_requisitions SET status = $status WHERE id = $id";
+			if(mysqli_query($this->stc_dbs, $query)){
+				return ['success' => true, 'message' => 'Status updated successfully'];
+			} else {
+				return ['success' => false, 'message' => 'Failed to update status'];
+			}
+		}
+		$query=mysqli_query($this->stc_dbs, "SELECT product_id FROM gld_requisitions WHERE id = $id");
+		$product_id = 0;
+		if($row=mysqli_fetch_assoc($query)){
+			$product_id = $row['product_id'];
 		} else {
-			return ['success' => false, 'message' => 'Failed to update status'];
+			return ['success' => false, 'message' => 'Requisition not found'];
+
+		}
+		$searchQuery = " AND (P.stc_product_id = '$product_id')";
+		// Main data with subquery to calculate remaining qty
+		$baseSql = "
+			FROM stc_product P
+			LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id 
+			LEFT JOIN (
+				SELECT 
+					stc_purchase_product_adhoc_productid AS product_id,
+					SUM(stc_purchase_product_adhoc_qty) AS total_stock
+				FROM stc_purchase_product_adhoc
+				WHERE stc_purchase_product_adhoc_status = 1
+				GROUP BY stc_purchase_product_adhoc_productid
+			) AS stock ON stock.product_id = P.stc_product_id
+			LEFT JOIN (
+				SELECT product_id, SUM(qty) AS total_challan
+				FROM gld_challan
+				GROUP BY product_id
+			) AS challan ON challan.product_id = P.stc_product_id
+			LEFT JOIN (
+				SELECT spa.stc_purchase_product_adhoc_productid AS product_id, SUM(srec.stc_cust_super_requisition_list_items_rec_recqty) AS total_direct
+				FROM stc_purchase_product_adhoc spa
+				JOIN stc_cust_super_requisition_list_items_rec srec ON srec.stc_cust_super_requisition_list_items_rec_list_poaid = spa.stc_purchase_product_adhoc_id
+				WHERE spa.stc_purchase_product_adhoc_status = 1
+				GROUP BY spa.stc_purchase_product_adhoc_productid
+			) AS direct ON direct.product_id = P.stc_product_id
+			LEFT JOIN(
+				SELECT spa.stc_purchase_product_adhoc_productid AS product_id, SUM(S.qty) AS total_shop
+				FROM stc_purchase_product_adhoc spa
+				JOIN stc_shop S ON S.adhoc_id = spa.stc_purchase_product_adhoc_id
+				WHERE spa.stc_purchase_product_adhoc_status = 1
+				GROUP BY spa.stc_purchase_product_adhoc_productid
+			) AS shop ON shop.product_id = P.stc_product_id
+			WHERE P.stc_product_avail = 1
+			AND (IFNULL(stock.total_stock, 0) - IFNULL(challan.total_challan, 0) - IFNULL(direct.total_direct, 0)) > 0
+			$searchQuery
+		";
+		// Actual data
+		$query = "
+			SELECT DISTINCT
+				P.stc_product_id, 
+				(IFNULL(stock.total_stock, 0) - IFNULL(challan.total_challan, 0) - IFNULL(direct.total_direct, 0) - IFNULL(shop.total_shop, 0)) AS remainingqty
+			$baseSql
+		";
+		$date=date("Y-m-d H:i:s");
+		if($query=mysqli_query($this->stc_dbs, $query)){
+			// Update the status of the requisition
+			if($row = mysqli_fetch_assoc($query)){
+				$remain_qty=$row['remainingqty'];
+				// Find stc_purchase_product_adhoc_id for this product
+				$adhoc_id = 0;
+				$adhocQry = mysqli_query($this->stc_dbs, "SELECT stc_purchase_product_adhoc_id FROM stc_purchase_product_adhoc WHERE 	stc_purchase_product_adhoc_productid = '".mysqli_real_escape_string($this->stc_dbs, $product_id)."' AND 	stc_purchase_product_adhoc_status = 1 ORDER BY stc_purchase_product_adhoc_id DESC LIMIT 1");
+				if($adhocRow = mysqli_fetch_assoc($adhocQry)){
+					$shopname='';
+					$qty=0;
+					$shopqry = mysqli_query($this->stc_dbs, "SELECT DISTINCT `quantity`, `stc_trading_user_location` FROM `gld_requisitions` INNER JOIN `stc_trading_user` ON `created_by`=`stc_trading_user_id` WHERE `id` = '".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+					if($shopqry = mysqli_fetch_assoc($shopqry)){
+						$shopname = $shopqry['stc_trading_user_location'];
+						$qty = $shopqry['quantity'];
+					}
+					if($remain_qty-$qty<0){
+						mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET remarks = CONCAT(COALESCE(remarks, ''),'".$date.": Item not available. Item will be dispacth soon.') WHERE id = $id");
+						return ['success' => false, 'message' => 'Invalid Quanitty'];
+					}
+					$adhoc_id = $adhocRow['stc_purchase_product_adhoc_id'];
+					$created_by = isset($_SESSION['stc_empl_id']) ? $_SESSION['stc_empl_id'] : 0;
+					$insertQry = mysqli_query($this->stc_dbs, "INSERT INTO `stc_shop`(`adhoc_id`, `shopname`, `qty`, created_date, created_by) VALUES('".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."', '".mysqli_real_escape_string($this->stc_dbs, $shopname)."', '".mysqli_real_escape_string($this->stc_dbs, $qty)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $created_by)."')");
+					if($insertQry){
+						mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET status = $status WHERE id = $id");
+						return ['success' => true, 'message' => 'Status updated and item dispatched successfully'];
+					}
+				}else{
+					mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET remarks = CONCAT(COALESCE(remarks, ''),'<br>".$date.": Item not available. Item will be dispacth soon.') WHERE id = $id");
+					return ['success' => false, 'message' => 'No adhoc entry found for this product'];
+				}
+			}else{
+				mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET remarks = CONCAT(COALESCE(remarks, ''),'<br>".$date.": Item not available. Item will be dispacth soon.') WHERE id = $id");
+				return ['success' => false, 'message' => 'Invalid Quanity'];
+			}
+		} else {
+			return ['success' => false, 'message' => 'Failed to fetch product data'];
 		}
 	}	
 

@@ -858,6 +858,7 @@ include("kattegat/role_check.php");
                           <thead>
                             <tr>
                               <th class="text-center">Branch</th>
+                              <th class="text-center">Product ID(SKU)</th>
                               <th class="text-center">Product Name</th>
                               <th class="text-center">Requested Quantity</th>
                               <th class="text-center">Unit</th>
@@ -2440,6 +2441,7 @@ $(document).ready(function () {
             
             rows += '<tr>' +
               '<td>' + item.stc_trading_user_location + '</td>' +
+              '<td>' + item.product_id + '</td>' +
               '<td>' + item.name + '</td>' +
               '<td>' + item.quantity + '</td>' +
               '<td>' + item.unit + '</td>' +

@@ -239,40 +239,42 @@ export default function Dashboard() {
             sortable: false,
             center: true,
             cell: row => (
-                <>
-                    {row.stc_item_inventory_pd_qty > 0 && (
-                        <Button
-                            variant="info"
-                            size="sm"
-                            style={{ marginRight: 8 }}
-                            onClick={() => handleOpenTransferModal(row)}
-                        >
-                            Transfer
-                        </Button>
-                    )}
-                    {row.stc_item_inventory_pd_qty === 0 ? (
-                        <Button
-                            variant="warning"
-                            size="sm"
-                            onClick={() => handleOpenRequisitionModal(row)}
-                        >
-                            Add Requisition
-                        </Button>
-                    ) : (
-                        <a
-                            href="#"
-                            className="btn btn-primary"
-                            onClick={() => {
-                                setSelectedProductId(row.stc_product_id);
-                                setSelectedProductRate(row.rate_including_gst);
-                                setSelectedProductQuantity(row.stc_item_inventory_pd_qty);
-                                setModalShow(true);
-                            }}
-                        >
-                            Add
-                        </a>
-                    )}
-                </>
+                locationcookie !== 'Root' ? (
+                    <>
+                        {row.stc_item_inventory_pd_qty > 0 && (
+                            <Button
+                                variant="info"
+                                size="sm"
+                                style={{ marginRight: 8 }}
+                                onClick={() => handleOpenTransferModal(row)}
+                            >
+                                Transfer
+                            </Button>
+                        )}
+                        {row.stc_item_inventory_pd_qty === 0 ? (
+                            <Button
+                                variant="warning"
+                                size="sm"
+                                onClick={() => handleOpenRequisitionModal(row)}
+                            >
+                                Add Requisition
+                            </Button>
+                        ) : (
+                            <a
+                                href="#"
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    setSelectedProductId(row.stc_product_id);
+                                    setSelectedProductRate(row.rate_including_gst);
+                                    setSelectedProductQuantity(row.stc_item_inventory_pd_qty);
+                                    setModalShow(true);
+                                }}
+                            >
+                                Add
+                            </a>
+                        )}
+                    </>
+                ) : null
             )
         }
     ];
@@ -287,7 +289,8 @@ export default function Dashboard() {
             name: row.stc_product_name,
             unit: row.stc_product_unit,
             quantity: '',
-            remarks: ''
+            remarks: '',
+            product_id: row.stc_product_id
         });
         setShowRequisitionModal(false); // Ensure modal is closed first
         setTimeout(() => setShowRequisitionModal(true), 50); // Open after state reset
@@ -307,7 +310,9 @@ export default function Dashboard() {
             setRequisitionLoading(false);
             return;
         }
-        axios.post(`${API_BASE_URL}/index.php?action=addRequisition`, requisitionFields)
+        // Ensure product_id is sent
+        const reqData = { ...requisitionFields, product_id: requisitionFields.product_id };
+        axios.post(`${API_BASE_URL}/index.php?action=addRequisition`, reqData)
             .then((response) => {
                 if (response.data && response.data.success === false && response.data.error) {
                     setModalError(response.data.message || response.data.error);

@@ -1314,10 +1314,10 @@ include("kattegat/role_check.php");
           loadInventories();
 
           // Search
-          $('.searchKey').on('keyup', function () {
+          $(document).on('keyup', '.searchKey', function () {
               const search = $(this).val();
               $('.searchKey').val(search);
-              inv_type = $('.InvTypeBtns').attr('type');
+              inv_type = $('.InvTypeBtns.active').attr('type');
               if(search.length >= 3 || search.length === 0) {
                   loadInventories(1, search, inv_type);
               } else {
@@ -1329,7 +1329,7 @@ include("kattegat/role_check.php");
           $(document).on('click', '.pagination_link', function () {
               const page = $(this).data('page');
               const search = $('.searchKey').val();
-              inv_type = $('.InvTypeBtns').attr('type');
+              inv_type = $('.InvTypeBtns.active').attr('type');
               loadInventories(1, search, inv_type);
           });
           $(document).on('click', '.InvTypeBtns', function () {

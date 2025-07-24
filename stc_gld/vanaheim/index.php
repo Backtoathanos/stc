@@ -488,7 +488,8 @@ function addRequisition($conn) {
     $quantity = floatval($data['quantity']);
     $unit = $conn->real_escape_string($data['unit']);
     $remarks = $conn->real_escape_string($data['remarks']);
-    $userId=$data['userId'] ?? 0;
+    $userId = $data['userId'] ?? 0;
+    $product_id = isset($data['product_id']) ? intval($data['product_id']) : 0;
     if($name == '' || $quantity == 0 || $unit == '') {
         echo json_encode(['success' => false, 'error' => 'Please fill all the fields']);
         return;
@@ -506,7 +507,11 @@ function addRequisition($conn) {
         ]);
         return;
     }
-    $query = "INSERT INTO gld_requisitions (name, quantity, unit, remarks, status, created_by) VALUES ('$name', $quantity, '$unit', '$remarks', 1, $userId)";
+    if ($product_id > 0) {
+        $query = "INSERT INTO gld_requisitions (name, quantity, unit, remarks, status, created_by, product_id) VALUES ('$name', $quantity, '$unit', '$remarks', 1, $userId, $product_id)";
+    } else {
+        $query = "INSERT INTO gld_requisitions (name, quantity, unit, remarks, status, created_by) VALUES ('$name', $quantity, '$unit', '$remarks', 1, $userId)";
+    }
     if ($conn->query($query)) {
         echo json_encode(['success' => true]);
     } else {

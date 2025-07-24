@@ -2687,6 +2687,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 			$searchQuery = " AND (P.stc_product_name LIKE '%$searchEscaped%' OR P.stc_product_desc LIKE '%$searchEscaped%' OR B.stc_brand_title LIKE '%$searchEscaped%' OR S.stc_sub_cat_name LIKE '%$searchEscaped%')";
 		}
 
+		if (is_numeric($search)) {
+			$searchQuery = " AND P.stc_product_id = $search";
+		}
+
 		// Main data with subquery to calculate remaining qty
 		$baseSql = "
 			FROM stc_product P
@@ -2713,6 +2717,13 @@ class ragnarPurchaseAdhoc extends tesseract{
 				WHERE spa.stc_purchase_product_adhoc_status = 1
 				GROUP BY spa.stc_purchase_product_adhoc_productid
 			) AS direct ON direct.product_id = P.stc_product_id
+			LEFT JOIN(
+				SELECT spa.stc_purchase_product_adhoc_productid AS product_id, SUM(S.qty) AS total_shop
+				FROM stc_purchase_product_adhoc spa
+				JOIN stc_shop S ON S.adhoc_id = spa.stc_purchase_product_adhoc_id
+				WHERE spa.stc_purchase_product_adhoc_status = 1
+				GROUP BY spa.stc_purchase_product_adhoc_productid
+			) AS shop ON shop.product_id = P.stc_product_id
 			WHERE P.stc_product_avail = 1
 			AND (IFNULL(stock.total_stock, 0) - IFNULL(challan.total_challan, 0) - IFNULL(direct.total_direct, 0)) > 0
 			$searchQuery
@@ -2740,11 +2751,11 @@ class ragnarPurchaseAdhoc extends tesseract{
 				IFNULL(stock.total_stock, 0) AS total_stock,
 				IFNULL(challan.total_challan, 0) AS total_challan,
 				IFNULL(direct.total_direct, 0) AS total_direct,
-				(IFNULL(stock.total_stock, 0) - IFNULL(challan.total_challan, 0) - IFNULL(direct.total_direct, 0)) AS remainingqty
+				(IFNULL(stock.total_stock, 0) - IFNULL(challan.total_challan, 0) - IFNULL(direct.total_direct, 0) - IFNULL(shop.total_shop, 0)) AS remainingqty
 			$baseSql
 			LIMIT $offset, $limit
 		";
-
+		// echo $query;
 		$result = mysqli_query($this->stc_dbs, $query);
 		$html = '
 			<table class="table table-bordered">
@@ -2830,13 +2841,36 @@ class ragnarPurchaseAdhoc extends tesseract{
 	public function getPaginatedProducts2($page, $search, $inv_type){
 		$limit = 25;
 		$offset = ($page - 1) * $limit;
-		$totalPages=0;
 		$searchQuery = "";
 		
-		$query = "SELECT DISTINCT P.stc_product_id, P.stc_product_name, S.stc_sub_cat_name,  C.stc_cat_name, P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image,   0 as remainingqty, P.stc_product_gst, P.stc_product_sale_percentage, B.stc_brand_title FROM stc_product P INNER JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id INNER JOIN stc_category C ON P.stc_product_cat_id = C.stc_cat_id LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id INNER JOIN `stc_purchase_product_adhoc` ON `stc_purchase_product_adhoc_productid`=P.stc_product_id INNER JOIN `stc_shop` ON `stc_purchase_product_adhoc_id`=`adhoc_id` WHERE P.stc_product_avail = 1 AND `shopname` = '".mysqli_real_escape_string($this->stc_dbs, $inv_type)."'";
+		// Base query (without LIMIT)
+		$baseQuery = "FROM stc_product P 
+			INNER JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id 
+			INNER JOIN stc_category C ON P.stc_product_cat_id = C.stc_cat_id 
+			LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id 
+			INNER JOIN stc_purchase_product_adhoc ON stc_purchase_product_adhoc_productid = P.stc_product_id 
+			INNER JOIN stc_shop ON stc_purchase_product_adhoc_id = adhoc_id 
+			WHERE P.stc_product_avail = 1 AND shopname = '".mysqli_real_escape_string($this->stc_dbs, $inv_type)."'";
 
-		if ($search) $query .= " AND (P.stc_product_id='$search' OR P.stc_product_name LIKE '%$search%' OR P.stc_product_desc LIKE '%$search%')";
-		// echo $query;
+		if ($search) {
+			$searchEscaped = mysqli_real_escape_string($this->stc_dbs, $search);
+			$baseQuery .= " AND (P.stc_product_id = '$searchEscaped' OR P.stc_product_name LIKE '%$searchEscaped%' OR P.stc_product_desc LIKE '%$searchEscaped%')";
+		}
+
+		// Count query for pagination
+		$countSql = "SELECT COUNT(DISTINCT P.stc_product_id) as total " . $baseQuery;
+		$countResult = mysqli_query($this->stc_dbs, $countSql);
+		$totalRows = 0;
+		$totalPages = 0;
+		if ($countResult) {
+			$totalData = mysqli_fetch_assoc($countResult);
+			$totalRows = $totalData['total'];
+			$totalPages = ceil($totalRows / $limit);
+		}
+
+		// Main data query with LIMIT
+		$query = "SELECT DISTINCT P.stc_product_id, P.stc_product_name, S.stc_sub_cat_name,  C.stc_cat_name, P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image, 0 as remainingqty, P.stc_product_gst, P.stc_product_sale_percentage, B.stc_brand_title " . $baseQuery . " LIMIT $offset, $limit";
+
 		$result = mysqli_query($this->stc_dbs, $query);
 		$html = '
 			<table class="table table-bordered">
@@ -2856,7 +2890,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$product_id = $row['stc_product_id'];
 
 				// get quantity from shop
-				$shopQtyQuery = mysqli_query($this->stc_dbs, "SELECT SUM(qty) AS total_qty FROM stc_shop INNER JOIN `stc_purchase_product_adhoc` ON `stc_purchase_product_adhoc_id`=adhoc_id WHERE stc_purchase_product_adhoc_productid = $product_id AND `shopname` = '".mysqli_real_escape_string($this->stc_dbs, $inv_type)."'");
+				$shopQtyQuery = mysqli_query($this->stc_dbs, "SELECT SUM(qty) AS total_qty FROM stc_shop INNER JOIN stc_purchase_product_adhoc ON stc_purchase_product_adhoc_id = adhoc_id WHERE stc_purchase_product_adhoc_productid = $product_id AND shopname = '".mysqli_real_escape_string($this->stc_dbs, $inv_type)."'");
 				$shopQtyRow = mysqli_fetch_assoc($shopQtyQuery);
 				$row['remainingqty'] = $shopQtyRow['total_qty'] ?? 0;
 				$remainingqty = $row['remainingqty'];
