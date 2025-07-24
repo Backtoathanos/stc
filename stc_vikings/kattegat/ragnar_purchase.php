@@ -2301,8 +2301,13 @@ class ragnarPurchaseAdhoc extends tesseract{
 					}
 				}
 				$stock=$stock-$shop_qty;
+				$rateforpieces=($odinrow['stc_purchase_product_adhoc_rate'] * $odinrow['stc_purchase_product_adhoc_qty'])/$odinrow['stc_purchase_product_adhoc_qty'];
+				$cherrypick="<a href='javascript:void(0)' class='btn btn-warning cherry-pick-btn' data-toggle='modal' data-target='#cherryPickModal' data-adhoc-id=".$odinrow['stc_purchase_product_adhoc_id']." data-current-qty=".$odinrow['stc_purchase_product_adhoc_qty']." data-rate=".$rateforpieces." data-unit=".$odinrow['stc_purchase_product_adhoc_unit']." title='Cherry Pick'><i class='fa fa-cut'></i></a>
+						";
+				if($stock==0){
+					$cherrypick='';
+				}
 				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
-				
 				$pro_rate='<input type="number" style="display:none" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" style="display:none" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				$product_name=$odinrow['stc_sub_cat_name']!="OTHERS"?$odinrow['stc_sub_cat_name']. ' ' .$odinrow['stc_product_name']:$odinrow['stc_product_name'];
 				$odin.="
@@ -2358,6 +2363,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 							<!--<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card'></i></a>-->
 							<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o'></i></a>
 							<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash'></i></a>
+							".$cherrypick."
 						</td>
 					</tr>
 				";
@@ -2439,6 +2445,54 @@ class ragnarPurchaseAdhoc extends tesseract{
 			$odin='failed';
 		}
 		return $odin;
+	}
+
+	// cherry pick function
+	public function stc_poadhoc_cherrypic($adhoc_id, $qtyToDecrease, $newQty, $unit, $rate) {
+		// Decrease original quantity
+		$update = mysqli_query($this->stc_dbs, "
+			UPDATE `stc_purchase_product_adhoc` 
+			SET `stc_purchase_product_adhoc_qty` = `stc_purchase_product_adhoc_qty` - '".mysqli_real_escape_string($this->stc_dbs, $qtyToDecrease)."' 
+			WHERE `stc_purchase_product_adhoc_id` = '".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'");
+		
+		if (!$update) return 'failed';
+		
+		$user_id = $_SESSION['stc_empl_id'] ?? 0;
+		$now = date('Y-m-d H:i:s');
+		
+		// Insert new row using SELECT
+		$insert = mysqli_query($this->stc_dbs, "
+			INSERT INTO stc_purchase_product_adhoc (
+				stc_purchase_product_adhoc_productid, stc_purchase_product_adhoc_itemdesc, 
+				stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, 
+				stc_purchase_product_adhoc_unit, stc_purchase_product_adhoc_rackid, 
+				stc_purchase_product_adhoc_condition, stc_purchase_product_adhoc_source, 
+				stc_purchase_product_adhoc_destination, stc_purchase_product_adhoc_recievedby, 
+				stc_purchase_product_adhoc_status, stc_purchase_product_adhoc_remarks, 
+				stc_purchase_product_adhoc_created_by, stc_purchase_product_adhoc_created_date, 
+				stc_purchase_product_adhoc_updated_by, stc_purchase_product_adhoc_updated_date
+			) 
+			SELECT 
+				stc_purchase_product_adhoc_productid, 
+				stc_purchase_product_adhoc_itemdesc, 
+				'".mysqli_real_escape_string($this->stc_dbs, $newQty)."', 
+				'".mysqli_real_escape_string($this->stc_dbs, $rate)."', 
+				'".mysqli_real_escape_string($this->stc_dbs, $unit)."', 
+				stc_purchase_product_adhoc_rackid, 
+				stc_purchase_product_adhoc_condition, 
+				stc_purchase_product_adhoc_source, 
+				stc_purchase_product_adhoc_destination, 
+				stc_purchase_product_adhoc_recievedby, 
+				stc_purchase_product_adhoc_status, 
+				stc_purchase_product_adhoc_remarks, 
+				'".mysqli_real_escape_string($this->stc_dbs, $user_id)."', 
+				'".mysqli_real_escape_string($this->stc_dbs, $now)."', 
+				'".mysqli_real_escape_string($this->stc_dbs, $user_id)."', 
+				'".mysqli_real_escape_string($this->stc_dbs, $now)."' 
+			FROM stc_purchase_product_adhoc 
+			WHERE stc_purchase_product_adhoc_id = '".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'");
+		
+		return $insert ? 'success' : 'failed';
 	}
 
 	public function stc_poadhoc_imgupdate($adhoc_id, $img_id){
@@ -3792,6 +3846,19 @@ if(isset($_POST['stc_po_adhoc_update'])){
 	$adhoc_qty=$_POST['adhoc_qty'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
 	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty);
+	echo $outbjornestocking;
+}
+
+// update po adhoc cherry pick 
+if(isset($_POST['stc_po_adhoc_cherrypic'])){
+	$adhoc_id=$_POST['adhoc_id'];
+	$qtyToDecrease=$_POST['qtyToDecrease'];
+	$newQty=$_POST['newQty'];
+	$unit=$_POST['unit'];
+	$rate=$_POST['rate'];
+	
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_cherrypic($adhoc_id, $qtyToDecrease, $newQty, $unit, $rate);
 	echo $outbjornestocking;
 }
 

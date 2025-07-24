@@ -39,7 +39,7 @@ foreach($result as $row) {
     
     // Calculate remaining quantity
     $row = calculateRemainingQty($con, $row, $product_id, $location_stc);
-    
+    $row['stc_product_name']=trim($row['stc_product_name'], ' ');
     $data[] = $row;
 }
 

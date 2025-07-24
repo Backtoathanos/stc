@@ -860,7 +860,61 @@ include("kattegat/role_check.php");
                 }
               }
             });  
-          });  
+          }); 
+          
+          // cherry pick functionalities
+          
+          // Open modal and fill values
+          $(document).on('click', '.cherry-pick-btn', function() {
+            const adhocId = $(this).data('adhoc-id');
+            const currentQty = $(this).data('current-qty');
+            const rate = $(this).data('rate');
+            const unit = $(this).data('unit');
+            $('#cherryAdhocId').val(adhocId);
+            $('#cherryCurrentQty').val(currentQty);
+            $('#cherryQtyToDecrease').val('');
+            $('#cherryNewQty').val('');
+            $('#cherryUnit').val('');
+            $('#cherryRate').val('');
+            $('#cherryPickModal').modal('show');
+          });
+          
+          // Handle form submit
+          $('#cherryPickForm').on('submit', function(e) {
+            e.preventDefault();
+            // Collect data
+            const adhocId = $('#cherryAdhocId').val();
+            const qtyToDecrease = $('#cherryQtyToDecrease').val();
+            const newQty = $('#cherryNewQty').val();
+            const unit = $('#cherryUnit').val();
+            const rate = $('#cherryRate').val();
+            $.ajax({
+              url     : "kattegat/ragnar_purchase.php",
+              method  : "POST",
+              data    : {
+                stc_po_adhoc_cherrypic:1,
+                adhoc_id:adhocId,
+                qtyToDecrease:qtyToDecrease,
+                newQty:newQty,
+                unit:unit,
+                rate:rate
+              },
+              success : function(response_items){
+                var response=response_items.trim();
+                if(response=="success"){
+                  alert("Item Name Updated Successfully.");
+                  $('#cherryAdhocId').val('');
+                  $('#cherryCurrentQty').val('');
+                  $('#cherryQtyToDecrease').val('');
+                  $('#cherryNewQty').val('');
+                  $('#cherryUnit').val('');
+                  Pagination.loadData(pagenumber);
+                }else{
+                  alert("Something went wrong please check and try again.");
+                }
+              }
+            }); 
+          });
           
           $('body').delegate('.img-inputbtnshow', 'click', function(e){
             $(this).parent().find('.img-idrateinput').toggle();
@@ -1900,4 +1954,77 @@ include("kattegat/role_check.php");
             </div>
         </div>
     </div>
+</div>
+
+<!-- Cherry Pick Modal -->
+<div class="modal fade" id="cherryPickModal" tabindex="-1" role="dialog" aria-labelledby="cherryPickModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <form id="cherryPickForm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="cherryPickModalLabel">Cherry Pick Adhoc Item</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-12">
+              <div class="form-group row">
+                <div class="col-sm-4">
+                  <label style="margin-left : 20px" for="cherryAdhocId">Adhoc ID : </label>
+                </div>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="cherryAdhocId" name="adhoc_id" readonly>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-4">
+                  <label style="margin-left : 20px" for="cherryCurrentQty">Current Qty : </label>
+                </div>
+                <div class="col-sm-8">
+                  <input type="number" class="form-control" id="cherryCurrentQty" readonly>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-4">
+                  <label style="margin-left : 20px" for="cherryQtyToDecrease">Qty to Decrease : </label>
+                </div>
+                <div class="col-sm-8">
+                  <input type="number" class="form-control" id="cherryQtyToDecrease" name="qty_to_decrease" min="1" required>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-4">
+                  <label style="margin-left : 20px" for="cherryNewQty">New Qty : </label>
+                </div>
+                <div class="col-sm-8">
+                  <input type="number" class="form-control" id="cherryNewQty" name="new_qty">
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-4">
+                  <label style="margin-left : 20px" for="cherryUnit">Unit : </label>
+                </div>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="cherryUnit" name="unit" required>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-4">
+                  <label style="margin-left : 20px" for="cherryRate">Rate : </label>
+                </div>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="cherryRate" name="rate" required>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save Cherry Pick</button>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>

@@ -31,7 +31,7 @@ if(isset($_GET['transfer_id'])){
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>Transfer Challan - STC-TC-<?php echo $str;?></title>
+    <title>Transfer Challan - STC-<?php echo $str;?></title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700" />
     <link rel="stylesheet" href="../stc_symbiote/css/bootstrap.min.css" />
     <link rel="stylesheet" href="../stc_symbiote/css/templatemo-style.css">
@@ -164,6 +164,27 @@ if(isset($_GET['transfer_id'])){
         border-radius: 4px;
         background: #fff;
       }
+      .impact-heading {
+        text-align: left;
+        font-size: 2.5rem;
+        font-weight: 900;
+        font-family: 'Segoe UI', 'Arial', sans-serif;
+        color: #222;
+        letter-spacing: 2px;
+        margin-bottom: 0.5em;
+        position: relative;
+        padding-left: 16px;
+      }
+      .impact-heading::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 10%;
+        width: 6px;
+        height: 80%;
+        background: linear-gradient(180deg, #ff5722 0%, #ffc107 100%);
+        border-radius: 3px;
+      }
       @media print {
         .invoice {
           box-shadow: none;
@@ -192,19 +213,18 @@ if(isset($_GET['transfer_id'])){
     <div class="container-fluid tm-mt-big tm-mb-big invoice">
       <div class="header">
         <div class="header-col" style="flex:1; align-items:flex-start;">
-          <img src="../stc_symbiote/img/stc-header.png" class="header-banner" alt="STC Banner">
+          <h1 class="impact-heading">Global AC</h1>
           <p style="margin-top:10px;">
-            Rajmahal Apartment, D/304 3rd Floor, Block No 1, Pardih, Jamshedpur, Jharkhand 832110
+            502/A, Jawahar Nagar, Road No.: 17, PO - Azad Nagar, Mango, Jamshedpur - 832110, Jharkhand, INDIA
           </p>
           <p>
-            Mobile No. : +91-8986811304<br>
-            E.Mail:stc111213@gmail.com<br>
-            GSTIN: 20JCBPS6008G1ZT           
+            Mobile No. : +91-7001006703/ +91-9204400572<br>
+            E.Mail:gld@globalacsystem.com<br> 
           </p>
         </div>
         <div class="header-col header-title" style="flex:2;">
           <h1 class="challan-title"><b>TRANSFER CHALLAN</b></h1>
-          <h4>Transfer No : STC/TC/<?php echo $str; ?></h4>
+          <h4>Transfer No : STC/<?php echo $str; ?></h4>
           <h4>Transfer Date : <?php echo isset($row['created_date']) ? date('d-m-Y',strtotime($row['created_date'])) : '-'; ?></h4>
           <h4>Branch Name : <?php echo isset($row['shopname']) ? htmlspecialchars($row['shopname']) : '-'; ?></h4>
         </div>
@@ -224,7 +244,7 @@ if(isset($_GET['transfer_id'])){
                     <span>GSTIN : <b>20JCBPS6008G1ZT</b></span>
                   </h6>
                   <h6>
-                    Transfer No : <b>STC/TC/<?php echo $str;?></b>
+                    Transfer No : <b>STC/<?php echo $str;?></b>
                   </h6>
                   <h6>
                     Transfer Date : <b><?php echo isset($row['created_date']) ? date('d-m-Y',strtotime($row['created_date'])) : '-'; ?></b>
@@ -279,7 +299,7 @@ if(isset($_GET['transfer_id'])){
               <div class="pre-cond-plus-total-taxa"></div>
               <div class="pre-cond-plus-total-taxb">
                 <div id="signatory-stc">
-                  <p>For <span><b>STC ASSOCIATES</b></span></p>
+                  <p>For <span><b>Global AC</b></span></p>
                   <br><br><br>
                   <p><span align="center">Authorised Signatory</span></p>
                 </div>
