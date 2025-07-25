@@ -793,11 +793,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             dataType  : 'JSON',
             success: function(response) {
               // console.log(response);
-              if(response.success=="true"){
+              if(response.success==true){
                 alert(response.message);
               }else{
                 alert(response.message);
-                location.reload();
               }
               // Optionally reload the table or update the row
             }
