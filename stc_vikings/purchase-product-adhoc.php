@@ -343,7 +343,7 @@ include("kattegat/role_check.php");
                                               <th>Sl No.</th>
                                               <th>Adhoc_Id</th>
                                               <th>Linked Product</th>
-                                              <th>Product Name</th>
+                                              <th>Product ID<br> Product Name</th>
                                               <th>Item Name</th>
                                               <th>Rack</th>
                                               <th>Unit</th>
@@ -383,6 +383,7 @@ include("kattegat/role_check.php");
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function(){
+          const urlParams = new URLSearchParams(window.location.search);
           // Get all options from the hidden select when page loads
           var options = [];
           $('select[name="sourcerack_value[]"] option').each(function() {
@@ -681,7 +682,13 @@ include("kattegat/role_check.php");
               }
             });
           });
-
+          if (urlParams.has('brequist_id')) {
+            $('#addRow').hide();
+          }
+          if(urlParams.has('product_id')){
+            $('#itemsTable tbody').find('input[name="itemcode[]"]').val(urlParams.get('product_id'));
+          }
+          
           // Add new row
           $('#addRow').click(function() {
               var newRow = $('.item-row:first').clone();
@@ -735,13 +742,21 @@ include("kattegat/role_check.php");
               if(!isValid || formData.length === 0) {
                   return;
               }
-              
+              // Get the URL parameters
+              var requist_id = 0;
+
+              // Check if brequist_id exists in URL
+              if (urlParams.has('brequist_id')) {
+                  requist_id = urlParams.get('brequist_id');
+                  requist_id = parseInt(requist_id);
+              }
               $.ajax({
                   url: "kattegat/ragnar_purchase.php",
                   method: "POST",
                   data: {
                       stc_po_adhoc_save: 1,
-                      items: formData
+                      items: formData,
+                      requisition_id: requist_id
                   },
                   dataType: "JSON",
                   success: function(response){
@@ -749,6 +764,9 @@ include("kattegat/role_check.php");
                           alert("Purchase Order Adhoc saved successfully.");
                           $(".stc-add-poadhoc-product-form")[0].reset();
                           Pagination.loadData(pagenumber);
+                          if (urlParams.has('brequist_id')) {
+                            window.location.href = "agent-order.php";
+                          }
                       } else {
                           alert(response || "Something went wrong please check and try again.");
                       }

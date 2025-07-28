@@ -2169,6 +2169,14 @@ class ragnarPurchaseAdhoc extends tesseract{
 		return $odin;
 	}
 
+	public function stc_update_brequisition_status($requisition_id){
+		$odin='';
+		$query="UPDATE gld_requisitions SET buy_status = 3 WHERE id = $requisition_id";
+		if(mysqli_query($this->stc_dbs, $query)){
+			$odin="success";
+		}
+	}
+
 	// call po adhoc
 	public function stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status, $page, $pageSize){
 		$odin='';
@@ -2268,14 +2276,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 					}
 				}
 				$deliveredgld=0;
-				$sql_qry=mysqli_query($this->stc_dbs, "
-					SELECT `qty` FROM `gld_challan` WHERE `adhoc_id`='".$odinrow['stc_purchase_product_adhoc_id']."'
-				");
-				if(mysqli_num_rows($sql_qry)>0){
-					foreach($sql_qry as $sql_row){
-						$deliveredgld+=$sql_row['qty'];
-					}
-				}
+				
 				$stock=$odinrow['stc_purchase_product_adhoc_qty'] - ($delivered + $deliveredgld);
 				$sql_qry=mysqli_query($this->stc_dbs, "
 					SELECT `stc_product_image` FROM `stc_product` WHERE `stc_product_id`='".$odinrow['stc_purchase_product_adhoc_productid']."'
@@ -2319,7 +2320,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 							</div>
 						</td>
 						<td style='width: 180px;'>".$productog."</td>
-						<td class='text-center'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$product_name."</a></td>
+						<td class='text-center'><b>".$odinrow['stc_product_id']."</b><br><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$product_name."</a></td>
 						<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a></td>
 						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
@@ -3748,6 +3749,7 @@ if(isset($_POST['stc_po_adhoc_save'])) {
     // Check if items data exists
     if(isset($_POST['items']) && is_array($_POST['items'])) {
         $items = $_POST['items'];
+        $requisition_id = isset($_POST['requisition_id']) ? $_POST['requisition_id'] : 0;
         $objloki = new ragnarPurchaseAdhoc();
         $successCount = 0;
         $errorMessages = [];
@@ -3785,7 +3787,9 @@ if(isset($_POST['stc_po_adhoc_save'])) {
                 $errorMessages[] = "Row ".($index+1).": ".$objlokiout;
             }
         }
-        
+		if($requisition_id > 0){
+			$objlokiout = $objloki->stc_update_brequisition_status($requisition_id);
+		}
         if($successCount > 0) {
             $response = ($successCount == count($items)) ? "success" : "Partial success - ".$successCount." of ".count($items)." items saved";
         }

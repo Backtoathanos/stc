@@ -4017,12 +4017,13 @@ class ragnarCallB2COrders extends tesseract{
 
 class ragnarCallGLDRequisitions extends tesseract{
 	
-	public function stc_call_gld_requisitions($search = '', $page = 1, $limit = 10, $offset = 0){
+	public function stc_call_gld_requisitions($search = '', $page = 1, $limit = 25, $offset = 0){
 		$where = "";
 		if($search != ''){
 			$where = "WHERE name LIKE '%".mysqli_real_escape_string($this->stc_dbs, $search)."%' 
 					  OR unit LIKE '%".mysqli_real_escape_string($this->stc_dbs, $search)."%' 
-					  OR remarks LIKE '%".mysqli_real_escape_string($this->stc_dbs, $search)."%'";
+					  OR remarks LIKE '%".mysqli_real_escape_string($this->stc_dbs, $search)."%'
+					  OR stc_trading_user_location LIKE '%".mysqli_real_escape_string($this->stc_dbs, $search)."%' ";
 		}
 		
 		// Get total count for pagination
@@ -4046,6 +4047,14 @@ class ragnarCallGLDRequisitions extends tesseract{
 				default: $statusText = 'Unknown';
 			}
 			$row['status_text'] = $statusText;
+			$buyStatusText = '';
+			switch((int)$row['buy_status']){
+				case 1: $buyStatusText = 'Pending'; break;
+				case 2: $buyStatusText = 'Purchased'; break;
+				case 3: $buyStatusText = 'Recieved'; break;
+				default: $buyStatusText = 'NA';
+			}
+			$row['buyStatus_text'] = $buyStatusText;
 			$records[] = $row;
 		}
 		
@@ -4149,11 +4158,11 @@ class ragnarCallGLDRequisitions extends tesseract{
 						return ['success' => true, 'message' => 'Status updated and item dispatched successfully'];
 					}
 				}else{
-					mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET remarks = CONCAT(COALESCE(remarks, ''),'<br>".$date.": Item not available. Item will be dispacth soon.') WHERE id = $id");
+					mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET remarks = CONCAT(COALESCE(remarks, ''),'<br>".$date.": Item not available. Item will be dispacth soon.'), buy_status = 1 WHERE id = $id");
 					return ['success' => false, 'message' => 'No adhoc entry found for this product'];
 				}
 			}else{
-				mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET remarks = CONCAT(COALESCE(remarks, ''),'<br>".$date.": Item not available. Item will be dispacth soon.') WHERE id = $id");
+				mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET remarks = CONCAT(COALESCE(remarks, ''),'<br>".$date.": Item not available. Item will be dispacth soon.'), buy_status = 1 WHERE id = $id");
 				return ['success' => false, 'message' => 'Invalid Quanity'];
 			}
 		} else {
@@ -4193,6 +4202,37 @@ class ragnarCallGLDRequisitions extends tesseract{
 			return ['success' => false, 'message' => 'Failed to update status'];
 		}
 	}
+
+	public function stc_update_gld_requisition_bstatus($id, $status){
+		if($id <= 0 || $status <= 0){
+			return ['success' => false, 'message' => 'Invalid parameters'];
+		}	
+		$date=date("Y-m-d H:i:s");	
+		$query = "UPDATE gld_requisitions SET remarks = CONCAT(COALESCE(remarks, ''),'<br>".$date.": Items purchased successfully.<br>'), buy_status = $status WHERE id = $id";
+		if(mysqli_query($this->stc_dbs, $query)){
+			return ['success' => true, 'message' => 'Status updated successfully'];
+		} else {
+			return ['success' => false, 'message' => 'Failed to update status'];
+		}
+	}
+	
+	public function stc_update_gld_requisition_remarks($id, $remarks){
+		if($id <= 0){
+			return ['success' => false, 'message' => 'Invalid requisition ID'];
+		}
+		
+		$date = date("Y-m-d H:i:s");
+		$escaped_remarks = mysqli_real_escape_string($this->stc_dbs, $remarks);
+		
+		// Update buy_remarks field with timestamp
+		$query = "UPDATE gld_requisitions SET buy_remarks = CONCAT(COALESCE(buy_remarks, ''), '".$date.": ".$escaped_remarks."<br>') WHERE id = $id";
+		
+		if(mysqli_query($this->stc_dbs, $query)){
+			return ['success' => true, 'message' => 'Remarks updated successfully'];
+		} else {
+			return ['success' => false, 'message' => 'Failed to update remarks: ' . mysqli_error($this->stc_dbs)];
+		}
+	}	
 }
 #<------------------------------------------------------------------------------------------------------>
 #<--------------------------------------Object sections of Order class---------------------------------->
@@ -4963,6 +5003,24 @@ if(isset($_POST['update_requisition_status'])){
 	
 	$odin_req = new ragnarCallGLDRequisitions();
 	$odin_req_out = $odin_req->stc_update_requisition_status($id, $status, $remarks);
+	echo json_encode($odin_req_out);
+}
+
+if(isset($_POST['stc_update_gld_requisition_bstatus'])){
+	$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+	$status = isset($_POST['status']) ? (int)$_POST['status'] : 0;
+	
+	$odin_req = new ragnarCallGLDRequisitions();
+	$odin_req_out = $odin_req->stc_update_gld_requisition_bstatus($id, $status);
+	echo json_encode($odin_req_out);
+}
+
+if(isset($_POST['stc_update_gld_requisition_remarks'])){
+	$id = isset($_POST['id']) ? (int)$_POST['id'] : 0;
+	$remarks = isset($_POST['remarks']) ? $_POST['remarks'] : '';
+	
+	$odin_req = new ragnarCallGLDRequisitions();
+	$odin_req_out = $odin_req->stc_update_gld_requisition_remarks($id, $remarks);
 	echo json_encode($odin_req_out);
 }
 

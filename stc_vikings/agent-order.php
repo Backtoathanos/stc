@@ -854,23 +854,29 @@ include("kattegat/role_check.php");
                     </div>
                     <div class="row">
                       <div class="col-md-12">
-                        <table class="table table-hover table-bordered" id="gld-requisition-table">
-                          <thead>
-                            <tr>
-                              <th class="text-center">Branch</th>
-                              <th class="text-center">Product ID(SKU)</th>
-                              <th class="text-center">Product Name</th>
-                              <th class="text-center">Requested Quantity</th>
-                              <th class="text-center">Unit</th>
-                              <th class="text-center">Remarks</th>
-                              <th class="text-center">Status</th>
-                              <th class="text-center">Action</th>
-                            </tr>
-                          </thead>
-                                                     <tbody class="gld-requisition-table-body">
-                             <tr><td colspan="7">Loading...</td></tr>
-                           </tbody>
-                        </table>
+                        <!-- Header Row -->
+                        <div class="row gld-requisition-header" style="background-color: #f8f9fa;border: 1px solid #dee2e6;margin-bottom: 0;position: relative;left: 15px;width: 100%;">
+                          <div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;"><strong>Branch</strong></div>
+                          <div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;"><strong>Product ID(SKU)</strong></div>
+                          <div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;"><strong>Product Name</strong></div>
+                          <div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;"><strong>Requested Quantity</strong></div>
+                          <div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;"><strong>Unit</strong></div>
+                          <div class="col-md-2 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;"><strong>Remarks</strong></div>
+                          <div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;"><strong>Dispatch Status</strong></div>
+                          <div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;"><strong>Buy Status</strong></div>
+                          <div class="col-md-2 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;"><strong>Buy Remarks</strong></div>
+                          <div class="col-md-1 text-center" style="padding: 10px;"><strong>Action</strong></div>
+                        </div>
+                        
+                        <!-- Data Container -->
+                        <div class="gld-requisition-table-body" style="border: 1px solid #dee2e6; border-top: none;">
+                          <div class="row" style="border-bottom: 1px solid #dee2e6; margin: 0;">
+                            <div class="col-md-12 text-center" style="padding: 20px;">
+                              Loading...
+                            </div>
+                          </div>
+                        </div>
+                        
                         <div class="gld-requisition-pagination"></div>
                       </div>
                     </div>
@@ -2396,7 +2402,7 @@ include("kattegat/role_check.php");
 $(document).ready(function () {
   // GLD Requisitions Tab Logic
   function loadGLDRequisitions(page = 1, search = '') {
-    $('.gld-requisition-table-body').html('<tr><td colspan="6">Loading...</td></tr>');
+    $('.gld-requisition-table-body').html('<div class="row" style="border-bottom: 1px solid #dee2e6; margin: 0;"><div class="col-md-12 text-center" style="padding: 20px;">Loading...</div></div>');
     $.ajax({
       url: 'kattegat/ragnar_order.php',
       method: 'POST',
@@ -2412,14 +2418,9 @@ $(document).ready(function () {
         if (response.records && response.records.length > 0) {
           response.records.forEach(function (item) {
             var actionButton = '';
-            if (item.status == 1) {
-              actionButton = '<a href="#" class="btn btn-success btn-sm gld-approve-btn" data-id="' + item.id + '" title="Approve"><i class="fa fa-check"></i> Approve</a>';
-            } else if (item.status == 2) {
-              actionButton = '<a href="#" class="btn btn-primary btn-sm gld-dispatch-btn" data-id="' + item.id + '" title="Dispatch"><i class="fa fa-shipping-fast"></i> Dispatch</a>';
-            } else {
-              actionButton = '<span class="text-muted">No Action</span>';
-            }
             
+            // Add remarks button for all items
+            var remarksButton = '<a href="#" class="btn btn-info btn-sm gld-remarks-btn" data-toggle="modal" data-target="#gld-remarks-modal" data-id="' + item.id + '" title="Add Remarks"><i class="fa fa-comment"></i> Remarks</a>';
             // Create status badge with color
             var statusBadge = '';
             switch(parseInt(item.status)) {
@@ -2438,28 +2439,66 @@ $(document).ready(function () {
               default:
                 statusBadge = '<span class="badge badge-secondary" style="background-color: #6c757d; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-question-circle"></i> ' + item.status_text + '</span>';
             }
+            var buyStatusBadge = '';
+            switch(parseInt(item.buy_status)) {
+              case 1:
+                buyStatusBadge = '<span class="badge badge-warning" style="background-color: #ffc107; color: #000; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-clock-o"></i> ' + item.buyStatus_text + '</span>';
+                break;
+              case 2:
+                buyStatusBadge = '<span class="badge badge-info" style="background-color: #17a2b8; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-check-circle"></i> ' + item.buyStatus_text + '</span>';
+                break;
+              case 3:
+                buyStatusBadge = '<span class="badge badge-primary" style="background-color: #007bff; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-shipping-fast"></i> ' + item.buyStatus_text + '</span>';
+                break;
+              case 4:
+                buyStatusBadge = '<span class="badge badge-success" style="background-color: #28a745; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-check-double"></i> ' + item.buyStatus_text + '</span>';
+                break;
+              default:
+              buyStatusBadge = '<span class="badge badge-secondary" style="background-color: #6c757d; color: #fff; padding: 5px 10px; border-radius: 15px; font-size: 12px;"><i class="fa fa-question-circle"></i> ' + item.buyStatus_text + '</span>';
+            }
+            if (item.buy_status == 1) {
+              actionButton = `
+              <a href="#" class="btn btn-success btn-sm gld-purchase-btn" data-id="${item.id}" title="Purchased"><i class="fa fa-check"></i> Purchased?</a>
+              `;
+            } else if (item.buy_status == 2) {
+              actionButton = `
+              <a href="purchase-product-adhoc.php?page=purchase&subpage=purchaseorderadhoc&brequist_id=${item.id}&product_id=${item.product_id}" class="btn btn-success btn-sm" title="Recieved"><i class="fa fa-check"></i> Recieved?</a>
+              `;
+
+            } else{
+              remarksButton='';
+              if (item.status == 1) {
+                actionButton = '<a href="#" class="btn btn-success btn-sm gld-approve-btn" data-id="' + item.id + '" title="Approve"><i class="fa fa-check"></i> Approve</a>';
+              } else if (item.status == 2) {
+                actionButton = '<a href="#" class="btn btn-primary btn-sm gld-dispatch-btn" data-id="' + item.id + '" title="Dispatch"><i class="fa fa-shipping-fast"></i> Dispatch</a>';
+              } else {
+                actionButton = '<span class="text-muted">No Action</span>';
+              }
+            }
             
-            rows += '<tr>' +
-              '<td>' + item.stc_trading_user_location + '</td>' +
-              '<td>' + item.product_id + '</td>' +
-              '<td>' + item.name + '</td>' +
-              '<td>' + item.quantity + '</td>' +
-              '<td>' + item.unit + '</td>' +
-              '<td>' + (item.remarks || '') + '</td>' +
-              '<td class="text-center">' + statusBadge + '</td>' +
-              '<td class="text-center">' + actionButton + '</td>' +
-              '</tr>';
+            rows += '<div class="row" style="border-bottom: 1px solid #dee2e6; margin: 0;">' +
+              '<div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;">' + item.stc_trading_user_location + '</div>' +
+              '<div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;">' + item.product_id + '</div>' +
+              '<div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6; word-wrap: break-word; white-space: normal; max-height: 100px; overflow-y: auto;">' + item.name + '</div>' +
+              '<div class="col-md-1 text-right" style="padding: 10px; border-right: 1px solid #dee2e6;">' + item.quantity + '</div>' +
+              '<div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;">' + item.unit + '</div>' +
+              '<div class="col-md-2 text-left" style="padding: 10px; border-right: 1px solid #dee2e6; word-wrap: break-word; white-space: normal; max-height: 100px; overflow-y: auto;">' + (item.remarks || '') + '</div>' +
+              '<div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;">' + statusBadge + '</div>' +
+              '<div class="col-md-1 text-center" style="padding: 10px; border-right: 1px solid #dee2e6;">' + buyStatusBadge + '</div>' +
+              '<div class="col-md-2 text-left" style="padding: 10px; border-right: 1px solid #dee2e6; word-wrap: break-word; white-space: normal; max-height: 100px; overflow-y: auto;">' + (item.buy_remarks || '') + '</div>' +
+              '<div class="col-md-1 text-center" style="padding: 10px;">' + actionButton + '<br>' + remarksButton + '</div>' +
+              '</div>';
           });
         } else {
-          rows = '<tr><td colspan="7">No requisitions found.</td></tr>';
+          rows = '<div class="row" style="border-bottom: 1px solid #dee2e6; margin: 0;"><div class="col-md-12 text-center" style="padding: 20px;">No requisitions found.</div></div>';
         }
         $('.gld-requisition-table-body').html(rows);
         // Pagination
         var total = response.total || 0;
-        var perPage = 10;
+        var perPage = 25;
         var totalPages = Math.ceil(total / perPage);
         var pagination = '';
-        if (totalPages > 1) {
+        if (totalPages > 0) {
           for (var i = 1; i <= totalPages; i++) {
             if (i == page) {
               pagination += '<span class="btn btn-sm btn-success mx-1">' + i + '</span>';
@@ -2517,7 +2556,17 @@ $(document).ready(function () {
     var id = $(this).data('id');
     if (confirm('Are you sure you want to dispatch this requisition?')) {
       updateGLDRequisitionStatus(id, 3);
+      var currentPage = $('.gld-requisition-page-link.btn-success').text() || 1;
+      var search = $('#gld-requisition-search').val();
+      loadGLDRequisitions(currentPage, search);
     }
+  });
+  
+  // Remarks button click
+  $('body').on('click', '.gld-remarks-btn', function (e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    $('#gld-remarks-id').val(id);
   });
   
   // Function to update status
@@ -2539,7 +2588,88 @@ $(document).ready(function () {
           var search = $('#gld-requisition-search').val();
           loadGLDRequisitions(currentPage, search);
         } else {
-          alert('Error: ' + response.message);
+          alert(response.message);
+        }
+      },
+      error: function () {
+        alert('Error updating status. Please try again.');
+      }
+    });
+  }
+  
+  // Function to save remarks
+  function saveGLDRequisitionRemarks(id, remarks) {
+    $.ajax({
+      url: 'kattegat/ragnar_order.php',
+      method: 'POST',
+      data: {
+        stc_update_gld_requisition_remarks: 1,
+        id: id,
+        remarks: remarks
+      },
+      dataType: 'json',
+      success: function (response) {
+        if (response.success) {
+          alert(response.message);
+          // Reload the current page to show updated data
+          var currentPage = $('.gld-requisition-page-link.btn-success').text() || 1;
+          var search = $('#gld-requisition-search').val();
+          $('#gld-remarks-text').val('');
+          loadGLDRequisitions(currentPage, search);
+        } else {
+          alert(response.message);
+        }
+      },
+      error: function () {
+        alert('Error saving remarks. Please try again.');
+      }
+    });
+  }
+  
+  // Save remarks button click
+  $('#gld-save-remarks-btn').on('click', function (e) {
+    e.preventDefault();
+    var id = $('#gld-remarks-id').val();
+    var remarks = $('#gld-remarks-text').val();
+    if (remarks.trim() === '') {
+      alert('Please enter some remarks.');
+      return;
+    }
+    saveGLDRequisitionRemarks(id, remarks);
+  });
+
+  
+  $('body').on('click', '.gld-purchase-btn', function (e) {
+    e.preventDefault();
+    var id = $(this).data('id');
+    if (confirm('Are you sure you want to change status for this requisition to Purchased?')) {
+      updateGLDRequisitionBStatus(id, 2);
+      var currentPage = $('.gld-requisition-page-link.btn-success').text() || 1;
+      var search = $('#gld-requisition-search').val();
+      loadGLDRequisitions(currentPage, search);
+    }
+  });
+  
+  // Function to update status
+  function updateGLDRequisitionBStatus(id, status) {
+    $.ajax({
+      url: 'kattegat/ragnar_order.php',
+      method: 'POST',
+      data: {
+        stc_update_gld_requisition_bstatus: 1,
+        id: id,
+        status: status
+      },
+      dataType: 'json',
+      success: function (response) {
+        if (response.success=="true") {
+          alert(response.message);
+          // Reload the current page to show updated data
+          var currentPage = $('.gld-requisition-page-link.btn-success').text() || 1;
+          var search = $('#gld-requisition-search').val();
+          loadGLDRequisitions(currentPage, search);
+        } else {
+          alert(response.message);
         }
       },
       error: function () {
@@ -2550,6 +2680,33 @@ $(document).ready(function () {
 });
 </script>
 </body>
+
+<!-- GLD Requisition Remarks Modal -->
+<div class="modal fade" id="gld-remarks-modal" tabindex="-1" role="dialog" aria-labelledby="gldRemarksModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="gldRemarksModalLabel">Add/Edit Remarks</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="gld-remarks-form">
+          <input type="hidden" id="gld-remarks-id" name="requisition_id">
+          <div class="form-group">
+            <p for="gld-remarks-text" style="display: block; font-weight: bold; margin-bottom: 8px;">Remarks:</p>
+            <textarea class="form-control" id="gld-remarks-text" name="remarks" rows="5" placeholder="Enter your remarks here..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" id="gld-save-remarks-btn">Save Remarks</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 </html>
 <div class="modal fade bd-example-modal-xl stc-call-for-select-merchant-res" tabindex="-1" role="dialog"
