@@ -906,32 +906,55 @@ include("kattegat/role_check.php");
             const newQty = $('#cherryNewQty').val();
             const unit = $('#cherryUnit').val();
             const rate = $('#cherryRate').val();
-            $.ajax({
-              url     : "kattegat/ragnar_purchase.php",
-              method  : "POST",
-              data    : {
-                stc_po_adhoc_cherrypic:1,
-                adhoc_id:adhocId,
-                qtyToDecrease:qtyToDecrease,
-                newQty:newQty,
-                unit:unit,
-                rate:rate
-              },
-              success : function(response_items){
-                var response=response_items.trim();
-                if(response=="success"){
-                  alert("Item Name Updated Successfully.");
-                  $('#cherryAdhocId').val('');
-                  $('#cherryCurrentQty').val('');
-                  $('#cherryQtyToDecrease').val('');
-                  $('#cherryNewQty').val('');
-                  $('#cherryUnit').val('');
-                  Pagination.loadData(pagenumber);
-                }else{
-                  alert("Something went wrong please check and try again.");
+            var validated=0;
+            $('.alert-box').remove();
+            if(qtyToDecrease=='' || qtyToDecrease==0){
+              validated=0;
+              $('#cherryQtyToDecrease').after('<p class="alert-box alert-danger">Please enter quantity to decrease.</p>');
+            }
+            if(newQty=='' || newQty==0){
+              validated=0;
+              $('#cherryNewQty').after('<p class="alert-box alert-danger">Please enter new quantity.</p>');
+            }
+            if(unit==''){
+              validated=0;
+              $('#cherryUnit').after('<p class="alert-box alert-danger">Please select unit.</p>');
+            }
+            if(rate=='' || rate==0){
+              validated=0;
+              $('#cherryRate').after('<p class="alert-box alert-danger">Please enter rate.</p>');
+            }
+            if(validated==1){
+              $.ajax({
+                url     : "kattegat/ragnar_purchase.php",
+                method  : "POST",
+                data    : {
+                  stc_po_adhoc_cherrypic:1,
+                  adhoc_id:adhocId,
+                  qtyToDecrease:qtyToDecrease,
+                  newQty:newQty,
+                  unit:unit,
+                  rate:rate
+                },
+                success : function(response_items){
+                  var response=response_items.trim();
+                  if(response=="success"){
+                    alert("Item Name Updated Successfully.");
+                    $('#cherryAdhocId').val('');
+                    $('#cherryCurrentQty').val('');
+                    $('#cherryQtyToDecrease').val('');
+                    $('#cherryNewQty').val('');
+                    $('#cherryUnit').val('');
+                    $('#cherryRate').val('');
+                    Pagination.loadData(pagenumber);
+                  }else{
+                    alert("Something went wrong please check and try again.");
+                  }
                 }
-              }
-            }); 
+              });
+            }else{
+              return false;
+            }
           });
           
           $('body').delegate('.img-inputbtnshow', 'click', function(e){
@@ -2009,7 +2032,7 @@ include("kattegat/role_check.php");
                   <label style="margin-left : 20px" for="cherryQtyToDecrease">Qty to Decrease : </label>
                 </div>
                 <div class="col-sm-8">
-                  <input type="number" class="form-control" id="cherryQtyToDecrease" name="qty_to_decrease" min="1" required>
+                  <input type="text" class="form-control" id="cherryQtyToDecrease" name="qty_to_decrease" min="1" required>
                 </div>
               </div>
               <div class="form-group row">
@@ -2017,7 +2040,7 @@ include("kattegat/role_check.php");
                   <label style="margin-left : 20px" for="cherryNewQty">New Qty : </label>
                 </div>
                 <div class="col-sm-8">
-                  <input type="number" class="form-control" id="cherryNewQty" name="new_qty">
+                  <input type="text" class="form-control" id="cherryNewQty" name="new_qty" required>
                 </div>
               </div>
               <div class="form-group row">
