@@ -906,7 +906,7 @@ include("kattegat/role_check.php");
             const newQty = $('#cherryNewQty').val();
             const unit = $('#cherryUnit').val();
             const rate = $('#cherryRate').val();
-            var validated=0;
+            var validated=1;
             $('.alert-box').remove();
             if(qtyToDecrease=='' || qtyToDecrease==0){
               validated=0;
