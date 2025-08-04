@@ -2128,7 +2128,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         var response=response_tbm.trim();
                         if(response=="success"){
                             alert("Record Removed!!!");
-                            call_toolelist(month, supervise_name);
+                            call_toolelist();
                         }else{
                             alert("Something went wrong, please check and try again.");
                         }
@@ -2201,14 +2201,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var toolelist_id=$(this).attr("id");
                 $('.stc-toolelist-no').val(toolelist_id);
                 $('.bd-toolelist-modal-lg').modal('show');
-                call_toolelist(month, supervise_name);
+                call_toolelist();
                 call_toolelist_fields();
             });
 
             // update ppec list
             $('body').delegate('.stc-toolelist-fields', 'focusout', function(){
                 save_toolelist();
-                call_toolelist(month, supervise_name);
+                call_toolelist();
                 $('.saved-popup').remove();
                 $(this).after('<p class="saved-popup text-success">Record Saved</p>');
             });
