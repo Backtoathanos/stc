@@ -2386,9 +2386,9 @@ if(isset($_POST['stc_safety_deletetoollist'])){
 
 // delete toollist
 if(isset($_POST['stc_safety_deletetoolelist'])){
-	$toollist_id=$_POST['toollist_id'];
+	$toollist_id=$_POST['toolelist_id'];
 	$objsearchreq=new witcher_toollist();
-	$opobjsearchreq=$objsearchreq->stc_delete_toolelist($toollist_id);
+	$opobjsearchreq=$objsearchreq->stc_safety_deletetoolelist($toollist_id);
 	echo $opobjsearchreq;
 }
 
