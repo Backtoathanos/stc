@@ -1614,7 +1614,43 @@ class witcher_toollist extends tesseract{
 		}
 		return $optimusprime;
 	}
-
+	
+	// calll created toollist no
+	public function stc_hit_toolelist_call_no(){
+		$optimusprime='';
+		$date=date("Y-m-d");
+		$optimusprimechecquery=mysqli_query($this->stc_dbs, "
+			SELECT `created_date` FROM `stc_safety_tandtequipment` WHERE `created_date`='".$date."' AND `created_by`='".$_SESSION['stc_agent_sub_id']."' ORDER BY `id` DESC LIMIT 0,1
+		");
+		$previousentrydate='';
+		foreach($optimusprimechecquery as $optimusprimechecrow){
+			$previousentrydate=$optimusprimechecrow['created_date'];
+		}
+		if(abs($previousentrydate==$date)){
+			$optimusprime='same';
+		}else{
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_safety_tandtequipment`(
+					`created_date`, 
+					`created_by`
+				) VALUES (
+					'".$date."',
+					'".$_SESSION['stc_agent_sub_id']."'
+				)
+			");
+			if($optimusprimequery){
+				$optimusprimequery=mysqli_query($this->stc_dbs, "
+					SELECT `id` FROM `stc_safety_tandtequipment` WHERE `created_by`='".$_SESSION['stc_agent_sub_id']."' ORDER BY `id` DESC LIMIT 0,1
+				");
+				foreach($optimusprimequery as $optimusprimerow){
+					$optimusprime=$optimusprimerow['id'];
+				}
+			}else{
+				$optimusprime="not success";
+			}
+		}
+		return $optimusprime;
+	}
 	// call toollist
 	public function stc_call_toollist(){
 		$optimusprime='';
@@ -1653,6 +1689,45 @@ class witcher_toollist extends tesseract{
 		}
 		return $optimusprime;
 	}
+	// call toollist
+	public function stc_call_toolelist(){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safety_tandtequipment` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`created_by`
+			WHERE `created_by`='".$_SESSION['stc_agent_sub_id']."' 
+			ORDER BY DATE(`created_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			$website=$_SERVER['SERVER_NAME'];
+			$website = $website=="localhost" ? '..' : 'https://stcassociate.com/';
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a href="'.$website.'/stc_agent47/safety-tandtequipement-print-preview.php?equipment_id='.$optimusprimerow['id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetytoolelist-edit" id="'.$optimusprimerow['id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetytoolelist-delete" id="'.$optimusprimerow['id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['created_date'])).'</td>
+						<td>'.$optimusprimerow['work_orderno'].'</td>
+						<td>'.$optimusprimerow['sitename'].'</td>
+						<td>'.$optimusprimerow['stc_cust_pro_supervisor_fullname'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
 
 	// delete toollist
 	public function stc_delete_toollist($toollist_id){
@@ -1671,6 +1746,24 @@ class witcher_toollist extends tesseract{
 		return $optimusprime;
 	}
 
+	// delete toollist
+	public function stc_safety_deletetoolelist($toollist_id){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_safety_tandtequipment` WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $toollist_id)."'
+		");
+		if($optimusprimequery){
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_safety_tandtequipment_toollist` WHERE `tandtequipment_id`='".mysqli_real_escape_string($this->stc_dbs, $toollist_id)."'
+			");
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
+	
+
 	// call toollist
 	public function stc_call_toollist_fields($stc_toollist_no){
 		$optimusprime=array();
@@ -1688,7 +1781,22 @@ class witcher_toollist extends tesseract{
 		}
 		return $optimusprime;
 	}
-
+	public function stc_call_toolelist_fields($stc_toollist_no){
+		$optimusprime=array();
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safety_tandtequipment` WHERE `id`='".$stc_toollist_no."' ORDER BY `id` DESC
+		");
+		foreach($optimusprimequery as $optimusprimerow){
+			$optimusprime['toollist']=$optimusprimerow;
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safety_tandtequipment_toollist` WHERE `tandtequipment_id`='".$stc_toollist_no."' ORDER BY `tandtequipment_id` DESC
+		");
+		foreach($optimusprimequery as $optimusprimerow){
+			$optimusprime['toollistlist'][]=$optimusprimerow;
+		}
+		return $optimusprime;
+	}
 	// update toollist
 	public function stc_update_toollist($stc_toollist_no, $stc_toollistdate, $stc_toollistwono, $stc_toollistsitename, $stc_toollistsuptech){
 		$optimusprime='';
@@ -1712,6 +1820,27 @@ class witcher_toollist extends tesseract{
 		return $optimusprime;
 	}
 
+	// update toollist
+	public function stc_update_toolelist($stc_toollist_no, $stc_toollistwono, $stc_toollistsitename, $stc_toollistsuptech){
+		$optimusprime='';
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			UPDATE
+			    `stc_safety_tandtequipment`
+			SET
+				`work_orderno`='".mysqli_real_escape_string($this->stc_dbs, $stc_toollistwono)."',
+				`sitename`='".mysqli_real_escape_string($this->stc_dbs, $stc_toollistsitename)."',
+				`siteincharge`='".mysqli_real_escape_string($this->stc_dbs, $stc_toollistsuptech)."'
+
+			WHERE
+			    `id`='".mysqli_real_escape_string($this->stc_dbs, $stc_toollist_no)."'
+		");
+		if($optimusprimequery){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
 	public function stc_save_tooollisttools($stc_toollist_no, $stc_toolddesc, $stc_toolqty, $stc_toolinuse, $stc_toolinrepair, $stc_tooldamaged){
 		$optimusprime='';
 		$optimusprime_qry="
@@ -1729,6 +1858,36 @@ class witcher_toollist extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_toolinuse)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_toolinrepair)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $stc_tooldamaged)."'
+			)
+		";
+		$optimusprime_res=mysqli_query($this->stc_dbs, $optimusprime_qry);
+		if($optimusprime_res){
+			$optimusprime="success";
+		}else{
+			$optimusprime="not success";
+		}
+		return $optimusprime;
+	}
+
+	public function stc_save_tooolelisttools($stc_toollist_no, $stc_tooldesc, $stc_serial_no, $stc_safetowork, $stc_suprname, $stc_tooldate){
+		$optimusprime='';
+		$optimusprime_qry="
+			INSERT INTO `stc_safety_tandtequipment_toollist`(
+				`tandtequipment_id`, 
+				`name`, 
+				`serial_no`, 
+				`safe_to_work`, 
+				`sup_engg_name`, 
+				`sign`, 
+				`ddate`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_toollist_no)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_tooldesc)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_serial_no)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_safetowork)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_suprname)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_suprname)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $stc_tooldate)."'
 			)
 		";
 		$optimusprime_res=mysqli_query($this->stc_dbs, $optimusprime_qry);
@@ -2192,10 +2351,28 @@ if(isset($_POST['stc_safety_addtoollist'])){
 	echo $opobjsearchreq;
 }
 
+// add id to toollist
+if(isset($_POST['stc_safety_addtoolelist'])){
+	$objsearchreq=new witcher_toollist();
+	if(empty($_SESSION['stc_agent_sub_id'])){
+		$opobjsearchreq="reload";
+	}else{
+		$opobjsearchreq=$objsearchreq->stc_hit_toolelist_call_no();
+	}
+	echo $opobjsearchreq;
+}
+
 // call toollist
 if(isset($_POST['stc_safety_calltoollist'])){
 	$objsearchreq=new witcher_toollist();
 	$opobjsearchreq=$objsearchreq->stc_call_toollist();
+	echo $opobjsearchreq;
+}
+
+// call toollist
+if(isset($_POST['stc_safety_calltoolelist'])){
+	$objsearchreq=new witcher_toollist();
+	$opobjsearchreq=$objsearchreq->stc_call_toolelist();
 	echo $opobjsearchreq;
 }
 
@@ -2207,11 +2384,28 @@ if(isset($_POST['stc_safety_deletetoollist'])){
 	echo $opobjsearchreq;
 }
 
+// delete toollist
+if(isset($_POST['stc_safety_deletetoolelist'])){
+	$toollist_id=$_POST['toollist_id'];
+	$objsearchreq=new witcher_toollist();
+	$opobjsearchreq=$objsearchreq->stc_delete_toolelist($toollist_id);
+	echo $opobjsearchreq;
+}
+
 // call fields for toollist
 if(isset($_POST['stc_safety_calltoollistfields'])){
 	$stc_toollist_no=$_POST['stc_toollist_no'];
 	$objsearchreq=new witcher_toollist();
 	$opobjsearchreq=$objsearchreq->stc_call_toollist_fields($stc_toollist_no);
+	echo json_encode($opobjsearchreq);
+	// echo $opobjsearchreq;
+}
+
+// call fields for toollist
+if(isset($_POST['stc_safety_calltoolelistfields'])){
+	$stc_toollist_no=$_POST['stc_toolelist_no'];
+	$objsearchreq=new witcher_toollist();
+	$opobjsearchreq=$objsearchreq->stc_call_toolelist_fields($stc_toollist_no);
 	echo json_encode($opobjsearchreq);
 	// echo $opobjsearchreq;
 }
@@ -2228,7 +2422,17 @@ if(isset($_POST['stc_safety_updatetoollist'])){
 	$opobjsearchreq=$objsearchreq->stc_update_toollist($stc_toollist_no, $stc_toollistdate, $stc_toollistwono, $stc_toollistsitename, $stc_toollistsuptech);
 	echo $opobjsearchreq;
 }
+// update save for toollist
+if(isset($_POST['stc_safety_updatetoolelist'])){
+	$stc_toollist_no=$_POST['stc_toollist_no'];
+	$stc_toollistwono=$_POST['stc_toollistwono'];
+	$stc_toollistsitename=$_POST['stc_toollistsitename'];
+	$stc_toollistsuptech=$_POST['stc_toollistsuptech'];
 
+	$objsearchreq=new witcher_toollist();
+	$opobjsearchreq=$objsearchreq->stc_update_toolelist($stc_toollist_no, $stc_toollistwono, $stc_toollistsitename, $stc_toollistsuptech);
+	echo $opobjsearchreq;
+}
 // save toolllist tools
 if(isset($_POST['stc_safety_savetoolliste'])){
 	$stc_toollist_no=$_POST['stc_toollist_no'];
@@ -2240,6 +2444,20 @@ if(isset($_POST['stc_safety_savetoolliste'])){
 
 	$objsearchreq=new witcher_toollist();
 	$opobjsearchreq=$objsearchreq->stc_save_tooollisttools($stc_toollist_no, $stc_toolddesc, $stc_toolqty, $stc_toolinuse, $stc_toolinrepair, $stc_tooldamaged);
+	echo $opobjsearchreq;
+}
+
+// save toolllist tools
+if(isset($_POST['stc_safety_savetooleliste'])){
+	$stc_toollist_no=$_POST['stc_toollist_no'];
+	$stc_tooldesc=$_POST['stc_tooldesc'];
+	$stc_serial_no=$_POST['stc_serial_no'];
+	$stc_safetowork=$_POST['stc_safetowork'];
+	$stc_suprname=$_POST['stc_suprname'];
+	$stc_tooldate=$_POST['stc_tooldate'];
+
+	$objsearchreq=new witcher_toollist();
+	$opobjsearchreq=$objsearchreq->stc_save_tooolelisttools($stc_toollist_no, $stc_tooldesc, $stc_serial_no, $stc_safetowork, $stc_suprname, $stc_tooldate);
 	echo $opobjsearchreq;
 }
 /*-------------------------------------For capa------------------------------------*/

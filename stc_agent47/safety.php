@@ -351,6 +351,7 @@ else {
                                                     <thead>
                                                         <tr>
                                                             <th class="text-center">Date.</th>
+                                                            <th class="text-center">Work Order No</th>
                                                             <th class="text-center">Site Name</th>
                                                             <th class="text-center">Supervisor Name</th>
                                                             <th width="10%" class="text-center">Action</th>
@@ -371,8 +372,50 @@ else {
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Tools & Tasckles Equipment comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body"><h5 class="card-title">Tools & Tackles Equipment</h5>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="position-relative form-group">
+                                                            <label for="exampleEmail" class="">By Month</label>
+                                                            <input type="month" class="form-control safety-toolelist-filter-by-month" value="<?php echo date("Y-m");?>">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <div class="position-relative form-group">
+                                                            <label for="exampleEmail" class="">By Supervisor Name</label>
+                                                            <input type="text" class="form-control safety-toolelist-filter-by-supervisorname" placeholder="Enter Supervisor Name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="position-relative form-group">
+                                                            <button type="text" class="form-control btn btn-primary safety-toolelist-filter-by-search">Search</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12"> 
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">Date.</th>
+                                                            <th class="text-center">Work Order No</th>
+                                                            <th class="text-center">Site Name</th>
+                                                            <th class="text-center">Supervisor Name</th>
+                                                            <th width="10%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-toolelist-res-table">
+                                                        <tr>
+                                                            <td>Loading...</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
                                             </div>
                                         </div>
                                     </div>
@@ -1675,6 +1718,169 @@ else {
                                 $('#stc-toollist-toolinuse').val('');
                                 $('#stc-toollist-toolinrepair').val('');
                                 $('#stc-toollist-tooldamaged').val('');
+                            }else{
+                                alert("Something went wrong, please check and try again.");
+                            }
+                        }
+                    });
+                }else{
+                    alert("Please enter name of workmen!!!");
+                }
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function(e){
+            var month = '';
+            var supervise_name='';
+            $('body').delegate('.safety-toolelist-filter-by-search', 'click', function() {
+                month = $('.safety-toolelist-filter-by-month').val();
+                supervise_name=$('.safety-toolelist-filter-by-supervisorname').val();
+                // call toolelist
+                call_toolelist(month, supervise_name);
+            });
+
+            function call_toolelist(month, supervise_name){
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {stc_safety_calltoolelist:1, month:month, supervise_name:supervise_name},
+                    success     : function(response_tbm){
+                        $('.stc-safety-toolelist-res-table').html(response_tbm);
+                    }
+                });
+            }
+
+            // delete toolelist            
+            $('body').delegate('.stc-safetytoolelist-delete', 'click', function(e){
+                e.preventDefault();
+                var toolelist_id=$(this).attr("id");
+                $.ajax({
+                    url         : "../stc_sub_agent47/nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_deletetoolelist:1,toolelist_id:toolelist_id},
+                    success     : function(response_tbm){
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+                            alert("Record Removed!!!");
+                            call_toolelist(month, supervise_name);
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            });  
+
+            function call_toolelist_fields(){
+                var stc_toolelist_no=$('.stc-toolelist-no').val();
+                $.ajax({
+                    url         : "../stc_sub_agent47/nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {stc_safety_calltoolelistfields:1,stc_toolelist_no:stc_toolelist_no},
+                    dataType    : "JSON",
+                    success     : function(response_vhl){
+                        // console.log(response_vhl);
+                        $('#stc-toolelist-wono').val(response_vhl.toollist.work_orderno);
+                        $('#stc-toolelist-sitename').val(response_vhl.toollist.sitename);
+                        $('#stc-toolelist-suptech').val(response_vhl.toollist.siteincharge);
+
+                        var toolelistlist=response_vhl.toollistlist;
+                            
+                        
+                        var toolelistlist_entry_out='<tr><td colspan="22" class="text-center">Empty record</td></td>';
+                        if(toolelistlist.length>0){
+                            toolelistlist_entry_out='';
+                            var sl=0;
+                            for(var i=0; i<toolelistlist.length; i++){
+                                sl++;
+                                toolelistlist_entry_out+='<tr><td>' + sl + '</td><td>' + toolelistlist[i].name + '</td><td class="text-right">' + toolelistlist[i].serial_no + '</td><td class="text-right">' + toolelistlist[i].safe_to_work + '</td><td class="text-right">' + toolelistlist[i].sup_engg_name + '</td><td class="text-right">' + toolelistlist[i].sign + '</td><td class="text-right">' + toolelistlist[i].ddate + '</td></tr>';
+                            }
+                        }
+                        $('.stc-toolelist-list-res-table').html(toolelistlist_entry_out);
+                    }
+                });
+            }
+
+            // save toolelist
+            function save_toolelist(){
+                var stc_toolelist_no=$('.stc-toolelist-no').val();
+                var stc_toolelistwono=$('#stc-toolelist-wono').val();
+                var stc_toolelistsitename=$('#stc-toolelist-sitename').val();
+                var stc_toolelistsuptech=$('#stc-toolelist-suptech').val();
+
+                $.ajax({
+                    url         : "../stc_sub_agent47/nemesis/stc_safety.php",
+                    method      : "POST",
+                    data        : {
+                        stc_safety_updatetoolelist:1,
+                        stc_toollist_no:stc_toolelist_no,
+                        stc_toollistwono:stc_toolelistwono,
+                        stc_toollistsitename:stc_toolelistsitename,
+                        stc_toollistsuptech:stc_toolelistsuptech
+                    },
+                    success     : function(response_tbm){
+                        // console.log(response_tbm);
+                        var response=response_tbm.trim();
+                        if(response=="success"){
+
+                        }else{
+                            alert("Something went wrong, please check and try again.");
+                        }
+                    }
+                });
+            }
+
+            // update
+            $('body').delegate('.stc-safetytoolelist-edit', 'click', function(e){
+                e.preventDefault();
+                var toolelist_id=$(this).attr("id");
+                $('.stc-toolelist-no').val(toolelist_id);
+                $('.bd-toolelist-modal-lg').modal('show');
+                call_toolelist(month, supervise_name);
+                call_toolelist_fields();
+            });
+
+            // update ppec list
+            $('body').delegate('.stc-toolelist-fields', 'focusout', function(){
+                save_toolelist();
+                call_toolelist(month, supervise_name);
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            // checklist save
+            $('body').delegate('#stc-toolelist-tooladdbtn', 'click', function(e){
+                e.preventDefault();
+                var stc_toollist_no=$('.stc-toolelist-no').val();
+                var tooldesc=$('#stc-toolelist-tooldesc').val();
+                var serial_no=$('#stc-toolelist-serial_no').val();
+                var safetowork=$('#stc-toolelist-safetowork').val();
+                var suprname=$('#stc-toolelist-suprname').val();
+                var tooldate=$('#stc-toolelist-tooldate').val();
+                if(tooldesc!=''){
+                     $.ajax({
+                        url         : "../stc_sub_agent47/nemesis/stc_safety.php",
+                        method      : "POST",
+                        data        : {
+                            stc_safety_savetooleliste:1,
+                            stc_toollist_no:stc_toollist_no,
+                            stc_tooldesc:tooldesc,
+                            stc_serial_no:serial_no,
+                            stc_safetowork:safetowork,
+                            stc_suprname:suprname,
+                            stc_tooldate:tooldate
+                        },
+                        success     : function(response_tbm){
+                            // console.log(response_tbm);
+                            var response=response_tbm.trim();
+                            if(response=="success"){
+                                alert("Record added.");
+                                call_toolelist_fields();
+                                $('#stc-toolelist-tooldesc').val('');
+                                $('#stc-toolelist-serial_no').val('');
+                                $('#stc-toolelist-safetowork').val('');
+                                $('#stc-toolelist-suprname').val('');
+                                $('#stc-toolelist-tooldate').val('');
                             }else{
                                 alert("Something went wrong, please check and try again.");
                             }
@@ -3765,6 +3971,122 @@ else {
                                                     </tr>
                                                 </thead>
                                                 <tbody class="stc-toollist-list-res-table">
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-toolelist-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">TOOLS & TACKLES Equipment</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xl-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <label>* fields are automatic saved when you switch</label>
+                                        <input type="hidden" class="stc-toolelist-no">
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Work Order No</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-toolelist-fields" id="stc-toolelist-wono" placeholder="Enter Work Permit No">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Job Sitename</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-toolelist-fields" id="stc-toolelist-sitename" placeholder="Enter Job sitename">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Safety Supervisor Signature</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control stc-toolelist-fields" id="stc-toolelist-suptech" placeholder="Enter Safety Supervisor Signature">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Desc of Tool name</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control" id="stc-toolelist-tooldesc" placeholder="Enter Desc of Tool name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Serial No</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control" id="stc-toolelist-serial_no" placeholder="Enter Serial No">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Safe To Work</h5>
+                                        <div class="position-relative form-group">
+                                            <select class="form-control" id="stc-toolelist-safetowork">
+                                                <option value="Yes">Yes</option>
+                                                <option value="No">No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Supr/Engg Name</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control" id="stc-toolelist-suprname" placeholder="Enter Supr/Engg Name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Sign</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="text" class="form-control" id="stc-toolelist-toolsign" placeholder="Enter Sign">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-sm-12 col-xl-3">
+                                        <h5 class="card-title">Date</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control" id="stc-toolelist-tooldate" placeholder="Enter Date">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 col-xl-4">
+                                        <h5 class="card-title">Add</h5>
+                                        <div class="position-relative form-group">
+                                            <a href="javascript:void(0)" class="form-control btn btn-success" id="stc-toolelist-tooladdbtn">Add</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 col-xl-12">
+                                        <div class="position-relative form-group">
+                                            <table class="table table-hover table-bordered table-responsive">
+                                                <thead>
+                                                    <tr>
+                                                        <td class="card-title">Item No</td>
+                                                        <td class="card-title">Tool Description</td>
+                                                        <td class="card-title">Serial No</td>
+                                                        <td class="card-title">Safe To Work</td>
+                                                        <td class="card-title">Supr/Engg Name</td>
+                                                        <td class="card-title">Sign</td>
+                                                        <td class="card-title">Date</td>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="stc-toolelist-list-res-table">
 
                                                 </tbody>
                                             </table>

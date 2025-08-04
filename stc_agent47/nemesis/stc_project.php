@@ -3133,6 +3133,58 @@ class pirates_supervisor extends tesseract{
 						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetytoolslist_date'])).'</td>
 						<td>'.$optimusprimerow['stc_safetytoolslist_wono'].'</td>
 						<td>'.$optimusprimerow['stc_safetytoolslist_sitename'].'</td>
+						<td>'.$optimusprimerow['stc_cust_pro_supervisor_fullname'].'</td>
+						<td>'.$action_show.'</td>
+					</tr>
+				';
+			}
+		}else{
+			$optimusprime.='
+				<tr>
+					<td colspan="5">No data found</td>
+				</tr>
+			';
+		}
+		return $optimusprime;
+	}
+	
+	// call toollist
+	public function stc_call_toollelist($month, $supervise_name){
+		$optimusprime='';
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$month = $month_arr[0];
+		$year = $month_arr[1];
+		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."'
+			AND";
+		if($supervise_name==''){
+			$supervise_rec='';
+		}
+		$optimusprimequery=mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_safety_tandtequipment` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`created_by`
+			WHERE ".$supervise_rec." (
+				MONTH(`created_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
+				YEAR(`created_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
+			) 
+			ORDER BY DATE(`created_date`) DESC
+		");
+		if(mysqli_num_rows($optimusprimequery)>0){
+			$website=$_SERVER['SERVER_NAME'];
+			$website = $website=="localhost" ? '' : 'https://stcassociate.com/stc_agent47/';
+			foreach($optimusprimequery as $optimusprimerow){
+				$action_show='
+					<a target="_blank" href="'.$website.'safety-tandtequipement-print-preview.php?equipment_id='.$optimusprimerow['id'].'" class="form-control btn btn-success" >View</a>
+					<a href="#" class="form-control btn btn-secondary stc-safetytoolelist-edit" id="'.$optimusprimerow['id'].'">Edit</a>
+					<a href="#" class="form-control btn btn-danger stc-safetytoolelist-delete" id="'.$optimusprimerow['id'].'">Delete</a>
+				';
+
+				$optimusprime.='
+					<tr>
+						<td>'.date('d-m-Y', strtotime($optimusprimerow['created_date'])).'</td>
+						<td>'.$optimusprimerow['work_orderno'].'</td>
+						<td>'.$optimusprimerow['sitename'].'</td>
+						<td>'.$optimusprimerow['stc_cust_pro_supervisor_fullname'].'</td>
 						<td>'.$action_show.'</td>
 					</tr>
 				';
@@ -3496,6 +3548,14 @@ if(isset($_POST['stc_safety_calltoollist'])){
 	$supervise_name	= 	$_POST['supervise_name'];
 	$objsearchreq=new pirates_supervisor();
 	$opobjsearchreq=$objsearchreq->stc_call_toolllist($month, $supervise_name);
+	echo $opobjsearchreq;
+}
+// call toollist  safety
+if(isset($_POST['stc_safety_calltoolelist'])){
+	$month 			= 	$_POST['month'];
+	$supervise_name	= 	$_POST['supervise_name'];
+	$objsearchreq=new pirates_supervisor();
+	$opobjsearchreq=$objsearchreq->stc_call_toollelist($month, $supervise_name);
 	echo $opobjsearchreq;
 }
 
