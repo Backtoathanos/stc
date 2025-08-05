@@ -251,9 +251,19 @@ if ($equipment_id > 0) {
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    document.getElementById('backBtn').addEventListener('click', function() {
+// Get all buttons with class 'backbtn'
+const backButtons = document.querySelectorAll('.backbtn');
+
+// Add click event to each button
+backButtons.forEach((button, index) => {
+    button.addEventListener('click', function() {
+        // Console which button was clicked (1 or 2)
+        console.log(`Back button ${index + 1} was clicked`);
+        
+        // Go back in history
         window.history.back();
     });
+});
 </script>
 </body>
 </html>
