@@ -224,7 +224,7 @@ if ($equipment_id > 0) {
         <div class="alert alert-warning">
           <h4>No Data Found</h4>
           <p>Equipment record not found or no equipment ID provided.</p>
-          <a href="/" class="btn btn-primary">Back to Management</a>
+          <a href="javascript:void(0)" class="btn btn-primary backbtn">Back to Management</a>
         </div>
       </div>
     </div>
@@ -244,12 +244,17 @@ if ($equipment_id > 0) {
     <button onclick="window.print()" class="btn btn-primary">
         <i class="fas fa-print"></i> Print
     </button>
-    <a href="/" class="btn btn-secondary">
+    <a href="javascript:void(0)" class="btn btn-secondary backbtn">
         <i class="fas fa-arrow-left"></i> Back
     </a>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('backBtn').addEventListener('click', function() {
+        window.history.back();
+    });
+</script>
 </body>
 </html>
 
