@@ -2171,6 +2171,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 var stc_toolelist_no=$('.stc-toolelist-no').val();
                 var stc_toolelistwono=$('#stc-toolelist-wono').val();
                 var stc_toolelistsitename=$('#stc-toolelist-sitename').val();
+                var stc_tooleliststartingdate=$('#stc-toolelist-startingdate').val();
                 var stc_toolelistsuptech=$('#stc-toolelist-suptech').val();
 
                 $.ajax({
@@ -2181,6 +2182,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         stc_toollist_no:stc_toolelist_no,
                         stc_toollistwono:stc_toolelistwono,
                         stc_toollistsitename:stc_toolelistsitename,
+                        stc_tooleliststartingdate:stc_tooleliststartingdate,
                         stc_toollistsuptech:stc_toolelistsuptech
                     },
                     success     : function(response_tbm){
@@ -4356,6 +4358,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <h5 class="card-title">Job Sitename</h5>
                                         <div class="position-relative form-group">
                                             <input type="text" class="form-control stc-toolelist-fields" id="stc-toolelist-sitename" placeholder="Enter Job sitename">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 col-xl-6">
+                                        <h5 class="card-title">Starting Date</h5>
+                                        <div class="position-relative form-group">
+                                            <input type="date" class="form-control stc-toolelist-fields" id="stc-toolelist-startingdate" placeholder="Enter Starting Date">
                                         </div>
                                     </div>
                                     <div class="col-md-6 col-sm-12 col-xl-6">

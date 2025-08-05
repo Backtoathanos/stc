@@ -1821,7 +1821,7 @@ class witcher_toollist extends tesseract{
 	}
 
 	// update toollist
-	public function stc_update_toolelist($stc_toollist_no, $stc_toollistwono, $stc_toollistsitename, $stc_toollistsuptech){
+	public function stc_update_toolelist($stc_toollist_no, $stc_toollistwono, $stc_toollistsitename, $stc_tooleliststartingdate, $stc_toollistsuptech){
 		$optimusprime='';
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			UPDATE
@@ -1829,6 +1829,7 @@ class witcher_toollist extends tesseract{
 			SET
 				`work_orderno`='".mysqli_real_escape_string($this->stc_dbs, $stc_toollistwono)."',
 				`sitename`='".mysqli_real_escape_string($this->stc_dbs, $stc_toollistsitename)."',
+				`starting_date`='".mysqli_real_escape_string($this->stc_dbs, $stc_tooleliststartingdate)."',
 				`siteincharge`='".mysqli_real_escape_string($this->stc_dbs, $stc_toollistsuptech)."'
 
 			WHERE
@@ -2427,10 +2428,11 @@ if(isset($_POST['stc_safety_updatetoolelist'])){
 	$stc_toollist_no=$_POST['stc_toollist_no'];
 	$stc_toollistwono=$_POST['stc_toollistwono'];
 	$stc_toollistsitename=$_POST['stc_toollistsitename'];
+	$stc_tooleliststartingdate=$_POST['stc_tooleliststartingdate'];
 	$stc_toollistsuptech=$_POST['stc_toollistsuptech'];
 
 	$objsearchreq=new witcher_toollist();
-	$opobjsearchreq=$objsearchreq->stc_update_toolelist($stc_toollist_no, $stc_toollistwono, $stc_toollistsitename, $stc_toollistsuptech);
+	$opobjsearchreq=$objsearchreq->stc_update_toolelist($stc_toollist_no, $stc_toollistwono, $stc_toollistsitename, $stc_tooleliststartingdate, $stc_toollistsuptech);
 	echo $opobjsearchreq;
 }
 // save toolllist tools
