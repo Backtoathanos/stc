@@ -224,7 +224,7 @@ if ($equipment_id > 0) {
         <div class="alert alert-warning">
           <h4>No Data Found</h4>
           <p>Equipment record not found or no equipment ID provided.</p>
-          <a href="safety.php?page=safety" class="btn btn-primary">Back to Management</a>
+          <a href="/" class="btn btn-primary">Back to Management</a>
         </div>
       </div>
     </div>
@@ -244,7 +244,7 @@ if ($equipment_id > 0) {
     <button onclick="window.print()" class="btn btn-primary">
         <i class="fas fa-print"></i> Print
     </button>
-    <a href="safety-tandtequipment-management.php" class="btn btn-secondary">
+    <a href="/" class="btn btn-secondary">
         <i class="fas fa-arrow-left"></i> Back
     </a>
 </div>
