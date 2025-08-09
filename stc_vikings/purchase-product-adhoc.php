@@ -236,6 +236,7 @@ include("kattegat/role_check.php");
                                                                     <option>PARDIH GODOWN</option>
                                                                     <option>RAMGARH GODOWN</option>
                                                                     <option>DHATKIDIH GODOWN</option>
+                                                                    <option>Kolkata GODOWN</option>
                                                                 </select>
                                                             </td>
                                                             <td style="width: 330px;">
