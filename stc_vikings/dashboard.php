@@ -101,7 +101,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-3 col-xl-3">
+                                        <!-- <div class="col-md-3 col-xl-3">
                                             <div class="card mb-3 widget-content bg-mixed-hopes">
                                                 <div class="widget-content-wrapper text-white">
                                                     <div class="widget-content-left">
@@ -160,7 +160,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> -->
                                     </div>
                                 </div>
                             </div>
@@ -171,27 +171,38 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         <div class="col-md-12 col-xl-12">
                                             <div class="card mb-4 border-success shadow-sm">
                                                 <div class="card-body p-4" style="font-size: 15px;">
-                                                    <!-- Month Selector Card -->
                                                     <div class="row mb-4">
-                                                        <div class="col-md-12">
-                                                            <div class="card border-0" style="background: linear-gradient(-20deg, #d4eeff 0%, #fdb8b5 100%);">
+                                                        <!-- Month Selector Card -->
+
+                                                        <!-- Report Type Selector Card -->
+                                                        <div class="col-md-6">
+                                                            <div class="card border-0 shadow-sm" style="background: linear-gradient(-20deg, #d4eeff 0%, #fdb8b5 100%); border-radius: 12px;">
+                                                                <div class="card-body py-3">
+                                                                    <div class="d-flex align-items-center justify-content-between">
+                                                                        <h5 class="mb-0 font-weight-bold text-dark">Select Type:</h5>
+                                                                        <select 
+                                                                            class="form-select stc-dash-type border-0 shadow-sm" 
+                                                                            style="background: rgba(255,255,255,0.8); border-radius: 8px; padding: 8px; width: 50%; cursor: pointer;"
+                                                                        >
+                                                                            <option value="NA">Select Type</option>
+                                                                            <option selected value="M">📅 Monthly</option>
+                                                                            <option value="Y">📊 Yearly</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6 mb-3 mb-md-0">
+                                                            <div class="card border-0 shadow-sm" style="background: linear-gradient(-20deg, #e3f2fd 0%, #ffcdd2 100%); border-radius: 12px;">
                                                                 <div class="card-body py-3">
                                                                     <div class="d-flex align-items-center justify-content-between">
                                                                         <h5 class="mb-0 font-weight-bold text-dark">Select Month:</h5>
-                                                                        <select class="form-control stc-dash-month w-50 border-0 shadow-sm" style="background: rgba(255,255,255,0.7);">
-                                                                            <option value="1">January</option>
-                                                                            <option value="2">February</option>
-                                                                            <option value="3">March</option>
-                                                                            <option value="4">April</option>
-                                                                            <option value="5">May</option>
-                                                                            <option value="6">June</option>
-                                                                            <option value="7">July</option>
-                                                                            <option value="8">August</option>
-                                                                            <option value="9">September</option>
-                                                                            <option value="10">October</option>
-                                                                            <option value="11">November</option>
-                                                                            <option value="12">December</option>
-                                                                        </select>
+                                                                        <input 
+                                                                            type="month" 
+                                                                            class="form-control stc-dash-month border-0 shadow-sm" 
+                                                                            style="background: rgba(255,255,255,0.8); border-radius: 8px; padding: 8px; width: 50%; cursor: pointer;"
+                                                                            value="'.date('Y-m').'"
+                                                                        />
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -297,7 +308,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                                     </div>
                                                                     <!-- Optional: Add more expense metrics here if needed -->
                                                                     <div class="mt-4 pt-2" style="border-top: 1px solid rgba(255,255,255,0.2);">
-                                                                        <small class="text-white-50">Updated monthly</small>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -325,7 +335,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                               </div>
                                                 <div class="col-md-6">
                                                     <div class="table-responsive">
-                                                        <table class="table table-bordered table-hover mb-0" id="gld-summary-table">
+                                                        <table class="table table-bordered table-hover mb-0" id="gld-summary-table2">
                                                             <thead class="thead-dark">
                                                             <tr>
                                                                 <th>Branch/Location</th>
@@ -392,220 +402,98 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                         .bg-info { background-color: #36b9cc !important; }
                                     </style>
                                     ';
+                                    ?>
+
+                                    <div class="row mt-4">
+                                        <div class="col-md-12 col-xl-12">
+                                            <div class="card mb-3 border-success shadow-sm">
+                                                <div class="card-body p-4">
+                                                    <h5 class="card-title font-weight-bold mb-4 text-dark text-center">GLD Profit Analyser Sheet Breakup</h5>
+                                                    <div class="table-responsive" style="height: 500px; overflow-y: auto;">
+                                                        <table class="table table-bordered table-hover">
+                                                            <thead class="thead-dark">
+                                                                <tr>
+                                                                    <th>Material Desc</th>
+                                                                    <th>Material Purchased Cost with Tax</th>
+                                                                    <th>Sale With Tax</th>
+                                                                    <th>Balance Quantity</th>
+                                                                    <th>Profit Margin (₹)</th>
+                                                                    <th>Total Profit Margin (₹)</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <?php                                                                
+                                                                    include_once("../MCU/db.php");
+                                                                    $query=mysqli_query($con, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE stc_purchase_product_adhoc_status=1 ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
+                                                                    $purchaseamount=0;
+                                                                    $totalcount=0;
+                                                                    $totalpurchaseamount=0;
+                                                                    $totalsoldamount=0;
+                                                                    $totalprofitmargin=0;
+                                                                    $gtotalprofitmargin=0;
+                                                                    foreach($query as $row){
+                                                                        $totalcount++;
+                                                                        $purchaseamount = $row['stc_purchase_product_adhoc_qty'] * $row['stc_purchase_product_adhoc_rate'];
+                                                                        $qty= $row['stc_purchase_product_adhoc_qty'];
+                                                                        $query=mysqli_query($con, "SELECT sum(`stc_cust_super_requisition_list_items_rec_recqty`) as qty FROM `stc_cust_super_requisition_list_items_rec` WHERE stc_cust_super_requisition_list_items_rec_list_poaid='".$row['stc_purchase_product_adhoc_id']."'");
+                                                                        $result=mysqli_fetch_array($query);
+                                                                        $soldqty = $result['qty'];
+
+                                                                        $salerate= $row['stc_purchase_product_adhoc_rate'] + ($row['stc_purchase_product_adhoc_rate'] * $row['stc_product_sale_percentage'] / 100);
+                                                                        $soldamount = $soldqty * $salerate;
+
+                                                                        $query=mysqli_query($con, "SELECT SUM(`qty`) as qty, avg(rate) as rate  FROM `gld_challan` WHERE adhoc_id='".$row['stc_purchase_product_adhoc_id']."' GROUP BY adhoc_id");
+                                                                        $soldgldqty = 0;
+                                                                        $soldgldrate = 0;
+                                                                        if(mysqli_num_rows($query)>0){
+                                                                            $result=mysqli_fetch_array($query);
+                                                                            $soldgldqty = $result['qty'];
+                                                                            $soldgldrate = $result['rate'];
+                                                                            $soldamount += $soldgldqty * $soldgldrate;
+
+                                                                        }
+
+                                                                        $qty = $qty - $soldqty - $soldgldqty;
+
+                                                                        $purchasedqtyamount = ($soldqty + $soldgldqty) * $row['stc_purchase_product_adhoc_rate'];
+                                                                        $profitmargin = $purchasedqtyamount - $soldamount;
+                                                                        $totalprofitmargin = $profitmargin * $qty;
+                                                                        if($purchaseamount>0 && $soldamount>0){
+                                                                            $totalpurchaseamount += $purchaseamount;
+                                                                            $totalsoldamount += $soldamount;
+                                                                            $gtotalprofitmargin += $profitmargin;
+                                                                            echo '
+                                                                                <tr>
+                                                                                    <td>'.$row['stc_purchase_product_adhoc_itemdesc'].'</td>
+                                                                                    <td class="text-right">'.number_format($purchaseamount, 2).'</td>
+                                                                                    <td class="text-right">'.number_format($soldamount, 2).'</td>
+                                                                                    <td class="text-right">'.number_format($qty, 2).'</td>
+                                                                                    <td class="text-right">'.number_format($profitmargin, 2).'</td>
+                                                                                    <td class="text-right">'.number_format($totalprofitmargin, 2).'</td>
+                                                                                </tr>
+                                                                            ';
+                                                                        }
+                                                                    }
+                                                                            echo '
+                                                                                <tr>
+                                                                                    <td>'.$totalcount.'</td>
+                                                                                    <td class="text-right">'.number_format($totalpurchaseamount, 2).'</td>
+                                                                                    <td class="text-right">'.number_format($totalsoldamount, 2).'</td>
+                                                                                    <td class="text-right"></td>
+                                                                                    <td class="text-right">'.number_format($gtotalprofitmargin, 2).'</td>
+                                                                                    <td class="text-right">'.number_format($totalprofitmargin, 2).'</td>
+                                                                                </tr>
+                                                                            ';
+                                                                ?>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
                                 }
-                        //     echo '
-                        // <div class="row">
-                        //     <div class="col-md-12 col-xl-12">
-                        //         <div class="card-border mb-3 card card-body border-success" style="font-size: 15px;">
-                        //             <div class="row">
-                        //                 <div class="col-md-12 col-xl-12">
-                        //                     <div class="card mb-3 widget-content bg-midnight-bloom" style="background-image: linear-gradient(-20deg, #d4eeff 0%, #fdb8b5 100%) !important;">
-                        //                         <div class="widget-heading">Month : </div>
-                        //                         <div class="widget-subheading">
-                        //                             <select class="form-control stc-dash-month">
-                        //                                 <option value="1">January</option>
-                        //                                 <option value="2">February</option>
-                        //                                 <option value="3">March</option>
-                        //                                 <option value="4">April</option>
-                        //                                 <option value="5">May</option>
-                        //                                 <option value="6">June</option>
-                        //                                 <option value="7">July</option>
-                        //                                 <option value="8">August</option>
-                        //                                 <option value="9">September</option>
-                        //                                 <option value="10">October</option>
-                        //                                 <option value="11">November</option>
-                        //                                 <option value="12">December</option>
-                        //                             </select>
-                        //                         </div>
-                        //                     </div>
-                        //                 </div>
-                        //                 <div class="col-md-6 col-xl-6">
-                        //                     <div class="card mb-3 widget-content bg-midnight-bloom">
-                        //                         <div class="widget-content-wrapper text-white">
-                        //                             <div class="widget-content-left">
-                        //                                 <div class="widget-heading">STC Electronics Summary
-                        //                                 </div>
-                        //                                 <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="toelecpurchase">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="toelecsale">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="toelecexpenses">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="toeleccpaid">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="toelecsdues">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                             </div>
-                        //                         </div>
-                        //                     </div>
-                        //                 </div>
-                        //                 <div class="col-md-6 col-xl-6">
-                        //                     <div class="card mb-3 widget-content bg-midnight-bloom">
-                        //                         <div class="widget-content-wrapper text-white">
-                        //                             <div class="widget-content-left">
-                        //                                 <div class="widget-heading">STC Electronics Summary</div>
-                        //                                 <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="toelecmpaid">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading">Purchase Dues &nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="toelecmdues">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                             </div>
-                        //                         </div>
-                        //                     </div>
-                        //                 </div>
-                        //                 <div class="col-md-6 col-xl-6">
-                        //                     <div class="card mb-3 widget-content bg-mixed-hopes">
-                        //                         <div class="widget-content-wrapper text-white">
-                        //                             <div class="widget-content-left">
-                        //                                 <div class="widget-heading">STC Trading Summary</div>
-                        //                                 <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="totrapurchase">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="totrasale">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="totraexpenses">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="totracpaid">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="totrasdues">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                             </div>
-                        //                         </div>
-                        //                     </div>
-                        //                 </div>
-                        //                 <div class="col-md-6 col-xl-6">
-                        //                     <div class="card mb-3 widget-content bg-mixed-hopes">
-                        //                         <div class="widget-content-wrapper text-white">
-                        //                             <div class="widget-content-left">
-                        //                                 <div class="widget-heading">STC Trading Summary</div>
-                        //                                 <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="totrampaid">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading">Purchase Dues &nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="totramdues">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                             </div>
-                        //                         </div>
-                        //                     </div>
-                        //                 </div>
-                        //                 <div class="col-md-6 col-xl-6">
-                        //                     <div class="card mb-3 widget-content bg-midnight-bloom">
-                        //                         <div class="widget-content-wrapper text-white">
-                        //                             <div class="widget-content-left">
-                        //                                 <div class="widget-heading">STC Groceries Summary</div>
-                        //                                 <div class="widget-subheading">Total Purchase &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="togrospurchase">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading"> Total Sale &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="togrossale">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading"> Total Expenses &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="togrosexpenses">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading">Party Paid &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="togroscpaid">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading">Party Dues &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="togrossdues">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                             </div>
-                        //                         </div>
-                        //                     </div>
-                        //                 </div>
-                        //                 <div class="col-md-6 col-xl-6">
-                        //                     <div class="card mb-3 widget-content bg-midnight-bloom">
-                        //                         <div class="widget-content-wrapper text-white">
-                        //                             <div class="widget-content-left">
-                        //                                 <div class="widget-heading">STC Groceries Summary</div>
-                        //                                 <div class="widget-subheading">Purchase Paid &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="togrosmpaid">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                                 <div class="widget-subheading">Purchase Dues &nbsp; &nbsp;&nbsp; &nbsp; : &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        //                                     <i class="fa fa-rupee-sign"></i>
-                        //                                     <span class="togrosmdues">
-                        //                                         <div class="loader"></div>
-                        //                                     </span>
-                        //                                 </div>
-                        //                             </div>
-                        //                         </div>
-                        //                     </div>
-                        //                 </div>
-                        //             </div>
-                        //         </div>
-                        //     </div>
-                        // </div>
-                        //     ';
-                        //         }
                             ?>
                         <!-- <div class="row">
                             <div class="col-md-12 col-xl-12 col-lg-12 col-sm-12">
@@ -645,24 +533,31 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     <script>
         $(document).ready(function(){
             var d = new Date($.now());
-            
             var month=$('.stc-dash-month').val();
+            var type=$('.stc-dash-type').val();
             $('body').delegate('.stc-dash-month', 'change', function() {
                 month=$(this).val();
-                stc_dashboard_reload(month);
+                type=$('.stc-dash-type').val();
+                stc_dashboard_reload(month, 'post');
+            });
+            $('body').delegate('.stc-dash-type', 'change', function() {
+                type=$(this).val();
+                month=$('.stc-dash-month').val();
+                stc_dashboard_reload(month, 'post');
             });
 
-            stc_dashboard_reload(month);
+            stc_dashboard_reload(month, 'preload');
             var gldDonutChartInstance = null;
             var gldBarChartInstance = null;
-            function stc_dashboard_reload(month){
+            function stc_dashboard_reload(month, preload){
                 $.ajax({
                     url         : "kattegat/ragnar_lothbrok.php",
                     method      : "post",
-                    data        : {dashboard:1, month:month},
+                    data        : {dashboard:1, month:month, type:type, preload:preload},
                     dataType    : 'JSON',
                     success     : function(data){
                         // console.log(data);
+                        $('.stc-dash-month').val(data[12]);
                         $('.toproducts').html(data[0]);
                         $('.toinventory').html(data[1]);
                         $('.tomerchants').html(data[2]);
@@ -698,22 +593,39 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                         var gld = data[11] || {};
                         $('.gld-total-purchase').text(gld.total_purchase !== undefined ? parseFloat(gld.total_purchase).toLocaleString('en-IN', {minimumFractionDigits:2}) : '--');
                         $('.gld-total-sale').text(gld.total_sale !== undefined ? parseFloat(gld.total_sale).toLocaleString('en-IN', {minimumFractionDigits:2}) : '--');
-                        var gldRows = '';
+                        var gldRows = '';var gldRows2 = '';
                         var donutLabels = [];
                         var donutData = [];
-                        if(Array.isArray(gld.locations) && gld.locations.length > 0) {
-                          $.each(gld.locations, function(i, item) {
-                            gldRows += '<tr>' +
-                              '<td>' + item.location + '</td>' +
-                              '<td class="text-right"><span class="badge badge-pill badge-info" style="font-size:14px;">₹ ' + parseFloat(item.amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
-                              '</tr>';
-                            donutLabels.push(item.location);
-                            donutData.push(item.amount);
+                        if(Array.isArray(gld.sub_locations_sale) && gld.sub_locations_sale.length > 0) {
+                            var total=0;
+                          $.each(gld.sub_locations_sale, function(i, item) {
+                                total += parseFloat(item.sale_amount);
+                                gldRows += '<tr>' +
+                                '<td>' + item.sale_location + '</td>' +
+                                '<td class="text-right"><span class="badge badge-pill badge-info" style="font-size:14px;">₹ ' + parseFloat(item.sale_amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
+                                '</tr>';
+                                donutLabels.push(item.sale_location);
+                                donutData.push(item.sale_amount);
                           });
+                          gldRows += '<tr><td><b>Total:</b></td><td class="text-right"><span class="badge badge-pill badge-success" style="font-size:14px;">₹ ' + parseFloat(total).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td></tr>';
                         } else {
                           gldRows = '<tr><td colspan="2" class="text-center text-muted">No data found for this period.</td></tr>';
                         }
                         $('#gld-summary-table tbody').html(gldRows);
+                        if(Array.isArray(gld.sub_locations_purchase) && gld.sub_locations_purchase.length > 0) {
+                            var total=0;
+                          $.each(gld.sub_locations_purchase, function(i, item) {
+                                total += parseFloat(item.purchase_amount);
+                                gldRows2 += '<tr>' +
+                                '<td>' + item.purchase_location + '</td>' +
+                                '<td class="text-right"><span class="badge badge-pill badge-info" style="font-size:14px;">₹ ' + parseFloat(item.purchase_amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
+                                '</tr>';
+                          });
+                          gldRows2 += '<tr><td><b>Total:</b></td><td class="text-right"><span class="badge badge-pill badge-success" style="font-size:14px;">₹ ' + parseFloat(total).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td></tr>';
+                        } else {
+                          gldRows2 = '<tr><td colspan="2" class="text-center text-muted">No data found for this period.</td></tr>';
+                        }
+                        $('#gld-summary-table2 tbody').html(gldRows2);
                         // Render Donut Chart
                         var ctxDonut = document.getElementById('gldDonutChart').getContext('2d');
                         if(gldDonutChartInstance) { gldDonutChartInstance.destroy(); }
@@ -886,10 +798,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             // Initial load
             fetchInventorySummary(month, d.getFullYear());
             // On month change
-            $('body').on('change', '.stc-dash-month', function() {
-              month = $(this).val();
-              fetchInventorySummary(month, d.getFullYear());
-            });
+            // $('body').on('change', '.stc-dash-month', function() {
+            //   month = $(this).val();
+            //   fetchInventorySummary(month, d.getFullYear());
+            // });
         });
     </script>
 </body>

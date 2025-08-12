@@ -683,6 +683,25 @@ include("kattegat/role_check.php");
               }
             });
           });
+
+          
+          $('body').delegate('.get-dispatch-details', 'click', function(e){
+            var poaid=$(this).attr('id');
+            $.ajax({
+              url       : "kattegat/ragnar_purchase.php",
+              method    : "post",
+              data      : {
+                stc_call_poadhoc_glddetails:1,
+                poaid: poaid
+              },
+              success   : function(data){
+                // console.log(data);
+                $('.show-glddispatchdetails-table').html(data);
+              }
+            });
+          });
+
+          
           if (urlParams.has('brequist_id')) {
             $('#addRow').hide();
           }
@@ -1599,26 +1618,69 @@ include("kattegat/role_check.php");
             <div class="modal-body">
               <div class="row">
                 <div class="col-xl-12 col-md-12 col-sm-12">
-                  <div class="card-border mb-3 card card-body border-success">
-                    <h5
-                      for=""
-                      >Dispatch Details
-                    </h5>
-                    <table class="table table-bordered table-reponsive">
-                      <thead>
-                        <tr>
-                          <th>Sl No</th>
-                          <th>Requisition Number</th>
-                          <th>Date</th>
-                          <th>Project Name</th>
-                          <th>User Name</th>
-                          <th>Dispatched Quantity</th>
-                        </tr>
-                      </thead>
-                      <tbody class="show-dispatchdetails-table">
-                      </tbody>
-                    </table>
-                  </div>
+                   <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#dispatchDetailsTab">Dispatch Details</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#additionalInfoTab">GLD Dispatch</a>
+                    </li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <!-- First Tab - Dispatch Details -->
+                    <div id="dispatchDetailsTab" class="tab-pane active">
+                        <div class="row mt-3">
+                            <div class="col-xl-12 col-md-12 col-sm-12">
+                                <div class="card-border mb-3 card card-body border-success">
+                                    <table class="table table-bordered table-reponsive">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No</th>
+                                                <th>Requisition Number</th>
+                                                <th>Date</th>
+                                                <th>Project Name</th>
+                                                <th>User Name</th>
+                                                <th>Dispatched Quantity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="show-dispatchdetails-table">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Second Tab - Additional Information -->
+                    <div id="additionalInfoTab" class="tab-pane fade">
+                        <div class="row mt-3">
+                            <div class="col-xl-12 col-md-12 col-sm-12">
+                                <div class="card-border mb-3 card card-body border-success">
+                                    <table class="table table-bordered table-reponsive">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">Sl No</th>
+                                                <th class="text-center">Date</th>
+                                                <th class="text-center">Bill Number</th>
+                                                <th class="text-center">Customer Name</th>
+                                                <th class="text-center">Qty</th>
+                                                <th class="text-center">Unit</th>
+                                                <th class="text-center">Rate</th>
+                                                <th class="text-center">Total</th>
+                                                <th class="text-center">Created BY</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="show-glddispatchdetails-table">
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 </div>
               </div>
             </div>

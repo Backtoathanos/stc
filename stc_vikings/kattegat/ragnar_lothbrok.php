@@ -233,7 +233,7 @@ class sceptor extends tesseract{
 	}
 
 	// call sale purcashe
-	public function stc_electronics($month){
+	public function stc_electronics($month, $year){
 		$electronics_array=array();
 		$date = date("d-m-Y");
     	$year = date("Y");
@@ -382,16 +382,24 @@ class sceptor extends tesseract{
 		return $electronics_array;
 	}
 
-	public function stc_trading($month){
+	public function stc_trading($month, $year, $type){
 		$trading_array=array();
 		$date = date("d-m-Y");
-    	$year = date("Y");
+    	// $year = date("Y");
     	// $month = date("m");
     	$day = 1;
     	$combinedtodate=$day.'-'.$month.'-'.$year;
     	$newDate = date('Y-m-d', strtotime($date)); 
     	// $effectiveDate = date('Y-m-d', strtotime($combinedtodate));
 		$effectiveDate = $month;
+		$queryFilter=" WHERE MONTH(`stc_trading_purchase_refrence_date`)='$effectiveDate' AND YEAR(`stc_trading_purchase_refrence_date`)='$year'";
+		$queryFilter1=" WHERE MONTH(`stc_trading_sale_date`)='$effectiveDate' AND YEAR(`stc_trading_sale_date`)='$year'";
+		$queryFilter2="AND MONTH(`stc_expenses_date`)='$effectiveDate' AND YEAR(`stc_expenses_date`)='$year'";
+		if($type == 'Y'){
+			$queryFilter=" WHERE YEAR(`stc_trading_purchase_refrence_date`)='$year'";
+			$queryFilter1=" WHERE YEAR(`stc_trading_sale_date`)='$year'";
+			$queryFilter2="AND YEAR(`stc_expenses_date`)='$year'";
+		}
 		$purchaseresult=mysqli_query($this->stc_dbs, "
 			SELECT
 			    `stc_trading_purchase_items_qty`,
@@ -403,10 +411,7 @@ class sceptor extends tesseract{
 			    `stc_trading_purchase`
 			ON
 			    `stc_trading_purchase_items_purchase_id`=`stc_trading_purchase_id`
-			WHERE 
-			    MONTH(`stc_trading_purchase_refrence_date`)='$effectiveDate'
-			AND 
-			    YEAR(`stc_trading_purchase_refrence_date`)='$year'
+			$queryFilter
 			ORDER BY
 			    DATE(`stc_trading_purchase_refrence_date`)
 			DESC
@@ -432,10 +437,7 @@ class sceptor extends tesseract{
 			    `stc_trading_sale`
 			ON
 			    `stc_trading_sale_items_sale_id`=`stc_trading_sale_id`
-			WHERE 
-			    MONTH(`stc_trading_sale_date`)='$effectiveDate'
-			AND 
-			    YEAR(`stc_trading_sale_date`)='$year'
+			$queryFilter1
 			ORDER BY
 			    DATE(`stc_trading_sale_date`)
 			DESC
@@ -456,10 +458,7 @@ class sceptor extends tesseract{
 				`stc_trading_purchase_id` 
 			FROM 
 				`stc_trading_purchase` 
-			WHERE 
-				MONTH(`stc_trading_purchase_refrence_date`)='$effectiveDate'
-			AND 
-			    YEAR(`stc_trading_purchase_refrence_date`)='$year'
+			$queryFilter
 		");
 		foreach($mpaypurchaseqry as $mpaypurchaserow){			
 			$cpayresult=mysqli_query($this->stc_dbs, "
@@ -482,10 +481,7 @@ class sceptor extends tesseract{
 				`stc_trading_sale_id` 
 			FROM 
 				`stc_trading_sale` 
-			WHERE 
-				MONTH(`stc_trading_sale_date`)='$effectiveDate'
-			AND 
-			    YEAR(`stc_trading_sale_date`)='$year'
+			$queryFilter1
 		");
 		foreach($mpaysaleqry as $mpaysalerow){			
 			$cpayresult=mysqli_query($this->stc_dbs, "
@@ -512,10 +508,7 @@ class sceptor extends tesseract{
 			    `stc_expenses`
 			WHERE
 				`stc_expenses_company`=1
-			AND 				
-			    MONTH(`stc_expenses_date`)='$effectiveDate'
-			AND 
-			    YEAR(`stc_expenses_date`)='$year'
+			$queryFilter2
 			ORDER BY
 			    DATE(`stc_expenses_date`)
 			DESC
@@ -532,10 +525,10 @@ class sceptor extends tesseract{
 		return $trading_array;
 	}
 
-	public function stc_groceries($month){
+	public function stc_groceries($month, $year){
 		$groceries_array=array();
 		$date = date("d-m-Y");
-    	$year = date("Y");
+    	// $year = date("Y");
     	// $month = date("m");
     	$day = 1;
     	$combinedtodate=$day.'-'.$month.'-'.$year;
@@ -766,13 +759,22 @@ class sceptor extends tesseract{
     }
 
     // GLD summary for dashboard
-    public function stc_gld($month) {
-        $year = date('Y');
+    public function stc_gld($month, $year, $type) {
+        // $year = date('Y');
+		$queryFilter="WHERE MONTH(stc_purchase_product_adhoc_created_date) = '$month' AND YEAR(stc_purchase_product_adhoc_created_date) = '$year'";
+		$queryFilter1="WHERE MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
+		$queryFilter2="WHERE MONTH(created_date)='$month' AND YEAR(created_date)='$year'";
+		$queryFilter3="WHERE MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
+		if($type == 'Y') {
+			$queryFilter = "WHERE YEAR(stc_purchase_product_adhoc_created_date) = '$year'";
+			$queryFilter1="WHERE YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
+			$queryFilter2="WHERE YEAR(created_date)='$year'";
+		}
         // Total Purchased
         $purchase_q = mysqli_query($this->stc_dbs, "
             SELECT SUM(stc_purchase_product_adhoc_qty * stc_purchase_product_adhoc_rate) as purchased
             FROM stc_purchase_product_adhoc
-            WHERE MONTH(stc_purchase_product_adhoc_created_date) = '$month' AND YEAR(stc_purchase_product_adhoc_created_date) = '$year'
+            $queryFilter
         ");
         $purchase = mysqli_fetch_assoc($purchase_q);
         $total_purchase = $purchase['purchased'] ? floatval($purchase['purchased']) : 0;
@@ -781,23 +783,33 @@ class sceptor extends tesseract{
             SELECT SUM(s.stc_cust_super_requisition_list_items_rec_recqty * (a.stc_purchase_product_adhoc_rate * 1.05)) as sold
             FROM stc_cust_super_requisition_list_items_rec s
             INNER JOIN stc_purchase_product_adhoc a ON s.stc_cust_super_requisition_list_items_rec_list_poaid = a.stc_purchase_product_adhoc_id
-            WHERE MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'
+            $queryFilter1
         ");
         $sold = mysqli_fetch_assoc($sold_q);
         $total_sale = $sold['sold'] ? floatval($sold['sold']) : 0;
 
-        $locations = [];
-        $sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, SUM(qty * rate) as amount FROM gld_challan INNER JOIN stc_trading_user ON created_by=stc_trading_user_id WHERE MONTH(created_date)='$month' AND YEAR(created_date)='$year' GROUP BY stc_trading_user_location");
+        $sale_locations = [];
+        $sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, SUM(qty * rate) as amount FROM gld_challan INNER JOIN stc_trading_user ON created_by=stc_trading_user_id $queryFilter2 GROUP BY stc_trading_user_location");
 		if(mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
-				$locations[] = [
-					'location' => $row['stc_trading_user_location'],
-					'amount' => floatval($row['amount'])
+				$sale_locations[] = [
+					'sale_location' => $row['stc_trading_user_location'],
+					'sale_amount' => floatval($row['amount'])
+				];
+			}
+		}
+        $purchase_locations = [];
+        $sql = mysqli_query($this->stc_dbs, "SELECT S.shopname, SUM(S.qty * A.stc_purchase_product_adhoc_rate) AS amount  FROM `stc_shop` S INNER JOIN `stc_purchase_product_adhoc` A ON S.adhoc_id=A.stc_purchase_product_adhoc_id $queryFilter2 GROUP BY S.shopname");
+		if(mysqli_num_rows($sql)>0){
+			while($row = mysqli_fetch_assoc($sql)){
+				$purchase_locations[] = [
+					'purchase_location' => $row['shopname'],
+					'purchase_amount' => floatval($row['amount'])
 				];
 			}
 		}
 
-        return array('total_purchase' => $total_purchase, 'total_sale' => $total_sale, 'locations' => $locations);
+        return array('total_purchase' => $total_purchase, 'total_sale' => $total_sale, 'sub_locations_purchase' => $purchase_locations, 'sub_locations_sale' => $sale_locations);
     }
 }
 
@@ -806,7 +818,17 @@ class sceptor extends tesseract{
 #<------------------------------------------------------------------------------->
 
 if(isset($_POST["dashboard"])){	
-	$month=isset($_POST['month']) ? $_POST['month'] : '01';
+	$Omonth=$month=isset($_POST['month']) ? $_POST['month'] : '01';
+	$preload=isset($_POST['preload']) ? $_POST['preload'] : '';
+	$type=isset($_POST['type']) ? $_POST['type'] : 'NA';
+	$year=date('Y');
+	$month=date('m', strtotime($month));
+	if($type=="Y"){
+		$year=date('Y', strtotime($Omonth));
+	}
+	if($preload=='preload'){
+		$month=date('m');
+	}
 	$objtitems=new sceptor();
 	$objinventory=new sceptor();
 	$objtmerchant=new sceptor();
@@ -827,12 +849,16 @@ if(isset($_POST["dashboard"])){
 	$opobjtsoled=$objtsoled->stc_soled();
 	$opobjmerdue=$objmerpaid->stc_merchant_paid();
 	$opobjcustdue=$objcustpaid->stc_customer_paid();
-	$opobjstcelec=$objstcelecpaid->stc_electronics($month);
-	$opobjstctra=$objstctrapaid->stc_trading($month);
-	$opobjstcgro=$objstcgropaid->stc_groceries($month);
-	$opobjstcgld=$objstcgropaid->stc_gld($month);
-
-	$cursedyouout=array($opobjtitems, $opobjinventory, $opobjtmerchant, $opobjtcustomer, $opobjtpurchased, $opobjtsoled, $opobjmerdue, $opobjcustdue, $opobjstcelec, $opobjstctra, $opobjstcgro, $opobjstcgld);
+	$opobjstcelec=$objstcelecpaid->stc_electronics($month, $year);
+	$opobjstctra=$objstctrapaid->stc_trading($month, $year, $type);
+	$opobjstcgro=$objstcgropaid->stc_groceries($month, $year);
+	$opobjstcgld=$objstcgropaid->stc_gld($month, $year, $type);
+	if($preload=='preload'){
+		$month=date('Y-m');
+	}else{
+		$month=date('Y-m', strtotime($Omonth));
+	}
+	$cursedyouout=array($opobjtitems, $opobjinventory, $opobjtmerchant, $opobjtcustomer, $opobjtpurchased, $opobjtsoled, $opobjmerdue, $opobjcustdue, $opobjstcelec, $opobjstctra, $opobjstcgro, $opobjstcgld, $month);
 
 	echo json_encode($cursedyouout);
 	// echo $cursedyouout;

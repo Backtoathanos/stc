@@ -2394,6 +2394,24 @@ class ragnarPurchaseAdhoc extends tesseract{
 		return $odin;
 	}
 
+
+	public function stc_call_poadhoc_gldddetails($poaid){
+		$odin='';
+		// echo "SELECT `stc_product_name`, GCR.gld_customer_title, GC.`challan_number`, GC.`bill_number`, GC.`qty`, GC.`rate`, GC.`created_date`, TU.stc_trading_user_name FROM `gld_challan` GC LEFT JOIN `gld_customer` GCR ON GC.cust_id=GCR.gld_customer_id LEFT JOIN `stc_product` ON GC.product_id=`stc_product_id` LEFT JOIN `stc_trading_user` TU ON GC.created_by=TU.stc_trading_user_id WHERE GC.adhoc_id=".$poaid." ORDER BY TIMESTAMP(`created_date`) DESC";
+		$odin_query=mysqli_query($this->stc_dbs, "SELECT `stc_product_name`, `stc_product_unit`, GCR.gld_customer_title, GC.`challan_number`, GC.`bill_number`, GC.`qty`, GC.`rate`, GC.`created_date`, TU.stc_trading_user_name FROM `gld_challan` GC LEFT JOIN `gld_customer` GCR ON GC.cust_id=GCR.gld_customer_id LEFT JOIN `stc_product` ON GC.product_id=`stc_product_id` LEFT JOIN `stc_trading_user` TU ON GC.created_by=TU.stc_trading_user_id WHERE GC.adhoc_id=".$poaid." ORDER BY TIMESTAMP(`created_date`) DESC");
+		if(mysqli_num_rows($odin_query)>0){
+			$slno=0;
+			foreach($odin_query as $odin_row){
+				$slno++;
+				$total=$odin_row['qty'] * $odin_row['rate'];
+				$odin.='<tr><td>'.$slno.'</td><td>'.$odin_row['gld_customer_title'].'</td><td>'.$odin_row['bill_number'].'</td><td>'.$odin_row['gld_customer_title'].'</td><td class="text-right">'.number_format($odin_row['qty'], 2).'</td><td class="text-right">'.$odin_row['stc_product_unit'].'</td><td class="text-right">'.number_format($odin_row['rate'], 2).'</td><td class="text-right">'.number_format($total, 2).'</td><td class="text-right">'.$odin_row['stc_trading_user_name'].'</td></tr>';
+			}
+		}else{
+			$odin='<tr><td>No record found.</td></tr>';
+		}
+		return $odin;
+	}
+
 	// received po adhoc save trigger
 	public function stc_poadhoc_rec_save($adhoc_id, $receiving){
 		$odin='';
@@ -3823,7 +3841,13 @@ if(isset($_POST['stc_call_poadhoc_details'])){
 	$outbjornestocking=$bjornestocking->stc_call_poadhoc_ddetails($poaid);
 	echo $outbjornestocking;
 }
-
+// call po adhoc
+if(isset($_POST['stc_call_poadhoc_glddetails'])){
+	$poaid=$_POST['poaid'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_call_poadhoc_gldddetails($poaid);
+	echo $outbjornestocking;
+}
 // receiving saved
 if(isset($_POST['stc_po_adhocrec_save'])){
 	$adhoc_id=$_POST['adhoc_id'];
