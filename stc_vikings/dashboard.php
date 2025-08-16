@@ -327,13 +327,16 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                               <i class="fa fa-cubes"></i> GLD Summary
                                             </h5>
                                             <div class="row mb-3">
-                                              <div class="col-md-6">
+                                              <div class="col-md-4">
                                                 <div class="alert alert-info mb-0"><b>Total Purchase:</b> <span class="gld-total-purchase">--</span></div>
                                               </div>
-                                              <div class="col-md-6">
+                                              <div class="col-md-4">
                                                 <div class="alert alert-primary mb-0"><b>Total Sale:</b> <span class="gld-total-sale">--</span></div>
                                               </div>
-                                                <div class="col-md-6">
+                                              <div class="col-md-4">
+                                                <div class="alert alert-primary mb-0"><b>Total Expenses:</b> <span class="gld-total-expenses">--</span></div>
+                                              </div>
+                                                <div class="col-md-4">
                                                     <div class="table-responsive">
                                                         <table class="table table-bordered table-hover mb-0" id="gld-summary-table2">
                                                             <thead class="thead-dark">
@@ -348,9 +351,24 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                         </table>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
+                                                <div class="col-md-4">
                                                     <div class="table-responsive">
                                                         <table class="table table-bordered table-hover mb-0" id="gld-summary-table">
+                                                            <thead class="thead-dark">
+                                                            <tr>
+                                                                <th>Branch/Location</th>
+                                                                <th>Amount (₹)</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            <!-- Data will be injected here -->
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered table-hover mb-0" id="gld-summary-table3">
                                                             <thead class="thead-dark">
                                                             <tr>
                                                                 <th>Branch/Location</th>
@@ -405,17 +423,17 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                     ?>
 
                                     <div class="row mt-4">
-                                        <div class="col-md-12 col-xl-12">
+                                        <div class="col-md-12 col-xl-6">
                                             <div class="card mb-3 border-success shadow-sm">
                                                 <div class="card-body p-4">
-                                                    <h5 class="card-title font-weight-bold mb-4 text-dark text-center">GLD Profit Analyser Sheet Breakup</h5>
+                                                    <h5 class="card-title font-weight-bold mb-4 text-dark text-center">GLD Profit Summary</h5>
                                                     <div class="table-responsive">
                                                         <table class="table table-bordered table-hover">
                                                             <thead class="thead-dark">
                                                                 <tr>
-                                                                    <th>Material Purchased Cost with Tax</th>
-                                                                    <th>Sale With Tax</th>
-                                                                    <th>Total Profit Margin (₹)</th>
+                                                                    <th class="text-center">Material Purchased Cost with Tax</th>
+                                                                    <th class="text-center">Sale With Tax</th>
+                                                                    <th class="text-center">Total Profit Margin (₹)</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody class="stc-gld-profit-analyser-sheet-breakup">
