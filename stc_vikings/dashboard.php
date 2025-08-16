@@ -415,78 +415,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                                 <tr>
                                                                     <th>Material Purchased Cost with Tax</th>
                                                                     <th>Sale With Tax</th>
-                                                                    <th>Profit Margin (₹)</th>
                                                                     <th>Total Profit Margin (₹)</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody class="stc-gld-profit-analyser-sheet-breakup">
-                                                                <?php                                                                
-                                                                    include_once("../MCU/db.php");
-                                                                    $query=mysqli_query($con, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE stc_purchase_product_adhoc_status=1 ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
-                                                                    $totalcount=0;
-                                                                    $totalpurchaseamount=0;
-                                                                    $totalsoldamount=0;
-                                                                    $totalprofitmargin=0;
-                                                                    $gtotalprofitmargin=0;
-                                                                    foreach($query as $row){
-                                                                        $qty= $row['stc_purchase_product_adhoc_qty'];
-                                                                        $query=mysqli_query($con, "SELECT sum(`stc_cust_super_requisition_list_items_rec_recqty`) as qty FROM `stc_cust_super_requisition_list_items_rec` WHERE stc_cust_super_requisition_list_items_rec_list_poaid='".$row['stc_purchase_product_adhoc_id']."'");
-                                                                        $result=mysqli_fetch_array($query);
-                                                                        $soldqty = $result['qty'];
-
-                                                                        $salerate= $row['stc_purchase_product_adhoc_rate'] + ($row['stc_purchase_product_adhoc_rate'] * $row['stc_product_sale_percentage'] / 100);
-
-                                                                        $query=mysqli_query($con, "SELECT SUM(`qty`) as qty, avg(rate) as rate FROM `gld_challan` WHERE adhoc_id='".$row['stc_purchase_product_adhoc_id']."' GROUP BY adhoc_id");
-                                                                        $soldgldqty = 0;
-                                                                        $soldgldrate = 0;
-                                                                        if(mysqli_num_rows($query)>0){
-                                                                            $result=mysqli_fetch_array($query);
-                                                                            $soldgldqty = $result['qty'];
-                                                                            $soldgldrate = $result['rate'];
-                                                                        }
-
-                                                                        $soldqty = $soldqty + $soldgldqty;
-                                                                        $profit_each = $salerate - $row['stc_purchase_product_adhoc_rate'];
-                                                                        $profit_amount = $profit_each * $soldqty;
-                                                                        $totalpurchaseamount += $qty * $row['stc_purchase_product_adhoc_rate'];
-                                                                        $totalsoldamount += $soldqty * $salerate;
-                                                                        $gtotalprofitmargin += $profit_each;
-                                                                        $totalprofitmargin += $profit_amount;
-                                                                        if($soldqty > 0){
-                                                                            $totalcount++;
-                                                                            // echo '
-                                                                            //     <tr>
-                                                                            //         <td>'.$row['stc_purchase_product_adhoc_itemdesc'].'</td>
-                                                                            //         <td class="text-right">'.number_format($row['stc_purchase_product_adhoc_rate'], 2).'</td>
-                                                                            //         <td class="text-right">'.number_format($salerate, 2).'</td>
-                                                                            //         <td class="text-right">'.number_format($soldqty, 2).'</td>
-                                                                            //         <td class="text-right">'.number_format($profit_each, 2).'</td>
-                                                                            //         <td class="text-right">'.number_format($profit_amount, 2).'</td>
-                                                                            //     </tr>
-                                                                            // ';
-                                                                        }
-                                                                    }
-                                                                    $gtotalprofitindex='';
-                                                                    if($gtotalprofitmargin>=0){
-                                                                        $gtotalprofitindex = '<span class="text-success">+'.number_format($gtotalprofitmargin, 2).'</span>';
-                                                                    } else {
-                                                                        $gtotalprofitindex = '<span class="text-danger">'.number_format($gtotalprofitmargin, 2).'</span>';
-                                                                    }
-                                                                    $gtotalprofitmarginindex='';
-                                                                    if($totalprofitmargin>=0){
-                                                                        $gtotalprofitmarginindex = '<span class="text-success">+'.number_format($totalprofitmargin, 2).'</span>';
-                                                                    } else {
-                                                                        $gtotalprofitmarginindex = '<span class="text-danger">'.number_format($totalprofitmargin, 2).'</span>';
-                                                                    }
-                                                                    echo '
-                                                                        <tr>
-                                                                            <td class="text-right">'.number_format($totalpurchaseamount, 2).'</td>
-                                                                            <td class="text-right">'.number_format($totalsoldamount, 2).'</td>
-                                                                            <td class="text-right">'.$gtotalprofitindex.'</td>
-                                                                            <td class="text-right">'.$gtotalprofitmarginindex.'</td>
-                                                                        </tr>
-                                                                    ';
-                                                                ?>
                                                             </tbody>
                                                         </table>
                                                     </div>
@@ -628,6 +560,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                           gldRows2 = '<tr><td colspan="2" class="text-center text-muted">No data found for this period.</td></tr>';
                         }
                         $('#gld-summary-table2 tbody').html(gldRows2);
+                        $('.stc-gld-profit-analyser-sheet-breakup').html(data[13]);
                         // Render Donut Chart
                         var ctxDonut = document.getElementById('gldDonutChart').getContext('2d');
                         if(gldDonutChartInstance) { gldDonutChartInstance.destroy(); }

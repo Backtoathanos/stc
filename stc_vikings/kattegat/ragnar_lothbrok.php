@@ -814,7 +814,12 @@ class sceptor extends tesseract{
 
 	public function stc_gldprofit_analyzer($month, $year, $type){
 		$ragnar='';
-		$query=mysqli_query($con, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE stc_purchase_product_adhoc_status=1 ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
+		if($type=='Y'){
+			$queryFilter="AND YEAR(stc_purchase_product_adhoc_created_date)='$year'";
+		}else{
+			$queryFilter="AND YEAR(stc_purchase_product_adhoc_created_date)='$year' AND MONTH(stc_purchase_product_adhoc_created_date)='$month'";
+		}
+		$query=mysqli_query($this->stc_dbs, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE stc_purchase_product_adhoc_status=1 $queryFilter ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
     	$totalcount=0;
     	$totalpurchaseamount=0;
     	$totalsoldamount=0;
@@ -822,13 +827,13 @@ class sceptor extends tesseract{
     	$gtotalprofitmargin=0;
     	foreach($query as $row){
     	    $qty= $row['stc_purchase_product_adhoc_qty'];
-    	    $query=mysqli_query($con, "SELECT sum(`stc_cust_super_requisition_list_items_rec_recqty`) as qty FROM `stc_cust_super_requisition_list_items_rec` WHERE stc_cust_super_requisition_list_items_rec_list_poaid='".$row['stc_purchase_product_adhoc_id']."'");
+    	    $query=mysqli_query($this->stc_dbs, "SELECT sum(`stc_cust_super_requisition_list_items_rec_recqty`) as qty FROM `stc_cust_super_requisition_list_items_rec` WHERE stc_cust_super_requisition_list_items_rec_list_poaid='".$row['stc_purchase_product_adhoc_id']."'");
     	    $result=mysqli_fetch_array($query);
     	    $soldqty = $result['qty'];
 
     	    $salerate= $row['stc_purchase_product_adhoc_rate'] + ($row['stc_purchase_product_adhoc_rate'] * $row['stc_product_sale_percentage'] / 100);
 
-    	    $query=mysqli_query($con, "SELECT SUM(`qty`) as qty, avg(rate) as rate FROM `gld_challan` WHERE adhoc_id='".$row['stc_purchase_product_adhoc_id']."' GROUP BY adhoc_id");
+    	    $query=mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) as qty, avg(rate) as rate FROM `gld_challan` WHERE adhoc_id='".$row['stc_purchase_product_adhoc_id']."' GROUP BY adhoc_id");
     	    $soldgldqty = 0;
     	    $soldgldrate = 0;
     	    if(mysqli_num_rows($query)>0){
@@ -844,29 +849,19 @@ class sceptor extends tesseract{
     	    $totalsoldamount += $salerate;
     	    $gtotalprofitmargin += $profit_each;
     	    $totalprofitmargin += $profit_amount;
-    	    if($soldqty > 0){
-    	        $totalcount++;
-    	        $ragnar .= '
-    	            <tr>
-    	                <td>'.$row['stc_purchase_product_adhoc_itemdesc'].'</td>
-    	                <td class="text-right">'.number_format($row['stc_purchase_product_adhoc_rate'], 2).'</td>
-    	                <td class="text-right">'.number_format($salerate, 2).'</td>
-    	                <td class="text-right">'.number_format($soldqty, 2).'</td>
-    	                <td class="text-right">'.number_format($profit_each, 2).'</td>
-    	                <td class="text-right">'.number_format($profit_amount, 2).'</td>
-    	            </tr>
-    	        ';
-    	    }
     	}
+  		$gtotalprofitmarginindex='';
+  		if($totalprofitmargin>=0){
+  		    $gtotalprofitmarginindex = '<span class="text-success">+'.number_format($totalprofitmargin, 2).'</span>';
+  		} else {
+  		    $gtotalprofitmarginindex = '<span class="text-danger">'.number_format($totalprofitmargin, 2).'</span>';
+		}
     	$ragnar .= '
-    	    <tr>
-    	        <td>Total : '.$totalcount.'</td>
-    	        <td class="text-right">'.number_format($totalpurchaseamount, 2).'</td>
-    	        <td class="text-right">'.number_format($totalsoldamount, 2).'</td>
-    	        <td class="text-right"></td>
-    	        <td class="text-right">'.number_format($gtotalprofitmargin, 2).'</td>
-    	        <td class="text-right">'.number_format($totalprofitmargin, 2).'</td>
-    	    </tr>
+        	<tr>
+        	    <td class="text-right">'.number_format($totalpurchaseamount, 2).'</td>
+        	    <td class="text-right">'.number_format($totalsoldamount, 2).'</td>
+        	    <td class="text-right">'.$gtotalprofitmarginindex.'</td>
+        	</tr>
     	';
 		return $ragnar;
 	}
@@ -912,13 +907,13 @@ if(isset($_POST["dashboard"])){
 	$opobjstctra=$objstctrapaid->stc_trading($month, $year, $type);
 	$opobjstcgro=$objstcgropaid->stc_groceries($month, $year);
 	$opobjstcgld=$objstcgropaid->stc_gld($month, $year, $type);
-	$opobjstcgld=$objstcgropaid->stc_gldprofit_analyzer($month, $year, $type);
+	$opobjstcgldanalyzer=$objstcgropaid->stc_gldprofit_analyzer($month, $year, $type);
 	if($preload=='preload'){
 		$month=date('Y-m');
 	}else{
 		$month=date('Y-m', strtotime($Omonth));
 	}
-	$cursedyouout=array($opobjtitems, $opobjinventory, $opobjtmerchant, $opobjtcustomer, $opobjtpurchased, $opobjtsoled, $opobjmerdue, $opobjcustdue, $opobjstcelec, $opobjstctra, $opobjstcgro, $opobjstcgld, $month);
+	$cursedyouout=array($opobjtitems, $opobjinventory, $opobjtmerchant, $opobjtcustomer, $opobjtpurchased, $opobjtsoled, $opobjmerdue, $opobjcustdue, $opobjstcelec, $opobjstctra, $opobjstcgro, $opobjstcgld, $month, $opobjstcgldanalyzer);
 
 	echo json_encode($cursedyouout);
 	// echo $cursedyouout;
