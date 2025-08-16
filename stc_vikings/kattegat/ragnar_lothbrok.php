@@ -814,12 +814,17 @@ class sceptor extends tesseract{
 
 	public function stc_gldprofit_analyzer($month, $year, $type){
 		$ragnar='';
+		$queryFilter='';$queryFilter2='';$queryFilter3='';
 		if($type=='Y'){
-			$queryFilter="AND YEAR(stc_purchase_product_adhoc_created_date)='$year'";
+			$queryFilter="YEAR(stc_purchase_product_adhoc_created_date)='$year'";
+			$queryFilter2="AND YEAR(stc_cust_super_requisition_list_items_rec_date)='$year'";
+			$queryFilter3="AND YEAR(created_date)='$year'";
 		}else{
-			$queryFilter="AND YEAR(stc_purchase_product_adhoc_created_date)='$year' AND MONTH(stc_purchase_product_adhoc_created_date)='$month'";
+			$queryFilter="YEAR(stc_purchase_product_adhoc_created_date)='$year' AND MONTH(stc_purchase_product_adhoc_created_date)='$month'";
+			$queryFilter2="AND YEAR(stc_cust_super_requisition_list_items_rec_date)='$year' AND MONTH(stc_cust_super_requisition_list_items_rec_date)='$month'";
+			$queryFilter3="AND YEAR(created_date)='$year' AND MONTH(created_date)='$month'";
 		}
-		$query=mysqli_query($this->stc_dbs, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE stc_purchase_product_adhoc_status=1 $queryFilter ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
+		$query=mysqli_query($this->stc_dbs, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE $queryFilter ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
     	$totalcount=0;
     	$totalpurchaseamount=0;
     	$totalsoldamount=0;
@@ -827,13 +832,13 @@ class sceptor extends tesseract{
     	$gtotalprofitmargin=0;
     	foreach($query as $row){
     	    $qty= $row['stc_purchase_product_adhoc_qty'];
-    	    $query=mysqli_query($this->stc_dbs, "SELECT sum(`stc_cust_super_requisition_list_items_rec_recqty`) as qty FROM `stc_cust_super_requisition_list_items_rec` WHERE stc_cust_super_requisition_list_items_rec_list_poaid='".$row['stc_purchase_product_adhoc_id']."'");
+    	    $query=mysqli_query($this->stc_dbs, "SELECT sum(`stc_cust_super_requisition_list_items_rec_recqty`) as qty FROM `stc_cust_super_requisition_list_items_rec` WHERE stc_cust_super_requisition_list_items_rec_list_poaid='".$row['stc_purchase_product_adhoc_id']."' $queryFilter2");
     	    $result=mysqli_fetch_array($query);
     	    $soldqty = $result['qty'];
 
     	    $salerate= $row['stc_purchase_product_adhoc_rate'] + ($row['stc_purchase_product_adhoc_rate'] * $row['stc_product_sale_percentage'] / 100);
 
-    	    $query=mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) as qty, avg(rate) as rate FROM `gld_challan` WHERE adhoc_id='".$row['stc_purchase_product_adhoc_id']."' GROUP BY adhoc_id");
+    	    $query=mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) as qty, avg(rate) as rate FROM `gld_challan` WHERE adhoc_id='".$row['stc_purchase_product_adhoc_id']."' $queryFilter3 GROUP BY adhoc_id");
     	    $soldgldqty = 0;
     	    $soldgldrate = 0;
     	    if(mysqli_num_rows($query)>0){
@@ -845,8 +850,9 @@ class sceptor extends tesseract{
     	    $soldqty = $soldqty + $soldgldqty;
     	    $profit_each = $salerate - $row['stc_purchase_product_adhoc_rate'];
     	    $profit_amount = $profit_each * $soldqty;
-    	    $totalpurchaseamount += $row['stc_purchase_product_adhoc_rate'];
-    	    $totalsoldamount += $salerate;
+			$amount=$qty * $row['stc_purchase_product_adhoc_rate'];
+    	    $totalpurchaseamount += $amount;
+    	    $totalsoldamount += $soldqty * $salerate;
     	    $gtotalprofitmargin += $profit_each;
     	    $totalprofitmargin += $profit_amount;
     	}
