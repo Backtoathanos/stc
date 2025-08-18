@@ -1301,7 +1301,58 @@ include("kattegat/role_check.php");
             });
 
           });
+          
+          $('.stc-summary-filter-find').on('click', function () {
+            // Get filter values
+            var dateFrom = $('.stc-summary-filterdatefrom').val();
+            var dateTo = $('.stc-summary-filterdateto').val();
 
+            // Make AJAX request
+            $.ajax({
+              url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
+              type: 'GET', // or 'POST' depending on your API
+              data: {
+                stc_get_customer_ledger: 1,
+                dateFrom: dateFrom,  // Ensure these are defined before use
+                dateTo: dateTo
+              },
+              dataType: 'json',
+              success: function (response) {
+                // Clear existing table rows
+                $('.stc-call-view-summaryledger-row').empty();
+
+                if (response && response.length > 0) {
+                  var total=0;
+                  $.each(response, function (index, item) {
+                    // Format date for better readability
+                    let formattedDate = new Date(item.stc_cust_super_requisition_list_date).toLocaleDateString('en-GB');
+
+                    var row = `<tr>
+                      <td class="text-center">${index + 1}</td>
+                      <td>${item.stc_cust_project_title}</td>
+                      <td class="text-right">${item.total}</td>
+                    </tr>
+                    `;
+                    total+=parseFloat(item.ltotal);
+                    $('.stc-call-view-summaryledger-row').append(row);
+                  });
+                  var outrow = `
+                    <tr>
+                      <td colspan="2" class="text-right"> Total : </td>
+                      <td class="text-right">${Number(total).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    </tr>`;
+                    $('.stc-call-view-summaryledger-row').append(outrow);
+                } else {
+                  $('.stc-call-view-summaryledger-row').html('<tr><td colspan="10">No data found</td></tr>');
+                }
+              },
+              error: function (xhr, status, error) {
+                // console.error('Error fetching data:', error, xhr.responseText);
+                $('.stc-call-view-summaryledger-row').html('<tr><td colspan="10">Error loading data</td></tr>');
+              }
+            });
+
+          });
           $('body').delegate('.showledgertr', 'click', function(e){
             var id=$(this).attr('id');
             $('.ledgeritemshow-'+id).toggle();
@@ -1847,84 +1898,148 @@ include("kattegat/role_check.php");
             </div>
         </div>
     </div>
-</div>
-<div class="modal fade bd-modal-ledgershow" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl ">
+</div><div class="modal fade bd-modal-ledgershow" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Product History</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Customer Ledger</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-              <div class="row">
-                <div class="col-xl-12 col-md-12 col-sm-12">
-                  <div class="card border-success mb-3 card-body">
-                    <table class="table table-hover table-bordered">
-                      <thead>
-                        <tr>
-                          <th scope="col" class="text-center">Date From/To</th>
-                          <th scope="col" class="text-center">Location </th>
-                          <th scope="col" class="text-center">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>
-                            <?php 
-                              $date = date("d-m-Y");
-                              $newDate = date('Y-m-d', strtotime($date)); 
-                              $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
-                            ?>   
-                            <input type="date" class="form-control stc-poa-filterdatefrom" <?php echo "value='$effectiveDate'";?>>
-                            <input type="date" class="form-control stc-poa-filterdateto" <?php echo "value='$newDate'";?>>
-                          </td>
-                          <td>
-                            <input type="text" class="form-control stc-poa-filtersitename" placeholder="Enter Sitename">
-                          </td>
-                          <td>
-                            <a class="btn btn-success stc-adhocpofilter-find" href="javascript:void(0)">Find</a>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-                <div class="col-xl-12 col-md-12 col-sm-12">
-                  <div class="card border-success mb-3 card-body">
-                    <table class="table table-hover table-bordered stc-purchase-view-table">
-                      <thead>
-                        <tr>
-                          <th>Sl No.</th>
-                          <th>Date</th>
-                          <th>Site Name</th>
-                          <th>Supervisors Name</th>
-                          <th>Item Code</th>
-                          <th>Product Name</th>
-                          <th>Unit</th>
-                          <th>Quantity</th>
-                          <th>Rate</th>
-                          <th>Total</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody class="stc-call-view-poadhocledger-row">
-                        <tr><td colspan="8">Search</td></tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#detailedLedger">Detailed Ledger</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="tab" href="#summaryLedger">Summary</a>
+                    </li>
+                </ul>
 
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <!-- Detailed Ledger Tab -->
+                    <div id="detailedLedger" class="tab-pane active">
+                        <div class="row mt-3">
+                            <div class="col-xl-12 col-md-12 col-sm-12">
+                                <div class="card border-success mb-3 card-body">
+                                    <table class="table table-hover table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="text-center">Date From/To</th>
+                                                <th scope="col" class="text-center">Location</th>
+                                                <th scope="col" class="text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <?php 
+                                                        $date = date("d-m-Y");
+                                                        $newDate = date('Y-m-d', strtotime($date)); 
+                                                        $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
+                                                    ?>   
+                                                    <input type="date" class="form-control stc-poa-filterdatefrom" <?php echo "value='$effectiveDate'";?>>
+                                                    <input type="date" class="form-control stc-poa-filterdateto" <?php echo "value='$newDate'";?>>
+                                                </td>
+                                                <td>
+                                                    <input type="text" class="form-control stc-poa-filtersitename" placeholder="Enter Sitename">
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-success stc-adhocpofilter-find" href="javascript:void(0)">Find</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-md-12 col-sm-12">
+                                <div class="card border-success mb-3 card-body">
+                                    <table class="table table-hover table-bordered stc-purchase-view-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No.</th>
+                                                <th>Date</th>
+                                                <th>Site Name</th>
+                                                <th>Supervisors Name</th>
+                                                <th>Item Code</th>
+                                                <th>Product Name</th>
+                                                <th>Unit</th>
+                                                <th>Quantity</th>
+                                                <th>Rate</th>
+                                                <th>Total</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="stc-call-view-poadhocledger-row">
+                                            <tr><td colspan="11">Search</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summary Tab -->
+                    <div id="summaryLedger" class="tab-pane fade">
+                        <div class="row mt-3">
+                            <div class="col-xl-12 col-md-12 col-sm-12">
+                                <div class="card border-success mb-3 card-body">
+                                    <table class="table table-hover table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="text-center">Date From/To</th>
+                                                <th scope="col" class="text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <?php 
+                                                        $date = date("d-m-Y");
+                                                        $newDate = date('Y-m-d', strtotime($date)); 
+                                                        $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
+                                                    ?>   
+                                                    <input type="date" class="form-control stc-summary-filterdatefrom" <?php echo "value='$effectiveDate'";?>>
+                                                    <input type="date" class="form-control stc-summary-filterdateto" <?php echo "value='$newDate'";?>>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-success stc-summary-filter-find" href="javascript:void(0)">Find</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-md-12 col-sm-12">
+                                <div class="card border-success mb-3 card-body">
+                                    <table class="table table-hover table-bordered stc-summary-view-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No.</th>
+                                                <th>Site Name</th>
+                                                <th>Total Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="stc-call-view-summaryledger-row">
+                                            <tr><td colspan="3">Search</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="modal-footer">
-              <div class="row">
-                <div class="col-xl-6 col-md-6 col-sm-6">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <div class="row">
+                    <div class="col-xl-6 col-md-6 col-sm-6">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
                 </div>
-            </div>
             </div>
         </div>
     </div>

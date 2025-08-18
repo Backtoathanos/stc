@@ -2705,6 +2705,35 @@ class ragnarPurchaseAdhoc extends tesseract{
 	
 		return $odin;
 	}	
+
+	public function stc_poadhoc_customerledger($dateFrom, $dateTo) {
+		$filter = '';
+		$dateFrom=date('Y-m-d', strtotime($dateFrom));
+		$dateTo=date('Y-m-d', strtotime($dateTo));
+		$query = "
+			SELECT D.stc_cust_project_title, SUM(A.stc_cust_super_requisition_list_items_rec_recqty * E.stc_purchase_product_adhoc_rate) as total FROM `stc_cust_super_requisition_list_items_rec` A 
+			INNER JOIN stc_cust_super_requisition_list_items B
+			ON A.stc_cust_super_requisition_list_items_rec_list_item_id=B.stc_cust_super_requisition_list_id
+			INNER JOIN stc_cust_super_requisition_list C
+			ON A.stc_cust_super_requisition_list_items_rec_list_id=C.stc_cust_super_requisition_list_id
+			INNER JOIN stc_cust_project D
+			ON C.stc_cust_super_requisition_list_project_id=D.stc_cust_project_id
+			INNER JOIN stc_purchase_product_adhoc E
+			ON A.stc_cust_super_requisition_list_items_rec_list_poaid=E.stc_purchase_product_adhoc_id
+			WHERE DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '$dateFrom' AND '$dateTo' GROUP BY D.stc_cust_project_title ORDER BY D.stc_cust_project_title
+		";
+		$result = mysqli_query($this->stc_dbs, $query);
+		// Fetch data
+		$odin = array();
+		if (mysqli_num_rows($result) > 0) {
+			while ($row = mysqli_fetch_assoc($result)) {
+				$row['ltotal'] = $row['total'];
+				$row['total'] = number_format($row['total'], 2);
+				$odin[] = $row; // Add each row to the array
+			}
+		}
+		return $odin;
+	}
 	
 	public function stc_poadhoc_update_ledger($id, $itemcode, $quantity) {
 		if(!empty($itemcode)){
@@ -3923,6 +3952,15 @@ if(isset($_GET['stc_get_ledger'])){
 	$siteName=$_GET['siteName'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
 	$outbjornestocking=$bjornestocking->stc_poadhoc_ledger($dateFrom, $dateTo, $siteName);
+	// echo $outbjornestocking;
+	echo json_encode($outbjornestocking);
+}
+// show ledger
+if(isset($_GET['stc_get_customer_ledger'])){
+	$dateFrom=$_GET['dateFrom'];
+	$dateTo=$_GET['dateTo'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_poadhoc_customerledger($dateFrom, $dateTo);
 	// echo $outbjornestocking;
 	echo json_encode($outbjornestocking);
 }
