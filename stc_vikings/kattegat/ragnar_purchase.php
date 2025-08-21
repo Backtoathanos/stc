@@ -2487,7 +2487,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				stc_purchase_product_adhoc_unit, stc_purchase_product_adhoc_rackid, 
 				stc_purchase_product_adhoc_condition, stc_purchase_product_adhoc_source, 
 				stc_purchase_product_adhoc_destination, stc_purchase_product_adhoc_recievedby, 
-				stc_purchase_product_adhoc_status, stc_purchase_product_adhoc_remarks, 
+				stc_purchase_product_adhoc_cherrypickby, stc_purchase_product_adhoc_status, stc_purchase_product_adhoc_remarks, 
 				stc_purchase_product_adhoc_created_by, stc_purchase_product_adhoc_created_date, 
 				stc_purchase_product_adhoc_updated_by, stc_purchase_product_adhoc_updated_date
 			) 
@@ -2502,6 +2502,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				stc_purchase_product_adhoc_source, 
 				stc_purchase_product_adhoc_destination, 
 				stc_purchase_product_adhoc_recievedby, 
+				'".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."', 
 				stc_purchase_product_adhoc_status, 
 				stc_purchase_product_adhoc_remarks, 
 				'".mysqli_real_escape_string($this->stc_dbs, $user_id)."', 

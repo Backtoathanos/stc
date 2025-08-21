@@ -762,12 +762,12 @@ class sceptor extends tesseract{
     public function stc_gld($month, $year, $type) {
         // $year = date('Y');
 		$queryFilter="WHERE MONTH(stc_purchase_product_adhoc_created_date) = '$month' AND YEAR(stc_purchase_product_adhoc_created_date) = '$year'";
-		$queryFilter1="WHERE MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
+		$queryFilter1="WHERE stc_purchase_product_adhoc_cherrypickby=0 AND MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
 		$queryFilter2="WHERE MONTH(created_date)='$month' AND YEAR(created_date)='$year'";
 		$queryFilter3="WHERE MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
 		if($type == 'Y') {
 			$queryFilter = "WHERE YEAR(stc_purchase_product_adhoc_created_date) = '$year'";
-			$queryFilter1="WHERE YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
+			$queryFilter1="WHERE stc_purchase_product_adhoc_cherrypickby=0 AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
 			$queryFilter2="WHERE YEAR(created_date)='$year'";
 		}
         // Total Purchased
@@ -824,7 +824,7 @@ class sceptor extends tesseract{
 			$queryFilter2="AND YEAR(stc_cust_super_requisition_list_items_rec_date)='$year' AND MONTH(stc_cust_super_requisition_list_items_rec_date)='$month'";
 			$queryFilter3="AND YEAR(created_date)='$year' AND MONTH(created_date)='$month'";
 		}
-		$query=mysqli_query($this->stc_dbs, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE $queryFilter ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
+		$query=mysqli_query($this->stc_dbs, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE `stc_purchase_product_adhoc_cherrypickby`=0 AND $queryFilter ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
     	$totalcount=0;
     	$totalpurchaseamount=0;
     	$totalsoldamount=0;

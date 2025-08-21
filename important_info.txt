@@ -123,3 +123,4 @@ CREATE TABLE `gld_requisitions` (
 ALTER TABLE `gld_requisitions` ADD `status` INT NOT NULL AFTER `remarks`;
 ALTER TABLE `stc_shop` ADD `rack_id` INT NOT NULL AFTER `qty`, ADD `remarks` TEXT NOT NULL AFTER `rack_id`;
 ALTER TABLE `stc_rack` ADD `stc_rack_location` VARCHAR(100) NOT NULL AFTER `stc_rack_name`;
+ALTER TABLE `stc_purchase_product_adhoc` ADD `stc_purchase_product_adhoc_cherrypickby` INT NOT NULL AFTER `stc_purchase_product_adhoc_recievedby`;
