@@ -2155,7 +2155,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $condition)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $source)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $destination)."',
-				'1',
+				'3',
 				'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
 				'".$_SESSION['stc_empl_id']."',
 				'".$date."'
@@ -2261,7 +2261,14 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$count_num=mysqli_num_rows($count_numqry);
 		if(mysqli_num_rows($odinqry)>0){
 			$slno=0;
-			$status=array(1 => 'Stock', 2 => 'Dispatched');
+			$statusColors = [
+				1 => 'badge bg-primary',   // Stock
+				2 => 'badge bg-info',      // Dispatched
+				3 => 'badge bg-warning',   // Pending
+				4 => 'badge bg-success',   // Approved
+				5 => 'badge bg-danger'     // Rejected
+			];
+			$status=array(1 => 'Stock', 2 => 'Dispatched', 3 => 'Pending', 4 => 'Approved', 5 => 'Rejected');
 			foreach($odinqry as $odinrow){
 				$slno++;
 				$delivered=0;
@@ -2311,6 +2318,50 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				$pro_rate='<input type="number" style="display:none" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" style="display:none" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				$product_name=$odinrow['stc_sub_cat_name']!="OTHERS"?$odinrow['stc_sub_cat_name']. ' ' .$odinrow['stc_product_name']:$odinrow['stc_product_name'];
+				$statusDropdown='';
+				if($odinrow['stc_purchase_product_adhoc_status']==3){
+					$statusDropdown='
+						<div class="dropdown" style="display:inline-block; margin-left: 10px;">
+							<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								Change Status
+							</button>
+							<div class="dropdown-menu" aria-labelledby="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'">
+								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="4">Approve</a>
+								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="5">Reject</a>
+							</div>
+						</div>
+					';
+				}elseif($odinrow['stc_purchase_product_adhoc_status']==4){
+					$statusDropdown='
+						<div class="dropdown" style="display:inline-block; margin-left: 10px;">
+							<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								Change Status
+							</button>
+							<div class="dropdown-menu" aria-labelledby="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'">
+								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="1">Accept</a>
+								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="3">Set to Pending</a>
+								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="5">Reject</a>
+							</div>
+						</div>';
+				}elseif($odinrow['stc_purchase_product_adhoc_status']==5){
+					$statusDropdown='
+						<div class="dropdown" style="display:inline-block; margin-left: 10px;">
+							<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+								Change Status
+							</button>
+							<div class="dropdown-menu" aria-labelledby="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'">
+								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="3">Set to Pending</a>
+								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="4">Approve</a>
+							</div>
+						</div>';
+				}
+				$updatestatus="<a href='javascript:void(0)' class='btn btn-secondary update-purchased-lineitems' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Update Status'><i class='fa fa-check-square'></i></a>";
+				$recieving="<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o'></i></a>";
+				if($odinrow['stc_purchase_product_adhoc_status']>2){
+					$updatestatus='';
+					$recieving='';
+					$cherrypick='';
+				}
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
@@ -2357,12 +2408,12 @@ class ragnarPurchaseAdhoc extends tesseract{
 								📅 ".date('d-m-Y', strtotime($odinrow['stc_purchase_product_adhoc_updated_date']))."
 							</div>
 						</td>
-						<td class='text-center'>".$status[$odinrow['stc_purchase_product_adhoc_status']]."</td>
+						<td class='text-center'><span class='".$statusColors[$odinrow['stc_purchase_product_adhoc_status']]."'>".$status[$odinrow['stc_purchase_product_adhoc_status']]."</span>".$statusDropdown."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_remarks']."</td>
 						<td class='text-center'>
-							<a href='javascript:void(0)' class='btn btn-secondary update-purchased-lineitems' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Update Status'><i class='fa fa-check-square'></i></a>
+							".$updatestatus."
 							<!--<a href='javascript:void(0)' class='btn btn-primary add-payment-details' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Payment details'><i class='fa fa-credit-card'></i></a>-->
-							<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o'></i></a>
+							".$recieving."							
 							<a href='javascript:void(0)' class='btn btn-danger remove-products' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Delete'><i class='fa fa-trash'></i></a>
 							".$cherrypick."
 						</td>
@@ -2487,7 +2538,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 				stc_purchase_product_adhoc_unit, stc_purchase_product_adhoc_rackid, 
 				stc_purchase_product_adhoc_condition, stc_purchase_product_adhoc_source, 
 				stc_purchase_product_adhoc_destination, stc_purchase_product_adhoc_recievedby, 
-				stc_purchase_product_adhoc_cherrypickby, stc_purchase_product_adhoc_status, stc_purchase_product_adhoc_remarks, 
+				stc_purchase_product_adhoc_qtytodecrease, stc_purchase_product_adhoc_cherrypickby, 
+				stc_purchase_product_adhoc_status, stc_purchase_product_adhoc_remarks, 
 				stc_purchase_product_adhoc_created_by, stc_purchase_product_adhoc_created_date, 
 				stc_purchase_product_adhoc_updated_by, stc_purchase_product_adhoc_updated_date
 			) 
@@ -2502,6 +2554,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				stc_purchase_product_adhoc_source, 
 				stc_purchase_product_adhoc_destination, 
 				stc_purchase_product_adhoc_recievedby, 
+				'".mysqli_real_escape_string($this->stc_dbs, $qtyToDecrease)."', 
 				'".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."', 
 				stc_purchase_product_adhoc_status, 
 				stc_purchase_product_adhoc_remarks, 
@@ -2779,7 +2832,18 @@ class ragnarPurchaseAdhoc extends tesseract{
 	
 		return $odin;
 	}
+
+	public function stc_update_adhoc_item_apprstatus($id, $status)	 {
+		$odin="no";
+		$query = mysqli_query($this->stc_dbs, "UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_status` = '$status' WHERE `stc_purchase_product_adhoc_id` = '".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+		
+		if($query){
+			$odin="yes";
+		}
 	
+		return $odin;
+	}
+
 	public function getPaginatedProducts($page, $search) {
 		$limit = 25;
 		$offset = ($page - 1) * $limit;
@@ -3999,6 +4063,15 @@ if(isset($_POST['stc_changestatus'])){
 	$id=$_POST['id'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
 	$outbjornestocking=$bjornestocking->stc_update_adhoc_item_status($id);
+	// echo $outbjornestocking;
+	echo json_encode($outbjornestocking);
+}
+
+if(isset($_POST['stc_changeapprovestatus'])){
+	$id=$_POST['id'];
+	$status=$_POST['status'];
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_update_adhoc_item_apprstatus($id, $status);
 	// echo $outbjornestocking;
 	echo json_encode($outbjornestocking);
 }

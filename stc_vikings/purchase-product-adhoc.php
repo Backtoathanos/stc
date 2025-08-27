@@ -136,9 +136,12 @@ include("kattegat/role_check.php");
                                                     <tbody>
                                                         <tr class="item-row">
                                                             <td style="width: 100px;">
+                                                              <a href="#" class="form-control btn btn-primary product-select" data-toggle="modal" data-target=".stc-agent-req-get-mer-product-show" title="Select Product">
+                                                                <i class="fa fa-edit"></i>
+                                                              </a>
                                                                 <input
                                                                     name="itemcode[]"
-                                                                    type="number"
+                                                                    type="hidden"
                                                                     placeholder="Item Code"
                                                                     class="form-control validate"
                                                                     required
@@ -385,64 +388,62 @@ include("kattegat/role_check.php");
     <script>
         $(document).ready(function(){
           const urlParams = new URLSearchParams(window.location.search);
-          // Get all options from the hidden select when page loads
-          var options = [];
-          $('select[name="sourcerack_value[]"] option').each(function() {
-              options.push({
-                  value: $(this).val(),
-                  text: $(this).text()
-              });
-          });
+          // Handle input/focus for each search input
+          $(document).on('input focus', '.search-input', function () {
+              var $container = $(this).closest('.searchable-dropdown');
+              var $dropdown = $container.find('.dropdown-options');
+              var $hiddenSelect = $container.find('select[name="sourcerack_value[]"]');
 
-          // Handle input events
-          $('.search-input').on('input focus', function() {
               var searchTerm = $(this).val().toUpperCase();
-              var $dropdown = $(this).next('.dropdown-options');
-              var $hiddenSelect = $(this).nextAll('select[name="sourcerack_value[]"]');
-              
+
+              // Collect options for THIS select
+              var options = [];
+              $hiddenSelect.find('option').each(function () {
+                  options.push({
+                      value: $(this).val(),
+                      text: $(this).text()
+                  });
+              });
+
               // Filter options
-              var filteredOptions = options.filter(function(option) {
-                  return option.text.toUpperCase().includes(searchTerm) || 
+              var filteredOptions = options.filter(function (option) {
+                  return option.text.toUpperCase().includes(searchTerm) ||
                         option.value.toUpperCase().includes(searchTerm);
               });
 
               // Build dropdown HTML
               var dropdownHTML = '';
-              filteredOptions.forEach(function(option) {
+              filteredOptions.forEach(function (option) {
                   dropdownHTML += `<div class="dropdown-item" data-value="${option.value}">${option.text}</div>`;
               });
 
               // Update dropdown
-              $dropdown.html(dropdownHTML).show();
-
-              // Hide if empty input
-              if (searchTerm === '') {
-                  $dropdown.hide();
-              }
+              $dropdown.html(dropdownHTML).toggle(filteredOptions.length > 0 && searchTerm !== '');
           });
 
           // Handle click on dropdown items
-          $(document).on('click', '.dropdown-item', function() {
+          $(document).on('click', '.dropdown-item', function () {
               var value = $(this).data('value');
               var text = $(this).text();
               var $container = $(this).closest('.searchable-dropdown');
-              
+
               // Update visible input field
               $container.find('.search-input').val(text);
-              
+
               // Update hidden select value
               $container.find('select[name="sourcerack_value[]"]').val(value);
-              
+
               // Hide dropdown
               $container.find('.dropdown-options').hide();
           });
 
           // Hide dropdown when clicking outside
-          $(document).on('click', function(e) {
+          $(document).on('click', function (e) {
               if (!$(e.target).closest('.searchable-dropdown').length) {
                   $('.dropdown-options').hide();
               }
           });
+
 
           $('#dropdown-search').on('input', function() {
             var searchTerm = $(this).val().toLowerCase();
@@ -795,6 +796,58 @@ include("kattegat/role_check.php");
                       alert("Error: " + error);
                   }
               });
+          });
+
+          
+
+          var jsfiltercat;
+          var jsfiltersubcat;
+          var jsfiltername;
+
+          // search item on a modal
+          $('body').delegate('.stcprosearchhit', 'click', function (e) {
+            e.preventDefault();
+            jsfiltercat = $('#filterbycat').val();
+            jsfiltersubcat = $('#filterbysubcat').val();
+            jsfiltername = $('#searchbystcname').val();
+            stc_filter_pro_forrequist(jsfiltercat, jsfiltersubcat, jsfiltername);
+          });
+
+          // filter function
+          function stc_filter_pro_forrequist(jsfiltercat, jsfiltersubcat, jsfiltername) {
+            $.ajax({
+              url: "kattegat/ragnar_order.php",
+              method: "post",
+              data: {
+                stccallmercaction: 1,
+                phpfiltercatout: jsfiltercat,
+                phpfiltersubcatout: jsfiltersubcat,
+                phpfilternameout: jsfiltername
+              },
+              // dataType : 'JSON',
+              success: function (data) {
+                // console.log(data);
+                $('.stc-req-product-show').html(data);
+                $('.add_to_requist_mer').attr('data-dismiss', 'modal');
+              }
+            });
+          }
+
+          $('body').delegate('.product-select', 'click', function (e) {
+            $(this).closest('tr').find('td:eq(0)').find('input').addClass('product-select-val');
+            $(this).closest('tr').find('td:eq(1)').find('textarea').addClass('product-select-name');
+          });
+          // add product for savess
+          $('body').delegate('.add_to_requist_mer', 'click', function (e) {
+            e.preventDefault();
+            var pd_id = $(this).attr("id");
+            var name = $(this).attr("pd-name");
+            $('.product-select-val').val(pd_id);
+            $('.product-select-name').val(name);
+            $('.product-select-val').removeClass("product-select-val");
+            $('.product-select-name').removeClass("product-select-name");
+            alert("Product added successfully.");
+            $(".close").click();
           });
           
           // add recieving modal
@@ -1426,6 +1479,28 @@ include("kattegat/role_check.php");
               });
             }
           });          
+          
+
+          $('body').delegate('.change-adhoc-status', 'click', function(e){
+            var id=$(this).attr('data-id');
+            var status=$(this).attr('data-status');
+            if(confirm("Are you sure want to approve status of this Item?")){
+              $.ajax({
+                url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
+                type: 'POST', // or 'POST' depending on your API
+                data: {
+                  stc_changeapprovestatus: 1,
+                  id: id,
+                  status:status
+                },
+                dataType: 'json',
+                success: function (response) {
+                  alert("Item updated successfully.");
+                  Pagination.loadData(pagenumber);
+                }
+              });
+            }
+          });       
           
 
           $('body').delegate('.update-purchased-lineitems', 'click', function(e){
@@ -2245,5 +2320,87 @@ include("kattegat/role_check.php");
         </div>
       </div>
     </form>
+  </div>
+</div>
+<!-- product selection modal -->
+<div class="modal fade stc-agent-req-get-mer-product-show" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Requisition Items Selection</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-12">
+            <table class="table table-hover ">
+              <thead>
+                <tr>
+                  <th scope="col">By Category</th>
+                  <th scope="col">By Name</th>
+                  <th scope="col">By Sub Category</th>
+                  <th scope="col">Search</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="card-border mb-3 card card-body border-success">
+                      <select class="custom-select tm-select-accounts call_cat" id="filterbycat"
+                        name="stcpdcategory">
+                      </select>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="card-border mb-3 card card-body border-success">
+                      <input id="searchbystcname" name="stcsearchpdname" type="text" placeholder="Product Name" class="form-control validate" />
+                      <input type="hidden" name="search_alo_in">
+                    </div>
+                  </td>
+                  <td>
+                    <div class="card-border mb-3 card card-body border-success">
+                      <select class="custom-select tm-select-accounts call_sub_cat" id="filterbysubcat" name="stcpdsubcategory">
+                      </select>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="card-border mb-3 card card-body border-success">
+                      <button type="submit" class="form-control btn btn-primary stcprosearchhit">Search <i class="fa fa-search"></i></button>
+                    </div>
+                  </td>
+                  <td>
+                    <a style="
+                        font-size: 20px;
+                        background: yellow;
+                        border-radius: 50%;
+                        padding: 5px;
+                        margin: 0;
+                      " href="#" class="upward"><i class="fas fa-arrow-up"></i>
+                    </a>
+                    <a style="
+                        font-size: 20px;
+                        background: yellow;
+                        border-radius: 50%;
+                        padding: 5px;
+                        margin: 0;
+                        display: none;
+                      " href="#" class="downward"><i class="fas fa-arrow-down"></i>
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-12">
+            <div class="row stc-req-product-show">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
   </div>
 </div>
