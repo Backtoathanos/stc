@@ -2319,41 +2319,47 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$pro_rate='<input type="number" style="display:none" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" style="display:none" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
 				$product_name=$odinrow['stc_sub_cat_name']!="OTHERS"?$odinrow['stc_sub_cat_name']. ' ' .$odinrow['stc_product_name']:$odinrow['stc_product_name'];
 				$statusDropdown='';
-				if($odinrow['stc_purchase_product_adhoc_status']==3){
-					$statusDropdown='
-						<div class="dropdown" style="display:inline-block; margin-left: 10px;">
-							<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								Change Status
-							</button>
-							<div class="dropdown-menu" aria-labelledby="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'">
-								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="4">Approve</a>
-								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="5">Reject</a>
+				if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==6){
+					if($odinrow['stc_purchase_product_adhoc_status']==3){
+						$statusDropdown='
+							<div class="dropdown" style="display:inline-block; margin-left: 10px;">
+								<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Change Status
+								</button>
+								<div class="dropdown-menu" aria-labelledby="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'">
+									<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="4">Approve</a>
+									<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="5">Reject</a>
+								</div>
 							</div>
-						</div>
-					';
-				}elseif($odinrow['stc_purchase_product_adhoc_status']==4){
-					$statusDropdown='
-						<div class="dropdown" style="display:inline-block; margin-left: 10px;">
-							<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								Change Status
-							</button>
-							<div class="dropdown-menu" aria-labelledby="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'">
-								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="1">Accept</a>
-								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="3">Set to Pending</a>
-								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="5">Reject</a>
-							</div>
-						</div>';
-				}elseif($odinrow['stc_purchase_product_adhoc_status']==5){
-					$statusDropdown='
-						<div class="dropdown" style="display:inline-block; margin-left: 10px;">
-							<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-								Change Status
-							</button>
-							<div class="dropdown-menu" aria-labelledby="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'">
-								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="3">Set to Pending</a>
-								<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="4">Approve</a>
-							</div>
-						</div>';
+						';
+					}elseif($odinrow['stc_purchase_product_adhoc_status']==4){
+						$acceptData='';
+						if($_SESSION['stc_empl_id']==6){
+							$acceptData='<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="1">Accept</a>';
+						}
+						$statusDropdown='
+							<div class="dropdown" style="display:inline-block; margin-left: 10px;">
+								<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Change Status
+								</button>
+								<div class="dropdown-menu" aria-labelledby="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'">
+									'.$acceptData.'
+									<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="3">Set to Pending</a>
+									<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="5">Reject</a>
+								</div>
+							</div>';
+					}elseif($odinrow['stc_purchase_product_adhoc_status']==5){
+						$statusDropdown='
+							<div class="dropdown" style="display:inline-block; margin-left: 10px;">
+								<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									Change Status
+								</button>
+								<div class="dropdown-menu" aria-labelledby="statusDropdownMenuButton'.$odinrow['stc_purchase_product_adhoc_id'].'">
+									<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="3">Set to Pending</a>
+									<a class="dropdown-item change-adhoc-status" href="javascript:void(0)" data-id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-status="4">Approve</a>
+								</div>
+							</div>';
+					}
 				}
 				$updatestatus="<a href='javascript:void(0)' class='btn btn-secondary update-purchased-lineitems' data-toggle='modal' data-target='#myModal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Update Status'><i class='fa fa-check-square'></i></a>";
 				$recieving="<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o'></i></a>";
