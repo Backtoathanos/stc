@@ -2365,7 +2365,6 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$recieving="<a href='javascript:void(0)' class='btn btn-success add-receiving' data-toggle='modal' data-target='.receiving-modal' id='".$odinrow['stc_purchase_product_adhoc_id']."' title='Receiving'><i class='fa fa-handshake-o'></i></a>";
 				if($odinrow['stc_purchase_product_adhoc_status']>2){
 					$updatestatus='';
-					$recieving='';
 					$cherrypick='';
 				}
 				$odin.="
