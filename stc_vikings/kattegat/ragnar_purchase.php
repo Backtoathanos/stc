@@ -2127,7 +2127,7 @@ class ragnarGRNAdd extends tesseract{
 class ragnarPurchaseAdhoc extends tesseract{
 
 	// save po adhoc trigger
-	public function stc_po_adhoc_save($itemcode, $itemname, $quantity, $rate, $unit, $rack, $condition, $source, $destination, $remarks){	
+	public function stc_po_adhoc_save($itemcode, $itemname, $quantity, $rate, $unit, $rack, $condition, $source, $destination, $receivedby, $remarks){	
 		$odin='';
 		$date=date("Y-m-d H:i:s");		
 		$lokipo=mysqli_query($this->stc_dbs, "
@@ -2141,6 +2141,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_condition`,
 				`stc_purchase_product_adhoc_source`,
 				`stc_purchase_product_adhoc_destination`,
+				`stc_purchase_product_adhoc_recievedby`,
 				`stc_purchase_product_adhoc_status`,
 				`stc_purchase_product_adhoc_remarks`,
 				`stc_purchase_product_adhoc_created_by`,
@@ -2155,6 +2156,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $condition)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $source)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $destination)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $receivedby)."',
 				'3',
 				'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
 				'".$_SESSION['stc_empl_id']."',
@@ -3895,6 +3897,7 @@ if(isset($_POST['stc_po_adhoc_save'])) {
                 $item['condition'] ?? '', 
                 $item['sourcerack'] ?? '', 
                 $item['destination'] ?? '', 
+                $item['receivedby'] ?? '', 
                 $item['remarks'] ?? ''
             );
             

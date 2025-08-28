@@ -129,6 +129,7 @@ include("kattegat/role_check.php");
                                                             <th>Rate</br>Rack</th>
                                                             <th>Condition</th>
                                                             <th>From (Source/Location)<br>To (Destination/Location)</th>
+                                                            <th>Received By</th>
                                                             <th>Remarks</th>
                                                             <th>Action</th>
                                                         </tr>
@@ -241,6 +242,14 @@ include("kattegat/role_check.php");
                                                                     <option>DHATKIDIH GODOWN</option>
                                                                     <option>Kolkata GODOWN</option>
                                                                 </select>
+                                                            </td>
+                                                            <td>
+                                                                <input
+                                                                    name="receivedby[]"
+                                                                    type="text"
+                                                                    placeholder="Received By"
+                                                                    class="form-control validate"
+                                                                />
                                                             </td>
                                                             <td style="width: 330px;">
                                                                 <textarea
@@ -746,6 +755,7 @@ include("kattegat/role_check.php");
                       condition: row.find('[name="condition[]"]').val(),
                       sourcerack: row.find('[name="sourcerack[]"]').val(),
                       destination: row.find('[name="destination[]"]').val(),
+                      receivedby: row.find('[name="receivedby[]"]').val(),
                       remarks: row.find('[name="remarks[]"]').val()
                   };
                   
