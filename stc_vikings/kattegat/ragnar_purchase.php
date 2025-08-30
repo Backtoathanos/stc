@@ -2773,7 +2773,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		return $odin;
 	}	
 
-	public function stc_poadhoc_customerledger($dateFrom, $dateTo) {
+	public function stc_poadhoc_customerledger($dateFrom, $dateTo, $siteName) {
 		$filter = '';
 		$dateFrom=date('Y-m-d', strtotime($dateFrom));
 		$dateTo=date('Y-m-d', strtotime($dateTo));
@@ -2787,13 +2787,17 @@ class ragnarPurchaseAdhoc extends tesseract{
 			ON C.stc_cust_super_requisition_list_project_id=D.stc_cust_project_id
 			INNER JOIN stc_purchase_product_adhoc E
 			ON A.stc_cust_super_requisition_list_items_rec_list_poaid=E.stc_purchase_product_adhoc_id
-			WHERE DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '$dateFrom' AND '$dateTo' GROUP BY D.stc_cust_project_title ORDER BY D.stc_cust_project_title
+			WHERE stc_cust_project_cust_id=$siteName AND DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '$dateFrom' AND '$dateTo' 
+			GROUP BY D.stc_cust_project_title ORDER BY D.stc_cust_project_title
 		";
 		$result = mysqli_query($this->stc_dbs, $query);
 		// Fetch data
 		$odin = array();
 		if (mysqli_num_rows($result) > 0) {
 			while ($row = mysqli_fetch_assoc($result)) {
+				if($row['total']==0){ 
+					continue;
+				}
 				$row['ltotal'] = $row['total'];
 				$row['total'] = number_format($row['total'], 2);
 				$odin[] = $row; // Add each row to the array
@@ -4041,8 +4045,9 @@ if(isset($_GET['stc_get_ledger'])){
 if(isset($_GET['stc_get_customer_ledger'])){
 	$dateFrom=$_GET['dateFrom'];
 	$dateTo=$_GET['dateTo'];
+	$siteName=$_GET['siteName'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_poadhoc_customerledger($dateFrom, $dateTo);
+	$outbjornestocking=$bjornestocking->stc_poadhoc_customerledger($dateFrom, $dateTo, $siteName);
 	// echo $outbjornestocking;
 	echo json_encode($outbjornestocking);
 }

@@ -813,63 +813,62 @@ class sceptor extends tesseract{
     }
 
 	public function stc_gldprofit_analyzer($month, $year, $type){
-		$ragnar='';
-		$queryFilter='';$queryFilter2='';$queryFilter3='';
-		if($type=='Y'){
-			$queryFilter="YEAR(stc_purchase_product_adhoc_created_date)='$year'";
-			$queryFilter2="AND YEAR(stc_cust_super_requisition_list_items_rec_date)='$year'";
-			$queryFilter3="AND YEAR(created_date)='$year'";
-		}else{
-			$queryFilter="YEAR(stc_purchase_product_adhoc_created_date)='$year' AND MONTH(stc_purchase_product_adhoc_created_date)='$month'";
-			$queryFilter2="AND YEAR(stc_cust_super_requisition_list_items_rec_date)='$year' AND MONTH(stc_cust_super_requisition_list_items_rec_date)='$month'";
-			$queryFilter3="AND YEAR(created_date)='$year' AND MONTH(created_date)='$month'";
+		$ragnar = '';
+		$yearFilter = "YEAR(created_date) = '$year'";
+		$monthFilter = $type != 'Y' ? "AND MONTH(created_date) = '$month'" : '';
+
+		// Main query with JOIN to avoid N+1 queries
+		$query = mysqli_query($this->stc_dbs, "
+			SELECT 
+				a.stc_purchase_product_adhoc_id,
+				a.stc_purchase_product_adhoc_itemdesc,
+				a.stc_purchase_product_adhoc_qty,
+				a.stc_purchase_product_adhoc_rate as salerate,
+				a.stc_purchase_product_adhoc_prate,
+				COALESCE(SUM(r.stc_cust_super_requisition_list_items_rec_recqty), 0) as sold_qty,
+				COALESCE(SUM(g.qty), 0) as gld_qty,
+				COALESCE(AVG(g.rate), 0) as gld_rate
+			FROM stc_purchase_product_adhoc a
+			LEFT JOIN stc_product p ON p.stc_product_id = a.stc_purchase_product_adhoc_productid
+			LEFT JOIN stc_cust_super_requisition_list_items_rec r 
+				ON r.stc_cust_super_requisition_list_items_rec_list_poaid = a.stc_purchase_product_adhoc_id
+				AND YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'
+				" . ($type != 'Y' ? "AND MONTH(r.stc_cust_super_requisition_list_items_rec_date) = '$month'" : "") . "
+			LEFT JOIN gld_challan g 
+				ON g.adhoc_id = a.stc_purchase_product_adhoc_id
+				AND YEAR(g.created_date) = '$year'
+				" . ($type != 'Y' ? "AND MONTH(g.created_date) = '$month'" : "") . "
+			WHERE a.stc_purchase_product_adhoc_cherrypickby = 0
+				AND YEAR(a.stc_purchase_product_adhoc_created_date) = '$year'
+				" . ($type != 'Y' ? "AND MONTH(a.stc_purchase_product_adhoc_created_date) = '$month'" : "") . "
+			GROUP BY a.stc_purchase_product_adhoc_id
+			ORDER BY a.stc_purchase_product_adhoc_itemdesc ASC
+		");
+
+		$totals = ['purchase' => 0, 'sold' => 0, 'profit' => 0];
+
+		foreach ($query as $row) {
+			$totalSoldQty = $row['sold_qty'] + $row['gld_qty'];
+			$purchaseAmount = $row['stc_purchase_product_adhoc_qty'] * $row['stc_purchase_product_adhoc_prate'];
+			$soldAmount = $totalSoldQty * $row['salerate'];
+			$profitAmount = ($row['salerate'] - $row['stc_purchase_product_adhoc_prate']) * $totalSoldQty;
+
+			$totals['purchase'] += $purchaseAmount;
+			$totals['sold'] += $soldAmount;
+			$totals['profit'] += $profitAmount;
 		}
-		$query=mysqli_query($this->stc_dbs, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_purchase_product_adhoc_prate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE `stc_purchase_product_adhoc_cherrypickby`=0 AND $queryFilter ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
-    	$totalcount=0;
-    	$totalpurchaseamount=0;
-    	$totalsoldamount=0;
-    	$totalprofitmargin=0;
-    	$gtotalprofitmargin=0;
-    	foreach($query as $row){
-    	    $qty= $row['stc_purchase_product_adhoc_qty'];
-    	    $query=mysqli_query($this->stc_dbs, "SELECT sum(`stc_cust_super_requisition_list_items_rec_recqty`) as qty FROM `stc_cust_super_requisition_list_items_rec` WHERE stc_cust_super_requisition_list_items_rec_list_poaid='".$row['stc_purchase_product_adhoc_id']."' $queryFilter2");
-    	    $result=mysqli_fetch_array($query);
-    	    $soldqty = $result['qty'];
 
-    	    // $salerate= $row['stc_purchase_product_adhoc_prate'] + ($row['stc_purchase_product_adhoc_prate'] * $row['stc_product_sale_percentage'] / 100);
-			$salerate = $row['stc_purchase_product_adhoc_rate'];
+		$profitClass = $totals['profit'] >= 0 ? 'text-success' : 'text-danger';
+		$profitDisplay = ($totals['profit'] >= 0 ? '+' : '') . number_format($totals['profit'], 2);
 
-    	    $query=mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) as qty, avg(rate) as rate FROM `gld_challan` WHERE adhoc_id='".$row['stc_purchase_product_adhoc_id']."' $queryFilter3 GROUP BY adhoc_id");
-    	    $soldgldqty = 0;
-    	    $soldgldrate = 0;
-    	    if(mysqli_num_rows($query)>0){
-    	        $result=mysqli_fetch_array($query);
-    	        $soldgldqty = $result['qty'];
-    	        $soldgldrate = $result['rate'];
-    	    }
+		$ragnar .= "
+			<tr>
+				<td class='text-right'>" . number_format($totals['purchase'], 2) . "</td>
+				<td class='text-right'>" . number_format($totals['sold'], 2) . "</td>
+				<td class='text-right'><span class='$profitClass'>$profitDisplay</span></td>
+			</tr>
+		";
 
-    	    $soldqty = $soldqty + $soldgldqty;
-    	    $profit_each = $salerate - $row['stc_purchase_product_adhoc_prate'];
-    	    $profit_amount = $profit_each * $soldqty;
-			$amount=$qty * $row['stc_purchase_product_adhoc_prate'];
-    	    $totalpurchaseamount += $amount;
-    	    $totalsoldamount += $soldqty * $salerate;
-    	    $gtotalprofitmargin += $profit_each;
-    	    $totalprofitmargin += $profit_amount;
-    	}
-  		$gtotalprofitmarginindex='';
-  		if($totalprofitmargin>=0){
-  		    $gtotalprofitmarginindex = '<span class="text-success">+'.number_format($totalprofitmargin, 2).'</span>';
-  		} else {
-  		    $gtotalprofitmarginindex = '<span class="text-danger">'.number_format($totalprofitmargin, 2).'</span>';
-		}
-    	$ragnar .= '
-        	<tr>
-        	    <td class="text-right">'.number_format($totalpurchaseamount, 2).'</td>
-        	    <td class="text-right">'.number_format($totalsoldamount, 2).'</td>
-        	    <td class="text-right">'.$gtotalprofitmarginindex.'</td>
-        	</tr>
-    	';
 		return $ragnar;
 	}
 }

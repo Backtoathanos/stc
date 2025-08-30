@@ -126,8 +126,8 @@ include("kattegat/role_check.php");
                                                             <th>Item Code</th>
                                                             <th>Item Name</th>
                                                             <th>Quantity</br>Unit</th>
-                                                            <th>Purchase Rate</br>Sale Rate</br>Rack</th>
-                                                            <th>Condition</th>
+                                                            <th>Purchase Rate</br>Sale Rate</th>
+                                                            <th>Rack</br>Condition</th>
                                                             <th>From (Source/Location)<br>To (Destination/Location)</th>
                                                             <th>Received By</th>
                                                             <th>Remarks</th>
@@ -187,6 +187,8 @@ include("kattegat/role_check.php");
                                                                     class="form-control validate"
                                                                     required
                                                                 />
+                                                            </td>
+                                                            <td>
                                                                 <select 
                                                                     name="rack[]"
                                                                     class="form-control validate"
@@ -202,8 +204,6 @@ include("kattegat/role_check.php");
                                                                         }
                                                                     ?>
                                                                 </select>
-                                                            </td>
-                                                            <td>
                                                                 <select 
                                                                     name="condition[]"
                                                                     class="form-control validate"
@@ -211,7 +211,7 @@ include("kattegat/role_check.php");
                                                                     <option value="NA">Select</option>
                                                                     <option value="Bad">Bad</option>
                                                                     <option value="Broken">Broken</option>
-                                                                    <option value="Good">Good</option>
+                                                                    <option value="Good" selected>Good</option>
                                                                 </select>
                                                             </td>
                                                             <td>
@@ -1412,6 +1412,7 @@ include("kattegat/role_check.php");
             // Get filter values
             var dateFrom = $('.stc-summary-filterdatefrom').val();
             var dateTo = $('.stc-summary-filterdateto').val();
+            var siteName = $('.stc-summary-filtersitename').val();
 
             // Make AJAX request
             $.ajax({
@@ -1420,7 +1421,8 @@ include("kattegat/role_check.php");
               data: {
                 stc_get_customer_ledger: 1,
                 dateFrom: dateFrom,  // Ensure these are defined before use
-                dateTo: dateTo
+                dateTo: dateTo,
+                siteName:siteName
               },
               dataType: 'json',
               success: function (response) {
@@ -2119,6 +2121,7 @@ include("kattegat/role_check.php");
                                         <thead>
                                             <tr>
                                                 <th scope="col" class="text-center">Date From/To</th>
+                                                <th scope="col" class="text-center">Customer</th>
                                                 <th scope="col" class="text-center">Action</th>
                                             </tr>
                                         </thead>
@@ -2132,6 +2135,12 @@ include("kattegat/role_check.php");
                                                     ?>   
                                                     <input type="date" class="form-control stc-summary-filterdatefrom" <?php echo "value='$effectiveDate'";?>>
                                                     <input type="date" class="form-control stc-summary-filterdateto" <?php echo "value='$newDate'";?>>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control stc-summary-filtersitename">
+                                                      <option value="2">GLOBAL AC SYSTEM JSR PVT.LTD</option>
+                                                      <option value="3">SARA ENTERPRISES</option>
+                                                    </select>
                                                 </td>
                                                 <td>
                                                     <a class="btn btn-success stc-summary-filter-find" href="javascript:void(0)">Find</a>
