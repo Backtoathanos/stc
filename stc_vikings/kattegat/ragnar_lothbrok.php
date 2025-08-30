@@ -772,7 +772,7 @@ class sceptor extends tesseract{
 		}
         // Total Purchased
         $purchase_q = mysqli_query($this->stc_dbs, "
-            SELECT SUM(stc_purchase_product_adhoc_qty * stc_purchase_product_adhoc_rate) as purchased
+            SELECT SUM(stc_purchase_product_adhoc_qty * stc_purchase_product_adhoc_prate) as purchased
             FROM stc_purchase_product_adhoc
             $queryFilter
         ");
@@ -780,7 +780,7 @@ class sceptor extends tesseract{
         $total_purchase = $purchase['purchased'] ? floatval($purchase['purchased']) : 0;
         // Total Sold (join to get rate +5%)
         $sold_q = mysqli_query($this->stc_dbs, "
-            SELECT SUM(s.stc_cust_super_requisition_list_items_rec_recqty * (a.stc_purchase_product_adhoc_rate * 1.05)) as sold
+            SELECT SUM(s.stc_cust_super_requisition_list_items_rec_recqty * (a.stc_purchase_product_adhoc_rate)) as sold
             FROM stc_cust_super_requisition_list_items_rec s
             INNER JOIN stc_purchase_product_adhoc a ON s.stc_cust_super_requisition_list_items_rec_list_poaid = a.stc_purchase_product_adhoc_id
             $queryFilter1

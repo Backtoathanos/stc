@@ -126,7 +126,7 @@ include("kattegat/role_check.php");
                                                             <th>Item Code</th>
                                                             <th>Item Name</th>
                                                             <th>Quantity</br>Unit</th>
-                                                            <th>Rate</br>Rack</th>
+                                                            <th>Purchase Rate</br>Sale Rate</br>Rack</th>
                                                             <th>Condition</th>
                                                             <th>From (Source/Location)<br>To (Destination/Location)</th>
                                                             <th>Received By</th>
@@ -174,9 +174,16 @@ include("kattegat/role_check.php");
                                                             </td>
                                                             <td>
                                                                 <input
+                                                                    name="prate[]"
+                                                                    type="number"
+                                                                    placeholder="Purchase Rate"
+                                                                    class="form-control validate"
+                                                                    required
+                                                                />
+                                                                <input
                                                                     name="rate[]"
                                                                     type="number"
-                                                                    placeholder="Rate"
+                                                                    placeholder="Sale Rate"
                                                                     class="form-control validate"
                                                                     required
                                                                 />
@@ -236,11 +243,11 @@ include("kattegat/role_check.php");
                                                                     name="destination[]"
                                                                 >
                                                                     <option value="NA">Select Destination</option>
-                                                                    <option>MANGO 17 NO GODOWN</option>
-                                                                    <option>PARDIH GODOWN</option>
-                                                                    <option>RAMGARH GODOWN</option>
-                                                                    <option>DHATKIDIH GODOWN</option>
-                                                                    <option>Kolkata GODOWN</option>
+                                                                    <option>MANGO LOCATION</option>
+                                                                    <option>PARDIH LOCATION</option>
+                                                                    <option>RAMGARH LOCATION</option>
+                                                                    <option>DHATKIDIH LOCATION</option>
+                                                                    <option>KOLKATA LOCATION</option>
                                                                 </select>
                                                             </td>
                                                             <td>
@@ -361,7 +368,7 @@ include("kattegat/role_check.php");
                                               <th>Rack</th>
                                               <th>Unit</th>
                                               <th>Quantity</th>
-                                              <th>Rate</th>
+                                              <th>Purchase Rate</br>Sale Rate</th>
                                               <th>Stock</th>
                                               <th>Shop</th>
                                               <th>Dispatch Details</th>
@@ -749,6 +756,7 @@ include("kattegat/role_check.php");
                       itemcode: row.find('[name="itemcode[]"]').val(),
                       itemname: row.find('[name="itemname[]"]').val(),
                       quantity: row.find('[name="quantity[]"]').val(),
+                      prate: row.find('[name="prate[]"]').val(),
                       rate: row.find('[name="rate[]"]').val(),
                       unit: row.find('[name="unit[]"]').val(),
                       rack: row.find('[name="rack[]"]').val(),
@@ -976,6 +984,7 @@ include("kattegat/role_check.php");
             $('#cherryQtyToDecrease').val('');
             $('#cherryNewQty').val('');
             $('#cherryUnit').val('');
+            $('#cherrypRate').val('');
             $('#cherryRate').val('');
             $('#cherryPickModal').modal('show');
           });
@@ -988,6 +997,7 @@ include("kattegat/role_check.php");
             const qtyToDecrease = $('#cherryQtyToDecrease').val();
             const newQty = $('#cherryNewQty').val();
             const unit = $('#cherryUnit').val();
+            const prate = $('#cherrypRate').val();
             const rate = $('#cherryRate').val();
             var validated=1;
             $('.alert-box').remove();
@@ -1003,6 +1013,10 @@ include("kattegat/role_check.php");
               validated=0;
               $('#cherryUnit').after('<p class="alert-box alert-danger">Please select unit.</p>');
             }
+            if(prate=='' || prate==0){
+              validated=0;
+              $('#cherrypRate').after('<p class="alert-box alert-danger">Please enter purchase rate.</p>');
+            }
             if(rate=='' || rate==0){
               validated=0;
               $('#cherryRate').after('<p class="alert-box alert-danger">Please enter rate.</p>');
@@ -1017,6 +1031,7 @@ include("kattegat/role_check.php");
                   qtyToDecrease:qtyToDecrease,
                   newQty:newQty,
                   unit:unit,
+                  prate:prate,
                   rate:rate
                 },
                 success : function(response_items){
@@ -1028,6 +1043,7 @@ include("kattegat/role_check.php");
                     $('#cherryQtyToDecrease').val('');
                     $('#cherryNewQty').val('');
                     $('#cherryUnit').val('');
+                    $('#cherrypRate').val('');
                     $('#cherryRate').val('');
                     Pagination.loadData(pagenumber);
                   }else{
@@ -1041,6 +1057,7 @@ include("kattegat/role_check.php");
           });
           
           $('body').delegate('.img-inputbtnshow', 'click', function(e){
+            $(this).parent().find('.img-idprateinput').toggle();
             $(this).parent().find('.img-idrateinput').toggle();
             $(this).parent().find('.img-inputratebtn').toggle();
           });
@@ -1069,16 +1086,40 @@ include("kattegat/role_check.php");
               }
             });  
           }); 
+          $('body').delegate('.img-inputpratebtn', 'click', function(e){
+            var adhoc_id=$(this).attr('id');
+            var rate=$(this).parent().find('.img-idprateinput').val();
+            $.ajax({
+              url     : "kattegat/ragnar_purchase.php",
+              method  : "POST",
+              data    : {
+                stc_po_adhoc_prateupdate:1,
+                adhoc_id:adhoc_id,
+                rate:rate
+              },
+              success : function(response_items){
+                var response=response_items.trim();
+                if(response=="success"){
+                  alert("Purchase rate Updated Successfully.");
+                  Pagination.loadData(pagenumber);
+                }else{
+                  alert("Something went wrong please check and try again.");
+                }
+              }
+            });  
+          });   
           $('body').delegate('.img-inputratebtn', 'click', function(e){
             var adhoc_id=$(this).attr('id');
             var rate=$(this).parent().find('.img-idrateinput').val();
+            var prate=$(this).parent().find('.img-idprateinput').val();
             $.ajax({
               url     : "kattegat/ragnar_purchase.php",
               method  : "POST",
               data    : {
                 stc_po_adhoc_rateupdate:1,
                 adhoc_id:adhoc_id,
-                rate:rate
+                rate:rate,
+                prate:prate
               },
               success : function(response_items){
                 var response=response_items.trim();
@@ -1157,11 +1198,11 @@ include("kattegat/role_check.php");
                     $.each(purchasedadhoc_data, function(index, row) {
                         slno++;
                         var quantity=parseFloat(row.stc_purchase_product_adhoc_qty);
-                        var rate=parseFloat(row.stc_purchase_product_adhoc_rate);
+                        var rate=parseFloat(row.stc_purchase_product_adhoc_prate);
                         var totalamount=parseFloat(rate) * parseFloat(quantity);
                         totalqnty+=parseFloat(row.stc_purchase_product_adhoc_qty);
-                        totalrate+=parseFloat(row.stc_purchase_product_adhoc_rate);
-                        total+=parseFloat(row.stc_purchase_product_adhoc_qty) * parseFloat(row.stc_purchase_product_adhoc_rate);
+                        totalrate+=parseFloat(row.stc_purchase_product_adhoc_prate);
+                        total+=parseFloat(row.stc_purchase_product_adhoc_qty) * parseFloat(row.stc_purchase_product_adhoc_prate);
                         data += `<tr>
                                     <td>${row.stc_purchase_product_adhoc_source}</td>
                                     <td>${row.stc_purchase_product_adhoc_destination}</td>
@@ -2316,7 +2357,15 @@ include("kattegat/role_check.php");
               </div>
               <div class="form-group row">
                 <div class="col-sm-4">
-                  <label style="margin-left : 20px" for="cherryRate">Rate : </label>
+                  <label style="margin-left : 20px" for="cherrypRate">Purchase Rate : </label>
+                </div>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="cherrypRate" name="rate" required>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-4">
+                  <label style="margin-left : 20px" for="cherryRate">Sale Rate : </label>
                 </div>
                 <div class="col-sm-8">
                   <input type="text" class="form-control" id="cherryRate" name="rate" required>

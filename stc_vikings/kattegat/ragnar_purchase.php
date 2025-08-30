@@ -2127,7 +2127,7 @@ class ragnarGRNAdd extends tesseract{
 class ragnarPurchaseAdhoc extends tesseract{
 
 	// save po adhoc trigger
-	public function stc_po_adhoc_save($itemcode, $itemname, $quantity, $rate, $unit, $rack, $condition, $source, $destination, $receivedby, $remarks){	
+	public function stc_po_adhoc_save($itemcode, $itemname, $quantity, $prate, $rate, $unit, $rack, $condition, $source, $destination, $receivedby, $remarks){	
 		$odin='';
 		$date=date("Y-m-d H:i:s");		
 		$lokipo=mysqli_query($this->stc_dbs, "
@@ -2135,6 +2135,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_productid`,
 				`stc_purchase_product_adhoc_itemdesc`,
 				`stc_purchase_product_adhoc_qty`,
+				`stc_purchase_product_adhoc_prate`,
 				`stc_purchase_product_adhoc_rate`,
 				`stc_purchase_product_adhoc_unit`,
 				`stc_purchase_product_adhoc_rackid`,
@@ -2150,6 +2151,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $itemcode)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $itemname)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $quantity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $prate)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $rate)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $unit)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $rack)."',
@@ -2208,6 +2210,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_product_image`,
 				`stc_purchase_product_adhoc_itemdesc`,
 				`stc_purchase_product_adhoc_qty`,
+				`stc_purchase_product_adhoc_prate`,
 				`stc_purchase_product_adhoc_rate`,
 				`stc_purchase_product_adhoc_unit`,
 				`stc_rack_name`,
@@ -2240,6 +2243,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_product_image`,
 				`stc_purchase_product_adhoc_itemdesc`,
 				`stc_purchase_product_adhoc_qty`,
+				`stc_purchase_product_adhoc_prate`,
 				`stc_purchase_product_adhoc_rate`,
 				`stc_purchase_product_adhoc_unit`,
 				`stc_rack_name`,
@@ -2311,14 +2315,15 @@ class ragnarPurchaseAdhoc extends tesseract{
 					}
 				}
 				$stock=$stock-$shop_qty;
-				$rateforpieces=($odinrow['stc_purchase_product_adhoc_rate'] * $odinrow['stc_purchase_product_adhoc_qty'])/$odinrow['stc_purchase_product_adhoc_qty'];
+				$rateforpieces=($odinrow['stc_purchase_product_adhoc_prate'] * $odinrow['stc_purchase_product_adhoc_qty'])/$odinrow['stc_purchase_product_adhoc_qty'];
 				$cherrypick="<a href='javascript:void(0)' class='btn btn-warning cherry-pick-btn' data-toggle='modal' data-target='#cherryPickModal' data-adhoc-id=".$odinrow['stc_purchase_product_adhoc_id']." data-current-qty=".$odinrow['stc_purchase_product_adhoc_qty']." data-rate=".$rateforpieces." data-unit=".$odinrow['stc_purchase_product_adhoc_unit']." title='Cherry Pick'><i class='fa fa-cut'></i></a>
 						";
 				if($stock==0){
 					$cherrypick='';
 				}
 				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
-				$pro_rate='<input type="number" style="display:none" placeholder="Enter rate" class="form-control img-idrateinput"><a href="javascript:void(0)" style="display:none" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
+				$pro_prate='<input type="number" style="display:none" placeholder="Enter purchase rate" class="form-control img-idprateinput" value="'.$odinrow['stc_purchase_product_adhoc_prate'].'"><a href="javascript:void(0)" style="display:none" class="form-control img-inputpratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
+				$pro_rate='<input type="number" style="display:none" placeholder="Enter sale rate" class="form-control img-idrateinput" value="'.$odinrow['stc_purchase_product_adhoc_rate'].'"><a href="javascript:void(0)" style="display:none" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Update</a>';
 				$product_name=$odinrow['stc_sub_cat_name']!="OTHERS"?$odinrow['stc_sub_cat_name']. ' ' .$odinrow['stc_product_name']:$odinrow['stc_product_name'];
 				$statusDropdown='';
 				if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==6){
@@ -2383,7 +2388,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
 						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
-						<td class='text-right' style='width: 125px;'><a href='javascript:void(0)' class='img-inputbtnshow'>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."</a>".$pro_rate."</td>
+						<td class='text-right' style='width: 125px;'><a href='javascript:void(0)' class='img-inputbtnshow'>".number_format($odinrow['stc_purchase_product_adhoc_prate'], 2)."</br>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."</a>".$pro_prate.$pro_rate."</td>
 						<td class='text-right'>".number_format($stock, 2)."</td>
 						<td class='text-center' style='width: 180px;'>
 							".$shop_details."
@@ -2525,7 +2530,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}
 
 	// cherry pick function
-	public function stc_poadhoc_cherrypic($adhoc_id, $qtyToDecrease, $newQty, $unit, $rate) {
+	public function stc_poadhoc_cherrypic($adhoc_id, $qtyToDecrease, $newQty, $unit, $prate, $rate) {
 		// Decrease original quantity
 		$update = mysqli_query($this->stc_dbs, "
 			UPDATE `stc_purchase_product_adhoc` 
@@ -2541,7 +2546,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$insert = mysqli_query($this->stc_dbs, "
 			INSERT INTO stc_purchase_product_adhoc (
 				stc_purchase_product_adhoc_productid, stc_purchase_product_adhoc_itemdesc, 
-				stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, 
+				stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_prate, stc_purchase_product_adhoc_rate, 
 				stc_purchase_product_adhoc_unit, stc_purchase_product_adhoc_rackid, 
 				stc_purchase_product_adhoc_condition, stc_purchase_product_adhoc_source, 
 				stc_purchase_product_adhoc_destination, stc_purchase_product_adhoc_recievedby, 
@@ -2554,6 +2559,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				stc_purchase_product_adhoc_productid, 
 				stc_purchase_product_adhoc_itemdesc, 
 				'".mysqli_real_escape_string($this->stc_dbs, $newQty)."', 
+				'".mysqli_real_escape_string($this->stc_dbs, $prate)."', 
 				'".mysqli_real_escape_string($this->stc_dbs, $rate)."', 
 				'".mysqli_real_escape_string($this->stc_dbs, $unit)."', 
 				stc_purchase_product_adhoc_rackid, 
@@ -2588,10 +2594,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 		return $odin;
 	}
 
-	public function stc_poadhoc_rateupdate($adhoc_id, $rate){
+	public function stc_poadhoc_rateupdate($adhoc_id, $rate, $prate){
 		$odin='';
 		$checkqry=mysqli_query($this->stc_dbs, "
-			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_rate`='".mysqli_real_escape_string($this->stc_dbs, $rate)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_rate`='".mysqli_real_escape_string($this->stc_dbs, $rate)."', `stc_purchase_product_adhoc_prate`='".mysqli_real_escape_string($this->stc_dbs, $prate)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
 		");
 		if($checkqry){
 			$odin='success';
@@ -2647,7 +2653,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 			// purchased adhoc data
 			$challan_data=[]; 
 			
-			$query = "SELECT `stc_purchase_product_adhoc_source`, `stc_purchase_product_adhoc_destination`, `stc_purchase_product_adhoc_recievedby`, `stc_purchase_product_adhoc_qty`, `stc_purchase_product_adhoc_rate`, `stc_purchase_product_adhoc_destination`, `stc_purchase_product_adhoc_recievedby`, `stc_user_name`, `stc_purchase_product_adhoc_created_date` FROM `stc_purchase_product_adhoc` LEFT JOIN `stc_user` ON `stc_purchase_product_adhoc_created_by`=`stc_user_id` WHERE `stc_purchase_product_adhoc_productid`=" . intval($adhoc_id);
+			$query = "SELECT `stc_purchase_product_adhoc_source`, `stc_purchase_product_adhoc_destination`, `stc_purchase_product_adhoc_recievedby`, `stc_purchase_product_adhoc_qty`, `stc_purchase_product_adhoc_prate`, `stc_purchase_product_adhoc_destination`, `stc_purchase_product_adhoc_recievedby`, `stc_user_name`, `stc_purchase_product_adhoc_created_date` FROM `stc_purchase_product_adhoc` LEFT JOIN `stc_user` ON `stc_purchase_product_adhoc_created_by`=`stc_user_id` WHERE `stc_purchase_product_adhoc_productid`=" . intval($adhoc_id);
 			$result = mysqli_query($this->stc_dbs, $query);
 
 
@@ -2954,15 +2960,15 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$rate_percentage = 0;
 
 				$rateQry = mysqli_query($this->stc_dbs, "
-					SELECT stc_purchase_product_adhoc_rate, 
-						ROUND(stc_purchase_product_adhoc_rate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
+					SELECT stc_purchase_product_adhoc_prate, 
+						ROUND(stc_purchase_product_adhoc_prate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
 					FROM stc_purchase_product_adhoc 
 					WHERE stc_purchase_product_adhoc_productid = $product_id
 					ORDER BY stc_purchase_product_adhoc_id DESC LIMIT 1
 				");
 				if ($rateQry && mysqli_num_rows($rateQry)) {
 					$r = mysqli_fetch_assoc($rateQry);
-					$rate_gst = $r['stc_purchase_product_adhoc_rate'];
+					$rate_gst = $r['stc_purchase_product_adhoc_prate'];
 					$rate_percentage = $r['rate_with_margin'];
 				}
 
@@ -3074,15 +3080,15 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$rate_percentage = 0;
 
 				$rateQry = mysqli_query($this->stc_dbs, "
-					SELECT stc_purchase_product_adhoc_rate, 
-						ROUND(stc_purchase_product_adhoc_rate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
+					SELECT stc_purchase_product_adhoc_prate, 
+						ROUND(stc_purchase_product_adhoc_prate * (1 + {$row['stc_product_sale_percentage']} / 100), 2) AS rate_with_margin
 					FROM stc_purchase_product_adhoc 
 					WHERE stc_purchase_product_adhoc_productid = $product_id
 					ORDER BY stc_purchase_product_adhoc_id DESC LIMIT 1
 				");
 				if ($rateQry && mysqli_num_rows($rateQry)) {
 					$r = mysqli_fetch_assoc($rateQry);
-					$rate_gst = $r['stc_purchase_product_adhoc_rate'];
+					$rate_gst = $r['stc_purchase_product_adhoc_prate'];
 					$rate_percentage = $r['rate_with_margin'];
 				}
 
@@ -3891,6 +3897,7 @@ if(isset($_POST['stc_po_adhoc_save'])) {
                 $item['itemcode'], 
                 $item['itemname'], 
                 $item['quantity'], 
+                $item['prate'] ?? '', 
                 $item['rate'], 
                 $item['unit'] ?? '', 
                 $item['rack'], 
@@ -3985,10 +3992,11 @@ if(isset($_POST['stc_po_adhoc_cherrypic'])){
 	$qtyToDecrease=$_POST['qtyToDecrease'];
 	$newQty=$_POST['newQty'];
 	$unit=$_POST['unit'];
+	$prate=$_POST['prate'];
 	$rate=$_POST['rate'];
 	
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_poadhoc_cherrypic($adhoc_id, $qtyToDecrease, $newQty, $unit, $rate);
+	$outbjornestocking=$bjornestocking->stc_poadhoc_cherrypic($adhoc_id, $qtyToDecrease, $newQty, $unit, $prate, $rate);
 	echo $outbjornestocking;
 }
 
@@ -4005,8 +4013,9 @@ if(isset($_POST['stc_po_adhoc_imgupdate'])){
 if(isset($_POST['stc_po_adhoc_rateupdate'])){
 	$adhoc_id=$_POST['adhoc_id'];
 	$rate=$_POST['rate'];
+	$prate=$_POST['prate'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_poadhoc_rateupdate($adhoc_id, $rate);
+	$outbjornestocking=$bjornestocking->stc_poadhoc_rateupdate($adhoc_id, $rate, $prate);
 	echo $outbjornestocking;
 }
 
