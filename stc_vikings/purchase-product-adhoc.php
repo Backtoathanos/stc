@@ -243,11 +243,13 @@ include("kattegat/role_check.php");
                                                                     name="destination[]"
                                                                 >
                                                                     <option value="NA">Select Destination</option>
-                                                                    <option>MANGO LOCATION</option>
-                                                                    <option>PARDIH LOCATION</option>
-                                                                    <option>RAMGARH LOCATION</option>
-                                                                    <option>DHATKIDIH LOCATION</option>
-                                                                    <option>KOLKATA LOCATION</option>
+                                                                    <option>MANGO SHOP NO-1</option>
+                                                                    <option>MANGO 17 NO STORE</option>
+                                                                    <option>PARDIH LOGISTICS CENTER</option>
+                                                                    <option>RAMGARH WAREHOUSE</option>
+                                                                    <option>DHATKIDIH STORE</option>
+                                                                    <option>DHATKIDIH SHOP NO 2</option>
+                                                                    <option>KOLKATA STORE</option>
                                                                 </select>
                                                             </td>
                                                             <td>

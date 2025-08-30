@@ -824,7 +824,7 @@ class sceptor extends tesseract{
 			$queryFilter2="AND YEAR(stc_cust_super_requisition_list_items_rec_date)='$year' AND MONTH(stc_cust_super_requisition_list_items_rec_date)='$month'";
 			$queryFilter3="AND YEAR(created_date)='$year' AND MONTH(created_date)='$month'";
 		}
-		$query=mysqli_query($this->stc_dbs, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE `stc_purchase_product_adhoc_cherrypickby`=0 AND $queryFilter ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
+		$query=mysqli_query($this->stc_dbs, "SELECT stc_purchase_product_adhoc_id, stc_purchase_product_adhoc_itemdesc, stc_purchase_product_adhoc_qty, stc_purchase_product_adhoc_rate, stc_purchase_product_adhoc_prate, stc_product_sale_percentage FROM stc_purchase_product_adhoc LEFT JOIN `stc_product` ON `stc_product_id`=`stc_purchase_product_adhoc_productid` WHERE `stc_purchase_product_adhoc_cherrypickby`=0 AND $queryFilter ORDER BY stc_purchase_product_adhoc_itemdesc ASC");
     	$totalcount=0;
     	$totalpurchaseamount=0;
     	$totalsoldamount=0;
@@ -836,7 +836,8 @@ class sceptor extends tesseract{
     	    $result=mysqli_fetch_array($query);
     	    $soldqty = $result['qty'];
 
-    	    $salerate= $row['stc_purchase_product_adhoc_rate'] + ($row['stc_purchase_product_adhoc_rate'] * $row['stc_product_sale_percentage'] / 100);
+    	    // $salerate= $row['stc_purchase_product_adhoc_prate'] + ($row['stc_purchase_product_adhoc_prate'] * $row['stc_product_sale_percentage'] / 100);
+			$salerate = $row['stc_purchase_product_adhoc_rate'];
 
     	    $query=mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) as qty, avg(rate) as rate FROM `gld_challan` WHERE adhoc_id='".$row['stc_purchase_product_adhoc_id']."' $queryFilter3 GROUP BY adhoc_id");
     	    $soldgldqty = 0;
@@ -848,9 +849,9 @@ class sceptor extends tesseract{
     	    }
 
     	    $soldqty = $soldqty + $soldgldqty;
-    	    $profit_each = $salerate - $row['stc_purchase_product_adhoc_rate'];
+    	    $profit_each = $salerate - $row['stc_purchase_product_adhoc_prate'];
     	    $profit_amount = $profit_each * $soldqty;
-			$amount=$qty * $row['stc_purchase_product_adhoc_rate'];
+			$amount=$qty * $row['stc_purchase_product_adhoc_prate'];
     	    $totalpurchaseamount += $amount;
     	    $totalsoldamount += $soldqty * $salerate;
     	    $gtotalprofitmargin += $profit_each;
