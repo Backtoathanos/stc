@@ -3885,7 +3885,7 @@ if(isset($_POST['stc_po_adhoc_save'])) {
         
         foreach($items as $index => $item) {
             // Validate required fields for each item
-            if(empty($item['itemname']) || empty($item['quantity']) || empty($item['rate'])) {
+            if(empty($item['itemname']) || empty($item['quantity']) || empty($item['prate'])) {
                 $errorMessages[] = "Row ".($index+1).": Missing required fields";
                 continue;
             }
