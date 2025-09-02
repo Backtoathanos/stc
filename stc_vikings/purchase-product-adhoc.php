@@ -165,12 +165,31 @@ include("kattegat/role_check.php");
                                                                     class="form-control validate"
                                                                     required
                                                                 />
-                                                                <input
-                                                                    name="unit[]"
-                                                                    type="text"
-                                                                    placeholder="Unit"
+                                                                <select 
+                                                                    name="unit_type[]"
                                                                     class="form-control validate"
-                                                                />
+                                                                  >
+                                                                    <option>BAG</option>
+                                                                    <option>BOX</option>
+                                                                    <option>BUNDLE</option>
+                                                                    <option>CASE</option>
+                                                                    <option>CuMTR</option>
+                                                                    <option>DRUM</option>
+                                                                    <option>FEET</option>
+                                                                    <option>GM</option>
+                                                                    <option>JAR</option>
+                                                                    <option>KGS</option>
+                                                                    <option>LTR</option>
+                                                                    <option>MTR</option>
+                                                                    <option selected>NOS</option>
+                                                                    <option>PAIR</option>
+                                                                    <option>PKT</option>
+                                                                    <option>ROLL</option>
+                                                                    <option>SET</option>
+                                                                    <option>SQFT</option>
+                                                                    <option>SQMM</option>
+                                                                    <option>SQMT</option>
+                                                                  </select>
                                                             </td>
                                                             <td>
                                                                 <input
@@ -185,6 +204,8 @@ include("kattegat/role_check.php");
                                                                     type="number"
                                                                     placeholder="Sale Rate"
                                                                     class="form-control validate"
+                                                                    value="0"
+                                                                    style="display: none;"
                                                                     required
                                                                 />
                                                             </td>
@@ -252,12 +273,23 @@ include("kattegat/role_check.php");
                                                                 </select>
                                                             </td>
                                                             <td>
-                                                                <input
+                                                                <select 
                                                                     name="receivedby[]"
-                                                                    type="text"
-                                                                    placeholder="Received By"
                                                                     class="form-control validate"
-                                                                />
+                                                                  >
+                                                                    <option>HASIBUL MONDAL</option>
+                                                                    <option>GAUTAM</option>
+                                                                    <option>KASEM</option>
+                                                                    <option>MURTUZA</option>
+                                                                    <option>MANSOOR</option>
+                                                                    <option>MUSHTAK</option>
+                                                                    <option>PAL DA</option>
+                                                                    <option>RAFIQUE</option>
+                                                                    <option>RAVI</option>
+                                                                    <option>RAZA</option>
+                                                                    <option>SUBGODIP</option>
+                                                                    <option>ZUBAIR</option>
+                                                                </select>
                                                             </td>
                                                             <td style="width: 330px;">
                                                                 <textarea
