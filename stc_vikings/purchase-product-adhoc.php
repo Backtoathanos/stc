@@ -242,14 +242,13 @@ include("kattegat/role_check.php");
                                                                     class="custom-select form-control"
                                                                     name="destination[]"
                                                                 >
-                                                                    <option value="NA">Select Destination</option>
+                                                                    <option>DHATKIDIH SHOP NO 2</option>
+                                                                    <option>DHATKIDIH STORE</option>
+                                                                    <option>KOLKATA STORE</option>
+                                                                    <option selected>MANGO 17 NO STORE</option>
                                                                     <option>MANGO SHOP NO-1</option>
-                                                                    <option>MANGO 17 NO STORE</option>
                                                                     <option>PARDIH STORE</option>
                                                                     <option>RAMGARH WAREHOUSE</option>
-                                                                    <option>DHATKIDIH STORE</option>
-                                                                    <option>DHATKIDIH SHOP NO 2</option>
-                                                                    <option>KOLKATA STORE</option>
                                                                 </select>
                                                             </td>
                                                             <td>
