@@ -206,7 +206,6 @@ include("kattegat/role_check.php");
                                                                     class="form-control validate"
                                                                     value="0"
                                                                     style="display: none;"
-                                                                    required
                                                                 />
                                                             </td>
                                                             <td>
