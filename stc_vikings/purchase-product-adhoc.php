@@ -762,7 +762,6 @@ include("kattegat/role_check.php");
           $('#addRow').click(function() {
               var newRow = $('.item-row:first').clone();
               newRow.find('input, textarea').val('');
-              newRow.find('select').prop('selectedIndex', 0);
               $('#itemsTable tbody').append(newRow);
           });
           
@@ -800,7 +799,7 @@ include("kattegat/role_check.php");
                   };
                   
                   // Validate required fields for this row
-                  if(itemData.itemname && itemData.quantity && itemData.rate) {
+                  if(itemData.itemname && itemData.quantity && itemData.prate) {
                       formData.push(itemData);
                   } else if(index === 0) {
                       // Only show error for first row if empty
