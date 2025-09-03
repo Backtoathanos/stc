@@ -286,8 +286,8 @@ include("kattegat/role_check.php");
                                                                     <option>RAFIQUE</option>
                                                                     <option>RAVI</option>
                                                                     <option>RAZA</option>
-                                                                    <option>SUBGODIP</option>
-                                                                    <option>ZUBAIR</option>
+                                                                    <option>SUBHDIP</option>
+                                                                    <option>ZUBER</option>
                                                                 </select>
                                                             </td>
                                                             <td style="width: 330px;">
