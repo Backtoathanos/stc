@@ -166,7 +166,7 @@ include("kattegat/role_check.php");
                                                                     required
                                                                 />
                                                                 <select 
-                                                                    name="unit_type[]"
+                                                                    name="unit[]"
                                                                     class="form-control validate"
                                                                   >
                                                                     <option>BAG</option>
