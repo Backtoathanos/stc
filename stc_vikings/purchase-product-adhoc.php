@@ -329,8 +329,21 @@ include("kattegat/role_check.php");
                                 <div class="row stc-view-product-row">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
-                                      <a class="btn btn-secondary" data-toggle="modal" data-target=".bd-modal-inventoryshow" href="javascript:void(0)">View Inventory</a>
-                                      <a class="btn btn-success" data-toggle="modal" data-target=".bd-modal-ledgershow" href="javascript:void(0)">View Ledger</a>
+                                    </div>
+                                  </div>
+                                  <div class="col-xl-12 col-lg-12 col-md-12">
+                                    <div class="card-border mb-3 card card-body border-success">
+                                      <div class="row mb-3">
+                                        <div class="col-md-4 text-right">
+                                          <a class="btn btn-secondary form-control" data-toggle="modal" data-target=".bd-modal-inventoryshow" href="javascript:void(0)">View Inventory</a>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                          <a class="btn btn-success form-control" data-toggle="modal" data-target=".bd-modal-ledgershow" href="javascript:void(0)">View Ledger</a>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                          <a class="btn btn-danger form-control" data-toggle="modal" data-target=".bd-modal-pendingshow" href="javascript:void(0)">View Pendings</a>
+                                        </div>
+                                      </div>
                                       <form action="" class="stc-view-product-form">
                                           <table class="table table-hover table-bordered">
                                             <thead>
@@ -1674,6 +1687,66 @@ include("kattegat/role_check.php");
               }
               loadInventories(1, search, inv_type);
           });
+          
+          $(document).on('click', '.stc-adhocpendingfilter-find', function () {
+              const datefrom = $('.stc-pending-filterdatefrom').val();
+              const dateto = $('.stc-pending-filterdateto').val();
+              $.ajax({
+                   url: "kattegat/ragnar_order.php", // Replace with your API endpoint
+                  method: 'POST',
+                  data: {
+                      stc_getpendingadhoc: 1,
+                      datefrom: datefrom,
+                      dateto: dateto
+                  },
+                  dataType: 'json',
+                  success: function(response) {
+                      var response=response.data;
+                      var data='';
+                      for(var i=0;i<=response.length-1;i++){
+                        var statusbtn='';
+                        data+='<tr>';
+                        data+='<td>'+(i+1)+'</td>';
+                        data+='<td class="text-center">'+response[i].stc_cust_super_requisition_list_items_rec_date+'</td>';
+                        data+='<td class="text-center">'+response[i].stc_cust_project_title+'</td>';
+                        data+='<td class="text-center">'+response[i].stc_cust_pro_supervisor_fullname+' '+response[i].stc_cust_pro_supervisor_contact+'</td>';
+                        data+='<td><input type="number" class="form-control adhocId-UpdatenumberBox" placeholder="Enter Adhoc ID"><button id="' + response[i].stc_cust_super_requisition_list_items_rec_id + '" class="form-control btn btn-success adhocId-UpdatenumberBoxBtn">Update</button>'+response[i].stc_cust_super_requisition_list_items_rec_list_poaid+'</td>';
+                        data+='<td>'+response[i].stc_cust_super_requisition_list_items_title+'</td>';
+                        data+='<td class="text-center">'+response[i].stc_cust_super_requisition_list_items_unit+'</td>';
+                        data+='<td class="text-right">'+response[i].stc_cust_super_requisition_list_items_rec_recqty+'</td>';
+                        data+='</tr>';
+                      }
+                      $('.stc-call-view-poadhocpending-row').html(data);
+                  }
+              });
+          });
+          $(document).on('click', '.adhocId-UpdatenumberBoxBtn', function () {
+            var repid=$(this).attr('id');
+            var adhoc_id=$(this).parent().find('.adhocId-UpdatenumberBox').val();
+            if(repid>0){
+              $.ajax({
+                url       : "kattegat/ragnar_order.php",
+                method    : 'POST',
+                data      : {
+                  update_adhoc_id_rec:1,
+                  adhoc_id:adhoc_id,
+                  repid:repid
+                },
+                dataType  : 'JSON',
+                success:function(req){
+                  // console.log(req);
+                  if(req=="Success"){
+                    alert("Updated successfully!! Please reload modal to see changes.");
+                    $('.stc-adhocpendingfilter-find').trigger('click');
+                  }else{
+                    alert(req);
+                  }
+                }
+              });
+            }else{
+              alert("Please enter valid quantity.");
+            }
+          });
 
           
         });
@@ -2057,7 +2130,8 @@ include("kattegat/role_check.php");
             </div>
         </div>
     </div>
-</div><div class="modal fade bd-modal-ledgershow" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+</div>
+<div class="modal fade bd-modal-ledgershow" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
@@ -2502,4 +2576,91 @@ include("kattegat/role_check.php");
       </div>
     </div>
   </div>
+</div>
+
+<div class="modal fade bd-modal-pendingshow" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Pendings List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-toggle="tab" href="#detailedLedger">Pending</a>
+                    </li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <!-- Detailed Ledger Tab -->
+                    <div id="detailedLedger" class="tab-pane active">
+                        <div class="row mt-3">
+                            <div class="col-xl-12 col-md-12 col-sm-12">
+                                <div class="card border-success mb-3 card-body">
+                                    <table class="table table-hover table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col" class="text-center">Date From/To</th>
+                                                <th scope="col" class="text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <?php 
+                                                        $date = date("d-m-Y");
+                                                        $newDate = date('Y-m-d', strtotime($date)); 
+                                                        $effectiveDate = date('Y-m-d', strtotime("-1 months", strtotime($date)));
+                                                    ?>   
+                                                    <input type="date" class="form-control stc-pending-filterdatefrom" <?php echo "value='$effectiveDate'";?>>
+                                                    <input type="date" class="form-control stc-pending-filterdateto" <?php echo "value='$newDate'";?>>
+                                                </td>
+                                                <td>
+                                                    <a class="btn btn-success stc-adhocpendingfilter-find" href="javascript:void(0)">Find</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-xl-12 col-md-12 col-sm-12">
+                                <div class="card border-success mb-3 card-body">
+                                    <table class="table table-hover table-bordered stc-purchase-view-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No.</th>
+                                                <th>Date</th>
+                                                <th>Site Name</th>
+                                                <th>Supervisors Name</th>
+                                                <th>Adhoc Id</th>
+                                                <th>Product Name</th>
+                                                <th>Unit</th>
+                                                <th>Quantity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="stc-call-view-poadhocpending-row">
+                                            <tr><td colspan="8">Search</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-xl-6 col-md-6 col-sm-6">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -4232,7 +4232,28 @@ class ragnarCallGLDRequisitions extends tesseract{
 		} else {
 			return ['success' => false, 'message' => 'Failed to update remarks: ' . mysqli_error($this->stc_dbs)];
 		}
-	}	
+	}
+	
+	public function stc_pendingadhoc($datefrom, $dateto){
+		
+		// Update buy_remarks field with timestamp
+		$query = "SELECT A.stc_cust_super_requisition_list_items_rec_id, E.stc_requisition_combiner_req_comb_id, B.stc_cust_super_requisition_list_id, C.stc_cust_project_title, F.stc_cust_pro_supervisor_fullname, F.stc_cust_pro_supervisor_contact, A.stc_cust_super_requisition_list_items_rec_recqty, D.stc_cust_super_requisition_list_items_title, D.stc_cust_super_requisition_list_items_unit, A.stc_cust_super_requisition_list_items_rec_date, A.stc_cust_super_requisition_list_items_rec_list_poaid FROM `stc_cust_super_requisition_list_items_rec` A
+			INNER JOIN `stc_cust_super_requisition_list` B ON A.stc_cust_super_requisition_list_items_rec_list_id=B.stc_cust_super_requisition_list_id
+			INNER JOIN `stc_cust_project` C ON B.stc_cust_super_requisition_list_project_id=C.stc_cust_project_id
+			INNER JOIN `stc_cust_super_requisition_list_items` D ON A.stc_cust_super_requisition_list_items_rec_list_item_id=D.stc_cust_super_requisition_list_id
+			INNER JOIN `stc_requisition_combiner_req` E ON B.stc_cust_super_requisition_list_id=E.stc_requisition_combiner_req_requisition_id
+			INNER JOIN `stc_cust_pro_supervisor` F ON B.stc_cust_super_requisition_list_super_id=F.stc_cust_pro_supervisor_id
+			WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`=0 AND DATE(`stc_cust_super_requisition_list_items_rec_date`) BETWEEN '".$datefrom."' AND '".$dateto."' ORDER BY A.stc_cust_super_requisition_list_items_rec_date DESC";
+		$output=array();
+		if($result=mysqli_query($this->stc_dbs, $query)){
+			while($row=mysqli_fetch_assoc($result)){
+				$row['stc_cust_super_requisition_list_items_rec_recqty']=number_format($row['stc_cust_super_requisition_list_items_rec_recqty'], 2);
+				$row['stc_cust_super_requisition_list_items_rec_date']=date('d-m-Y', strtotime($row['stc_cust_super_requisition_list_items_rec_date']));
+				$output[]=$row;
+			}
+		}
+		return ['success' => true, 'data' => $output, 'message' => 'Remarks updated successfully'];
+	}
 }
 #<------------------------------------------------------------------------------------------------------>
 #<--------------------------------------Object sections of Order class---------------------------------->
@@ -5024,3 +5045,11 @@ if(isset($_POST['stc_update_gld_requisition_remarks'])){
 	echo json_encode($odin_req_out);
 }
 
+if(isset($_POST['stc_getpendingadhoc'])){
+	$datefrom = isset($_POST['datefrom']) ? $_POST['datefrom'] : '';
+	$dateto = isset($_POST['dateto']) ? $_POST['dateto'] : '';
+	
+	$odin_req = new ragnarCallGLDRequisitions();
+	$odin_req_out = $odin_req->stc_pendingadhoc($datefrom, $dateto);
+	echo json_encode($odin_req_out);
+}
