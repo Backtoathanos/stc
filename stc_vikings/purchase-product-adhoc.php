@@ -1703,7 +1703,7 @@ include("kattegat/role_check.php");
                         var statusbtn='';
                         data+='<tr>';
                         data+='<td>'+(i+1)+'</td>';
-                        data+='<td class="text-center">'+response[i].stc_requisition_combiner_req_comb_id+' '+response[i].stc_cust_super_requisition_list_id+'</td>';
+                        data+='<td class="text-center">'+response[i].stc_requisition_combiner_req_comb_id+'<br>'+response[i].stc_cust_super_requisition_list_id+'</td>';
                         data+='<td class="text-center">'+response[i].stc_cust_super_requisition_list_items_rec_date+'</td>';
                         data+='<td class="text-center">'+response[i].stc_cust_project_title+'</td>';
                         data+='<td class="text-center">'+response[i].stc_cust_pro_supervisor_fullname+' '+response[i].stc_cust_pro_supervisor_contact+'</td>';
