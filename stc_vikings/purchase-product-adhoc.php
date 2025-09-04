@@ -329,10 +329,6 @@ include("kattegat/role_check.php");
                                 <div class="row stc-view-product-row">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
-                                    </div>
-                                  </div>
-                                  <div class="col-xl-12 col-lg-12 col-md-12">
-                                    <div class="card-border mb-3 card card-body border-success">
                                       <div class="row mb-3">
                                         <div class="col-md-4 text-right">
                                           <a class="btn btn-secondary form-control" data-toggle="modal" data-target=".bd-modal-inventoryshow" href="javascript:void(0)">View Inventory</a>
@@ -1707,6 +1703,7 @@ include("kattegat/role_check.php");
                         var statusbtn='';
                         data+='<tr>';
                         data+='<td>'+(i+1)+'</td>';
+                        data+='<td class="text-center">'+response[i].stc_requisition_combiner_req_comb_id+' '+response[i].stc_cust_super_requisition_list_id+'</td>';
                         data+='<td class="text-center">'+response[i].stc_cust_super_requisition_list_items_rec_date+'</td>';
                         data+='<td class="text-center">'+response[i].stc_cust_project_title+'</td>';
                         data+='<td class="text-center">'+response[i].stc_cust_pro_supervisor_fullname+' '+response[i].stc_cust_pro_supervisor_contact+'</td>';
@@ -2634,6 +2631,7 @@ include("kattegat/role_check.php");
                                         <thead>
                                             <tr>
                                                 <th>Sl No.</th>
+                                                <th>Combiner Id <br> Requisition Id</th>
                                                 <th>Date</th>
                                                 <th>Site Name</th>
                                                 <th>Supervisors Name</th>
