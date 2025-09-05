@@ -1349,6 +1349,9 @@ class pirates_project extends tesseract{
 		// Initialize filter array
 		$filters = [];
 
+		$users=explode(',', $users);
+		$users=array_map('intval', $users);
+		$users=implode(',', $users);
 		// Add user filter if $users is not empty
 		if (!empty($users)) {
 		$filters[] = "`created_by` IN (" . mysqli_real_escape_string($this->stc_dbs, $users) . ")";
@@ -1374,7 +1377,6 @@ class pirates_project extends tesseract{
 
 		// Complete query with filters and ordering
 		$query = $baseQuery . $filterString . " ORDER BY TIMESTAMP(`created_date`) DESC";
-
 		// Execute query
 		$blackpearl_qry = mysqli_query($this->stc_dbs, $query);
 
