@@ -71,6 +71,11 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 <div class="page-title-heading">
                                     <div>Safety</div>
                                 </div>
+                                <div class="page-title-actions">
+                                    <button type="button" class="btn btn-primary" id="backbtn" onclick="goBack()">
+                                        <i class="fa fa-arrow-left"></i> Back
+                                    </button>
+                                </div>
                             </div>
                         </div>            
                         <ul class="body-tabs body-tabs-layout tabs-animated body-tabs-animated nav">

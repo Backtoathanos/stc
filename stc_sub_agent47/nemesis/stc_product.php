@@ -515,6 +515,7 @@ class prime extends tesseract{
 		$blackpearl=[];
 		if(mysqli_num_rows($blackpearl_qry)>0){
 			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$blackpearl_row['stc_agent_sub_category'] = $_SESSION['stc_agent_sub_category'];
 				$blackpearl[] = $blackpearl_row;
 			}
 		}
@@ -581,6 +582,100 @@ class prime extends tesseract{
 		}
 		return $blackpearl;
 	}
+
+	public function stc_get_equipment_log_ids($id) {
+		$blackpearl = array();		
+		$date = date("Y-m-d");
+
+		// Escape input
+		$id_safe = mysqli_real_escape_string($this->stc_dbs, $id);
+
+		// Check if records already exist for today
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "SELECT EDL.*, ED.unit_no FROM `equipment_details_log` EDL INNER JOIN `equipment_details` ED ON EDL.`equipment_details_id`=ED.`id` WHERE EDL.`equipment_details_id` = '$id_safe' AND `status`=2 ORDER BY EDL.`id` DESC LIMIT 1");
+
+		if (mysqli_num_rows($blackpearl_qry) > 0) {
+			// Fetch rows
+			while ($row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$row['date'] = date('Y-m-d', strtotime($row['created_date']));
+				$row['time'] = date('h:i', strtotime($row['created_date']));
+				$query=mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details_log_comp` WHERE `equipment_details_log_id`=".$row['id']);
+				$compressor_reading_array=array();
+				if($query && mysqli_num_rows($query)>0){
+					foreach($query as $queryrow){
+						$compressor_reading_array[]=$queryrow;
+					}
+				}
+				$row['compressor_reading'] = $compressor_reading_array ? $compressor_reading_array : 'NA';
+				$blackpearl[] = $row;
+			}
+		} else {
+			$date = date("Y-m-d h:i A");
+			// Insert a new record if none exist
+			$insert_qry = mysqli_query( $this->stc_dbs, "INSERT INTO `equipment_details_log` (`equipment_details_id`, `status`, `created_date`, `created_by`) VALUES ('$id_safe', '2', '$date', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."')" );
+			$date = date("Y-m-d");
+
+			if ($insert_qry) {
+				// Fetch the newly inserted row(s)
+				$new_qry = mysqli_query( $this->stc_dbs, "SELECT EDL.*, ED.unit_no FROM `equipment_details_log` EDL INNER JOIN `equipment_details` ED ON EDL.`equipment_details_id`=ED.`id` WHERE EDL.`equipment_details_id` = '$id_safe' AND status=2 ORDER BY EDL.`id` DESC LIMIT 1" );
+
+				while ($row = mysqli_fetch_assoc($new_qry)) {
+					$row['date'] = date('Y-m-d', strtotime($row['created_date']));
+					$row['time'] = date('h:i', strtotime($row['created_date']));
+					$query=mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details_log_comp` WHERE `equipment_details_log_id`=".$row['id']);
+					$compressor_reading_array=array();
+					if($query && mysqli_num_rows($query)>0){
+						foreach($query as $queryrow){
+							$compressor_reading_array[]=$queryrow;
+						}
+					}
+					$row['compressor_reading'] = $compressor_reading_array ? $compressor_reading_array : 'NA';
+					$blackpearl[] = $row;
+				}
+			}
+		}
+
+		return $blackpearl;
+	}
+
+	public function stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load){
+		if(empty($_SESSION['stc_agent_sub_id'])){
+			return 'reload';
+		}
+		if($id>0){
+			$query=mysqli_query($this->stc_dbs, "UPDATE `equipment_details_log_comp` SET `suction_pr_psig`='".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', `disc_pr`='".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', `disc_temp_degC`='".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', `dsh`='".mysqli_real_escape_string($this->stc_dbs, $dsh)."', `oil_level`='".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', `comp_load`='".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', `updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', `updated_date`='".date("Y-m-d H:i:s")."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+		}else{
+			$query=mysqli_query($this->stc_dbs, "INSERT INTO `equipment_details_log_comp` (`equipment_details_log_id`, `suction_pr_psig`, `disc_pr`, `disc_temp_degC`, `dsh`, `oil_level`, `comp_load`, `created_by`, `created_date`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $ed_log_id)."', '".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', '".mysqli_real_escape_string($this->stc_dbs, $dsh)."', '".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', '".date("Y-m-d H:i:s")."')");
+		}
+		
+		return "yes";
+	}
+
+	public function stc_update_equipment_log($id, $label, $value){
+		if (empty($_SESSION['stc_agent_sub_id'])) {
+			return 'reload';
+		}
+
+		// Validate the label to prevent SQL injection
+		$allowed_labels = ['voltage', 'chw_inlet_temp', 'chw_outlet_temp', 'chw_inlet_pr', 'chw_outlet_pr', 'cow_inlet_temp', 'cow_outlet_temp', 'cow_inlet_pr', 'cow_outlet_pr'];
+		if (!in_array($label, $allowed_labels)) {
+			return 'invalid_label';
+		}
+
+		$query = mysqli_query($this->stc_dbs, "UPDATE `equipment_details_log` SET `$label`='" . mysqli_real_escape_string($this->stc_dbs, $value) . "', `updated_by`='" . mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id']) . "', `updated_date`='" . date("Y-m-d H:i:s") . "' WHERE `id`='" . mysqli_real_escape_string($this->stc_dbs, $id) . "'");
+
+		return $query ? 'yes' : 'no';
+	}
+
+	public function stc_update_ed_log_status($id){
+		if (empty($_SESSION['stc_agent_sub_id'])) {
+			return 'reload';
+		}
+
+		$query = mysqli_query($this->stc_dbs, "UPDATE `equipment_details_log` SET `status`=1 WHERE `id`='" . mysqli_real_escape_string($this->stc_dbs, $id) . "'");
+
+		return $query ? 'yes' : 'no';
+	}
+
 }
 
 // search product
@@ -754,4 +849,42 @@ if(isset($_POST['delete_equipmentdetails'])){
 	$opmetabots=$metabots->stc_delete_equipmentdetails($id);
 	echo json_encode($opmetabots);
 }
+
+if(isset($_POST['get_equipment_log_changes'])) {
+	$id = $_POST['equipment_id'];
+	$metabots = new prime();
+	$opmetabots = $metabots->stc_get_equipment_log_ids($id);
+	echo json_encode($opmetabots);
+}
+
+if(isset($_POST['stc_ed_log_comp_reading_save'])) {
+	$ed_log_id = $_POST['ed_log_id'];
+	$id = $_POST['eq_comp_reading_id'];
+	$suction_pr_psig = $_POST['suction_pr_psig'];
+	$disc_pr = $_POST['disc_pr'];
+	$disc_temp_degC = $_POST['disc_temp_degC'];
+	$dsh = $_POST['dsh'];
+	$oil_level = $_POST['oil_level'];
+	$comp_load = $_POST['comp_load'];
+	$metabots = new prime();
+	$opmetabots = $metabots->stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load);
+	echo json_encode($opmetabots);
+}
+
+if(isset($_POST['update_equipementdetails'])) {
+	$id = $_POST['id'];
+	$label = $_POST['label'];
+	$value = $_POST['value'];
+	$metabots = new prime();
+	$opmetabots = $metabots->stc_update_equipment_log($id, $label, $value);
+	echo json_encode($opmetabots);
+}
+
+if(isset($_POST['stc_ed_log_status_update'])) {
+	$id = $_POST['id'];
+	$metabots = new prime();
+	$opmetabots = $metabots->stc_update_ed_log_status($id);
+	echo json_encode($opmetabots);
+}
+
 ?>
