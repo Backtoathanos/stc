@@ -505,7 +505,7 @@ class prime extends tesseract{
 
 	// show equipmentdetails 
 	public function stc_equipement_details_get($search){
-		$filter=" AND (`model_no` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `capacity` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_cust_pro_supervisor_fullname` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_status_down_list_department_dept` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."')";
+		$filter=" AND (`equipment_name` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `equipment_type` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `area` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `sub_location` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_status_down_list_department_dept` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."')";
 		$search=$search==''?'':$filter;
 	
 		// Check for duplicate unique ID

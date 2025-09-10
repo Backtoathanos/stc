@@ -148,7 +148,7 @@ else {
             
             $('body').delegate('#itt-toolssearchInput', 'keyup', function(e){
                 var search=$(this).val();
-                if(search.length>3){
+                if(search.length>3 || search.length==0){
                     call_equipementdetails(search);
                 }
             });
@@ -172,8 +172,30 @@ else {
                         var slno=0;
                         for (var i = 0; i < response.length; i++) {
                             slno++;
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center"><a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
+                            var log_button = '';
+                            if(response[i].log_status == 'yes') {
+                                log_buttons = '<a href="#" class="btn btn-primary ed-logequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
+                            }
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + log_buttons + '<a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
                         }
+
+                        $('body').delegate('.ed-logequipment', 'click', function(e){
+                            var id = $(this).attr('id');
+                            $('.ed-logequipmentdetails-show').html('Loading...');
+                            var logData='<tr><td colspan="4" class="text-center">No log entries found.</td></tr>';
+                            for (var j = 0; j < response.length; j++) {
+                                if(response[j].id == id) {
+                                    logData='';
+                                    var response2 = response[j].log;
+                                    console.log(response2);
+                                    for(var k=0; k<response2.length; k++) {
+                                        logData += '<tr><td>' + response2[k].date + '</td><td>' + response2[k].time + '</td><td>' + response[j].unit_no + '</td><td>' + response2[k].voltage + '</td></tr>';
+                                    }
+                                    break;
+                                }
+                            }
+                            $('.ed-logequipmentdetails-show').html(logData);
+                        });
                     } else {
                         data="<td>No data found.</td>";
                     }
@@ -212,17 +234,17 @@ else {
             // to edit modal show
             $('body').delegate('.ed-editequipment', 'click', function(e){
                 var id=$(this).attr('id');
-                var equipmenttype=$(this).closest('tr').find('td:eq(4)').html();
+                var equipmenttype = $(this).closest('tr').find('td:eq(5)').html();
                 $('.hide-col').hide();
-                if(equipmenttype=="Air Handling Unit" || equipmenttype=="VAM"){$('.AirHandlingUnit').show();}
-                if(equipmenttype=="Chilled Water Pump" || equipmenttype=="Chiller Unit"){$('.ChilledWaterPump').show();}
-                if(equipmenttype=="Condenser Water Pump"){$('.CondenserWaterPump').show();}
-                if(equipmenttype=="Cooling Tower"){$('.CoolingTower').show();}
-                if(equipmenttype=="Drinking Water Unit"){$('.drinkingWaterUnit').show();}
-                if(equipmenttype=="Package Air Conditioning" || equipmenttype=="VRF" || equipmenttype=="FCU" || equipmenttype=="Split AC" || equipmenttype=="Window AC" || equipmenttype=="Ductable Unit" ){$('.PackageAirConditioning').show();}
-                if(equipmenttype=="Primary Drinking Water pump"){$('.PrimaryDrinkingWaterPump').show();}
-                if(equipmenttype=="Secondary Drinking Water pump"){$('.SecondaryDrinkingWaterPump').show();}
-                if(equipmenttype=="Unit Input"){$('.unitInputs').show();}
+                if (equipmenttype == "AIR HANDLING UNIT" || equipmenttype == "VAM") { $('.AirHandlingUnit').show(); }
+                if (equipmenttype == "CHILLER WATER PUMP" || equipmenttype == "CHILLER WATER PUMP") { $('.ChilledWaterPump').show(); }
+                if (equipmenttype == "CONDENSER WATER PUMP" || equipmenttype == "Package Water Cool" || equipmenttype == "DX Plant") { $('.CondenserWaterPump').show(); }
+                if (equipmenttype == "COOLING TOWER") { $('.CoolingTower').show(); }
+                if (equipmenttype == "D/W CHILLER UNIT") { $('.drinkingWaterUnit').show(); }
+                if (equipmenttype == "PACKAGE UNIT" || equipmenttype == "VRF" || equipmenttype == "FCU" || equipmenttype == "Split AC" || equipmenttype == "Window AC" || equipmenttype == "Ductable Unit") { $('.PackageAirConditioning').show(); }
+                if (equipmenttype == "PRIMARY D/W PUMP") { $('.PrimaryDrinkingWaterPump').show(); }
+                if (equipmenttype == "SECONDARY D/W PUMP") { $('.SecondaryDrinkingWaterPump').show(); }
+                if (equipmenttype == "CHILLER UNIT") { $('.unitInputs').show(); }
                 $('.ed-equipment-id').remove();
                 $('#capacity').before('<input type="hidden" class="ed-equipment-id" value="' + id + '">');
                 $.ajax({
@@ -235,7 +257,8 @@ else {
                     dataType    : "JSON",
                     success     : function(response){
                         $('#capacity').val(response[0].capacity);
-                        $.each(fields, function(index, field) {$('#' + field).val(response[0][field]);});
+
+                        $.each(fields, function (index, field) { $('#' + field).val(response[0][field]); });
                     }
                 });
             });
@@ -259,31 +282,42 @@ else {
             }
 
             get_fields(fields, labels);
-            function get_fields(fields, labels){
-                var unitInputs = ['make_name','compressor_qty','each_of_capacity','max_load','min_load','inlet_temp','outlet_temp','delta_t','current_rating_max','min_fuse_rating','max_fuse_rating','inlet_pressure','outlet_pressure','delta_p'];
-                var drinkingWaterUnit = ['make_name', 'compressor_qty', 'each_of_capacity', 'max_load', 'min_load', 'equipment_serial_no', 'refrigerant_type', 'control', 'current_rating_max'];
-                var CoolingTower = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'header_size', 'fan_blade_size', 'fan_blade_qty', 'equipment_serial_no', 'coupling_type'];
-                var CondenserWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'motor_make_name'];
-                var ChilledWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'motor_make_name'];
-                var SecondaryDrinkingWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
-                var PrimaryDrinkingWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
-                var AirHandlingUnit = ['ahu_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'ahu_filter_type', 'ahu_v_belt_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'ahu_filter_size', 'ahu_filter_qty', 'ahu_v_belt_qty'];
-                var PackageAirConditioning = ['make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'filter_type', 'v_belt_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'filter_size', 'filter_qty', 'v_belt_qty'];
+            function get_fields(fields, labels) {
+                // var unitInputs = ['make_name','compressor_qty','each_of_capacity','max_load','min_load','inlet_temp','outlet_temp','delta_t','current_rating_max','min_fuse_rating','max_fuse_rating','inlet_pressure','outlet_pressure','delta_p'];
+                // var drinkingWaterUnit = ['make_name', 'compressor_qty', 'each_of_capacity', 'max_load', 'min_load', 'equipment_serial_no', 'refrigerant_type', 'control', 'current_rating_max'];
+                // var CoolingTower = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'header_size', 'fan_blade_size', 'fan_blade_qty', 'equipment_serial_no', 'coupling_type'];
+                // var CondenserWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'motor_make_name'];
+                // var ChilledWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'motor_make_name'];
+                // var SecondaryDrinkingWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
+                // var PrimaryDrinkingWaterPump = ['pump_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
+                // var AirHandlingUnit = ['ahu_make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'ahu_filter_type', 'ahu_v_belt_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'ahu_filter_size', 'ahu_filter_qty', 'ahu_v_belt_qty'];
+                // var PackageAirConditioning = ['make_name', 'motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'filter_type', 'v_belt_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'filter_size', 'filter_qty', 'v_belt_qty'];
+
+                var AirHandlingUnit = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'ahu_filter_type', 'ahu_make_name', 'ahu_v_belt_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'ahu_filter_size', 'ahu_filter_qty', 'ahu_v_belt_qty'];
+                var ChilledWaterPump = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'pump_make_name', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
+                var CondenserWaterPump = [...ChilledWaterPump]; // same structure
+                var CoolingTower = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'header_size', 'fan_blade_size', 'fan_blade_qty', 'equipment_serial_no', 'bearing_size', 'pulley_size', 'v_belt_size', 'make_name', 'coupling_size', 'coupling_type'];
+                var PackageAirConditioning = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'filter_type', 'make_name', 'v_belt_size', 'compressor_qty', 'each_of_capacity', 'equipment_serial_no', 'motor_bearing_size', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'filter_size', 'filter_qty', 'v_belt_qty', 'refrigerant_type', 'control'];
+                var PrimaryDrinkingWaterPump = ['motor_voltage_rating', 'motor_current_rating', 'motor_capacity', 'motor_rpm', 'tyre_size', 'pump_make_name', 'equipment_serial_no', 'bearing_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'motor_make_name'];
+                var SecondaryDrinkingWaterPump = [...PrimaryDrinkingWaterPump]; // same structure
+                var drinkingWaterUnit = ['compressor_qty', 'each_of_capacity', 'max_load', 'min_load', 'make_name', 'equipment_serial_no', 'refrigerant_type', 'control', 'current_rating_max', 'min_load', 'max_fuse_rating'];
+                var unitInputs = ['compressor_qty', 'each_of_capacity', 'max_load', 'min_load', 'make_name', 'inlet_temp', 'outlet_temp', 'delta_t', 'equipment_serial_no', 'refrigerant_type', 'control', 'current_rating_max', 'min', 'max_fuse_rating', 'inlet_pressure', 'outlet_pressure', 'delta_p'];
+
 
 
                 var data = '';
-                $.each(fields, function(index, field) {
-                    var classname="";
-                    $.each(unitInputs, function(index1, field1) {if(labels[field]==labels[field1]){classname+=' unitInputs';}});
-                    $.each(drinkingWaterUnit, function(index1, field1) {if(labels[field]==labels[field1]){classname+=' drinkingWaterUnit';}});
-                    $.each(CoolingTower, function(index1, field1) {if(labels[field]==labels[field1]){classname+=' CoolingTower';}});
-                    $.each(CondenserWaterPump, function(index1, field1) {if(labels[field]==labels[field1]){classname+=' CondenserWaterPump';}});
-                    $.each(ChilledWaterPump, function(index1, field1) {if(labels[field]==labels[field1]){classname+=' ChilledWaterPump';}});
-                    $.each(SecondaryDrinkingWaterPump, function(index1, field1) {if(labels[field]==labels[field1]){classname+=' SecondaryDrinkingWaterPump';}});
-                    $.each(PrimaryDrinkingWaterPump, function(index1, field1) {if(labels[field]==labels[field1]){classname+=' PrimaryDrinkingWaterPump';}});
-                    $.each(AirHandlingUnit, function(index1, field1) {if(labels[field]==labels[field1]){classname+=' AirHandlingUnit';}});
-                    $.each(PackageAirConditioning, function(index1, field1) {if(labels[field]==labels[field1]){classname+=' PackageAirConditioning';}});
-                    data += '<div class="col-md-4 col-sm-12 hide-col' + classname + '"><h5>' + labels[field] + '</h5><br><div class="card mb-3 widget-content"><input type="text" class="form-control eq-edit-textbox" label="' + field + '" id="' + field + '" disabled></div></div>';
+                $.each(fields, function (index, field) {
+                    var classname = "";
+                    $.each(unitInputs, function (index1, field1) { if (labels[field] == labels[field1]) { classname += ' unitInputs'; } });
+                    $.each(drinkingWaterUnit, function (index1, field1) { if (labels[field] == labels[field1]) { classname += ' drinkingWaterUnit'; } });
+                    $.each(CoolingTower, function (index1, field1) { if (labels[field] == labels[field1]) { classname += ' CoolingTower'; } });
+                    $.each(CondenserWaterPump, function (index1, field1) { if (labels[field] == labels[field1]) { classname += ' CondenserWaterPump'; } });
+                    $.each(ChilledWaterPump, function (index1, field1) { if (labels[field] == labels[field1]) { classname += ' ChilledWaterPump'; } });
+                    $.each(SecondaryDrinkingWaterPump, function (index1, field1) { if (labels[field] == labels[field1]) { classname += ' SecondaryDrinkingWaterPump'; } });
+                    $.each(PrimaryDrinkingWaterPump, function (index1, field1) { if (labels[field] == labels[field1]) { classname += ' PrimaryDrinkingWaterPump'; } });
+                    $.each(AirHandlingUnit, function (index1, field1) { if (labels[field] == labels[field1]) { classname += ' AirHandlingUnit'; } });
+                    $.each(PackageAirConditioning, function (index1, field1) { if (labels[field] == labels[field1]) { classname += ' PackageAirConditioning'; } });
+                    data += '<div class="col-md-4 col-sm-12 hide-col' + classname + '"><h5>' + labels[field] + '</h5><br><div class="card mb-3 widget-content"><input type="text" class="form-control eq-edit-textbox" label="' + field + '" id="' + field + '" placeholder="Enter ' + labels[field] + '"></div></div>';
                 });
                 $('#capacity').closest('.col-md-6').after(data);
             }
@@ -410,6 +444,49 @@ else {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-logequipmentdetails-modal-lg " tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Equipment Details Log Sheet</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="container mt-5">
+                    <div class="card shadow-lg border-0 rounded-3">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="mb-0">Equipment Details Log Sheet</h5>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center" scope="col">DATE</th>
+                                            <th class="text-center" scope="col">TIME</th>
+                                            <th class="text-center" scope="col">UNIT NO</th>
+                                            <th class="text-center" scope="col">VOLTAGE</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="ed-logequipmentdetails-show">
+                                        <!-- Log entries will be dynamically inserted here -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

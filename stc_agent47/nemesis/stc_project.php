@@ -1344,7 +1344,7 @@ class pirates_project extends tesseract{
 			}
 		}
 		// Initialize the base query
-		$baseQuery = "SELECT `id`, `area`, `sub_location`, `equipment_type`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `model_no`, `capacity`, `equipment_name`, `equipment_no`, `stc_cust_pro_supervisor_fullname`, `created_date` FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id` = `equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id` = `equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by` = `stc_cust_pro_supervisor_id`";
+		$baseQuery = "SELECT `id`, `area`, `sub_location`, `equipment_type`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `unit_no`, `model_no`, `capacity`, `equipment_name`, `equipment_no`, `stc_cust_pro_supervisor_fullname`, `created_date` FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id` = `equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id` = `equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by` = `stc_cust_pro_supervisor_id`";
 
 		// Initialize filter array
 		$filters = [];
@@ -1383,6 +1383,18 @@ class pirates_project extends tesseract{
 		$blackpearl=[];
 		if(mysqli_num_rows($blackpearl_qry)>0){
 			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$query=mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details_log` WHERE `equipment_details_id`='".$blackpearl_row['id']."'");
+				$blackpearl_row['log_status']='no';
+				if(mysqli_num_rows($query) > 0){
+					$blackpearl_row['log_status'] = 'yes';
+					$blackpearl_row['log'] = [];
+
+					while($row = mysqli_fetch_assoc($query)){
+						$row['date'] = date('d-m-Y', strtotime($row['created_date']));
+						$row['time'] = date('h:i A', strtotime($row['created_date']));
+						$blackpearl_row['log'][] = $row;  // push modified row
+					}
+				}
 				$blackpearl[] = $blackpearl_row;
 			}
 		}

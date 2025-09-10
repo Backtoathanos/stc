@@ -201,7 +201,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 var edit_buttons = '<a href="#" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a>';
                                 var log_buttons = '';
                                 var delete_buttons = '<a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a>';
-                                if (category == "Operator") {
+                                if (category == "Operator" || category == "Service Group") {
                                     edit_buttons = '';
                                     log_buttons = '<a href="#" class="btn btn-primary ed-logequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
                                     delete_buttons = '';
