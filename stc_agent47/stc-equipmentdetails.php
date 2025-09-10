@@ -174,9 +174,9 @@ else {
                             slno++;
                             var log_button = '';
                             if(response[i].log_status == 'yes') {
-                                log_buttons = '<a href="#" class="btn btn-primary ed-logequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
+                                log_button = '<a href="#" class="btn btn-primary ed-logequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
                             }
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + log_buttons + '<a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + log_button + '<a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
                         }
 
                         $('body').delegate('.ed-logequipment', 'click', function(e){
