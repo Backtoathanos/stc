@@ -183,18 +183,47 @@ else {
                             var id = $(this).attr('id');
                             $('.ed-logequipmentdetails-show').html('Loading...');
                             var logData='<tr><td colspan="4" class="text-center">No log entries found.</td></tr>';
+                            var comp_reading_headerCount=0;
                             for (var j = 0; j < response.length; j++) {
                                 if(response[j].id == id) {
                                     logData='';
                                     var response2 = response[j].log;
-                                    console.log(response2);
                                     for(var k=0; k<response2.length; k++) {
-                                        logData += '<tr><td>' + response2[k].date + '</td><td>' + response2[k].time + '</td><td>' + response[j].unit_no + '</td><td>' + response2[k].voltage + '</td></tr>';
+                                        var comp_reading='';
+                                        var comp_reading_array=response2[k].log_comp_reading;
+                                        comp_reading_headerCount=comp_reading_array.length;
+                                        if(comp_reading_array.length>0){
+                                            
+                                            for(var cr=0;cr<comp_reading_array.length;cr++){
+                                                comp_reading+='<td>'+comp_reading_array[cr].suction_pr_psig+'</td>';
+                                                comp_reading+='<td>'+comp_reading_array[cr].disc_pr+'</td>';
+                                                comp_reading+='<td>'+comp_reading_array[cr].disc_temp_degC+'</td>';
+                                                comp_reading+='<td>'+comp_reading_array[cr].dsh+'</td>';
+                                                comp_reading+='<td>'+comp_reading_array[cr].oil_level+'</td>';
+                                                comp_reading+='<td>'+comp_reading_array[cr].comp_load+'</td>';
+                                                // comp_reading+='<td>'+comp_reading_array[cr].parameter+'</td>';
+                                            }
+                                        }
+                                        var comp_reading_body=comp_reading_array.length>0 ? '' : 'comp_reading_body';
+                                        logData += '<tr><td class="text-center">' + response2[k].date + '</td><td class="text-center">' + response2[k].time + '</td><td>' + response[j].unit_no + '</td><td class="text-right">' + response2[k].voltage + '</td>' + comp_reading + '<td class="text-right '+comp_reading_body+'">' + response2[k].chw_inlet_temp + '</td><td class="text-right">' + response2[k].chw_outlet_temp + '</td><td class="text-right">' + response2[k].chw_inlet_pr + '</td><td class="text-right">' + response2[k].chw_outlet_pr + '</td><td class="text-right">' + response2[k].cow_inlet_temp + '</td><td class="text-right">' + response2[k].cow_outlet_temp + '</td><td class="text-right">' + response2[k].cow_inlet_pr + '</td><td class="text-right">' + response2[k].cow_outlet_pr + '</td></tr>';
                                     }
                                     break;
                                 }
                             }
                             $('.ed-logequipmentdetails-show').html(logData);
+                            if(comp_reading_headerCount>0){
+                                var comp_reading_header='<th class="regenerate">SUCTION PR. PSIG</th><th class="regenerate">DISC.PR.</th><th class="regenerate">DISC TEM./°C</th><th class="regenerate">DSH</th><th class="regenerate">OIL LEVEL</th><th class="regenerate">COMP. LOAD</th>';
+                                var comp_reading_body='<td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td>';
+                                var counter=0;
+                                for(var h=0;h<comp_reading_headerCount;h++){
+                                    counter++;
+                                    console.log(comp_reading_headerCount);
+                                    $('.regenerate').remove();
+                                    $('.comp_header_row').before('<th class="text-center regenerate" colspan="6">COMP#' + counter + ' READING </th>');
+                                    $('.comp_reading_header').before(comp_reading_header);
+                                    $('.comp_reading_body').before(comp_reading_body);
+                                }
+                            }
                         });
                     } else {
                         data="<td>No data found.</td>";
@@ -477,10 +506,23 @@ else {
                                 <table class="table table-bordered">
                                     <thead>
                                         <tr>
-                                            <th class="text-center" scope="col">DATE</th>
-                                            <th class="text-center" scope="col">TIME</th>
-                                            <th class="text-center" scope="col">UNIT NO</th>
-                                            <th class="text-center" scope="col">VOLTAGE</th>
+                                            <th class="text-center" rowspan="2">DATE</th>
+                                            <th class="text-center" rowspan="2">TIME</th>
+                                            <th class="text-center" rowspan="2">UNIT NO</th>
+                                            <th class="text-center" rowspan="2">VOLTAGE</th>
+                                            <th class="text-center comp_header_row" colspan="4">CHILLER WATER</th>
+                                            <th class="text-center" colspan="4">CONDENSER WATER</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-center comp_reading_header">INLET TEMP</th>
+                                            <th class="text-center">OUTLET TEMP</th>
+                                            <th class="text-center">INLET PR</th>
+                                            <th class="text-center">OUTLET PR</th>
+
+                                            <th class="text-center">INLET TEMP</th>
+                                            <th class="text-center">OUTLET TEMP</th>
+                                            <th class="text-center">INLET PR</th>
+                                            <th class="text-center">OUTLET PR</th>
                                         </tr>
                                     </thead>
                                     <tbody class="ed-logequipmentdetails-show">

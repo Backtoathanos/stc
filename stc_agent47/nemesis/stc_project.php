@@ -1392,6 +1392,13 @@ class pirates_project extends tesseract{
 					while($row = mysqli_fetch_assoc($query)){
 						$row['date'] = date('d-m-Y', strtotime($row['created_date']));
 						$row['time'] = date('h:i A', strtotime($row['created_date']));
+						$query1=mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details_log_comp` WHERE `equipment_details_log_id`='".$row['id']."'");
+						$row['log_comp_reading'] = [];
+						if(mysqli_num_rows($query1) > 0){
+							while($row1 = mysqli_fetch_assoc($query1)){
+								$row['log_comp_reading'][] = $row1;
+							}
+						}
 						$blackpearl_row['log'][] = $row;  // push modified row
 					}
 				}
