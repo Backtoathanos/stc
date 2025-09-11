@@ -1421,6 +1421,134 @@ class pirates_project extends tesseract{
 		}
 		return $blackpearl;
 	}
+
+    // fetch and render equipment logs
+	public function stc_get_equipmentdetails_logs($id) {
+		$id = intval($id);
+
+		$query = mysqli_query(
+			$this->stc_dbs,
+			"SELECT EDL.*, ED.unit_no 
+			FROM equipment_details_log EDL 
+			INNER JOIN equipment_details ED 
+				ON EDL.equipment_details_id=ED.id 
+			WHERE EDL.equipment_details_id='$id'"
+		);
+
+		if (mysqli_num_rows($query) == 0) {
+			return '<p class="text-center">No log entries found.</p>';
+		}
+
+		$rowsHtml   = '';
+		$maxCompCnt = 0;
+		$dataRows   = [];
+
+		while ($row = mysqli_fetch_assoc($query)) {
+			$qComp = mysqli_query(
+				$this->stc_dbs,
+				"SELECT * FROM equipment_details_log_comp 
+				WHERE equipment_details_log_id='".$row['id']."'"
+			);
+
+			$compCols = [];
+			$compCnt  = mysqli_num_rows($qComp);
+			$maxCompCnt = max($maxCompCnt, $compCnt);
+
+			if ($compCnt > 0) {
+				while ($cr = mysqli_fetch_assoc($qComp)) {
+					$compCols[] = [
+						$cr['suction_pr_psig'],
+						$cr['disc_pr'],
+						$cr['disc_temp_degC'],
+						$cr['dsh'],
+						$cr['oil_level'],
+						$cr['comp_load']
+					];
+				}
+			}
+
+			$dataRows[] = [
+				'date' => date('d-m-Y', strtotime($row['created_date'])),
+				'time' => date('h:i A', strtotime($row['created_date'])),
+				'unit' => $row['unit_no'],
+				'voltage' => $row['voltage'],
+				'comps' => $compCols,
+				'chw' => [
+					$row['chw_inlet_temp'], $row['chw_outlet_temp'],
+					$row['chw_inlet_pr'], $row['chw_outlet_pr']
+				],
+				'cow' => [
+					$row['cow_inlet_temp'], $row['cow_outlet_temp'],
+					$row['cow_inlet_pr'], $row['cow_outlet_pr']
+				]
+			];
+		}
+
+		// Build header
+		$thead = '<thead><tr>
+					<th rowspan="2">DATE</th>
+					<th rowspan="2">TIME</th>
+					<th rowspan="2">UNIT NO</th>
+					<th rowspan="2">VOLTAGE</th>';
+
+		for ($i = 1; $i <= $maxCompCnt; $i++) {
+			$thead .= '<th colspan="6">COMP#'.$i.' READING</th>';
+		}
+
+		$thead .= '<th colspan="4">CHILLER WATER</th>
+				<th colspan="4">CONDENSER WATER</th></tr><tr>';
+
+		for ($i = 1; $i <= $maxCompCnt; $i++) {
+			$thead .= '<th>SUCTION PR. PSIG</th>
+					<th>DISC.PR. PSIG</th>
+					<th>DISC TEM./°C</th>
+					<th>DSH</th>
+					<th>OIL LEVEL</th>
+					<th>COMP. LOAD</th>';
+		}
+
+		$thead .= '<th>INLET TEMP</th>
+				<th>OUTLET TEMP</th>
+				<th>INLET PR</th>
+				<th>OUTLET PR</th>
+				<th>INLET TEMP</th>
+				<th>OUTLET TEMP</th>
+				<th>INLET PR</th>
+				<th>OUTLET PR</th>
+				</tr></thead>';
+
+		// Build rows
+		foreach ($dataRows as $dr) {
+			$rowsHtml .= "<tr>
+				<td>{$dr['date']}</td>
+				<td>{$dr['time']}</td>
+				<td>{$dr['unit']}</td>
+				<td>{$dr['voltage']}</td>";
+
+			for ($i = 0; $i < $maxCompCnt; $i++) {
+				if (isset($dr['comps'][$i])) {
+					foreach ($dr['comps'][$i] as $val) {
+						$rowsHtml .= "<td>{$val}</td>";
+					}
+				} else {
+					$rowsHtml .= '<td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>';
+				}
+			}
+
+			foreach ($dr['chw'] as $val) {
+				$rowsHtml .= "<td>{$val}</td>";
+			}
+			foreach ($dr['cow'] as $val) {
+				$rowsHtml .= "<td>{$val}</td>";
+			}
+
+			$rowsHtml .= "</tr>";
+		}
+
+		return '<table class="table table-bordered">'.$thead.'<tbody>'.$rowsHtml.'</tbody></table>';
+	}
+
+
 }
 
 class pirates_supervisor extends tesseract{
@@ -4952,4 +5080,14 @@ if(isset($_POST['stc_req_edit_item_delete'])){
 	$opmetabots=$metabots->stc_delete_requisition_item($id, $list_id, $reason);
 	echo json_encode($opmetabots);
 }
+
+if (isset($_POST['get_logequipmentdetails'])) {
+    $id = $_POST['id'];
+    $logs = new pirates_project();
+    $output = $logs->stc_get_equipmentdetails_logs($id);
+	echo json_encode($output);
+	// echo $output;
+}
+
+
 ?>

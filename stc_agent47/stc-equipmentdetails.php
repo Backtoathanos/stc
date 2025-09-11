@@ -178,53 +178,6 @@ else {
                             }
                             data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + log_button + '<a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
                         }
-
-                        $('body').delegate('.ed-logequipment', 'click', function(e){
-                            var id = $(this).attr('id');
-                            $('.ed-logequipmentdetails-show').html('Loading...');
-                            var logData='<tr><td colspan="4" class="text-center">No log entries found.</td></tr>';
-                            var comp_reading_headerCount=0;
-                            for (var j = 0; j < response.length; j++) {
-                                if(response[j].id == id) {
-                                    logData='';
-                                    var response2 = response[j].log;
-                                    for(var k=0; k<response2.length; k++) {
-                                        var comp_reading='';
-                                        var comp_reading_array=response2[k].log_comp_reading;
-                                        comp_reading_headerCount=comp_reading_array.length;
-                                        if(comp_reading_array.length>0){
-                                            
-                                            for(var cr=0;cr<comp_reading_array.length;cr++){
-                                                comp_reading+='<td>'+comp_reading_array[cr].suction_pr_psig+'</td>';
-                                                comp_reading+='<td>'+comp_reading_array[cr].disc_pr+'</td>';
-                                                comp_reading+='<td>'+comp_reading_array[cr].disc_temp_degC+'</td>';
-                                                comp_reading+='<td>'+comp_reading_array[cr].dsh+'</td>';
-                                                comp_reading+='<td>'+comp_reading_array[cr].oil_level+'</td>';
-                                                comp_reading+='<td>'+comp_reading_array[cr].comp_load+'</td>';
-                                                // comp_reading+='<td>'+comp_reading_array[cr].parameter+'</td>';
-                                            }
-                                        }
-                                        var comp_reading_body=comp_reading_array.length>0 ? '' : 'comp_reading_body';
-                                        logData += '<tr><td class="text-center">' + response2[k].date + '</td><td class="text-center">' + response2[k].time + '</td><td>' + response[j].unit_no + '</td><td class="text-right">' + response2[k].voltage + '</td>' + comp_reading + '<td class="text-right '+comp_reading_body+'">' + response2[k].chw_inlet_temp + '</td><td class="text-right">' + response2[k].chw_outlet_temp + '</td><td class="text-right">' + response2[k].chw_inlet_pr + '</td><td class="text-right">' + response2[k].chw_outlet_pr + '</td><td class="text-right">' + response2[k].cow_inlet_temp + '</td><td class="text-right">' + response2[k].cow_outlet_temp + '</td><td class="text-right">' + response2[k].cow_inlet_pr + '</td><td class="text-right">' + response2[k].cow_outlet_pr + '</td></tr>';
-                                    }
-                                    break;
-                                }
-                            }
-                            $('.ed-logequipmentdetails-show').html(logData);
-                            if(comp_reading_headerCount>0){
-                                var comp_reading_header='<th class="regenerate">SUCTION PR. PSIG</th><th class="regenerate">DISC.PR. PSIG</th><th class="regenerate">DISC TEM./°C</th><th class="regenerate">DSH</th><th class="regenerate">OIL LEVEL</th><th class="regenerate">COMP. LOAD</th>';
-                                var comp_reading_body='<td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td>';
-                                var counter=0;
-                                for(var h=0;h<comp_reading_headerCount;h++){
-                                    counter++;
-                                    console.log(comp_reading_headerCount);
-                                    $('.regenerate').remove();
-                                    $('.comp_header_row').before('<th class="text-center regenerate" colspan="6">COMP#' + counter + ' READING </th>');
-                                    $('.comp_reading_header').before(comp_reading_header);
-                                    $('.comp_reading_body').before(comp_reading_body);
-                                }
-                            }
-                        });
                     } else {
                         data="<td>No data found.</td>";
                     }
@@ -232,6 +185,28 @@ else {
                     }
                 });
             }
+            
+            $('body').delegate('.ed-logequipment', 'click', function(e){
+                e.preventDefault();
+                var id = $(this).attr('id');
+
+                $('.ed-logequipmentdetails-show').html('Loading...');
+
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    type : "POST",
+                    data : {
+                        get_logequipmentdetails: 1,
+                        id: id
+                    },
+                    dataType : "JSON",
+                    success: function(response){
+                        // response will already contain <tr> rows + headers
+                        $('.ed-logequipmentdetails-show').html(response);
+                    }
+                });
+            });
+
             
             // to delete 
             $('body').delegate('.ed-delete', 'click', function(e){
@@ -502,33 +477,7 @@ else {
                             <h5 class="mb-0">Equipment Details Log Sheet</h5>
                         </div>
                         <div class="card-body p-4">
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th class="text-center" rowspan="2">DATE</th>
-                                            <th class="text-center" rowspan="2">TIME</th>
-                                            <th class="text-center" rowspan="2">UNIT NO</th>
-                                            <th class="text-center" rowspan="2">VOLTAGE</th>
-                                            <th class="text-center comp_header_row" colspan="4">CHILLER WATER</th>
-                                            <th class="text-center" colspan="4">CONDENSER WATER</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-center comp_reading_header">INLET TEMP</th>
-                                            <th class="text-center">OUTLET TEMP</th>
-                                            <th class="text-center">INLET PR</th>
-                                            <th class="text-center">OUTLET PR</th>
-
-                                            <th class="text-center">INLET TEMP</th>
-                                            <th class="text-center">OUTLET TEMP</th>
-                                            <th class="text-center">INLET PR</th>
-                                            <th class="text-center">OUTLET PR</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="ed-logequipmentdetails-show">
-                                        <!-- Log entries will be dynamically inserted here -->
-                                    </tbody>
-                                </table>
+                            <div class="table-responsive ed-logequipmentdetails-show">
                             </div>
                         </div>
                     </div>
