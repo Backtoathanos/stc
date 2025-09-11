@@ -212,7 +212,7 @@ else {
                             }
                             $('.ed-logequipmentdetails-show').html(logData);
                             if(comp_reading_headerCount>0){
-                                var comp_reading_header='<th class="regenerate">SUCTION PR. PSIG</th><th class="regenerate">DISC.PR.</th><th class="regenerate">DISC TEM./°C</th><th class="regenerate">DSH</th><th class="regenerate">OIL LEVEL</th><th class="regenerate">COMP. LOAD</th>';
+                                var comp_reading_header='<th class="regenerate">SUCTION PR. PSIG</th><th class="regenerate">DISC.PR. PSIG</th><th class="regenerate">DISC TEM./°C</th><th class="regenerate">DSH</th><th class="regenerate">OIL LEVEL</th><th class="regenerate">COMP. LOAD</th>';
                                 var comp_reading_body='<td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td><td class="text-right regenerate">0</td>';
                                 var counter=0;
                                 for(var h=0;h<comp_reading_headerCount;h++){

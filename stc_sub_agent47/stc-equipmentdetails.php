@@ -203,10 +203,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 var delete_buttons = '<a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a>';
                                 if (category == "Operator" || category == "Service Group") {
                                     edit_buttons = '';
-                                    log_buttons = '<a href="#" class="btn btn-primary ed-logequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
+                                    log_buttons = '';
                                     delete_buttons = '';
-                                    if(response[i].equipment_type != "RECIPROCATIG CHILLER"){
-                                        log_buttons='';
+                                    if(response[i].equipment_name == "CHILLER UNIT" && response[i].equipment_type == "SCREW CHILLER"){
+                                        log_buttons='<a href="#" class="btn btn-primary ed-logequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
                                     }
                                 }
                                 data += '<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + log_buttons + edit_buttons + delete_buttons + '</td></tr>';
@@ -968,7 +968,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <tr id="headerRow1">
                                                         <th class="align-middle">Parameter</th>
                                                         <th>Suction Pr. PSIG</th>
-                                                        <th>Disc. Pr.</th>
+                                                        <th>Disc. Pr. PSIG</th>
                                                         <th>Disc Temp. °C</th>
                                                         <th>DSH</th>
                                                         <th>Oil Level</th>
