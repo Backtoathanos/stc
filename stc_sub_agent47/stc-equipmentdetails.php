@@ -543,7 +543,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             $('.comp-reading-body').empty();
                             var data='';
                             for(var i=0;i<response.compressor_reading.length;i++){
-                                var compresor_parameter=`COMP #${i+1} READING`;
+                                var compresor_parameter=`COMP #${i+1}`;
                                 data+=`
                                     <tr id="readingRow${i+1}">
                                         <td>${compresor_parameter}</td>
@@ -570,7 +570,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 compCount = $('.comp-reading-body tr').length + 1;
                 let newRow = `
                     <tr>
-                    <td>COMP #${compCount} READING</td>
+                    <td>COMP #${compCount}</td>
                     <td><input type="number" class="form-control" placeholder="Value"></td>
                     <td><input type="number" class="form-control" placeholder="Value"></td>
                     <td><input type="number" class="form-control" placeholder="Value"></td>
@@ -698,7 +698,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                equipment_id=$(this).attr('id');
                $('.comp-reading-body').html(`
                     <tr>
-                        <td>COMP #1 READING</td>
+                        <td>COMP #1</td>
                         <td><input type="number" class="form-control" placeholder="Value"></td>
                         <td><input type="number" class="form-control" placeholder="Value"></td>
                         <td><input type="number" class="form-control" placeholder="Value"></td>
@@ -997,7 +997,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 </thead>
                                                 <tbody class="comp-reading-body">
                                                     <tr id="readingRow">
-                                                        <td>COMP #1 READING</td>
+                                                        <td>COMP #1</td>
                                                         <td><input type="number" class="form-control" placeholder="Value"></td>
                                                         <td><input type="number" class="form-control" placeholder="Value"></td>
                                                         <td><input type="number" class="form-control" placeholder="Value"></td>

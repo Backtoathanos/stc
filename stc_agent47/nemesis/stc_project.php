@@ -1368,7 +1368,7 @@ class pirates_project extends tesseract{
 				`stc_status_down_list_department_location` REGEXP '$escapedSearch' OR 
 				`stc_status_down_list_department_dept` REGEXP '$escapedSearch' OR 
 				`equipment_name` REGEXP '$escapedSearch' OR 
-				`equipment_no` REGEXP '$escapedSearch'
+				`equipment_type` REGEXP '$escapedSearch'
 			)";
 		}
 
@@ -1493,7 +1493,7 @@ class pirates_project extends tesseract{
 					<th class="text-center" rowspan="2">VOLTAGE</th>';
 
 		for ($i = 1; $i <= $maxCompCnt; $i++) {
-			$thead .= '<th class="text-center" colspan="7">COMP#'.$i.' READING</th>';
+			$thead .= '<th class="text-center" colspan="7">COMP #'.$i.'</th>';
 		}
 
 		$thead .= '<th class="text-center" colspan="4">CHILLER WATER</th>
