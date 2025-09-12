@@ -154,3 +154,6 @@ create table equipment_details_log_comp(
     updated_date timestamp null,
     updated_by int not null
 );
+
+ALTER TABLE `equipment_details_log_comp` ADD `comp_amp` DOUBLE NOT NULL AFTER `comp_load`;
+

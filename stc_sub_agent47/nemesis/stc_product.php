@@ -637,14 +637,14 @@ class prime extends tesseract{
 		return $blackpearl;
 	}
 
-	public function stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load){
+	public function stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load, $comp_amp){
 		if(empty($_SESSION['stc_agent_sub_id'])){
 			return 'reload';
 		}
 		if($id>0){
-			$query=mysqli_query($this->stc_dbs, "UPDATE `equipment_details_log_comp` SET `suction_pr_psig`='".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', `disc_pr`='".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', `disc_temp_degC`='".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', `dsh`='".mysqli_real_escape_string($this->stc_dbs, $dsh)."', `oil_level`='".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', `comp_load`='".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', `updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', `updated_date`='".date("Y-m-d H:i:s")."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+			$query=mysqli_query($this->stc_dbs, "UPDATE `equipment_details_log_comp` SET `suction_pr_psig`='".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', `disc_pr`='".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', `disc_temp_degC`='".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', `dsh`='".mysqli_real_escape_string($this->stc_dbs, $dsh)."', `oil_level`='".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', `comp_load`='".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', `comp_amp`='".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', `updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', `updated_date`='".date("Y-m-d H:i:s")."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
 		}else{
-			$query=mysqli_query($this->stc_dbs, "INSERT INTO `equipment_details_log_comp` (`equipment_details_log_id`, `suction_pr_psig`, `disc_pr`, `disc_temp_degC`, `dsh`, `oil_level`, `comp_load`, `created_by`, `created_date`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $ed_log_id)."', '".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', '".mysqli_real_escape_string($this->stc_dbs, $dsh)."', '".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', '".date("Y-m-d H:i:s")."')");
+			$query=mysqli_query($this->stc_dbs, "INSERT INTO `equipment_details_log_comp` (`equipment_details_log_id`, `suction_pr_psig`, `disc_pr`, `disc_temp_degC`, `dsh`, `oil_level`, `comp_load`, `comp_amp`, `created_by`, `created_date`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $ed_log_id)."', '".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', '".mysqli_real_escape_string($this->stc_dbs, $dsh)."', '".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', '".date("Y-m-d H:i:s")."')");
 		}
 		
 		return "yes";
@@ -866,8 +866,9 @@ if(isset($_POST['stc_ed_log_comp_reading_save'])) {
 	$dsh = $_POST['dsh'];
 	$oil_level = $_POST['oil_level'];
 	$comp_load = $_POST['comp_load'];
+	$comp_amp = $_POST['comp_amp'];
 	$metabots = new prime();
-	$opmetabots = $metabots->stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load);
+	$opmetabots = $metabots->stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load, $comp_amp);
 	echo json_encode($opmetabots);
 }
 
