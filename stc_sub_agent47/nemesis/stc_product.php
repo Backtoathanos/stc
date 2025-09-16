@@ -654,6 +654,31 @@ class prime extends tesseract{
 						}
 					}
 					$row['compressor_reading'] = $compressor_reading_array ? $compressor_reading_array : 'NA';
+
+					$query=mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details_log_cd_waterpump` WHERE `equipment_details_log_id`=".$row['id']);
+					$cd_waterpump_array=array();
+					if($query && mysqli_num_rows($query)>0){
+						foreach($query as $queryrow){
+							$cd_waterpump_array[]=$queryrow;
+						}
+					}
+					$row['cd_waterpump'] = $cd_waterpump_array ? $cd_waterpump_array : 'NA';
+					$query=mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details_log_ch_waterpump` WHERE `equipment_details_log_id`=".$row['id']);
+					$ch_waterpump_array=array();
+					if($query && mysqli_num_rows($query)>0){
+						foreach($query as $queryrow){
+							$ch_waterpump_array[]=$queryrow;
+						}
+					}
+					$row['ch_waterpump'] = $ch_waterpump_array ? $ch_waterpump_array : 'NA';
+					$query=mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details_log_coolingtower` WHERE `equipment_details_log_id`=".$row['id']);
+					$coolingtower_array=array();
+					if($query && mysqli_num_rows($query)>0){
+						foreach($query as $queryrow){
+							$coolingtower_array[]=$queryrow;
+						}
+					}
+					$row['coolingtower'] = $coolingtower_array ? $coolingtower_array : 'NA';
 					$blackpearl[] = $row;
 				}
 			}
