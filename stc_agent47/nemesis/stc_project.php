@@ -1428,11 +1428,11 @@ class pirates_project extends tesseract{
 
 		$query = mysqli_query(
 			$this->stc_dbs,
-			"SELECT EDL.*, ED.unit_no 
+			"SELECT EDL.*, ED.unit_no, S.stc_cust_pro_supervisor_fullname as creator 
 			FROM equipment_details_log EDL 
-			INNER JOIN equipment_details ED 
-				ON EDL.equipment_details_id=ED.id 
-			WHERE EDL.equipment_details_id='$id'"
+			INNER JOIN equipment_details ED ON EDL.equipment_details_id=ED.id 
+			INNER JOIN stc_cust_pro_supervisor S ON EDL.created_by=S.stc_cust_pro_supervisor_id 
+			WHERE EDL.equipment_details_id='$id' ORDER BY EDL.created_date DESC"
 		);
 
 		if (mysqli_num_rows($query) == 0) {
@@ -1440,7 +1440,7 @@ class pirates_project extends tesseract{
 		}
 
 		$rowsHtml   = '';
-		$maxCompCnt = 0;
+		$maxCompCnt = 0;$maxCompCntA = 0;$maxCompCntB = 0;$maxCompCntC = 0;
 		$dataRows   = [];
 
 		while ($row = mysqli_fetch_assoc($query)) {
@@ -1467,6 +1467,33 @@ class pirates_project extends tesseract{
 					];
 				}
 			}
+			// extra 3 tables
+			$cd_pumps = [];
+			$res_cd = mysqli_query($this->stc_dbs,
+				"SELECT numb, amp FROM equipment_details_log_cd_waterpump 
+				WHERE equipment_details_log_id='".$row['id']."'");
+			while ($cd = mysqli_fetch_assoc($res_cd)) {
+				$maxCompCntA++;
+				$cd_pumps[] = [$cd['numb'], $cd['amp']];
+			}
+
+			$ch_pumps = [];
+			$res_ch = mysqli_query($this->stc_dbs,
+				"SELECT numb, amp FROM equipment_details_log_ch_waterpump 
+				WHERE equipment_details_log_id='".$row['id']."'");
+			while ($ch = mysqli_fetch_assoc($res_ch)) {
+				$maxCompCntB++;
+				$ch_pumps[] = [$ch['numb'], $ch['amp']];
+			}
+
+			$ctowers = [];
+			$res_ct = mysqli_query($this->stc_dbs,
+				"SELECT numb, amp FROM equipment_details_log_coolingtower 
+				WHERE equipment_details_log_id='".$row['id']."'");
+			while ($ct = mysqli_fetch_assoc($res_ct)) {
+				$maxCompCntC++;
+				$ctowers[] = [$ct['numb'], $ct['amp']];
+			}
 
 			$dataRows[] = [
 				'date' => date('d-m-Y', strtotime($row['created_date'])),
@@ -1481,7 +1508,11 @@ class pirates_project extends tesseract{
 				'cow' => [
 					$row['cow_inlet_temp'], $row['cow_outlet_temp'],
 					$row['cow_inlet_pr'], $row['cow_outlet_pr']
-				]
+				],
+				'cd_pumps' => $cd_pumps,
+				'ch_pumps' => $ch_pumps,
+				'ctowers'  => $ctowers,
+				'creator' => $row['creator']
 			];
 		}
 
@@ -1495,9 +1526,21 @@ class pirates_project extends tesseract{
 		for ($i = 1; $i <= $maxCompCnt; $i++) {
 			$thead .= '<th class="text-center" colspan="7">COMP #'.$i.'</th>';
 		}
-
 		$thead .= '<th class="text-center" colspan="4">CHILLER WATER</th>
-				<th class="text-center" colspan="4">CONDENSER WATER</th></tr><tr>';
+				<th class="text-center" colspan="4">CONDENSER WATER</th>';
+		for ($i = 1; $i <= $maxCompCntA; $i++) {
+			$thead .= '<th class="text-center" colspan="2">CHILLER WATER PUMP #'.$i.'</th>';
+		}
+
+		for ($i = 1; $i <= $maxCompCntB; $i++) {
+			$thead .= '<th class="text-center" colspan="2">CONDENSER WATER PUMP #'.$i.'</th>';
+		}
+
+		for ($i = 1; $i <= $maxCompCntC; $i++) {
+			$thead .= '<th class="text-center" colspan="2">COOLING TOWER #'.$i.'</th>';
+		}
+
+		$thead .= '<th class="text-center" rowspan="2">Operator Name</th></tr><tr>';
 
 		for ($i = 1; $i <= $maxCompCnt; $i++) {
 			$thead .= '<th class="text-center">SUCTION PR. PSIG</th>
@@ -1508,7 +1551,21 @@ class pirates_project extends tesseract{
 					<th class="text-center">COMP. LOAD %</th>
 					<th class="text-center">COMP. AMP</th>';
 		}
-
+		
+		$chw_thead = '';
+		for ($i = 0; $i < $maxCompCntA; $i++) {
+			$chw_thead .= '<th class="text-center">NUMB</th><th class="text-center">AMP</th>';
+		}
+		
+		$cdw_thead = '';
+		for ($i = 0; $i < $maxCompCntB; $i++) {
+			$chw_thead .= '<th class="text-center">NUMB</th><th class="text-center">AMP</th>';
+		}
+		
+		$ct_thead = '';
+		for ($i = 0; $i < $maxCompCntC; $i++) {
+			$chw_thead .= '<th class="text-center">NUMB</th><th class="text-center">AMP</th>';
+		}
 		$thead .= '<th class="text-center">INLET TEMP</th>
 				<th class="text-center">OUTLET TEMP</th>
 				<th class="text-center">INLET PR</th>
@@ -1517,6 +1574,7 @@ class pirates_project extends tesseract{
 				<th class="text-center">OUTLET TEMP</th>
 				<th class="text-center">INLET PR</th>
 				<th class="text-center">OUTLET PR</th>
+				'.$chw_thead.$cdw_thead.$ct_thead.'
 				</tr></thead>';
 
 		// Build rows
@@ -1550,6 +1608,47 @@ class pirates_project extends tesseract{
 			foreach ($dr['cow'] as $val) {
 				$rowsHtml .= "<td class='text-right'>{$val}</td>";
 			}
+			
+
+			for ($i = 0; $i < $maxCompCntA; $i++) {
+				if (isset($dr['cd_pumps'][$i])) {
+					$j=0;
+					foreach ($dr['cd_pumps'][$i] as $val) {
+						$rowsHtml .= "<td class='text-right'>{$val}</td>";
+						$j++;
+					}
+				} else {
+					// Fill with 0s (NUMB, AMP)
+					$rowsHtml .= "<td class='text-right'></td><td class='text-right'>0</td>";
+				}
+			}
+
+			for ($i = 0; $i < $maxCompCntB; $i++) {
+				if (isset($dr['ch_pumps'][$i])) {
+					$j=0;
+					foreach ($dr['ch_pumps'][$i] as $val) {
+						$rowsHtml .= "<td class='text-right'>{$val}</td>";
+						$j++;
+					}
+				} else {
+					// Fill with 0s (NUMB, AMP)
+					$rowsHtml .= "<td class='text-right'></td><td class='text-right'>0</td>";
+				}
+			}
+
+			for ($i = 0; $i < $maxCompCntC; $i++) {
+				if (isset($dr['ctowers'][$i])) {
+					$j=0;
+					foreach ($dr['ctowers'][$i] as $val) {
+						$rowsHtml .= "<td class='text-right'>{$val}</td>";
+						$j++;
+					}
+				} else {
+					// Fill with 0s (NUMB, AMP)
+					$rowsHtml .= "<td class='text-right'></td><td class='text-right'>0</td>";
+				}
+			}
+			$rowsHtml .= "<td class='text-right'>{$dr['creator']}</td>";
 
 			$rowsHtml .= "</tr>";
 		}

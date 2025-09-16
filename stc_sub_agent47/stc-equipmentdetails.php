@@ -561,6 +561,51 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             }
                             
                         }
+                        if(response.ch_waterpump!="NA"){
+                            $('.chw-reading-body').empty();
+                            var data='';
+                            for(var i=0;i<response.ch_waterpump.length;i++){
+                                data+=`
+                                    <tr id="readingRow${i+1}">
+                                        <td><input type="text" class="form-control" value="${response.ch_waterpump[i].numb}" placeholder="Value"></td>
+                                        <td><input type="number" class="form-control" value="${response.ch_waterpump[i].amp}" placeholder="Value"></td>
+                                        <td><a href="javascript:void(0)" tablename="equipment_details_log_ch_waterpump" data-id="${response.ch_waterpump[i].id}" class="form-control ed-log-chw-update">Save</a></td>
+                                    </tr>
+                                `;
+                                $('.chw-reading-body').html(data);
+                            }
+                            
+                        }
+                        if(response.cd_waterpump!="NA"){
+                            $('.cdw-reading-body').empty();
+                            var data='';
+                            for(var i=0;i<response.cd_waterpump.length;i++){
+                                data+=`
+                                    <tr id="readingRow${i+1}">
+                                        <td><input type="text" class="form-control" value="${response.cd_waterpump[i].numb}" placeholder="Value"></td>
+                                        <td><input type="number" class="form-control" value="${response.cd_waterpump[i].amp}" placeholder="Value"></td>
+                                        <td><a href="javascript:void(0)" tablename="equipment_details_log_cd_waterpump" data-id="${response.cd_waterpump[i].id}" class="form-control ed-log-cdw-update">Save</a></td>
+                                    </tr>
+                                `;
+                                $('.cdw-reading-body').html(data);
+                            }
+                            
+                        }
+                        if(response.coolingtower!="NA"){
+                            $('.ct-reading-body').empty();
+                            var data='';
+                            for(var i=0;i<response.coolingtower.length;i++){
+                                data+=`
+                                    <tr id="readingRow${i+1}">
+                                        <td><input type="text" class="form-control" value="${response.coolingtower[i].numb}" placeholder="Value"></td>
+                                        <td><input type="number" class="form-control" value="${response.coolingtower[i].amp}" placeholder="Value"></td>
+                                        <td><a href="javascript:void(0)" tablename="equipment_details_log_coolingtower" data-id="${response.coolingtower[i].id}" class="form-control ed-log-ct-update">Save</a></td>
+                                    </tr>
+                                `;
+                                $('.ct-reading-body').html(data);
+                            }
+                            
+                        }
                     }
                });
             }
@@ -751,6 +796,99 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         oil_level: oil_level,
                         comp_load: comp_load,
                         comp_amp: comp_amp
+                    },
+                    dataType: "JSON",
+                    success: function (response) {
+                        if(response.trim()=='yes'){
+                            alert('Record saved successfully!!!');
+                            load_ed_log_comp(equipment_id);
+                        } else if(response.trim()=="reload"){
+                            window.location.reload();
+                        }else {
+                            alert('Something went wrong. Record not updated');
+                        }
+                    }
+                });
+            }
+
+            $(".addRowBtn").click(function () {
+                // find the tbody closest to the clicked button
+                let tbody = $(this).closest(".table-responsive").find("tbody");
+
+                // clone first row as a template
+                let newRow = tbody.find("tr:first").clone();
+
+                // clear input values
+                newRow.find("input").val("");
+                newRow.find("a").attr("data-id", 0); // reset data-id for new entry
+
+                // append row
+                tbody.append(newRow);
+            });
+
+            var list_id=0;
+            $(document).on('click', '.ed-log-chw-save', function () {
+               list_id=0;
+               var tableName=$(this).attr('tablename');
+               var number = $(this).closest('tr').find('td:eq(0) input').val();
+               var amp = $(this).closest('tr').find('td:eq(1) input').val();
+               var ed_log_id = $('.ed-log-logid').val();
+               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+            });
+            $(document).on('click', '.ed-log-cdw-save', function () {
+               list_id=0;
+               var tableName=$(this).attr('tablename');
+               var number = $(this).closest('tr').find('td:eq(0) input').val();
+               var amp = $(this).closest('tr').find('td:eq(1) input').val();
+               var ed_log_id = $('.ed-log-logid').val();
+               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+            });
+            $(document).on('click', '.ed-log-ct-save', function () {
+               list_id=0;
+               var tableName=$(this).attr('tablename');
+               var number = $(this).closest('tr').find('td:eq(0) input').val();
+               var amp = $(this).closest('tr').find('td:eq(1) input').val();
+               var ed_log_id = $('.ed-log-logid').val();
+               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+            });
+
+            $(document).on('click', '.ed-log-chw-update', function () {
+               list_id=$(this).attr('data-id');
+               var tableName=$(this).attr('tablename');
+               var number = $(this).closest('tr').find('td:eq(0) input').val();
+               var amp = $(this).closest('tr').find('td:eq(1) input').val();
+               var ed_log_id = $('.ed-log-logid').val();
+               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+            });
+            $(document).on('click', '.ed-log-cdw-update', function () {
+               list_id=$(this).attr('data-id');
+               var tableName=$(this).attr('tablename');
+               var number = $(this).closest('tr').find('td:eq(0) input').val();
+               var amp = $(this).closest('tr').find('td:eq(1) input').val();
+               var ed_log_id = $('.ed-log-logid').val();
+               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+            });
+            $(document).on('click', '.ed-log-ct-update', function () {
+               list_id=$(this).attr('data-id');
+               var tableName=$(this).attr('tablename');
+               var number = $(this).closest('tr').find('td:eq(0) input').val();
+               var amp = $(this).closest('tr').find('td:eq(1) input').val();
+               var ed_log_id = $('.ed-log-logid').val();
+               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+            });
+
+            
+            function save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp){
+                $.ajax({
+                    url: "nemesis/stc_product.php",
+                    method: "POST",
+                    data: {
+                        stc_ed_log_equipMachineDetails_save: 1,
+                        ed_log_id:ed_log_id,
+                        tableName: tableName,
+                        number: number,
+                        amp: amp,
+                        list_id: list_id
                     },
                     dataType: "JSON",
                     success: function (response) {
@@ -1065,6 +1203,90 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-12">
+                                        <h4 class="mb-3">Chiller Water Pump</h4>
+                                        <!-- Compressor Readings Table -->
+                                        <div class="table-responsive">
+                                            <table id="chw-table" class="table table-bordered align-middle text-center">
+                                                <thead class="table-light">
+                                                    <tr id="headerRow1">
+                                                        <th class="align-middle">Pump Number</th>
+                                                        <th>Pump Amp</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="chw-reading-body">
+                                                    <tr id="readingRow">
+                                                        <td><input type="text" class="form-control" placeholder="Value"></td>
+                                                        <td><input type="number" class="form-control" placeholder="Value"></td>
+                                                        <td><a href="javascript:void(0)" tablename="equipment_details_log_ch_waterpump" class="form-control ed-log-chw-save">Save</a></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <!-- Add Row Button -->
+                                            <div class="mt-2">
+                                                <button type="button" class="btn btn-sm btn-primary addRowBtn">+ Add Row</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-12">
+                                        <h4 class="mb-3">Condenser Water Pump</h4>
+                                        <!-- Compressor Readings Table -->
+                                        <div class="table-responsive">
+                                            <table id="cdw-table" class="table table-bordered align-middle text-center">
+                                                <thead class="table-light">
+                                                    <tr id="headerRow1">
+                                                        <th class="align-middle">Pump Number</th>
+                                                        <th>Pump Amp</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="cdw-reading-body">
+                                                    <tr id="readingRow">
+                                                        <td><input type="text" class="form-control" placeholder="Value"></td>
+                                                        <td><input type="number" class="form-control" placeholder="Value"></td>
+                                                        <td><a href="javascript:void(0)" tablename="equipment_details_log_cd_waterpump" class="form-control ed-log-cdw-save">Save</a></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <!-- Add Row Button -->
+                                            <div class="mt-2">
+                                                <button type="button" class="btn btn-sm btn-primary addRowBtn">+ Add Row</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-12">
+                                        <h4 class="mb-3">Cooling Tower</h4>
+                                        <!-- Compressor Readings Table -->
+                                        <div class="table-responsive">
+                                            <table id="ct-table" class="table table-bordered align-middle text-center">
+                                                <thead class="table-light">
+                                                    <tr id="headerRow1">
+                                                        <th class="align-middle">Cooling Tower Number</th>
+                                                        <th>Cooling Tower Amp</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="ct-reading-body">
+                                                    <tr id="readingRow">
+                                                        <td><input type="text" class="form-control" placeholder="Value"></td>
+                                                        <td><input type="number" class="form-control" placeholder="Value"></td>
+                                                        <td><a href="javascript:void(0)" tablename="equipment_details_log_coolingtower" class="form-control ed-log-ct-save">Save</a></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <!-- Add Row Button -->
+                                            <div class="mt-2">
+                                                <button type="button" class="btn btn-sm btn-primary addRowBtn">+ Add Row</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

@@ -157,3 +157,35 @@ create table equipment_details_log_comp(
 
 ALTER TABLE `equipment_details_log_comp` ADD `comp_amp` DOUBLE NOT NULL AFTER `comp_load`;
 
+create table equipment_details_log_ch_waterpump(
+	id int not null primary key auto_increment,
+    equipment_details_log_id int not null,
+    numb varchar(20),
+    amp float not null,
+    created_date timestamp default current_timestamp,
+    created_by int not null,
+    updated_date timestamp default current_timestamp on update current_timestamp,
+    updated_by int not null
+);
+create table equipment_details_log_cd_waterpump(
+	id int not null primary key auto_increment,
+    equipment_details_log_id int not null,
+    numb varchar(20),
+    amp float not null,
+    created_date timestamp default current_timestamp,
+    created_by int not null,
+    updated_date timestamp default current_timestamp on update current_timestamp,
+    updated_by int not null
+);
+
+
+create table equipment_details_log_coolingtower(
+	id int not null primary key auto_increment,
+    equipment_details_log_id int not null,
+    numb varchar(20),
+    amp float not null,
+    created_date timestamp default current_timestamp,
+    created_by int not null,
+    updated_date timestamp default current_timestamp on update current_timestamp,
+    updated_by int not null
+)

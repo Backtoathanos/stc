@@ -606,6 +606,31 @@ class prime extends tesseract{
 					}
 				}
 				$row['compressor_reading'] = $compressor_reading_array ? $compressor_reading_array : 'NA';
+
+				$query=mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details_log_cd_waterpump` WHERE `equipment_details_log_id`=".$row['id']);
+				$cd_waterpump_array=array();
+				if($query && mysqli_num_rows($query)>0){
+					foreach($query as $queryrow){
+						$cd_waterpump_array[]=$queryrow;
+					}
+				}
+				$row['cd_waterpump'] = $cd_waterpump_array ? $cd_waterpump_array : 'NA';
+				$query=mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details_log_ch_waterpump` WHERE `equipment_details_log_id`=".$row['id']);
+				$ch_waterpump_array=array();
+				if($query && mysqli_num_rows($query)>0){
+					foreach($query as $queryrow){
+						$ch_waterpump_array[]=$queryrow;
+					}
+				}
+				$row['ch_waterpump'] = $ch_waterpump_array ? $ch_waterpump_array : 'NA';
+				$query=mysqli_query($this->stc_dbs, "SELECT * FROM `equipment_details_log_coolingtower` WHERE `equipment_details_log_id`=".$row['id']);
+				$coolingtower_array=array();
+				if($query && mysqli_num_rows($query)>0){
+					foreach($query as $queryrow){
+						$coolingtower_array[]=$queryrow;
+					}
+				}
+				$row['coolingtower'] = $coolingtower_array ? $coolingtower_array : 'NA';
 				$blackpearl[] = $row;
 			}
 		} else {
@@ -649,6 +674,20 @@ class prime extends tesseract{
 		
 		return "yes";
 	}
+
+	public function stc_save_equipment_log_machinedetails_save($list_id, $ed_log_id, $tableName, $number, $amp){
+		if(empty($_SESSION['stc_agent_sub_id'])){
+			return 'reload';
+		}
+		if($list_id>0){
+			$query=mysqli_query($this->stc_dbs, "UPDATE `".$tableName."` SET `numb`='".mysqli_real_escape_string($this->stc_dbs, $number)."', `amp`='".mysqli_real_escape_string($this->stc_dbs, $amp)."', `updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', `updated_date`='".date("Y-m-d H:i:s")."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $list_id)."'");
+		}else{
+			$query=mysqli_query($this->stc_dbs, "INSERT INTO `".$tableName."` (`equipment_details_log_id`, `numb`, `amp`, `created_by`, `created_date`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $ed_log_id)."', '".mysqli_real_escape_string($this->stc_dbs, $number)."', '".mysqli_real_escape_string($this->stc_dbs, $amp)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', '".date("Y-m-d H:i:s")."')");
+		}
+		
+		return "yes";
+	}
+	
 
 	public function stc_update_equipment_log($id, $label, $value){
 		if (empty($_SESSION['stc_agent_sub_id'])) {
@@ -885,6 +924,17 @@ if(isset($_POST['stc_ed_log_status_update'])) {
 	$id = $_POST['id'];
 	$metabots = new prime();
 	$opmetabots = $metabots->stc_update_ed_log_status($id);
+	echo json_encode($opmetabots);
+}
+
+if(isset($_POST['stc_ed_log_equipMachineDetails_save'])) {
+	$ed_log_id = $_POST['ed_log_id'];
+	$tableName = $_POST['tableName'];
+	$number = $_POST['number'];
+	$amp = $_POST['amp'];
+	$list_id = $_POST['list_id'];
+	$metabots = new prime();
+	$opmetabots = $metabots->stc_save_equipment_log_machinedetails_save($list_id, $ed_log_id, $tableName, $number, $amp);
 	echo json_encode($opmetabots);
 }
 
