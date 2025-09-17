@@ -80,6 +80,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                             <th class="text-center">SUB LOCATION</th>
                                                             <th class="text-center">EQUIPMENT NAME</th>
                                                             <th class="text-center">EQUIPMENT TYPE</th>
+                                                            <th class="text-center">STATUS</th>
                                                             <th class="text-center">EQUIPMENT NO</th>
                                                             <th class="text-center">ACTION</th>
                                                         </tr>
@@ -198,18 +199,29 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             for (var i = 0; i < response.length; i++) {
                                 slno++;
                                 var category = response[i].stc_agent_sub_category;
-                                var edit_buttons = '<a href="#" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a>';
+                                var edit_buttons = '<a href="#" class="btn btn-primary ed-editequipment" title="Edit" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a>';
                                 var log_buttons = '';
-                                var delete_buttons = '<a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a>';
+                                var delete_buttons = '<a href="javascript:void(0)" title="Delete" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a>';
+                                var status_buttons = '';
                                 if (category == "Operator" || category == "Service Group") {
                                     edit_buttons = '';
                                     log_buttons = '';
                                     delete_buttons = '';
-                                    if(response[i].equipment_name == "CHILLER UNIT" && response[i].equipment_type == "SCREW CHILLER"){
-                                        log_buttons='<a href="#" class="btn btn-primary ed-logequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
+                                    if(parseInt(response[i].status) === 1 && response[i].equipment_name == "CHILLER UNIT" && response[i].equipment_type == "SCREW CHILLER"){
+                                        log_buttons='<a href="#" class="btn btn-primary ed-logequipment" title="Logs" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
                                     }
                                 }
-                                data += '<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + log_buttons + edit_buttons + delete_buttons + '</td></tr>';
+                                var isRunning = String(response[i].status) === '1';
+                                // Toggle button: Pause when running, Run when standby
+                                if(isRunning){
+                                    status_buttons = '<a href="javascript:void(0)" title="make it Running" class="btn btn-warning ed-set-standby" id="' + response[i].id + '"><i class="fa fa-pause"></i></a>';
+                                }else{
+                                    status_buttons = '<a href="javascript:void(0)" title="Make it Stand By" class="btn btn-success ed-set-running" id="' + response[i].id + '"><i class="fa fa-play"></i></a>';
+                                }
+                                var statusHtml = isRunning
+                                    ? '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#28a745;color:#fff;font-weight:600;">Running</span>'
+                                    : '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#ffc107;color:#212529;font-weight:600;">Stand By</span>';
+                                data += '<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td class="text-center">' + statusHtml + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + status_buttons + log_buttons + edit_buttons + delete_buttons + '</td></tr>';
                             }
                         } else {
                             data = "<td>No data found.</td>";
@@ -361,6 +373,46 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     }
                 });
             }
+
+            // quick set running from list
+            $('body').delegate('.ed-set-running', 'click', function (e) {
+                e.preventDefault();
+                var id = $(this).attr('id');
+                $.ajax({
+                    url: "nemesis/stc_product.php",
+                    method: "POST",
+                    data: {
+                        update_equipementdetails: 1,
+                        id: id,
+                        label: 'status',
+                        value: 1
+                    },
+                    success: function (response) {
+                        call_equipementdetails('');
+                    }
+                });
+            });
+
+            // quick set standby from list
+            $('body').delegate('.ed-set-standby', 'click', function (e) {
+                e.preventDefault();
+                var id = $(this).attr('id');
+                if(confirm("Are you sure want to updates status?")){
+                    $.ajax({
+                        url: "nemesis/stc_product.php",
+                        method: "POST",
+                        data: {
+                            update_equipementdetails: 1,
+                            id: id,
+                            label: 'status',
+                            value: 0
+                        },
+                        success: function (response) {
+                            call_equipementdetails('');
+                        }
+                    });
+                }
+            });
 
             $('body').delegate('.eq-edit-dropdown', 'change', function (e) {
                 var label = $(this).attr('label');
@@ -567,7 +619,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             for(var i=0;i<response.ch_waterpump.length;i++){
                                 data+=`
                                     <tr id="readingRow${i+1}">
-                                        <td><input type="text" class="form-control" value="${response.ch_waterpump[i].numb}" placeholder="Value"></td>
+                                        <td>${response.ch_waterpump[i].equipment_name}</td>
+                                        <td>${response.ch_waterpump[i].slno}</td>
+                                        <td>${response.ch_waterpump[i].unit_no}</td>
+                                        <td>${response.ch_waterpump[i].equipment_no}</td>
                                         <td><input type="number" class="form-control" value="${response.ch_waterpump[i].amp}" placeholder="Value"></td>
                                         <td><a href="javascript:void(0)" tablename="equipment_details_log_ch_waterpump" data-id="${response.ch_waterpump[i].id}" class="form-control ed-log-chw-update">Save</a></td>
                                     </tr>
@@ -575,6 +630,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 $('.chw-reading-body').html(data);
                             }
                             
+                        }else{
+                            $('.chw-reading-row').hide();
                         }
                         if(response.cd_waterpump!="NA"){
                             $('.cdw-reading-body').empty();
@@ -582,7 +639,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             for(var i=0;i<response.cd_waterpump.length;i++){
                                 data+=`
                                     <tr id="readingRow${i+1}">
-                                        <td><input type="text" class="form-control" value="${response.cd_waterpump[i].numb}" placeholder="Value"></td>
+                                        <td>${response.cd_waterpump[i].equipment_name}</td>
+                                        <td>${response.cd_waterpump[i].slno}</td>
+                                        <td>${response.cd_waterpump[i].unit_no}</td>
+                                        <td>${response.cd_waterpump[i].equipment_no}</td>
                                         <td><input type="number" class="form-control" value="${response.cd_waterpump[i].amp}" placeholder="Value"></td>
                                         <td><a href="javascript:void(0)" tablename="equipment_details_log_cd_waterpump" data-id="${response.cd_waterpump[i].id}" class="form-control ed-log-cdw-update">Save</a></td>
                                     </tr>
@@ -590,6 +650,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 $('.cdw-reading-body').html(data);
                             }
                             
+                        }else{
+                            $('.cdw-reading-row').hide();
                         }
                         if(response.coolingtower!="NA"){
                             $('.ct-reading-body').empty();
@@ -597,7 +659,10 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             for(var i=0;i<response.coolingtower.length;i++){
                                 data+=`
                                     <tr id="readingRow${i+1}">
-                                        <td><input type="text" class="form-control" value="${response.coolingtower[i].numb}" placeholder="Value"></td>
+                                        <td>${response.coolingtower[i].equipment_name}</td>
+                                        <td>${response.coolingtower[i].slno}</td>
+                                        <td>${response.coolingtower[i].unit_no}</td>
+                                        <td>${response.coolingtower[i].equipment_no}</td>
                                         <td><input type="number" class="form-control" value="${response.coolingtower[i].amp}" placeholder="Value"></td>
                                         <td><a href="javascript:void(0)" tablename="equipment_details_log_coolingtower" data-id="${response.coolingtower[i].id}" class="form-control ed-log-ct-update">Save</a></td>
                                     </tr>
@@ -605,6 +670,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                 $('.ct-reading-body').html(data);
                             }
                             
+                        }else{
+                            $('.ct-reading-row').hide();
                         }
                     }
                });
@@ -827,58 +894,55 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             });
 
             var list_id=0;
-            $(document).on('click', '.ed-log-chw-save', function () {
-               list_id=0;
-               var tableName=$(this).attr('tablename');
-               var number = $(this).closest('tr').find('td:eq(0) input').val();
-               var amp = $(this).closest('tr').find('td:eq(1) input').val();
-               var ed_log_id = $('.ed-log-logid').val();
-               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
-            });
-            $(document).on('click', '.ed-log-cdw-save', function () {
-               list_id=0;
-               var tableName=$(this).attr('tablename');
-               var number = $(this).closest('tr').find('td:eq(0) input').val();
-               var amp = $(this).closest('tr').find('td:eq(1) input').val();
-               var ed_log_id = $('.ed-log-logid').val();
-               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
-            });
-            $(document).on('click', '.ed-log-ct-save', function () {
-               list_id=0;
-               var tableName=$(this).attr('tablename');
-               var number = $(this).closest('tr').find('td:eq(0) input').val();
-               var amp = $(this).closest('tr').find('td:eq(1) input').val();
-               var ed_log_id = $('.ed-log-logid').val();
-               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
-            });
+            // $(document).on('click', '.ed-log-chw-save', function () {
+            //    list_id=0;
+            //    var tableName=$(this).attr('tablename');
+            //    var number = $(this).closest('tr').find('td:eq(0) input').val();
+            //    var amp = $(this).closest('tr').find('td:eq(1) input').val();
+            //    var ed_log_id = $('.ed-log-logid').val();
+            //    save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+            // });
+            // $(document).on('click', '.ed-log-cdw-save', function () {
+            //    list_id=0;
+            //    var tableName=$(this).attr('tablename');
+            //    var number = $(this).closest('tr').find('td:eq(0) input').val();
+            //    var amp = $(this).closest('tr').find('td:eq(1) input').val();
+            //    var ed_log_id = $('.ed-log-logid').val();
+            //    save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+            // });
+            // $(document).on('click', '.ed-log-ct-save', function () {
+            //    list_id=0;
+            //    var tableName=$(this).attr('tablename');
+            //    var number = $(this).closest('tr').find('td:eq(0) input').val();
+            //    var amp = $(this).closest('tr').find('td:eq(1) input').val();
+            //    var ed_log_id = $('.ed-log-logid').val();
+            //    save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+            // });
 
             $(document).on('click', '.ed-log-chw-update', function () {
                list_id=$(this).attr('data-id');
                var tableName=$(this).attr('tablename');
-               var number = $(this).closest('tr').find('td:eq(0) input').val();
-               var amp = $(this).closest('tr').find('td:eq(1) input').val();
+               var amp = $(this).closest('tr').find('td input').val();
                var ed_log_id = $('.ed-log-logid').val();
-               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+               save_ed_equip_machine_details(list_id, ed_log_id, tableName, amp);
             });
             $(document).on('click', '.ed-log-cdw-update', function () {
                list_id=$(this).attr('data-id');
                var tableName=$(this).attr('tablename');
-               var number = $(this).closest('tr').find('td:eq(0) input').val();
-               var amp = $(this).closest('tr').find('td:eq(1) input').val();
+               var amp = $(this).closest('tr').find('td input').val();
                var ed_log_id = $('.ed-log-logid').val();
-               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+               save_ed_equip_machine_details(list_id, ed_log_id, tableName, amp);
             });
             $(document).on('click', '.ed-log-ct-update', function () {
                list_id=$(this).attr('data-id');
                var tableName=$(this).attr('tablename');
-               var number = $(this).closest('tr').find('td:eq(0) input').val();
-               var amp = $(this).closest('tr').find('td:eq(1) input').val();
+               var amp = $(this).closest('tr').find('td input').val();
                var ed_log_id = $('.ed-log-logid').val();
-               save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp);
+               save_ed_equip_machine_details(list_id, ed_log_id, tableName, amp);
             });
 
             
-            function save_ed_equip_machine_details(list_id, ed_log_id, tableName, number, amp){
+            function save_ed_equip_machine_details(list_id, ed_log_id, tableName, amp){
                 $.ajax({
                     url: "nemesis/stc_product.php",
                     method: "POST",
@@ -886,7 +950,6 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         stc_ed_log_equipMachineDetails_save: 1,
                         ed_log_id:ed_log_id,
                         tableName: tableName,
-                        number: number,
                         amp: amp,
                         list_id: list_id
                     },
@@ -1206,7 +1269,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row g-3 mb-4">
+                                <div class="row g-3 mb-4 chw-reading-row">
                                     <div class="col-md-12">
                                         <h4 class="mb-3">Chiller Water Pump</h4>
                                         <!-- Compressor Readings Table -->
@@ -1214,27 +1277,23 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <table id="chw-table" class="table table-bordered align-middle text-center">
                                                 <thead class="table-light">
                                                     <tr id="headerRow1">
-                                                        <th class="align-middle">Pump Number</th>
-                                                        <th>Pump Amp</th>
-                                                        <th>Action</th>
+                                                        <th class="align-middle">EQUIPMENT NAME</th>
+                                                        <th>SL NO</th>
+                                                        <th>UNIT NO</th>
+                                                        <th>EQUIPMENT NO</th>
+                                                        <th>AMP</th>
+                                                        <th>ACTION</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="chw-reading-body">
                                                     <tr id="readingRow">
-                                                        <td><input type="text" class="form-control" placeholder="Value"></td>
-                                                        <td><input type="number" class="form-control" placeholder="Value"></td>
-                                                        <td><a href="javascript:void(0)" tablename="equipment_details_log_ch_waterpump" class="form-control ed-log-chw-save">Save</a></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            <!-- Add Row Button -->
-                                            <div class="mt-2">
-                                                <button type="button" class="btn btn-sm btn-primary addRowBtn">+ Add Row</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row g-3 mb-4">
+                                <div class="row g-3 mb-4 cdw-reading-row">
                                     <div class="col-md-12">
                                         <h4 class="mb-3">Condenser Water Pump</h4>
                                         <!-- Compressor Readings Table -->
@@ -1242,27 +1301,23 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <table id="cdw-table" class="table table-bordered align-middle text-center">
                                                 <thead class="table-light">
                                                     <tr id="headerRow1">
-                                                        <th class="align-middle">Pump Number</th>
-                                                        <th>Pump Amp</th>
-                                                        <th>Action</th>
+                                                        <th class="align-middle">EQUIPMENT NAME</th>
+                                                        <th>SL NO</th>
+                                                        <th>UNIT NO</th>
+                                                        <th>EQUIPMENT NO</th>
+                                                        <th>AMP</th>
+                                                        <th>ACTION</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="cdw-reading-body">
                                                     <tr id="readingRow">
-                                                        <td><input type="text" class="form-control" placeholder="Value"></td>
-                                                        <td><input type="number" class="form-control" placeholder="Value"></td>
-                                                        <td><a href="javascript:void(0)" tablename="equipment_details_log_cd_waterpump" class="form-control ed-log-cdw-save">Save</a></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            <!-- Add Row Button -->
-                                            <div class="mt-2">
-                                                <button type="button" class="btn btn-sm btn-primary addRowBtn">+ Add Row</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row g-3 mb-4">
+                                <div class="row g-3 mb-4 ct-reading-row">
                                     <div class="col-md-12">
                                         <h4 class="mb-3">Cooling Tower</h4>
                                         <!-- Compressor Readings Table -->
@@ -1270,23 +1325,19 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             <table id="ct-table" class="table table-bordered align-middle text-center">
                                                 <thead class="table-light">
                                                     <tr id="headerRow1">
-                                                        <th class="align-middle">Cooling Tower Number</th>
-                                                        <th>Cooling Tower Amp</th>
-                                                        <th>Action</th>
+                                                        <th class="align-middle">EQUIPMENT NAME</th>
+                                                        <th>SL NO</th>
+                                                        <th>UNIT NO</th>
+                                                        <th>EQUIPMENT NO</th>
+                                                        <th>AMP</th>
+                                                        <th>ACTION</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody class="ct-reading-body">
                                                     <tr id="readingRow">
-                                                        <td><input type="text" class="form-control" placeholder="Value"></td>
-                                                        <td><input type="number" class="form-control" placeholder="Value"></td>
-                                                        <td><a href="javascript:void(0)" tablename="equipment_details_log_coolingtower" class="form-control ed-log-ct-save">Save</a></td>
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            <!-- Add Row Button -->
-                                            <div class="mt-2">
-                                                <button type="button" class="btn btn-sm btn-primary addRowBtn">+ Add Row</button>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>

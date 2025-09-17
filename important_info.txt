@@ -189,3 +189,5 @@ create table equipment_details_log_coolingtower(
     updated_date timestamp default current_timestamp on update current_timestamp,
     updated_by int not null
 )
+
+ALTER TABLE `equipment_details` ADD `status` INT NOT NULL DEFAULT '1' AFTER `created_by`;
