@@ -1332,10 +1332,23 @@ class pirates_project extends tesseract{
 
 	//show equipment details
 	public function stc_equipement_details_get($search){
-		$query=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_pro_supervisor_collaborate_userid` FROM `stc_agents` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` LEFT JOIN `stc_cust_pro_supervisor_collaborate` ON `stc_cust_pro_supervisor_id`=`stc_cust_pro_supervisor_collaborate_userid` WHERE `stc_agents_id`='".$_SESSION['stc_agent_id']."'");
+		// Get supervisors created by current manager
+		$query1=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_pro_supervisor_id` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'");
 		$users='';
-		if(mysqli_num_rows($query)>0){
-			foreach($query as $rows){
+		if(mysqli_num_rows($query1)>0){
+			foreach($query1 as $rows){
+				if($users==''){
+					$users=$rows['stc_cust_pro_supervisor_id'];
+				}else{
+					$users.=','.$rows['stc_cust_pro_supervisor_id'];
+				}
+			}
+		}
+		
+		// Get supervisors that are collaborated TO the current manager
+		$query2=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_pro_supervisor_collaborate_userid` FROM `stc_cust_pro_supervisor_collaborate` WHERE `stc_cust_pro_supervisor_collaborate_teamid`='".$_SESSION['stc_agent_id']."' AND `stc_cust_pro_supervisor_collaborate_status`=1");
+		if(mysqli_num_rows($query2)>0){
+			foreach($query2 as $rows){
 				if($users==''){
 					$users=$rows['stc_cust_pro_supervisor_collaborate_userid'];
 				}else{
