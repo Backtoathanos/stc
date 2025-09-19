@@ -607,7 +607,7 @@ class prime extends tesseract{
 				}
 				$row['compressor_reading'] = $compressor_reading_array ? $compressor_reading_array : 'NA';
 
-				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_ch_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_ch_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
 				$ch_waterpump_array=array();
 				if($query && mysqli_num_rows($query)>0){
 					foreach($query as $queryrow){
@@ -616,7 +616,7 @@ class prime extends tesseract{
 				}
 				$row['ch_waterpump'] = $ch_waterpump_array ? $ch_waterpump_array : 'NA';
 
-				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_cd_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`equipment_name`='CONDENSER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_cd_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CONDENSER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
 				$cd_waterpump_array=array();
 				if($query && mysqli_num_rows($query)>0){
 					foreach($query as $queryrow){
@@ -624,7 +624,7 @@ class prime extends tesseract{
 					}
 				}
 				$row['cd_waterpump'] = $cd_waterpump_array ? $cd_waterpump_array : 'NA';
-				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_coolingtower` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`equipment_name`='COOLING TOWER' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_coolingtower` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='COOLING TOWER' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
 				$coolingtower_array=array();
 				if($query && mysqli_num_rows($query)>0){
 					foreach($query as $queryrow){
@@ -656,7 +656,7 @@ class prime extends tesseract{
 					}
 					$row['compressor_reading'] = $compressor_reading_array ? $compressor_reading_array : 'NA';
 
-					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_ch_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_ch_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
 					$ch_waterpump_array=array();
 					if($query && mysqli_num_rows($query)>0){
 						foreach($query as $queryrow){
@@ -665,7 +665,7 @@ class prime extends tesseract{
 					}
 					$row['ch_waterpump'] = $ch_waterpump_array ? $ch_waterpump_array : 'NA';
 	
-					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_cd_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_cd_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
 					$cd_waterpump_array=array();
 					if($query && mysqli_num_rows($query)>0){
 						foreach($query as $queryrow){
@@ -673,7 +673,7 @@ class prime extends tesseract{
 						}
 					}
 					$row['cd_waterpump'] = $cd_waterpump_array ? $cd_waterpump_array : 'NA';
-					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_coolingtower` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_coolingtower` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
 					$coolingtower_array=array();
 					if($query && mysqli_num_rows($query)>0){
 						foreach($query as $queryrow){
@@ -689,14 +689,14 @@ class prime extends tesseract{
 		return $blackpearl;
 	}
 
-	public function stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load, $comp_amp){
+	public function stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load, $comp_amp, $current){
 		if(empty($_SESSION['stc_agent_sub_id'])){
 			return 'reload';
 		}
 		if($id>0){
-			$query=mysqli_query($this->stc_dbs, "UPDATE `equipment_details_log_comp` SET `suction_pr_psig`='".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', `disc_pr`='".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', `disc_temp_degC`='".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', `dsh`='".mysqli_real_escape_string($this->stc_dbs, $dsh)."', `oil_level`='".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', `comp_load`='".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', `comp_amp`='".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', `updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', `updated_date`='".date("Y-m-d H:i:s")."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+			$query=mysqli_query($this->stc_dbs, "UPDATE `equipment_details_log_comp` SET `suction_pr_psig`='".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', `disc_pr`='".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', `disc_temp_degC`='".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', `dsh`='".mysqli_real_escape_string($this->stc_dbs, $dsh)."', `oil_level`='".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', `comp_load`='".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', `comp_amp`='".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', `current`='".mysqli_real_escape_string($this->stc_dbs, $current)."', `updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', `updated_date`='".date("Y-m-d H:i:s")."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
 		}else{
-			$query=mysqli_query($this->stc_dbs, "INSERT INTO `equipment_details_log_comp` (`equipment_details_log_id`, `suction_pr_psig`, `disc_pr`, `disc_temp_degC`, `dsh`, `oil_level`, `comp_load`, `comp_amp`, `created_by`, `created_date`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $ed_log_id)."', '".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', '".mysqli_real_escape_string($this->stc_dbs, $dsh)."', '".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', '".date("Y-m-d H:i:s")."')");
+			$query=mysqli_query($this->stc_dbs, "INSERT INTO `equipment_details_log_comp` (`equipment_details_log_id`, `suction_pr_psig`, `disc_pr`, `disc_temp_degC`, `dsh`, `oil_level`, `comp_load`, `comp_amp`, `current`, `created_by`, `created_date`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $ed_log_id)."', '".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', '".mysqli_real_escape_string($this->stc_dbs, $dsh)."', '".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', '".date("Y-m-d H:i:s")."')");
 		}
 		
 		return "yes";
@@ -936,8 +936,9 @@ if(isset($_POST['stc_ed_log_comp_reading_save'])) {
 	$oil_level = $_POST['oil_level'];
 	$comp_load = $_POST['comp_load'];
 	$comp_amp = $_POST['comp_amp'];
+	$current = $_POST['current'];
 	$metabots = new prime();
-	$opmetabots = $metabots->stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load, $comp_amp);
+	$opmetabots = $metabots->stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load, $comp_amp, $current);
 	echo json_encode($opmetabots);
 }
 

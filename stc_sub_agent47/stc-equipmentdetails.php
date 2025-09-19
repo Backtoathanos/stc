@@ -606,6 +606,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                         <td><input type="number" class="form-control ed-comp-reading-parameter percent-box" min="0" max="100" value="${response.compressor_reading[i].oil_level}" placeholder="Value"></td>
                                         <td><input type="number" class="form-control ed-comp-reading-parameter percent-box" min="0" max="100" value="${response.compressor_reading[i].comp_load}" placeholder="Value"></td>
                                         <td><input type="number" class="form-control ed-comp-reading-parameter" value="${response.compressor_reading[i].comp_amp}" placeholder="Value"></td>
+                                        <td><input type="number" class="form-control ed-comp-reading-parameter" value="${response.compressor_reading[i].current}" placeholder="Value"></td>
                                         <td><a href="javascript:void(0)" data-id="${response.compressor_reading[i].id}" class="form-control ed-log-comp-reading-update">Save</a></td>
                                     </tr>
                                 `;
@@ -689,6 +690,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     <td><input type="number" class="form-control" placeholder="Value"></td>
                     <td><input type="number" class="form-control percent-box" min="0" max="100" placeholder="Value"></td>
                     <td><input type="number" class="form-control percent-box" min="0" max="100" placeholder="Value"></td>
+                    <td><input type="number" class="form-control" placeholder="Value"></td>
                     <td><input type="number" class="form-control" placeholder="Value"></td>
                     <td><a href="javascript:void(0)" class="form-control ed-log-comp-reading-save">Save</a></td>
                     </tr>
@@ -818,6 +820,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         <td><input type="number" class="form-control percent-box" min="0" max="100" min="0" max="100" placeholder="Value"></td>
                         <td><input type="number" class="form-control percent-box" min="0" max="100" min="0" max="100" placeholder="Value"></td>
                         <td><input type="number" class="form-control" placeholder="Value"></td>
+                        <td><input type="number" class="form-control" placeholder="Value"></td>
                         <td><a href="javascript:void(0)" class="form-control ed-log-comp-reading-save">Save</a></td>
                     </tr>
                `);
@@ -833,8 +836,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                var oil_level = $(this).closest('tr').find('td:eq(5) input').val();
                var comp_load = $(this).closest('tr').find('td:eq(6) input').val();
                var comp_amp = $(this).closest('tr').find('td:eq(7) input').val();
+               var current = $(this).closest('tr').find('td:eq(8) input').val();
                var ed_log_id = $('.ed-log-logid').val();
-               save_ed_comp_reading(ed_log_id, eq_comp_reading_id, suction_pr_psig, disc_pr, disc_temp_degC, dsh, oil_level, comp_load, comp_amp);
+               save_ed_comp_reading(ed_log_id, eq_comp_reading_id, suction_pr_psig, disc_pr, disc_temp_degC, dsh, oil_level, comp_load, comp_amp, current);
             });
             $(document).on('click', '.ed-log-comp-reading-save', function () {
                eq_comp_reading_id=0;
@@ -846,9 +850,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                var comp_load = $(this).closest('tr').find('td:eq(6) input').val();
                var comp_amp = $(this).closest('tr').find('td:eq(7) input').val();
                var ed_log_id = $('.ed-log-logid').val();
-               save_ed_comp_reading(ed_log_id, eq_comp_reading_id, suction_pr_psig, disc_pr, disc_temp_degC, dsh, oil_level, comp_load, comp_amp);
+               save_ed_comp_reading(ed_log_id, eq_comp_reading_id, suction_pr_psig, disc_pr, disc_temp_degC, dsh, oil_level, comp_load, comp_amp, current);
             });
-            function save_ed_comp_reading(ed_log_id, eq_comp_reading_id, suction_pr_psig, disc_pr, disc_temp_degC, dsh, oil_level, comp_load, comp_amp){
+            function save_ed_comp_reading(ed_log_id, eq_comp_reading_id, suction_pr_psig, disc_pr, disc_temp_degC, dsh, oil_level, comp_load, comp_amp, current){
                 $.ajax({
                     url: "nemesis/stc_product.php",
                     method: "POST",
@@ -862,7 +866,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         dsh: dsh,
                         oil_level: oil_level,
                         comp_load: comp_load,
-                        comp_amp: comp_amp
+                        comp_amp: comp_amp,
+                        current: current
                     },
                     dataType: "JSON",
                     success: function (response) {
@@ -1193,6 +1198,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <th>Oil Level %</th>
                                                         <th>Comp. Load %</th>
                                                         <th>Comp AMP</th>
+                                                        <th>Current</th>
                                                         <th>Action</th>
                                                     </tr>
                                                 </thead>
@@ -1205,6 +1211,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <td><input type="number" class="form-control" placeholder="Value"></td>
                                                         <td><input type="number" class="form-control percent-box" min="0" max="100"  placeholder="Value"></td>
                                                         <td><input type="number" class="form-control percent-box" min="0" max="100" placeholder="Value"></td>
+                                                        <td><input type="number" class="form-control" placeholder="Value"></td>
                                                         <td><input type="number" class="form-control" placeholder="Value"></td>
                                                         <td><a href="javascript:void(0)" class="form-control ed-log-comp-reading-save">Save</a></td>
                                                     </tr>

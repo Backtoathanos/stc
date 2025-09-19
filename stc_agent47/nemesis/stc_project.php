@@ -1463,7 +1463,8 @@ class pirates_project extends tesseract{
 						$cr['dsh'],
 						$cr['oil_level'],
 						$cr['comp_load'],
-						$cr['comp_amp']
+						$cr['comp_amp'],
+						$cr['current']
 					];
 				}
 			}
@@ -1549,7 +1550,8 @@ class pirates_project extends tesseract{
 					<th class="text-center">DSH</th>
 					<th class="text-center">OIL LEVEL %</th>
 					<th class="text-center">COMP. LOAD %</th>
-					<th class="text-center">COMP. AMP</th>';
+					<th class="text-center">COMP. AMP</th>
+					<th class="text-center">Current</th>';
 		}
 		
 		$chw_thead = '';
@@ -1598,7 +1600,7 @@ class pirates_project extends tesseract{
 						$j++;
 					}
 				} else {
-					$rowsHtml .= '<td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td>';
+					$rowsHtml .= '<td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td>';
 				}
 			}
 
