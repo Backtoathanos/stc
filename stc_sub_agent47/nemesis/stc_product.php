@@ -591,7 +591,7 @@ class prime extends tesseract{
 		$id_safe = mysqli_real_escape_string($this->stc_dbs, $id);
 
 		// Check if records already exist for today
-		$blackpearl_qry = mysqli_query($this->stc_dbs, "SELECT EDL.*, ED.unit_no, ED.location, ED.department FROM `equipment_details_log` EDL INNER JOIN `equipment_details` ED ON EDL.`equipment_details_id`=ED.`id` WHERE EDL.`equipment_details_id` = '$id_safe' AND EDL.`status`=2 ORDER BY EDL.`id` DESC LIMIT 1");
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "SELECT EDL.*, ED.unit_no, ED.location, ED.department, ED.area FROM `equipment_details_log` EDL INNER JOIN `equipment_details` ED ON EDL.`equipment_details_id`=ED.`id` WHERE EDL.`equipment_details_id` = '$id_safe' AND EDL.`status`=2 ORDER BY EDL.`id` DESC LIMIT 1");
 
 		if (mysqli_num_rows($blackpearl_qry) > 0) {
 			// Fetch rows
@@ -607,7 +607,7 @@ class prime extends tesseract{
 				}
 				$row['compressor_reading'] = $compressor_reading_array ? $compressor_reading_array : 'NA';
 
-				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_ch_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_ch_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']." AND A.`area`=".$row['area']."");
 				$ch_waterpump_array=array();
 				if($query && mysqli_num_rows($query)>0){
 					foreach($query as $queryrow){
@@ -616,7 +616,7 @@ class prime extends tesseract{
 				}
 				$row['ch_waterpump'] = $ch_waterpump_array ? $ch_waterpump_array : 'NA';
 
-				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_cd_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CONDENSER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_cd_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CONDENSER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']." AND A.`area`=".$row['area']."");
 				$cd_waterpump_array=array();
 				if($query && mysqli_num_rows($query)>0){
 					foreach($query as $queryrow){
@@ -624,7 +624,7 @@ class prime extends tesseract{
 					}
 				}
 				$row['cd_waterpump'] = $cd_waterpump_array ? $cd_waterpump_array : 'NA';
-				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_coolingtower` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='COOLING TOWER' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+				$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_coolingtower` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='COOLING TOWER' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']." AND A.`area`=".$row['area']."");
 				$coolingtower_array=array();
 				if($query && mysqli_num_rows($query)>0){
 					foreach($query as $queryrow){
@@ -656,7 +656,7 @@ class prime extends tesseract{
 					}
 					$row['compressor_reading'] = $compressor_reading_array ? $compressor_reading_array : 'NA';
 
-					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_ch_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_ch_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']." AND A.`area`=".$row['area']."");
 					$ch_waterpump_array=array();
 					if($query && mysqli_num_rows($query)>0){
 						foreach($query as $queryrow){
@@ -665,7 +665,7 @@ class prime extends tesseract{
 					}
 					$row['ch_waterpump'] = $ch_waterpump_array ? $ch_waterpump_array : 'NA';
 	
-					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_cd_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_cd_waterpump` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']." AND A.`area`=".$row['area']."");
 					$cd_waterpump_array=array();
 					if($query && mysqli_num_rows($query)>0){
 						foreach($query as $queryrow){
@@ -673,7 +673,7 @@ class prime extends tesseract{
 						}
 					}
 					$row['cd_waterpump'] = $cd_waterpump_array ? $cd_waterpump_array : 'NA';
-					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_coolingtower` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']."");
+					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_coolingtower` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']." AND A.`area`=".$row['area']."");
 					$coolingtower_array=array();
 					if($query && mysqli_num_rows($query)>0){
 						foreach($query as $queryrow){
