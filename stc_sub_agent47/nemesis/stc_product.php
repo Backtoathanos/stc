@@ -673,7 +673,7 @@ class prime extends tesseract{
 						}
 					}
 					$row['cd_waterpump'] = $cd_waterpump_array ? $cd_waterpump_array : 'NA';
-					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_coolingtower` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='CHILLER WATER PUMP' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']." AND A.`area`='".$row['area']."'");
+					$query=mysqli_query($this->stc_dbs, "SELECT A.id, A.equipment_name, A.slno, A.unit_no, A.equipment_no, B.numb, B.amp FROM `equipment_details` A LEFT JOIN `equipment_details_log_coolingtower` B ON A.id=B.numb AND B.`equipment_details_log_id`=".$row['id']." WHERE A.`status`=1 AND A.`equipment_name`='COOLING TOWER' AND A.`location`=".$row['location']." AND A.`department`=".$row['department']." AND A.`area`='".$row['area']."'");
 					$coolingtower_array=array();
 					if($query && mysqli_num_rows($query)>0){
 						foreach($query as $queryrow){

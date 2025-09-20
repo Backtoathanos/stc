@@ -1183,9 +1183,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                             placeholder="Enter voltage">
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="voltage" class="form-label fw-semibold">Creator Name</label>
+                                        <label for="voltage" class="form-label fw-semibold">Operator Name</label>
                                         <input type="text" class="form-control ed-log-event ed-log-creator_name" label="creator_name" id="creator_name"
-                                            placeholder="Enter creator name">
+                                            placeholder="Enter operator name">
                                     </div>
                                 </div>
                                 <div class="row g-3 mb-4">
