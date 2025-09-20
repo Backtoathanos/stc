@@ -97,6 +97,7 @@ else {
                                                 </thead>
                                                 <tbody class="equipement-details-show"></tbody>
                                             </table>
+                                            <div class="equipment-pagination"></div>
                                         </div>
                                     </div>
                                   </div>
@@ -149,39 +150,104 @@ else {
             $('body').delegate('#itt-toolssearchInput', 'keyup', function(e){
                 var search=$(this).val();
                 if(search.length>3 || search.length==0){
-                    call_equipementdetails(search);
+                    call_equipementdetails(search, 1);
                 }
             });
 
-            call_equipementdetails('');
-            // call tools tracker
-            function call_equipementdetails(search){
+            // Pagination variables - make globally accessible
+            window.currentPage = 1;
+            window.recordsPerPage = 25;
+            window.totalRecords = 0;
+            window.currentSearch = '';
+            
+            // call tools tracker - make function globally accessible
+            window.call_equipementdetails = function(search, page = 1){
+                window.currentPage = page;
+                window.currentSearch = search;
+                var row = (page - 1) * window.recordsPerPage;
+                
                 $.ajax({
                     url : "nemesis/stc_project.php",
                     method : "POST",
                     data : {
                         call_equipementdetails:1,
-                        search:search
+                        search:search,
+                        row:row,
+                        rowperpage:window.recordsPerPage
                     },
                     dataType : "JSON",
                     success : function(response){
-                    var data='';
-                    // Check if response is valid
-                    if (response.length > 0) {
-                        // Loop through the JSON data
-                        var slno=0;
-                        for (var i = 0; i < response.length; i++) {
-                            slno++;
-                            var log_button = '';
-                            if(response[i].log_status == 'yes') {
-                                log_button = '<a href="#" class="btn btn-primary ed-logequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
+                        var data='';
+                        // Check if response is valid
+                        if (response.length > 0) {
+                            // Loop through the JSON data
+                            var slno = row + 1;
+                            for (var i = 0; i < response.length; i++) {
+                                var log_button = '';
+                                if(response[i].log_status == 'yes') {
+                                    log_button = '<a href="#" class="btn btn-primary ed-logequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
+                                }
+                                data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + log_button + '<a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
+                                slno++;
                             }
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + log_button + '<a href="javascript:void(0)" class="btn btn-primary ed-editequipment" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a><a href="javascript:void(0)" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a></td></tr>';
+                        } else {
+                            data="<tr><td colspan='9' class='text-center'>No data found.</td></tr>";
                         }
-                    } else {
-                        data="<td>No data found.</td>";
+                        $('.equipement-details-show').html(data);
+                        
+                        // Update pagination
+                        updatePagination(search);
                     }
-                    $('.equipement-details-show').html(data);
+                });
+            }
+
+            call_equipementdetails('', 1);
+
+            // Function to get total count and update pagination
+            function updatePagination(search){
+                $.ajax({
+                    url : "nemesis/stc_project.php",
+                    method : "POST",
+                    data : {
+                        call_equipementdetails_count:1,
+                        search:search
+                    },
+                    success : function(totalCount){
+                        window.totalRecords = parseInt(totalCount);
+                        var totalPages = Math.ceil(window.totalRecords / window.recordsPerPage);
+                        
+                        var paginationHtml = '';
+                        if(totalPages > 1){
+                            paginationHtml = '<nav aria-label="Equipment Details Pagination"><ul class="pagination justify-content-center">';
+                            
+                            // Previous button
+                            if(window.currentPage > 1){
+                                paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_equipementdetails(\''+window.currentSearch+'\', '+(window.currentPage-1)+')">Previous</a></li>';
+                            }
+                            
+                            // Page numbers
+                            var startPage = Math.max(1, window.currentPage - 2);
+                            var endPage = Math.min(totalPages, window.currentPage + 2);
+                            
+                            for(var i = startPage; i <= endPage; i++){
+                                var activeClass = (i == window.currentPage) ? ' active' : '';
+                                paginationHtml += '<li class="page-item'+activeClass+'"><a class="page-link" href="javascript:void(0)" onclick="call_equipementdetails(\''+window.currentSearch+'\', '+i+')">'+i+'</a></li>';
+                            }
+                            
+                            // Next button
+                            if(window.currentPage < totalPages){
+                                paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_equipementdetails(\''+window.currentSearch+'\', '+(window.currentPage+1)+')">Next</a></li>';
+                            }
+                            
+                            paginationHtml += '</ul></nav>';
+                            
+                            // Show records info
+                            var startRecord = (window.currentPage - 1) * window.recordsPerPage + 1;
+                            var endRecord = Math.min(window.currentPage * window.recordsPerPage, window.totalRecords);
+                            paginationHtml += '<div class="text-center mt-2"><small>Showing '+startRecord+' to '+endRecord+' of '+window.totalRecords+' records</small></div>';
+                        }
+                        
+                        $('.equipment-pagination').html(paginationHtml);
                     }
                 });
             }
@@ -222,7 +288,7 @@ else {
                             var result = $.trim(response);
                             if (result === 'success') {
                                 alert('Record deleted successfully!');
-                                call_equipementdetails();
+                                call_equipementdetails(window.currentSearch, 1);
                             } else {
                                 alert('Failed to delete the record. Please try again.');
                             }
@@ -280,7 +346,7 @@ else {
                         value:value
                     },
                     success : function(response){
-                        call_equipementdetails('');
+                        call_equipementdetails(window.currentSearch, 1);
                     }
                 });
             }

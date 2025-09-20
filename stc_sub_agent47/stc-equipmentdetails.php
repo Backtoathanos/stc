@@ -275,7 +275,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             var obj_response = response.trim();
                             if (obj_response == "yes") {
                                 alert("Record saved successfully!!!");
-                                call_equipementdetails();
+                                call_equipementdetails('');
                                 $('.ed-equipment-name').val('NA');
                                 $('.ed-equipment-no').val('');
                                 $('.ed-model-no').val('');

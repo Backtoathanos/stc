@@ -1331,7 +1331,7 @@ class pirates_project extends tesseract{
 	}
 
 	//show equipment details
-	public function stc_equipement_details_get($search){
+	public function stc_equipement_details_get($search, $row = 0, $rowperpage = 10){
 		// Get supervisors created by current manager
 		$query1=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_pro_supervisor_id` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'");
 		$users='';
@@ -1388,8 +1388,8 @@ class pirates_project extends tesseract{
 		// Combine filters with `AND` if any exist
 		$filterString = !empty($filters) ? " WHERE " . implode(" AND ", $filters) : "";
 
-		// Complete query with filters and ordering
-		$query = $baseQuery . $filterString . " ORDER BY TIMESTAMP(`created_date`) DESC";
+		// Complete query with filters, ordering, and pagination
+		$query = $baseQuery . $filterString . " ORDER BY TIMESTAMP(`created_date`) DESC LIMIT ".$row.",".$rowperpage;
 		// Execute query
 		$blackpearl_qry = mysqli_query($this->stc_dbs, $query);
 
@@ -1420,6 +1420,75 @@ class pirates_project extends tesseract{
 		}
 	
 		return $blackpearl;
+	}
+
+	//get total count for equipment details pagination
+	public function stc_equipement_details_count($search){
+		// Get supervisors created by current manager
+		$query1=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_pro_supervisor_id` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_created_by`='".$_SESSION['stc_agent_id']."'");
+		$users='';
+		if(mysqli_num_rows($query1)>0){
+			foreach($query1 as $rows){
+				if($users==''){
+					$users=$rows['stc_cust_pro_supervisor_id'];
+				}else{
+					$users.=','.$rows['stc_cust_pro_supervisor_id'];
+				}
+			}
+		}
+		
+		// Get supervisors that are collaborated TO the current manager
+		$query2=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_pro_supervisor_collaborate_userid` FROM `stc_cust_pro_supervisor_collaborate` WHERE `stc_cust_pro_supervisor_collaborate_teamid`='".$_SESSION['stc_agent_id']."' AND `stc_cust_pro_supervisor_collaborate_status`=1");
+		if(mysqli_num_rows($query2)>0){
+			foreach($query2 as $rows){
+				if($users==''){
+					$users=$rows['stc_cust_pro_supervisor_collaborate_userid'];
+				}else{
+					$users.=','.$rows['stc_cust_pro_supervisor_collaborate_userid'];
+				}
+			}
+		}
+		
+		// Initialize the base query for count
+		$baseQuery = "SELECT COUNT(*) as total FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id` = `equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id` = `equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by` = `stc_cust_pro_supervisor_id`";
+
+		// Initialize filter array
+		$filters = [];
+
+		$users=explode(',', $users);
+		$users=array_map('intval', $users);
+		$users=implode(',', $users);
+		// Add user filter if $users is not empty
+		if (!empty($users)) {
+		$filters[] = "`created_by` IN (" . mysqli_real_escape_string($this->stc_dbs, $users) . ")";
+		}
+
+		// Add search filter if $search is not empty
+		if (!empty($search)) {
+			$escapedSearch = mysqli_real_escape_string($this->stc_dbs, $search);
+			$filters[] = "(
+				`model_no` = '$escapedSearch' OR 
+				`capacity` REGEXP '$escapedSearch' OR 
+				`stc_cust_pro_supervisor_fullname` REGEXP '$escapedSearch' OR 
+				`area` REGEXP '$escapedSearch' OR 
+				`stc_status_down_list_department_location` REGEXP '$escapedSearch' OR 
+				`stc_status_down_list_department_dept` REGEXP '$escapedSearch' OR 
+				`equipment_name` REGEXP '$escapedSearch' OR 
+				`equipment_type` REGEXP '$escapedSearch'
+			)";
+		}
+
+		// Combine filters with `AND` if any exist
+		$filterString = !empty($filters) ? " WHERE " . implode(" AND ", $filters) : "";
+
+		// Complete query with filters
+		$query = $baseQuery . $filterString;
+		
+		// Execute query
+		$count_qry = mysqli_query($this->stc_dbs, $query);
+		$count_result = mysqli_fetch_assoc($count_qry);
+		
+		return $count_result['total'];
 	}
 
 	// show equipment details perticular
@@ -5181,9 +5250,19 @@ if(isset($_POST['call_item_tracker'])){
 // call equipment details
 if(isset($_POST['call_equipementdetails'])){
 	$search=isset($_POST['search']) ? $_POST['search'] : '';
+	$row=isset($_POST['row']) ? (int)$_POST['row'] : 0;
+	$rowperpage=isset($_POST['rowperpage']) ? (int)$_POST['rowperpage'] : 10;
 	$odin_req=new pirates_project();
-	$odin_req_out=$odin_req->stc_equipement_details_get($search);
+	$odin_req_out=$odin_req->stc_equipement_details_get($search, $row, $rowperpage);
 	echo json_encode($odin_req_out);
+}
+
+// get equipment details count for pagination
+if(isset($_POST['call_equipementdetails_count'])){
+	$search=isset($_POST['search']) ? $_POST['search'] : '';
+	$odin_req=new pirates_project();
+	$odin_req_out=$odin_req->stc_equipement_details_count($search);
+	echo $odin_req_out;
 }
 
 // delete equipment details
