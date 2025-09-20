@@ -1149,7 +1149,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Equipment Details Log Sheet</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Equipment Log Sheet</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -1158,7 +1158,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 <div class="container mt-5">
                     <div class="card shadow-lg border-0 rounded-3">
                         <div class="card-header bg-primary text-white py-3">
-                            <h5 class="mb-0">Equipment Details Log Sheet</h5>
+                            <h5 class="mb-0">Running parameters</h5>
                         </div>
                         <div class="card-body p-4">
                             <form>
