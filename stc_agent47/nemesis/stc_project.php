@@ -1510,7 +1510,7 @@ class pirates_project extends tesseract{
 
 		$query = mysqli_query(
 			$this->stc_dbs,
-			"SELECT EDL.*, ED.unit_no, S.stc_cust_pro_supervisor_fullname as creator 
+			"SELECT EDL.*, ED.unit_no, EDL.creator_name as creator 
 			FROM equipment_details_log EDL 
 			INNER JOIN equipment_details ED ON EDL.equipment_details_id=ED.id 
 			INNER JOIN stc_cust_pro_supervisor S ON EDL.created_by=S.stc_cust_pro_supervisor_id 
@@ -1545,8 +1545,7 @@ class pirates_project extends tesseract{
 						$cr['dsh'],
 						$cr['oil_level'],
 						$cr['comp_load'],
-						$cr['comp_amp'],
-						$cr['current']
+						$cr['comp_amp']
 					];
 				}
 			}
@@ -1632,8 +1631,7 @@ class pirates_project extends tesseract{
 					<th class="text-center">DSH</th>
 					<th class="text-center">OIL LEVEL %</th>
 					<th class="text-center">COMP. LOAD %</th>
-					<th class="text-center">COMP. AMP</th>
-					<th class="text-center">Current</th>';
+					<th class="text-center">COMP. AMP</th>';
 		}
 		
 		$chw_thead = '';
@@ -1682,7 +1680,7 @@ class pirates_project extends tesseract{
 						$j++;
 					}
 				} else {
-					$rowsHtml .= '<td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td>';
+					$rowsHtml .= '<td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td>';
 				}
 			}
 

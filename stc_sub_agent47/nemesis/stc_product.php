@@ -591,7 +591,7 @@ class prime extends tesseract{
 		$id_safe = mysqli_real_escape_string($this->stc_dbs, $id);
 
 		// Check if records already exist for today
-		$blackpearl_qry = mysqli_query($this->stc_dbs, "SELECT EDL.*, ED.unit_no, ED.location, ED.department, ED.area FROM `equipment_details_log` EDL INNER JOIN `equipment_details` ED ON EDL.`equipment_details_id`=ED.`id` WHERE EDL.`equipment_details_id` = '$id_safe' AND EDL.`status`=2 ORDER BY EDL.`id` DESC LIMIT 1");
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "SELECT EDL.*, ED.unit_no, ED.location, ED.department, ED.area, EDL.creator_name FROM `equipment_details_log` EDL INNER JOIN `equipment_details` ED ON EDL.`equipment_details_id`=ED.`id` WHERE EDL.`equipment_details_id` = '$id_safe' AND EDL.`status`=2 ORDER BY EDL.`id` DESC LIMIT 1");
 
 		if (mysqli_num_rows($blackpearl_qry) > 0) {
 			// Fetch rows
@@ -689,14 +689,14 @@ class prime extends tesseract{
 		return $blackpearl;
 	}
 
-	public function stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load, $comp_amp, $current){
+	public function stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load, $comp_amp){
 		if(empty($_SESSION['stc_agent_sub_id'])){
 			return 'reload';
 		}
 		if($id>0){
-			$query=mysqli_query($this->stc_dbs, "UPDATE `equipment_details_log_comp` SET `suction_pr_psig`='".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', `disc_pr`='".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', `disc_temp_degC`='".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', `dsh`='".mysqli_real_escape_string($this->stc_dbs, $dsh)."', `oil_level`='".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', `comp_load`='".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', `comp_amp`='".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', `current`='".mysqli_real_escape_string($this->stc_dbs, $current)."', `updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', `updated_date`='".date("Y-m-d H:i:s")."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+			$query=mysqli_query($this->stc_dbs, "UPDATE `equipment_details_log_comp` SET `suction_pr_psig`='".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', `disc_pr`='".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', `disc_temp_degC`='".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', `dsh`='".mysqli_real_escape_string($this->stc_dbs, $dsh)."', `oil_level`='".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', `comp_load`='".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', `comp_amp`='".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', `updated_by`='".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', `updated_date`='".date("Y-m-d H:i:s")."' WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."'");
 		}else{
-			$query=mysqli_query($this->stc_dbs, "INSERT INTO `equipment_details_log_comp` (`equipment_details_log_id`, `suction_pr_psig`, `disc_pr`, `disc_temp_degC`, `dsh`, `oil_level`, `comp_load`, `comp_amp`, `current`, `created_by`, `created_date`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $ed_log_id)."', '".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', '".mysqli_real_escape_string($this->stc_dbs, $dsh)."', '".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', '".date("Y-m-d H:i:s")."')");
+			$query=mysqli_query($this->stc_dbs, "INSERT INTO `equipment_details_log_comp` (`equipment_details_log_id`, `suction_pr_psig`, `disc_pr`, `disc_temp_degC`, `dsh`, `oil_level`, `comp_load`, `comp_amp`, `created_by`, `created_date`) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $ed_log_id)."', '".mysqli_real_escape_string($this->stc_dbs, $suction_pr_psig)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_pr)."', '".mysqli_real_escape_string($this->stc_dbs, $disc_temp_degC)."', '".mysqli_real_escape_string($this->stc_dbs, $dsh)."', '".mysqli_real_escape_string($this->stc_dbs, $oil_level)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_load)."', '".mysqli_real_escape_string($this->stc_dbs, $comp_amp)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."', '".date("Y-m-d H:i:s")."')");
 		}
 		
 		return "yes";
@@ -725,13 +725,12 @@ class prime extends tesseract{
 		}
 
 		// Validate the label to prevent SQL injection
-		$allowed_labels = ['voltage', 'chw_inlet_temp', 'chw_outlet_temp', 'chw_inlet_pr', 'chw_outlet_pr', 'cow_inlet_temp', 'cow_outlet_temp', 'cow_inlet_pr', 'cow_outlet_pr'];
+		$allowed_labels = ['voltage', 'chw_inlet_temp', 'chw_outlet_temp', 'chw_inlet_pr', 'chw_outlet_pr', 'cow_inlet_temp', 'cow_outlet_temp', 'cow_inlet_pr', 'cow_outlet_pr', 'creator_name'];
 		if (!in_array($label, $allowed_labels)) {
 			return 'invalid_label';
 		}
 
 		$query = mysqli_query($this->stc_dbs, "UPDATE `equipment_details_log` SET `$label`='" . mysqli_real_escape_string($this->stc_dbs, $value) . "', `updated_by`='" . mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id']) . "', `updated_date`='" . date("Y-m-d H:i:s") . "' WHERE `id`='" . mysqli_real_escape_string($this->stc_dbs, $id) . "'");
-
 		return $query ? 'yes' : 'no';
 	}
 
@@ -851,22 +850,6 @@ if (isset($_POST['save_equipementdetails'])) {
 }
 
 // save equipment details
-if (isset($_POST['update_equipementdetails'])) {
-    $id = $_POST['id'];
-    $label = $_POST['label'];
-    $value = $_POST['value'];
-    $out = '';
-
-    if (empty($_SESSION['stc_agent_sub_id'])) {
-        $out = 'reload';
-    } else {
-        $odin_req = new prime();
-        $out = $odin_req->stc_equipement_details_update($id, $label, $value);
-    }
-    echo $out;
-}
-
-// save equipment details
 if (isset($_POST['call_tool_trackertrackrecieve'])) {
     $id = $_POST['itt_id'];
     $out = '';
@@ -936,9 +919,8 @@ if(isset($_POST['stc_ed_log_comp_reading_save'])) {
 	$oil_level = $_POST['oil_level'];
 	$comp_load = $_POST['comp_load'];
 	$comp_amp = $_POST['comp_amp'];
-	$current = $_POST['current'];
 	$metabots = new prime();
-	$opmetabots = $metabots->stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load, $comp_amp, $current);
+	$opmetabots = $metabots->stc_save_equipment_log_comp_reading($ed_log_id, $id, $suction_pr_psig, $disc_pr, $disc_temp_degC, $dsh, $oil_level, $comp_load, $comp_amp);
 	echo json_encode($opmetabots);
 }
 
