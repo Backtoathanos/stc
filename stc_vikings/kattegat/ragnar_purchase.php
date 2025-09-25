@@ -2322,8 +2322,9 @@ class ragnarPurchaseAdhoc extends tesseract{
 					$cherrypick='';
 				}
 				$productog.='<input type="number" placeholder="Enter product id" class="form-control img-idinput"><a href="javascript:void(0)" class="form-control img-inputbtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
-				$pro_prate='<input type="number" style="display:none" placeholder="Enter purchase rate" class="form-control img-idprateinput" value="'.$odinrow['stc_purchase_product_adhoc_prate'].'"><a href="javascript:void(0)" style="display:none" class="form-control img-inputpratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
-				$pro_rate='<input type="number" style="display:none" placeholder="Enter sale rate" class="form-control img-idrateinput" value="'.$odinrow['stc_purchase_product_adhoc_rate'].'"><a href="javascript:void(0)" style="display:none" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Update</a>';
+				$pro_prate='<input type="number" style="display:none" placeholder="Enter purchase rate" class="form-control img-idprateinput" value="'.$odinrow['stc_purchase_product_adhoc_prate'].'" step="0.01" oninput="calculateInlineSaleRate(this)"><a href="javascript:void(0)" style="display:none" class="form-control img-inputpratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
+				$pro_percentage='<input type="number" style="display:none" placeholder="Enter profit %" class="form-control img-idpercentageinput" step="0.01" oninput="calculateInlineSaleRate(this)"><a href="javascript:void(0)" style="display:none" class="form-control img-inputpercentagebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Add</a>';
+				$pro_rate='<input type="number" style="display:none" placeholder="Calculated sale rate" class="form-control img-idrateinput" value="'.$odinrow['stc_purchase_product_adhoc_rate'].'" readonly><a href="javascript:void(0)" style="display:none" class="form-control img-inputratebtn" id="'.$odinrow['stc_purchase_product_adhoc_id'].'">Update</a>';
 				$product_name=$odinrow['stc_sub_cat_name']!="OTHERS"?$odinrow['stc_sub_cat_name']. ' ' .$odinrow['stc_product_name']:$odinrow['stc_product_name'];
 				$statusDropdown='';
 				if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==6){
@@ -2388,7 +2389,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
 						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
-						<td class='text-right' style='width: 125px;'><a href='javascript:void(0)' class='img-inputbtnshow'>".number_format($odinrow['stc_purchase_product_adhoc_prate'], 2)."</br>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."</a>".$pro_prate.$pro_rate."</td>
+						<td class='text-right' style='width: 125px;'><a href='javascript:void(0)' class='img-inputbtnshow'>".number_format($odinrow['stc_purchase_product_adhoc_prate'], 2)."</br>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."</a>".$pro_prate.$pro_percentage.$pro_rate."</td>
 						<td class='text-right'>".number_format($stock, 2)."</td>
 						<td class='text-center' style='width: 180px;'>
 							".$shop_details."
@@ -2594,8 +2595,14 @@ class ragnarPurchaseAdhoc extends tesseract{
 		return $odin;
 	}
 
-	public function stc_poadhoc_rateupdate($adhoc_id, $rate, $prate){
+	public function stc_poadhoc_rateupdate($adhoc_id, $rate, $prate, $percentage = null){
 		$odin='';
+		// If percentage is provided, calculate the sale rate from purchase rate and percentage
+		if($percentage !== null && $percentage !== '' && $prate > 0){
+			$calculated_rate = $prate + ($prate * $percentage / 100);
+			$rate = $calculated_rate;
+		}
+		
 		$checkqry=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_rate`='".mysqli_real_escape_string($this->stc_dbs, $rate)."', `stc_purchase_product_adhoc_prate`='".mysqli_real_escape_string($this->stc_dbs, $prate)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
 		");
@@ -4018,8 +4025,9 @@ if(isset($_POST['stc_po_adhoc_rateupdate'])){
 	$adhoc_id=$_POST['adhoc_id'];
 	$rate=$_POST['rate'];
 	$prate=$_POST['prate'];
+	$percentage=$_POST['percentage'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_poadhoc_rateupdate($adhoc_id, $rate, $prate);
+	$outbjornestocking=$bjornestocking->stc_poadhoc_rateupdate($adhoc_id, $rate, $prate, $percentage);
 	echo $outbjornestocking;
 }
 

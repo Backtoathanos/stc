@@ -77,6 +77,56 @@ include("kattegat/role_check.php");
       .dropdown-item:hover {
           background-color: #f5f5f5;
       }
+
+      /* Percentage calculation styling */
+      .percentage-input {
+          margin-top: 5px;
+          border-left: 3px solid #28a745;
+      }
+
+      .sale-rate-display {
+          margin-top: 5px;
+          border-left: 3px solid #007bff;
+          font-weight: bold;
+      }
+
+      .purchase-rate-input {
+          border-left: 3px solid #ffc107;
+      }
+
+      .percentage-input:focus {
+          border-color: #28a745;
+          box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+      }
+
+      .sale-rate-display:focus {
+          border-color: #007bff;
+          box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+
+      /* Inline editing percentage styling */
+      .img-idpercentageinput {
+          margin-top: 5px;
+          border-left: 3px solid #28a745;
+          background-color: #f8f9fa;
+      }
+
+      .img-idpercentageinput:focus {
+          border-color: #28a745;
+          box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+          background-color: #fff;
+      }
+
+      .img-idprateinput {
+          border-left: 3px solid #ffc107;
+      }
+
+      .img-idrateinput {
+          margin-top: 5px;
+          border-left: 3px solid #007bff;
+          font-weight: bold;
+          background-color: #e9ecef;
+      }
     </style>
 </head>
 <body>
@@ -126,7 +176,7 @@ include("kattegat/role_check.php");
                                                             <th>Item Code</th>
                                                             <th>Item Name</th>
                                                             <th>Quantity</br>Unit</th>
-                                                            <th>Purchase Rate</br>Sale Rate</th>
+                                                            <th>Purchase Rate</br>Profit % / Sale Rate</th>
                                                             <th>Rack</br>Condition</th>
                                                             <th>From (Source/Location)<br>To (Destination/Location)</th>
                                                             <th>Received By</th>
@@ -196,16 +246,26 @@ include("kattegat/role_check.php");
                                                                     name="prate[]"
                                                                     type="number"
                                                                     placeholder="Purchase Rate"
-                                                                    class="form-control validate"
+                                                                    class="form-control validate purchase-rate-input"
                                                                     required
+                                                                    step="0.01"
+                                                                />
+                                                                <input
+                                                                    name="percentage[]"
+                                                                    type="number"
+                                                                    placeholder="Profit %"
+                                                                    class="form-control validate percentage-input"
+                                                                    step="0.01"
+                                                                    oninput="calculateSaleRate(this)"
                                                                 />
                                                                 <input
                                                                     name="rate[]"
                                                                     type="number"
                                                                     placeholder="Sale Rate"
-                                                                    class="form-control validate"
+                                                                    class="form-control validate sale-rate-display"
                                                                     value="0"
-                                                                    style="display: none;"
+                                                                    readonly
+                                                                    style="background-color: #f8f9fa;"
                                                                 />
                                                             </td>
                                                             <td>
@@ -409,7 +469,7 @@ include("kattegat/role_check.php");
                                               <th>Rack</th>
                                               <th>Unit</th>
                                               <th>Quantity</th>
-                                              <th>Purchase Rate</br>Sale Rate</th>
+                                              <th>Purchase Rate</br>Profit % / Sale Rate</th>
                                               <th>Stock</th>
                                               <th>Shop</th>
                                               <th>Dispatch Details</th>
@@ -1098,6 +1158,7 @@ include("kattegat/role_check.php");
           
           $('body').delegate('.img-inputbtnshow', 'click', function(e){
             $(this).parent().find('.img-idprateinput').toggle();
+            $(this).parent().find('.img-idpercentageinput').toggle();
             $(this).parent().find('.img-idrateinput').toggle();
             $(this).parent().find('.img-inputratebtn').toggle();
           });
@@ -1152,6 +1213,7 @@ include("kattegat/role_check.php");
             var adhoc_id=$(this).attr('id');
             var rate=$(this).parent().find('.img-idrateinput').val();
             var prate=$(this).parent().find('.img-idprateinput').val();
+            var percentage=$(this).parent().find('.img-idpercentageinput').val();
             $.ajax({
               url     : "kattegat/ragnar_purchase.php",
               method  : "POST",
@@ -1159,7 +1221,8 @@ include("kattegat/role_check.php");
                 stc_po_adhoc_rateupdate:1,
                 adhoc_id:adhoc_id,
                 rate:rate,
-                prate:prate
+                prate:prate,
+                percentage:percentage
               },
               success : function(response_items){
                 var response=response_items.trim();
@@ -1747,6 +1810,55 @@ include("kattegat/role_check.php");
 
           
         });
+
+        // Function to calculate sale rate based on purchase rate and percentage
+        function calculateSaleRate(percentageInput) {
+            var row = percentageInput.closest('tr');
+            var purchaseRateInput = row.querySelector('.purchase-rate-input');
+            var saleRateInput = row.querySelector('.sale-rate-display');
+            
+            var purchaseRate = parseFloat(purchaseRateInput.value) || 0;
+            var percentage = parseFloat(percentageInput.value) || 0;
+            
+            if (purchaseRate > 0 && percentage >= 0) {
+                var saleRate = purchaseRate + (purchaseRate * percentage / 100);
+                saleRateInput.value = saleRate.toFixed(2);
+            } else {
+                saleRateInput.value = '0.00';
+            }
+        }
+
+        // Function to calculate sale rate in edit form
+        function calculateEditSaleRate() {
+            var purchaseRate = parseFloat(document.getElementById('cherrypRate').value) || 0;
+            var percentage = parseFloat(document.getElementById('cherryPercentage').value) || 0;
+            var saleRateInput = document.getElementById('cherryRate');
+            
+            if (purchaseRate > 0 && percentage >= 0) {
+                var saleRate = purchaseRate + (purchaseRate * percentage / 100);
+                saleRateInput.value = saleRate.toFixed(2);
+            } else {
+                saleRateInput.value = '0.00';
+            }
+        }
+
+        // Function to calculate sale rate for inline editing
+        function calculateInlineSaleRate(inputElement) {
+            var row = inputElement.closest('td');
+            var purchaseRateInput = row.querySelector('.img-idprateinput');
+            var percentageInput = row.querySelector('.img-idpercentageinput');
+            var saleRateInput = row.querySelector('.img-idrateinput');
+            
+            var purchaseRate = parseFloat(purchaseRateInput.value) || 0;
+            var percentage = parseFloat(percentageInput.value) || 0;
+            
+            if (purchaseRate > 0 && percentage >= 0) {
+                var saleRate = purchaseRate + (purchaseRate * percentage / 100);
+                saleRateInput.value = saleRate.toFixed(2);
+            } else {
+                saleRateInput.value = '0.00';
+            }
+        }
     </script>
 </body>
 </html>
@@ -2471,7 +2583,15 @@ include("kattegat/role_check.php");
                   <label style="margin-left : 20px" for="cherrypRate">Purchase Rate : </label>
                 </div>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" id="cherrypRate" name="rate" required>
+                  <input type="number" class="form-control" id="cherrypRate" name="purchase_rate" step="0.01" oninput="calculateEditSaleRate()" required>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div class="col-sm-4">
+                  <label style="margin-left : 20px" for="cherryPercentage">Profit Percentage : </label>
+                </div>
+                <div class="col-sm-8">
+                  <input type="number" class="form-control" id="cherryPercentage" name="percentage" step="0.01" oninput="calculateEditSaleRate()" placeholder="Enter profit percentage">
                 </div>
               </div>
               <div class="form-group row">
@@ -2479,7 +2599,7 @@ include("kattegat/role_check.php");
                   <label style="margin-left : 20px" for="cherryRate">Sale Rate : </label>
                 </div>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" id="cherryRate" name="rate" required>
+                  <input type="number" class="form-control" id="cherryRate" name="sale_rate" readonly style="background-color: #f8f9fa;">
                 </div>
               </div>
             </div>
