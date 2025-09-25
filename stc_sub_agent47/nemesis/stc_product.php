@@ -725,7 +725,7 @@ class prime extends tesseract{
 		}
 
 		// Validate the label to prevent SQL injection
-		$allowed_labels = ['voltage', 'chw_inlet_temp', 'chw_outlet_temp', 'chw_inlet_pr', 'chw_outlet_pr', 'cow_inlet_temp', 'cow_outlet_temp', 'cow_inlet_pr', 'cow_outlet_pr', 'creator_name', 'status'];
+		$allowed_labels = ['voltage', 'chw_inlet_temp', 'chw_outlet_temp', 'chw_inlet_pr', 'chw_outlet_pr', 'cow_inlet_temp', 'cow_outlet_temp', 'cow_inlet_pr', 'cow_outlet_pr', 'creator_name'];
 		if (!in_array($label, $allowed_labels)) {
 			return 'invalid_label';
 		}
@@ -850,6 +850,22 @@ if (isset($_POST['save_equipementdetails'])) {
 }
 
 // save equipment details
+if (isset($_POST['update_equipementdetails'])) {
+	$id = $_POST['id'];
+	$label = $_POST['label'];
+	$value = $_POST['value'];
+	$out = '';
+
+	if (empty($_SESSION['stc_agent_sub_id'])) {
+		$out = 'reload';
+	} else {
+		$odin_req = new prime();
+		$out = $odin_req->stc_equipement_details_update($id, $label, $value);
+	}
+	echo $out;
+}
+
+// save equipment details
 if (isset($_POST['call_tool_trackertrackrecieve'])) {
     $id = $_POST['itt_id'];
     $out = '';
@@ -924,7 +940,7 @@ if(isset($_POST['stc_ed_log_comp_reading_save'])) {
 	echo json_encode($opmetabots);
 }
 
-if(isset($_POST['update_equipementdetails'])) {
+if(isset($_POST['update_equipementdetailslog'])) {
 	$id = $_POST['id'];
 	$label = $_POST['label'];
 	$value = $_POST['value'];

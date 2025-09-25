@@ -363,7 +363,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     url: "nemesis/stc_product.php",
                     method: "POST",
                     data: {
-                        update_equipementdetails: 1,
+                        update_equipementdetailslog: 1,
                         id: id,
                         label: label,
                         value: value
@@ -706,7 +706,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                     url: "nemesis/stc_product.php",
                     method: "POST",
                     data: {
-                        update_equipementdetails: 1,
+                        update_equipementdetailslog: 1,
                         id: id,
                         label: label,
                         value: value
