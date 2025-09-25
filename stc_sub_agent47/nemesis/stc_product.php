@@ -725,7 +725,7 @@ class prime extends tesseract{
 		}
 
 		// Validate the label to prevent SQL injection
-		$allowed_labels = ['voltage', 'chw_inlet_temp', 'chw_outlet_temp', 'chw_inlet_pr', 'chw_outlet_pr', 'cow_inlet_temp', 'cow_outlet_temp', 'cow_inlet_pr', 'cow_outlet_pr', 'creator_name'];
+		$allowed_labels = ['voltage', 'chw_inlet_temp', 'chw_outlet_temp', 'chw_inlet_pr', 'chw_outlet_pr', 'cow_inlet_temp', 'cow_outlet_temp', 'cow_inlet_pr', 'cow_outlet_pr', 'creator_name', 'status'];
 		if (!in_array($label, $allowed_labels)) {
 			return 'invalid_label';
 		}
