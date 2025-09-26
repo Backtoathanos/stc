@@ -3691,7 +3691,9 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 			OR `make` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
 			OR `tooltype` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
 			OR `purchase_details` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
-			OR `taxinvono` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' ";
+			OR `taxinvono` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
+			OR `warranty` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' 
+			OR `remarks` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' ";
 		
 		$search = $search == '' ? '' : $filter;
 	
