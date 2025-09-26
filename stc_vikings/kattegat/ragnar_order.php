@@ -3698,7 +3698,7 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		$search = $search == '' ? '' : $filter;
 	
 		// Pagination variables
-		$limit = 10; // Number of records per page
+		$limit = 25; // Number of records per page
 		$offset = ($page - 1) * $limit;
 	
 		// Total record count for pagination
