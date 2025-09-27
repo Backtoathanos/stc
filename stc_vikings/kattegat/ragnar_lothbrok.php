@@ -812,59 +812,142 @@ class sceptor extends tesseract{
         return array('total_purchase' => $total_purchase, 'total_sale' => $total_sale, 'sub_locations_purchase' => $purchase_locations, 'sub_locations_sale' => $sale_locations);
     }
 
+	// public function stc_gldprofit_analyzer($month, $year, $type){
+	// 	$ragnar = '';
+	// 	$yearFilter = "YEAR(created_date) = '$year'";
+	// 	$monthFilter = $type != 'Y' ? "AND MONTH(created_date) = '$month'" : '';
+
+	// 	// Main query with JOIN to avoid N+1 queries
+	// 	$query = mysqli_query($this->stc_dbs, "
+	// 		SELECT 
+	// 			a.stc_purchase_product_adhoc_id,
+	// 			a.stc_purchase_product_adhoc_itemdesc,
+	// 			a.stc_purchase_product_adhoc_qty,
+	// 			a.stc_purchase_product_adhoc_rate as salerate,
+	// 			a.stc_purchase_product_adhoc_prate,
+	// 			COALESCE(SUM(r.stc_cust_super_requisition_list_items_rec_recqty), 0) as sold_qty,
+	// 			COALESCE(SUM(g.qty), 0) as gld_qty,
+	// 			COALESCE(AVG(g.rate), 0) as gld_rate
+	// 		FROM stc_purchase_product_adhoc a
+	// 		LEFT JOIN stc_product p ON p.stc_product_id = a.stc_purchase_product_adhoc_productid
+	// 		LEFT JOIN stc_cust_super_requisition_list_items_rec r 
+	// 			ON r.stc_cust_super_requisition_list_items_rec_list_poaid = a.stc_purchase_product_adhoc_id
+	// 			AND YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'
+	// 			" . ($type != 'Y' ? "AND MONTH(r.stc_cust_super_requisition_list_items_rec_date) = '$month'" : "") . "
+	// 		LEFT JOIN gld_challan g 
+	// 			ON g.adhoc_id = a.stc_purchase_product_adhoc_id
+	// 			AND YEAR(g.created_date) = '$year'
+	// 			" . ($type != 'Y' ? "AND MONTH(g.created_date) = '$month'" : "") . "
+	// 		WHERE a.stc_purchase_product_adhoc_cherrypickby = 0
+	// 			AND YEAR(a.stc_purchase_product_adhoc_created_date) = '$year'
+	// 			" . ($type != 'Y' ? "AND MONTH(a.stc_purchase_product_adhoc_created_date) = '$month'" : "") . "
+	// 		GROUP BY a.stc_purchase_product_adhoc_id
+	// 		ORDER BY a.stc_purchase_product_adhoc_itemdesc ASC
+	// 	");
+
+	// 	$totals = ['purchase' => 0, 'sold' => 0, 'profit' => 0];
+
+	// 	foreach ($query as $row) {
+	// 		$totalSoldQty = $row['sold_qty'] + $row['gld_qty'];
+	// 		$purchaseAmount = $row['stc_purchase_product_adhoc_qty'] * $row['stc_purchase_product_adhoc_prate'];
+	// 		$soldAmount = $totalSoldQty * $row['salerate'];
+	// 		$profitAmount = ($row['salerate'] - $row['stc_purchase_product_adhoc_prate']) * $totalSoldQty;
+
+	// 		$totals['purchase'] += $purchaseAmount;
+	// 		$totals['sold'] += $soldAmount;
+	// 		$totals['profit'] += $profitAmount;
+	// 	}
+
+	// 	$profitClass = $totals['profit'] >= 0 ? 'text-success' : 'text-danger';
+	// 	$profitDisplay = ($totals['profit'] >= 0 ? '+' : '') . number_format($totals['profit'], 2);
+
+	// 	$ragnar .= "
+	// 		<tr>
+	// 			<td class='text-right'>" . number_format($totals['purchase'], 2) . "</td>
+	// 			<td class='text-right'>" . number_format($totals['sold'], 2) . "</td>
+	// 			<td class='text-right'><span class='$profitClass'>$profitDisplay</span></td>
+	// 		</tr>
+	// 	";
+
+	// 	return $ragnar;
+	// }
 	public function stc_gldprofit_analyzer($month, $year, $type){
 		$ragnar = '';
 		$yearFilter = "YEAR(created_date) = '$year'";
 		$monthFilter = $type != 'Y' ? "AND MONTH(created_date) = '$month'" : '';
 
-		// Main query with JOIN to avoid N+1 queries
-		$query = mysqli_query($this->stc_dbs, "
+		// Step 1: Get purchase data from adhoc table - get qty and rate, do sum in loop and add to purchase array
+		$purchaseQuery = mysqli_query($this->stc_dbs, "
 			SELECT 
-				a.stc_purchase_product_adhoc_id,
-				a.stc_purchase_product_adhoc_itemdesc,
-				a.stc_purchase_product_adhoc_qty,
-				a.stc_purchase_product_adhoc_rate as salerate,
-				a.stc_purchase_product_adhoc_prate,
-				COALESCE(SUM(r.stc_cust_super_requisition_list_items_rec_recqty), 0) as sold_qty,
-				COALESCE(SUM(g.qty), 0) as gld_qty,
-				COALESCE(AVG(g.rate), 0) as gld_rate
+				stc_purchase_product_adhoc_qty,
+				stc_purchase_product_adhoc_prate
 			FROM stc_purchase_product_adhoc a
 			LEFT JOIN stc_product p ON p.stc_product_id = a.stc_purchase_product_adhoc_productid
-			LEFT JOIN stc_cust_super_requisition_list_items_rec r 
-				ON r.stc_cust_super_requisition_list_items_rec_list_poaid = a.stc_purchase_product_adhoc_id
-				AND YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'
-				" . ($type != 'Y' ? "AND MONTH(r.stc_cust_super_requisition_list_items_rec_date) = '$month'" : "") . "
-			LEFT JOIN gld_challan g 
-				ON g.adhoc_id = a.stc_purchase_product_adhoc_id
-				AND YEAR(g.created_date) = '$year'
-				" . ($type != 'Y' ? "AND MONTH(g.created_date) = '$month'" : "") . "
 			WHERE a.stc_purchase_product_adhoc_cherrypickby = 0
 				AND YEAR(a.stc_purchase_product_adhoc_created_date) = '$year'
 				" . ($type != 'Y' ? "AND MONTH(a.stc_purchase_product_adhoc_created_date) = '$month'" : "") . "
-			GROUP BY a.stc_purchase_product_adhoc_id
-			ORDER BY a.stc_purchase_product_adhoc_itemdesc ASC
 		");
 
-		$totals = ['purchase' => 0, 'sold' => 0, 'profit' => 0];
-
-		foreach ($query as $row) {
-			$totalSoldQty = $row['sold_qty'] + $row['gld_qty'];
+		$purchaseArray = 0;
+		while ($row = mysqli_fetch_assoc($purchaseQuery)) {
 			$purchaseAmount = $row['stc_purchase_product_adhoc_qty'] * $row['stc_purchase_product_adhoc_prate'];
-			$soldAmount = $totalSoldQty * $row['salerate'];
-			$profitAmount = ($row['salerate'] - $row['stc_purchase_product_adhoc_prate']) * $totalSoldQty;
-
-			$totals['purchase'] += $purchaseAmount;
-			$totals['sold'] += $soldAmount;
-			$totals['profit'] += $profitAmount;
+			$purchaseArray += $purchaseAmount;
 		}
 
-		$profitClass = $totals['profit'] >= 0 ? 'text-success' : 'text-danger';
-		$profitDisplay = ($totals['profit'] >= 0 ? '+' : '') . number_format($totals['profit'], 2);
+		// Step 2: Get sold data from rec table with rate from adhoc table join
+		$soldQuery = mysqli_query($this->stc_dbs, "
+			SELECT 
+				r.stc_cust_super_requisition_list_items_rec_recqty,
+				a.stc_purchase_product_adhoc_rate,
+				a.stc_purchase_product_adhoc_prate
+			FROM stc_cust_super_requisition_list_items_rec r
+			LEFT JOIN stc_purchase_product_adhoc a ON a.stc_purchase_product_adhoc_id = r.stc_cust_super_requisition_list_items_rec_list_poaid
+			WHERE YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'
+				" . ($type != 'Y' ? "AND MONTH(r.stc_cust_super_requisition_list_items_rec_date) = '$month'" : "") . "
+		");
+
+		$soldArray = 0;
+		$profitArray = 0;
+		while ($row = mysqli_fetch_assoc($soldQuery)) {
+			// Calculate sold amount: rate from adhoc * qty from rec table
+			$soldAmount = $row['stc_purchase_product_adhoc_rate'] * $row['stc_cust_super_requisition_list_items_rec_recqty'];
+			$soldArray += $soldAmount;
+			
+			// Calculate profit: (rate from adhoc - prate from adhoc) * qty from rec table
+			$profitAmount = ($row['stc_purchase_product_adhoc_rate'] - $row['stc_purchase_product_adhoc_prate']) * $row['stc_cust_super_requisition_list_items_rec_recqty'];
+			$profitArray += $profitAmount;
+		}
+
+		// Step 3: Get GLD data from gld_challan table with adhoc table join
+		$gldQuery = mysqli_query($this->stc_dbs, "
+			SELECT 
+				g.qty,
+				g.rate,
+				a.stc_purchase_product_adhoc_rate,
+				a.stc_purchase_product_adhoc_prate
+			FROM gld_challan g
+			LEFT JOIN stc_purchase_product_adhoc a ON a.stc_purchase_product_adhoc_id = g.adhoc_id
+			WHERE YEAR(g.created_date) = '$year'
+				" . ($type != 'Y' ? "AND MONTH(g.created_date) = '$month'" : "") . "
+		");
+
+		while ($row = mysqli_fetch_assoc($gldQuery)) {
+			// Calculate sold amount: rate from adhoc * qty from gld table
+			$gldSoldAmount = $row['stc_purchase_product_adhoc_rate'] * $row['qty'];
+			$soldArray += $gldSoldAmount;
+			
+			// Calculate profit: (rate from adhoc - prate from adhoc) * qty from gld table
+			$gldProfitAmount = ($row['stc_purchase_product_adhoc_rate'] - $row['stc_purchase_product_adhoc_prate']) * $row['qty'];
+			$profitArray += $gldProfitAmount;
+		}
+
+		$profitClass = $profitArray >= 0 ? 'text-success' : 'text-danger';
+		$profitDisplay = ($profitArray >= 0 ? '+' : '') . number_format($profitArray, 2);
 
 		$ragnar .= "
 			<tr>
-				<td class='text-right'>" . number_format($totals['purchase'], 2) . "</td>
-				<td class='text-right'>" . number_format($totals['sold'], 2) . "</td>
+				<td class='text-right'>" . number_format($purchaseArray, 2) . "</td>
+				<td class='text-right'>" . number_format($soldArray, 2) . "</td>
 				<td class='text-right'><span class='$profitClass'>$profitDisplay</span></td>
 			</tr>
 		";

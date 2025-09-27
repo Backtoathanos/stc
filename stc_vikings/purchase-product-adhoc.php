@@ -2367,9 +2367,9 @@ include("kattegat/role_check.php");
                                     <table class="table table-hover table-bordered stc-summary-view-table">
                                         <thead>
                                             <tr>
-                                                <th>Sl No.</th>
-                                                <th>Site Name</th>
-                                                <th>Total Amount</th>
+                                                <th class="text-center">Sl No.</th>
+                                                <th class="text-center">Site Name</th>
+                                                <th class="text-center">Total Amount</th>
                                             </tr>
                                         </thead>
                                         <tbody class="stc-call-view-summaryledger-row">
