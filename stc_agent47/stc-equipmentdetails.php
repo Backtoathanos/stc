@@ -77,8 +77,13 @@ else {
                               <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
                                   <div class="card-border mb-3 card card-body border-success" style="overflow-x: auto; ">
                                     <div class="row">
-                                        <div class="col-md-12">
+                                        <div class="col-md-10">
                                             <input type="text" id="itt-toolssearchInput" class="form-control" placeholder="Type to search...">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-info btn-block" data-toggle="modal" data-target="#logsSearchModal">
+                                                <i class="fa fa-search"></i> Logs Search
+                                            </button>
                                         </div>
                                         <div class="col-md-12">
                                             <table class="table table-stripped table-bordered table-hover">
@@ -109,6 +114,7 @@ else {
             </div>
         </div>
     </div>
+
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
@@ -392,6 +398,50 @@ else {
                 $('#capacity').closest('.col-md-6').after(data);
             }
         });
+
+        // Logs Search Modal Functionality
+        $('body').delegate('#searchLogsBtn', 'click', function(e) {
+            e.preventDefault();
+            console.log('Search button clicked');
+            
+            var fromDate = $('#fromDate').val();
+            var toDate = $('#toDate').val();
+            
+            // Validate date range
+            if (fromDate && toDate) {
+                if (new Date(fromDate) > new Date(toDate)) {
+                    alert('From Date cannot be greater than To Date');
+                    return;
+                }
+            }
+            
+            // Show loading
+            $('#searchLogsBtn').html('<i class="fa fa-spinner fa-spin"></i> Searching...');
+            $('#searchLogsBtn').prop('disabled', true);
+            
+            // Call the same API as logequipment but with date range
+            $.ajax({
+                url: "nemesis/stc_project.php",
+                type: "POST",
+                data: {
+                    get_logequipmentdetailsBydate: 1,
+                    fromDate: fromDate,
+                    toDate: toDate
+                },
+                dataType: "JSON",
+                success: function(response) {
+                    // console.log('API Response:', response);
+                    $('#logsResultsTable').html(response);
+                    // Show loading
+                    $('#searchLogsBtn').html('<i class="fa fa-search"></i> Search Logs');
+                    $('#searchLogsBtn').prop('disabled', false);
+                },
+                error: function(xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                    alert('Error searching logs: ' + error);
+                }
+            });
+        });
     </script>
 </body>
 </html>
@@ -551,6 +601,56 @@ else {
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Logs Search Modal -->
+<div class="modal fade" id="logsSearchModal" tabindex="-1" role="dialog" aria-labelledby="logsSearchModalLabel">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Equipment Logs Daily Basis</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="logsSearchForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="fromDate">From Date:</label>
+                                <input type="date" class="form-control" id="fromDate" name="fromDate">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="toDate">To Date:</label>
+                                <input type="date" class="form-control" id="toDate" name="toDate">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <button type="button" class="btn btn-primary" id="searchLogsBtn">
+                                    <i class="fa fa-search"></i> Search Logs
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="logsResultsTable">Logs Results:</label>
+                                <div class="table-responsive" id="logsResultsTable"></div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    <i class="fa fa-times"></i> Cancel
+                </button>
             </div>
         </div>
     </div>
