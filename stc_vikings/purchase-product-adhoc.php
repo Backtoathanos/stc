@@ -1808,6 +1808,66 @@ include("kattegat/role_check.php");
             }
           });
 
+          var repid=0;
+          $(document).on('click', '.itt-create', function () {
+            repid=$(this).attr('id');            
+          });
+
+          
+
+          // save dispatch
+          $('body').delegate('.itt-save', 'click', function (e) {
+            e.preventDefault();
+            var unique = $('.itt-unique-id').val();
+            var itemdescription = $('.itt-itemdescription').val();
+            var machineslno = $('.itt-machinesrno').val();
+            var make = $('.itt-make').val();
+            var type = $('.itt-type').val();
+            var warranty = $('.itt-warranty').val();
+            var purdetails = $('.itt-purdetails').val();
+            var tinnumber = $('.itt-tinnumber').val();
+            var tindate = $('.itt-tindate').val();
+            var remarks = $('.itt-remarks').val();
+            if (unique != '' && itemdescription != '') {
+              var data = {
+                save_tool_tracker: 1,
+                unique: unique,
+                itemdescription: itemdescription,
+                machineslno: machineslno,
+                make: make,
+                type: type,
+                warranty: warranty,
+                purdetails: purdetails,
+                tinnumber: tinnumber,
+                tindate: tindate,
+                remarks: remarks,
+                repid: repid
+              };
+              $.ajax({
+                url       : "kattegat/ragnar_purchase.php",
+                method: "POST",
+                data: data,
+                success: function (response) {
+                  var obj_response = response.trim();
+                  if (obj_response == "yes") {
+                    alert("Record updated successfully!!!");
+                    Pagination.loadData(pagenumber);
+                  } else if (obj_response == "duplicate") {
+                    alert("This tool is already in records.");
+                  } else if (obj_response == "reload") {
+                    window.location.reload();
+                  } else if (obj_response == "empty") {
+                    alert("Please fill complete details.");
+                  } else if (obj_response == "no") {
+                    alert("Something went wrong. Record not updated");
+                  }
+                }
+              });
+            } else {
+              alert("Please check Required fields.");
+            }
+          });
+
           
         });
 
@@ -2781,4 +2841,104 @@ include("kattegat/role_check.php");
             </div>
         </div>
     </div>
+</div>
+
+
+<!-- Tools details -->
+<div class="modal fade bd-toolstracker-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Tools Track</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-xl-12">
+            <div class="main-card mb-3 card">
+              <div class="card-body">
+                <div class="row formcontrol">
+                  <div class="col-md-4">
+                    <h5>Unique Id</h5><br>
+                    <div class="card mb-3 widget-content">
+                      <input type="text" class="form-control itt-unique-id" placeholder="Enter unique id" value="GTT/"
+                        required>
+                    </div>
+                  </div>
+                  <div class="col-md-8">
+                    <h5>Item Description</h5><br>
+                    <div class="card mb-3 widget-content">
+                      <textarea class="form-control itt-itemdescription"
+                        placeholder="Enter Item Description"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <h5>Machine SR No</h5><br>
+                    <div class="card mb-3 widget-content">
+                      <input type="text" class="form-control itt-machinesrno" placeholder="Enter Machine SR No"
+                        required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <h5>Make</h5><br>
+                    <div class="card mb-3 widget-content">
+                      <input type="text" class="form-control itt-make" placeholder="Enter Make" required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <h5>Type</h5><br>
+                    <div class="card mb-3 widget-content">
+                      <input type="text" class="form-control itt-type" placeholder="Enter Type" required>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <h5>Warranty</h5><br>
+                    <div class="card mb-3 widget-content">
+                      <input type="text" class="form-control itt-warranty" placeholder="Enter Warranty" required>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <h5>Purchase Details</h5><br>
+                    <div class="card mb-3 widget-content">
+                      <input type="text" class="form-control itt-purdetails" placeholder="Enter Purchase Details"
+                        required>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <h5>Tax Invoice Number</h5><br>
+                    <div class="card mb-3 widget-content">
+                      <input type="text" class="form-control itt-tinnumber" placeholder="Enter Invoice Number" required>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <h5>Tax Invoice Date</h5><br>
+                    <div class="card mb-3 widget-content">
+                      <input type="date" class="form-control itt-tindate" value="<?php echo date('Y-m-d'); ?>" required>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <h5>Remarks</h5><br>
+                    <div class="card mb-3 widget-content">
+                      <textarea class="form-control itt-remarks" placeholder="Enter remarks"></textarea>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="card mb-3 widget-content">
+                      <button class="form-control btn btn-success itt-save">Save</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>

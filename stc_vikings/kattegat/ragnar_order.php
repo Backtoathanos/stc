@@ -2128,6 +2128,7 @@ class ragnarRequisitionPertView extends tesseract{
 						<th class="text-center">Dispatched Qty</th> 
 						<th class="text-center">Status</th>   
 						<th class="text-center">Priority</th>  
+						<th class="text-center">Item Type</th>  
 						<th class="text-center">Action</th>
 						<th class="text-center">Log</th>
 					</tr>
@@ -2150,7 +2151,8 @@ class ragnarRequisitionPertView extends tesseract{
 				I.`stc_cust_super_requisition_list_items_unit`,
 				I.`stc_cust_super_requisition_list_items_approved_qty`,
 				I.`stc_cust_super_requisition_items_priority`,
-				I.`stc_cust_super_requisition_list_items_status`
+				I.`stc_cust_super_requisition_list_items_status`,
+				I.`stc_cust_super_requisition_items_type`
 			FROM `stc_cust_super_requisition_list_items` I
 			INNER JOIN `stc_cust_super_requisition_list` L 
 			ON I.`stc_cust_super_requisition_list_items_req_id`=L.`stc_cust_super_requisition_list_id`
@@ -2241,7 +2243,7 @@ class ragnarRequisitionPertView extends tesseract{
 					// <a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
 				$actiondeliver='
 					<a class="btn-change-status" data-toggle="modal" data-target="#statusRemarkModal" style="font-size:25px;color:black;" status="'.$requisrow['stc_cust_super_requisition_list_items_status'].'" title="Update to pending" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-clock-o"></i></a>
-					<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>
+					<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" itemtype="'.$requisrow['stc_cust_super_requisition_items_type'].'"  id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>
 					<a class="stc_add_togld" style="font-size:25px;color:black;" title="Add to GLD" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-shopping-cart"></i></a>
 				';
 				$calculation=$requisrow["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
@@ -2298,6 +2300,7 @@ class ragnarRequisitionPertView extends tesseract{
 						 <td align="right">'.number_format($dispatchedgqty, 2).'</td>
 						 <td class="text-center">'.$status.'</td>
 						 <td class="text-center" '.$bgcolor.'>'.$priority.'</td>
+						 <td class="text-center">'.$requisrow['stc_cust_super_requisition_items_type'].'</td>
 						 <td>'.$actiondeliver.'</td>
 						 <td>'.$log.'</td>
 					</tr>
@@ -3138,7 +3141,7 @@ class ragnarRequisitionPertAdd extends tesseract{
 	}
 
 	// iinsert data into recieving table to dispatch show
-	public function stc_ag_req_direct($stc_req_id, $stc_req_item_id, $stc_tools_id, $dispatch_qty, $poadhocitem){
+	public function stc_ag_req_direct($stc_req_id, $stc_req_item_id, $stc_tools_id, $dispatch_qty, $poadhocitem, $item_type){
 		$loki='';
 		if($stc_tools_id!='NA'){
 			$getuser=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_project_title` FROM `stc_cust_super_requisition_list` INNER JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id` INNER JOIN `stc_cust_project` ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id` WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_item_id)."'");
@@ -3194,6 +3197,72 @@ class ragnarRequisitionPertAdd extends tesseract{
 					`stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."'
 				AND `stc_cust_super_requisition_list_items_req_id` = '".mysqli_real_escape_string($this->stc_dbs, $stc_req_item_id)."'
 			");
+			
+			// After successful insert, get project_id and user_id from requisition table
+			$get_requisition_data=mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_cust_super_requisition_list_project_id` as project_id,
+					`stc_cust_super_requisition_list_super_id` as user_id,
+					`stc_cust_pro_supervisor_fullname` as username,
+					`stc_cust_project_title` as location
+				FROM `stc_cust_super_requisition_list` 
+				INNER JOIN `stc_cust_pro_supervisor` 
+				ON `stc_cust_super_requisition_list_super_id`=`stc_cust_pro_supervisor_id` 
+				INNER JOIN `stc_cust_project` 
+				ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id` 
+				WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_item_id)."'
+			");
+			
+			if(mysqli_num_rows($get_requisition_data)>0){
+				$requisition_data = mysqli_fetch_assoc($get_requisition_data);
+				$project_id = $requisition_data['project_id'];
+				$user_id = $requisition_data['user_id'];
+				$username = $requisition_data['username'];
+				$location = $requisition_data['location'];
+				
+				// Check if item_type is "Tools & Tackles" and get tools & tackles ID from poa_id
+				if($item_type == "Tools & Tackles" && $poadhocitem != '0'){
+					$get_tools_tackles_id=mysqli_query($this->stc_dbs, "
+						SELECT `id` FROM `stc_tooldetails` WHERE `poa_id`='".mysqli_real_escape_string($this->stc_dbs, $poadhocitem)."'
+					");
+					
+					if(mysqli_num_rows($get_tools_tackles_id)>0){
+						$tools_tackles_data = mysqli_fetch_assoc($get_tools_tackles_id);
+						$tools_tackles_id = $tools_tackles_data['id'];
+						
+						// Insert into stc_tooldetails_track with all required fields
+						$insert_tools_track=mysqli_query($this->stc_dbs, "
+							INSERT INTO `stc_tooldetails_track`(
+								`toolsdetails_id`, 
+								`issuedby`, 
+								`project_id`, 
+								`user_id`, 
+								`status`, 
+								`location`, 
+								`issueddate`, 
+								`receivedby`, 
+								`handoverto`, 
+								`created_date`, 
+								`created_by`, 
+								`id_type`
+							) VALUES (
+								'".mysqli_real_escape_string($this->stc_dbs, $tools_tackles_id)."',
+								'".mysqli_real_escape_string($this->stc_dbs, $username)."',
+								'".mysqli_real_escape_string($this->stc_dbs, $project_id)."',
+								'".mysqli_real_escape_string($this->stc_dbs, $user_id)."',
+								'1',
+								'".mysqli_real_escape_string($this->stc_dbs, $location)."',
+								'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+								'".mysqli_real_escape_string($this->stc_dbs, $username)."',
+								'".mysqli_real_escape_string($this->stc_dbs, $username)."',
+								'".mysqli_real_escape_string($this->stc_dbs, $date)."',
+								'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."',
+								'vikings'
+							)
+						");
+					}
+				}
+			}
 			
 			$title="Dispatched";
 			$message="Dispatched by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A'). " <br> Quantity :".$dispatch_qty;
@@ -4799,10 +4868,11 @@ if(isset($_POST['stc_dispatch_hit'])){
 	$dispatch_qty=$_POST['stc_dispatch_qty'];
 	$stc_req_id=$_POST['stc_req_id'];
 	$stc_req_item_id=$_POST['stc_req_item_id'];
+	$item_type=$_POST['item_type'];
 	$stc_tools_id=isset($_POST['stc_tools_id']) || 'NA';
 	$poadhocitem=$_POST['poadhocitem'];
 	$raven=new ragnarRequisitionPertAdd();
-	$outraven=$raven->stc_ag_req_direct($stc_req_id, $stc_req_item_id, $stc_tools_id, $dispatch_qty, $poadhocitem);
+	$outraven=$raven->stc_ag_req_direct($stc_req_id, $stc_req_item_id, $stc_tools_id, $dispatch_qty, $poadhocitem, $item_type);
 	// echo json_encode($outraven);
 	echo $outraven;
 }

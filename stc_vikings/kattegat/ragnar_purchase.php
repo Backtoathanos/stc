@@ -2375,6 +2375,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 					$updatestatus='';
 					$cherrypick='';
 				}
+				$addtoollist='<a href="javascript:void(0)" class="btn btn-success itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" title="Add to Toollist"><i class="fa fa-tools"></i></a>';
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno."</td>
@@ -2385,7 +2386,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						</td>
 						<td style='width: 180px;'>".$productog."</td>
 						<td class='text-center'><b>".$odinrow['stc_product_id']."</b><br><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$product_name."</a></td>
-						<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a></td>
+						<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a> ".$addtoollist."</td>
 						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
 						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
@@ -3147,6 +3148,69 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$pagination .= '</div>';
 
 		return ['html' => $html, 'query' => $query, 'pagination' => $pagination];
+	}
+
+	// save tool track
+	public function stc_tool_tracker_save($repid, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks){
+		$date=date("Y-m-d H:i:s");
+	
+		// Check for duplicate unique ID
+		$duplicate_check_qry = mysqli_query($this->stc_dbs, "
+			SELECT `unique_id` FROM `stc_tooldetails` WHERE `unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $unique)."'
+		");
+		// Check for duplicate unique ID
+		$duplicate_check_qry2 = mysqli_query($this->stc_dbs, "
+			SELECT `unique_id` FROM `stc_tooldetails` WHERE `poa_id` = '".mysqli_real_escape_string($this->stc_dbs, $repid)."'
+		");
+		// If a duplicate is found, set $blackpearl to "duplicate"
+		if(mysqli_num_rows($duplicate_check_qry) > 0) {
+			$blackpearl = "duplicate";
+		} else if(mysqli_num_rows($duplicate_check_qry2) > 0){
+			$blackpearl = "duplicate";
+		} else {
+			$query="
+				INSERT INTO `stc_tooldetails`(
+					`poa_id`,
+					`unique_id`,
+					`itemdescription`,
+					`machinesrno`,
+					`make`,
+					`tooltype`,
+					`purchase_details`,
+					`warranty`,
+					`taxinvono`,
+					`taxinvodate`,
+					`remarks`,
+					`created_by`,
+					`created_date`
+				)VALUES(
+					'".mysqli_real_escape_string($this->stc_dbs, $repid)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $unique)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $itemdescription)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $machineslno)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $make)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $type)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $warranty)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $purdetails)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $tinnumber)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $tindate)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."',
+					'".$date."'
+				)
+			";
+			$blackpearl_qry = mysqli_query($this->stc_dbs, $query);
+	
+			// If the INSERT query is successful, set $blackpearl to "yes"
+			if($blackpearl_qry) {
+				$blackpearl = "yes";
+			} else {
+				// If the INSERT query fails, set $blackpearl to "no"
+				$blackpearl = "no";
+			}
+		}
+	
+		return $blackpearl;
 	}
 
 	
@@ -4119,6 +4183,29 @@ if(isset($_POST['stc_getinventory'])){
 		$result = $bjornestocking->getPaginatedProducts2($page, $search, $inv_type);
 		echo json_encode($result);
 	}
+}
+
+// save procurment tracker payment
+if(isset($_POST['save_tool_tracker'])){
+	$repid=$_POST['repid'];
+	$unique=$_POST['unique'];
+	$itemdescription=$_POST['itemdescription'];
+	$machineslno=$_POST['machineslno'];
+	$make=$_POST['make'];
+	$type=$_POST['type'];
+	$warranty=$_POST['warranty'];
+	$purdetails=$_POST['purdetails'];
+	$tinnumber=$_POST['tinnumber'];
+	$tindate=$_POST['tindate'];
+	$remarks=$_POST['remarks'];
+	$out='';
+	if(empty($_SESSION['stc_empl_id'])){
+		$out='reload';
+	}else{
+		$odin_req=new ragnarPurchaseAdhoc();
+		$out=$odin_req->stc_tool_tracker_save($repid, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks);
+	}
+	echo $out;
 }
 
 ?>
