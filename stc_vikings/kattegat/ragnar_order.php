@@ -3156,6 +3156,7 @@ class ragnarRequisitionPertAdd extends tesseract{
 				$loki="Hmmm!!! Something went wrong. Dispatched not done properly.";
 			}
 		}
+		$date = date("Y-m-d H:i:s");
 		$gamorarecgoqry=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_cust_super_requisition_list_items_rec`(
 				`stc_cust_super_requisition_list_items_rec_list_id`, 
@@ -3170,7 +3171,7 @@ class ragnarRequisitionPertAdd extends tesseract{
 				'0',
 				'".mysqli_real_escape_string($this->stc_dbs, $poadhocitem)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $dispatch_qty)."',
-				NOW()
+				'".mysqli_real_escape_string($this->stc_dbs, $date)."'
 			)
 		");
 		if($gamorarecgoqry){
@@ -3929,7 +3930,7 @@ class ragnarCallB2COrders extends tesseract{
 			
 				if (mysqli_num_rows($orderQuery) > 0) {
 					$orderData = mysqli_fetch_assoc($orderQuery);
-			
+					$date = date("Y-m-d H:i:s");
 					// Insert into gld_challan table
 					$insertChallanQuery = mysqli_query($this->stc_dbs, "
 						INSERT INTO `gld_challan` (`product_id`, `cust_id`, `challan_number`, `qty`, `rate`, `created_date`, `created_by`) 
@@ -3939,7 +3940,7 @@ class ragnarCallB2COrders extends tesseract{
 							'" . mysqli_real_escape_string($this->stc_dbs, $orderData['order_number']) . "',
 							'" . mysqli_real_escape_string($this->stc_dbs, $orderData['quantity']) . "',
 							'" . mysqli_real_escape_string($this->stc_dbs, $orderData['rate']) . "',
-							NOW(),
+							'" . mysqli_real_escape_string($this->stc_dbs, $date) . "',
 							'" . $_SESSION['stc_empl_id'] . "'
 						)
 					");
