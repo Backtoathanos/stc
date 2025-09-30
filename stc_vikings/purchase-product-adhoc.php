@@ -1538,7 +1538,7 @@ include("kattegat/role_check.php");
 
                     var row = `<tr>
                       <td class="text-center">${index + 1}</td>
-                      <td>${item.stc_cust_project_title}</td>
+                      <td><a href="project_expense_details.php?pro_id=${item.stc_cust_project_id}&dateFrom=${dateFrom}&dateTo=${dateTo}" target="_blank">${item.stc_cust_project_title}</a></td>
                       <td class="text-right">${item.total}</td>
                     </tr>
                     `;

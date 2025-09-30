@@ -2786,7 +2786,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$dateFrom=date('Y-m-d', strtotime($dateFrom));
 		$dateTo=date('Y-m-d', strtotime($dateTo));
 		$query = "
-			SELECT D.stc_cust_project_title, SUM(A.stc_cust_super_requisition_list_items_rec_recqty * E.stc_purchase_product_adhoc_rate) as total FROM `stc_cust_super_requisition_list_items_rec` A 
+			SELECT D.stc_cust_project_id, D.stc_cust_project_title, SUM(A.stc_cust_super_requisition_list_items_rec_recqty * E.stc_purchase_product_adhoc_rate) as total FROM `stc_cust_super_requisition_list_items_rec` A 
 			INNER JOIN stc_cust_super_requisition_list_items B
 			ON A.stc_cust_super_requisition_list_items_rec_list_item_id=B.stc_cust_super_requisition_list_id
 			INNER JOIN stc_cust_super_requisition_list C
