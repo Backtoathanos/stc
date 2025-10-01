@@ -2520,6 +2520,11 @@ class ragnarPurchaseAdhoc extends tesseract{
 	// update po adhoc item name
 	public function stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty){
 		$odin='';
+		// Remove commas and ensure proper decimal formatting
+		$adhoc_qty = str_replace(',', '', $adhoc_qty);
+		// Convert to float to ensure proper number formatting, then back to string
+		$adhoc_qty = number_format((float)$adhoc_qty, 2, '.', '');
+		
 		$checkqry=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."', `stc_purchase_product_adhoc_qty`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_qty)."', `stc_purchase_product_adhoc_unit`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_unit)."', `stc_purchase_product_adhoc_rackid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_rack)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
 		");
@@ -2815,6 +2820,11 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}
 	
 	public function stc_poadhoc_update_ledger($id, $itemcode, $quantity) {
+		// Remove commas and ensure proper decimal formatting
+		$quantity = str_replace(',', '', $quantity);
+		// Convert to float to ensure proper number formatting, then back to string
+		$quantity = number_format((float)$quantity, 2, '.', '');
+		
 		if(!empty($itemcode)){
 			mysqli_query($this->stc_dbs, "UPDATE `stc_cust_super_requisition_list_items_rec` SET `stc_cust_super_requisition_list_items_rec_list_poaid`='$itemcode', `stc_cust_super_requisition_list_items_rec_recqty`='$quantity' WHERE `stc_cust_super_requisition_list_items_rec_id`='$id'");
 		}else{

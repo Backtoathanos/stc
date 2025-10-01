@@ -231,6 +231,7 @@ include("kattegat/role_check.php");
                                                                     <option>KGS</option>
                                                                     <option>LTR</option>
                                                                     <option>MTR</option>
+                                                                    <option>MTS</option>
                                                                     <option selected>NOS</option>
                                                                     <option>PAIR</option>
                                                                     <option>PKT</option>
@@ -239,6 +240,7 @@ include("kattegat/role_check.php");
                                                                     <option>SQFT</option>
                                                                     <option>SQMM</option>
                                                                     <option>SQMT</option>
+                                                                    <option>TONS</option>
                                                                   </select>
                                                             </td>
                                                             <td>
