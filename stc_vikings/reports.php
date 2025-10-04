@@ -379,17 +379,17 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <th class="text-center" width="10%">Comb PR Date &<br>No</th>
                                                 <th class="text-center" width="10%">PR Date &<br>No</th>
                                                 <th class="text-center" width="10%">Challan Date &<br>No</th>
-                                                <th class="text-center">Site Name</th>
-                                                <th class="text-center">Item Desc</th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;">Site Name</th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;word-wrap: break-word;white-space: normal;">Item Desc</th>
                                                 <th class="text-center">Unit</th>
-                                                <th class="text-center">PR Qty</th>
-                                                <th class="text-center">GM Apprv Qty</th>
-                                                <th class="text-center">Proc Apprv Qty</th>
-                                                <th class="text-center">Dispatch Qty</th>
-                                                <th class="text-center">Pending Qty</th>
-                                                <th class="text-center">Recieved Qty</th>
-                                                <th class="text-center">Consumption Qty</th>
-                                                <th class="text-center">Balance Qty</th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">PR Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">GM Apprv Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Proc Apprv Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Dispatch Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Pending Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Recieved Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Consumption Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Balance Qty</div></th>
                                                 <th class="text-center">Status</th>
                                             </tr>
                                             </thead>

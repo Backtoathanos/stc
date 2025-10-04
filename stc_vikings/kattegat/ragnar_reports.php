@@ -1692,7 +1692,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   </b>
                ';
             }else{
-               $stcbalqtymark=number_format($stcpendingqty, 2);
+               $stcbalqtymark=$stcpendingqty;
             }
             $optimusprime.='
                   <tr>
