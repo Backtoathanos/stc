@@ -693,14 +693,17 @@ include("kattegat/role_check.php");
                         <a href="javascript:void(0)" class="btn btn-primary form-control itt-create" data-toggle="modal"
                           data-target=".bd-toolstracker-modal-lg">Add Tools</a>
                       </div>
-                      <div class="col-md-8">
+                      <div class="col-md-6">
                         <input type="text" id="itt-toolssearchInput" class="form-control"
                           placeholder="Type to search...">
                       </div>
                       <div class="col-md-2">
                         <a href="javascript:void(0)" id="itt-toolssearchInputbtn"
                           class="btn btn-success form-control">Find</a>
-
+                      </div>
+                      <div class="col-md-2">
+                        <a href="javascript:void(0)" class="btn btn-secondary form-control" data-toggle="modal"
+                          data-target=".bd-toolstrackerproject-modal-lg">Tools Details By Customer Projects</a>
                       </div>
                       <div class="col-md-12">
                         <table class="table table-stripped table-bordered table-hover">
@@ -2650,6 +2653,63 @@ $(document).ready(function () {
     }
   });
   
+  
+   // Function to bind data to tools details table
+   function bindToolsDetailsTable(data) {
+     var tbody = $('#tools-details-tbody');
+     tbody.empty();
+     
+     if (data && data.length > 0) {
+       data.forEach(function(item, index) {
+         var row = '<tr>' +
+           '<td class="text-center">' + (index + 1) + '</td>' +
+           '<td class="text-center">GTT/' + (item.unique_id || 'N/A') + '</td>' +
+           '<td class="text-center">' + (item.itemdescription || 'N/A') + '</td>' +
+           '<td class="text-center">' + (item.machinesrno || 'N/A') + '</td>' +
+           '<td class="text-center">' + (item.make || 'N/A') + '</td>' +
+           '<td class="text-center">' + (item.tooltype || 'N/A') + '</td>' +
+           '<td class="text-center">' + (item.receivedby || 'N/A') + '</td>' +
+           '<td class="text-center">' + formatDate(item.issueddate) + '</td>' +
+           '</tr>';
+         tbody.append(row);
+       });
+     } else {
+       tbody.append('<tr><td colspan="10" class="text-center text-muted">No data available</td></tr>');
+     }
+   }
+   
+   // Function to format date
+   function formatDate(dateString) {
+     if (!dateString) return 'N/A';
+     var date = new Date(dateString);
+     return date.toLocaleDateString('en-GB');
+   }
+   
+   $('body').on('click', '#find-site-data', function (e) {
+     e.preventDefault();
+     var sitefilter = $('#site-filter').val();
+     $.ajax({
+       url: 'kattegat/ragnar_order.php',
+       method: 'POST',
+       data: {
+         stc_find_site_data: 1,
+         sitefilter: sitefilter
+       },
+       dataType: 'json',
+       success: function (response) {
+         if (response.data && Array.isArray(response.data)) {
+          $('.project-name-title').html(response.project_name);
+           bindToolsDetailsTable(response.data);
+         } else {
+           $('#tools-details-tbody').html('<tr><td colspan="10" class="text-center text-muted">No data available</td></tr>');
+         }
+       },
+       error: function() {
+         $('#tools-details-tbody').html('<tr><td colspan="10" class="text-center text-danger">Error loading data</td></tr>');
+       }
+     });
+   });
+  
   // Function to update status
   function updateGLDRequisitionBStatus(id, status) {
     $.ajax({
@@ -2681,6 +2741,7 @@ $(document).ready(function () {
 </script>
 </body>
 
+</html>
 <!-- GLD Requisition Remarks Modal -->
 <div class="modal fade" id="gld-remarks-modal" tabindex="-1" role="dialog" aria-labelledby="gldRemarksModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
@@ -2708,7 +2769,6 @@ $(document).ready(function () {
   </div>
 </div>
 
-</html>
 <div class="modal fade bd-example-modal-xl stc-call-for-select-merchant-res" tabindex="-1" role="dialog"
   aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
@@ -3381,6 +3441,92 @@ $(document).ready(function () {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade bd-toolstrackerproject-modal-lg" tabindex="-1" role="dialog" aria-labelledby="toolstrackerprojectModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="toolstrackerprojectModalLabel">Tools Details By Customer Projects</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+          <div class="row mb-4">
+            <div class="col-md-12">
+              <div class="card border-success">
+                <div class="card-body p-3">
+                  <h5 class="card-title text-success mb-2">
+                    <i class="fas fa-map-marker-alt mr-2"></i>Site Filter
+                  </h5>
+                  <div class="input-group">
+                    <select class="form-control" id="site-filter">
+                      <option value="">All Sites</option>
+                      <?php
+                        include_once("../MCU/db.php");
+                        $site_query = "SELECT B.stc_cust_project_id, B.stc_cust_project_title FROM `stc_tooldetails_track` A INNER JOIN `stc_cust_project` B ON A.project_id=B.stc_cust_project_id ORDER BY B.stc_cust_project_title ASC";
+                        $site_result = mysqli_query($con, $site_query);
+                        if ($site_result && mysqli_num_rows($site_result) > 0) {
+                          while ($site = mysqli_fetch_assoc($site_result)) {
+                            echo '<option value="' . htmlspecialchars($site['stc_cust_project_id']) . '">' . htmlspecialchars($site['stc_cust_project_title']) . '</option>';
+                          }
+                        }
+                      ?>  
+                    </select>
+                    <div class="input-group-append">
+                      <button class="btn btn-success" type="button" id="find-site-data">
+                        <i class="fas fa-search"></i> Find
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="card border-primary">
+                <div class="card-body p-3">
+                  <h5 class="card-title text-primary mb-1">
+                    <i class="fas fa-project-diagram mr-2"></i>Project
+                  </h5>
+                  <p class="card-text mb-0 project-name-title" id="project-name">Project Name</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-12">
+              <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover" id="tools-details-table">
+                  <thead class="thead-dark">
+                    <tr>
+                      <th class="text-center">SL NO</th>
+                      <th class="text-center">Item Code</th>
+                      <th class="text-center">Item Description</th>
+                      <th class="text-center">Machine SL No</th>
+                      <th class="text-center">Make</th>
+                      <th class="text-center">Type</th>
+                      <th class="text-center">Received Person</th>
+                      <th class="text-center">Dispatch Date</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tools-details-tbody">
+                    <!-- Data will be populated here -->
+                    <tr>
+                      <td colspan="10" class="text-center text-muted">No data available</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

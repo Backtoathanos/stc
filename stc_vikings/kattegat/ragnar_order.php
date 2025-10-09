@@ -3810,6 +3810,26 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		];
 	}
 
+	public function stc_tool_tracker_get_bysite($sitefilter){
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "SELECT A.receivedby, A.issueddate, B.itemdescription, B.machinesrno, B.make, B.tooltype,B.unique_id,C.stc_cust_project_title FROM `stc_tooldetails_track` A INNER JOIN `stc_tooldetails` B ON A.toolsdetails_id=B.id INNER JOIN `stc_cust_project` C ON A.project_id=C.stc_cust_project_id WHERE A.`project_id`='".mysqli_real_escape_string($this->stc_dbs, $sitefilter)."' ORDER BY A.`id` DESC");
+		$blackpearl = [];
+		$i=0;
+		$project_name='';
+		if(mysqli_num_rows($blackpearl_qry) > 0){
+			$i=0;
+			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$project_name=$blackpearl_row['stc_cust_project_title'];
+				$blackpearl[$i] = $blackpearl_row;
+				$i++;
+			}
+		}
+		return [
+			'project_name' => $project_name,
+			'data' => $blackpearl,
+			'total_pages' => $i
+		];
+	}
+
 	// for edit
 	public function stc_tool_tracker_edit($itt_id, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks){
 		$blackpearl='';
@@ -5015,6 +5035,16 @@ if(isset($_POST['call_tools_tracker'])){
 
     echo json_encode($odin_req_out);
 }
+
+// call tools tracker
+if(isset($_POST['stc_find_site_data'])){
+    $sitefilter = isset($_POST['sitefilter']) ? $_POST['sitefilter'] : '';
+    $odin_req = new ragnarCallRequisitionItemTrack();
+    $odin_req_out = $odin_req->stc_tool_tracker_get_bysite($sitefilter);
+
+    echo json_encode($odin_req_out);
+}
+
 
 
 // savce tools tracker
