@@ -1795,13 +1795,28 @@ class ragnarReportsViewRequiReports extends tesseract{
             $stcdispatchedqty=0;
             $stcrecievedqty=0;
             $stcpendingqty=0;
-            if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
-               $rqitemstts='ALLOW';
-            }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
-               $rqitemstts='DIRECT';
-            }else{
-               $rqitemstts='NOT ALLOW';
-            }
+            $rqitemstts='';
+				if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
+					$rqitemstts='<span style="background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px;">Ordered</span>';
+				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
+					$rqitemstts='<span style="background-color: #2ecc71; color: white; padding: 2px 6px; border-radius: 3px;">Approved</span>';
+				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==3){
+					$rqitemstts='<span style="background-color: #27ae60; color: white; padding: 2px 6px; border-radius: 3px;">Accepted</span>';
+				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==4){
+					$rqitemstts='<span style="background-color: #f39c12; color: white; padding: 2px 6px; border-radius: 3px;">Dispatched</span>';
+				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==5){
+					$rqitemstts='<span style="background-color: #16a085; color: white; padding: 2px 6px; border-radius: 3px;">Received</span>';
+				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==6){
+					$rqitemstts='<span style="background-color: #e74c3c; color: white; padding: 2px 6px; border-radius: 3px;">Rejected</span>';
+				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==7){
+					$rqitemstts='<span style="background-color: #95a5a6; color: white; padding: 2px 6px; border-radius: 3px;">Canceled</span>';
+				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==8){
+					$rqitemstts='<span style="background-color: #9b59b6; color: white; padding: 2px 6px; border-radius: 3px;">Returned</span>';
+				}elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==9){
+					$rqitemstts='<span style="background-color:rgb(255, 47, 47); color: white; padding: 2px 6px; border-radius: 3px;">Pending</span>';
+				}else{
+					$rqitemstts='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
+				}
             $stcdecqtyqry=mysqli_query($this->stc_dbs, "
                SELECT 
                   `stc_cust_super_requisition_list_items_rec_recqty`
@@ -4702,17 +4717,21 @@ if(isset($_POST['stc_pending_reports_req'])){
    $end_date = strtotime($stc_enddate);
    $out='';
       $objloki=new ragnarReportsViewRequiReports();
-      if((empty($stc_begdate) && empty($stc_enddate)) && $stc_custid=='NA'){
+      if((empty($stc_begdate) && empty($stc_enddate)) || $stc_custid=='NA' || $stc_projeid=='NA'){
          $out='
             <tr>
                <td colspan="10">Dont late any fields empty</td>
             </tr>
          ';
       }else{
-         if($stc_begdate!=$stc_enddate){
+         // Calculate the difference between start and end dates
+         $date_diff = (strtotime($stc_enddate) - strtotime($stc_begdate)) / (60 * 60 * 24);
+         
+         // Allow same date or up to 30 days difference for pending reports
+         if($date_diff < 0 || $date_diff > 30){
          $out='
             <tr>
-               <td colspan="10">Date will be same for pending list.</td>
+               <td colspan="10">Date range should be within one month (30 days) for pending list.</td>
             </tr>
          ';
          }else{

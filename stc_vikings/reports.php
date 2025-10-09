@@ -48,6 +48,47 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
         .stc-purchase-view-table td p{
           font-size: 10px;
         }
+
+        /* Loader Styles */
+        .stc-loader {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+
+        .stc-loader-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+        }
+
+        .stc-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stc-loader-text {
+            font-size: 16px;
+            font-weight: bold;
+        }
         
         .fade:not(.show) {
           opacity: 10;
@@ -94,6 +135,14 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
     </style>
 </head>
 <body>
+    <!-- Loader -->
+    <div class="stc-loader" id="stc-loader">
+        <div class="stc-loader-content">
+            <div class="stc-spinner"></div>
+            <div class="stc-loader-text">Loading...</div>
+        </div>
+    </div>
+    
     <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
         <?php include_once("header-nav.php");?>
         <div class="app-main">
@@ -1540,6 +1589,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var begdate=$('.merbegdate').val();
                 var enddate=$('.merenddate').val();
                 var merchantid=$('#stc-select-merchant-to-ledger').val();
+                
+                // Show loader
+                $('#stc-loader').show();
+                $('.stc-loader-text').text('Loading merchant reports...');
+                
                 $.ajax({
                     url     : "kattegat/ragnar_reports.php",
                     method  : "POST",
@@ -1552,6 +1606,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     success : function(data){
                     // console.log(data);
                     $('.stc-reports-merchant-ledger-view').html(data);
+                    $('#stc-loader').hide();
+                    },
+                    error   : function(){
+                        $('#stc-loader').hide();
+                        alert('Error loading merchant reports. Please try again.');
                     }
                 });
             });
@@ -1585,6 +1644,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
             $('body').delegate('#stc-on-call-customer-customer', 'change', function(e){
               e.preventDefault();
               var custid=$(this).val();
+              
+              // Show loader for dropdown
+              $('.stc-select-agent').html('<option value="NA">Loading agents...</option>');
+              
               $.ajax({
                 url     : "kattegat/ragnar_reports.php",
                 method  : "POST",
@@ -1594,6 +1657,9 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 },
                 success : function(data){
                   $('.stc-select-agent').html(data);
+                },
+                error   : function(){
+                  $('.stc-select-agent').html('<option value="NA">Error loading agents</option>');
                 }
               });
             });
@@ -1603,6 +1669,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
               e.preventDefault();
               var agentid=$(this).val();
               var custid=$('#stc-on-call-customer-customer').val();
+              
+              // Show loader for dropdown
+              $('.stc-select-project').html('<option value="NA">Loading projects...</option>');
+              
               $.ajax({
                 url     : "kattegat/ragnar_reports.php",
                 method  : "POST",
@@ -1613,6 +1683,9 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 },
                 success : function(data){
                   $('.stc-select-project').html(data);
+                },
+                error   : function(){
+                  $('.stc-select-project').html('<option value="NA">Error loading projects</option>');
                 }
               });
             });
@@ -1629,6 +1702,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var jsagentid=$('.stc-select-agent').val();
                 var jsprojeid=$('.stc-select-project').val();
                 var count_id=0;
+                
+                // Show loader
+                $('#stc-loader').show();
+                $('.stc-loader-text').text('Loading requisition reports...');
+                
                 $.ajax({
                     url         : "kattegat/ragnar_reports.php",
                     method      : "POST",
@@ -1643,6 +1721,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     },
                     success     : function(reportsfindres){
                         $('.stc-reports-pending-view').html(reportsfindres);
+                        $('#stc-loader').hide();
+                    },
+                    error       : function(){
+                        $('#stc-loader').hide();
+                        alert('Error loading requisition reports. Please try again.');
                     }
                 });
             });
@@ -1658,6 +1741,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var jscustid=$('.stc-select-customer').val();
                 var jsagentid=$('.stc-select-agent').val();
                 var jsprojeid=$('.stc-select-project').val();
+                
+                // Show loader
+                $('#stc-loader').show();
+                $('.stc-loader-text').text('Loading more records...');
+                
                 $.ajax({
                     url         : "kattegat/ragnar_reports.php",
                     method      : "POST",
@@ -1672,6 +1760,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     },
                     success     : function(reportsfindres){
                         $('.stc-reports-pending-view').append(reportsfindres);
+                        $('#stc-loader').hide();
+                    },
+                    error       : function(){
+                        $('#stc-loader').hide();
+                        alert('Error loading more records. Please try again.');
                     }
                 });
             });
@@ -1685,6 +1778,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                 var jscustid=$('.stc-select-customer').val();
                 var jsagentid=$('.stc-select-agent').val();
                 var jsprojeid=$('.stc-select-project').val();
+                
+                // Show loader
+                $('#stc-loader').show();
+                $('.stc-loader-text').text('Loading pending reports...');
+                
                 $.ajax({
                     url         : "kattegat/ragnar_reports.php",
                     method      : "POST",
@@ -1698,6 +1796,11 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                     },
                     success     : function(reportsfindres){
                         $('.stc-reports-pending-view').html(reportsfindres);
+                        $('#stc-loader').hide();
+                    },
+                    error       : function(){
+                        $('#stc-loader').hide();
+                        alert('Error loading pending reports. Please try again.');
                     }
                 });
             });
