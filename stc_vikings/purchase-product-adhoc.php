@@ -399,7 +399,7 @@ include("kattegat/role_check.php");
                                           <a class="btn btn-success form-control" data-toggle="modal" data-target=".bd-modal-ledgershow" href="javascript:void(0)">View Ledger</a>
                                         </div>
                                         <div class="col-md-4 text-right">
-                                          <a class="btn btn-danger form-control" data-toggle="modal" data-target=".bd-modal-pendingshow" href="javascript:void(0)">View Pendings</a>
+                                          <a class="btn btn-danger form-control" data-toggle="modal" data-target=".bd-modal-pendingshow" href="javascript:void(0)">View Adjustments</a>
                                         </div>
                                       </div>
                                       <form action="" class="stc-view-product-form">
@@ -2761,7 +2761,7 @@ include("kattegat/role_check.php");
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLongTitle">Pendings List</h5>
+                <h5 class="modal-title" id="exampleModalLongTitle">Adhoc Adjustments List</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -2770,7 +2770,7 @@ include("kattegat/role_check.php");
                 <!-- Nav tabs -->
                 <ul class="nav nav-tabs" role="tablist">
                     <li class="nav-item">
-                        <a class="nav-link active" data-toggle="tab" href="#detailedLedger">Pending</a>
+                        <a class="nav-link active" data-toggle="tab" href="#detailedLedger">Adhoc Adjustments</a>
                     </li>
                 </ul>
 
