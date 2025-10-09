@@ -3475,7 +3475,7 @@ $(document).ready(function () {
                       <option value="">All Sites</option>
                       <?php
                         include_once("../MCU/db.php");
-                        $site_query = "SELECT B.stc_cust_project_id, B.stc_cust_project_title FROM `stc_tooldetails_track` A INNER JOIN `stc_cust_project` B ON A.project_id=B.stc_cust_project_id ORDER BY B.stc_cust_project_title ASC";
+                        $site_query = "SELECT DISTINCT B.stc_cust_project_id, B.stc_cust_project_title FROM `stc_tooldetails_track` A INNER JOIN `stc_cust_project` B ON A.project_id=B.stc_cust_project_id ORDER BY B.stc_cust_project_title ASC";
                         $site_result = mysqli_query($con, $site_query);
                         if ($site_result && mysqli_num_rows($site_result) > 0) {
                           while ($site = mysqli_fetch_assoc($site_result)) {
