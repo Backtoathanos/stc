@@ -2376,9 +2376,13 @@ class ragnarPurchaseAdhoc extends tesseract{
 					$cherrypick='';
 				}
 				$addtoollist='<a href="javascript:void(0)" class="btn btn-success itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" title="Add to Toollist"><i class="fa fa-tools"></i></a>';
+				$checkbox = '';
+				if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==6){
+					$checkbox="<div class='card-border mb-3 card-body border-success'><input type='checkbox' class='material-icons form-control common_selector' style='width:50px;' value='".$odinrow['stc_purchase_product_adhoc_id']."'></div>";
+				}
 				$odin.="
 					<tr>
-						<td class='text-center'>".$slno."</td>
+						<td class='text-center'>".$slno." ".$checkbox."</td>
 						<td class='text-center' style='width: 180px; font-family: Arial, sans-serif; padding: 8px;'>
 							<div style='font-weight: bold; color: #34495e;'>
 								".$odinrow['stc_purchase_product_adhoc_id']."
@@ -3168,15 +3172,15 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$duplicate_check_qry = mysqli_query($this->stc_dbs, "
 			SELECT `unique_id` FROM `stc_tooldetails` WHERE `unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $unique)."'
 		");
-		// Check for duplicate unique ID
-		$duplicate_check_qry2 = mysqli_query($this->stc_dbs, "
-			SELECT `unique_id` FROM `stc_tooldetails` WHERE `poa_id` = '".mysqli_real_escape_string($this->stc_dbs, $repid)."'
-		");
+		// // Check for duplicate unique ID
+		// $duplicate_check_qry2 = mysqli_query($this->stc_dbs, "
+		// 	SELECT `unique_id` FROM `stc_tooldetails` WHERE `poa_id` = '".mysqli_real_escape_string($this->stc_dbs, $repid)."'
+		// ");
 		// If a duplicate is found, set $blackpearl to "duplicate"
 		if(mysqli_num_rows($duplicate_check_qry) > 0) {
 			$blackpearl = "duplicate";
-		} else if(mysqli_num_rows($duplicate_check_qry2) > 0){
-			$blackpearl = "duplicate";
+		// } else if(mysqli_num_rows($duplicate_check_qry2) > 0){
+		// 	$blackpearl = "duplicate";
 		} else {
 			$query="
 				INSERT INTO `stc_tooldetails`(

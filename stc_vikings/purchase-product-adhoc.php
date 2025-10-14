@@ -463,7 +463,10 @@ include("kattegat/role_check.php");
                                       <form action="" class="stc-view-purchase-order-form" style="overflow-x: auto; width: 100%;">
                                           <table class="table table-hover table-bordered stc-purchase-view-table">
                                             <thead>
-                                              <th>Sl No.</th>
+                                              <th>
+                                                <input type="checkbox" id="selectAllCheckbox" class="form-control" style="width: 20px; height: 20px; margin: 0 auto; display: block;">
+                                                <br>Sl No.
+                                              </th>
                                               <th>Adhoc_Id</th>
                                               <th>Linked Product</th>
                                               <th>Product ID<br> Product Name</th>
@@ -1921,6 +1924,150 @@ include("kattegat/role_check.php");
                 saleRateInput.value = '0.00';
             }
         }
+        
+        // Show/hide dropdown based on checkbox selection (using event delegation for dynamic content)
+        $(document).on('change', '.common_selector', function() {
+            var checkedBoxes = $('.common_selector:checked');
+            
+            if (checkedBoxes.length > 0) {
+                // Remove any existing fixed dropdown
+                $('.fixed-status-dropdown').remove();
+                
+                // Create fixed dropdown in top right corner
+                var dropdownHtml = '<div class="fixed-status-dropdown" style="position: fixed; top: 60px; right: 20px; z-index: 9999; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">' +
+                    '<h6 style="margin-bottom: 10px;">Bulk Actions</h6>' +
+                    '<div class="dropdown" style="display: inline-block;">' +
+                    '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="bulkStatusDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
+                    'Change Status' +
+                    '</button>' +
+                    '<div class="dropdown-menu" aria-labelledby="bulkStatusDropdown">' +
+                    '<a class="dropdown-item bulk-status-change" href="javascript:void(0)" data-status="1">Accept All Selected</a>' +
+                    '<a class="dropdown-item bulk-status-change" href="javascript:void(0)" data-status="4">Approve All Selected</a>' +
+                    '<a class="dropdown-item bulk-status-change" href="javascript:void(0)" data-status="5">Reject All Selected</a>' +
+                    '</div>' +
+                    '</div>' +
+                    '<button class="btn btn-danger btn-sm ml-2" id="closeBulkActions" style="margin-left: 10px;">Close</button>' +
+                    '</div>';
+                
+                $('body').append(dropdownHtml);
+            } else {
+                // Hide fixed dropdown when no checkboxes are checked
+                $('.fixed-status-dropdown').remove();
+            }
+        });
+        
+        // Close bulk actions dropdown
+        $(document).on('click', '#closeBulkActions', function() {
+            $('.fixed-status-dropdown').remove();
+        });
+        
+        // Handle Select All checkbox
+        $(document).on('change', '#selectAllCheckbox', function() {
+            var isChecked = $(this).is(':checked');
+            $('.common_selector').prop('checked', isChecked).trigger('change');
+        });
+        
+        // Handle individual checkbox changes to update Select All state
+        $(document).on('change', '.common_selector', function() {
+            var totalCheckboxes = $('.common_selector').length;
+            var checkedCheckboxes = $('.common_selector:checked').length;
+            
+            if (checkedCheckboxes === 0) {
+                $('#selectAllCheckbox').prop('checked', false).prop('indeterminate', false);
+            } else if (checkedCheckboxes === totalCheckboxes) {
+                $('#selectAllCheckbox').prop('checked', true).prop('indeterminate', false);
+            } else {
+                $('#selectAllCheckbox').prop('checked', false).prop('indeterminate', true);
+            }
+        });
+        
+        // Handle bulk status change
+        $(document).on('click', '.bulk-status-change', function() {
+            var status = $(this).data('status');
+            var checkedBoxes = $('.common_selector:checked');
+            var itemIds = [];
+            
+            // Collect all checked item IDs
+            checkedBoxes.each(function() {
+                itemIds.push($(this).val());
+            });
+            
+            if (itemIds.length > 0) {
+                var statusText = status == 4 ? 'Approve' : 'Reject';
+                if (confirm('Are you sure you want to ' + statusText.toLowerCase() + ' ' + itemIds.length + ' selected items?')) {
+                    // Show loading indicator
+                    $('.fixed-status-dropdown').html('<div style="text-align: center; padding: 20px;"><i class="fa fa-spinner fa-spin"></i> Updating items...</div>');
+                    
+                    var completedCount = 0;
+                    var totalItems = itemIds.length;
+                    var failedItems = [];
+                    
+                    // Process each item in loop
+                    itemIds.forEach(function(itemId, index) {
+                        $.ajax({
+                            url: "kattegat/ragnar_purchase.php",
+                            type: 'POST',
+                            data: {
+                                stc_changeapprovestatus: 1,
+                                id: itemId,
+                                status: status
+                            },
+                            dataType: 'json',
+                            success: function (response) {
+                                completedCount++;
+                                console.log('Item ' + itemId + ' updated successfully');
+                                
+                                // Check if all items are processed
+                                if (completedCount === totalItems) {
+                                    // All items processed, refresh data
+                                    if (failedItems.length === 0) {
+                                        alert('All ' + totalItems + ' items updated successfully!');
+                                    } else {
+                                        alert('Updated ' + (totalItems - failedItems.length) + ' items successfully. Failed: ' + failedItems.join(', '));
+                                    }
+                                    
+                                    // Remove the fixed dropdown
+                                    $('.fixed-status-dropdown').remove();
+                                    
+                                    // Refresh the data
+                                    if (typeof Pagination !== 'undefined' && Pagination.loadData) {
+                                        Pagination.loadData(1); // Reload first page
+                                    } else {
+                                        // Fallback: reload the page
+                                        location.reload();
+                                    }
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                completedCount++;
+                                failedItems.push(itemId);
+                                console.log('Failed to update item ' + itemId + ': ' + error);
+                                
+                                // Check if all items are processed
+                                if (completedCount === totalItems) {
+                                    if (failedItems.length === 0) {
+                                        alert('All ' + totalItems + ' items updated successfully!');
+                                    } else {
+                                        alert('Updated ' + (totalItems - failedItems.length) + ' items successfully. Failed: ' + failedItems.join(', '));
+                                    }
+                                    
+                                    // Remove the fixed dropdown
+                                    $('.fixed-status-dropdown').remove();
+                                    
+                                    // Refresh the data
+                                    if (typeof Pagination !== 'undefined' && Pagination.loadData) {
+                                        Pagination.loadData(1); // Reload first page
+                                    } else {
+                                        // Fallback: reload the page
+                                        location.reload();
+                                    }
+                                }
+                            }
+                        });
+                    });
+                }
+            }
+        });
     </script>
 </body>
 </html>
