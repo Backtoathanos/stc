@@ -1817,7 +1817,6 @@ class ragnarReportsViewRequiReports extends tesseract{
          ) ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
       ";
       $getrequisitionsqry=mysqli_query($this->stc_dbs, $query);
-      echo $query;
       if(mysqli_num_rows($getrequisitionsqry)>0){
          foreach($getrequisitionsqry as$requisitionrow){
             $loopcount++;
