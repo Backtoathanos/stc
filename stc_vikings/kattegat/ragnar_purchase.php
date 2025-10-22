@@ -3227,6 +3227,49 @@ class ragnarPurchaseAdhoc extends tesseract{
 		return $blackpearl;
 	}
 
+	public function stc_reset_items(){
+		$lokiout='';
+		$sqlqry=mysqli_query($this->stc_dbs, "
+			SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM `stc_purchase_product_adhoc` WHERE (`stc_purchase_product_adhoc_status`=1 OR `stc_purchase_product_adhoc_status`=2)
+		");
+		if($sqlqry && mysqli_num_rows($sqlqry) > 0){
+			while($row=mysqli_fetch_assoc($sqlqry)){
+				$ad_id=$row['stc_purchase_product_adhoc_id'];
+				$pqty=$row['stc_purchase_product_adhoc_qty'];
+				$gld_qty=0;
+				$challan_qty=0;
+				
+				// Get GLD challan quantity
+				$query = mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) as total_qty FROM `gld_challan` WHERE `adhoc_id` = $ad_id");
+				if($query && mysqli_num_rows($query) > 0){
+					$gld_row=mysqli_fetch_assoc($query);
+					$gld_qty = $gld_row['total_qty'] ? $gld_row['total_qty'] : 0;
+				}
+
+				// Get requisition quantity
+				$query = mysqli_query($this->stc_dbs, "SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`) as total_qty FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_list_poaid` = $ad_id");
+				if($query && mysqli_num_rows($query) > 0){
+					$challan_row=mysqli_fetch_assoc($query);
+					$challan_qty = $challan_row['total_qty'] ? $challan_row['total_qty'] : 0;
+				}
+
+				// Calculate remaining quantity (fixed logic)
+				$remaining_qty = $pqty - $gld_qty - $challan_qty;
+				
+				if($remaining_qty > 0){
+					$query = mysqli_query($this->stc_dbs, "UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_status` = 1 WHERE `stc_purchase_product_adhoc_id` = $ad_id");
+				}else if($remaining_qty == 0){
+					$query = mysqli_query($this->stc_dbs, "UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_status` = 2 WHERE `stc_purchase_product_adhoc_id` = $ad_id");
+				}
+			}
+			$lokiout='Success';
+		}
+		else{
+			$lokiout='Hmmm!!! Something went wrong on resetting items.';
+		}
+		return $lokiout;
+	}
+
 	
 }
 #<------------------------------------------------------------------------------------------------------>
@@ -4220,6 +4263,12 @@ if(isset($_POST['save_tool_tracker'])){
 		$out=$odin_req->stc_tool_tracker_save($repid, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks);
 	}
 	echo $out;
+}
+
+if(isset($_POST['reset_items'])){
+	$bjornestocking=new ragnarPurchaseAdhoc();
+	$outbjornestocking=$bjornestocking->stc_reset_items();
+	echo json_encode($outbjornestocking);
 }
 
 ?>

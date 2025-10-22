@@ -392,14 +392,17 @@ include("kattegat/role_check.php");
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
                                       <div class="row mb-3">
-                                        <div class="col-md-4 text-right">
+                                        <div class="col-md-3 text-right">
                                           <a class="btn btn-secondary form-control" data-toggle="modal" data-target=".bd-modal-inventoryshow" href="javascript:void(0)">View Inventory</a>
                                         </div>
-                                        <div class="col-md-4 text-right">
+                                        <div class="col-md-3 text-right">
                                           <a class="btn btn-success form-control" data-toggle="modal" data-target=".bd-modal-ledgershow" href="javascript:void(0)">View Ledger</a>
                                         </div>
-                                        <div class="col-md-4 text-right">
+                                        <div class="col-md-3 text-right">
                                           <a class="btn btn-danger form-control" data-toggle="modal" data-target=".bd-modal-pendingshow" href="javascript:void(0)">View Adjustments</a>
+                                        </div>
+                                        <div class="col-md-3 text-right">
+                                          <a class="btn btn-primary form-control reset-items" href="javascript:void(0)">Reset Items</a>
                                         </div>
                                       </div>
                                       <form action="" class="stc-view-product-form">
@@ -1871,6 +1874,40 @@ include("kattegat/role_check.php");
             } else {
               alert("Please check Required fields.");
             }
+          });
+
+          // AJAX click event for updating adhoc ID
+          $('body').delegate('.reset-items', 'click', function(e){
+              if(confirm("Are you sure want to reset items?")){
+                $.ajax({
+                    url: "kattegat/ragnar_purchase.php",
+                    method: "POST",
+                    data: {
+                        reset_items: 1
+                    },
+                    dataType: 'json',
+                    beforeSend: function() {
+                        $(this).prop('disabled', true).text('Updating...');
+                    },
+                    success: function(response) {
+                        if(response === 'reload') {
+                            alert('Session expired. Please reload the page.');
+                            window.location.reload();
+                        } else if(response === 'Success') {
+                            alert('Adhoc ID updated successfully');
+                            location.reload();
+                        } else {
+                            alert('Update Failed: ' + response);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('AJAX Error: Failed to update adhoc ID - ' + error);
+                    },
+                    complete: function() {
+                        $('.update-adhoc-id-btn').prop('disabled', false).text('Update Adhoc ID');
+                    }
+                });
+              }
           });
 
           
