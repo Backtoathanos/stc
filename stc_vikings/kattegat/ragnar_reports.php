@@ -1809,7 +1809,9 @@ class ragnarReportsViewRequiReports extends tesseract{
          ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id` 
          WHERE 
             `stc_cust_super_requisition_items_finalqty`!=0
-         AND `stc_cust_project_cust_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_custid)."'
+         AND `stc_cust_project_cust_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_custid)."' 
+         AND `stc_cust_super_requisition_list_super_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_agentid)."'
+         AND `stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_projeid)."'
          AND (
             DATE(`stc_cust_super_requisition_list_date`) 
             BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $stc_begdate)."'
@@ -4746,7 +4748,7 @@ if(isset($_POST['stc_pending_reports_req'])){
    $end_date = strtotime($stc_enddate);
    $out='';
       $objloki=new ragnarReportsViewRequiReports();
-      if((empty($stc_begdate) && empty($stc_enddate)) || $stc_custid=='NA' || $stc_projeid=='NA'){
+      if((empty($stc_begdate) && empty($stc_enddate)) || $stc_custid=='NA' || $stc_agentid=='NA' || $stc_projeid=="Please Select Agent First" || $stc_projeid=='NA'){
          $out='
             <tr>
                <td colspan="10">Dont late any fields empty</td>
