@@ -1784,7 +1784,7 @@ class ragnarReportsViewRequiReports extends tesseract{
       $optimusprime='';
       $slno=0;
       $loopcount=0;
-      $getrequisitionsqry=mysqli_query($this->stc_dbs, "
+      $query="
          SELECT DISTINCT
             `stc_requisition_combiner_id`,
             DATE(`stc_requisition_combiner_date`) as stc_req_comb_date,
@@ -1807,17 +1807,17 @@ class ragnarReportsViewRequiReports extends tesseract{
          ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` 
          INNER JOIN `stc_requisition_combiner` 
          ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id` 
-         WHERE 
-            `stc_cust_super_requisition_items_finalqty`!=0
+         WHERE `stc_cust_super_requisition_items_finalqty`!=0
          AND `stc_cust_project_cust_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_custid)."' 
-         AND `stc_cust_super_requisition_list_super_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_agentid)."'
          AND `stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_projeid)."'
          AND (
             DATE(`stc_cust_super_requisition_list_date`) 
             BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $stc_begdate)."'
             AND '".mysqli_real_escape_string($this->stc_dbs, $stc_enddate)."' 
          ) ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
-      ");
+      ";
+      $getrequisitionsqry=mysqli_query($this->stc_dbs, $query);
+      echo $query;
       if(mysqli_num_rows($getrequisitionsqry)>0){
          foreach($getrequisitionsqry as$requisitionrow){
             $loopcount++;
