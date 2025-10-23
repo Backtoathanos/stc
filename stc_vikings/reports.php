@@ -440,6 +440,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Consumption Qty</div></th>
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Balance Qty</div></th>
                                                 <th class="text-center">Status</th>
+                                                <th class="text-center" style="width: 80px;">Pending Reason</th>
                                             </tr>
                                             </thead>
                                             <tbody class="stc-reports-pending-view">

@@ -1940,6 +1940,14 @@ class ragnarReportsViewRequiReports extends tesseract{
                      '.number_format($stcpendingqty, 2).'
                   </b>
                ';
+               $pendingreason='';
+               $qry=mysqli_query($this->stc_dbs, "
+                  SELECT `message` FROM `stc_cust_super_requisition_list_items_log` WHERE title='Pending' AND `item_id`='".$requisitionrow['reqlistid']."'
+               ");
+               foreach($qry as $result){
+                  $pendingreason.=$result['message'].'<br>';
+               }
+
                     $optimusprime.='
                             <tr>
                                 <td>'.$slno.'</td>
@@ -1968,6 +1976,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                                 <td align="right">'.number_format($stcconsumedqty, 2).'</td>
                                 <td align="right">'.$stcbalqtymark.'</td>
                                 <td>'.$rqitemstts.'</td>
+                                <td>'.$pendingreason.'</td>
                             </tr>
                     ';
             }
