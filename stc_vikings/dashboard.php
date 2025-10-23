@@ -471,6 +471,255 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                 </div>
                             </div>
                         </div> -->
+                        
+
+                        <div class="row mt-4">
+                                        <div class="col-md-12 col-xl-12">
+                                            <div class="card mb-3 border-success shadow-sm">
+                                                <div class="card-body p-4">
+                                                    <h5 class="card-title font-weight-bold mb-4 text-dark text-center">Pending List</h5>
+                                                    <div class="table-responsive">
+                                                    <table class="mb-0 table table-bordered" id="stc-reports-requisition-pending-view">
+                                            <thead>
+                                            <tr>
+                                                <th class="text-center">#</th>
+                                                <th class="text-center" width="10%">Comb PR Date &<br>No</th>
+                                                <th class="text-center" width="10%">PR Date &<br>No</th>
+                                                <th class="text-center" width="10%">Challan Date &<br>No</th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;">Site Name</th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;word-wrap: break-word;white-space: normal;">Item Desc</th>
+                                                <th class="text-center">Unit</th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">PR Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">GM Apprv Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Proc Apprv Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Dispatch Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Pending Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Recieved Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Consumption Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Balance Qty</div></th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center" style="width: 80px;">Pending Reason</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody class="stc-reports-pending-view">
+                                             <?php
+                                             include_once("../MCU/db.php");
+                                             $optimusprime='';
+                                             $slno=0;
+                                             $loopcount=0;
+                                             $query="
+                                                SELECT DISTINCT
+                                                   `stc_requisition_combiner_id`,
+                                                   DATE(`stc_requisition_combiner_date`) as stc_req_comb_date,
+                                                   `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
+                                                   DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
+                                                   `stc_cust_super_requisition_list_items_req_id`,
+                                                   `stc_cust_project_title`,
+                                                   `stc_cust_super_requisition_list_items_title`,
+                                                   `stc_cust_super_requisition_list_items_unit`,
+                                                   `stc_cust_super_requisition_list_items_reqqty`,
+                                                   `stc_cust_super_requisition_list_items_approved_qty`,
+                                                   `stc_cust_super_requisition_items_finalqty`,
+                                                   `stc_cust_super_requisition_list_items_status`,
+                                                   COUNT(*) as pending_count
+                                                FROM `stc_cust_super_requisition_list_items`
+                                                INNER JOIN `stc_cust_super_requisition_list` 
+                                                ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+                                                INNER JOIN `stc_cust_project` 
+                                                ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
+                                                INNER JOIN `stc_requisition_combiner_req` 
+                                                ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` 
+                                                INNER JOIN `stc_requisition_combiner` 
+                                                ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id` 
+                                                INNER JOIN `stc_cust_super_requisition_list_items_log` 
+                                                ON `item_id`=`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
+                                                WHERE `stc_cust_super_requisition_items_finalqty`!=0 AND `stc_cust_super_requisition_list_items_status`='9' AND `title`='Pending' 
+                                                GROUP BY `stc_requisition_combiner_id`
+                                                HAVING COUNT(*) > 2 
+                                                ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
+                                             ";
+                                             $getrequisitionsqry=mysqli_query($con, $query);
+                                             if(mysqli_num_rows($getrequisitionsqry)>0){
+                                                foreach($getrequisitionsqry as$requisitionrow){
+                                                   $loopcount++;
+                                                   $slno++;
+                                                   $rqitemstts='';
+                                                   $stcdispatchedqty=0;
+                                                   $stcrecievedqty=0;
+                                                   $stcpendingqty=0;
+                                                   $rqitemstts='';
+                                                       if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
+                                                           $rqitemstts='<span style="background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px;">Ordered</span>';
+                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
+                                                           $rqitemstts='<span style="background-color: #2ecc71; color: white; padding: 2px 6px; border-radius: 3px;">Approved</span>';
+                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==3){
+                                                           $rqitemstts='<span style="background-color: #27ae60; color: white; padding: 2px 6px; border-radius: 3px;">Accepted</span>';
+                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==4){
+                                                           $rqitemstts='<span style="background-color: #f39c12; color: white; padding: 2px 6px; border-radius: 3px;">Dispatched</span>';
+                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==5){
+                                                           $rqitemstts='<span style="background-color: #16a085; color: white; padding: 2px 6px; border-radius: 3px;">Received</span>';
+                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==6){
+                                                           $rqitemstts='<span style="background-color: #e74c3c; color: white; padding: 2px 6px; border-radius: 3px;">Rejected</span>';
+                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==7){
+                                                           $rqitemstts='<span style="background-color: #95a5a6; color: white; padding: 2px 6px; border-radius: 3px;">Canceled</span>';
+                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==8){
+                                                           $rqitemstts='<span style="background-color: #9b59b6; color: white; padding: 2px 6px; border-radius: 3px;">Returned</span>';
+                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==9){
+                                                           $rqitemstts='<span style="background-color:rgb(255, 47, 47); color: white; padding: 2px 6px; border-radius: 3px;">Pending</span>';
+                                                       }else{
+                                                           $rqitemstts='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
+                                                       }
+                                                   $stcdecqtyqry=mysqli_query($con, "
+                                                      SELECT 
+                                                         `stc_cust_super_requisition_list_items_rec_recqty`
+                                                      FROM `stc_cust_super_requisition_list_items_rec` 
+                                                      WHERE 
+                                                         `stc_cust_super_requisition_list_items_rec_list_id`='".$requisitionrow['stc_cust_super_requisition_list_items_req_id']."' 
+                                                      AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$requisitionrow['reqlistid']."'  
+                                                   ");
+                                                   foreach($stcdecqtyqry as $dispatchedrow){
+                                                      $stcdispatchedqty+=$dispatchedrow['stc_cust_super_requisition_list_items_rec_recqty'];
+                                                   }
+                                       
+                                                   $stcrecqtyqry=mysqli_query($con, "
+                                                      SELECT 
+                                                         `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+                                                      FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
+                                                      WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$requisitionrow['reqlistid']."'  
+                                                   ");
+                                                   foreach($stcrecqtyqry as $recievedrow){
+                                                      $stcrecievedqty+=$recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
+                                                   }
+                                       
+                                                   $stcconsumedqty=0;
+                                                   $stcconsrecqtyqry=mysqli_query($con, "
+                                                      SELECT 
+                                                         SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
+                                                      FROM `stc_cust_super_list_items_consumption_items` 
+                                                      WHERE `stc_cust_super_list_items_consumption_items_name`='".$requisitionrow['reqlistid']."'  
+                                                   ");
+                                                   foreach($stcconsrecqtyqry as $consumedrow){
+                                                      $stcconsumedqty+=$consumedrow['consumable_qty'];
+                                                   }
+                                       
+                                                   $challanqry=mysqli_query($con, "
+                                                      SELECT DISTINCT
+                                                         `stc_sale_product_id`,
+                                                         `stc_sale_product_date`
+                                                      FROM
+                                                         `stc_sale_product`
+                                                      INNER JOIN 
+                                                         `stc_sale_product_items` 
+                                                      ON 
+                                                         `stc_sale_product_items_sale_product_id`=`stc_sale_product_id`
+                                                      INNER JOIN 
+                                                         `stc_cust_super_requisition_list_items` 
+                                                      ON 
+                                                         `stc_cust_super_requisition_list_items_req_id`=`stc_sale_product_order_id`
+                                                      INNER JOIN 
+                                                         `stc_cust_super_requisition_list_items_rec` 
+                                                      ON 
+                                                         `stc_cust_super_requisition_list_items_rec_list_item_id`=`stc_cust_super_requisition_list_id`
+                                                      WHERE
+                                                         `stc_sale_product_order_id`='".mysqli_real_escape_string($con, $requisitionrow['stc_cust_super_requisition_list_items_req_id'])."'
+                                                      AND 
+                                                         `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($con, $requisitionrow['reqlistid'])."'
+                                                   ");
+                                                   $challaninfo='';
+                                                   foreach($challanqry as $challanrow){
+                                                      $challaninfo.=
+                                                          '<a href="challan-preview.php?pid='.$challanrow['stc_sale_product_id'].'">'.
+                                                               date('d-m-Y',strtotime($challanrow['stc_sale_product_date'])).
+                                                            '<br>'.
+                                                               $challanrow['stc_sale_product_id'].
+                                                            '<br>
+                                                          </a>
+                                                         '
+                                                      ;
+                                                   }
+                                                   $stcpendingqty=$requisitionrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
+                                                       
+                                                       $cosump_bal_qty = $stcrecievedqty - $stcconsumedqty;
+                                                       $stcbalqtymark = '';
+                                                       if($cosump_bal_qty>0){
+                                                      $stcbalqtymark='
+                                                         <p class="form-control" style="
+                                                             background: #ffd81a;
+                                                             color: red;
+                                                         ">
+                                                            '.number_format($cosump_bal_qty, 2).'
+                                                         </b>
+                                                      ';
+                                                   }else{
+                                                      $stcbalqtymark=number_format($cosump_bal_qty, 2);
+                                                   }
+                                                   if($stcpendingqty>0){
+                                                      $stcpendingqty='
+                                                         <p class="form-control" style="
+                                                             background: #ffd81a;
+                                                             color: red;
+                                                         ">
+                                                            '.number_format($stcpendingqty, 2).'
+                                                         </b>
+                                                      ';
+                                                      $pendingreason='<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisitionrow['stc_requisition_combiner_id'].'" target="__blank">';
+                                                      $qry=mysqli_query($con, "
+                                                         SELECT `message` FROM `stc_cust_super_requisition_list_items_log` WHERE title='Pending' AND `item_id`='".$requisitionrow['reqlistid']."'
+                                                      ");
+                                                      foreach($qry as $result){
+                                                         $pendingreason.=$result['message'].'<br>';
+                                                      }
+                                                      $pendingreason.='</a>';
+                                                           $optimusprime.='
+                                                                   <tr>
+                                                                       <td>'.$slno.'</td>
+                                                                       <td>
+                                                                           <a href="stc-requisition-combiner-fshow.php?requi_id='.$requisitionrow['stc_requisition_combiner_id'].'">
+                                                                               '.$requisitionrow['stc_req_comb_date'].'<br>
+                                                                               '.$requisitionrow['stc_requisition_combiner_id'].'
+                                                                           </a>
+                                                                       </td>
+                                                                       <td>
+                                                                           '.$requisitionrow['stc_req_date'].'<br>
+                                                                           '.$requisitionrow['stc_cust_super_requisition_list_items_req_id'].'
+                                                                       </td>
+                                                                       <td>
+                                                                           '.$challaninfo.'
+                                                                       </td>
+                                                                       <td>'.$requisitionrow['stc_cust_project_title'].'</td>
+                                                                       <td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
+                                                                       <td>'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
+                                                                       <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
+                                                                       <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+                                                                       <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
+                                                                       <td align="right">'.number_format($stcdispatchedqty, 2).'</td>
+                                                                       <td align="right">'.$stcpendingqty.'</td>
+                                                                       <td align="right">'.number_format($stcrecievedqty, 2).'</td>
+                                                                       <td align="right">'.number_format($stcconsumedqty, 2).'</td>
+                                                                       <td align="right">'.$stcbalqtymark.'</td>
+                                                                       <td>'.$rqitemstts.'</td>
+                                                                       <td>'.$pendingreason.'</td>
+                                                                   </tr>
+                                                           ';
+                                                   }
+                                                           
+                                                }
+                                             }else{
+                                                $optimusprime.='
+                                                      <tr>
+                                                         <td colspan="10">No requisition found!!!</td>
+                                                      </tr>
+                                                ';
+                                             }
+                                             echo $optimusprime;
+                                             ?>
+                                            </tbody>
+                                          </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                     </div>
                 </div>
         </div>
