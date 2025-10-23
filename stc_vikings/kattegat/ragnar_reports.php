@@ -1940,14 +1940,14 @@ class ragnarReportsViewRequiReports extends tesseract{
                      '.number_format($stcpendingqty, 2).'
                   </b>
                ';
-               $pendingreason='';
+               $pendingreason='<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisitionrow['stc_requisition_combiner_id'].'" target="__blank">';
                $qry=mysqli_query($this->stc_dbs, "
                   SELECT `message` FROM `stc_cust_super_requisition_list_items_log` WHERE title='Pending' AND `item_id`='".$requisitionrow['reqlistid']."'
                ");
                foreach($qry as $result){
                   $pendingreason.=$result['message'].'<br>';
                }
-
+               $pendingreason.='</a>';
                     $optimusprime.='
                             <tr>
                                 <td>'.$slno.'</td>
