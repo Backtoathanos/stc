@@ -483,22 +483,15 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                             <thead>
                                             <tr>
                                                 <th class="text-center">#</th>
-                                                <th class="text-center" width="10%">Comb PR Date &<br>No</th>
                                                 <th class="text-center" width="10%">PR Date &<br>No</th>
-                                                <th class="text-center" width="10%">Challan Date &<br>No</th>
-                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;">Site Name</th>
-                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;word-wrap: break-word;white-space: normal;">Item Desc</th>
-                                                <th class="text-center">Unit</th>
-                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">PR Qty</div></th>
-                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">GM Apprv Qty</div></th>
+                                                <th class="text-center" style="width: 300px;text-align: center;height: 118px;">Site Name</th>
+                                                <th class="text-center" style="width: 500px;text-align: center;height: 118px;word-wrap: break-word;white-space: normal;">Item Desc</th>
+                                                <th class="text-center" style="width: 40px;text-align: center;height: 118px;word-wrap: break-word;white-space: normal;">Unit</th>
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Proc Apprv Qty</div></th>
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Dispatch Qty</div></th>
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Pending Qty</div></th>
-                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Recieved Qty</div></th>
-                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Consumption Qty</div></th>
-                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Balance Qty</div></th>
                                                 <th class="text-center">Status</th>
-                                                <th class="text-center" style="width: 80px;">Pending Reason</th>
+                                                <th class="text-center" style="width: 500px;">Pending Reason</th>
                                             </tr>
                                             </thead>
                                             <tbody class="stc-reports-pending-view">
@@ -674,29 +667,15 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                                    <tr>
                                                                        <td>'.$slno.'</td>
                                                                        <td>
-                                                                           <a href="stc-requisition-combiner-fshow.php?requi_id='.$requisitionrow['stc_requisition_combiner_id'].'">
-                                                                               '.$requisitionrow['stc_req_comb_date'].'<br>
-                                                                               '.$requisitionrow['stc_requisition_combiner_id'].'
-                                                                           </a>
-                                                                       </td>
-                                                                       <td>
                                                                            '.$requisitionrow['stc_req_date'].'<br>
                                                                            '.$requisitionrow['stc_cust_super_requisition_list_items_req_id'].'
-                                                                       </td>
-                                                                       <td>
-                                                                           '.$challaninfo.'
                                                                        </td>
                                                                        <td>'.$requisitionrow['stc_cust_project_title'].'</td>
                                                                        <td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
                                                                        <td>'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
-                                                                       <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_reqqty'], 2).'</td>
-                                                                       <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
                                                                        <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
                                                                        <td align="right">'.number_format($stcdispatchedqty, 2).'</td>
                                                                        <td align="right">'.$stcpendingqty.'</td>
-                                                                       <td align="right">'.number_format($stcrecievedqty, 2).'</td>
-                                                                       <td align="right">'.number_format($stcconsumedqty, 2).'</td>
-                                                                       <td align="right">'.$stcbalqtymark.'</td>
                                                                        <td>'.$rqitemstts.'</td>
                                                                        <td>'.$pendingreason.'</td>
                                                                    </tr>
