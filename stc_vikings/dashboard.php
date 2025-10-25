@@ -513,8 +513,7 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                    `stc_cust_super_requisition_list_items_reqqty`,
                                                    `stc_cust_super_requisition_list_items_approved_qty`,
                                                    `stc_cust_super_requisition_items_finalqty`,
-                                                   `stc_cust_super_requisition_list_items_status`,
-                                                   COUNT(*) as pending_count
+                                                   `stc_cust_super_requisition_list_items_status`
                                                 FROM `stc_cust_super_requisition_list_items`
                                                 INNER JOIN `stc_cust_super_requisition_list` 
                                                 ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
@@ -528,7 +527,6 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
                                                 ON `item_id`=`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
                                                 WHERE `stc_cust_super_requisition_items_finalqty`!=0 AND `stc_cust_super_requisition_list_items_status`='9' AND `title`='Pending' 
                                                 GROUP BY `stc_requisition_combiner_id`
-                                                HAVING COUNT(*) > 2 
                                                 ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
                                              ";
                                              $getrequisitionsqry=mysqli_query($con, $query);
