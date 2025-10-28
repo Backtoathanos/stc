@@ -150,29 +150,67 @@ const CustomerModal = ({ show, handleClose, productId, productRate, productQuant
 
         axios.post(`${API_BASE_URL}/index.php?action=addCustomer`, customerData)
             .then(response => {
-                // If a new customer is added, update the select options
-                if (!customerId) {
-                    const newCustomerOption = {
-                        value: response.data.newCustomerId,
-                        label: customerName
-                    };
-                    setCustomerOptions([...customerOptions, newCustomerOption]);
-                    setSelectedCustomer(newCustomerOption); // Set newly added customer
+                // Check if the response contains an error
+                if (response.data.error) {
+                    // Show error message
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.data.error,
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Reload page after clicking OK on error
+                        window.location.reload();
+                    });
+                } else if (response.data.success) {
+                    // If a new customer is added, update the select options
+                    if (!customerId) {
+                        const newCustomerOption = {
+                            value: response.data.newCustomerId,
+                            label: customerName
+                        };
+                        setCustomerOptions([...customerOptions, newCustomerOption]);
+                        setSelectedCustomer(newCustomerOption); // Set newly added customer
+                    }
+
+                    // Reset fields after successful submission
+                    resetForm();
+                    handleClose(); // Close the modal after showing the alert
+
+                    // Show success message
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: 'Customer and product added successfully.',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Reload page after clicking OK on success
+                        window.location.reload();
+                    });
+                } else {
+                    // Handle unexpected response format
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: 'Unexpected response from server.',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 }
-
-                // Reset fields after successful submission
-                resetForm();
-                handleClose(); // Close the modal after showing the alert
-                window.location.reload();
-
+            })
+            .catch(error => {
+                console.error('Error adding customer and product:', error);
+                // Show error message for network/server errors
                 Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: 'Customer and product added successfully.',
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Failed to connect to server. Please try again.',
                     confirmButtonText: 'OK'
+                }).then(() => {
+                    window.location.reload();
                 });
             })
-            .catch(error => console.error('Error adding customer and product:', error))
             .finally(() => setIsSubmitting(false));
     };
 

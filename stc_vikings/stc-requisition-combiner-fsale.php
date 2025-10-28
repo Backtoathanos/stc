@@ -614,7 +614,10 @@ if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){
           var balanced_qty2=$('.stcbalancedqty').val();
           var item_type=$('#stc-req-list-item-itemtype').val();
           var validated=0;
-          if($('#searchInput').val()==''){
+          if($('#stcdispatchedqty').val()==''){
+            validated=0;
+            alert("Please enter dispatched quantity.");
+          }else if($('#searchInput').val()==''){
             validated=1;
           }else{
             if((dispatch_qnty>orderqty)){

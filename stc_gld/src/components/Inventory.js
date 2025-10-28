@@ -576,6 +576,7 @@ export default function Dashboard() {
                                 onChange={handleRequisitionFieldChange}
                                 placeholder="Enter quantity"
                                 min={0}
+                                step="0.01"
                                 required
                             />
                         </Form.Group>
