@@ -1,10 +1,7 @@
 <?php
-session_start();
-$sesionname=@$_SESSION['stc_empl_id'];
-$logout=session_destroy();
-if($logout){
-	header('location:../index.html');
-}else{
-	echo "No logout";
-}
+// Include authentication helper
+require_once 'auth_helper.php';
+
+// Use the new logout method that clears both session and cookies
+STCAuthHelper::logout();
 ?>

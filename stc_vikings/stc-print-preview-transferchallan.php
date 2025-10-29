@@ -1,11 +1,8 @@
 <?php
 ini_set("session.gc_maxlifetime", 21600);
 session_set_cookie_params(21600);
-session_start();
-if(empty(@$_SESSION['stc_empl_id'])){
-    header('location:index.html');
-    exit;
-}
+
+STCAuthHelper::checkAuth(); 
 ?>
 <?php 
 if(isset($_GET['transfer_id'])){

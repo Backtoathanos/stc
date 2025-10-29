@@ -1,10 +1,9 @@
 <?php  
-session_start(); 
-if(isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"]>0)){ 
-}else{ 
-    header("Location:index.html"); 
-} 
-?> 
+// Include authentication helper
+require_once 'kattegat/auth_helper.php';
+
+// Check authentication using the new hybrid system
+STCAuthHelper::checkAuth();?> 
 <!doctype html>
 <html lang="en">
 

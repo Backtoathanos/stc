@@ -2,6 +2,7 @@
 session_start();
 date_default_timezone_set('Asia/Kolkata');
 include "../../MCU/obdb.php";
+require_once 'auth_helper.php';
 /*------------------------------------------------------------------------------------------------*/
 /*------------------------------------------For employees ----------------------------------------*/
 /*------------------------------------------------------------------------------------------------*/
@@ -27,6 +28,10 @@ class prime extends tesseract{
 			$_SESSION['stc_empl_id']=$user_id;
 			$_SESSION['stc_empl_name']=$user_name;
 			$_SESSION['stc_empl_role']=$user_details['stc_user_role'];
+			
+			// Store authentication data in cookie for 30 days
+			STCAuthHelper::storeAuthInCookie();
+			
 			$op="success";
 		}else{
 			$op="Please Check Username & Password Again.";
