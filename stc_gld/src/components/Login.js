@@ -3,6 +3,7 @@ import {Link, useNavigate} from 'react-router-dom';
 import './Login.css';
 import { useEffect, useState } from 'react';
 import Footer from './layouts/Footer';
+import { setCookie } from './cookieUtils.js';
 export default function Login(){
     const navigate=useNavigate();
     const [user, setUser]=useState("");
@@ -50,14 +51,6 @@ export default function Login(){
             default:
         }
     }
-    const setCookie = (name, value, days) => {
-        const expires = new Date(Date.now() + days * 864e5).toUTCString();
-        document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; Secure; SameSite=Strict`;
-    };
-    
-    const deleteCookie = (name) => {
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    };
         
     const handleSubmit = (e) => {
         e.preventDefault(); // Prevent page refresh

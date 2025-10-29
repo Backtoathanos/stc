@@ -1,10 +1,19 @@
-import {Link, useNavigate} from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
+import { clearAllAuthCookies } from '../cookieUtils.js';
 export default function Navbar(){
     const navigate = useNavigate();
     function logoutSubmit(e) {
         e.preventDefault();
-        localStorage.removeItem("login"); // Clears the login status from localStorage
-        localStorage.setItem("loginStatus", "Logged out successfully."); // Optional message
+        
+        // Clear localStorage
+        localStorage.removeItem("login");
+        localStorage.setItem("loginStatus", "Logged out successfully.");
+        
+        // Clear cookies using utility function
+        clearAllAuthCookies();
+        
+        console.log("Logged out - cleared all cookies and localStorage");
+        
         navigate("/"); // Redirects to the login page
     }
     

@@ -4247,7 +4247,7 @@ class ragnarCallGLDRequisitions extends tesseract{
 					$created_by = isset($_SESSION['stc_empl_id']) ? $_SESSION['stc_empl_id'] : 0;
 					$insertQry = mysqli_query($this->stc_dbs, "INSERT INTO `stc_shop`(`adhoc_id`, `shopname`, `qty`, created_date, created_by) VALUES('".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."', '".mysqli_real_escape_string($this->stc_dbs, $shopname)."', '".mysqli_real_escape_string($this->stc_dbs, $qty)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $created_by)."')");
 					if($insertQry){
-						mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET status = $status WHERE id = $id");
+						mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET status = '3' WHERE id = $id");
 						return ['success' => true, 'message' => 'Status updated and item dispatched successfully'];
 					}
 				}else{
