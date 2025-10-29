@@ -1,6 +1,8 @@
 <?php
 ini_set("session.gc_maxlifetime", 21600);
 session_set_cookie_params(21600);
+// Include authentication helper
+require_once 'kattegat/auth_helper.php';
 
 STCAuthHelper::checkAuth(); 
 
