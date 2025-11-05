@@ -491,6 +491,7 @@ STCAuthHelper::checkAuth();
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Dispatch Qty</div></th>
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Pending Qty</div></th>
                                                 <th class="text-center">Status</th>
+                                                <th class="text-center">Pending Duration</th>
                                                 <th class="text-center" style="width: 500px;">Pending Reason</th>
                                             </tr>
                                             </thead>
@@ -513,7 +514,8 @@ STCAuthHelper::checkAuth();
                                                    `stc_cust_super_requisition_list_items_reqqty`,
                                                    `stc_cust_super_requisition_list_items_approved_qty`,
                                                    `stc_cust_super_requisition_items_finalqty`,
-                                                   `stc_cust_super_requisition_list_items_status`
+                                                   `stc_cust_super_requisition_list_items_status`,
+                                                   DATE(`created_date`) as stc_log_date
                                                 FROM `stc_cust_super_requisition_list_items`
                                                 INNER JOIN `stc_cust_super_requisition_list` 
                                                 ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
@@ -653,6 +655,52 @@ STCAuthHelper::checkAuth();
                                                             '.number_format($stcpendingqty, 2).'
                                                          </b>
                                                       ';
+                                                      // Calculate Pending Duration
+                                                      $pendingduration = '';
+                                                      if(!empty($requisitionrow['stc_log_date'])){
+                                                         $log_date = new DateTime($requisitionrow['stc_log_date']);
+                                                         $today = new DateTime();
+                                                         $interval = $log_date->diff($today);
+                                                         $months = $interval->y * 12 + $interval->m;
+                                                         
+                                                         // Calculate total days for more accurate month calculation
+                                                         $total_days = $log_date->diff($today)->days;
+                                                         $months_precise = floor($total_days / 30);
+                                                         
+                                                         // Determine color based on months
+                                                         $bg_color = '';
+                                                         $text_color = '#000000';
+                                                         
+                                                         if($months_precise >= 3){
+                                                            $bg_color = '#ff0000'; // Red for 3+ months
+                                                            $text_color = '#ffffff';
+                                                         }elseif($months_precise >= 2){
+                                                            $bg_color = '#ff8800'; // Orange for 2 months
+                                                            $text_color = '#ffffff';
+                                                         }elseif($months_precise >= 1){
+                                                            $bg_color = '#ffd700'; // Yellow/Gold for 1 month
+                                                            $text_color = '#000000';
+                                                         }else{
+                                                            $bg_color = '#ffffff'; // White for less than 1 month
+                                                            $text_color = '#000000';
+                                                         }
+                                                         
+                                                         $pendingduration = '
+                                                            <div style="
+                                                               background-color: '.$bg_color.';
+                                                               color: '.$text_color.';
+                                                               padding: 5px 10px;
+                                                               border-radius: 3px;
+                                                               text-align: center;
+                                                               font-weight: bold;
+                                                            ">
+                                                               '.$months_precise.' Month'.($months_precise != 1 ? 's' : '').' ('.$total_days.' Days)
+                                                            </div>
+                                                         ';
+                                                      }else{
+                                                         $pendingduration = '<div style="padding: 5px 10px;">N/A</div>';
+                                                      }
+                                                      
                                                       $pendingreason='<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisitionrow['stc_requisition_combiner_id'].'" target="__blank">';
                                                       $qry=mysqli_query($con, "
                                                          SELECT `message` FROM `stc_cust_super_requisition_list_items_log` WHERE title='Pending' AND `item_id`='".$requisitionrow['reqlistid']."'
@@ -675,6 +723,7 @@ STCAuthHelper::checkAuth();
                                                                        <td align="right">'.number_format($stcdispatchedqty, 2).'</td>
                                                                        <td align="right">'.$stcpendingqty.'</td>
                                                                        <td>'.$rqitemstts.'</td>
+                                                                       <td>'.$pendingduration.'</td>
                                                                        <td>'.$pendingreason.'</td>
                                                                    </tr>
                                                            ';
@@ -684,7 +733,7 @@ STCAuthHelper::checkAuth();
                                              }else{
                                                 $optimusprime.='
                                                       <tr>
-                                                         <td colspan="10">No requisition found!!!</td>
+                                                         <td colspan="11">No requisition found!!!</td>
                                                       </tr>
                                                 ';
                                              }
