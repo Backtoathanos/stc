@@ -9,12 +9,14 @@ class prime extends tesseract{
 
 	// check agents existance
 	public function stc_login($user,$pass){
+		$user = trim($user); // Trim input
+		$pass = trim($pass); // Trim input
 		$checkbumblebee=mysqli_query($this->stc_dbs, "
 			SELECT * FROM `stc_agents` 
 			WHERE `stc_agents_userid`='".mysqli_real_escape_string($this->stc_dbs, $user)."' 
 			AND `stc_agents_pass`='".mysqli_real_escape_string($this->stc_dbs, $pass)."'
 		");
-		if(mysqli_num_rows($checkbumblebee)>0){
+		if($checkbumblebee && mysqli_num_rows($checkbumblebee)>0){
 			$user_details=mysqli_fetch_assoc($checkbumblebee);
 			$user_name=$user_details['stc_agents_name'];
 			$user_id=$user_details['stc_agents_id'];
