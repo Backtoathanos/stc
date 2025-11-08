@@ -1416,6 +1416,24 @@ include("kattegat/role_check.php");
         $('.stc-call-for-select-merchant-res').modal("show");
       });
 
+      // select merchant for purchase 
+      $('body').delegate('.stc-generate-requisition', 'click', function () {
+        var req_comb_id = $(this).attr("id");
+        // $('#stc-req-list-rep').val(req_comb_id);
+        $.ajax({
+          url: "kattegat/ragnar_order.php",
+          method: "post",
+          data: {
+            stc_call_req_items_for_merchant_g: 1,
+            stc_req_comb_id: req_comb_id
+          },
+          success: function (response_merchandise_data) {
+            $('.generate-requisition-modal-body').html(response_merchandise_data);
+            // stc_call_merchant();
+          }
+        });
+      });
+
       // show merchanise modal
       $('body').delegate('.stc-agent-req-get-mer-product', 'click', function (e) {
         e.preventDefault();
@@ -3526,6 +3544,42 @@ $(document).ready(function () {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Tools details tracking show -->
+<div class="modal fade generate-requisition-modal" tabindex="-1" role="dialog"
+  aria-labelledby="myLargeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">Generate Requisition</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-xl-12">
+            <div class="main-card mb-3 card">
+              <div class="card-body">
+                <div class="row form control">
+                  <div class="col-md-12">
+                    <div class="card mb-3 widget-content generate-requisition-modal-body"">
+                      
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -648,128 +648,13 @@ class ragnarOrderAdd extends tesseract{
 // call requisition combiner class
 class ragnarRequisitionView extends tesseract{
 	// call all agents order records
+	// This function is now replaced by stc_getrequisition_by_multiple_inp with show_generate=true
 	public function stc_call_ag_requisition(){
-		$ivar='
-			<table class="table table-hover table-bordered form-group call-order">
-				<thead>
-					<tr>
-						<th class="text-center">Requisition For</th>
-						<th class="text-center">Parent Requisition ID<br>Parent Requisition Date</th>
-						<th class="text-center">Requisition Sitename</th>
-						<th class="text-center">Requisition Accepted By</th>
-						<th class="text-center">Requisition Status</th>
-						<th class="text-center">Action</th>
-					</tr>
-				</thead>
-				<tbody>
-		';
-		$ivarfilterquery=mysqli_query($this->stc_dbs, "
-			SELECT DISTINCT 
-				`stc_requisition_combiner_id`,
-				`stc_requisition_combiner_date`,
-			    `stc_requisition_combiner_refrence`,
-			    `stc_agents_name`,
-                `stc_customer_name`,
-				`stc_requisition_combiner_status`
-			FROM `stc_requisition_combiner`
-			INNER JOIN `stc_requisition_combiner_req` 
-			ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id`
-			INNER JOIN `stc_cust_super_requisition_list` 
-			ON `stc_cust_super_requisition_list_id`=`stc_requisition_combiner_req_requisition_id`
-			INNER JOIN `stc_cust_project` 
-			ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
-			INNER JOIN `stc_customer` 
-			ON `stc_cust_project_cust_id`=`stc_customer_id`
-			INNER JOIN `stc_agents` 
-			ON `stc_agents_id`=`stc_requisition_combiner_agent_id`
-			ORDER BY `stc_requisition_combiner_id` DESC LIMIT 0,15
-		");
-		if(mysqli_num_rows($ivarfilterquery)!=0){
-			foreach($ivarfilterquery as $requisrow){
-				$reqcomstatus='';
-				if($requisrow['stc_requisition_combiner_status']==1){$reqcomstatus="PROCESS";}else{$reqcomstatus="ACCEPTED";}
-				$badgeurgent='<span class="urgent" style="position: relative;display: inline-block;top: -10px;padding: 1px 3px;font-size: 10px;font-weight: bold;color: #fff;background-color: #dc3545; border-radius: 15px;">Urgent</span>';
-				$chursql=mysqli_query($this->stc_dbs, "
-					SELECT DISTINCT `stc_cust_super_requisition_list_id`
-					FROM `stc_cust_super_requisition_list_items`
-					INNER JOIN `stc_requisition_combiner_req`
-					ON `stc_cust_super_requisition_list_items_req_id`=`stc_requisition_combiner_req_requisition_id`
-					WHERE `stc_requisition_combiner_req_comb_id`='".$requisrow['stc_requisition_combiner_id']."' AND `stc_cust_super_requisition_items_priority`=2
-				");
-				if(mysqli_num_rows($chursql)==0){
-					$badgeurgent="";
-				}
-				$ivar.= '
-					<tr>
-						<td class="text-center">'.$requisrow['stc_customer_name'].'</td>
-						<td class="text-center">							
-							<a href="#" class="stc-call-for-select-merchant-req" title="Add product and merchant." id="'.$requisrow["stc_requisition_combiner_id"].'" style="color: black;">
-								'.$requisrow['stc_requisition_combiner_id'].'<br>
-								'.date('d-m-Y', strtotime($requisrow['stc_requisition_combiner_date'])).'
-							</a>
-						</td>
-						<td>						
-							<a target="_blank" href="stc-requisition-combiner-fsale.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="Process requisitions." style="font-size: 15px;color: black;">
-								'.$requisrow['stc_requisition_combiner_refrence'].'	
-								<i class="fa fa-pen-square" aria-hidden="true"></i>
-							</a>
-						</td>
-						<td class="text-center">
-							'.$requisrow['stc_agents_name'].'
-						</td>
-						<td class="text-center">'.$reqcomstatus.$badgeurgent.'</td>
-						<td class="text-center">
-							<a href="stc-requisition-combiner-fshow.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="P.M Requisition" style="font-size: 25px;color: black;">
-								<i class="fa fa-print" aria-hidden="true"></i>
-							</a>
-							<a href="stc-requisition-combiner-dcprintpreview.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="DC Receiving Requisition" style="font-size: 25px;color: black;">
-								<i class="fa fa-print" aria-hidden="true"></i>
-							</a>
-							<a href="stc-print-preview-directchallan.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="Delivery Challan" style="font-size: 25px;color: black;">
-								<i class="fa fa-print" aria-hidden="true"></i>
-							</a>
-						</td>
-					</tr>
-				';
-			}
-		}else{
-    	        $ivar.= '
-    	            <tr>
-    	                <td colspan="6">
-    	                    <b>No Requisition Found!!!</b>
-    	                </td>
-    	            </tr>
-    	        ';
-		}
-		$ivar.= '
-			<tr>
-				<td>
-					0 to 15
-					<button type="button" class="btn btn-primary begbuttoninvsearch" style="float:right;">
-						<i class="fas fa-arrow-left"></i>
-					</button>
-					<input type="hidden" class="begvalueinput" value="0">
-					<input type="hidden" class="begvalueinputsearch" value="0">
-				</td>
-				<td colspan="9">
-					<button type="button" class="btn btn-primary endbuttoninvsearch">
-						<i class="fas fa-arrow-right"></i>
-					</button>
-					<input type="hidden" class="endvalueinput" value="20">
-					<input type="hidden" class="endvalueinputsearch" value="20">
-				</td>
-			</tr>
-		';
-
-		$ivar.='
-				</tbody>
-			</table>
-		';
-		return $ivar;
+		return $this->stc_getrequisition_by_multiple_inp('', '', 'NA', '', '', '', 0, 15, true);
 	}
 
 	// filter combiner requisition by all
-	public function stc_getrequisition_by_multiple_inp($bjornefilterreqbegdate, $bjornefilterreqenddate, $bjornefilterreqcustomerid, $bjornefilterreqnumber, $bjornefilterreqsitename, $bjornefilterreqmaterials, $bjornebegval, $bjorneendval){
+	public function stc_getrequisition_by_multiple_inp($bjornefilterreqbegdate = '', $bjornefilterreqenddate = '', $bjornefilterreqcustomerid = 'NA', $bjornefilterreqnumber = '', $bjornefilterreqsitename = '', $bjornefilterreqmaterials = '', $bjornebegval = 0, $bjorneendval = 15, $show_generate = false){
 		$ivar='
 			<table class="table table-hover table-bordered form-group call-order">
 				<thead>
@@ -778,6 +663,7 @@ class ragnarRequisitionView extends tesseract{
 						<th class="text-center">Parent Requisition ID<br>Parent Requisition Date</th>
 						<th class="text-center">Requisition Sitename</th>
 						<th class="text-center">Requisition Accepted By</th>
+						<th class="text-center">Generate</th>
 						<th class="text-center">Requisition Status</th>
 						<th class="text-center">Action</th>
 					</tr>
@@ -796,9 +682,9 @@ class ragnarRequisitionView extends tesseract{
 		$reqno='';
 		$reqsitename='';
 		$reqmaterialsname='';
+		$date_filter='';
 
 		$itemjoiner='';
-		$loopcount=0;
 		foreach($array as $key => $value){
 			if($array['byreqcustomer']!="NA"){
 				$reqcustomer="
@@ -828,6 +714,18 @@ class ragnarRequisitionView extends tesseract{
 				";
 			}
 		}
+		
+		// Build WHERE clause
+		$where_parts = array();
+		if(!empty($bjornefilterreqbegdate) && !empty($bjornefilterreqenddate)){
+			$where_parts[] = "DATE(`stc_requisition_combiner_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornefilterreqbegdate)."' AND '".mysqli_real_escape_string($this->stc_dbs, $bjornefilterreqenddate)."'";
+		}
+		
+		$where_clause = '';
+		if(!empty($where_parts) || $reqcustomer || $reqno || $reqsitename || $reqmaterialsname){
+			$where_clause = 'WHERE ' . (!empty($where_parts) ? implode(' AND ', $where_parts) : '1=1');
+		}
+		
 		$endfilterqry='ORDER BY `stc_requisition_combiner_id` DESC LIMIT '.$bjornebegval.','.$bjorneendval;
 		$ivarfilterquery=mysqli_query($this->stc_dbs, "
 			SELECT DISTINCT 
@@ -844,11 +742,7 @@ class ragnarRequisitionView extends tesseract{
 			INNER JOIN `stc_cust_project` ON L.`stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
 			INNER JOIN `stc_customer` ON `stc_cust_project_cust_id`=`stc_customer_id`
 			INNER JOIN `stc_agents` ON `stc_agents_id`=`stc_requisition_combiner_agent_id`
-		    WHERE (
-		        DATE(`stc_requisition_combiner_date`)
-		         BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $bjornefilterreqbegdate)."'
-		         AND '".mysqli_real_escape_string($this->stc_dbs, $bjornefilterreqenddate)."'
-		    )".$reqcustomer.$reqno.$reqsitename.$reqmaterialsname.$endfilterqry
+		    ".$where_clause.$reqcustomer.$reqno.$reqsitename.$reqmaterialsname.$endfilterqry
 		);
 
 		if(mysqli_num_rows($ivarfilterquery)!=0){
@@ -865,6 +759,12 @@ class ragnarRequisitionView extends tesseract{
 				");
 				if(mysqli_num_rows($chursql)==0){
 					$badgeurgent="";
+				}
+				$generate = '';
+				
+				
+				if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==20){
+					$generate='<td class="text-center"><a href="javascript:void(0)" id="'.$requisrow["stc_requisition_combiner_id"].'" data-toggle="modal" data-target=".generate-requisition-modal" class="stc-generate-requisition" title="Generate Requisition" style="font-size: 25px;color: black;"><i class="fa fa-recycle" aria-hidden="true"></i></a></td>';
 				}
 				$ivar.= '
 					<tr>
@@ -884,6 +784,7 @@ class ragnarRequisitionView extends tesseract{
 						<td class="text-center">
 							'.$requisrow['stc_agents_name'].'
 						</td>
+						'.$generate.'
 						<td class="text-center">'.$reqcomstatus.$badgeurgent.'</td>
 						<td class="text-center">
 							<a href="stc-requisition-combiner-fshow.php?requi_id='.$requisrow["stc_requisition_combiner_id"].'" title="P.M Requisition" style="font-size: 25px;color: black;">
@@ -902,7 +803,7 @@ class ragnarRequisitionView extends tesseract{
 		}else{
     	        $ivar.= '
     	            <tr>
-    	                <td colspan="6">
+    	                <td colspan="'.($show_generate ? '7' : '6').'">
     	                    <b>No Requisition Found!!!</b>
     	                </td>
     	            </tr>
@@ -1265,6 +1166,197 @@ class ragnarRequisitionView extends tesseract{
 		$ivar.='
 			</table>
 		';
+		return $ivar;
+	} 
+
+	public function stc_call_ag_requisition_items_merchandise_generate($stc_req_comb_id){
+		$ivar = '<table class="table table-bordered" style="color: black;">
+			<tr>
+				<th class="text-center">#</th>
+				<th class="text-center">Site Name</th>
+				<th class="text-center">Requisition Number</th>
+				<th class="text-center" width="30%">Item Desc</th>
+				<th class="text-center">Qty</th>
+				<th class="text-center">Unit</th>
+				<th class="text-center">Generate Status</th>
+				<th class="text-center">Generated Item Name</th>
+			</tr>';
+
+		$query = mysqli_query($this->stc_dbs, "
+			SELECT
+				C.`stc_cust_project_title`,
+				B.`stc_cust_super_requisition_list_id`,
+				D.`stc_cust_super_requisition_list_id` as item_id,
+				D.`stc_cust_super_requisition_list_items_title`,
+				D.`stc_cust_super_requisition_list_items_approved_qty`,
+				D.`stc_cust_super_requisition_list_items_unit`
+			FROM `stc_requisition_combiner_req` A
+			INNER JOIN `stc_cust_super_requisition_list` B ON B.stc_cust_super_requisition_list_id=A.stc_requisition_combiner_req_requisition_id
+			INNER JOIN `stc_cust_project` C ON C.stc_cust_project_id=B.stc_cust_super_requisition_list_project_id
+			INNER JOIN `stc_cust_super_requisition_list_items` D ON D.stc_cust_super_requisition_list_items_req_id=B.stc_cust_super_requisition_list_id
+			WHERE A.stc_requisition_combiner_req_comb_id = '".mysqli_real_escape_string($this->stc_dbs, $stc_req_comb_id)."'
+			ORDER BY DATE(B.stc_cust_super_requisition_list_date) ASC
+		");
+		$sl = 0;
+		$date = date("Y-m-d H:i:s");
+		foreach($query as $row){
+			$sl++;
+			
+			// Get product ID from purchaser table
+			$get_pd_id_qry = mysqli_query($this->stc_dbs, "
+				SELECT `stc_cust_super_requisition_list_purchaser_pd_id` 
+				FROM `stc_cust_super_requisition_list_purchaser` 
+				WHERE `stc_cust_super_requisition_list_purchaser_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['item_id'])."'
+				LIMIT 1
+			");
+			$pd_id = '0';
+			if($get_pd_id_qry && mysqli_num_rows($get_pd_id_qry) > 0){
+				$pd_row = mysqli_fetch_assoc($get_pd_id_qry);
+				$pd_id = $pd_row['stc_cust_super_requisition_list_purchaser_pd_id'];
+			}
+			
+			// Check for existing records and calculate total received quantity
+			$check_rec_qry = mysqli_query($this->stc_dbs, "
+				SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS total_rec_qty
+				FROM `stc_cust_super_requisition_list_items_rec` 
+				WHERE `stc_cust_super_requisition_list_items_rec_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_id'])."'
+				AND `stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['item_id'])."'
+			");
+			$total_rec_qty = 0;
+			if($check_rec_qry && mysqli_num_rows($check_rec_qry) > 0){
+				$rec_row = mysqli_fetch_assoc($check_rec_qry);
+				$total_rec_qty = $rec_row['total_rec_qty'] ? $rec_row['total_rec_qty'] : 0;
+			}
+			
+			// Calculate remaining quantity
+			$approved_qty = $row['stc_cust_super_requisition_list_items_approved_qty'];
+			$remaining_qty = $approved_qty - $total_rec_qty;
+			
+			// Check for exact duplicate (same list_id, item_id, pd_id, poaid, and qty)
+			$check_duplicate_qry = mysqli_query($this->stc_dbs, "
+				SELECT `stc_cust_super_requisition_list_items_rec_id`
+				FROM `stc_cust_super_requisition_list_items_rec` 
+				WHERE `stc_cust_super_requisition_list_items_rec_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_id'])."'
+				AND `stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['item_id'])."'
+				AND `stc_cust_super_requisition_list_items_rec_list_pd_id` = '".mysqli_real_escape_string($this->stc_dbs, $pd_id)."'
+				AND `stc_cust_super_requisition_list_items_rec_list_poaid` = '0'
+				AND `stc_cust_super_requisition_list_items_rec_recqty` = '".mysqli_real_escape_string($this->stc_dbs, $remaining_qty)."'
+				AND DATE(`stc_cust_super_requisition_list_items_rec_date`) = DATE('".mysqli_real_escape_string($this->stc_dbs, $date)."')
+				LIMIT 1
+			");
+			$is_duplicate = ($check_duplicate_qry && mysqli_num_rows($check_duplicate_qry) > 0);
+			$itemid=0;
+			$itemdesc='';
+			// Insert record if there's remaining quantity and no duplicate
+			$generateStatus = "Already Generated";
+			if($remaining_qty > 0 && !$is_duplicate){
+				$adhoc_id=0;
+				$titlesearch=$row['stc_cust_super_requisition_list_items_title'];
+				
+				// Clean and prepare search terms - remove brackets, extra spaces, and special characters
+				$clean_title = preg_replace('/\[.*?\]/', '', $titlesearch); // Remove [MAKE - TAPARIA] type content
+				$clean_title = preg_replace('/[^\w\s\d]/', ' ', $clean_title); // Replace special chars with space, keep alphanumeric
+				$clean_title = preg_replace('/\s+/', ' ', trim($clean_title)); // Normalize spaces
+				$clean_title = strtolower($clean_title);
+				
+				// Normalize numbers attached to words (e.g., "8no" -> "8 no", "5mm" -> "5 mm")
+				$clean_title = preg_replace('/(\d)([a-z])/i', '$1 $2', $clean_title); // Add space between number and letter
+				$clean_title = preg_replace('/([a-z])(\d)/i', '$1 $2', $clean_title); // Add space between letter and number
+				$clean_title = preg_replace('/\s+/', ' ', trim($clean_title)); // Normalize spaces again
+				
+				// Split into words
+				$title_words = preg_split('/\s+/', $clean_title);
+				$title_words = array_filter($title_words, function($word) { 
+					$word = trim($word);
+					return strlen($word) > 0; // Keep all words including single characters and numbers
+				});
+				$title_words = array_values($title_words); // Re-index array
+				
+				// Build flexible search query - match all words regardless of order
+				$search_conditions = array();
+				foreach($title_words as $word){
+					$word_escaped = mysqli_real_escape_string($this->stc_dbs, $word);
+					// Match word (case-insensitive, order-independent)
+					$search_conditions[] = "LOWER(`stc_purchase_product_adhoc_itemdesc`) LIKE '%".$word_escaped."%'";
+				}
+				
+				if(!empty($search_conditions)){
+					$where_clause = implode(' AND ', $search_conditions);
+					$result=mysqli_query($this->stc_dbs, "
+						SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_itemdesc`
+						FROM `stc_purchase_product_adhoc` 
+						WHERE ".$where_clause." 
+						AND `stc_purchase_product_adhoc_status` = 1 
+						ORDER BY `stc_purchase_product_adhoc_id` ASC 
+						LIMIT 1
+					");
+					if($result && mysqli_num_rows($result) > 0){
+						$adhoc_row=mysqli_fetch_assoc($result);
+						$adhoc_id=$adhoc_row['stc_purchase_product_adhoc_id'];
+						$itemdesc=$adhoc_row['stc_purchase_product_adhoc_itemdesc'];
+					}
+				}
+				$itemid=$adhoc_id;
+				$itemdesc=$itemdesc;
+				if($adhoc_id==0){
+					$generateStatus = "Issue";
+				}else{
+					$insert_qry = mysqli_query($this->stc_dbs, "
+						INSERT INTO `stc_cust_super_requisition_list_items_rec`(
+							`stc_cust_super_requisition_list_items_rec_list_id`, 
+							`stc_cust_super_requisition_list_items_rec_list_item_id`, 
+							`stc_cust_super_requisition_list_items_rec_list_pd_id`, 
+							`stc_cust_super_requisition_list_items_rec_list_poaid`,
+							`stc_cust_super_requisition_list_items_rec_recqty`, 
+							`stc_cust_super_requisition_list_items_rec_status`, 
+							`stc_cust_super_requisition_list_items_rec_date`
+						) VALUES (
+							'".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_id'])."',
+							'".mysqli_real_escape_string($this->stc_dbs, $row['item_id'])."',
+							'".mysqli_real_escape_string($this->stc_dbs, $pd_id)."',
+							'".$adhoc_id."',
+							'".mysqli_real_escape_string($this->stc_dbs, $remaining_qty)."',
+							'1',
+							'".mysqli_real_escape_string($this->stc_dbs, $date)."'
+						)
+					");					
+				}
+			} else if($remaining_qty < 0){
+				// If received quantity exceeds approved, there's an issue
+				$generateStatus = "Issue";
+			} else if($is_duplicate){
+				// Duplicate record exists, but quantity is already handled
+				$generateStatus = "Generated";
+			}
+			
+			// Set background color based on status
+			$status_bg_color = '';
+			$status_text_color = '';
+			if($generateStatus == "Generated"){
+				$status_bg_color = '#28a745'; // Green background
+				$status_text_color = '#ffffff'; // White text
+			} else if($generateStatus == "Issue"){
+				$status_bg_color = '#dc3545'; // Red background
+				$status_text_color = '#ffffff'; // White text
+			} else if($generateStatus == "Already Generated"){
+				$status_bg_color = '#c7d120'; // Red background
+				$status_text_color = '#000000'; // White text
+			}
+			$status_style = !empty($status_bg_color) ? 'style="background-color: '.$status_bg_color.'; color: '.$status_text_color.'; padding: 5px 10px; border-radius: 4px; font-weight: bold;"' : '';
+			$ivar .= '
+			<tr>
+				<td class="no">'.$sl.'</td>
+				<td class="text-center">'.htmlspecialchars($row['stc_cust_project_title']).'</td>
+				<td class="text-center">'.$row['stc_cust_super_requisition_list_id'].'</td>
+				<td class="text-left">'.htmlspecialchars($row['stc_cust_super_requisition_list_items_title']).'</td>
+				<td class="qty">'.number_format($row['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+				<td class="unit">'.htmlspecialchars($row['stc_cust_super_requisition_list_items_unit']).'</td>
+				<td class="text-center" '.$status_style.'><span >'.$generateStatus.'</span></td>
+				<td class="text-left">'.$itemdesc.'</td>
+			</tr>';
+		}
+
+		$ivar .= '</table>';
 		return $ivar;
 	} 
 
@@ -4531,7 +4623,7 @@ if(isset($_POST['stcreqaction'])){
 		$bjorneendval=20;
 	}
 	$objpdres=new ragnarRequisitionView();	
-	$opobjpdres=$objpdres->stc_getrequisition_by_multiple_inp($bjornefilterreqbegdate, $bjornefilterreqenddate, $bjornefilterreqcustomerid, $bjornefilterreqnumber, $bjornefilterreqsitename, $bjornefilterreqmaterials, $bjornebegval, $bjorneendval);
+	$opobjpdres=$objpdres->stc_getrequisition_by_multiple_inp($bjornefilterreqbegdate, $bjornefilterreqenddate, $bjornefilterreqcustomerid, $bjornefilterreqnumber, $bjornefilterreqsitename, $bjornefilterreqmaterials, $bjornebegval, $bjorneendval, false);
 	$out=$opobjpdres;
 	echo $out;
 }
@@ -4539,10 +4631,8 @@ if(isset($_POST['stcreqaction'])){
 // page load order call
 if(isset($_POST["callrequisition"])){
 	$objagentorder=new ragnarRequisitionView();
-
-	$opobjagentorder=$objagentorder->stc_call_ag_requisition();
+	$opobjagentorder=$objagentorder->stc_getrequisition_by_multiple_inp('', '', 'NA', '', '', '', 0, 15, true);
 	echo json_encode($opobjagentorder);
-	// echo $opobjagentorder;
 }
 
 //call req for merchandise
@@ -4553,7 +4643,14 @@ if(isset($_POST['stc_call_req_items_for_merchant'])){
 	// echo json_encode($opobjagentorder);
 	echo $opobjagentorder;
 } 
-
+//call req for merchandise
+if(isset($_POST['stc_call_req_items_for_merchant_g'])){
+	$stc_req_comb_id=$_POST['stc_req_comb_id'];
+	$objagentorder=new ragnarRequisitionView();
+	$opobjagentorder=$objagentorder->stc_call_ag_requisition_items_merchandise_generate($stc_req_comb_id);
+	// echo json_encode($opobjagentorder);
+	echo $opobjagentorder;
+} 
 // update material name of requisiotn
 if(isset($_POST['stc_update_requisition_items_hit'])){
 	$material_id=$_POST['material_id'];
