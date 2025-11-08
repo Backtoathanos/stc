@@ -760,7 +760,7 @@ class ragnarRequisitionView extends tesseract{
 				if(mysqli_num_rows($chursql)==0){
 					$badgeurgent="";
 				}
-				$generate = '';
+				$generate = '<td class="text-center"></td>';
 				
 				
 				if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==20){
