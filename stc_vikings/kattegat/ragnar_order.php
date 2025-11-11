@@ -1180,15 +1180,16 @@ class ragnarRequisitionView extends tesseract{
 				<th class="text-center">Unit</th>
 				<th class="text-center">Generate Status</th>
 				<th class="text-center">Generated Item Name</th>
+				<th class="text-center">Action</th>
 			</tr>';
 
 		$query = mysqli_query($this->stc_dbs, "
 			SELECT
 				C.`stc_cust_project_title`,
-				B.`stc_cust_super_requisition_list_id`,
-				D.`stc_cust_super_requisition_list_id` as item_id,
+				B.`stc_cust_super_requisition_list_id` as requisition_list_id,
+				D.`stc_cust_super_requisition_list_id` as list_item_id,
 				D.`stc_cust_super_requisition_list_items_title`,
-				D.`stc_cust_super_requisition_list_items_approved_qty`,
+				D.`stc_cust_super_requisition_items_finalqty`,
 				D.`stc_cust_super_requisition_list_items_unit`
 			FROM `stc_requisition_combiner_req` A
 			INNER JOIN `stc_cust_super_requisition_list` B ON B.stc_cust_super_requisition_list_id=A.stc_requisition_combiner_req_requisition_id
@@ -1206,7 +1207,7 @@ class ragnarRequisitionView extends tesseract{
 			$get_pd_id_qry = mysqli_query($this->stc_dbs, "
 				SELECT `stc_cust_super_requisition_list_purchaser_pd_id` 
 				FROM `stc_cust_super_requisition_list_purchaser` 
-				WHERE `stc_cust_super_requisition_list_purchaser_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['item_id'])."'
+				WHERE `stc_cust_super_requisition_list_purchaser_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['list_item_id'])."'
 				LIMIT 1
 			");
 			$pd_id = '0';
@@ -1219,8 +1220,8 @@ class ragnarRequisitionView extends tesseract{
 			$check_rec_qry = mysqli_query($this->stc_dbs, "
 				SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS total_rec_qty
 				FROM `stc_cust_super_requisition_list_items_rec` 
-				WHERE `stc_cust_super_requisition_list_items_rec_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_id'])."'
-				AND `stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['item_id'])."'
+				WHERE `stc_cust_super_requisition_list_items_rec_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['requisition_list_id'])."'
+				AND `stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['list_item_id'])."'
 			");
 			$total_rec_qty = 0;
 			if($check_rec_qry && mysqli_num_rows($check_rec_qry) > 0){
@@ -1229,104 +1230,135 @@ class ragnarRequisitionView extends tesseract{
 			}
 			
 			// Calculate remaining quantity
-			$approved_qty = $row['stc_cust_super_requisition_list_items_approved_qty'];
+			$approved_qty = $row['stc_cust_super_requisition_items_finalqty'];
 			$remaining_qty = $approved_qty - $total_rec_qty;
 			
 			// Check for exact duplicate (same list_id, item_id, pd_id, poaid, and qty)
 			$check_duplicate_qry = mysqli_query($this->stc_dbs, "
-				SELECT `stc_cust_super_requisition_list_items_rec_id`
+				SELECT `stc_cust_super_requisition_list_items_rec_id`, `stc_cust_super_requisition_list_items_rec_list_poaid`, `stc_cust_super_requisition_list_items_rec_recqty`
 				FROM `stc_cust_super_requisition_list_items_rec` 
-				WHERE `stc_cust_super_requisition_list_items_rec_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_id'])."'
-				AND `stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['item_id'])."'
-				AND `stc_cust_super_requisition_list_items_rec_list_pd_id` = '".mysqli_real_escape_string($this->stc_dbs, $pd_id)."'
-				AND `stc_cust_super_requisition_list_items_rec_list_poaid` = '0'
-				AND `stc_cust_super_requisition_list_items_rec_recqty` = '".mysqli_real_escape_string($this->stc_dbs, $remaining_qty)."'
-				AND DATE(`stc_cust_super_requisition_list_items_rec_date`) = DATE('".mysqli_real_escape_string($this->stc_dbs, $date)."')
-				LIMIT 1
+				WHERE `stc_cust_super_requisition_list_items_rec_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['requisition_list_id'])."'
+				AND `stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $row['list_item_id'])."'
 			");
 			$is_duplicate = ($check_duplicate_qry && mysqli_num_rows($check_duplicate_qry) > 0);
 			$itemid=0;
 			$itemdesc='';
+			$generatedaction='';
 			// Insert record if there's remaining quantity and no duplicate
-			$generateStatus = "Already Generated";
-			if($remaining_qty > 0 && !$is_duplicate){
-				$adhoc_id=0;
-				$titlesearch=$row['stc_cust_super_requisition_list_items_title'];
-				
-				// Clean and prepare search terms - remove brackets, extra spaces, and special characters
-				$clean_title = preg_replace('/\[.*?\]/', '', $titlesearch); // Remove [MAKE - TAPARIA] type content
-				$clean_title = preg_replace('/[^\w\s\d]/', ' ', $clean_title); // Replace special chars with space, keep alphanumeric
-				$clean_title = preg_replace('/\s+/', ' ', trim($clean_title)); // Normalize spaces
-				$clean_title = strtolower($clean_title);
-				
-				// Normalize numbers attached to words (e.g., "8no" -> "8 no", "5mm" -> "5 mm")
-				$clean_title = preg_replace('/(\d)([a-z])/i', '$1 $2', $clean_title); // Add space between number and letter
-				$clean_title = preg_replace('/([a-z])(\d)/i', '$1 $2', $clean_title); // Add space between letter and number
-				$clean_title = preg_replace('/\s+/', ' ', trim($clean_title)); // Normalize spaces again
-				
-				// Split into words
-				$title_words = preg_split('/\s+/', $clean_title);
-				$title_words = array_filter($title_words, function($word) { 
-					$word = trim($word);
-					return strlen($word) > 0; // Keep all words including single characters and numbers
-				});
-				$title_words = array_values($title_words); // Re-index array
-				
-				// Build flexible search query - match all words regardless of order
-				$search_conditions = array();
-				foreach($title_words as $word){
-					$word_escaped = mysqli_real_escape_string($this->stc_dbs, $word);
-					// Match word (case-insensitive, order-independent)
-					$search_conditions[] = "LOWER(`stc_purchase_product_adhoc_itemdesc`) LIKE '%".$word_escaped."%'";
+			$generateStatus = "Generated";
+			if(mysqli_num_rows($check_duplicate_qry) == 0){
+				if($remaining_qty > 0 && !$is_duplicate){
+					$adhoc_id=0;				
+					$titlesearch=$row['stc_cust_super_requisition_list_items_title'];
+					
+					// Clean and prepare search terms - remove brackets, extra spaces, and special characters
+					$clean_title = preg_replace('/\[.*?\]/', '', $titlesearch); // Remove [MAKE - TAPARIA] type content
+					$clean_title = preg_replace('/[^\w\s\d]/', ' ', $clean_title); // Replace special chars with space, keep alphanumeric
+					$clean_title = preg_replace('/\s+/', ' ', trim($clean_title)); // Normalize spaces
+					$clean_title = strtolower($clean_title);
+					
+					// Normalize numbers attached to words (e.g., "8no" -> "8 no", "5mm" -> "5 mm")
+					$clean_title = preg_replace('/(\d)([a-z])/i', '$1 $2', $clean_title); // Add space between number and letter
+					$clean_title = preg_replace('/([a-z])(\d)/i', '$1 $2', $clean_title); // Add space between letter and number
+					$clean_title = preg_replace('/\s+/', ' ', trim($clean_title)); // Normalize spaces again
+					
+					// Split into words
+					$title_words = preg_split('/\s+/', $clean_title);
+					$title_words = array_filter($title_words, function($word) { 
+						$word = trim($word);
+						return strlen($word) > 0; // Keep all words including single characters and numbers
+					});
+					$title_words = array_values($title_words); // Re-index array
+					
+					// Build flexible search query - match all words regardless of order
+					// Use word boundaries for numbers to prevent substring matches (e.g., "30" should not match "3000")
+					$search_conditions = array();
+					$relevance_parts = array();
+					foreach($title_words as $word){
+						$word_escaped = mysqli_real_escape_string($this->stc_dbs, $word);
+						// Check if word is numeric - use word boundary matching to prevent substring matches
+						if(is_numeric($word)){
+							// For numbers, use REGEXP with word boundaries to match exact number, not substring
+							// Pattern: (^|[^0-9])30([^0-9]|$) ensures "30" matches but not "3000"
+							$search_conditions[] = "LOWER(`stc_purchase_product_adhoc_itemdesc`) REGEXP '(^|[^0-9])".$word_escaped."([^0-9]|$)'";
+							// Higher relevance for exact numeric matches
+							$relevance_parts[] = "CASE WHEN LOWER(`stc_purchase_product_adhoc_itemdesc`) REGEXP '(^|[^0-9])".$word_escaped."([^0-9]|$)' THEN 10 ELSE 0 END";
+						} else {
+							// For text words, use LIKE for substring matching
+							$search_conditions[] = "LOWER(`stc_purchase_product_adhoc_itemdesc`) LIKE '%".$word_escaped."%'";
+							// Higher relevance for word matches
+							$relevance_parts[] = "CASE WHEN LOWER(`stc_purchase_product_adhoc_itemdesc`) LIKE '%".$word_escaped."%' THEN 5 ELSE 0 END";
+						}
+					}
+					
+					if(!empty($search_conditions)){
+						$where_clause = implode(' AND ', $search_conditions);
+						$relevance_score = "(" . implode(' + ', $relevance_parts) . ") AS relevance_score";
+						$result=mysqli_query($this->stc_dbs, "
+							SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_itemdesc`, `stc_purchase_product_adhoc_unit`, ".$relevance_score."
+							FROM `stc_purchase_product_adhoc` 
+							WHERE ".$where_clause." 
+							AND `stc_purchase_product_adhoc_status` = 1 
+							ORDER BY relevance_score DESC, `stc_purchase_product_adhoc_id` ASC 
+							LIMIT 1
+						");
+						if($result && mysqli_num_rows($result) > 0){
+							$adhoc_row=mysqli_fetch_assoc($result);
+							$adhoc_id=$adhoc_row['stc_purchase_product_adhoc_id'];
+							$itemdesc.=$adhoc_id." - ".$adhoc_row['stc_purchase_product_adhoc_itemdesc']." - ".$adhoc_row['stc_purchase_product_adhoc_unit']."<br>";
+						}
+					}
+					$itemid=$adhoc_id;
+					$itemdesc=$itemdesc;
+					if($adhoc_id==0){
+						$generateStatus = "Issue";
+					}else{
+						// $insert_qry = mysqli_query($this->stc_dbs, "
+						// 	INSERT INTO `stc_cust_super_requisition_list_items_rec`(
+						// 		`stc_cust_super_requisition_list_items_rec_list_id`, 
+						// 		`stc_cust_super_requisition_list_items_rec_list_item_id`, 
+						// 		`stc_cust_super_requisition_list_items_rec_list_pd_id`, 
+						// 		`stc_cust_super_requisition_list_items_rec_list_poaid`,
+						// 		`stc_cust_super_requisition_list_items_rec_recqty`, 
+						// 		`stc_cust_super_requisition_list_items_rec_status`, 
+						// 		`stc_cust_super_requisition_list_items_rec_date`
+						// 	) VALUES (
+						// 		'".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_id'])."',
+						// 		'".mysqli_real_escape_string($this->stc_dbs, $row['item_id'])."',
+						// 		'".mysqli_real_escape_string($this->stc_dbs, $pd_id)."',
+						// 		'".$adhoc_id."',
+						// 		'".mysqli_real_escape_string($this->stc_dbs, $remaining_qty)."',
+						// 		'1',
+						// 		'".mysqli_real_escape_string($this->stc_dbs, $date)."'
+						// 	)
+						// ");	
+					
+						$generatedaction='<a href="javascript:void(0)" class="stc-generate-requisition-do" qty="'.$remaining_qty.'" adhoc_id="'.$itemid.'" listid="'.$row['requisition_list_id'].'" listitemid="'.$row['list_item_id'].'" title="Generate Requisition" style="font-size: 25px;color: black;"><i class="fa fa-plus" aria-hidden="true"></i></a>';
+					}
+				} else if($remaining_qty < 0){
+					// If received quantity exceeds approved, there's an issue
+					$generateStatus = "Issue";
+				} else if($is_duplicate){
+					// Duplicate record exists, but quantity is already handled
+					$generateStatus = "Already Generated";
+				}else{
+					$generateStatus = "Not Generated";
 				}
-				
-				if(!empty($search_conditions)){
-					$where_clause = implode(' AND ', $search_conditions);
+			}else{
+				$generateStatus = "Already Generated";
+				$itemid=0;
+				foreach($check_duplicate_qry as $row2){
+					$itemid=$row2['stc_cust_super_requisition_list_items_rec_list_poaid'];
 					$result=mysqli_query($this->stc_dbs, "
-						SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_itemdesc`
+						SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_itemdesc`, `stc_purchase_product_adhoc_unit`
 						FROM `stc_purchase_product_adhoc` 
-						WHERE ".$where_clause." 
-						AND `stc_purchase_product_adhoc_status` = 1 
-						ORDER BY `stc_purchase_product_adhoc_id` ASC 
-						LIMIT 1
+						WHERE `stc_purchase_product_adhoc_id`=".$itemid."
 					");
 					if($result && mysqli_num_rows($result) > 0){
 						$adhoc_row=mysqli_fetch_assoc($result);
-						$adhoc_id=$adhoc_row['stc_purchase_product_adhoc_id'];
-						$itemdesc=$adhoc_row['stc_purchase_product_adhoc_itemdesc'];
+						$itemdesc.=$adhoc_id." - ".$adhoc_row['stc_purchase_product_adhoc_itemdesc']." - ".$adhoc_row['stc_purchase_product_adhoc_unit']."<br>";
 					}
 				}
-				$itemid=$adhoc_id;
-				$itemdesc=$itemdesc;
-				if($adhoc_id==0){
-					$generateStatus = "Issue";
-				}else{
-					$insert_qry = mysqli_query($this->stc_dbs, "
-						INSERT INTO `stc_cust_super_requisition_list_items_rec`(
-							`stc_cust_super_requisition_list_items_rec_list_id`, 
-							`stc_cust_super_requisition_list_items_rec_list_item_id`, 
-							`stc_cust_super_requisition_list_items_rec_list_pd_id`, 
-							`stc_cust_super_requisition_list_items_rec_list_poaid`,
-							`stc_cust_super_requisition_list_items_rec_recqty`, 
-							`stc_cust_super_requisition_list_items_rec_status`, 
-							`stc_cust_super_requisition_list_items_rec_date`
-						) VALUES (
-							'".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_id'])."',
-							'".mysqli_real_escape_string($this->stc_dbs, $row['item_id'])."',
-							'".mysqli_real_escape_string($this->stc_dbs, $pd_id)."',
-							'".$adhoc_id."',
-							'".mysqli_real_escape_string($this->stc_dbs, $remaining_qty)."',
-							'1',
-							'".mysqli_real_escape_string($this->stc_dbs, $date)."'
-						)
-					");					
-				}
-			} else if($remaining_qty < 0){
-				// If received quantity exceeds approved, there's an issue
-				$generateStatus = "Issue";
-			} else if($is_duplicate){
-				// Duplicate record exists, but quantity is already handled
-				$generateStatus = "Generated";
 			}
 			
 			// Set background color based on status
@@ -1347,18 +1379,66 @@ class ragnarRequisitionView extends tesseract{
 			<tr>
 				<td class="no">'.$sl.'</td>
 				<td class="text-center">'.htmlspecialchars($row['stc_cust_project_title']).'</td>
-				<td class="text-center">'.$row['stc_cust_super_requisition_list_id'].'</td>
+				<td class="text-center">'.$row['requisition_list_id'].'</td>
 				<td class="text-left">'.htmlspecialchars($row['stc_cust_super_requisition_list_items_title']).'</td>
-				<td class="qty">'.number_format($row['stc_cust_super_requisition_list_items_approved_qty'], 2).'</td>
+				<td class="qty">'.number_format($row['stc_cust_super_requisition_items_finalqty'], 2).'</td>
 				<td class="unit">'.htmlspecialchars($row['stc_cust_super_requisition_list_items_unit']).'</td>
 				<td class="text-center" '.$status_style.'><span >'.$generateStatus.'</span></td>
 				<td class="text-left">'.$itemdesc.'</td>
+				<td class="text-left">'.$generatedaction.'</td>
 			</tr>';
 		}
 
 		$ivar .= '</table>';
 		return $ivar;
 	} 
+
+	public function stc_call_ag_requisition_items_merchandise_generate_activate($adhoc_id, $listid, $listitemid, $qty){
+		$date = date("Y-m-d H:i:s");
+		$insert_qry = mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_super_requisition_list_items_rec`(
+				`stc_cust_super_requisition_list_items_rec_list_id`, 
+				`stc_cust_super_requisition_list_items_rec_list_item_id`, 
+				`stc_cust_super_requisition_list_items_rec_list_pd_id`, 
+				`stc_cust_super_requisition_list_items_rec_list_poaid`,
+				`stc_cust_super_requisition_list_items_rec_recqty`, 
+				`stc_cust_super_requisition_list_items_rec_status`, 
+				`stc_cust_super_requisition_list_items_rec_date`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $listid)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $listitemid)."',
+				'0',
+				'".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $qty)."',
+				'1',
+				'".mysqli_real_escape_string($this->stc_dbs, $date)."'
+			)
+		");
+		if($insert_qry){
+
+			$title="Dispatched";
+			$message="Dispatched by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A'). " <br> Quantity :".$qty;
+		
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, 
+					`title`, 
+					`message`, 
+					`status`, 
+					`created_by`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $listitemid)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+					'1',
+					'".$_SESSION['stc_empl_id']."'
+				)
+			");
+			return "success";
+		}else{
+			return "error";
+		}
+	}
 
 	// filter product by all
 	public function stc_getpd_by_multiple_inp($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout){
@@ -4648,6 +4728,17 @@ if(isset($_POST['stc_call_req_items_for_merchant_g'])){
 	$stc_req_comb_id=$_POST['stc_req_comb_id'];
 	$objagentorder=new ragnarRequisitionView();
 	$opobjagentorder=$objagentorder->stc_call_ag_requisition_items_merchandise_generate($stc_req_comb_id);
+	// echo json_encode($opobjagentorder);
+	echo $opobjagentorder;
+}
+//call req for merchandise
+if(isset($_POST['stc_call_req_items_for_merchant_g_activate'])){
+	$adhoc_id=$_POST['adhoc_id'];
+	$listid=$_POST['listid'];
+	$listitemid=$_POST['listitemid'];
+	$qty=$_POST['qty'];
+	$objagentorder=new ragnarRequisitionView();
+	$opobjagentorder=$objagentorder->stc_call_ag_requisition_items_merchandise_generate_activate($adhoc_id, $listid, $listitemid, $qty);
 	// echo json_encode($opobjagentorder);
 	echo $opobjagentorder;
 } 

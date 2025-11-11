@@ -1420,6 +1420,7 @@ include("kattegat/role_check.php");
       $('body').delegate('.stc-generate-requisition', 'click', function () {
         var req_comb_id = $(this).attr("id");
         // $('#stc-req-list-rep').val(req_comb_id);
+        $('.spinner').show();
         $.ajax({
           url: "kattegat/ragnar_order.php",
           method: "post",
@@ -1430,6 +1431,51 @@ include("kattegat/role_check.php");
           success: function (response_merchandise_data) {
             $('.generate-requisition-modal-body').html(response_merchandise_data);
             // stc_call_merchant();
+            $('.spinner').hide();
+          },
+          error: function () {
+            $('.spinner').hide();
+          }
+        });
+      });
+
+      // select merchant for purchase 
+      $('body').delegate('.stc-generate-requisition-do', 'click', function () {
+        var $button = $(this);
+        var adhoc_id = $button.attr("adhoc_id");
+        var listid = $button.attr("listid");
+        var listitemid = $button.attr("listitemid");
+        var qty = $button.attr("qty");
+        $('.alert-success, .alert-danger').remove();
+        $.ajax({
+          url: "kattegat/ragnar_order.php",
+          method: "post",
+          data: {
+            stc_call_req_items_for_merchant_g_activate: 1,
+            adhoc_id: adhoc_id,
+            listid: listid,
+            listitemid: listitemid,
+            qty: qty
+          },
+          success: function (response_merchandise_data) {
+            $button.hide();
+            var $alert = $('<div class="alert alert-success">Dispatched Successfully.</div>');
+            $button.after($alert);
+            setTimeout(function() {
+              $alert.fadeOut(300, function() {
+                $(this).remove();
+              });
+            }, 2000);
+          },
+          error: function () {
+            $button.hide();
+            var $alert = $('<div class="alert alert-danger">Error in dispatching.</div>');
+            $button.after($alert);
+            setTimeout(function() {
+              $alert.fadeOut(300, function() {
+                $(this).remove();
+              });
+            }, 2000);
           }
         });
       });
