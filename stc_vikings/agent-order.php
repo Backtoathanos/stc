@@ -42,7 +42,7 @@ include("kattegat/role_check.php");
 </head>
 
 <body>
-  <div class="spinner" style="display: none;position: fixed;top: 50%; left: 50%;z-index: 999;">
+  <div class="spinner" style="display: none;position: fixed;top: 50%; left: 50%;transform: translate(-50%, -50%);z-index: 9999;background: rgba(255,255,255,0.8);padding: 20px;border-radius: 5px;">
     <img src="https://cdn.pixabay.com/animation/2023/08/11/21/18/21-18-05-265_256.gif" alt="Loading...">
   </div>
   <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
