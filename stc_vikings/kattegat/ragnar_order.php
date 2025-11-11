@@ -1356,7 +1356,7 @@ class ragnarRequisitionView extends tesseract{
 					");
 					if($result && mysqli_num_rows($result) > 0){
 						$adhoc_row=mysqli_fetch_assoc($result);
-						$itemdesc.=$adhoc_id." - ".$adhoc_row['stc_purchase_product_adhoc_itemdesc']." - ".$adhoc_row['stc_purchase_product_adhoc_unit']."<br>";
+						$itemdesc.=$itemid." - ".$adhoc_row['stc_purchase_product_adhoc_itemdesc']." - ".$adhoc_row['stc_purchase_product_adhoc_unit']."<br>";
 					}
 				}
 			}
