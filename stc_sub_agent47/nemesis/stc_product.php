@@ -725,7 +725,7 @@ class prime extends tesseract{
 		}
 
 		// Validate the label to prevent SQL injection
-		$allowed_labels = ['voltage', 'chw_inlet_temp', 'chw_outlet_temp', 'chw_inlet_pr', 'chw_outlet_pr', 'cow_inlet_temp', 'cow_outlet_temp', 'cow_inlet_pr', 'cow_outlet_pr', 'creator_name'];
+		$allowed_labels = ['voltage', 'chw_inlet_temp', 'chw_outlet_temp', 'chw_inlet_pr', 'chw_outlet_pr', 'cow_inlet_temp', 'cow_outlet_temp', 'cow_inlet_pr', 'cow_outlet_pr', 'creator_name', 'capacity', 'ahu_filter_qty', 'ahu_filter_size', 'ahu_filter_type', 'ahu_make_name', 'blower_flywheel_size', 'equipment_serial_no', 'motor_bearing_size', 'motor_capacity', 'motor_current_rating', 'motor_voltage_rating', 'motor_rpm', 'motor_make_name', 'motor_pulley_size', 'blower_bearing_size', 'blower_flywheel_size', 'ahu_filter_size', 'ahu_filter_qty', 'ahu_v_belt_qty', 'ahu_v_belt_size', 'coupling_size', 'coupling_type', 'power_factor', 'pump_head', 'pump_make_name', 'refrigerant_type', 'tyre_size', 'v_belt_qty', 'v_belt_size'];
 		if (!in_array($label, $allowed_labels)) {
 			return 'invalid_label';
 		}
