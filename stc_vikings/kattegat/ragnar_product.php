@@ -79,11 +79,11 @@ class ragnarProduct extends tesseract{
 		$stc_filter_add_product=$stcpdname;
 		$check_loki=mysqli_query($this->stc_dbs, "
 			SELECT * FROM `stc_product` 
-			WHERE `stc_product_name`='".$stc_filter_add_product."' 
-			AND `stc_product_cat_id`='".$stcpdcat."'
-			AND `stc_product_sub_cat_id`='".$stcpdsubcat."'
-			AND `stc_product_desc`='".$stcpddsc."'
-			AND `stc_product_brand_id`='".$stcpdbrand."'
+			WHERE `stc_product_name`='".mysqli_real_escape_string($this->stc_dbs, $stc_filter_add_product)."' 
+			AND `stc_product_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $stcpdcat)."'
+			AND `stc_product_sub_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $stcpdsubcat)."'
+			AND `stc_product_desc`='".mysqli_real_escape_string($this->stc_dbs, $stcpddsc)."'
+			AND `stc_product_brand_id`='".mysqli_real_escape_string($this->stc_dbs, $stcpdbrand)."'
 		");
 		$count_loki_out=mysqli_num_rows($check_loki);
 		if($count_loki_out == 0){
@@ -835,7 +835,8 @@ if(isset($_POST['friday'])){
 
 // sudoop product to product table
 if(isset($_POST['stc_add_product_hit'])){
-	$stcpdname=strtoupper($_POST['stcpdname']);
+	$stcpdnameRaw=trim($_POST['stcpdname']);
+	$stcpdname=strtoupper($stcpdnameRaw);
 	$stcpddsc=strtoupper($_POST['stcpddesc']);
 	$stcpdcat=$_POST['stcpdcategory'];
 	$stcpdsubcat=$_POST['stcpdsubcategory'];
@@ -847,6 +848,18 @@ if(isset($_POST['stc_add_product_hit'])){
 	$stcpdgst=$_POST['stcpdgst'];
 	$stcpdimages=$_FILES['stcpdimage']['name'];
 	$stcpdtmpname=$_FILES['stcpdimage']['tmp_name'];
+
+	$stcpdslug=strtolower($stcpdnameRaw);
+	$stcpdslug=preg_replace('/[^a-z0-9]+/i', '-', $stcpdslug);
+	$stcpdslug=trim($stcpdslug, '-');
+	$stcpdextension=pathinfo($stcpdimages, PATHINFO_EXTENSION);
+	$stcpdrandom=random_int(1000000000000, 9999999999999);
+	if(!empty($stcpdextension)){
+		$stcpdextension=strtolower($stcpdextension);
+		$stcpdimages=$stcpdslug.'-'.$stcpdrandom.'.'.$stcpdextension;
+	}else{
+		$stcpdimages=$stcpdslug.'-'.$stcpdrandom;
+	}
 
 	$adago=new ragnarProduct();
 
