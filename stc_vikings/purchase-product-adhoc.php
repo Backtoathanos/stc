@@ -330,6 +330,7 @@ include("kattegat/role_check.php");
                                                                     <option>MANGO SHOP NO-1</option>
                                                                     <option>PARDIH STORE</option>
                                                                     <option>RAMGARH WAREHOUSE</option>
+                                                                    <option>SARA INTERNATIONAL SCHOOL</option>
                                                                 </select>
                                                             </td>
                                                             <td>
@@ -345,6 +346,7 @@ include("kattegat/role_check.php");
                                                                     <option>MUSHTAK</option>
                                                                     <option>PAL DA</option>
                                                                     <option>RAFIQUE</option>
+                                                                    <option>RAJESH MUNSHI</option>
                                                                     <option>RAVI</option>
                                                                     <option>RAZA</option>
                                                                     <option>SUBHDIP</option>
