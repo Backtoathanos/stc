@@ -739,7 +739,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                 $projects[] = $row['stc_cust_pro_attend_supervise_pro_id'];
                                             }
                                             $commsep_projects=implode(',', $projects);
-                                            $UsersQuery = "SELECT DISTINCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact`, `stc_cust_pro_supervisor_category` FROM stc_cust_pro_attend_supervise INNER JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`stc_cust_pro_attend_supervise_super_id` WHERE stc_cust_pro_supervisor_status=1 ADstc_cust_pro_supervisor_status=1 AND stc_cust_pro_attend_supervise_pro_id IN (".$commsep_projects.")";
+                                            $UsersQuery = "SELECT DISTINCT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_uid`, `stc_cust_pro_supervisor_contact`, `stc_cust_pro_supervisor_category` FROM stc_cust_pro_attend_supervise INNER JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`stc_cust_pro_attend_supervise_super_id` WHERE stc_cust_pro_supervisor_status=1 AND stc_cust_pro_attend_supervise_pro_id IN (".$commsep_projects.")";
                                             $UsersResult = mysqli_query($con, $UsersQuery);
                                             if(mysqli_num_rows($UsersResult)>0){
                                                 $usercounter=0;
