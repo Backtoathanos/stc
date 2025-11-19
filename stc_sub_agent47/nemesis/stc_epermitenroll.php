@@ -32,22 +32,22 @@ class transformers extends tesseract{
 	// call sitename
 	public function stc_call_epermitenroll($begdate, $enddate, $shift){
         $shift=$shift!="NA"? '`shift`="'.$shift.'" AND ':'';
-        $filter='WHERE '.$shift.'DATE(`created_date`)="'.$enddate.'" AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department`  ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='.$_SESSION['stc_agent_sub_id'].')'; 
+        $filter='WHERE `stc_cust_pro_supervisor_status`=1 AND '.$shift.'DATE(`created_date`)="'.$enddate.'" AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department`  ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='.$_SESSION['stc_agent_sub_id'].')'; 
         $countPEntry = 0;
         if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
             if($enddate==''){
                 $enddate=DATE('Y-m-d');
-                $filter='WHERE '.$shift.'DATE(`created_date`)="'.$enddate.'" AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department`  ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='.$_SESSION['stc_agent_sub_id'].')'; 
+                $filter='WHERE `stc_cust_pro_supervisor_status`=1 AND '.$shift.'DATE(`created_date`)="'.$enddate.'" AND `stc_status_down_list_department_id` IN ( SELECT DISTINCT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department`  ON `stc_cust_pro_attend_supervise_pro_id` = `stc_status_down_list_department_loc_id` WHERE `stc_cust_pro_attend_supervise_super_id`='.$_SESSION['stc_agent_sub_id'].')'; 
             }
         }else{
             if($enddate==''){
-                $filter='WHERE '.$shift.'DATE(`created_date`)="'.$enddate.'" AND `created_by`="'.$_SESSION['stc_agent_sub_id'].'"';
+                $filter='WHERE `stc_cust_pro_supervisor_status`=1 AND '.$shift.'DATE(`created_date`)="'.$enddate.'" AND `created_by`="'.$_SESSION['stc_agent_sub_id'].'"';
             }else{
                 $filter.=' AND `created_by`="'.$_SESSION['stc_agent_sub_id'].'"';
             }
         }
         $query="
-            SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `status`, `created_date`, `created_by` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`created_by`LEFT JOIN `stc_agents` ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` ".$filter." ORDER BY `emp_name` ASC
+            SELECT `id`, `location`, `stc_status_down_list_department_dept`, `emp_name`, `gpno`, `shift`, `status`, `created_date`, `created_by` FROM `stc_epermit_enrollment` LEFT JOIN `stc_status_down_list_department` ON `dep_id`=`stc_status_down_list_department_id` INNER JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`created_by`LEFT JOIN `stc_agents` ON `stc_cust_pro_supervisor_created_by`=`stc_agents_id` ".$filter." ORDER BY `emp_name` ASC
         ";
 		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
 		$optimusprime='
