@@ -68,55 +68,102 @@ class prime extends tesseract{
 
 	public function stc_update_tandtdata($toolData) {
 		$result = '';
-	
-		$insertQuery = mysqli_query($this->stc_dbs, "
-			INSERT INTO `toolstackelsdata` (
-				`title`,
-				`calibration_date`,
-				`calibration_due`,
-				`status`,
-				`docs`,
-				`created_by`
-			) VALUES (
-				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['toolName']) . "',
-				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDate']) . "',
-				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDue']) . "',
-				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['status']) . "',
-				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['certificatePath']) . "',
-				'" . mysqli_real_escape_string($this->stc_dbs, $toolData['created_by']) . "'
-			)
-		");
-	
-		if ($insertQuery) {
-			$result = "success";
+		
+		// Check if it's an update or insert
+		if(isset($toolData['id']) && !empty($toolData['id'])){
+			// Update existing record
+			$updateQuery = "UPDATE `toolstackelsdata` SET 
+				`title` = '" . mysqli_real_escape_string($this->stc_dbs, $toolData['toolName']) . "',
+				`calibration_date` = '" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDate']) . "',
+				`calibration_due` = '" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDue']) . "'";
+			
+			// Update docs only if a new file was uploaded
+			if(!empty($toolData['certificatePath'])){
+				$updateQuery .= ", `docs` = '" . mysqli_real_escape_string($this->stc_dbs, $toolData['certificatePath']) . "'";
+			}
+			
+			$updateQuery .= " WHERE `id` = '" . mysqli_real_escape_string($this->stc_dbs, $toolData['id']) . "'";
+			
+			$queryResult = mysqli_query($this->stc_dbs, $updateQuery);
+			if ($queryResult) {
+				$result = "success";
+			} else {
+				$result = "not success: " . mysqli_error($this->stc_dbs);
+			}
 		} else {
-			$result = "not success: " . mysqli_error($this->stc_dbs);
+			// Insert new record
+			$insertQuery = mysqli_query($this->stc_dbs, "
+				INSERT INTO `toolstackelsdata` (
+					`title`,
+					`calibration_date`,
+					`calibration_due`,
+					`status`,
+					`docs`,
+					`created_by`
+				) VALUES (
+					'" . mysqli_real_escape_string($this->stc_dbs, $toolData['toolName']) . "',
+					'" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDate']) . "',
+					'" . mysqli_real_escape_string($this->stc_dbs, $toolData['calibrationDue']) . "',
+					'" . mysqli_real_escape_string($this->stc_dbs, $toolData['status']) . "',
+					'" . mysqli_real_escape_string($this->stc_dbs, $toolData['certificatePath']) . "',
+					'" . mysqli_real_escape_string($this->stc_dbs, $toolData['created_by']) . "'
+				)
+			");
+		
+			if ($insertQuery) {
+				$result = "success";
+			} else {
+				$result = "not success: " . mysqli_error($this->stc_dbs);
+			}
 		}
 	
 		return $result;
 	}
 
-	public function stc_call_tandtdata($search){
-		$optimusprime='';
-		$query = "
-			SELECT * FROM `toolstackelsdata` WHERE `status`='1'
-		";
+	public function stc_call_tandtdata($search, $page = 1, $pageSize = 10){
+		$whereClause = "`status`='1'";
 		if($search!=''){
-			$query .= ' AND `title` REGEXP "'.mysqli_real_escape_string($this->stc_dbs, $search).'"';
+			$whereClause .= ' AND `title` REGEXP "'.mysqli_real_escape_string($this->stc_dbs, $search).'"';
 		}
-		$query .= " ORDER BY `id` DESC";
+		
+		// Get total count
+		$countQuery = "SELECT COUNT(*) as total FROM `toolstackelsdata` WHERE " . $whereClause;
+		$countResult = mysqli_query($this->stc_dbs, $countQuery);
+		$totalCount = 0;
+		if($countResult && $row = mysqli_fetch_assoc($countResult)){
+			$totalCount = $row['total'];
+		}
+		
+		// Calculate offset
+		$offset = ($page - 1) * $pageSize;
+		
+		// Get paginated data
+		$query = "SELECT * FROM `toolstackelsdata` WHERE " . $whereClause . " ORDER BY `id` DESC LIMIT " . intval($offset) . ", " . intval($pageSize);
 		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
 		$data = [];
 		if (mysqli_num_rows($optimusprimequery) > 0) {
-			$i = 1; // Counter for serial number
 			while ($row = mysqli_fetch_assoc($optimusprimequery)) {
 				$row['calibration_date'] = date('d-m-Y', strtotime($row['calibration_date']));
 				$row['calibration_due'] = date('d-m-Y', strtotime($row['calibration_due']));
 				$data[] = $row;
 			}
-			$optimusprime=$data;
 		}
-		return $optimusprime;
+		
+		return array(
+			'data' => $data,
+			'total_count' => $totalCount
+		);
+	}
+
+	public function stc_call_tandtdata_by_id($id){
+		$query = "SELECT * FROM `toolstackelsdata` WHERE `id`='".mysqli_real_escape_string($this->stc_dbs, $id)."' AND `status`='1'";
+		$result = mysqli_query($this->stc_dbs, $query);
+		if($result && $row = mysqli_fetch_assoc($result)){
+			$row['calibration_date'] = date('Y-m-d', strtotime($row['calibration_date']));
+			$row['calibration_due'] = date('Y-m-d', strtotime($row['calibration_due']));
+			return array('status' => true, 'data' => $row);
+		}
+		return array('status' => false, 'message' => 'Tool not found');
 	}
 }
 
@@ -163,11 +210,17 @@ if (isset($_POST['tandtdataaction'])) {
         'toolName' => $_POST['toolName'],
         'calibrationDate' => $_POST['calibrationDate'],
         'calibrationDue' => $_POST['calibrationDue'],
-        'status' => 1, // Example status
-        'created_by' => $_SESSION['stc_agent_id'], // Example user ID
-        'certificatePath' => '' // Placeholder for file path
+        'status' => 1,
+        'created_by' => $_SESSION['stc_agent_id'],
+        'certificatePath' => ''
     ];
+    
+    // Check if it's an edit operation
+    if(isset($_POST['toolId']) && !empty($_POST['toolId'])){
+        $toolData['id'] = $_POST['toolId'];
+    }
 
+    // Handle file upload (optional for edit mode)
     if (isset($_FILES['certificate']) && $_FILES['certificate']['error'] === UPLOAD_ERR_OK) {
 		$uploadDir = '../docs/'; // Absolute path to the directory
 	
@@ -193,8 +246,20 @@ if (isset($_POST['tandtdataaction'])) {
 			exit;
 		}
 	} else {
-		echo json_encode(['status' => false, 'message' => 'No file uploaded or upload error']);
-		exit;
+		// For edit mode, if no file uploaded, keep existing file
+		if(isset($toolData['id'])){
+			// Get existing docs path
+			$objsearchreq_temp = new prime();
+			$existingData = $objsearchreq_temp->stc_call_tandtdata_by_id($toolData['id']);
+			if($existingData['status'] && isset($existingData['data']['docs'])){
+				$toolData['certificatePath'] = $existingData['data']['docs'];
+			} else {
+				$toolData['certificatePath'] = '';
+			}
+		} else {
+			// For new records, file is optional
+			$toolData['certificatePath'] = '';
+		}
 	}
 
     // Insert data into database
@@ -203,13 +268,17 @@ if (isset($_POST['tandtdataaction'])) {
 
     // Return response
     if ($result === "success") {
+        $message = isset($toolData['id']) ? 'Record Updated' : 'Record Saved';
+        $toolId = isset($toolData['id']) ? $toolData['id'] : mysqli_insert_id($objsearchreq->stc_dbs);
+        
         echo json_encode([
             'status' => true,
+            'message' => $message,
             'data' => [
-                'id' => mysqli_insert_id($objsearchreq->stc_dbs),
+                'id' => $toolId,
                 'title' => $toolData['toolName'],
-                'calibration_date' => $toolData['calibrationDate'],
-                'calibration_due' => $toolData['calibrationDue'],
+                'calibration_date' => date('d-m-Y', strtotime($toolData['calibrationDate'])),
+                'calibration_due' => date('d-m-Y', strtotime($toolData['calibrationDue'])),
                 'docs' => $toolData['certificatePath']
             ]
         ]);
@@ -218,11 +287,21 @@ if (isset($_POST['tandtdataaction'])) {
     }
 }
 
+// Fetch tool data by ID
+if(isset($_POST['fetchToolsDataById'])){
+	$id = $_POST['id'];
+	$objsearchreq = new prime();
+	$opobjsearchreq = $objsearchreq->stc_call_tandtdata_by_id($id);
+	echo json_encode($opobjsearchreq);
+}
+
 // call fields for tbm
 if(isset($_POST['fetchToolsData'])){
-	$search=$_POST['search'];
+	$search = isset($_POST['search']) ? $_POST['search'] : '';
+	$page = isset($_POST['page']) ? intval($_POST['page']) : 1;
+	$pageSize = isset($_POST['pageSize']) ? intval($_POST['pageSize']) : 10;
 	$objsearchreq=new prime();
-	$opobjsearchreq=$objsearchreq->stc_call_tandtdata($search);
+	$opobjsearchreq=$objsearchreq->stc_call_tandtdata($search, $page, $pageSize);
 	echo json_encode($opobjsearchreq);
 }
 ?>

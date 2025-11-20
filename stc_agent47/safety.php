@@ -679,6 +679,7 @@ else {
                                                             <th class="text-center">Calibration Date</th>
                                                             <th class="text-center">Calibration Due</th>
                                                             <th width="10%" class="text-center">Certificate Attended</th>
+                                                            <th width="10%" class="text-center">Action</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody class="stc-safety-toolsTable-res-table">
@@ -687,6 +688,7 @@ else {
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                <div class="stc-safety-toolsTable-pagination" style="margin-top: 20px; text-align: center;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -2622,34 +2624,53 @@ else {
             $('#tandtdatafind').on('click', function (e) {
                 e.preventDefault();
                 var search=$('#tandtdatainput').val();
-                fetchToolsData(search);
+                fetchToolsData(search, 1);
             });
 
-            function fetchToolsData(search) {
+            window.toolsCurrentPage = 1;
+            window.toolsRecordsPerPage = 10;
+            window.toolsCurrentSearch = '';
+
+            window.fetchToolsData = function(search, page) {
+                if(search !== undefined) window.toolsCurrentSearch = search;
+                if(page) window.toolsCurrentPage = page;
+                
                 $.ajax({
-                    url: 'nemesis/stc_safety.php', // Update with the correct server-side script path
+                    url: 'nemesis/stc_safety.php',
                     type: 'POST',
-                    data: { fetchToolsData: 1, search:search },
+                    data: { 
+                        fetchToolsData: 1, 
+                        search: window.toolsCurrentSearch,
+                        page: window.toolsCurrentPage,
+                        pageSize: window.toolsRecordsPerPage
+                    },
+                    dataType: 'JSON',
                     success: function (response) {
-                        let toolsData = JSON.parse(response);
                         let tableBody = $('.stc-safety-toolsTable-res-table');
                         tableBody.empty(); // Clear existing rows
 
-                        if (toolsData.length > 0) {
-                            toolsData.forEach(function (tool) {
+                        if (response.data && response.data.length > 0) {
+                            let slno = (window.toolsCurrentPage - 1) * window.toolsRecordsPerPage;
+                            response.data.forEach(function (tool) {
+                                slno++;
                                 let row = `
                                     <tr>
-                                        <td>${tool.id}</td>
+                                        <td>${slno}</td>
                                         <td>${tool.title}</td>
                                         <td class="text-center">${tool.calibration_date}</td>
                                         <td class="text-center">${tool.calibration_due}</td>
-                                        <td class="text-center">${tool.docs ? `<a href="docs/${tool.docs}" target="_blank">View</a>` : 'N/A'}</td>
+                                        <td class="text-center">${tool.docs ? `<a href="docs/${tool.docs}" target="_blank" class="btn btn-info btn-sm" title="View Certificate"><i class="fa fa-eye"></i></a>` : 'N/A'}</td>
+                                        <td class="text-center">
+                                            <a href="#" class="btn btn-secondary btn-sm stc-tools-edit" data-id="${tool.id}" title="Edit"><i class="fa fa-edit"></i></a>
+                                        </td>
                                     </tr>
                                 `;
                                 tableBody.append(row);
                             });
+                            updateToolsPagination(response.total_count);
                         } else {
-                            tableBody.append('<tr><td colspan="5">No records found</td></tr>');
+                            tableBody.append('<tr><td colspan="6">No records found</td></tr>');
+                            $('.stc-safety-toolsTable-pagination').html('');
                         }
                     },
                     error: function () {
@@ -2658,11 +2679,99 @@ else {
                 });
             }
 
+            function updateToolsPagination(totalRecords) {
+                var totalPages = Math.ceil(totalRecords / window.toolsRecordsPerPage);
+                var paginationHtml = '';
+                
+                if(totalPages > 1){
+                    paginationHtml = '<nav aria-label="Tools Pagination"><ul class="pagination justify-content-center">';
+                    
+                    // Previous button
+                    if(window.toolsCurrentPage > 1){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="fetchToolsData(\'' + window.toolsCurrentSearch + '\', ' + (window.toolsCurrentPage - 1) + ')">Previous</a></li>';
+                    }
+                    
+                    // Page numbers
+                    var startPage = Math.max(1, window.toolsCurrentPage - 2);
+                    var endPage = Math.min(totalPages, window.toolsCurrentPage + 2);
+                    
+                    if(startPage > 1){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="fetchToolsData(\'' + window.toolsCurrentSearch + '\', 1)">1</a></li>';
+                        if(startPage > 2){
+                            paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                    }
+                    
+                    for(var i = startPage; i <= endPage; i++){
+                        var activeClass = (i == window.toolsCurrentPage) ? ' active' : '';
+                        paginationHtml += '<li class="page-item' + activeClass + '"><a class="page-link" href="javascript:void(0)" onclick="fetchToolsData(\'' + window.toolsCurrentSearch + '\', ' + i + ')">' + i + '</a></li>';
+                    }
+                    
+                    if(endPage < totalPages){
+                        if(endPage < totalPages - 1){
+                            paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="fetchToolsData(\'' + window.toolsCurrentSearch + '\', ' + totalPages + ')">' + totalPages + '</a></li>';
+                    }
+                    
+                    // Next button
+                    if(window.toolsCurrentPage < totalPages){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="fetchToolsData(\'' + window.toolsCurrentSearch + '\', ' + (window.toolsCurrentPage + 1) + ')">Next</a></li>';
+                    }
+                    
+                    paginationHtml += '</ul></nav>';
+                }
+                
+                $('.stc-safety-toolsTable-pagination').html(paginationHtml);
+            };
+
             // Call the function to fetch data on page load
-            fetchToolsData('');
+            fetchToolsData('', 1);
 
             $('.datacallmethod').click(function(){
+                $('#toolsForm')[0].reset();
+                $('#toolsForm input[name="toolId"]').remove();
+                $('#toolsForm input[name="tandtdataaction"]').val('');
+                $('#toolsModal .modal-title').text('TOOLS & TACKLES DATA - Add');
                 $('#toolsModal').modal('show');
+            });
+
+            // Handle edit button click
+            $(document).on('click', '.stc-tools-edit', function(e){
+                e.preventDefault();
+                var toolId = $(this).data('id');
+                
+                // Fetch tool data
+                $.ajax({
+                    url: 'nemesis/stc_safety.php',
+                    type: 'POST',
+                    data: { fetchToolsDataById: 1, id: toolId },
+                    dataType: 'JSON',
+                    success: function(response) {
+                        if(response.status === true && response.data) {
+                            var tool = response.data;
+                            $('#toolName').val(tool.title);
+                            $('#calibrationDate').val(tool.calibration_date);
+                            $('#calibrationDue').val(tool.calibration_due);
+                            
+                            // Add hidden field for edit mode
+                            if($('#toolsForm input[name="toolId"]').length === 0) {
+                                $('#toolsForm').append('<input type="hidden" name="toolId" value="' + tool.id + '">');
+                            } else {
+                                $('#toolsForm input[name="toolId"]').val(tool.id);
+                            }
+                            
+                            $('#toolsForm input[name="tandtdataaction"]').val('edit');
+                            $('#toolsModal .modal-title').text('TOOLS & TACKLES DATA - Edit');
+                            $('#toolsModal').modal('show');
+                        } else {
+                            alert('Failed to load tool data.');
+                        }
+                    },
+                    error: function() {
+                        alert('Failed to fetch tool data.');
+                    }
+                });
             });
             
             // Handle form submission 
@@ -2685,23 +2794,19 @@ else {
                             let newRow = JSON.parse(response);
 
                             if (newRow.status === true) {
-                                alert("Record Saved");
-                                // Append new row to the table
-                                $('.stc-safety-toolsTable-res-table').before(`
-                                    <tr>
-                                        <td>${newRow.data.id}</td>
-                                        <td>${newRow.data.title}</td>
-                                        <td class="text-center">${newRow.data.calibration_date}</td>
-                                        <td class="text-center">${newRow.data.calibration_due}</td>
-                                        <td class="text-center">${newRow.data.docs ? `<a href="docs/${newRow.data.docs}" target="_blank">View</a>` : 'N/A'}</td>
-                                    </tr>
-                                `);
-
+                                alert(newRow.message || "Record Saved");
+                                
                                 // Close modal
                                 $('#toolsModal').modal('hide');
 
                                 // Reset form
                                 $('#toolsForm')[0].reset();
+                                $('#toolsForm input[name="toolId"]').remove();
+                                $('#toolsForm input[name="tandtdataaction"]').val('');
+                                $('#toolsModal .modal-title').text('TOOLS & TACKLES DATA - Add');
+                                
+                                // Reload data
+                                fetchToolsData(window.toolsCurrentSearch, window.toolsCurrentPage);
                             } else {
                                 alert(newRow.message);
                             }
