@@ -162,6 +162,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                <div class="stc-safety-tbm-pagination" style="margin-top: 20px; text-align: center;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -194,6 +195,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                <div class="stc-safety-ppec-pagination" style="margin-top: 20px; text-align: center;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -226,6 +228,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                                <div class="stc-safety-ppem-pagination" style="margin-top: 20px; text-align: center;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -487,16 +490,78 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             });            
 
             // call tbm
-            call_tbm();
-            function call_tbm(){
+            window.tbmCurrentPage = 1;
+            window.tbmRecordsPerPage = 10;
+            
+            window.call_tbm = function(page){
+                if(page) window.tbmCurrentPage = page;
                 $.ajax({
                     url         : "nemesis/stc_safety.php",
                     method      : "POST",
-                    data        : {stc_safety_calltbm:1},
+                    data        : {
+                        stc_safety_calltbm:1,
+                        page: window.tbmCurrentPage,
+                        pageSize: window.tbmRecordsPerPage
+                    },
+                    dataType    : "JSON",
                     success     : function(response_tbm){
-                        $('.stc-safety-tbm-res-table').html(response_tbm);
+                        $('.stc-safety-tbm-res-table').html(response_tbm.data);
+                        updateTbmPagination(response_tbm.total_count);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error loading TBM data:", error);
+                        $('.stc-safety-tbm-res-table').html('<tr><td colspan="6">Error loading data. Please try again.</td></tr>');
                     }
                 });
+            };
+            
+            // Initialize on page load
+            call_tbm(1);
+            
+            function updateTbmPagination(totalRecords){
+                var totalPages = Math.ceil(totalRecords / window.tbmRecordsPerPage);
+                var paginationHtml = '';
+                
+                if(totalPages > 1){
+                    paginationHtml = '<nav aria-label="TBM Pagination"><ul class="pagination justify-content-center">';
+                    
+                    // Previous button
+                    if(window.tbmCurrentPage > 1){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_tbm(' + (window.tbmCurrentPage - 1) + ')">Previous</a></li>';
+                    }
+                    
+                    // Page numbers
+                    var startPage = Math.max(1, window.tbmCurrentPage - 2);
+                    var endPage = Math.min(totalPages, window.tbmCurrentPage + 2);
+                    
+                    if(startPage > 1){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_tbm(1)">1</a></li>';
+                        if(startPage > 2){
+                            paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                    }
+                    
+                    for(var i = startPage; i <= endPage; i++){
+                        var activeClass = (i == window.tbmCurrentPage) ? ' active' : '';
+                        paginationHtml += '<li class="page-item' + activeClass + '"><a class="page-link" href="javascript:void(0)" onclick="call_tbm(' + i + ')">' + i + '</a></li>';
+                    }
+                    
+                    if(endPage < totalPages){
+                        if(endPage < totalPages - 1){
+                            paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_tbm(' + totalPages + ')">' + totalPages + '</a></li>';
+                    }
+                    
+                    // Next button
+                    if(window.tbmCurrentPage < totalPages){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_tbm(' + (window.tbmCurrentPage + 1) + ')">Next</a></li>';
+                    }
+                    
+                    paginationHtml += '</ul></nav>';
+                }
+                
+                $('.stc-safety-tbm-pagination').html(paginationHtml);
             }
 
             // add image for tbm
@@ -1180,16 +1245,78 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     <script>
         $(document).ready(function(){  
             // call ppem
-            call_ppem();
-            function call_ppem(){
+            window.ppemCurrentPage = 1;
+            window.ppemRecordsPerPage = 10;
+            
+            window.call_ppem = function(page){
+                if(page) window.ppemCurrentPage = page;
                 $.ajax({
                     url         : "nemesis/stc_safety.php",
                     method      : "POST",
-                    data        : {stc_safety_callppem:1},
-                    success     : function(response_tbm){
-                        $('.stc-safety-ppem-res-table').html(response_tbm);
+                    data        : {
+                        stc_safety_callppem:1,
+                        page: window.ppemCurrentPage,
+                        pageSize: window.ppemRecordsPerPage
+                    },
+                    dataType    : "JSON",
+                    success     : function(response_ppem){
+                        $('.stc-safety-ppem-res-table').html(response_ppem.data);
+                        updatePpemPagination(response_ppem.total_count);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error loading PPEM data:", error);
+                        $('.stc-safety-ppem-res-table').html('<tr><td colspan="4">Error loading data. Please try again.</td></tr>');
                     }
                 });
+            };
+            
+            // Initialize on page load
+            call_ppem(1);
+            
+            function updatePpemPagination(totalRecords){
+                var totalPages = Math.ceil(totalRecords / window.ppemRecordsPerPage);
+                var paginationHtml = '';
+                
+                if(totalPages > 1){
+                    paginationHtml = '<nav aria-label="PPEM Pagination"><ul class="pagination justify-content-center">';
+                    
+                    // Previous button
+                    if(window.ppemCurrentPage > 1){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_ppem(' + (window.ppemCurrentPage - 1) + ')">Previous</a></li>';
+                    }
+                    
+                    // Page numbers
+                    var startPage = Math.max(1, window.ppemCurrentPage - 2);
+                    var endPage = Math.min(totalPages, window.ppemCurrentPage + 2);
+                    
+                    if(startPage > 1){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_ppem(1)">1</a></li>';
+                        if(startPage > 2){
+                            paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                    }
+                    
+                    for(var i = startPage; i <= endPage; i++){
+                        var activeClass = (i == window.ppemCurrentPage) ? ' active' : '';
+                        paginationHtml += '<li class="page-item' + activeClass + '"><a class="page-link" href="javascript:void(0)" onclick="call_ppem(' + i + ')">' + i + '</a></li>';
+                    }
+                    
+                    if(endPage < totalPages){
+                        if(endPage < totalPages - 1){
+                            paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_ppem(' + totalPages + ')">' + totalPages + '</a></li>';
+                    }
+                    
+                    // Next button
+                    if(window.ppemCurrentPage < totalPages){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_ppem(' + (window.ppemCurrentPage + 1) + ')">Next</a></li>';
+                    }
+                    
+                    paginationHtml += '</ul></nav>';
+                }
+                
+                $('.stc-safety-ppem-pagination').html(paginationHtml);
             }
 
             // delete ppem            
@@ -1742,16 +1869,78 @@ if(isset($_SESSION["stc_agent_sub_id"])){
     <script>
         $(document).ready(function(){    
             // call ppec
-            call_ppec();
-            function call_ppec(){
+            window.ppecCurrentPage = 1;
+            window.ppecRecordsPerPage = 10;
+            
+            window.call_ppec = function(page){
+                if(page) window.ppecCurrentPage = page;
                 $.ajax({
                     url         : "nemesis/stc_safety.php",
                     method      : "POST",
-                    data        : {stc_safety_callppec:1},
-                    success     : function(response_tbm){
-                        $('.stc-safety-ppec-res-table').html(response_tbm);
+                    data        : {
+                        stc_safety_callppec:1,
+                        page: window.ppecCurrentPage,
+                        pageSize: window.ppecRecordsPerPage
+                    },
+                    dataType    : "JSON",
+                    success     : function(response_ppec){
+                        $('.stc-safety-ppec-res-table').html(response_ppec.data);
+                        updatePpecPagination(response_ppec.total_count);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error loading PPEC data:", error);
+                        $('.stc-safety-ppec-res-table').html('<tr><td colspan="4">Error loading data. Please try again.</td></tr>');
                     }
                 });
+            };
+            
+            // Initialize on page load
+            call_ppec(1);
+            
+            function updatePpecPagination(totalRecords){
+                var totalPages = Math.ceil(totalRecords / window.ppecRecordsPerPage);
+                var paginationHtml = '';
+                
+                if(totalPages > 1){
+                    paginationHtml = '<nav aria-label="PPEC Pagination"><ul class="pagination justify-content-center">';
+                    
+                    // Previous button
+                    if(window.ppecCurrentPage > 1){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_ppec(' + (window.ppecCurrentPage - 1) + ')">Previous</a></li>';
+                    }
+                    
+                    // Page numbers
+                    var startPage = Math.max(1, window.ppecCurrentPage - 2);
+                    var endPage = Math.min(totalPages, window.ppecCurrentPage + 2);
+                    
+                    if(startPage > 1){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_ppec(1)">1</a></li>';
+                        if(startPage > 2){
+                            paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                    }
+                    
+                    for(var i = startPage; i <= endPage; i++){
+                        var activeClass = (i == window.ppecCurrentPage) ? ' active' : '';
+                        paginationHtml += '<li class="page-item' + activeClass + '"><a class="page-link" href="javascript:void(0)" onclick="call_ppec(' + i + ')">' + i + '</a></li>';
+                    }
+                    
+                    if(endPage < totalPages){
+                        if(endPage < totalPages - 1){
+                            paginationHtml += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                        }
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_ppec(' + totalPages + ')">' + totalPages + '</a></li>';
+                    }
+                    
+                    // Next button
+                    if(window.ppecCurrentPage < totalPages){
+                        paginationHtml += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_ppec(' + (window.ppecCurrentPage + 1) + ')">Next</a></li>';
+                    }
+                    
+                    paginationHtml += '</ul></nav>';
+                }
+                
+                $('.stc-safety-ppec-pagination').html(paginationHtml);
             }       
 
             // delete ppec            
