@@ -184,8 +184,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     <thead>
                                                         <tr>
                                                             <th class="text-center">Date.</th>
+                                                            <th class="text-center">Work Order No</th>
                                                             <th class="text-center">Site Name</th>
-                                                            <th class="text-center">Supervisor Name</th>
                                                             <th width="10%" class="text-center">Action</th>
                                                         </tr>
                                                     </thead>
