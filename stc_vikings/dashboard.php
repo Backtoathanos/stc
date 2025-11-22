@@ -702,14 +702,37 @@ STCAuthHelper::checkAuth();
                                                          $pendingduration = '<div style="padding: 5px 10px;">N/A</div>';
                                                       }
                                                       
-                                                      $pendingreason='<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisitionrow['stc_requisition_combiner_id'].'" target="__blank">';
+                                                      $pendingreason='';
+                                                      $fullMessage='';
                                                       $qry=mysqli_query($con, "
                                                          SELECT `message` FROM `stc_cust_super_requisition_list_items_log` WHERE title='Pending' AND `item_id`='".$requisitionrow['reqlistid']."'
                                                       ");
                                                       foreach($qry as $result){
-                                                         $pendingreason.=$result['message'].'<br>';
+                                                         $fullMessage.=$result['message'].'<br>';
                                                       }
-                                                      $pendingreason.='</a>';
+                                                      
+                                                      // Extract name from message for truncated display
+                                                      $truncatedText = '';
+                                                      $uniqueId = 'pending-reason-'.$requisitionrow['stc_requisition_combiner_id'].'-'.$requisitionrow['reqlistid'];
+                                                      if(!empty($fullMessage)){
+                                                         // Try to extract name from "Pending by [Name] on"
+                                                         // Remove HTML tags first for better matching
+                                                         $cleanMessage = strip_tags($fullMessage);
+                                                         if(preg_match('/Pending by\s+(.+?)\s+on/i', $cleanMessage, $matches)){
+                                                            $name = trim($matches[1]);
+                                                            $truncatedText = 'Pending by '.$name;
+                                                         } else {
+                                                            // Fallback: use first part of message
+                                                            $truncatedText = substr($cleanMessage, 0, 30);
+                                                         }
+                                                      }
+                                                      
+                                                      // Create the link with truncated text and separate read more functionality
+                                                      $pendingreason = '<div class="pending-reason-container" id="'.$uniqueId.'">';
+                                                      $pendingreason .= '<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisitionrow['stc_requisition_combiner_id'].'" target="__blank" class="pending-reason-link">'.$truncatedText.'</a>';
+                                                      $pendingreason .= ' <a href="#" class="pending-read-more" style="color: #007bff; text-decoration: underline; cursor: pointer;">...read more</a>';
+                                                      $pendingreason .= '<span class="pending-reason-full" style="display: none;">'.$fullMessage.'</span>';
+                                                      $pendingreason .= '</div>';
                                                            $optimusprime.='
                                                                    <tr>
                                                                        <td>'.$slno.'</td>
@@ -1031,6 +1054,24 @@ STCAuthHelper::checkAuth();
             //   month = $(this).val();
             //   fetchInventorySummary(month, d.getFullYear());
             // });
+        });
+        
+        // Function to toggle pending reason display
+        $(document).on('click', '.pending-read-more', function(e) {
+            e.preventDefault();
+            var $container = $(this).closest('.pending-reason-container');
+            var $readMoreLink = $(this);
+            var $fullSpan = $container.find('.pending-reason-full');
+            
+            if($fullSpan.is(':visible')) {
+                // Collapse: hide full message, show truncated version
+                $fullSpan.hide();
+                $readMoreLink.text('...read more');
+            } else {
+                // Expand: show full message
+                $fullSpan.show();
+                $readMoreLink.text(' read less');
+            }
         });
     </script>
 </body>
