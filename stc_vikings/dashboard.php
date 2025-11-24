@@ -491,7 +491,7 @@ STCAuthHelper::checkAuth();
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Dispatch Qty</div></th>
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Pending Qty</div></th>
                                                 <th class="text-center">Status</th>
-                                                <th class="text-center">Pending Duration</th>
+                                                <th class="text-center" style="width: 200px;text-align: center;">Pending Duration</th>
                                                 <th class="text-center" style="width: 500px;">Pending Reason</th>
                                             </tr>
                                             </thead>
@@ -541,28 +541,43 @@ STCAuthHelper::checkAuth();
                                                    $stcdispatchedqty=0;
                                                    $stcrecievedqty=0;
                                                    $stcpendingqty=0;
-                                                   $rqitemstts='';
-                                                       if($requisitionrow['stc_cust_super_requisition_list_items_status']==1){
-                                                           $rqitemstts='<span style="background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px;">Ordered</span>';
-                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==2){
-                                                           $rqitemstts='<span style="background-color: #2ecc71; color: white; padding: 2px 6px; border-radius: 3px;">Approved</span>';
-                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==3){
-                                                           $rqitemstts='<span style="background-color: #27ae60; color: white; padding: 2px 6px; border-radius: 3px;">Accepted</span>';
-                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==4){
-                                                           $rqitemstts='<span style="background-color: #f39c12; color: white; padding: 2px 6px; border-radius: 3px;">Dispatched</span>';
-                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==5){
-                                                           $rqitemstts='<span style="background-color: #16a085; color: white; padding: 2px 6px; border-radius: 3px;">Received</span>';
-                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==6){
-                                                           $rqitemstts='<span style="background-color: #e74c3c; color: white; padding: 2px 6px; border-radius: 3px;">Rejected</span>';
-                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==7){
-                                                           $rqitemstts='<span style="background-color: #95a5a6; color: white; padding: 2px 6px; border-radius: 3px;">Canceled</span>';
-                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==8){
-                                                           $rqitemstts='<span style="background-color: #9b59b6; color: white; padding: 2px 6px; border-radius: 3px;">Returned</span>';
-                                                       }elseif($requisitionrow['stc_cust_super_requisition_list_items_status']==9){
-                                                           $rqitemstts='<span style="background-color:rgb(255, 47, 47); color: white; padding: 2px 6px; border-radius: 3px;">Pending</span>';
-                                                       }else{
-                                                           $rqitemstts='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
-                                                       }
+                                                   $rqitemstts2='';
+                                                    $currentStatus = $requisitionrow['stc_cust_super_requisition_list_items_status'];
+                                                    $reqlistid = $requisitionrow['reqlistid'];
+                                                    if($requisitionrow['stc_cust_super_requisition_list_items_status']==9){
+                                                           $rqitemstts2='<span style="background-color:rgb(255, 47, 47); color: white; padding: 2px 6px; border-radius: 3px;">Pending</span>';
+                                                    }
+                                                    // Create dropdown for status change (only for pending items)
+                                                    if($currentStatus == 9){ // Pending status
+                                                        $rqitemstts = '<select class="form-control status-dropdown" data-item-id="'.$reqlistid.'" data-old-status="9" style="font-size: 12px; padding: 2px 5px; min-width: 100px;">';
+                                                        $rqitemstts .= '<option value="9" selected>Select Status</option>';
+                                                        $rqitemstts .= '<option value="6">Reject</option>';
+                                                        $rqitemstts .= '<option value="10">Close</option>';
+                                                        $rqitemstts .= '</select>';
+                                                    } else {
+                                                        // Display status badge for non-pending items
+                                                        if($currentStatus==1){
+                                                            $rqitemstts='<span style="background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px;">Ordered</span>';
+                                                        }elseif($currentStatus==2){
+                                                            $rqitemstts='<span style="background-color: #2ecc71; color: white; padding: 2px 6px; border-radius: 3px;">Approved</span>';
+                                                        }elseif($currentStatus==3){
+                                                            $rqitemstts='<span style="background-color: #27ae60; color: white; padding: 2px 6px; border-radius: 3px;">Accepted</span>';
+                                                        }elseif($currentStatus==4){
+                                                            $rqitemstts='<span style="background-color: #f39c12; color: white; padding: 2px 6px; border-radius: 3px;">Dispatched</span>';
+                                                        }elseif($currentStatus==5){
+                                                            $rqitemstts='<span style="background-color: #16a085; color: white; padding: 2px 6px; border-radius: 3px;">Received</span>';
+                                                        }elseif($currentStatus==6){
+                                                            $rqitemstts='<span style="background-color: #e74c3c; color: white; padding: 2px 6px; border-radius: 3px;">Rejected</span>';
+                                                        }elseif($currentStatus==7){
+                                                         $rqitemstts='<span style="background-color: #95a5a6; color: white; padding: 2px 6px; border-radius: 3px;">Canceled</span>';
+                                                        }elseif($currentStatus==8){
+                                                            $rqitemstts='<span style="background-color: #9b59b6; color: white; padding: 2px 6px; border-radius: 3px;">Returned</span>';
+                                                        }elseif($currentStatus==10){
+                                                            $rqitemstts='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
+                                                        }else{
+                                                            $rqitemstts='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
+                                                        }
+                                                    }
                                                    $stcdecqtyqry=mysqli_query($con, "
                                                       SELECT 
                                                          `stc_cust_super_requisition_list_items_rec_recqty`
@@ -746,8 +761,8 @@ STCAuthHelper::checkAuth();
                                                                        <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
                                                                        <td align="right">'.number_format($stcdispatchedqty, 2).'</td>
                                                                        <td align="right">'.$stcpendingqty.'</td>
-                                                                       <td>'.$rqitemstts.'</td>
-                                                                       <td>'.$pendingduration.'</td>
+                                                                       <td>'.$rqitemstts2.$rqitemstts.'</td>
+                                                                       <td style="font-size:10px;">'.$pendingduration.'</td>
                                                                        <td>'.$pendingreason.'</td>
                                                                    </tr>
                                                            ';
@@ -1072,6 +1087,82 @@ STCAuthHelper::checkAuth();
                 $fullSpan.show();
                 $readMoreLink.text(' read less');
             }
+        });
+        
+        // Handle status dropdown change
+        $(document).on('change', '.status-dropdown', function() {
+            var $dropdown = $(this);
+            var itemId = $dropdown.data('item-id');
+            var newStatus = $dropdown.val();
+            var oldStatus = $dropdown.data('old-status') || '9';
+            
+            // Don't proceed if status hasn't actually changed
+            if(newStatus == oldStatus) {
+                return;
+            }
+            
+            // Only allow Reject (6) or Close (10)
+            if(newStatus != '6' && newStatus != '10') {
+                alert('Please select either Reject or Close');
+                $dropdown.val(oldStatus);
+                return;
+            }
+            
+            // Confirm action
+            var action = (newStatus == '6') ? 'reject' : 'close';
+            var reason = prompt('Please enter a reason for ' + action + 'ing this item:');
+            
+            if(reason === null) {
+                // User cancelled, revert dropdown
+                $dropdown.val(oldStatus);
+                return;
+            }
+            
+            if(reason.trim() === '') {
+                alert('Reason is required');
+                $dropdown.val(oldStatus);
+                return;
+            }
+            
+            // Disable dropdown during request
+            $dropdown.prop('disabled', true);
+            
+            // Make AJAX request
+            $.ajax({
+                url: 'kattegat/ragnar_lothbrok.php',
+                method: 'POST',
+                data: {
+                    update_pending_requisition_status: 1,
+                    item_id: itemId,
+                    status: newStatus,
+                    reason: reason
+                },
+                dataType: 'json',
+                success: function(response) {
+                    if(response.success) {
+                        // Update the dropdown to show status badge instead
+                        var statusText = (newStatus == '6') ? 'Rejected' : 'Closed';
+                        var statusColor = (newStatus == '6') ? '#e74c3c' : '#34495e';
+                        var statusBadge = '<span style="background-color: ' + statusColor + '; color: white; padding: 2px 6px; border-radius: 3px;">' + statusText + '</span>';
+                        $dropdown.replaceWith(statusBadge);
+                        
+                        // Show success message
+                        alert('Status updated successfully!');
+                        
+                        // Optionally reload the page to reflect changes
+                        // location.reload();
+                    } else {
+                        alert('Error: ' + response.message);
+                        $dropdown.val(oldStatus);
+                        $dropdown.prop('disabled', false);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    alert('Error updating status: ' + error);
+                    $dropdown.val(oldStatus);
+                    $dropdown.prop('disabled', false);
+                }
+            });
         });
     </script>
 </body>

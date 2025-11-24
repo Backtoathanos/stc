@@ -954,6 +954,54 @@ class sceptor extends tesseract{
 
 		return $ragnar;
 	}
+
+	// Update requisition item status with logging
+	public function stc_update_pending_requisition_status($item_id, $status, $reason = ''){
+		if($item_id <= 0 || ($status != 6 && $status != 10)){
+			return ['success' => false, 'message' => 'Invalid parameters'];
+		}
+		
+		// Update the status
+		$query = "UPDATE stc_cust_super_requisition_list_items SET stc_cust_super_requisition_list_items_status = $status WHERE stc_cust_super_requisition_list_id = $item_id";
+		
+		if(mysqli_query($this->stc_dbs, $query)){
+			// Determine title based on status
+			$title = ($status == 6) ? 'Rejected' : 'Closed';
+			
+			// Get user name from session
+			$user_name = isset($_SESSION['stc_empl_name']) ? $_SESSION['stc_empl_name'] : 'System';
+			$user_id = isset($_SESSION['stc_empl_id']) ? $_SESSION['stc_empl_id'] : 0;
+			
+			// Create message
+			$message = $title . " by " . $user_name . " on " . date('d-m-Y h:i A');
+			if(!empty($reason)){
+				$message .= " <br> Reason: " . $reason;
+			}
+			
+			// Insert log entry
+			$logQuery = "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, 
+					`title`, 
+					`message`, 
+					`status`, 
+					`created_by`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $item_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+					'1',
+					'".mysqli_real_escape_string($this->stc_dbs, $user_id)."'
+				)
+			";
+			
+			mysqli_query($this->stc_dbs, $logQuery);
+			
+			return ['success' => true, 'message' => 'Status updated successfully'];
+		} else {
+			return ['success' => false, 'message' => 'Failed to update status: ' . mysqli_error($this->stc_dbs)];
+		}
+	}
 }
 
 #<------------------------------------------------------------------------------->
@@ -1045,4 +1093,18 @@ if(isset($_POST["dashboard"])){
 //     echo json_encode($result);
 //     exit;
 // }
+
+// API endpoint for updating pending requisition status
+if(isset($_POST["update_pending_requisition_status"])){
+    session_start();
+    $item_id = isset($_POST['item_id']) ? intval($_POST['item_id']) : 0;
+    $status = isset($_POST['status']) ? intval($_POST['status']) : 0;
+    $reason = isset($_POST['reason']) ? $_POST['reason'] : '';
+    
+    $obj = new sceptor();
+    $result = $obj->stc_update_pending_requisition_status($item_id, $status, $reason);
+    header('Content-Type: application/json');
+    echo json_encode($result);
+    exit;
+}
 ?>
