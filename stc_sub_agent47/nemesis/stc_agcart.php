@@ -220,7 +220,7 @@ class witcher_supervisor extends tesseract{
 			");
 			$last_itemid = mysqli_insert_id($this->stc_dbs);
 			$title="Ordered";
-			$message="Ordered by ".$_SESSION['stc_agent_sub_name']." on ".date('d-m-Y h:i A');
+			$message="Ordered by ".$_SESSION['stc_agent_sub_name']." on ".date('d-m-Y h:i A')."<br/> Quantity: ".$qty." ".$unit;
 			$optimusprimequery=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_cust_super_requisition_list_items_log`(
 					`item_id`, 
@@ -713,6 +713,7 @@ class witcher_supervisor extends tesseract{
 		$stcsuporderqty=0;
 		$stcsupdisqty=0;
 		$stcfinalvalue=0;
+		$stcsupunit='';
 		$date=date("Y-m-d H:i:s");
 		$stcceckqntyqry=mysqli_query($this->stc_dbs, "
 			SELECT 
@@ -730,7 +731,8 @@ class witcher_supervisor extends tesseract{
 			$stccheckrecqry=mysqli_query($this->stc_dbs, "
 				SELECT 
 					`stc_cust_super_requisition_items_finalqty`,
-				    `stc_cust_super_requisition_list_items_rec_recqty`
+				    `stc_cust_super_requisition_list_items_rec_recqty`,
+					`stc_cust_super_requisition_list_items_unit`
 				FROM `stc_cust_super_requisition_list_items`
 				INNER JOIN `stc_cust_super_requisition_list_items_rec` 
 				ON `stc_cust_super_requisition_list_items_rec_list_item_id`=`stc_cust_super_requisition_list_id` 
@@ -740,6 +742,7 @@ class witcher_supervisor extends tesseract{
 			foreach($stccheckrecqry as $stccheckrow){
 				$stcsuporderqty+=$stccheckrow['stc_cust_super_requisition_items_finalqty'];
 				$stcsupdisqty+=$stccheckrow['stc_cust_super_requisition_list_items_rec_recqty'];
+				$stcsupunit=$stccheckrow['stc_cust_super_requisition_list_items_unit'];
 			}
 			$stcfinalvalue=$stcsuporderqty - $stcsupdisqty;
 			if($stc_rec_qty>$stcsupdisqty){
@@ -762,7 +765,7 @@ class witcher_supervisor extends tesseract{
 						UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`='5' WHERE `stc_cust_super_requisition_list_id`='$stc_req_item_id'
 					");
 					$title="Recieved";
-					$message="Recieved by ".$_SESSION['stc_agent_sub_name']." on ".date('d-m-Y h:i A')."<br/> Recieving Qty: ".$stc_rec_qty."<br/> Final Qty: ".$stcsuporderqty;
+					$message="Recieved by ".$_SESSION['stc_agent_sub_name']." on ".date('d-m-Y h:i A')."<br/> Recieving Qty: ".$stc_rec_qty." ".$stcsupunit."<br/> Final Qty: ".$stcsuporderqty." ".$stcsupunit;
 					$optimusprimequery=mysqli_query($this->stc_dbs, "
 						INSERT INTO `stc_cust_super_requisition_list_items_log`(
 							`item_id`, 

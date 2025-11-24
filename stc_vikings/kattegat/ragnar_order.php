@@ -1415,9 +1415,17 @@ class ragnarRequisitionView extends tesseract{
 			)
 		");
 		if($insert_qry){
+			$itemunit='';
+			$getapprqry=mysqli_query($this->stc_dbs, "
+				select `stc_cust_super_requisition_list_items_unit` 
+				from stc_cust_super_requisition_list_items 
+				where stc_cust_super_requisition_list_id='".$listitemid."'
+			");
+			$result=mysqli_fetch_assoc($getapprqry);
+			$itemunit=$result['stc_cust_super_requisition_list_items_unit'];
 
 			$title="Dispatched";
-			$message="Dispatched by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A'). " <br> Quantity :".$qty;
+			$message="Dispatched by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A'). " <br> Quantity :".$qty." ".$itemunit;
 		
 			$optimusprimequery=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_cust_super_requisition_list_items_log`(
@@ -1950,6 +1958,23 @@ class ragnarRequisitionView extends tesseract{
 			    `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_item_id)."'
 		");
 		if($odinattrchqry){
+			$title="Approved";
+			$message="Updated by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A')." Quanitiy: ".$req_item_qty." ".$req_item_unit;
+			$optimusprimequery=mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, 
+					`title`, 
+					`message`, 
+					`status`, 
+					`created_by`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $req_item_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+					'1',
+					'".$_SESSION['stc_agent_id']."'
+				)
+			");
 			$odin="Requisition Item Type, Quantity & Unit Updated Successfully. Reload to see.";
 		}else{
 			$odin="Hmmm!!! Something Went Wrong While Updating Requisition Item Quantity & Unit.";
@@ -3437,8 +3462,16 @@ class ragnarRequisitionPertAdd extends tesseract{
 				}
 			}
 			
+			$itemunit='';
+			$getapprqry=mysqli_query($this->stc_dbs, "
+				select `stc_cust_super_requisition_list_items_unit` 
+				from stc_cust_super_requisition_list_items 
+				where stc_cust_super_requisition_list_id='".$stc_req_id."'
+			");
+			$result=mysqli_fetch_assoc($getapprqry);
+			$itemunit=$result['stc_cust_super_requisition_list_items_unit'];
 			$title="Dispatched";
-			$message="Dispatched by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A'). " <br> Quantity :".$dispatch_qty;
+			$message="Dispatched by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A'). " <br> Quantity :".$dispatch_qty." ".$itemunit;
 			$this->stc_generate_log($stc_req_id, $title, $message);
 			if($gamoraupdateqry){
 				$loki="Item dispatched successfully.";

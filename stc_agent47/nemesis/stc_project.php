@@ -2576,13 +2576,15 @@ class pirates_supervisor extends tesseract{
 			WHERE `stc_cust_super_requisition_list_id`='".$item_id."'
 		");
 		if($setapprqry){
+			$itemunit='';
 			$getapprqry=mysqli_query($this->stc_dbs, "
-				select `stc_cust_super_requisition_list_items_req_id` 
+				select `stc_cust_super_requisition_list_items_req_id`, `stc_cust_super_requisition_list_items_unit` 
 				from stc_cust_super_requisition_list_items 
 				where stc_cust_super_requisition_list_id='".$item_id."'
 			");
 			$result=mysqli_fetch_assoc($getapprqry);
 			$req_id=$result['stc_cust_super_requisition_list_items_req_id'];
+			$itemunit=$result['stc_cust_super_requisition_list_items_unit'];
 
 			// check status from item
 			$checkquery=mysqli_query($this->stc_dbs, "
@@ -2600,7 +2602,7 @@ class pirates_supervisor extends tesseract{
 				}
 			}
 			$title="Approved";
-			$message="Approved by ".$_SESSION['stc_agent_name']." on ".date('d-m-Y h:i A')." Quanitiy: ".$itemqty;
+			$message="Approved by ".$_SESSION['stc_agent_name']." on ".date('d-m-Y h:i A')." Quanitiy: ".$itemqty." ".$itemunit;
 			$optimusprimequery=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_cust_super_requisition_list_items_log`(
 					`item_id`, 
