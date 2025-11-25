@@ -2602,7 +2602,7 @@ class pirates_supervisor extends tesseract{
 				}
 			}
 			$title="Approved";
-			$message="Approved by ".$_SESSION['stc_agent_name']." on ".date('d-m-Y h:i A')." Quanitiy: ".$itemqty." ".$itemunit;
+			$message="Approved by ".$_SESSION['stc_agent_name']." on ".date('d-m-Y h:i A')." Quantity: ".$itemqty." ".$itemunit;
 			$optimusprimequery=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_cust_super_requisition_list_items_log`(
 					`item_id`, 
