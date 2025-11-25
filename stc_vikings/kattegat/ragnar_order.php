@@ -1959,12 +1959,12 @@ class ragnarRequisitionView extends tesseract{
 		");
 		if($odinattrchqry){
 			$title="Approved";
-			$message="Updated by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A')." Quanitiy: ".$req_item_qty." ".$req_item_unit;
+			$message="Updated by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A')." Quantity: ".$req_item_qty." ".$req_item_unit;
 			$optimusprimequery=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_cust_super_requisition_list_items_log`(
 					`item_id`, 
 					`title`, 
-					`message`, 
+					`message`, 	
 					`status`, 
 					`created_by`
 				) VALUES (
@@ -4446,7 +4446,7 @@ class ragnarCallGLDRequisitions extends tesseract{
 					}
 					if($remain_qty-$qty<0){
 						mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET remarks = CONCAT(COALESCE(remarks, ''),'".$date.": Item not available. Item will be dispacth soon.') WHERE id = $id");
-						return ['success' => false, 'message' => 'Invalid Quanitty'];
+						return ['success' => false, 'message' => 'Invalid Quantity'];
 					}
 					$adhoc_id = $adhocRow['stc_purchase_product_adhoc_id'];
 					$created_by = isset($_SESSION['stc_empl_id']) ? $_SESSION['stc_empl_id'] : 0;
@@ -4461,7 +4461,7 @@ class ragnarCallGLDRequisitions extends tesseract{
 				}
 			}else{
 				mysqli_query($this->stc_dbs, "UPDATE gld_requisitions SET remarks = CONCAT(COALESCE(remarks, ''),'<br>".$date.": Item not available. Item will be dispacth soon.'), buy_status = 1 WHERE id = $id");
-				return ['success' => false, 'message' => 'Invalid Quanity'];
+				return ['success' => false, 'message' => 'Invalid Quantity'];
 			}
 		} else {
 			return ['success' => false, 'message' => 'Failed to fetch product data'];
