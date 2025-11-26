@@ -586,6 +586,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                             <option value="BUNDLE">BUNDLE</option>
                                                             <option value="CASE">CASE</option>
                                                             <option value="CBM">CBM</option>
+                                                            <option value="CFT">CFT</option>
                                                             <option value="COIL">COIL</option>
                                                             <option value="FEET">FEET</option>
                                                             <option value="JAR">JAR</option>
