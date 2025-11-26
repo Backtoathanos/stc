@@ -26,6 +26,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\RequisitionController;
 use App\Http\Controllers\STDController;
 use App\Http\Controllers\EquipmentController;
+use App\Http\Controllers\POAdhocController;
 
 /*
 |--------------------------------------------------------------------------
@@ -221,4 +222,11 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/stc/equipment', [EquipmentController::class, 'show']);    
     Route::post('/branch/stc/equipment/list', [EquipmentController::class, 'list']);
     Route::get('/branch/stc/equipment/delete', [EquipmentController::class, 'delete']);
+    
+    // for stc po adhoc
+    Route::get('/branch/stc/poadhoc', [POAdhocController::class, 'show']);    
+    Route::post('/branch/stc/poadhoc/list', [POAdhocController::class, 'list']);
+    Route::get('/branch/stc/poadhoc/get', [POAdhocController::class, 'get']);
+    Route::post('/branch/stc/poadhoc/edit', [POAdhocController::class, 'update']);
+    Route::get('/branch/stc/poadhoc/delete', [POAdhocController::class, 'delete']);
 });

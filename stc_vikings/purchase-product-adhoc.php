@@ -449,6 +449,9 @@ include("kattegat/role_check.php");
                                                     <option value="NA">Select Status</option>
                                                     <option value="1">Stock</option>
                                                     <option value="2">Dispatched</option>
+                                                    <option value="3">Pending</option>
+                                                    <option value="4">Approved</option>
+                                                    <option value="5">Rejected</option>
                                                   </select>
                                                 </td>
                                                 <td>
