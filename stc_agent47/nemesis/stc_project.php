@@ -1169,8 +1169,15 @@ class pirates_project extends tesseract{
 						<td class="text-center">'.date('d-m-Y', strtotime($blackpearl_row['stc_cust_project_collaborate_created_date'])).'</td>
 						<td>'.$blackpearl_row['stc_agents_name'].'</td>
 						<td class="text-center">'.$status.'</td>
-						<td class="text-center"><a href="javascript:void(0)" class="btn btn-danger" '.$blackpearl_row['stc_cust_project_collaborate_id'].'><i class="fa fa-remove"></i></a></td>
-					<tr>
+						<td class="text-center">
+							<a href="javascript:void(0)"
+								class="btn btn-danger stc-project-collaborate-delete"
+								data-collab-id="'.$blackpearl_row['stc_cust_project_collaborate_id'].'"
+								data-project-id="'.$blackpearl_row['stc_cust_project_collaborate_projectid'].'">
+								<i class="fa fa-remove"></i>
+							</a>
+						</td>
+					</tr>
 				';
 			}
 		}else{
@@ -1224,6 +1231,33 @@ class pirates_project extends tesseract{
 			'message' => $message
 		);
 		return $blackpearl_arr;
+	}
+
+	// delete project collaborate
+	public function stc_project_collaborate_delete($collab_id){
+		$status="error";
+		$message="Unable to remove collaborator. Please try again.";
+		$collab_id=mysqli_real_escape_string($this->stc_dbs, $collab_id);
+		$current_manager=mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id']);
+		if(!empty($collab_id) && !empty($current_manager)){
+			$delete_qry=mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_project_collaborate`
+				WHERE
+					`stc_cust_project_collaborate_id`='".$collab_id."'
+				AND `stc_cust_project_collaborate_managerid`='".$current_manager."'
+			");
+			if($delete_qry && mysqli_affected_rows($this->stc_dbs)>0){
+				$status="success";
+				$message="Collaborator removed successfully.";
+			}else if($delete_qry){
+				$status="notfound";
+				$message="Collaborator mapping not found.";
+			}
+		}
+		return array(
+			'status' => $status,
+			'message' => $message
+		);
 	}
 
 	// save item tracker 
@@ -4504,6 +4538,20 @@ if(isset($_POST['stc_collaborate_project_save'])){
 		$opobjcrproj=$objcrproj->stc_project_collaborate_save($project_id, $email);
 	}
 	// echo $opobjcrproj;
+	echo json_encode($opobjcrproj);
+}
+
+// delete collaborate project
+if(isset($_POST['stc_collaborate_project_delete'])){
+	$collab_id=$_POST['collab_id'];
+
+	$objcrproj=new pirates_project();
+	$opobjcrproj='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$opobjcrproj = 'empty';
+	}else{
+		$opobjcrproj=$objcrproj->stc_project_collaborate_delete($collab_id);
+	}
 	echo json_encode($opobjcrproj);
 }
 /*---------------------------------------------Supervisors Objects section-------------------------------------------------*/

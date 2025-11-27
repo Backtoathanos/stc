@@ -1504,6 +1504,41 @@ include_once("../MCU/db.php");
                 });
             });
 
+            $('body').delegate('.stc-project-collaborate-delete', 'click', function(e){
+                e.preventDefault();
+                var collabId=$(this).data('collab-id');
+                var projectId=$(this).data('project-id') || $('.collaborate-project-id').val();
+                if(!collabId){
+                    return;
+                }
+                if(!confirm('Remove this collaborator from the project?')){
+                    return;
+                }
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_collaborate_project_delete:1,
+                        collab_id:collabId
+                    },
+                    dataType    : "JSON",
+                    success     : function(res_data){
+                        if(res_data=="empty"){
+                            window.location.reload();
+                            return;
+                        }
+                        if(res_data['status']=="success"){
+                            alert(res_data['message']);
+                            if(projectId){
+                                stc_cust_project_collaborated(projectId);
+                            }
+                        }else{
+                            alert(res_data['message'] ? res_data['message'] : 'Unable to remove collaborator.');
+                        }
+                    }
+                });
+            });
+
             // save ahu details
             $('.stc-project-collaborate').click(function(e){
                 e.preventDefault();
