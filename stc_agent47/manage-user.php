@@ -354,35 +354,9 @@ include_once("../MCU/db.php");
                                                     <div class="row">
                                                         <div class="col-md-12">
                                                             <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">Select Project</label>
-                                                                <select name="stc_alot_pro_project" id="#" class="form-control" required>
-                                                                    <?php 
-                                                                        $proseleqry=mysqli_query($con, "
-                                                                            SELECT DISTINCT `stc_cust_project_id`, `stc_cust_project_title` 
-                                                                            FROM `stc_cust_project` 
-                                                                            INNER JOIN `stc_agent_requested_customer` 
-                                                                            ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
-                                                                            LEFT JOIN `stc_cust_project_collaborate` 
-                                                                            ON `stc_cust_project_collaborate_projectid`=`stc_cust_project_id`
-                                                                            WHERE `stc_cust_project_createdby`='".$_SESSION['stc_agent_id']."'
-                                                                            OR `stc_cust_project_collaborate_teamid`='".$_SESSION['stc_agent_id']."'
-                                                                            ORDER BY `stc_cust_project_title` ASC
-                                                                        ");
-                                                                        if(mysqli_num_rows($proseleqry)>0){
-                                                                            foreach($proseleqry as $proselrow){
-                                                                                echo '<option value="'.$proselrow['stc_cust_project_id'].'">'.$proselrow['stc_cust_project_title'].'</option>';
-                                                                            }
-                                                                        }else{
-                                                                            echo '<option value="NA">Project not found.</option>';
-                                                                        }
-                                                                    ?>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-md-12">
-                                                            <div class="position-relative form-group">
-                                                                <label for="exampleSelect" class="">Select User</label>
-                                                                <select name="stc_alot_pro_supervisor" id="exampleSelect" class="form-control" required>
+                                                                <label for="exampleSelect" class=""><b>Select User</b></label>
+                                                                <select name="stc_alot_pro_supervisor" id="stc-alot-user-select" class="form-control" required>
+                                                                    <option value="">Please Select User</option>
                                                                     <?php 
                                                                         $proseleqry=mysqli_query($con, "
                                                                             SELECT `stc_cust_pro_supervisor_id`, TRIM(`stc_cust_pro_supervisor_fullname`) as stc_cust_pro_supervisor_fullname
@@ -406,8 +380,7 @@ include_once("../MCU/db.php");
                                                         </div>
                                                         <div class="col-sm-12 col-md-12">
                                                             <div class="position-relative form-group">
-                                                                <input type="hidden" name="stc_alot_project_action">
-                                                                <button class="mt-1 btn btn-warning">Add</button>
+                                                                <button type="button" class="mt-1 btn btn-warning stc-assign-sites-btn" data-toggle="modal" data-target="#bd-assignsites-modal-lg" disabled>Assign Sites</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -707,30 +680,98 @@ include_once("../MCU/db.php");
                 });
             });
 
-            $('.stc-project-alot-cust').on('submit', function(e){
+            // Enable/disable assign sites button based on user selection
+            $('#stc-alot-user-select').on('change', function(){
+                if($(this).val() && $(this).val() != 'NA'){
+                    $('.stc-assign-sites-btn').prop('disabled', false);
+                } else {
+                    $('.stc-assign-sites-btn').prop('disabled', true);
+                }
+            });
+
+            // Reset modal content when modal is closed
+            $('#bd-assignsites-modal-lg').on('hidden.bs.modal', function(){
+                $('.stc-projects-loader').hide();
+                $('.stc-user-projects-list').html('<p class="text-center text-muted">Please select a user and click "Assign Sites" to load projects.</p>');
+            });
+
+            // Open modal and load projects for selected user
+            $('.stc-assign-sites-btn').on('click', function(e){
                 e.preventDefault();
+                var userId = $('#stc-alot-user-select').val();
+                if(!userId || userId == 'NA'){
+                    alert('Please select a user first');
+                    return;
+                }
+                $('.assign-sites-user-id').val(userId);
+                // Show loader
+                $('.stc-user-projects-list').html('');
+                $('.stc-projects-loader').show();
+                // Load projects for this user
                 $.ajax({
                     url         : "nemesis/stc_project.php",
                     method      : "POST",
-                    data        : new FormData(this),
-                    contentType : false,
-                    processData : false,
-                    dataType    : "JSON",
-                    success     : function(argument) {
-                        // console.log(argument);
-                        if (argument == "yes") {
-                          alert("Project alotted!!!");
-                          $(".stc-project-alot-cust")[0].reset();
-                        } else if (argument == "no") {
-                          alert("Please check & try again!!!");
-                        } else if (argument == "logout") {
-                          // alert("Please check & try again!!!&#9786;");
-                          window.location.reload();
-                        } else if (argument == "not") {
-                          alert("This User is already alotted on that project!!!");
-                        } else {
-                          alert("Do not empty any field!!!");
+                    data        : {
+                        stc_get_user_projects: 1,
+                        user_id: userId
+                    },
+                    success     : function(res_data) {
+                        // Hide loader
+                        $('.stc-projects-loader').hide();
+                        if(res_data == "empty" || res_data == "logout"){
+                            window.location.reload();
+                            return;
                         }
+                        $('.stc-user-projects-list').html(res_data);
+                    },
+                    error       : function(){
+                        // Hide loader on error
+                        $('.stc-projects-loader').hide();
+                        $('.stc-user-projects-list').html('<p class="text-center text-danger">Error loading projects. Please try again.</p>');
+                    }
+                });
+            });
+
+            // Save project assignments
+            $('.stc-save-project-assignments').on('click', function(e){
+                e.preventDefault();
+                var userId = $('.assign-sites-user-id').val();
+                var selectedProjects = [];
+                $('.stc-project-checkbox:checked').each(function(){
+                    selectedProjects.push($(this).val());
+                });
+
+                if(!userId || userId == 'NA'){
+                    alert('User not selected');
+                    return;
+                }
+
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_save_user_projects: 1,
+                        user_id: userId,
+                        project_ids: selectedProjects
+                    },
+                    dataType    : "JSON",
+                    success     : function(res_data) {
+                        if(res_data == "empty" || res_data == "logout"){
+                            window.location.reload();
+                            return;
+                        }
+                        if(res_data == "success"){
+                            alert("Project assignments saved successfully!!!");
+                            $('#bd-assignsites-modal-lg').modal('hide');
+                            window.location.reload();
+                        } else if(res_data == "error"){
+                            alert("Error saving assignments. Please try again.");
+                        } else {
+                            alert(res_data);
+                        }
+                    },
+                    error       : function(){
+                        alert('Error saving assignments. Please try again.');
                     }
                 });
             });
@@ -1274,6 +1315,46 @@ include_once("../MCU/db.php");
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade bd-assignsites-modal-lg" id="bd-assignsites-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Assign Sites to User</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" class="assign-sites-user-id">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <h5 class="card-title">Select Projects</h5>
+                                <div class="position-relative form-group">
+                                    <div class="stc-projects-loader" style="display: none; text-align: center; padding: 40px;">
+                                        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                        <p class="mt-3">Loading projects...</p>
+                                    </div>
+                                    <div class="stc-user-projects-list" style="max-height: 400px; overflow-y: auto;">
+                                        <p class="text-center text-muted">Please select a user and click "Assign Sites" to load projects.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary stc-save-project-assignments">Save Assignments</button>
             </div>
         </div>
     </div>

@@ -203,6 +203,9 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/stc/projects', [ProjectController::class, 'show']);    
     Route::get('/branch/stc/projects/list', [ProjectController::class, 'list']);
     Route::get('/branch/stc/projects/delete', [ProjectController::class, 'delete']);
+    Route::get('/branch/stc/projects/collaborations/list', [ProjectController::class, 'collaborationsList']);
+    Route::get('/branch/stc/projects/collaborations/remove', [ProjectController::class, 'removeCollaborator']);
+    Route::post('/branch/stc/projects/collaborations/bulk-remove', [ProjectController::class, 'bulkRemoveCollaborators']);
     
     // for stc requisition
     Route::get('/branch/stc/requisitions', [RequisitionController::class, 'show']);    

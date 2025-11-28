@@ -1587,21 +1587,31 @@ include_once("../MCU/db.php");
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-sm-12 col-md-6">
+                                        <div class="col-sm-12 col-md-12">
                                             <div class="position-relative form-group">
-                                                <label for="exampleEmail" class="">Project title/ Site name</b></label>
+                                                <label for="exampleEmail" class=""><b>Project title/ Site name</b></label>
                                                 <input placeholder="Enter your project name" type="text" name="stc_cust_pro_title" class="mb-2 form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-12 col-md-12">
+                                            <div class="position-relative form-group">
+                                                <label for="exampleEmail" class=""><b>Project Reference No</b></label>
+                                                <input placeholder="Enter your project reference. Ex:- GTO/123/21-22 or PWOG/123/21-22" type="text" name="stc_cust_pro_refr" class="mb-2 form-control" required>
                                             </div>
                                         </div>
                                         <div class="col-sm-12 col-md-6">
                                             <div class="position-relative form-group">
-                                                <label for="exampleEmail" class="">Project Reference No</b></label>
-                                                <input placeholder="Enter your project reference. Ex:- GTO/123/21-22 or PWOG/123/21-22" type="text" name="stc_cust_pro_refr" class="mb-2 form-control" required>
+                                                <label for="exampleSelect" class=""><b>Type</b></label>
+                                                <select name="stc_cust_pro_type" class="form-control" required>
+                                                    <option value="">Please Select Type</option>
+                                                    <option value="project">Project</option>
+                                                    <option value="service">Service</option>
+                                                </select>
                                             </div>
                                         </div>
                                     </div>                                                        
                                     <div class="position-relative form-group">
-                                        <label for="exampleText" class="">Project address</b></label>
+                                        <label for="exampleText" class=""><b>Project address</b></label>
                                         <textarea id="exampleText" class="form-control" name="stc_cust_pro_address" placeholder="Enter your project address" required></textarea>
                                     </div>
                                     <div class="row">

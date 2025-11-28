@@ -8,7 +8,7 @@ include "../../MCU/obdb.php";
 class pirates_project extends tesseract{
 
 	// create project
-	public function stc_create_project($pro_cust,$pro_title, $pro_refr,$pro_address, $pro_city, $pro_state, $pro_resperson, $pro_supqty,$pro_begdate, $pro_enddate, $pro_begbudget, $pro_status){
+	public function stc_create_project($pro_cust,$pro_title, $pro_refr, $pro_type, $pro_address, $pro_city, $pro_state, $pro_resperson, $pro_supqty,$pro_begdate, $pro_enddate, $pro_begbudget, $pro_status){
 		$blackpearl='';
 		$date=date("Y-m-d H:i:s");
 		$cptjackcheckqry=mysqli_query($this->stc_dbs, "
@@ -24,6 +24,7 @@ class pirates_project extends tesseract{
 					`stc_cust_project_cust_id`, 
 					`stc_cust_project_title`,  
 					`stc_cust_project_refr`, 
+					`stc_cust_project_type`,
 					`stc_cust_project_address`, 
 					`stc_cust_project_city_id`, 
 					`stc_cust_project_state_id`, 
@@ -41,10 +42,11 @@ class pirates_project extends tesseract{
 					'".mysqli_real_escape_string($this->stc_dbs, $pro_cust)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $pro_title)."', 
 					'".mysqli_real_escape_string($this->stc_dbs, $pro_refr)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $pro_type)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $pro_address)."', 
 					'".mysqli_real_escape_string($this->stc_dbs, $pro_city)."', 
 					'".mysqli_real_escape_string($this->stc_dbs, $pro_state)."', 
-					'".mysqli_real_escape_string($this->stc_dbs, $pro_resperson)."', 
+					'".mysqli_real_escape_string($this->stc_dbs, $pro_resperson)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $pro_supqty)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $pro_begdate)."', 
 					'".mysqli_real_escape_string($this->stc_dbs, $pro_enddate)."', 
@@ -1163,7 +1165,7 @@ class pirates_project extends tesseract{
 		");
 		if(mysqli_num_rows($blackpearl_qry)>0){
 			foreach($blackpearl_qry as $blackpearl_row){
-				$status=$blackpearl_row['stc_cust_project_collaborate_status']==1 ? "Active" : "in-active";
+				$status=$blackpearl_row['stc_cust_project_collaborate_status']==1 ? "Active" : "In-Active";
 				$blackpearl.='
 					<tr>
 						<td class="text-center">'.date('d-m-Y', strtotime($blackpearl_row['stc_cust_project_collaborate_created_date'])).'</td>
@@ -2108,6 +2110,148 @@ class pirates_supervisor extends tesseract{
 		}else{
 			$blackpearl='not';
 		}
+		return $blackpearl;
+	}
+
+	// get projects for user assignment (with check status)
+	public function stc_get_user_projects($user_id){
+		$blackpearl='';
+		$user_id=mysqli_real_escape_string($this->stc_dbs, $user_id);
+		$current_agent=mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id']);
+		
+		// Get all projects accessible to this agent
+		$projects_qry=mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT 
+				`stc_cust_project_id`, 
+				`stc_cust_project_title`,
+				`stc_status_down_list_department_location`
+			FROM `stc_cust_project` 
+			INNER JOIN `stc_agent_requested_customer` 
+			ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
+			LEFT JOIN `stc_cust_project_collaborate` 
+			ON `stc_cust_project_collaborate_projectid`=`stc_cust_project_id`
+			LEFT JOIN `stc_status_down_list_department` 
+			ON `stc_status_down_list_department_loc_id`=`stc_cust_project_id`
+			WHERE (`stc_cust_project_createdby`='".$current_agent."'
+			OR `stc_cust_project_collaborate_teamid`='".$current_agent."')
+			ORDER BY `stc_status_down_list_department_location`, `stc_cust_project_title` ASC
+		");
+		
+		// Get projects already assigned to this user
+		$assigned_projects=array();
+		$assigned_qry=mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_pro_attend_supervise_pro_id`
+			FROM `stc_cust_pro_attend_supervise`
+			WHERE `stc_cust_pro_attend_supervise_super_id`='".$user_id."'
+			AND `stc_cust_pro_attend_supervise_status`='1'
+		");
+		if(mysqli_num_rows($assigned_qry)>0){
+			foreach($assigned_qry as $assigned_row){
+				$assigned_projects[]=$assigned_row['stc_cust_pro_attend_supervise_pro_id'];
+			}
+		}
+		
+		if(mysqli_num_rows($projects_qry)>0){
+			foreach($projects_qry as $proj_row){
+				$checked='';
+				if(in_array($proj_row['stc_cust_project_id'], $assigned_projects)){
+					$checked='checked';
+				}
+				$project_label='';
+				if($proj_row['stc_status_down_list_department_location']!=''){
+					$project_label=''.$proj_row['stc_cust_project_title'].' -> <b>'.$proj_row['stc_status_down_list_department_location'].'</b>';
+				}else{
+					$project_label=''.$proj_row['stc_cust_project_title'];
+				}
+				$blackpearl.='
+					<div class="form-check mb-2">
+						<input class="form-check-input stc-project-checkbox" style="width: 20px; height: 20px; margin: 0 auto; display: block;" type="checkbox" value="'.$proj_row['stc_cust_project_id'].'" id="project_'.$proj_row['stc_cust_project_id'].'" '.$checked.'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						<label class="form-check-label" for="project_'.$proj_row['stc_cust_project_id'].'">
+							'.$project_label.'
+						</label>
+					</div>
+				';
+			}
+		}else{
+			$blackpearl='<p class="text-center">No projects found.</p>';
+		}
+		return $blackpearl;
+	}
+
+	// save user project assignments
+	public function stc_save_user_projects($user_id, $project_ids){
+		$blackpearl='error';
+		$user_id=mysqli_real_escape_string($this->stc_dbs, $user_id);
+		$current_agent=mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_id']);
+		$date=date("Y-m-d H:i:s");
+		
+		if(empty($user_id)){
+			return 'empty';
+		}
+		
+		// Get currently assigned projects
+		$current_assignments=array();
+		$current_qry=mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_pro_attend_supervise_pro_id`
+			FROM `stc_cust_pro_attend_supervise`
+			WHERE `stc_cust_pro_attend_supervise_super_id`='".$user_id."'
+		");
+		if(mysqli_num_rows($current_qry)>0){
+			foreach($current_qry as $curr_row){
+				$current_assignments[]=$curr_row['stc_cust_pro_attend_supervise_pro_id'];
+			}
+		}
+		
+		// Remove unchecked projects
+		$to_remove=array_diff($current_assignments, $project_ids);
+		foreach($to_remove as $remove_id){
+			$remove_id=mysqli_real_escape_string($this->stc_dbs, $remove_id);
+			mysqli_query($this->stc_dbs, "
+				UPDATE `stc_cust_pro_attend_supervise`
+				SET `stc_cust_pro_attend_supervise_status`='0'
+				WHERE `stc_cust_pro_attend_supervise_pro_id`='".$remove_id."'
+				AND `stc_cust_pro_attend_supervise_super_id`='".$user_id."'
+			");
+		}
+		
+		// Add new projects
+		$to_add=array_diff($project_ids, $current_assignments);
+		foreach($to_add as $add_id){
+			$add_id=mysqli_real_escape_string($this->stc_dbs, $add_id);
+			// Check if already exists (inactive)
+			$check_existing=mysqli_query($this->stc_dbs, "
+				SELECT * FROM `stc_cust_pro_attend_supervise`
+				WHERE `stc_cust_pro_attend_supervise_pro_id`='".$add_id."'
+				AND `stc_cust_pro_attend_supervise_super_id`='".$user_id."'
+			");
+			if(mysqli_num_rows($check_existing)>0){
+				// Reactivate existing
+				mysqli_query($this->stc_dbs, "
+					UPDATE `stc_cust_pro_attend_supervise`
+					SET `stc_cust_pro_attend_supervise_status`='1',
+					`stc_cust_pro_attend_supervise_date`='".$date."'
+					WHERE `stc_cust_pro_attend_supervise_pro_id`='".$add_id."'
+					AND `stc_cust_pro_attend_supervise_super_id`='".$user_id."'
+				");
+			}else{
+				// Insert new
+				mysqli_query($this->stc_dbs, "
+					INSERT INTO `stc_cust_pro_attend_supervise`(
+						`stc_cust_pro_attend_supervise_pro_id`, 
+						`stc_cust_pro_attend_supervise_super_id`, 
+						`stc_cust_pro_attend_supervise_date`, 
+						`stc_cust_pro_attend_supervise_status`
+					) VALUES (
+						'".$add_id."',
+						'".$user_id."',
+						'".$date."',
+						'1'
+					)
+				");
+			}
+		}
+		
+		$blackpearl='success';
 		return $blackpearl;
 	}
 
@@ -4209,6 +4353,7 @@ if(isset($_POST['stc_cust_project_action'])){
 	$pro_cust 		= 	$_POST['stc_cust_pro_cust'];
 	$pro_title 		=	$_POST['stc_cust_pro_title'];
 	$pro_refr		= 	$_POST['stc_cust_pro_refr'];
+	$pro_type		=	$_POST['stc_cust_pro_type'];
 	$pro_address	=	$_POST['stc_cust_pro_address'];
 	$pro_city 		=	$_POST['stc_cust_pro_city'];
 	$pro_state 		=	$_POST['stc_cust_pro_state'];
@@ -4221,6 +4366,7 @@ if(isset($_POST['stc_cust_project_action'])){
 	$outcome		=	'';
 	if(
 		empty($pro_title) || 
+		empty($pro_type) ||
 		empty($pro_address) || 
 		empty($pro_city) || 
 		empty($pro_state) || 
@@ -4239,6 +4385,7 @@ if(isset($_POST['stc_cust_project_action'])){
 			$pro_cust,
 			$pro_title, 
 			$pro_refr,
+			$pro_type,
 			$pro_address, 
 			$pro_city, 
 			$pro_state, 
@@ -4820,6 +4967,33 @@ if(isset($_POST['stc_alot_project_action'])){
 	}
 	// echo $outcome;
 	echo json_encode($outcome);
+}
+
+// get projects for user assignment
+if(isset($_POST['stc_get_user_projects'])){
+	$user_id=$_POST['user_id'];
+	$objcrproj=new pirates_supervisor();
+	$opobjcrproj='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$opobjcrproj = 'logout';
+	}else{
+		$opobjcrproj=$objcrproj->stc_get_user_projects($user_id);
+	}
+	echo $opobjcrproj;
+}
+
+// save user project assignments
+if(isset($_POST['stc_save_user_projects'])){
+	$user_id=$_POST['user_id'];
+	$project_ids=isset($_POST['project_ids']) ? $_POST['project_ids'] : array();
+	$objcrproj=new pirates_supervisor();
+	$opobjcrproj='';
+	if(empty($_SESSION['stc_agent_id'])){
+		$opobjcrproj = 'logout';
+	}else{
+		$opobjcrproj=$objcrproj->stc_save_user_projects($user_id, $project_ids);
+	}
+	echo json_encode($opobjcrproj);
 }
 
 // get perticular orders
