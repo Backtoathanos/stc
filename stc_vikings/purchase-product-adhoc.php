@@ -126,6 +126,58 @@ include("kattegat/role_check.php");
           font-weight: bold;
           background-color: #e9ecef;
       }
+
+      /* Item name autocomplete styling */
+      .itemname-autocomplete-wrapper {
+          position: relative;
+      }
+
+      .itemname-autocomplete-list {
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          background-color: #fff;
+          border: 1px solid #ced4da;
+          border-top: none;
+          max-height: 200px;
+          overflow-y: auto;
+          z-index: 1000;
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+
+      .itemname-autocomplete-list li {
+          padding: 10px 15px;
+          cursor: pointer;
+          border-bottom: 1px solid #f0f0f0;
+          font-size: 14px;
+      }
+
+      .itemname-autocomplete-list li:hover {
+          background-color: #f8f9fa;
+      }
+
+      .itemname-autocomplete-list li:last-child {
+          border-bottom: none;
+      }
+
+      .itemname-autocomplete-list li strong {
+          color: #007bff;
+      }
+
+      .autocomplete-item-name {
+          font-weight: 600;
+          color: #333;
+      }
+
+      .autocomplete-item-details {
+          font-size: 12px;
+          color: #666;
+          margin-top: 3px;
+      }
     </style>
 </head>
 <body>
@@ -198,13 +250,16 @@ include("kattegat/role_check.php");
                                                                 />
                                                             </td>
                                                             <td style="width: 330px;">
-                                                                <textarea
-                                                                    name="itemname[]"
-                                                                    type="text"
-                                                                    placeholder="Item Name"
-                                                                    class="form-control validate"
-                                                                    required
-                                                                ></textarea>
+                                                                <div class="itemname-autocomplete-wrapper" style="position: relative;">
+                                                                    <textarea
+                                                                        name="itemname[]"
+                                                                        type="text"
+                                                                        placeholder="Item Name"
+                                                                        class="form-control validate itemname-input"
+                                                                        required
+                                                                    ></textarea>
+                                                                    <ul class="itemname-autocomplete-list" style="display: none;"></ul>
+                                                                </div>
                                                             </td>
                                                             <td>
                                                                 <input
@@ -838,11 +893,86 @@ include("kattegat/role_check.php");
           if(urlParams.has('product_id')){
             $('#itemsTable tbody').find('input[name="itemcode[]"]').val(urlParams.get('product_id'));
           }
+
+          // Item name autocomplete search function
+          function searchItemName(inputElement) {
+              var searchTerm = $(inputElement).val().trim();
+              var autocompleteList = $(inputElement).closest('.itemname-autocomplete-wrapper').find('.itemname-autocomplete-list');
+              
+              // Hide autocomplete if search term is too short
+              if(searchTerm.length < 2) {
+                  autocompleteList.hide().empty();
+                  return;
+              }
+
+              $.ajax({
+                  url: "kattegat/ragnar_purchase.php",
+                  method: "POST",
+                  data: {
+                      stc_search_itemname_autocomplete: 1,
+                      keyword: searchTerm
+                  },
+                  dataType: "JSON",
+                  success: function(response) {
+                      autocompleteList.empty();
+                      if(response.success && response.data && response.data.length > 0) {
+                          $.each(response.data, function(index, item) {
+                              var li = $('<li></li>');
+                              var itemName = item.itemname || 'N/A';
+                              var unit = item.unit || 'N/A';
+                              var rate = item.rate || '0';
+                              
+                              li.html(
+                                  '<div class="autocomplete-item-name">' + itemName + '</div>' +
+                                  '<div class="autocomplete-item-details">' + unit + ' / ' + rate + '</div>'
+                              );
+                              li.data('item', item);
+                              li.on('click', function() {
+                                  var row = $(inputElement).closest('tr');
+                                  var itemData = $(this).data('item');
+                                  
+                                  // Populate fields
+                                  row.find('[name="itemname[]"]').val(itemData.itemname || '');
+                                  row.find('[name="unit[]"]').val(itemData.unit || 'NOS');
+                                  row.find('[name="rate[]"]').val(itemData.rate || '0');
+                                  row.find('[name="prate[]"]').val(itemData.prate || itemData.rate || '0');
+                                  
+                                  // Hide autocomplete
+                                  autocompleteList.hide();
+                                  
+                                  // Trigger change event for rate calculation if needed
+                                  row.find('[name="prate[]"]').trigger('input');
+                              });
+                              autocompleteList.append(li);
+                          });
+                          autocompleteList.show();
+                      } else {
+                          autocompleteList.hide();
+                      }
+                  },
+                  error: function() {
+                      autocompleteList.hide();
+                  }
+              });
+          }
+
+          // Handle input event for itemname textarea (using delegate for dynamically added rows)
+          $(document).on('input', '.itemname-input', function() {
+              searchItemName(this);
+          });
+
+          // Hide autocomplete when clicking outside
+          $(document).on('click', function(e) {
+              if(!$(e.target).closest('.itemname-autocomplete-wrapper').length) {
+                  $('.itemname-autocomplete-list').hide();
+              }
+          });
           
           // Add new row
           $('#addRow').click(function() {
               var newRow = $('.item-row:first').clone();
               newRow.find('input, textarea').val('');
+              newRow.find('.itemname-autocomplete-list').hide().empty();
               $('#itemsTable tbody').append(newRow);
           });
           

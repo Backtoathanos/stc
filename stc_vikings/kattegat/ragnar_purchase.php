@@ -2130,6 +2130,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 	public function stc_po_adhoc_save($itemcode, $itemname, $quantity, $prate, $rate, $unit, $rack, $condition, $source, $destination, $receivedby, $remarks){	
 		$odin='';
 		$date=date("Y-m-d H:i:s");		
+		$status=3;
 		$lokipo=mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_purchase_product_adhoc`(
 				`stc_purchase_product_adhoc_productid`,
@@ -2159,7 +2160,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $source)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $destination)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $receivedby)."',
-				'3',
+				'".mysqli_real_escape_string($this->stc_dbs, $status)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $remarks)."',
 				'".$_SESSION['stc_empl_id']."',
 				'".$date."'
@@ -2170,6 +2171,45 @@ class ragnarPurchaseAdhoc extends tesseract{
 		}else{
 			$odin="failed";
 		}
+		return $odin;
+	}
+
+	// search item name for autocomplete
+	public function stc_search_itemname_autocomplete($keyword){
+		$odin = array();
+		$keyword = mysqli_real_escape_string($this->stc_dbs, $keyword);
+		
+		// Search in purchase product adhoc table for previous entries
+		$search_qry = mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT
+				`stc_purchase_product_adhoc_itemdesc` as itemname,
+				`stc_purchase_product_adhoc_unit` as unit,
+				`stc_purchase_product_adhoc_rate` as rate,
+				`stc_purchase_product_adhoc_prate` as prate
+			FROM `stc_purchase_product_adhoc`
+			WHERE `stc_purchase_product_adhoc_itemdesc` LIKE '%".$keyword."%'
+			AND `stc_purchase_product_adhoc_itemdesc` != ''
+			ORDER BY `stc_purchase_product_adhoc_created_date` DESC
+			LIMIT 10
+		");
+		
+		$data = array();
+		if(mysqli_num_rows($search_qry) > 0){
+			foreach($search_qry as $row){
+				$data[] = array(
+					'itemname' => $row['itemname'],
+					'unit' => $row['unit'],
+					'rate' => $row['rate'],
+					'prate' => $row['prate']
+				);
+			}
+		}
+		
+		$odin = array(
+			'success' => true,
+			'data' => $data
+		);
+		
 		return $odin;
 	}
 
@@ -2874,6 +2914,36 @@ class ragnarPurchaseAdhoc extends tesseract{
 
 	public function stc_update_adhoc_item_apprstatus($id, $status)	 {
 		$odin="no";
+		
+		// Get productid and rate from adhoc table using id
+		$adhoc_qry = mysqli_query($this->stc_dbs, "SELECT `stc_purchase_product_adhoc_productid`, `stc_purchase_product_adhoc_prate` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_id` = '".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+		if(mysqli_num_rows($adhoc_qry) > 0){
+			$adhoc_row = mysqli_fetch_assoc($adhoc_qry);
+			$productid = $adhoc_row['stc_purchase_product_adhoc_productid'];
+			$adhoc_rate = $adhoc_row['stc_purchase_product_adhoc_prate'];
+			
+			// Check if productid exists in grn_items table and compare rates
+			if($productid != '0' && $productid != 0 && !empty($productid)){
+				$grn_qry = mysqli_query($this->stc_dbs, "SELECT `stc_purchase_product_adhoc_productid`, `stc_purchase_product_adhoc_prate` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid` = '".mysqli_real_escape_string($this->stc_dbs, $productid)."' AND `stc_purchase_product_adhoc_id`<>'".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+				if(mysqli_num_rows($grn_qry) > 0){
+					foreach($grn_qry as $row){
+						$grn_id = $row['stc_purchase_product_adhoc_productid'];
+						if($productid == $grn_id){
+							$status = 1;
+						}
+					}
+					$loopcounter=1;
+					foreach($grn_qry as $row){
+						$grn_rate = $row['stc_purchase_product_adhoc_prate'];
+						if($adhoc_rate != $grn_rate){
+							$status = 4;
+							break;
+						}
+					}
+				}
+			}
+		}
+		
 		$query = mysqli_query($this->stc_dbs, "UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_status` = '$status' WHERE `stc_purchase_product_adhoc_id` = '".mysqli_real_escape_string($this->stc_dbs, $id)."'");
 		
 		if($query){
@@ -4268,6 +4338,14 @@ if(isset($_POST['save_tool_tracker'])){
 if(isset($_POST['reset_items'])){
 	$bjornestocking=new ragnarPurchaseAdhoc();
 	$outbjornestocking=$bjornestocking->stc_reset_items();
+	echo json_encode($outbjornestocking);
+}
+
+// search item name autocomplete
+if(isset($_POST['stc_search_itemname_autocomplete'])){
+	$keyword = $_POST['keyword'];
+	$objloki = new ragnarPurchaseAdhoc();
+	$outbjornestocking = $objloki->stc_search_itemname_autocomplete($keyword);
 	echo json_encode($outbjornestocking);
 }
 
