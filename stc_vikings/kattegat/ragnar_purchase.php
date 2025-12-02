@@ -2914,36 +2914,36 @@ class ragnarPurchaseAdhoc extends tesseract{
 
 	public function stc_update_adhoc_item_apprstatus($id, $status)	 {
 		$odin="no";
-		
-		// Get productid and rate from adhoc table using id
-		$adhoc_qry = mysqli_query($this->stc_dbs, "SELECT `stc_purchase_product_adhoc_productid`, `stc_purchase_product_adhoc_prate` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_id` = '".mysqli_real_escape_string($this->stc_dbs, $id)."'");
-		if(mysqli_num_rows($adhoc_qry) > 0){
-			$adhoc_row = mysqli_fetch_assoc($adhoc_qry);
-			$productid = $adhoc_row['stc_purchase_product_adhoc_productid'];
-			$adhoc_rate = $adhoc_row['stc_purchase_product_adhoc_prate'];
-			
-			// Check if productid exists in grn_items table and compare rates
-			if($productid != '0' && $productid != 0 && !empty($productid)){
-				$grn_qry = mysqli_query($this->stc_dbs, "SELECT `stc_purchase_product_adhoc_productid`, `stc_purchase_product_adhoc_prate` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid` = '".mysqli_real_escape_string($this->stc_dbs, $productid)."' AND `stc_purchase_product_adhoc_id`<>'".mysqli_real_escape_string($this->stc_dbs, $id)."'");
-				if(mysqli_num_rows($grn_qry) > 0){
-					foreach($grn_qry as $row){
-						$grn_id = $row['stc_purchase_product_adhoc_productid'];
-						if($productid == $grn_id){
-							$status = 1;
+		if($status!=1){
+			// Get productid and rate from adhoc table using id
+			$adhoc_qry = mysqli_query($this->stc_dbs, "SELECT `stc_purchase_product_adhoc_productid`, `stc_purchase_product_adhoc_prate` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_id` = '".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+			if(mysqli_num_rows($adhoc_qry) > 0){
+				$adhoc_row = mysqli_fetch_assoc($adhoc_qry);
+				$productid = $adhoc_row['stc_purchase_product_adhoc_productid'];
+				$adhoc_rate = $adhoc_row['stc_purchase_product_adhoc_prate'];
+				
+				// Check if productid exists in grn_items table and compare rates
+				if($productid != '0' && $productid != 0 && !empty($productid)){
+					$grn_qry = mysqli_query($this->stc_dbs, "SELECT `stc_purchase_product_adhoc_productid`, `stc_purchase_product_adhoc_prate` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid` = '".mysqli_real_escape_string($this->stc_dbs, $productid)."' AND `stc_purchase_product_adhoc_id`<>'".mysqli_real_escape_string($this->stc_dbs, $id)."'");
+					if(mysqli_num_rows($grn_qry) > 0){
+						foreach($grn_qry as $row){
+							$grn_id = $row['stc_purchase_product_adhoc_productid'];
+							if($productid == $grn_id){
+								$status = 1;
+							}
 						}
-					}
-					$loopcounter=1;
-					foreach($grn_qry as $row){
-						$grn_rate = $row['stc_purchase_product_adhoc_prate'];
-						if($adhoc_rate != $grn_rate){
-							$status = 4;
-							break;
+						$loopcounter=1;
+						foreach($grn_qry as $row){
+							$grn_rate = $row['stc_purchase_product_adhoc_prate'];
+							if($adhoc_rate != $grn_rate){
+								$status = 4;
+								break;
+							}
 						}
 					}
 				}
 			}
 		}
-		
 		$query = mysqli_query($this->stc_dbs, "UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_status` = '$status' WHERE `stc_purchase_product_adhoc_id` = '".mysqli_real_escape_string($this->stc_dbs, $id)."'");
 		
 		if($query){
