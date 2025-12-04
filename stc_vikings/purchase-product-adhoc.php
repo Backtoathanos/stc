@@ -1887,6 +1887,9 @@ include("kattegat/role_check.php");
               if(inv_type == 'Sehrabazar'){
                 search=$('.searchKey').val();
               }
+              if(inv_type == 'Pardih'){
+                search=$('.searchKey').val();
+              }
               loadInventories(1, search, inv_type);
           });
           
@@ -2796,7 +2799,7 @@ include("kattegat/role_check.php");
                       id="stcpoadhocnameshop"
                       placeholder="Shop Name"
                       class="form-control validate"
-                    ><option>Dhatkidih</option><option>Kolkata</option><option>Sehrabazar</option></select>
+                    ><option>Dhatkidih</option><option>Kolkata</option><option>Pardih</option><option>Sehrabazar</option></select>
                   </div>
                 </div>
                 <div class="col-xl-12 col-md-12 col-sm-12">
@@ -2861,6 +2864,11 @@ include("kattegat/role_check.php");
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a role="tab" type="Pardih" class="nav-link InvTypeBtns" id="tab-modal-5" data-toggle="tab" href="#tab-content-modal-5">
+                                <span>Pardih</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a role="tab" type="Sehrabazar" class="nav-link InvTypeBtns" id="tab-modal-4" data-toggle="tab" href="#tab-content-modal-4">
                                 <span>Sehrabazar</span>
                             </a>
@@ -2886,6 +2894,11 @@ include("kattegat/role_check.php");
                           <input type="text" class="searchKey" placeholder="Search product..." />
                           <div id="dataContainer4">I am Sehrabazar Shop, will coming soon</div>
                           <div id="paginations4"></div>
+                        </div>
+                        <div class="tab-pane tabs-animation fade" id="tab-content-modal-5" role="tabpanel">
+                          <input type="text" class="searchKey" placeholder="Search product..." />
+                          <div id="dataContainer5">I am Pardih Shop, will coming soon</div>
+                          <div id="paginations5"></div>
                         </div>
                     </div>
                   </div>
