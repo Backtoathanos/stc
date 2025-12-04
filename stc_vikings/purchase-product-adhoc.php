@@ -277,6 +277,7 @@ include("kattegat/role_check.php");
                                                                     <option>BOX</option>
                                                                     <option>BUNDLE</option>
                                                                     <option>CASE</option>
+                                                                    <option>CFT</option>
                                                                     <option>CuMTR</option>
                                                                     <option>DRUM</option>
                                                                     <option>FEET</option>
