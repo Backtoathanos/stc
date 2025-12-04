@@ -1069,7 +1069,7 @@ class ragnarRequisitionView extends tesseract{
 						$type_select.='<option value="'.$typearrayorw.'">'.$typearrayorw.'</option>';
 					}
 				}
-				$unitarray = array('Nos', 'Set', 'Feet', 'Mtr', 'Sqmt', 'Ltr', 'Bag', 'Roll', 'Lot', 'Kgs', 'Pkt', 'Case', 'Bundle', 'Pair', 'Jar');
+				$unitarray = array('Nos', 'Set', 'Feet', 'Mtr', 'Sqmt', 'Ltr', 'Bag', 'Roll', 'Lot', 'Kgs', 'Pkt', 'Case', 'Bundle', 'CFT', 'Pair', 'Jar');
 				asort($unitarray);
 				$unit_select= '<option value="NA">Please Select Unit</option>';
 				foreach($unitarray as $unitarrayorw){
