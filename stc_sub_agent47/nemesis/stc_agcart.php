@@ -740,7 +740,7 @@ class witcher_supervisor extends tesseract{
 				AND `stc_cust_super_requisition_list_items_req_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_id)."'
 			");
 			foreach($stccheckrecqry as $stccheckrow){
-				$stcsuporderqty+=$stccheckrow['stc_cust_super_requisition_items_finalqty'];
+				$stcsuporderqty=$stccheckrow['stc_cust_super_requisition_items_finalqty'];
 				$stcsupdisqty+=$stccheckrow['stc_cust_super_requisition_list_items_rec_recqty'];
 				$stcsupunit=$stccheckrow['stc_cust_super_requisition_list_items_unit'];
 			}
