@@ -877,6 +877,32 @@ STCAuthHelper::checkAuth();?>
         });
     </script>
     <!-- tbm -->
+     <style>
+        .stc-clear-filter {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #999;
+            font-weight: bold;
+            padding: 3px 8px;
+            background-color: #f8f8f8;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+            transition: all 0.2s;
+            z-index: 10;
+            display: none; /* Hidden by default */
+        }
+        .stc-clear-filter:hover {
+            background-color: #e8e8e8;
+            color: #666;
+            border-color: #bbb;
+        }
+        .stc-dept-box-container.active-filter .stc-clear-filter {
+            display: block; /* Show when filter is active */
+        }
+    </style>
      <script>
         $(document).ready(function(e){
             var location = '';
@@ -907,6 +933,110 @@ STCAuthHelper::checkAuth();?>
                 var img_src=$(this).attr("data-src");
                 $(this).after('<img src="' + img_src + '" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">');
                 $(this).hide();
+            });
+            
+            // Filter TBM rows by department within the same date section
+            $('body').delegate('.stc-dept-box', 'click', function() {
+                var selectedDept = $(this).attr('data-dept');
+                var selectedDate = $(this).attr('data-date');
+                var $deptBoxRow = $(this).closest('tr');
+                var $deptBoxContainer = $deptBoxRow.find('.stc-dept-box-container');
+                var $dateHeaderRow = $deptBoxRow.prev('tr');
+                
+                // Remove active class from all boxes in this date section
+                $deptBoxRow.find('.stc-dept-box').css({
+                    'transform': 'scale(1)',
+                    'box-shadow': 'none'
+                });
+                
+                // Add active class to clicked box
+                $(this).css({
+                    'transform': 'scale(1.05)',
+                    'box-shadow': '0 4px 8px rgba(0,0,0,0.2)'
+                });
+                
+                // Find all rows after this department box row until next date header
+                var $currentRow = $deptBoxRow.next('tr');
+                var rowsInThisDate = [];
+                
+                while($currentRow.length && !$currentRow.find('td[colspan="6"]').text().includes('Date:')){
+                    if($currentRow.hasClass('stc-tbm-row')){
+                        rowsInThisDate.push($currentRow);
+                    }
+                    $currentRow = $currentRow.next('tr');
+                }
+                
+                // Show/hide rows in this date section based on department
+                if(selectedDept && selectedDept != ''){
+                    // Add active-filter class to show clear button
+                    $deptBoxContainer.addClass('active-filter');
+                    
+                    $.each(rowsInThisDate, function() {
+                        var rowDept = $(this).attr('data-dept');
+                        if(rowDept == selectedDept){
+                            $(this).show();
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                } else {
+                    // Remove active-filter class to hide clear button
+                    $deptBoxContainer.removeClass('active-filter');
+                    
+                    // Show all rows in this date section
+                    $.each(rowsInThisDate, function() {
+                        $(this).show();
+                    });
+                }
+            });
+            
+            // Double click to show all rows in the date section
+            $('body').delegate('.stc-dept-box', 'dblclick', function() {
+                var $deptBoxRow = $(this).closest('tr');
+                var $deptBoxContainer = $deptBoxRow.find('.stc-dept-box-container');
+                
+                $deptBoxRow.find('.stc-dept-box').css({
+                    'transform': 'scale(1)',
+                    'box-shadow': 'none'
+                });
+                
+                // Remove active-filter class to hide clear button
+                $deptBoxContainer.removeClass('active-filter');
+                
+                // Show all rows in this date section
+                var $currentRow = $deptBoxRow.next('tr');
+                while($currentRow.length && !$currentRow.find('td[colspan="6"]').text().includes('Date:')){
+                    if($currentRow.hasClass('stc-tbm-row')){
+                        $currentRow.show();
+                    }
+                    $currentRow = $currentRow.next('tr');
+                }
+            });
+            
+            // Clear filter button - reset to default state
+            $('body').delegate('.stc-clear-filter', 'click', function(e) {
+                e.stopPropagation();
+                var $clearBtn = $(this);
+                var $deptBoxContainer = $clearBtn.parent();
+                var $deptBoxRow = $deptBoxContainer.closest('tr');
+                
+                // Reset all department boxes in this date section
+                $deptBoxRow.find('.stc-dept-box').css({
+                    'transform': 'scale(1)',
+                    'box-shadow': 'none'
+                });
+                
+                // Remove active-filter class to hide clear button
+                $deptBoxContainer.removeClass('active-filter');
+                
+                // Show all rows in this date section
+                var $currentRow = $deptBoxRow.next('tr');
+                while($currentRow.length && !$currentRow.find('td[colspan="6"]').text().includes('Date:')){
+                    if($currentRow.hasClass('stc-tbm-row')){
+                        $currentRow.show();
+                    }
+                    $currentRow = $currentRow.next('tr');
+                }
             });
         });
     </script>

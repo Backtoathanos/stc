@@ -9,29 +9,195 @@ class ragnarSummary extends tesseract{
 		$month_arr = explode('-', date('m-Y', strtotime($month)));
 		$month = $month_arr[0];
 		$year = $month_arr[1];
-		$location=" `stc_safetytbm_loc`='".mysqli_real_escape_string($this->stc_dbs, $location)."' AND";
+		$location_filter=" `stc_safetytbm_loc`='".mysqli_real_escape_string($this->stc_dbs, $location)."' AND";
 		if($location=='NA'){
-			$location='';
+			$location_filter='';
 		}
 		$supervise_rec="`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."' AND";
 		if($supervise_name==''){
 			$supervise_rec='';
 		}
+		
+		// Get all departments for the location
+		$dept_boxes = '';
+		$dept_list = array();
+		
+		// First try to get departments from department table
+		$location_for_dept = $location == 'NA' ? '' : $location;
+		$dept_where = $location_for_dept != '' ? "WHERE `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $location_for_dept)."' AND `stc_status_down_list_department_dept`<>''" : "WHERE `stc_status_down_list_department_dept`<>''";
+		$dept_query = "SELECT DISTINCT `stc_status_down_list_department_dept` 
+			FROM `stc_status_down_list_department` 
+			".$dept_where."
+			ORDER BY `stc_status_down_list_department_dept` ASC";
+		$dept_result = mysqli_query($this->stc_dbs, $dept_query);
+		
+		if($dept_result && mysqli_num_rows($dept_result) > 0){
+			foreach($dept_result as $dept_row){
+				$dept_list[] = $dept_row['stc_status_down_list_department_dept'];
+			}
+		}
+		
+		// If no departments found, try to extract from TBM place field
+		if(empty($dept_list)){
+			$temp_where_conditions = array();
+			if($supervise_rec != ''){
+				$temp_where_conditions[] = rtrim($supervise_rec, ' AND');
+			}
+			if($location_filter != ''){
+				$temp_where_conditions[] = rtrim($location_filter, ' AND');
+			}
+			$temp_where_conditions[] = "MONTH(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."'";
+			$temp_where_conditions[] = "YEAR(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'";
+			$temp_where_clause = "WHERE " . implode(" AND ", $temp_where_conditions);
+			
+			$temp_tbm_query = "SELECT DISTINCT `stc_safetytbm_place` FROM `stc_safetytbm` ".$temp_where_clause;
+			$temp_tbm_result = mysqli_query($this->stc_dbs, $temp_tbm_query);
+			if($temp_tbm_result && mysqli_num_rows($temp_tbm_result) > 0){
+				foreach($temp_tbm_result as $temp_row){
+					$place = trim($temp_row['stc_safetytbm_place']);
+					if($place != ''){
+						// Try to extract department code (e.g., "LD#1", "SP#1", "MK#7")
+						if(preg_match('/([A-Z]+)#?\d*/', $place, $matches)){
+							$dept_code = $matches[1];
+							if(!in_array($dept_code, $dept_list)){
+								$dept_list[] = $dept_code;
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		// Build WHERE clause properly
+		$where_conditions = array();
+		if($supervise_rec != ''){
+			$where_conditions[] = rtrim($supervise_rec, ' AND');
+		}
+		if($location_filter != ''){
+			$where_conditions[] = rtrim($location_filter, ' AND');
+		}
+		$where_conditions[] = "MONTH(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."'";
+		$where_conditions[] = "YEAR(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'";
+		
+		$where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
+		
 		$query="
-			SELECT * FROM `stc_safetytbm` 
+			SELECT *, `stc_status_down_list_department_dept` as dept_name, DATE(`stc_safetytbm_date`) as tbm_date FROM `stc_safetytbm` 
 			LEFT JOIN `stc_cust_pro_supervisor`
 			ON `stc_cust_pro_supervisor_id`=`stc_safetytbm_created_by`
-			WHERE ".$supervise_rec.$location." (
-				MONTH(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $month)."' AND
-				YEAR(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $year)."'
-			)
+			LEFT JOIN `stc_status_down_list`
+			ON `stc_safetytbm_std_id`=`stc_status_down_list_id`
+			LEFT JOIN `stc_status_down_list_department`
+			ON `stc_status_down_list_department_loc_id`=`stc_status_down_list_location`
+			".$where_clause."
 			ORDER BY DATE(`stc_safetytbm_date`) DESC
 		";
 		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
+		
+		// Check for query errors
+		if(!$optimusprimequery){
+			$optimusprime .= '<tr><td colspan="6">Query Error: '.mysqli_error($this->stc_dbs).'</td></tr>';
+			return $optimusprime;
+		}
+		
 		if(mysqli_num_rows($optimusprimequery)>0){
 			$website=$_SERVER['SERVER_NAME'];
 			$website = $website=="localhost" ? '../stc_agent47/' : 'https://stcassociate.com/stc_agent47/';
+			
+			// Group records by date
+			$records_by_date = array();
 			foreach($optimusprimequery as $optimusprimerow){
+				$tbm_date = date('Y-m-d', strtotime($optimusprimerow['stc_safetytbm_date']));
+				if(!isset($records_by_date[$tbm_date])){
+					$records_by_date[$tbm_date] = array();
+				}
+				$records_by_date[$tbm_date][] = $optimusprimerow;
+			}
+			
+			// Process each date
+			foreach($records_by_date as $tbm_date => $date_records){
+				// Generate department boxes for this specific date
+				$dept_boxes = '';
+				if(!empty($dept_list)){
+					$dept_boxes = '<div class="stc-dept-box-container" style="position: relative; display: flex; flex-wrap: wrap; gap: 6px; padding: 8px;">';
+					$dept_boxes .= '<span class="stc-clear-filter" data-date="'.$tbm_date.'" title="Clear Filter">×</span>';
+					foreach($dept_list as $dept_name){
+						
+						// Count TBMs for this department for this specific date
+						$count_where_conditions = array();
+						if($supervise_rec != ''){
+							$count_where_conditions[] = rtrim($supervise_rec, ' AND');
+						}
+						if($location_filter != ''){
+							$count_where_conditions[] = rtrim($location_filter, ' AND');
+						}
+						$count_where_conditions[] = "DATE(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $tbm_date)."'";
+						$count_where_conditions[] = "(
+							`stc_safetytbm_place` LIKE '%".mysqli_real_escape_string($this->stc_dbs, $dept_name)."%' OR
+							`stc_status_down_list_department_dept`='".mysqli_real_escape_string($this->stc_dbs, $dept_name)."'
+						)";
+						
+						$count_where_clause = "WHERE " . implode(" AND ", $count_where_conditions);
+						
+						$tbm_count_query = "
+							SELECT COUNT(*) as tbm_count FROM `stc_safetytbm` 
+							LEFT JOIN `stc_cust_pro_supervisor`
+							ON `stc_cust_pro_supervisor_id`=`stc_safetytbm_created_by`
+							LEFT JOIN `stc_status_down_list`
+							ON `stc_safetytbm_std_id`=`stc_status_down_list_id`
+							LEFT JOIN `stc_status_down_list_department`
+							ON `stc_status_down_list_department_loc_id`=`stc_status_down_list_location`
+							".$count_where_clause."
+						";
+						$tbm_count_result = mysqli_query($this->stc_dbs, $tbm_count_query);
+						$tbm_count = 0;
+						if($tbm_count_result){
+							$count_row = mysqli_fetch_assoc($tbm_count_result);
+							$tbm_count = $count_row['tbm_count'];
+						} else {
+							// Fallback: simple count without joins - only check place field
+							$simple_where_conditions = array();
+							if($supervise_rec != ''){
+								$simple_where_conditions[] = rtrim($supervise_rec, ' AND');
+							}
+							if($location_filter != ''){
+								$simple_where_conditions[] = rtrim($location_filter, ' AND');
+							}
+							$simple_where_conditions[] = "DATE(`stc_safetytbm_date`) = '".mysqli_real_escape_string($this->stc_dbs, $tbm_date)."'";
+							$simple_where_conditions[] = "`stc_safetytbm_place` LIKE '%".mysqli_real_escape_string($this->stc_dbs, $dept_name)."%'";
+							$simple_where_clause = "WHERE " . implode(" AND ", $simple_where_conditions);
+							
+							$simple_count_query = "SELECT COUNT(*) as tbm_count FROM `stc_safetytbm` ".$simple_where_clause;
+							$simple_count_result = mysqli_query($this->stc_dbs, $simple_count_query);
+							if($simple_count_result){
+								$count_row = mysqli_fetch_assoc($simple_count_result);
+								$tbm_count = $count_row['tbm_count'];
+							}
+						}
+						
+						// Determine color: green if count > 0, red if count = 0
+						$box_color = $tbm_count > 0 ? '#28a745' : '#dc3545';
+						$box_bg = $tbm_count > 0 ? '#d4edda' : '#f8d7da';
+						
+						$dept_boxes .= '
+							<div class="stc-dept-box" 
+								data-dept="'.htmlspecialchars($dept_name).'" 
+								data-date="'.$tbm_date.'"
+								style="cursor: pointer; padding: 6px 10px; border: 1px solid '.$box_color.'; background-color: '.$box_bg.'; border-radius: 3px; text-align: center; min-width: 70px; transition: all 0.3s;">
+								<div style="font-weight: bold; color: '.$box_color.'; font-size: 11px; line-height: 1.2;">'.htmlspecialchars($dept_name).'</div>
+								<div style="font-size: 10px; color: #333; margin-top: 2px; line-height: 1.2;">'.$tbm_count.'</div>
+							</div>
+						';
+					}
+					$dept_boxes .= '</div>';
+					
+					// Add date header and department boxes row
+					$optimusprime .= '<tr><td colspan="6" style="background-color: #f0f0f0; font-weight: bold; padding: 10px;">Date: '.date('d-m-Y', strtotime($tbm_date)).'</td></tr>';
+					$optimusprime .= '<tr><td colspan="6">'.$dept_boxes.'</td></tr>';
+				}
+				
+				// Add rows for this date
+				foreach($date_records as $optimusprimerow){
 				$optimusprimeimgqry=mysqli_query($this->stc_dbs, "
 					SELECT `stc_safetytbm_img_location` FROM `stc_safetytbm_img` WHERE `stc_safetytbm_img_tbmid`='".$optimusprimerow['stc_safetytbm_id']."'
 				");
@@ -51,23 +217,46 @@ class ragnarSummary extends tesseract{
 				$action_show='
 			    	<a target="_blank" href="'.$website.'safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetytbm_id'].'" class="form-control btn btn-danger">Print</a>
 			    ';
+				
+				// Get department name - try from join first, then check if place contains department name
+				$dept_name_attr = '';
+				if(isset($optimusprimerow['dept_name']) && $optimusprimerow['dept_name'] != ''){
+					$dept_name_attr = htmlspecialchars($optimusprimerow['dept_name']);
+				} else {
+					// Try to match department from place field
+					$place = $optimusprimerow['stc_safetytbm_place'];
+					if($place != ''){
+						$dept_match_query = "SELECT `stc_status_down_list_department_dept` 
+							FROM `stc_status_down_list_department` 
+							WHERE `stc_status_down_list_department_dept`<>'' 
+							AND '".mysqli_real_escape_string($this->stc_dbs, $place)."' LIKE CONCAT('%', `stc_status_down_list_department_dept`, '%')
+							LIMIT 1";
+						$dept_match_result = mysqli_query($this->stc_dbs, $dept_match_query);
+						if($dept_match_result && mysqli_num_rows($dept_match_result) > 0){
+							$dept_match_row = mysqli_fetch_assoc($dept_match_result);
+							$dept_name_attr = htmlspecialchars($dept_match_row['stc_status_down_list_department_dept']);
+						}
+					}
+				}
 
-				$optimusprime.='
-					<tr>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetytbm_date'])).'</td>
-						<td>'.date('h:i A', strtotime($optimusprimerow['stc_safetytbm_time'])).'</td>
-						<td>'.$optimusprimerow['stc_safetytbm_place'].'</td>
-						<td>'.$safety_image.'</td>
-						<td>'.$optimusprimerow['stc_cust_pro_supervisor_fullname'].'</td>
-						<td>'.$action_show.'
-						</td>
-					</tr>
-				';
+					$row_date = date('Y-m-d', strtotime($optimusprimerow['stc_safetytbm_date']));
+					$optimusprime.='
+						<tr class="stc-tbm-row" data-dept="'.$dept_name_attr.'" data-date="'.$row_date.'">
+							<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetytbm_date'])).'</td>
+							<td>'.date('h:i A', strtotime($optimusprimerow['stc_safetytbm_time'])).'</td>
+							<td>'.$optimusprimerow['stc_safetytbm_place'].'</td>
+							<td>'.$safety_image.'</td>
+							<td>'.$optimusprimerow['stc_cust_pro_supervisor_fullname'].'</td>
+							<td>'.$action_show.'
+							</td>
+						</tr>
+					';
+				}
 			}
 		}else{
 			$optimusprime.='
 				<tr>
-					<td colspan="5">No data found</td>
+					<td colspan="6">No data found</td>
 				</tr>
 			';
 		}
