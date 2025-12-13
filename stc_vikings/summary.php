@@ -902,31 +902,56 @@ STCAuthHelper::checkAuth();?>
         .stc-dept-box-container.active-filter .stc-clear-filter {
             display: block; /* Show when filter is active */
         }
+        .pagination a {
+            text-decoration: none;
+            color: #333;
+        }
+        .pagination a:hover {
+            background-color: #e0e0e0 !important;
+        }
     </style>
      <script>
         $(document).ready(function(e){
             var location = '';
             var month = '';
             var supervise_name = '';
+            var tbm_page = 1;
+            var tbm_limit = 25;
+            
             $('body').delegate('.safety-filter-by-search', 'click', function() {
                 location = $('.safety-filter-by-location').val();
                 month = $('.safety-filter-by-month').val();
                 supervise_name=$('.safety-filter-by-supervisorname').val();
+                tbm_page = 1; // Reset to first page on new search
                 // call tbm
-                call_tbm(location, month, supervise_name);
+                call_tbm(location, month, supervise_name, tbm_page);
             });
             
-            function call_tbm(location, month, supervise_name){
+            function call_tbm(location, month, supervise_name, page){
                 $.ajax({
                     url         : "kattegat/ragnar_summary.php",
                     method      : "POST",
-                    data        : {stc_safety_calltbm:1, location:location, month:month, supervise_name:supervise_name},
+                    data        : {
+                        stc_safety_calltbm:1, 
+                        location:location, 
+                        month:month, 
+                        supervise_name:supervise_name,
+                        page: page,
+                        limit: tbm_limit
+                    },
                     success     : function(response_tbm){
                         // console.log(response_tbm);
                         $('.stc-safety-tbm-res-table').html(response_tbm);
                     }
                 });
             }
+            
+            // Handle pagination clicks
+            $('body').delegate('.stc-tbm-page', 'click', function() {
+                var page = $(this).attr('data-page');
+                tbm_page = parseInt(page);
+                call_tbm(location, month, supervise_name, tbm_page);
+            });
 
             // add image for tbm
             $('body').delegate('.stc-safety-tbm-image-show-btn', 'click', function() {

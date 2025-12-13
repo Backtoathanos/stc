@@ -4,8 +4,9 @@ session_start();
 // reports merchant ledger
 class ragnarSummary extends tesseract{
    // safety
-	public function stc_call_tbm($location, $month, $supervise_name){
+	public function stc_call_tbm($location, $month, $supervise_name, $page = 1, $limit = 10){
 		$optimusprime='';
+		$offset = ($page - 1) * $limit;
 		$month_arr = explode('-', date('m-Y', strtotime($month)));
 		$month = $month_arr[0];
 		$year = $month_arr[1];
@@ -81,6 +82,24 @@ class ragnarSummary extends tesseract{
 		
 		$where_clause = !empty($where_conditions) ? "WHERE " . implode(" AND ", $where_conditions) : "";
 		
+		// Get total count for pagination
+		$count_query = "
+			SELECT COUNT(*) as total_count FROM `stc_safetytbm` 
+			LEFT JOIN `stc_cust_pro_supervisor`
+			ON `stc_cust_pro_supervisor_id`=`stc_safetytbm_created_by`
+			LEFT JOIN `stc_status_down_list`
+			ON `stc_safetytbm_std_id`=`stc_status_down_list_id`
+			LEFT JOIN `stc_status_down_list_department`
+			ON `stc_status_down_list_department_loc_id`=`stc_status_down_list_location`
+			".$where_clause."
+		";
+		$count_result = mysqli_query($this->stc_dbs, $count_query);
+		$total_record = 0;
+		if($count_result){
+			$count_row = mysqli_fetch_assoc($count_result);
+			$total_record = $count_row['total_count'];
+		}
+		
 		$query="
 			SELECT *, `stc_status_down_list_department_dept` as dept_name, DATE(`stc_safetytbm_date`) as tbm_date FROM `stc_safetytbm` 
 			LEFT JOIN `stc_cust_pro_supervisor`
@@ -91,6 +110,7 @@ class ragnarSummary extends tesseract{
 			ON `stc_status_down_list_department_loc_id`=`stc_status_down_list_location`
 			".$where_clause."
 			ORDER BY DATE(`stc_safetytbm_date`) DESC
+			LIMIT $limit OFFSET $offset
 		";
 		$optimusprimequery=mysqli_query($this->stc_dbs, $query);
 		
@@ -260,6 +280,20 @@ class ragnarSummary extends tesseract{
 				</tr>
 			';
 		}
+		
+		// Add pagination controls
+		$pages = ceil($total_record / $limit);
+		if($pages > 1){
+			$pagination = '<tr><td colspan="6"><div class="pagination" style="text-align: center; padding: 10px;">';
+			for ($i = 1; $i <= $pages; $i++) {
+				$active = ($i == $page) ? 'active' : '';
+				$activestyle = ($i == $page) ? "style='background-color: #afaeff; font-weight: bold; padding: 5px 10px; margin: 0 2px; border-radius: 3px; cursor: pointer; display: inline-block;'" : "style='font-weight: bold; padding: 5px 10px; margin: 0 2px; border-radius: 3px; cursor: pointer; display: inline-block; background-color: #f0f0f0;'";
+				$pagination .= "<a href='javascript:void(0)' class='stc-tbm-page $active' $activestyle data-page='$i'>$i</a>";
+			}
+			$pagination .= '</div></td></tr>';
+			$optimusprime .= $pagination;
+		}
+		
 		return $optimusprime;
 	}
 
@@ -502,8 +536,10 @@ if(isset($_POST['stc_safety_calltbm'])){
 	$location 			= 	$_POST['location'];
 	$month 			= 	$_POST['month'];
 	$supervise_name	= 	$_POST['supervise_name'];
+	$page = isset($_POST['page']) ? intval($_POST['page']) : 1;
+	$limit = isset($_POST['limit']) ? intval($_POST['limit']) : 10;
 	$objsearchreq=new ragnarSummary();
-	$opobjsearchreq=$objsearchreq->stc_call_tbm($location, $month, $supervise_name);
+	$opobjsearchreq=$objsearchreq->stc_call_tbm($location, $month, $supervise_name, $page, $limit);
 	echo $opobjsearchreq;
 }
 
