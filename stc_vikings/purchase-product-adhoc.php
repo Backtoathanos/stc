@@ -1093,22 +1093,42 @@ include("kattegat/role_check.php");
               }
             });
           }
-
           $('body').delegate('.product-select', 'click', function (e) {
-            $(this).closest('tr').find('td:eq(0)').find('input').addClass('product-select-val');
-            $(this).closest('tr').find('td:eq(1)').find('textarea').addClass('product-select-name');
+            // Remove classes from all previous rows first
+            $('.product-select-val').removeClass("product-select-val");
+            $('.product-select-name').removeClass("product-select-name");
+            
+            // Add classes to the current row
+            var $row = $(this).closest('tr');
+            var $input = $row.find('td:eq(0)').find('input');
+            var $textarea = $row.find('td:eq(1)').find('textarea');
+            $input.addClass('product-select-val');
+            $textarea.addClass('product-select-name');
           });
           // add product for savess
           $('body').delegate('.add_to_requist_mer', 'click', function (e) {
             e.preventDefault();
             var pd_id = $(this).attr("id");
             var name = $(this).attr("pd-name");
-            $('.product-select-val').val(pd_id);
-            $('.product-select-name').val(name);
-            $('.product-select-val').removeClass("product-select-val");
-            $('.product-select-name').removeClass("product-select-name");
-            alert("Product added successfully.");
-            $(".close").click();
+            
+            // Find the row that has the active product-select-val class
+            var $activeInput = $('.product-select-val');
+            var $activeTextarea = $('.product-select-name');
+            
+            if ($activeInput.length && $activeTextarea.length) {
+              // Update only the active row's elements
+              $activeInput.val(pd_id);
+              $activeTextarea.val(name);
+              
+              // Remove classes after updating
+              $activeInput.removeClass("product-select-val");
+              $activeTextarea.removeClass("product-select-name");
+              
+              alert("Product added successfully.");
+              $(".close").click();
+            } else {
+              alert("Please select a row first.");
+            }
           });
           
           // add recieving modal

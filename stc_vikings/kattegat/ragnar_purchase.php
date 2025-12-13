@@ -2270,7 +2270,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 			LEFT JOIN `stc_rack` ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
 			LEFT JOIN `stc_user` ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
 			WHERE `stc_purchase_product_adhoc_qty`>0 ".$filter."
-			ORDER BY TIMESTAMP(`stc_purchase_product_adhoc_created_date`) DESC
+			ORDER BY stc_purchase_product_adhoc_id DESC
 		";
 		$query .= " LIMIT " . ($page - 1) * $pageSize . ", " . $pageSize;
 		$odinqry=mysqli_query($this->stc_dbs, $query);
@@ -2302,7 +2302,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 			LEFT JOIN `stc_rack` ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
 			LEFT JOIN `stc_user` ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
 			WHERE `stc_purchase_product_adhoc_qty`>0 ".$filter."
-			ORDER BY TIMESTAMP(`stc_purchase_product_adhoc_created_date`) DESC
+			ORDER BY stc_purchase_product_adhoc_id DESC
 		");
 		$count_num=mysqli_num_rows($count_numqry);
 		if(mysqli_num_rows($odinqry)>0){
