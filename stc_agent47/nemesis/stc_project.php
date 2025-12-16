@@ -3776,7 +3776,7 @@ class pirates_supervisor extends tesseract{
 			$website = $website=="localhost" ? '' : 'https://stcassociate.com/stc_agent47/';
 			foreach($optimusprimequery as $optimusprimerow){
 				$action_show='
-					<a href="'.$website.'stc-ppec-print-preview.php?ppec_no='.$optimusprimerow['stc_safetyppec_id'].'" class="form-control btn btn-success" >View</a>
+					<a href="'.$website.'stc-ppec-print-preview.php?ppec_no='.$optimusprimerow['stc_safetyppec_id'].'" class="form-control btn btn-success" target="_blank">View</a>
 					<a href="#" class="form-control btn btn-secondary stc-safetyppec-edit" id="'.$optimusprimerow['stc_safetyppec_id'].'">Edit</a>
 					<a href="#" class="form-control btn btn-danger stc-safetyppec-delete" id="'.$optimusprimerow['stc_safetyppec_id'].'">Delete</a>
 				';
