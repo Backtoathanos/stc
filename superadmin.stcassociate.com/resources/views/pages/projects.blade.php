@@ -101,10 +101,13 @@
                 <div class="card-header p-0 border-bottom-0">
                   <ul class="nav nav-tabs" id="custom-tabs-four-tab" role="tablist">
                     <li class="nav-item">
-                      <a class="nav-link active" id="projects-tab" data-toggle="tab" href="#projects" role="tab" aria-controls="projects" aria-selected="true">Projects</a>
+                      <a class="nav-link active" id="projects-tab" data-toggle="tab" href="#projects" role="tab" aria-controls="projects" aria-selected="false">Projects</a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" id="collaborations-tab" data-toggle="tab" href="#collaborations" role="tab" aria-controls="collaborations" aria-selected="false">Project Collaborations</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" id="departments-tab" data-toggle="tab" href="#departments" role="tab" aria-controls="departments" aria-selected="false">Departments</a>
                     </li>
                   </ul>
                 </div>
@@ -231,6 +234,54 @@
                         </div>
                       </div>
                     </div>
+                    <!-- Departments Tab -->
+                    <div class="tab-pane fade" id="departments" role="tabpanel" aria-labelledby="departments-tab">
+                      <div class="row mb-3">
+                        <div class="col-md-12 text-right">
+                          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#add-department-modal">
+                            <i class="fas fa-plus"></i> Add Department
+                          </button>
+                        </div>
+                      </div>
+                      <!-- Fixed Bulk Action Buttons -->
+                      <div id="departments-bulk-actions" style="position: fixed; top: 70px; right: 30px; z-index: 1000; background: white; padding: 15px; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.3); display: none;">
+                        <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                          <select class="form-control form-control-sm" id="bulk-status-change" style="width: 150px; margin-right: 8px;">
+                            <option value="">Change Status</option>
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                          </select>
+                          <button type="button" class="btn btn-danger btn-sm" id="bulk-delete-departments" style="margin-right: 8px;">
+                            <i class="fas fa-trash"></i> Delete Selected
+                          </button>
+                          <button type="button" class="btn btn-secondary btn-sm" id="clear-selection">
+                            <i class="fas fa-times"></i>
+                          </button>
+                        </div>
+                        <small class="text-muted" id="selected-count" style="display: block; margin-top: 5px;">0 selected</small>
+                      </div>
+                      <div class="table-responsive">
+                        <table id="departments-table" class="table table-bordered table-striped">
+                          <thead>
+                            <tr>
+                              <th class="text-center" style="width: 50px;">
+                                <input type="checkbox" id="select-all-departments" title="Select All">
+                              </th>
+                              <th class="text-center">ID</th>
+                              <th class="text-center">Date</th>
+                              <th class="text-center">Project Title</th>
+                              <th class="text-center">Location</th>
+                              <th class="text-center">Department</th>
+                              <th class="text-center">Status</th>
+                              <th class="text-center">Created By</th>
+                              <th class="text-center">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
                   </div>
                 </div>
             </div>
@@ -266,13 +317,498 @@
             title: message
             })
         }
-        var dataTableAct="active";
-        getProjects(dataTableAct);      
+        
+        // Initialize Departments DataTable - only when tab is shown
+        var departmentsTable = null;
+        
+        function initDepartmentsTable() {
+            if (departmentsTable === null && !$.fn.DataTable.isDataTable('#departments-table')) {
+                departmentsTable = $('#departments-table').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    responsive: true,
+                    lengthChange: true,
+                    pageLength: 25,
+                    lengthMenu: [[25, 50, 100, 500], [25, 50, 100, 500]],
+                    autoWidth: true,
+                    ajax: {
+                        url: "{{ url('/branch/stc/departments/list') }}",
+                        type: 'GET'
+                    },
+                    drawCallback: function() {
+                        // Reset select all checkbox after reload
+                        $('#select-all-departments').prop('checked', false);
+                        updateBulkActions();
+                    },
+                    columns: [
+                        { 
+                            data: 'stc_status_down_list_department_id',
+                            name: 'checkbox',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center',
+                            render: function(data) {
+                                return '<input type="checkbox" class="department-checkbox" value="' + data + '">';
+                            }
+                        },
+                        { data: 'stc_status_down_list_department_id', name: 'stc_status_down_list_department_id', className: 'text-center' },
+                        { 
+                            data: 'stc_status_down_list_department_date', 
+                            name: 'stc_status_down_list_department_date',
+                            className: 'text-center',
+                            render: function(data) {
+                                return data && data !== '-' ? data : '-';
+                            }
+                        },
+                        { 
+                            data: 'stc_status_down_list_department_loc_id', 
+                            name: 'stc_status_down_list_department_loc_id', 
+                            className: 'text-left',
+                            title: 'Project Title'
+                        },
+                        { data: 'stc_status_down_list_department_location', name: 'stc_status_down_list_department_location', className: 'text-center' },
+                        { data: 'stc_status_down_list_department_dept', name: 'stc_status_down_list_department_dept', className: 'text-center' },
+                        { 
+                            data: 'stc_status_down_list_department_status', 
+                            name: 'stc_status_down_list_department_status',
+                            className: 'text-center',
+                            render: function(data) {
+                                return data == 1 
+                                    ? '<span class="badge badge-success">Active</span>' 
+                                    : '<span class="badge badge-danger">Inactive</span>';
+                            }
+                        },
+                        { data: 'stc_status_down_list_department_created_by', name: 'stc_status_down_list_department_created_by', className: 'text-center' },
+                        { 
+                            data: 'stc_status_down_list_department_id',
+                            name: 'action',
+                            orderable: false,
+                            searchable: false,
+                            className: 'text-center',
+                            render: function(data) {
+                                return '<a href="javascript:void(0)" class="btn btn-warning btn-sm edit-department" data-id="' + data + '" title="Edit">' +
+                                       '<i class="fas fa-edit"></i></a> ' +
+                                       '<a href="javascript:void(0)" class="btn btn-danger btn-sm delete-department" data-id="' + data + '" title="Delete">' +
+                                       '<i class="fas fa-trash"></i></a>';
+                            }
+                        }
+                    ],
+                    order: [[1, 'desc']]
+                });
+                
+                // Handle checkbox selection
+                handleDepartmentCheckboxes();
+            }
+        }
+        
+        // Handle department checkboxes
+        function handleDepartmentCheckboxes() {
+            // Select all checkbox
+            $(document).on('change', '#select-all-departments', function() {
+                var isChecked = $(this).is(':checked');
+                $('.department-checkbox').prop('checked', isChecked);
+                updateBulkActions();
+            });
+            
+            // Individual checkbox
+            $(document).on('change', '.department-checkbox', function() {
+                updateBulkActions();
+                updateSelectAllCheckbox();
+            });
+            
+            // Clear selection
+            $(document).on('click', '#clear-selection', function() {
+                $('.department-checkbox, #select-all-departments').prop('checked', false);
+                updateBulkActions();
+            });
+            
+            // Bulk status change
+            $(document).on('change', '#bulk-status-change', function() {
+                var status = $(this).val();
+                if(status && status !== '') {
+                    var selectedIds = getSelectedDepartmentIds();
+                    if(selectedIds.length > 0) {
+                        changeBulkStatus(selectedIds, status);
+                    } else {
+                        swalSuccess('error', 'Please select at least one department');
+                        $(this).val('');
+                    }
+                }
+            });
+            
+            // Bulk delete
+            $(document).on('click', '#bulk-delete-departments', function() {
+                var selectedIds = getSelectedDepartmentIds();
+                if(selectedIds.length > 0) {
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: 'You are about to delete ' + selectedIds.length + ' department(s). This action cannot be undone!',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete them!',
+                        cancelButtonText: 'Cancel'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            deleteBulkDepartments(selectedIds);
+                        }
+                    });
+                } else {
+                    swalSuccess('error', 'Please select at least one department');
+                }
+            });
+        }
+        
+        // Get selected department IDs
+        function getSelectedDepartmentIds() {
+            var ids = [];
+            $('.department-checkbox:checked').each(function() {
+                ids.push($(this).val());
+            });
+            return ids;
+        }
+        
+        // Update bulk actions visibility
+        function updateBulkActions() {
+            var selectedCount = getSelectedDepartmentIds().length;
+            if(selectedCount > 0) {
+                $('#departments-bulk-actions').show();
+                $('#selected-count').text(selectedCount + ' selected');
+            } else {
+                $('#departments-bulk-actions').hide();
+                $('#bulk-status-change').val('');
+            }
+        }
+        
+        // Update select all checkbox
+        function updateSelectAllCheckbox() {
+            var totalCheckboxes = $('.department-checkbox').length;
+            var checkedCheckboxes = $('.department-checkbox:checked').length;
+            $('#select-all-departments').prop('checked', totalCheckboxes > 0 && totalCheckboxes === checkedCheckboxes);
+        }
+        
+        // Change bulk status
+        function changeBulkStatus(ids, status) {
+            $.ajax({
+                url: "{{ url('/branch/stc/departments/bulk-status') }}",
+                type: 'POST',
+                data: {
+                    ids: ids,
+                    status: status,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if(response.success) {
+                        swalSuccess('success', response.message || 'Status updated successfully');
+                        $('.department-checkbox, #select-all-departments').prop('checked', false);
+                        updateBulkActions();
+                        if(departmentsTable !== null && $.fn.DataTable.isDataTable('#departments-table')) {
+                            departmentsTable.ajax.reload(null, false);
+                        }
+                    } else {
+                        swalSuccess('error', response.message || 'Error updating status');
+                    }
+                },
+                error: function() {
+                    swalSuccess('error', 'Error updating status');
+                }
+            });
+        }
+        
+        // Delete bulk departments
+        function deleteBulkDepartments(ids) {
+            $.ajax({
+                url: "{{ url('/branch/stc/departments/bulk-delete') }}",
+                type: 'POST',
+                data: {
+                    ids: ids,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if(response.success) {
+                        swalSuccess('success', response.message || 'Departments deleted successfully');
+                        $('.department-checkbox, #select-all-departments').prop('checked', false);
+                        updateBulkActions();
+                        if(departmentsTable !== null && $.fn.DataTable.isDataTable('#departments-table')) {
+                            departmentsTable.ajax.reload(null, false);
+                        }
+                    } else {
+                        swalSuccess('error', response.message || 'Error deleting departments');
+                    }
+                },
+                error: function() {
+                    swalSuccess('error', 'Error deleting departments');
+                }
+            });
+        }
+        
+        // Initialize departments table when tab is shown
+        $('#departments-tab').on('shown.bs.tab', function (e) {
+            initDepartmentsTable();
+        });
+        
+        // Initialize if departments tab is active by default
+        if($('#departments-tab').hasClass('active')) {
+            initDepartmentsTable();
+        }
+        
+        var isEditMode = false;
+        
+        // Open add modal
+        $('#add-department-modal').on('show.bs.modal', function() {
+            if(!isEditMode) {
+                $('#department-modal-title').text('Add Department');
+                $('#department-form')[0].reset();
+                $('#department_id').val('');
+            }
+        });
+        
+        // Open add modal button
+        $('[data-target="#add-department-modal"]').on('click', function() {
+            isEditMode = false;
+            $('#department-modal-title').text('Add Department');
+            $('#department-form')[0].reset();
+            $('#department_id').val('');
+        });
+        
+        // Edit department
+        $(document).on('click', '.edit-department', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            isEditMode = true;
+            var deptId = $(this).data('id');
+            console.log('Loading department for edit, ID:', deptId);
+            
+            // Show loading state
+            $('#department-modal-title').text('Loading...');
+            $('#add-department-modal').modal('show');
+            
+            $.ajax({
+                url: "{{ url('/branch/stc/departments/get') }}",
+                type: 'GET',
+                data: { id: deptId },
+                success: function(response) {
+                    console.log('Department data response:', response);
+                    if(response.success && response.data) {
+                        var dept = response.data;
+                        
+                        // Populate form fields
+                        $('#department_id').val(dept.stc_status_down_list_department_id || '');
+                        $('#department_project_id').val(dept.stc_status_down_list_department_loc_id || '');
+                        $('#department_location').val(dept.stc_status_down_list_department_location || '');
+                        $('#department_name').val(dept.stc_status_down_list_department_dept || '');
+                        $('#department_status').val(dept.stc_status_down_list_department_status || '1');
+                        
+                        // Update title
+                        $('#department-modal-title').text('Edit Department');
+                    } else {
+                        $('#add-department-modal').modal('hide');
+                        swalSuccess('error', response.message || 'Error loading department data');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#add-department-modal').modal('hide');
+                    swalSuccess('error', 'Error loading department data');
+                }
+            });
+        });
+        
+        // Reset edit mode when modal is hidden
+        $('#add-department-modal').on('hidden.bs.modal', function() {
+            isEditMode = false;
+        });
+        
+        // Save department (add/edit)
+        $('#department-form').on('submit', function(e) {
+            e.preventDefault();
+            var formData = {
+                id: $('#department_id').val(),
+                project_id: $('#department_project_id').val(),
+                location: $('#department_location').val(),
+                department_name: $('#department_name').val(),
+                status: $('#department_status').val(),
+                _token: '{{ csrf_token() }}'
+            };
+            
+            $.ajax({
+                url: "{{ url('/branch/stc/departments/save') }}",
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if(response.success) {
+                        swalSuccess('success', response.message || 'Department saved successfully');
+                        $('#add-department-modal').modal('hide');
+                        if(departmentsTable !== null && $.fn.DataTable.isDataTable('#departments-table')) {
+                            departmentsTable.ajax.reload(null, false);
+                        }
+                    } else {
+                        swalSuccess('error', response.message || 'Error saving department');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    swalSuccess('error', 'Error saving department');
+                }
+            });
+        });
+        
+        // Delete department
+        $(document).on('click', '.delete-department', function() {
+            var deptId = $(this).data('id');
+            $('#delete_department_id').val(deptId);
+            $('#delete-department-modal').modal('show');
+        });
+        
+        $('#confirm-delete-department').on('click', function() {
+            var deptId = $('#delete_department_id').val();
+            $.ajax({
+                url: "{{ url('/branch/stc/departments/delete') }}",
+                type: 'GET',
+                data: { id: deptId },
+                success: function(response) {
+                    if(response.success) {
+                        swalSuccess('success', response.message || 'Department deleted successfully');
+                        $('#delete-department-modal').modal('hide');
+                        if(departmentsTable !== null && $.fn.DataTable.isDataTable('#departments-table')) {
+                            departmentsTable.ajax.reload(null, false);
+                        }
+                    } else {
+                        swalSuccess('error', response.message || 'Error deleting department');
+                    }
+                },
+                error: function() {
+                    swalSuccess('error', 'Error deleting department');
+                }
+            });
+        });
+        
+        // Edit project
+        var isProjectEditMode = false;
+        
+        $(document).on('click', '.edit-project', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            isProjectEditMode = true;
+            var projectId = $(this).data('id');
+            
+            // Show loading state
+            $('#project-modal-title').text('Loading...');
+            $('#edit-project-modal').modal('show');
+            
+            $.ajax({
+                url: "{{ url('/branch/stc/projects/get') }}",
+                type: 'GET',
+                data: { id: projectId },
+                success: function(response) {
+                    if(response.success && response.data) {
+                        var project = response.data;
+                        
+                        // Populate form fields
+                        $('#project_id').val(project.stc_cust_project_id || '');
+                        $('#project_customer_id').val(project.stc_cust_project_cust_id || '');
+                        $('#project_title').val(project.stc_cust_project_title || '');
+                        $('#project_reference_number').val(project.stc_cust_project_refr || '');
+                        $('#project_address').val(project.stc_cust_project_address || '');
+                        $('#project_city_id').val(project.stc_cust_project_city_id || '');
+                        $('#project_state_id').val(project.stc_cust_project_state_id || '');
+                        $('#project_responsive_person').val(project.stc_cust_project_responsive_person || '');
+                        $('#project_supervisor_qty').val(project.stc_cust_project_supervis_qty || '');
+                        $('#project_beg_date').val(project.stc_cust_project_beg_date || '');
+                        $('#project_end_date').val(project.stc_cust_project_end_date || '');
+                        $('#project_beg_budget').val(project.stc_cust_project_beg_budget || '');
+                        $('#project_status').val(project.stc_cust_project_status || '1');
+                        $('#project_editable_mincount').val(project.stc_cust_project_editable_mincount || '');
+                        $('#project_editable_maxcount').val(project.stc_cust_project_editable_maxcount || '');
+                        
+                        // Update title
+                        $('#project-modal-title').text('Edit Project');
+                    } else {
+                        $('#edit-project-modal').modal('hide');
+                        swalSuccess('error', response.message || 'Error loading project data');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#edit-project-modal').modal('hide');
+                    swalSuccess('error', 'Error loading project data');
+                }
+            });
+        });
+        
+        // Open add project modal
+        $('#edit-project-modal').on('show.bs.modal', function() {
+            if(!isProjectEditMode) {
+                $('#project-modal-title').text('Add Project');
+                $('#project-form')[0].reset();
+                $('#project_id').val('');
+            }
+        });
+        
+        // Reset edit mode when modal is hidden
+        $('#edit-project-modal').on('hidden.bs.modal', function() {
+            isProjectEditMode = false;
+        });
+        
+        // Save project (add/edit)
+        $('#project-form').on('submit', function(e) {
+            e.preventDefault();
+            var formData = {
+                id: $('#project_id').val(),
+                customer_id: $('#project_customer_id').val(),
+                title: $('#project_title').val(),
+                reference_number: $('#project_reference_number').val(),
+                address: $('#project_address').val(),
+                city_id: $('#project_city_id').val(),
+                state_id: $('#project_state_id').val(),
+                responsive_person: $('#project_responsive_person').val(),
+                supervisor_qty: $('#project_supervisor_qty').val(),
+                beg_date: $('#project_beg_date').val(),
+                end_date: $('#project_end_date').val(),
+                beg_budget: $('#project_beg_budget').val(),
+                status: $('#project_status').val(),
+                editable_mincount: $('#project_editable_mincount').val(),
+                editable_maxcount: $('#project_editable_maxcount').val(),
+                _token: '{{ csrf_token() }}'
+            };
+            
+            $.ajax({
+                url: "{{ url('/branch/stc/projects/save') }}",
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    if(response.success) {
+                        swalSuccess('success', response.message || 'Project saved successfully');
+                        $('#edit-project-modal').modal('hide');
+                        if(projectsTable !== null && $.fn.DataTable.isDataTable('#example1')) {
+                            projectsTable.ajax.reload(null, false);
+                        }
+                    } else {
+                        swalSuccess('error', response.message || 'Error saving project');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    swalSuccess('error', 'Error saving project');
+                }
+            });
+        });
+        
+        // Initialize projects table if projects tab is active by default
+        if($('#projects-tab').hasClass('active')) {
+            var dataTableAct="active";
+            getProjects(dataTableAct);
+        }      
       
+        // Projects DataTable variable
+        var projectsTable = null;
+        
         // get Rack function
         function getProjects() {
+            // Destroy existing table if it exists
+            if ($.fn.DataTable.isDataTable('#example1')) {
+                $('#example1').DataTable().destroy();
+            }
+            
             // Initialize DataTable
-            let table = $('#example1').DataTable({
+            projectsTable = $('#example1').DataTable({
                 processing: true,
                 serverSide: true,
                 responsive: true,
@@ -316,8 +852,18 @@
             });
 
             // Add buttons to container
-            table.buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+            if(projectsTable) {
+                projectsTable.buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+            }
         }
+        
+        // Initialize projects table only when projects tab is shown
+        $('#projects-tab').on('shown.bs.tab', function (e) {
+            if(projectsTable === null || !$.fn.DataTable.isDataTable('#example1')) {
+                var dataTableAct="active";
+                getProjects(dataTableAct);
+            }
+        });
 
 
 
@@ -622,6 +1168,7 @@
         });
 
         // delete function
+        // Delete project
         $('.delete-btn').on('click', function(e){
             e.preventDefault();
             var id = $('#delete_id').val();
@@ -633,13 +1180,16 @@
                 url: "{{ url('/branch/stc/projects/delete') }}",
                 success: function(response) {
                     if(response.success==true){
-
                         swalSuccess('success', 'Record deleted.');
-                        if ( $.fn.DataTable.isDataTable('#example1') ) {
-                        $('#example1').DataTable().destroy();
+                        if(projectsTable !== null && $.fn.DataTable.isDataTable('#example1')) {
+                            projectsTable.ajax.reload(null, false);
+                        } else {
+                            if ( $.fn.DataTable.isDataTable('#example1') ) {
+                                $('#example1').DataTable().destroy();
+                            }
+                            var dataTableAct="active";
+                            getProjects(dataTableAct);
                         }
-                        dataTableAct="active";
-                        getProjects(dataTableAct);
                         $('.close-btn').click();
                     }else{
                         swalSuccess('error', response.message);
@@ -652,6 +1202,225 @@
 
 </body>
 </html>
+<!-- Add/Edit Project Modal -->
+<div class="modal fade" id="edit-project-modal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="project-modal-title">Add Project</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="project-form">
+        <div class="modal-body">
+          <input type="hidden" id="project_id">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Customer <span class="text-danger">*</span></label>
+                <select class="form-control" id="project_customer_id" required>
+                  <option value="">-- Select Customer --</option>
+                  @if(isset($customers) && count($customers) > 0)
+                    @foreach($customers as $customer)
+                      <option value="{{ $customer->stc_customer_id }}">{{ $customer->stc_customer_name }}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Title <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="project_title" placeholder="Enter Project Title" required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Reference Number</label>
+                <input type="text" class="form-control" id="project_reference_number" placeholder="Enter Reference Number">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Address</label>
+                <input type="text" class="form-control" id="project_address" placeholder="Enter Address">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>City</label>
+                <select class="form-control" id="project_city_id">
+                  <option value="">-- Select City --</option>
+                  @if(isset($cities) && count($cities) > 0)
+                    @foreach($cities as $city)
+                      <option value="{{ $city->stc_city_id }}">{{ $city->stc_city_name }}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>State</label>
+                <select class="form-control" id="project_state_id">
+                  <option value="">-- Select State --</option>
+                  @if(isset($states) && count($states) > 0)
+                    @foreach($states as $state)
+                      <option value="{{ $state->stc_state_id }}">{{ $state->stc_state_name }}</option>
+                    @endforeach
+                  @endif
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Responsive Person</label>
+                <input type="text" class="form-control" id="project_responsive_person" placeholder="Enter Responsive Person">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Supervisor Quantity</label>
+                <input type="number" class="form-control" id="project_supervisor_qty" placeholder="Enter Supervisor Quantity">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Begin Date</label>
+                <input type="date" class="form-control" id="project_beg_date">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>End Date</label>
+                <input type="date" class="form-control" id="project_end_date">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Begin Budget</label>
+                <input type="number" step="0.01" class="form-control" id="project_beg_budget" placeholder="Enter Budget">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Status</label>
+                <select class="form-control" id="project_status">
+                  <option value="1">Active</option>
+                  <option value="0">Inactive</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Editable Min Count</label>
+                <input type="number" class="form-control" id="project_editable_mincount" placeholder="Enter Min Count">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label>Editable Max Count</label>
+                <input type="number" class="form-control" id="project_editable_maxcount" placeholder="Enter Max Count">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Project</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Department Modal -->
+<div class="modal fade" id="add-department-modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="department-modal-title">Add Department</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form id="department-form">
+        <div class="modal-body">
+          <input type="hidden" id="department_id">
+          <div class="form-group">
+            <label>Project <span class="text-danger">*</span></label>
+            <select class="form-control" id="department_project_id" required>
+              <option value="">-- Select Project --</option>
+              @if(isset($projects) && count($projects) > 0)
+                @foreach($projects as $project)
+                  <option value="{{ $project->stc_cust_project_id }}">{{ $project->stc_cust_project_title }}</option>
+                @endforeach
+              @endif
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Location <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="department_location" placeholder="Enter Location" required>
+          </div>
+          <div class="form-group">
+            <label>Department Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="department_name" placeholder="Enter Department Name" required>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" id="department_status">
+              <option value="1">Active</option>
+              <option value="0">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
+<!-- Delete Department Modal -->
+<div class="modal fade" id="delete-department-modal">
+  <div class="modal-dialog">
+    <div class="modal-content bg-danger">
+      <div class="modal-header">
+        <h4 class="modal-title">Delete Department</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete this department?</p>
+        <p class="text-warning"><small>This action cannot be undone.</small></p>
+        <input type="hidden" id="delete_department_id">
+      </div>
+      <div class="modal-footer justify-content-between">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete-department">Delete</button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+
 <!-- delete modal -->
 <div class="modal fade" id="delete-modal">
   <div class="modal-dialog">

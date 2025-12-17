@@ -25,7 +25,7 @@ class ragnarSummary extends tesseract{
 		
 		// First try to get departments from department table
 		$location_for_dept = $location == 'NA' ? '' : $location;
-		$dept_where = $location_for_dept != '' ? "WHERE `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $location_for_dept)."' AND `stc_status_down_list_department_dept`<>''" : "WHERE `stc_status_down_list_department_dept`<>''";
+		$dept_where = $location_for_dept != '' ? "WHERE `stc_status_down_list_department_status`=1 AND `stc_status_down_list_department_location`='".mysqli_real_escape_string($this->stc_dbs, $location_for_dept)."' AND `stc_status_down_list_department_dept`<>''" : "WHERE `stc_status_down_list_department_status`=1 AND `stc_status_down_list_department_dept`<>''";
 		$dept_query = "SELECT DISTINCT `stc_status_down_list_department_dept` 
 			FROM `stc_status_down_list_department` 
 			".$dept_where."

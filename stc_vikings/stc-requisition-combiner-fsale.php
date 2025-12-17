@@ -29,6 +29,18 @@ STCAuthHelper::checkAuth();?>
       .fade:not(.show) {
         opacity: 10;
       }
+      .fixed-action-buttons {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .fixed-action-buttons .btn {
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      }
     </style>
 </head>
 <body>
@@ -53,7 +65,9 @@ STCAuthHelper::checkAuth();?>
                                   <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
                                       <div class="card-border mb-3 card card-body border-success">
-                                        <h2 class="tm-block-title d-inline-block">Requisition</h2>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                          <h2 class="tm-block-title d-inline-block">Requisition</h2>
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
@@ -95,6 +109,17 @@ STCAuthHelper::checkAuth();?>
                 </div>  
             </div>
         </div>
+    </div>
+    <!-- Fixed Action Buttons -->
+    <div class="fixed-action-buttons">
+      <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#addItemToRequisitionModal" id="addItemToRequisitionBtn">
+        <i class="fa fa-plus"></i> Add Item to Requisition
+      </button>
+      <?php if(isset($_SESSION['stc_empl_id']) && ($_SESSION['stc_empl_id'] == 1 || $_SESSION['stc_empl_id'] == 2)): ?>
+      <button type="button" class="btn btn-danger" id="deleteSelectedRequisitionsBtn" style="display: none;">
+        <i class="fa fa-trash"></i> Delete Selected Requisitions
+      </button>
+      <?php endif; ?>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
@@ -810,6 +835,223 @@ STCAuthHelper::checkAuth();?>
           });
         }
       });
+
+      // Delete selected requisitions functionality
+      $(document).ready(function(){
+        // Select all checkbox functionality
+        $(document).on('change', '#selectAllRequisitions', function(){
+          var isChecked = $(this).is(':checked');
+          $('.requisition-checkbox').prop('checked', isChecked);
+          checkSelectedRequisitions();
+        });
+
+        // Individual checkbox change
+        $(document).on('change', '.requisition-checkbox', function(){
+          // Update select all checkbox state
+          var totalCheckboxes = $('.requisition-checkbox').length;
+          var checkedCheckboxes = $('.requisition-checkbox:checked').length;
+          $('#selectAllRequisitions').prop('checked', totalCheckboxes === checkedCheckboxes && totalCheckboxes > 0);
+          checkSelectedRequisitions();
+        });
+
+        // Function to update row numbers after deletion
+        function updateRowNumbers(){
+          $('.stc-view-ag-requisition-form table tbody tr').not(':has([colspan])').each(function(index){
+            $(this).find('td:eq(1)').text(index + 1); // Update Sl No column (2nd column after checkbox)
+          });
+        }
+
+        // Check selected requisitions and show/hide delete button
+        function checkSelectedRequisitions(){
+          var selectedIds = [];
+          $('.requisition-checkbox:checked').each(function(){
+            var reqId = $(this).val();
+            // Deduplicate - only add if not already in array
+            if(selectedIds.indexOf(reqId) === -1){
+              selectedIds.push(reqId);
+            }
+          });
+
+          if(selectedIds.length > 0){
+            // Check if all selected requisitions are older than 1 year
+            $.ajax({
+              url: 'kattegat/ragnar_order.php',
+              method: 'POST',
+              data: { 
+                check_requisitions_age: 1,
+                requisition_ids: selectedIds
+              },
+              dataType: 'JSON',
+              success: function(response) {
+                if(response.success == true){
+                  if(response.all_old == true){
+                    // All selected requisitions are less than 1 year old - show delete button
+                    $('#deleteSelectedRequisitionsBtn').show();
+                  } else {
+                    // Some requisitions are more than 1 year old - hide delete button
+                    $('#deleteSelectedRequisitionsBtn').hide();
+                    // Don't show alert on every checkbox change, only when user tries to delete
+                  }
+                }
+              },
+              error: function() {
+                $('#deleteSelectedRequisitionsBtn').hide();
+              }
+            });
+          } else {
+            // No checkboxes selected - hide delete button
+            $('#deleteSelectedRequisitionsBtn').hide();
+          }
+        }
+
+        // Delete selected requisitions
+        $('#deleteSelectedRequisitionsBtn').on('click', function(e){
+          e.preventDefault();
+          var selectedIds = [];
+          $('.requisition-checkbox:checked').each(function(){
+            var reqId = $(this).val();
+            // Deduplicate - only add if not already in array
+            if(selectedIds.indexOf(reqId) === -1){
+              selectedIds.push(reqId);
+            }
+          });
+
+          if(selectedIds.length == 0){
+            alert('Please select at least one requisition to delete.');
+            return;
+          }
+
+          // Double check that all are older than 1 year
+          $.ajax({
+            url: 'kattegat/ragnar_order.php',
+            method: 'POST',
+            data: { 
+              check_requisitions_age: 1,
+              requisition_ids: selectedIds
+            },
+            dataType: 'JSON',
+            success: function(checkResponse) {
+              if(checkResponse.success == true && checkResponse.all_old == true){
+                if(confirm('Are you sure you want to delete '+selectedIds.length+' selected requisition(s)? This action cannot be undone!')){
+                  $.ajax({
+                    url: 'kattegat/ragnar_order.php',
+                    method: 'POST',
+                    data: { 
+                      delete_selected_requisitions: 1,
+                      requisition_ids: selectedIds
+                    },
+                    dataType: 'JSON',
+                    success: function(response) {
+                      if(response.success == true){
+                        alert(response.message);
+                        // Reload the page
+                        window.location.reload();
+                      } else {
+                        alert(response.message);
+                      }
+                    },
+                    error: function() {
+                      alert('Error occurred while deleting requisitions.');
+                    }
+                  });
+                }
+              } else {
+                alert('Cannot delete: Some selected requisitions are more than 1 year old.');
+                $('#deleteSelectedRequisitionsBtn').hide();
+              }
+            },
+            error: function() {
+              alert('Error occurred while checking requisition age.');
+            }
+          });
+        });
+
+        // Load parent projects for add item modal
+        $('#addItemToRequisitionModal').on('show.bs.modal', function() {
+          loadParentProjects();
+          // Reset form
+          $('#addItemToRequisitionForm')[0].reset();
+          $('#parentProjectId').val('');
+        });
+
+        function loadParentProjects(){
+          var url_param = $.urlParam('requi_id');
+          $.ajax({
+            url: 'kattegat/ragnar_order.php',
+            method: 'POST',
+            data: { get_parent_projects: 1, url_param: url_param },
+            dataType: 'JSON',
+            success: function(response) {
+              if(response.success == true){
+                var options = '<option value="">Select Project</option>';
+                $.each(response.projects, function(index, project) {
+                  options += '<option value="' + project.id + '">' + project.title + '</option>';
+                });
+                $('#parentProjectSelect').html(options);
+              } else {
+                $('#parentProjectSelect').html('<option value="">No projects found</option>');
+              }
+            }
+          });
+        }
+
+        $('#parentProjectSelect').on('change', function(){
+          var projectId = $(this).val();
+          $('#parentProjectId').val(projectId);
+        });
+
+        // Save item to requisition
+        $('#saveItemToRequisition').on('click', function(e){
+          e.preventDefault();
+          
+          var projectId = $('#parentProjectId').val();
+          var itemDescription = $('#itemDescription').val();
+          var itemQuantity = $('#itemQuantity').val();
+          var itemUnit = $('#itemUnit').val();
+          var itemType = $('#itemType').val();
+          var itemPriority = $('#itemPriority').val();
+          var url_param = $.urlParam('requi_id');
+
+          if(!projectId){
+            alert('Please select a project.');
+            return;
+          }
+
+          if(!itemDescription || !itemQuantity || itemUnit == 'NA' || itemType == 'NA'){
+            alert('Please fill in all required fields.');
+            return;
+          }
+
+          $.ajax({
+            url: 'kattegat/ragnar_order.php',
+            method: 'POST',
+            data: {
+              add_item_to_parent_requisition: 1,
+              project_id: projectId,
+              item_description: itemDescription,
+              item_quantity: itemQuantity,
+              item_unit: itemUnit,
+              item_type: itemType,
+              item_priority: itemPriority,
+              url_param: url_param
+            },
+            dataType: 'JSON',
+            success: function(response) {
+              if(response.success == true){
+                alert(response.message);
+                $('#addItemToRequisitionModal').modal('hide');
+                // Reload the page
+                window.location.reload();
+              } else {
+                alert(response.message);
+              }
+            },
+            error: function() {
+              alert('Error occurred while adding item.');
+            }
+          });
+        });
+      });
     </script>
 </body>
 </html>
@@ -1144,4 +1386,99 @@ STCAuthHelper::checkAuth();?>
             </div>
         </div>
     </div>
+</div>
+
+<!-- Add Item to Requisition Modal -->
+<div class="modal fade" id="addItemToRequisitionModal" tabindex="-1" role="dialog" aria-labelledby="addItemToRequisitionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="addItemToRequisitionModalLabel">Add Item to Requisition</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+            <form id="addItemToRequisitionForm">
+              <table class="table table-bordered table-hover">
+                <thead>
+                  <tr>
+                    <th class="text-center">Project</th>
+                    <th class="text-center">Item Description</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-center">Unit</th>
+                    <th class="text-center">Type</th>
+                    <th class="text-center">Priority</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <select class="form-control" id="parentProjectSelect" required>
+                        <option value="">Select Project</option>
+                      </select>
+                      <input type="hidden" id="parentProjectId" value="">
+                    </td>
+                    <td>
+                      <input type="text" class="form-control" id="itemDescription" name="item_description" placeholder="Enter Item Name" required>
+                    </td>
+                    <td>
+                      <input type="number" class="form-control" id="itemQuantity" name="item_quantity" placeholder="Qty" step="0.01" required>
+                    </td>
+                    <td>
+                      <select class="form-control" id="itemUnit" name="item_unit" required>
+                        <option value="NA">SELECT</option>
+                        <option value="BAG">BAG</option>
+                        <option value="BOTTLE">BOTTLE</option>
+                        <option value="BOX">BOX</option>
+                        <option value="BUNDLE">BUNDLE</option>
+                        <option value="CASE">CASE</option>
+                        <option value="CBM">CBM</option>
+                        <option value="CFT">CFT</option>
+                        <option value="COIL">COIL</option>
+                        <option value="FEET">FEET</option>
+                        <option value="JAR">JAR</option>
+                        <option value="KGS">KGS</option>
+                        <option value="LOT">LOT</option>
+                        <option value="LTR">LTR</option>
+                        <option value="MTR">MTR</option>
+                        <option value="MTS">MTS</option>
+                        <option value="NOS">NOS</option>
+                        <option value="PAIR">PAIR</option>
+                        <option value="PKT">PKT</option>
+                        <option value="ROLL">ROLL</option>
+                        <option value="SET">SET</option>
+                        <option value="SQFT">SQFT</option>
+                        <option value="SQMT">SQMT</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select class="form-control" id="itemType" name="item_type" required>
+                        <option value="NA">SELECT</option>
+                        <option value="Consumable">CONSUMABLE</option>
+                        <option value="PPE">PPE</option>
+                        <option value="Supply">SUPPPLY</option>
+                        <option value="Tools & Tackles">TOOLS & TACKLES</option>
+                        <option value="Product">Product</option>
+                      </select>
+                    </td>
+                    <td>
+                      <select class="form-control" id="itemPriority" name="item_priority">
+                        <option value="1">Normal</option>
+                        <option value="2">Urgent</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="saveItemToRequisition">Save</button>
+        <button type="button" class="btn btn-default" id="closeAddItemModal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>

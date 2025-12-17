@@ -2310,12 +2310,184 @@ class raganarRequisitionUpdate extends tesseract{
 
 // call perticular requistion class
 class ragnarRequisitionPertView extends tesseract{
+	// Check if requisitions are older than 1 year
+	public function stc_check_requisitions_age($requisition_ids){
+		$result = array('success' => false, 'message' => '', 'all_old' => false, 'old_ids' => array(), 'new_ids' => array());
+		$date_one_year_ago = date('Y-m-d H:i:s', strtotime('-1 year'));
+		
+		if(empty($requisition_ids) || !is_array($requisition_ids)){
+			$result['message'] = 'Invalid requisition IDs.';
+			return $result;
+		}
+		
+		$old_ids = array();
+		$new_ids = array();
+		
+		foreach($requisition_ids as $req_id){
+			$req_id = (int)$req_id;
+			if($req_id <= 0) continue;
+			
+			$check_query = mysqli_query($this->stc_dbs, "
+				SELECT `stc_cust_super_requisition_list_id`, `stc_cust_super_requisition_list_date` 
+				FROM `stc_cust_super_requisition_list` 
+				WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
+			");
+			
+			if(mysqli_num_rows($check_query) > 0){
+				$req_data = mysqli_fetch_assoc($check_query);
+				if(strtotime($req_data['stc_cust_super_requisition_list_date']) < strtotime($date_one_year_ago)){
+					$old_ids[] = $req_id;
+				} else {
+					$new_ids[] = $req_id;
+				}
+			}
+		}
+		
+		$result['success'] = true;
+		// all_old means all are less than 1 year (can be deleted)
+		// If any is more than 1 year old, hide delete button
+		$result['all_old'] = (count($old_ids) == 0 && count($new_ids) > 0);
+		$result['old_ids'] = $old_ids;
+		$result['new_ids'] = $new_ids;
+		
+		if(count($old_ids) > 0){
+			$result['message'] = 'Some selected requisitions are more than 1 year old and cannot be deleted.';
+		} else {
+			$result['message'] = 'All selected requisitions are less than 1 year old.';
+		}
+		
+		return $result;
+	}
+	
+	// Delete selected requisitions (less than 1 year old)
+	public function stc_delete_selected_requisitions($requisition_ids){
+		$result = array('success' => false, 'message' => '', 'deleted_count' => 0);
+		$date_one_year_ago = date('Y-m-d H:i:s', strtotime('-1 year'));
+		
+		if(empty($requisition_ids) || !is_array($requisition_ids)){
+			$result['message'] = 'Invalid requisition IDs.';
+			return $result;
+		}
+		
+		// First verify all are less than 1 year old
+		$valid_ids = array();
+		foreach($requisition_ids as $req_id){
+			$req_id = (int)$req_id;
+			if($req_id <= 0) continue;
+			
+			$check_query = mysqli_query($this->stc_dbs, "
+				SELECT `stc_cust_super_requisition_list_date` 
+				FROM `stc_cust_super_requisition_list` 
+				WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
+			");
+			
+			if(mysqli_num_rows($check_query) > 0){
+				$req_data = mysqli_fetch_assoc($check_query);
+				// Only add if less than 1 year old (date is after one year ago)
+				if(strtotime($req_data['stc_cust_super_requisition_list_date']) >= strtotime($date_one_year_ago)){
+					$valid_ids[] = $req_id;
+				}
+			}
+		}
+		
+		if(empty($valid_ids)){
+			$result['message'] = 'No valid requisitions to delete. All selected requisitions are more than 1 year old.';
+			return $result;
+		}
+		
+		$deleted_count = 0;
+		
+		foreach($valid_ids as $req_id){
+			$req_id = (int)$req_id;
+			if($req_id <= 0) continue;
+			
+			// Get all item IDs for this requisition
+			$item_ids_query = mysqli_query($this->stc_dbs, "
+				SELECT `stc_cust_super_requisition_list_id` 
+				FROM `stc_cust_super_requisition_list_items` 
+				WHERE `stc_cust_super_requisition_list_items_req_id` = '".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
+			");
+			$item_ids = array();
+			while($item_row = mysqli_fetch_assoc($item_ids_query)){
+				$item_ids[] = $item_row['stc_cust_super_requisition_list_id'];
+			}
+			
+			// Delete logs for all items
+			if(!empty($item_ids)){
+				$item_ids_str = implode(',', array_map(function($id) { return mysqli_real_escape_string($this->stc_dbs, $id); }, $item_ids));
+				mysqli_query($this->stc_dbs, "
+					DELETE FROM `stc_cust_super_requisition_list_items_log` 
+					WHERE `item_id` IN (".$item_ids_str.")
+				");
+			}
+			
+			// Delete requisition items
+			mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_super_requisition_list_items` 
+				WHERE `stc_cust_super_requisition_list_items_req_id` = '".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
+			");
+			
+			// Delete main requisition
+			mysqli_query($this->stc_dbs, "
+				DELETE FROM `stc_cust_super_requisition_list` 
+				WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
+			");
+			
+			$deleted_count++;
+		}
+		
+		$result['success'] = true;
+		$result['message'] = 'Successfully deleted '.$deleted_count.' requisition(s) and their related logs.';
+		$result['deleted_count'] = $deleted_count;
+		$result['deleted_ids'] = $valid_ids; // Return deleted IDs for frontend row removal
+		
+		return $result;
+	}
+	
+	// Get unique projects from parent requisitions for add item modal
+	public function stc_get_parent_projects($url_param){
+		$result = array('success' => false, 'message' => '', 'projects' => array());
+		
+		$query = "
+			SELECT DISTINCT
+				L.`stc_cust_super_requisition_list_project_id` as project_id,
+				`stc_cust_project_title` as project_title
+			FROM `stc_cust_super_requisition_list` L
+			INNER JOIN `stc_cust_project` 
+			ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
+			INNER JOIN `stc_requisition_combiner_req`
+			ON `stc_requisition_combiner_req_requisition_id`=L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_requisition_combiner`
+			ON `stc_requisition_combiner_req_comb_id`=`stc_requisition_combiner_id`
+			WHERE `stc_requisition_combiner_id`='".mysqli_real_escape_string($this->stc_dbs, $url_param)."'
+			ORDER BY `stc_cust_project_title` ASC
+		";
+		
+		$project_query = mysqli_query($this->stc_dbs, $query);
+		
+		if(mysqli_num_rows($project_query) > 0){
+			while($row = mysqli_fetch_assoc($project_query)){
+				$result['projects'][] = array(
+					'id' => $row['project_id'],
+					'title' => $row['project_title']
+				);
+			}
+			$result['success'] = true;
+		} else {
+			$result['success'] = false;
+			$result['message'] = 'No projects found.';
+		}
+		
+		return $result;
+	}
+	
 	// call perticular 
 	public function stc_show_requisition_list($url_param){
 		$lokiout='
 			<table class="table table-hover table-bordered">
 				<thead>
 					<tr>
+						<th class="text-center"><input type="checkbox" id="selectAllRequisitions" title="Select All"></th>
 						<th class="text-center">Sl No</th>
 						<th class="text-center">ID<br>Date</th>
 						<th class="text-center">From</th>
@@ -2486,8 +2658,22 @@ class ragnarRequisitionPertView extends tesseract{
 					}
 				}
 				$slno++;
+				$req_date = $requisrow['stc_cust_super_requisition_list_date'];
+				$req_id = $requisrow['list_id'];
+				$list_item_id = $requisrow['list_item_id'];
+				
+				// Check if dispatched quantity is 0 - only show checkbox if dispatched_qty is 0
+				$show_checkbox = ($dispatchedgqty == 0 || $dispatchedgqty == null || $dispatchedgqty == '');
+				
 				$lokiout.= '
-					<tr>
+					<tr data-req-id="'.$req_id.'" data-list-item-id="'.$list_item_id.'">
+						 <td class="text-center">
+						 	'.($show_checkbox ? '<input type="checkbox" class="requisition-checkbox" 
+						 		data-req-id="'.$req_id.'" 
+						 		data-req-date="'.$req_date.'"
+						 		data-list-item-id="'.$list_item_id.'"
+						 		value="'.$req_id.'">' : '').'
+						 </td>
 						 <td class="text-center"> '.$slno.' </td>
 						 <td class="text-center"> '.$requisrow['list_id'].'<br> '.date('d-m-Y h:i A', strtotime($requisrow['stc_cust_super_requisition_list_date'])).' </td>
 						 <td class="text-center">'.$requisrow['stc_cust_pro_supervisor_fullname'].'<br>'.$requisrow['stc_cust_pro_supervisor_contact'].'</td>
@@ -2507,7 +2693,7 @@ class ragnarRequisitionPertView extends tesseract{
 		}else{
 			$lokiout.= '
 				<tr>
-					<td colspan="6">
+					<td colspan="14">
 					    <b>No Requisition Found!!!</b>
 					</td>
 				</tr>
@@ -3057,7 +3243,7 @@ class ragnarRequisitionPertView extends tesseract{
 											<div class="h-bg-inner"></div>
 										</div>
 
-										<a class="cart add_to_requist_cart" href="#" id="'.$filterrow["stc_product_id"].'">
+										<a class="cart '.($parent_requisition_id > 0 ? 'add_to_parent_requisition' : 'add_to_requist_cart').'" href="#" id="'.$filterrow["stc_product_id"].'">
 										<span class="price">'.$filterrow["stc_sub_cat_name"].' / '.$filterrow["stc_brand_title"].'</span>
 										<span class="add-to-cart">
 											<span class="txt">Add Item</span>
@@ -3163,6 +3349,176 @@ class ragnarRequisitionPertView extends tesseract{
 
 // add requisition perticular class
 class ragnarRequisitionPertAdd extends tesseract{
+	// Add item to parent requisition by project
+	public function stc_add_item_to_parent_requisition($project_id, $item_description, $item_quantity, $item_unit, $item_type, $item_priority, $url_param){
+		$result = array('success' => false, 'message' => '');
+		
+		if($project_id <= 0 || empty($item_description) || $item_quantity <= 0){
+			$result['message'] = 'Invalid parameters.';
+			return $result;
+		}
+		
+		// Get requisition ID for this project from the combiner
+		$req_query = mysqli_query($this->stc_dbs, "
+			SELECT L.`stc_cust_super_requisition_list_id`, L.`stc_cust_super_requisition_list_super_id`
+			FROM `stc_cust_super_requisition_list` L
+			INNER JOIN `stc_requisition_combiner_req`
+			ON `stc_requisition_combiner_req_requisition_id`=L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_requisition_combiner`
+			ON `stc_requisition_combiner_req_comb_id`=`stc_requisition_combiner_id`
+			WHERE `stc_requisition_combiner_id`='".mysqli_real_escape_string($this->stc_dbs, $url_param)."'
+			AND L.`stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $project_id)."'
+			LIMIT 1
+		");
+		
+		$requisition_id = 0;
+		
+		if(mysqli_num_rows($req_query) == 0){
+			// No requisition found, create a new one
+			// Get agent_id and supervisor_id from requisition combiner and project
+			$combiner_query = mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_requisition_combiner_agent_id`,
+					P.`stc_cust_project_createdby` as supervisor_id
+				FROM `stc_requisition_combiner`
+				INNER JOIN `stc_cust_project` P
+				ON P.`stc_cust_project_id`='".mysqli_real_escape_string($this->stc_dbs, $project_id)."'
+				WHERE `stc_requisition_combiner_id`='".mysqli_real_escape_string($this->stc_dbs, $url_param)."'
+				LIMIT 1
+			");
+			
+			if(mysqli_num_rows($combiner_query) > 0){
+				$combiner_data = mysqli_fetch_assoc($combiner_query);
+				$req_data = mysqli_fetch_assoc($req_query);
+				$agent_id = $combiner_data['stc_requisition_combiner_agent_id'];
+				$supervisor_id = $req_data['stc_cust_super_requisition_list_super_id'];
+				
+				// Get current date/time
+				$current_date = date('Y-m-d H:i:s');
+				
+				// Insert new requisition into stc_cust_super_requisition_list
+				$insert_requisition_query = mysqli_query($this->stc_dbs, "
+					INSERT INTO `stc_cust_super_requisition_list`(
+						`stc_cust_super_requisition_list_project_id`,
+						`stc_cust_super_requisition_list_super_id`,
+						`stc_cust_super_requisition_list_date`,
+						`stc_cust_super_requisition_list_status`
+					) VALUES (
+						'".mysqli_real_escape_string($this->stc_dbs, $project_id)."',
+						'".mysqli_real_escape_string($this->stc_dbs, $supervisor_id)."',
+						'".mysqli_real_escape_string($this->stc_dbs, $current_date)."',
+						'0'
+					)
+				");
+				
+				if($insert_requisition_query){
+					$requisition_id = mysqli_insert_id($this->stc_dbs);
+					
+					// Link the new requisition to the combiner
+					$link_combiner_query = mysqli_query($this->stc_dbs, "
+						INSERT INTO `stc_requisition_combiner_req`(
+							`stc_requisition_combiner_req_comb_id`,
+							`stc_requisition_combiner_req_requisition_id`
+						) VALUES (
+							'".mysqli_real_escape_string($this->stc_dbs, $url_param)."',
+							'".mysqli_real_escape_string($this->stc_dbs, $requisition_id)."'
+						)
+					");
+				} else {
+					$result['message'] = 'Failed to create requisition.';
+					return $result;
+				}
+			} else {
+				$result['message'] = 'Requisition combiner not found.';
+				return $result;
+			}
+		} else {
+			$req_data = mysqli_fetch_assoc($req_query);
+			$requisition_id = $req_data['stc_cust_super_requisition_list_id'];
+		}
+		
+		// Get manager/agent name for approval
+		$manager_query = mysqli_query($this->stc_dbs, "
+			SELECT `stc_agents_name`
+			FROM `stc_cust_super_requisition_list` L
+			INNER JOIN `stc_cust_project` P
+			ON P.`stc_cust_project_id`=L.`stc_cust_super_requisition_list_project_id`
+			INNER JOIN `stc_agents` A
+			ON A.`stc_agents_id`=P.`stc_cust_project_createdby`
+			WHERE L.`stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $requisition_id)."'
+		");
+		$manager_name = 'Administration';
+		if(mysqli_num_rows($manager_query) > 0){
+			$manager_data = mysqli_fetch_assoc($manager_query);
+			$manager_name = $manager_data['stc_agents_name'];
+		}
+		
+		// Set status - 3 for Approved
+		$item_status = 3;
+		// Insert item into requisition list items with all three quantity fields
+		$insert_query = mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_super_requisition_list_items`(
+				`stc_cust_super_requisition_list_items_req_id`,
+				`stc_cust_super_requisition_list_items_title`,
+				`stc_cust_super_requisition_list_items_unit`,
+				`stc_cust_super_requisition_list_items_reqqty`,
+				`stc_cust_super_requisition_list_items_approved_qty`,
+				`stc_cust_super_requisition_items_finalqty`,
+				`stc_cust_super_requisition_items_priority`,
+				`stc_cust_super_requisition_list_items_status`,
+				`stc_cust_super_requisition_items_type`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $requisition_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_description)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_unit)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_quantity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_quantity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_quantity)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_priority)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_status)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_type)."'
+			)
+		");
+		
+		if($insert_query){
+			$item_id = mysqli_insert_id($this->stc_dbs);
+			
+			// Get current date/time
+			$current_date = date('d-m-Y h:i A');
+			$current_date_db = date('Y-m-d H:i:s');
+			
+			// Add log entry with proper format
+			$title = "Ordered";
+			$user_name = isset($_SESSION['stc_empl_name']) ? $_SESSION['stc_empl_name'] : 'System';
+			$message = "Ordered added by ".$user_name." from Administrations on ".$current_date." with approval from ".$manager_name;
+			
+			$log_query = mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, 
+					`title`, 
+					`message`, 
+					`status`, 
+					`created_by`,
+					`created_date`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $item_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+					'1',
+					'".$_SESSION['stc_empl_id']."',
+					'".$current_date_db."'
+				)
+			");
+			
+			$result['success'] = true;
+			$result['message'] = 'Item added to requisition successfully.';
+		} else {
+			$result['message'] = 'Failed to add item to requisition.';
+		}
+		
+		return $result;
+	}
+	
 	// save order to challan
 	public function stc_ag_req_go_to_challan($challan_id, $stc_ch_notes, $stc_ch_tandc, $stc_ch_waybilno, $stc_ch_lrno){
 		$heimdall='';
@@ -5377,4 +5733,57 @@ if(isset($_POST['stc_getpendingadhoc'])){
 	$odin_req = new ragnarCallGLDRequisitions();
 	$odin_req_out = $odin_req->stc_pendingadhoc($datefrom, $dateto);
 	echo json_encode($odin_req_out);
+}
+
+// Check if requisitions are older than 1 year
+if(isset($_POST['check_requisitions_age'])){
+	$requisition_ids = isset($_POST['requisition_ids']) ? $_POST['requisition_ids'] : array();
+	$objcheck = new ragnarRequisitionPertView();
+	$result = $objcheck->stc_check_requisitions_age($requisition_ids);
+	echo json_encode($result);
+}
+
+// Delete selected requisitions (older than 1 year)
+if(isset($_POST['delete_selected_requisitions'])){
+	$requisition_ids = isset($_POST['requisition_ids']) ? $_POST['requisition_ids'] : array();
+	$objdelete = new ragnarRequisitionPertView();
+	$result = $objdelete->stc_delete_selected_requisitions($requisition_ids);
+	echo json_encode($result);
+}
+
+// Get unique projects from parent requisitions for add item modal
+if(isset($_POST['get_parent_projects'])){
+	$url_param = isset($_POST['url_param']) ? $_POST['url_param'] : '';
+	$objget = new ragnarRequisitionPertView();
+	$result = $objget->stc_get_parent_projects($url_param);
+	echo json_encode($result);
+}
+
+// Add item to parent requisition by project
+if(isset($_POST['add_item_to_parent_requisition'])){
+	$project_id = isset($_POST['project_id']) ? (int)$_POST['project_id'] : 0;
+	$item_description = isset($_POST['item_description']) ? $_POST['item_description'] : '';
+	$item_quantity = isset($_POST['item_quantity']) ? $_POST['item_quantity'] : 0;
+	$item_unit = isset($_POST['item_unit']) ? $_POST['item_unit'] : '';
+	$item_type = isset($_POST['item_type']) ? $_POST['item_type'] : '';
+	$item_priority = isset($_POST['item_priority']) ? $_POST['item_priority'] : 1;
+	$url_param = isset($_POST['url_param']) ? $_POST['url_param'] : '';
+	
+	$objadd = new ragnarRequisitionPertAdd();
+	$result = $objadd->stc_add_item_to_parent_requisition($project_id, $item_description, $item_quantity, $item_unit, $item_type, $item_priority, $url_param);
+	echo json_encode($result);
+}
+
+// Filter products for parent requisition
+if(isset($_POST['stceditsaleaction_parent'])){
+	$bjornefiltercatout = isset($_POST['phpfiltercatout']) ? $_POST['phpfiltercatout'] : '';
+	$bjornefiltersubcatout = isset($_POST['phpfiltersubcatout']) ? $_POST['phpfiltersubcatout'] : '';
+	$bjornefilternameout = isset($_POST['phpfilternameout']) ? $_POST['phpfilternameout'] : '';
+	$parent_requisition_id = isset($_POST['parent_requisition_id']) ? (int)$_POST['parent_requisition_id'] : 0;
+	
+	$out = '';
+	$objpdres = new ragnarRequisitionPertView();
+	$opobjpdres = $objpdres->stc_getpd_by_multiple_inp($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout, $parent_requisition_id);
+	$out = $opobjpdres;
+	echo $out;
 }

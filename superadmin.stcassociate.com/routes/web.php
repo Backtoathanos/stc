@@ -202,10 +202,19 @@ Route::group(['middleware' => 'superadmin'], function(){
     // for stc requisition
     Route::get('/branch/stc/projects', [ProjectController::class, 'show']);    
     Route::get('/branch/stc/projects/list', [ProjectController::class, 'list']);
+    Route::get('/branch/stc/projects/get', [ProjectController::class, 'getProject']);
+    Route::post('/branch/stc/projects/save', [ProjectController::class, 'saveProject']);
     Route::get('/branch/stc/projects/delete', [ProjectController::class, 'delete']);
     Route::get('/branch/stc/projects/collaborations/list', [ProjectController::class, 'collaborationsList']);
     Route::get('/branch/stc/projects/collaborations/remove', [ProjectController::class, 'removeCollaborator']);
     Route::post('/branch/stc/projects/collaborations/bulk-remove', [ProjectController::class, 'bulkRemoveCollaborators']);
+    // for departments
+    Route::get('/branch/stc/departments/list', [ProjectController::class, 'departmentsList']);
+    Route::get('/branch/stc/departments/get', [ProjectController::class, 'getDepartment']);
+    Route::post('/branch/stc/departments/save', [ProjectController::class, 'saveDepartment']);
+    Route::get('/branch/stc/departments/delete', [ProjectController::class, 'deleteDepartment']);
+    Route::post('/branch/stc/departments/bulk-status', [ProjectController::class, 'bulkStatusDepartments']);
+    Route::post('/branch/stc/departments/bulk-delete', [ProjectController::class, 'bulkDeleteDepartments']);
     
     // for stc requisition
     Route::get('/branch/stc/requisitions', [RequisitionController::class, 'show']);    
