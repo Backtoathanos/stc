@@ -5,18 +5,39 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Gang;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Traits\HasPermissions;
+use App\Http\Controllers\Traits\CheckPermissions;
 
 class GangController extends Controller
 {
+    use HasPermissions, CheckPermissions;
+    
     public function index()
     {
+        $user = auth()->user();
+        
+        // Check if user has view permission (root user always has access)
+        if (!$user || (!$user->hasPermission('master.gangs.view') && $user->email !== 'root@stcassociate.com')) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You do not have permission to access this page'
+                ], 403);
+            }
+            return redirect('/stc/stc_payroll/')->with('error', 'You do not have permission to access this page');
+        }
+        
         return view('pages.master.gangs', [
-            'page_title' => 'Gangs'
+            'page_title' => 'Gangs',
+            'permissions' => $this->getPermissions('master', 'gangs')
         ]);
     }
 
     public function list(Request $request)
     {
+        $permissionCheck = $this->checkPermission('master.gangs.view', 'view');
+        if ($permissionCheck) return $permissionCheck;
+        
         $query = Gang::query();
 
         // Search functionality
@@ -68,6 +89,9 @@ class GangController extends Controller
 
     public function store(Request $request)
     {
+        $permissionCheck = $this->checkPermission('master.gangs.edit', 'create');
+        if ($permissionCheck) return $permissionCheck;
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:gangs,name',
         ]);
@@ -75,16 +99,25 @@ class GangController extends Controller
         try {
             DB::beginTransaction();
             
-            $gang = Gang::create([
-                'name' => $request->name
+            // Get the ID directly from database insert
+            $id = DB::table('gangs')->insertGetId([
+                'name' => $request->name,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
             
             DB::commit();
             
+            // Get the created record
+            $gang = Gang::find($id);
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Gang created successfully',
-                'data' => $gang
+                'data' => [
+                    'id' => (string) $gang->id,
+                    'name' => $gang->name
+                ]
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -97,6 +130,9 @@ class GangController extends Controller
 
     public function show($id)
     {
+        $permissionCheck = $this->checkPermission('master.gangs.view', 'view');
+        if ($permissionCheck) return $permissionCheck;
+        
         $gang = Gang::find($id);
         
         if (!$gang) {
@@ -108,6 +144,9 @@ class GangController extends Controller
 
     public function update(Request $request, $id)
     {
+        $permissionCheck = $this->checkPermission('master.gangs.edit', 'update');
+        if ($permissionCheck) return $permissionCheck;
+        
         $gang = Gang::find($id);
         
         if (!$gang) {
@@ -115,7 +154,7 @@ class GangController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:gangs,name,' . $id,
+            'name' => 'required|string|max:255|unique:gangs,name,' . $id . ',id',
         ]);
 
         try {

@@ -65,6 +65,35 @@
           "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
         }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
       }
+      
+      // Logout functionality
+      $('#logoutBtn').on('click', function(e) {
+        e.preventDefault();
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "You will be logged out of the system",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, logout!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Create a form and submit it
+            var form = $('<form>', {
+              'method': 'POST',
+              'action': '/stc/stc_payroll/logout'
+            });
+            form.append($('<input>', {
+              'type': 'hidden',
+              'name': '_token',
+              'value': $('meta[name="csrf-token"]').attr('content')
+            }));
+            $('body').append(form);
+            form.submit();
+          }
+        });
+      });
     });
   </script>
   

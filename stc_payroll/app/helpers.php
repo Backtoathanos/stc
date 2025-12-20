@@ -9,7 +9,7 @@ if (!function_exists('asset_url')) {
      */
     function asset_url($path)
     {
-        $basePath = '/stc/stc_payroll/public';
+        $basePath = '/stc/stc_payroll';
         return $basePath . '/' . ltrim($path, '/');
     }
 }
@@ -23,7 +23,7 @@ if (!function_exists('base_url')) {
      */
     function base_url($path = '')
     {
-        $basePath = '/stc/stc_payroll/public';
+        $basePath = '/stc/stc_payroll';
         if (empty($path)) {
             return $basePath;
         }

@@ -9,9 +9,11 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "dompdf/dompdf": "^3.1",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^6.0",
-        "laravel/tinker": "^1.0"
+        "laravel/tinker": "^1.0",
+        "phpoffice/phpspreadsheet": "^1.30"
     },
     "require-dev": {
         "filp/whoops": "^2.0",

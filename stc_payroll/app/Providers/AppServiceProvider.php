@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         // Set base URL for subdirectory
-        $appUrl = env('APP_URL', 'http://localhost/stc/stc_payroll/public');
+        $appUrl = env('APP_URL', 'http://localhost/stc/stc_payroll');
         \Illuminate\Support\Facades\URL::forceRootUrl($appUrl);
         
         // Set asset URL

@@ -277,7 +277,9 @@ class ImportUserData extends Command
                 
                 // Import Rate
                 if (isset($record['rate']) && $employee && $employee->id) {
+                    $rateId = $record['rate']['id'] ?? null;
                     $rateData = [
+                        'id' => $rateId,
                         'employee_id' => $employee->id,
                         'ctc' => $record['rate']['ctc'] ?? 0,
                         'basic' => $record['rate']['basic'] ?? 0,
@@ -305,10 +307,17 @@ class ImportUserData extends Command
                         'netamt' => $record['rate']['netamt'] ?? 0,
                     ];
                     
-                    Rate::updateOrCreate(
-                        ['employee_id' => $employee->id],
-                        $rateData
-                    );
+                    if ($rateId) {
+                        Rate::updateOrCreate(
+                            ['id' => $rateId],
+                            $rateData
+                        );
+                    } else {
+                        Rate::updateOrCreate(
+                            ['employee_id' => $employee->id],
+                            $rateData
+                        );
+                    }
                 }
                 
                 $progressBar->advance();

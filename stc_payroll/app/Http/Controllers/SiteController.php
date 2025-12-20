@@ -5,18 +5,39 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Site;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Traits\HasPermissions;
+use App\Http\Controllers\Traits\CheckPermissions;
 
 class SiteController extends Controller
 {
+    use HasPermissions, CheckPermissions;
+    
     public function index()
     {
+        $user = auth()->user();
+        
+        // Check if user has view permission (root user always has access)
+        if (!$user || (!$user->hasPermission('master.sites.view') && $user->email !== 'root@stcassociate.com')) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You do not have permission to access this page'
+                ], 403);
+            }
+            return redirect('/stc/stc_payroll/')->with('error', 'You do not have permission to access this page');
+        }
+        
         return view('pages.master.sites', [
-            'page_title' => 'Sites'
+            'page_title' => 'Sites',
+            'permissions' => $this->getPermissions('master', 'sites')
         ]);
     }
 
     public function list(Request $request)
     {
+        $permissionCheck = $this->checkPermission('master.sites.view', 'view');
+        if ($permissionCheck) return $permissionCheck;
+        
         $query = Site::query();
 
         // Search functionality
@@ -68,6 +89,9 @@ class SiteController extends Controller
 
     public function store(Request $request)
     {
+        $permissionCheck = $this->checkPermission('master.sites.edit', 'create');
+        if ($permissionCheck) return $permissionCheck;
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:sites,name',
         ]);
@@ -75,16 +99,25 @@ class SiteController extends Controller
         try {
             DB::beginTransaction();
             
-            $site = Site::create([
-                'name' => $request->name
+            // Get the ID directly from database insert
+            $id = DB::table('sites')->insertGetId([
+                'name' => $request->name,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
             
             DB::commit();
             
+            // Get the created record
+            $site = Site::find($id);
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Site created successfully',
-                'data' => $site
+                'data' => [
+                    'id' => (string) $site->id,
+                    'name' => $site->name
+                ]
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -97,6 +130,9 @@ class SiteController extends Controller
 
     public function show($id)
     {
+        $permissionCheck = $this->checkPermission('master.sites.view', 'view');
+        if ($permissionCheck) return $permissionCheck;
+        
         $site = Site::find($id);
         
         if (!$site) {
@@ -108,6 +144,9 @@ class SiteController extends Controller
 
     public function update(Request $request, $id)
     {
+        $permissionCheck = $this->checkPermission('master.sites.edit', 'update');
+        if ($permissionCheck) return $permissionCheck;
+        
         $site = Site::find($id);
         
         if (!$site) {
@@ -115,7 +154,7 @@ class SiteController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:sites,name,' . $id,
+            'name' => 'required|string|max:255|unique:sites,name,' . $id . ',id',
         ]);
 
         try {
@@ -142,6 +181,9 @@ class SiteController extends Controller
 
     public function destroy($id)
     {
+        $permissionCheck = $this->checkPermission('master.sites.delete', 'delete');
+        if ($permissionCheck) return $permissionCheck;
+        
         $site = Site::find($id);
         
         if (!$site) {

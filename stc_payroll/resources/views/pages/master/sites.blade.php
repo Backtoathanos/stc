@@ -5,9 +5,11 @@
   <div class="card-header">
     <h3 class="card-title">Sites Management</h3>
     <div class="card-tools">
+      @if(($permissions['edit'] ?? false))
       <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addSiteModal">
         <i class="fas fa-plus"></i> Add Site
       </button>
+      @endif
     </div>
   </div>
   <div class="card-body">
@@ -112,7 +114,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/stc/stc_payroll/public/master/sites/list",
+            url: "/stc/stc_payroll/master/sites/list",
             type: 'GET'
         },
         columns: [
@@ -127,9 +129,15 @@ $(document).ready(function() {
                 searchable: false,
                 render: function(data, type, row) {
                     var id = row.id || data;
-                    return '<button class="btn btn-info btn-sm view-btn" data-id="' + id + '" title="View"><i class="fas fa-eye"></i></button> ' +
-                           '<button class="btn btn-warning btn-sm edit-btn" data-id="' + id + '" title="Edit"><i class="fas fa-edit"></i></button> ' +
-                           '<button class="btn btn-danger btn-sm delete-btn" data-id="' + id + '" title="Delete"><i class="fas fa-trash"></i></button>';
+                    var viewBtn = @json($permissions['view'] ?? false) ? 
+                        '<button class="btn btn-info btn-sm view-btn" data-id="' + id + '" title="View"><i class="fas fa-eye"></i></button> ' : '';
+                    var editBtn = @json($permissions['edit'] ?? false) ? 
+                        '<button class="btn btn-warning btn-sm edit-btn" data-id="' + id + '" title="Edit"><i class="fas fa-edit"></i></button> ' : 
+                        '<button class="btn btn-warning btn-sm" disabled title="No permission"><i class="fas fa-edit"></i></button> ';
+                    var deleteBtn = @json($permissions['delete'] ?? false) ? 
+                        '<button class="btn btn-danger btn-sm delete-btn" data-id="' + id + '" title="Delete"><i class="fas fa-trash"></i></button>' : 
+                        '<button class="btn btn-danger btn-sm" disabled title="No permission"><i class="fas fa-trash"></i></button>';
+                    return viewBtn + editBtn + deleteBtn;
                 }
             }
         ],
@@ -142,7 +150,7 @@ $(document).ready(function() {
     $(document).on('click', '.view-btn', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: "/stc/stc_payroll/public/master/sites/show/" + id,
+            url: "/stc/stc_payroll/master/sites/show/" + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -171,7 +179,7 @@ $(document).ready(function() {
     $(document).on('click', '.edit-btn', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: "/stc/stc_payroll/public/master/sites/show/" + id,
+            url: "/stc/stc_payroll/master/sites/show/" + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -198,7 +206,7 @@ $(document).ready(function() {
         var formData = $(this).serialize();
         
         $.ajax({
-            url: "/stc/stc_payroll/public/master/sites/" + id,
+            url: "/stc/stc_payroll/master/sites/" + id,
             type: 'POST',
             data: formData + '&_method=PUT',
             headers: {
@@ -247,7 +255,7 @@ $(document).ready(function() {
         var formData = $(this).serialize();
         
         $.ajax({
-            url: "/stc/stc_payroll/public/master/sites",
+            url: "/stc/stc_payroll/master/sites",
             type: 'POST',
             data: formData,
             headers: {
@@ -304,7 +312,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "/stc/stc_payroll/public/master/sites/" + id,
+                    url: "/stc/stc_payroll/master/sites/" + id,
                     type: 'POST',
                     data: {
                         _method: 'DELETE',

@@ -5,18 +5,39 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Department;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Traits\HasPermissions;
+use App\Http\Controllers\Traits\CheckPermissions;
 
 class DepartmentController extends Controller
 {
+    use HasPermissions, CheckPermissions;
+    
     public function index()
     {
+        $user = auth()->user();
+        
+        // Check if user has view permission (root user always has access)
+        if (!$user || (!$user->hasPermission('master.departments.view') && $user->email !== 'root@stcassociate.com')) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You do not have permission to access this page'
+                ], 403);
+            }
+            return redirect('/stc/stc_payroll/')->with('error', 'You do not have permission to access this page');
+        }
+        
         return view('pages.master.departments', [
-            'page_title' => 'Departments'
+            'page_title' => 'Departments',
+            'permissions' => $this->getPermissions('master', 'departments')
         ]);
     }
 
     public function list(Request $request)
     {
+        $permissionCheck = $this->checkPermission('master.departments.view', 'view');
+        if ($permissionCheck) return $permissionCheck;
+        
         $query = Department::query();
 
         // Search functionality
@@ -68,6 +89,9 @@ class DepartmentController extends Controller
 
     public function store(Request $request)
     {
+        $permissionCheck = $this->checkPermission('master.departments.edit', 'create');
+        if ($permissionCheck) return $permissionCheck;
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:departments,name',
         ]);
@@ -75,16 +99,25 @@ class DepartmentController extends Controller
         try {
             DB::beginTransaction();
             
-            $department = Department::create([
-                'name' => $request->name
+            // Get the ID directly from database insert
+            $id = DB::table('departments')->insertGetId([
+                'name' => $request->name,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
             
             DB::commit();
             
+            // Get the created record
+            $department = Department::find($id);
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Department created successfully',
-                'data' => $department
+                'data' => [
+                    'id' => (string) $department->id,
+                    'name' => $department->name
+                ]
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -115,7 +148,7 @@ class DepartmentController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:departments,name,' . $id,
+            'name' => 'required|string|max:255|unique:departments,name,' . $id . ',id',
         ]);
 
         try {
@@ -142,6 +175,9 @@ class DepartmentController extends Controller
 
     public function destroy($id)
     {
+        $permissionCheck = $this->checkPermission('master.departments.delete', 'delete');
+        if ($permissionCheck) return $permissionCheck;
+        
         $department = Department::find($id);
         
         if (!$department) {

@@ -41,7 +41,7 @@
         // Build update URL
         var finalUpdateUrl = updateUrl;
         if (!finalUpdateUrl || !finalUpdateUrl.includes('/' + id)) {
-            var baseUrl = window.baseUrl || '/stc/stc_payroll/public';
+            var baseUrl = window.baseUrl || '/stc/stc_payroll';
             if (updateUrl && updateUrl.includes('/master/employees')) {
                 finalUpdateUrl = baseUrl + '/master/employees/' + id;
             } else if (updateUrl) {
@@ -245,7 +245,7 @@
                                     if (fieldName) {
                                         var id = $('#editEmployeeId').val();
                                         if (id) {
-                                            var baseUrl = window.baseUrl || '/stc/stc_payroll/public';
+                                            var baseUrl = window.baseUrl || '/stc/stc_payroll';
                                             var updateUrl = baseUrl + '/master/employees/' + id;
                                             window.saveField(fieldName, newId, $input, updateUrl);
                                         }
@@ -342,7 +342,7 @@
         if ($form.length === 0) return;
         
         // Auto-save on blur for text inputs
-        $form.find('input[type="text"], input[type="email"], input[type="date"], textarea').on('blur', function() {
+        $form.find('input[type="text"], input[type="email"], input[type="date"], input[type="number"], textarea').on('blur', function() {
             // Skip if form is loading data
             if ($form.data('loading')) return;
             
@@ -407,7 +407,7 @@
 
     // Set base URL if not already set
     if (typeof window.baseUrl === 'undefined') {
-        window.baseUrl = '/stc/stc_payroll/public';
+        window.baseUrl = '/stc/stc_payroll';
     }
 
 })(jQuery);

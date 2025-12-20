@@ -5,18 +5,39 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Designation;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Traits\HasPermissions;
+use App\Http\Controllers\Traits\CheckPermissions;
 
 class DesignationController extends Controller
 {
+    use HasPermissions, CheckPermissions;
+    
     public function index()
     {
+        $user = auth()->user();
+        
+        // Check if user has view permission (root user always has access)
+        if (!$user || (!$user->hasPermission('master.designations.view') && $user->email !== 'root@stcassociate.com')) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You do not have permission to access this page'
+                ], 403);
+            }
+            return redirect('/stc/stc_payroll/')->with('error', 'You do not have permission to access this page');
+        }
+        
         return view('pages.master.designations', [
-            'page_title' => 'Designations'
+            'page_title' => 'Designations',
+            'permissions' => $this->getPermissions('master', 'designations')
         ]);
     }
 
     public function list(Request $request)
     {
+        $permissionCheck = $this->checkPermission('master.designations.view', 'view');
+        if ($permissionCheck) return $permissionCheck;
+        
         $query = Designation::query();
 
         // Search functionality
@@ -68,6 +89,9 @@ class DesignationController extends Controller
 
     public function store(Request $request)
     {
+        $permissionCheck = $this->checkPermission('master.designations.edit', 'create');
+        if ($permissionCheck) return $permissionCheck;
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:designations,name',
         ]);
@@ -75,16 +99,25 @@ class DesignationController extends Controller
         try {
             DB::beginTransaction();
             
-            $designation = Designation::create([
-                'name' => $request->name
+            // Get the ID directly from database insert
+            $id = DB::table('designations')->insertGetId([
+                'name' => $request->name,
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
             
             DB::commit();
             
+            // Get the created record
+            $designation = Designation::find($id);
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Designation created successfully',
-                'data' => $designation
+                'data' => [
+                    'id' => (string) $designation->id,
+                    'name' => $designation->name
+                ]
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -97,6 +130,9 @@ class DesignationController extends Controller
 
     public function show($id)
     {
+        $permissionCheck = $this->checkPermission('master.designations.view', 'view');
+        if ($permissionCheck) return $permissionCheck;
+        
         $designation = Designation::find($id);
         
         if (!$designation) {
@@ -108,6 +144,9 @@ class DesignationController extends Controller
 
     public function update(Request $request, $id)
     {
+        $permissionCheck = $this->checkPermission('master.designations.edit', 'update');
+        if ($permissionCheck) return $permissionCheck;
+        
         $designation = Designation::find($id);
         
         if (!$designation) {
@@ -115,7 +154,7 @@ class DesignationController extends Controller
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:designations,name,' . $id,
+            'name' => 'required|string|max:255|unique:designations,name,' . $id . ',id',
         ]);
 
         try {
@@ -142,6 +181,9 @@ class DesignationController extends Controller
 
     public function destroy($id)
     {
+        $permissionCheck = $this->checkPermission('master.designations.delete', 'delete');
+        if ($permissionCheck) return $permissionCheck;
+        
         $designation = Designation::find($id);
         
         if (!$designation) {

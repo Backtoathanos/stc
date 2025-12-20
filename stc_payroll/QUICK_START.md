@@ -46,7 +46,7 @@ The application should now work with all CSS and JavaScript loading correctly!
 ### CSS/JS Not Loading?
 - Make sure you copied the `dist` and `plugins` folders to `public/`
 - Check browser console for 404 errors
-- Verify the paths in the HTML source start with `/stc/stc_payroll/public/`
+- Verify the paths in the HTML source start with `/stc/stc_payroll/`
 
 ### 404 Errors?
 - Make sure mod_rewrite is enabled in Apache

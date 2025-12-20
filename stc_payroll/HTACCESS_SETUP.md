@@ -40,12 +40,12 @@ After making changes:
 
 1. Try accessing: `http://localhost/stc/stc_payroll/`
 2. If you still get 404, check Apache error logs: `C:\xampp\apache\logs\error.log`
-3. Verify mod_rewrite is loaded by checking: `http://localhost/stc/stc_payroll/public/` (this should always work)
+3. Verify mod_rewrite is loaded by checking: `http://localhost/stc/stc_payroll/` (this should always work)
 
 ## Alternative: If .htaccess Still Doesn't Work
 
 If the `.htaccess` approach doesn't work, you can:
 
-1. **Use the public URL** (always works): `http://localhost/stc/stc_payroll/public/`
+1. **Use the public URL** (always works): `http://localhost/stc/stc_payroll/`
 2. **Create a Virtual Host** (best solution) - see `404_FIX.md` for instructions
 

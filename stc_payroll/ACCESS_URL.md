@@ -5,7 +5,7 @@
 Access the application directly via the public folder:
 
 ```
-http://localhost/stc/stc_payroll/public/
+http://localhost/stc/stc_payroll/
 ```
 
 This will work immediately without any Apache configuration changes.
@@ -38,7 +38,7 @@ If you want to access via `http://localhost/stc/stc_payroll/`, you need to:
 
 Try accessing:
 ```
-http://localhost/stc/stc_payroll/public/index.php
+http://localhost/stc/stc_payroll/index.php
 ```
 
 If this works but `http://localhost/stc/stc_payroll/` doesn't, then mod_rewrite is not enabled or .htaccess is not being read.

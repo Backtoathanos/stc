@@ -5,8 +5,16 @@
   <div class="card-header">
     <h3 class="card-title">Employees Management</h3>
     <div class="card-tools">
+      @if(($permissions['edit'] ?? false))
       <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addEmployeeModal">
         <i class="fas fa-plus"></i> Add Employee
+      </button>
+      @endif
+      <button type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#importEmployeeModal">
+        <i class="fas fa-file-import"></i> Import Employee
+      </button>
+      <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#importRateModal">
+        <i class="fas fa-file-import"></i> Import Rate
       </button>
     </div>
   </div>
@@ -42,12 +50,35 @@
         </button>
       </div>
     </div>
-
+    
+    <!-- Export Section -->
+    <div class="row mb-3">
+      <div class="col-md-12">
+        <div class="btn-group">
+          <button type="button" class="btn btn-success btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-file-export"></i> Export Selected
+          </button>
+          <div class="dropdown-menu">
+            <a class="dropdown-item export-option" href="#" data-format="xlsx">
+              <i class="fas fa-file-excel text-success"></i> Export as Excel (XLSX)
+            </a>
+            <a class="dropdown-item export-option" href="#" data-format="pdf">
+              <i class="fas fa-file-pdf text-danger"></i> Export as PDF
+            </a>
+          </div>
+        </div>
+        <span class="ml-2 text-muted" id="selectedCount">0 selected</span>
+      </div>
+    </div>
+  
     <!-- DataTable -->
     <div class="table-responsive">
     <table id="employeesTable" class="table table-bordered table-striped">
       <thead>
         <tr>
+          <th width="30">
+            <input type="checkbox" id="selectAll" title="Select All">
+          </th>
           <th>Emp ID</th>
           <th>Name</th>
           <th>Father</th>
@@ -165,6 +196,33 @@
                 <input type="date" class="form-control" id="editSafetyCardExpiry" name="SafetyCardExpiry">
               </div>
             </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Aadhar <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="editAadhar" name="Aadhar" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Applicable for PF & ESIC <span class="text-danger">*</span></label>
+                <select class="form-control" id="editPfEsicApplicable" name="PfEsicApplicable" required>
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6" id="editUanWrapper" style="display: none;">
+              <div class="form-group">
+                <label>UAN</label>
+                <input type="text" class="form-control" id="editUan" name="Uan">
+              </div>
+            </div>
+            <div class="col-md-6" id="editEsicWrapper" style="display: none;">
+              <div class="form-group">
+                <label>ESIC</label>
+                <input type="text" class="form-control" id="editEsic" name="Esic">
+              </div>
+            </div>
             <div class="col-md-12">
               <div class="form-group">
                 <label>Address</label>
@@ -203,6 +261,11 @@
             <li class="nav-item">
               <a class="nav-link" id="edit-settings-tab" data-toggle="tab" href="#edit-settings" role="tab" aria-controls="edit-settings" aria-selected="false">
                 <i class="fas fa-cog"></i> Additional Settings
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="edit-rate-tab" data-toggle="tab" href="#edit-rate" role="tab" aria-controls="edit-rate" aria-selected="false">
+                <i class="fas fa-money-bill-wave"></i> Rate
               </a>
             </li>
           </ul>
@@ -344,24 +407,6 @@
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label>Aadhar</label>
-                    <input type="text" class="form-control" id="editAadhar" name="Aadhar">
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label>UAN</label>
-                    <input type="text" class="form-control" id="editUan" name="Uan">
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label>ESIC</label>
-                    <input type="text" class="form-control" id="editEsic" name="Esic">
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
                     <label>Employee Safety Card</label>
                     <input type="text" class="form-control" id="editEmpSafetyCard" name="EmpSafetyCard">
                   </div>
@@ -422,18 +467,6 @@
               <div class="row mt-3">
                 <div class="col-md-4">
                   <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="editPfApplicable" name="PfApplicable" value="1">
-                    <label class="form-check-label" for="editPfApplicable">PF Applicable</label>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="editEsicApplicable" name="EsicApplicable" value="1">
-                    <label class="form-check-label" for="editEsicApplicable">ESIC Applicable</label>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="editPRFTax" name="PRFTax" value="1">
                     <label class="form-check-label" for="editPRFTax">PRF Tax</label>
                   </div>
@@ -484,6 +517,156 @@
                   <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="editIsOfficeStaff" name="is_officeStaff" value="1">
                     <label class="form-check-label" for="editIsOfficeStaff">Is Office Staff</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {{-- Rate Tab --}}
+            <div class="tab-pane fade" id="edit-rate" role="tabpanel" aria-labelledby="edit-rate-tab">
+              <div class="row mt-3">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>CTC</label>
+                    <input type="number" step="0.01" class="form-control" id="editCtc" name="rate[ctc]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Basic</label>
+                    <input type="number" step="0.01" class="form-control" id="editBasic" name="rate[basic]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>DA</label>
+                    <input type="number" step="0.01" class="form-control" id="editDa" name="rate[da]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Attendance Rate</label>
+                    <input type="number" step="0.01" class="form-control" id="editArate" name="rate[arate]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>OT Rate</label>
+                    <input type="number" step="0.01" class="form-control" id="editOtrate" name="rate[otrate]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>HRA</label>
+                    <input type="number" step="0.01" class="form-control" id="editHra" name="rate[hra]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Medical</label>
+                    <input type="number" step="0.01" class="form-control" id="editMadical" name="rate[madical]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Exgratia Retention</label>
+                    <input type="number" step="0.01" class="form-control" id="editExgratiaRetention" name="rate[ExgratiaRetention]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>LTA Retention</label>
+                    <input type="number" step="0.01" class="form-control" id="editLTARetention" name="rate[LTARetention]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>LTA</label>
+                    <input type="number" step="0.01" class="form-control" id="editLTA" name="rate[LTA]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>CA</label>
+                    <input type="number" step="0.01" class="form-control" id="editCA" name="rate[CA]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Fooding</label>
+                    <input type="number" step="0.01" class="form-control" id="editFooding" name="rate[Fooding]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Misc</label>
+                    <input type="number" step="0.01" class="form-control" id="editMisc" name="rate[Misc]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>CEA</label>
+                    <input type="number" step="0.01" class="form-control" id="editCEA" name="rate[CEA]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Washing Allowance</label>
+                    <input type="number" step="0.01" class="form-control" id="editWashingAllowance" name="rate[WashingAllowance]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Professional Pursuits</label>
+                    <input type="number" step="0.01" class="form-control" id="editProfessionalPursuits" name="rate[ProfessionalPursuits]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Special Allowance</label>
+                    <input type="number" step="0.01" class="form-control" id="editSpecialAllowance" name="rate[SpecialAllowance]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Income Tax</label>
+                    <input type="number" step="0.01" class="form-control" id="editIncomeTax" name="rate[IncomeTax]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Personal Pay</label>
+                    <input type="number" step="0.01" class="form-control" id="editPersonalpay" name="rate[personalpay]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Petrol</label>
+                    <input type="number" step="0.01" class="form-control" id="editPetrol" name="rate[petrol]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Mobile</label>
+                    <input type="number" step="0.01" class="form-control" id="editRateMobile" name="rate[mobile]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Incentive</label>
+                    <input type="number" step="0.01" class="form-control" id="editIncentive" name="rate[incentive]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Fixed Amount</label>
+                    <input type="number" step="0.01" class="form-control" id="editFixedamt" name="rate[fixedamt]" placeholder="0.00">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <label>Net Amount</label>
+                    <input type="number" step="0.01" class="form-control" id="editNetamt" name="rate[netamt]" placeholder="0.00">
                   </div>
                 </div>
               </div>
@@ -575,6 +758,33 @@
               <div class="form-group">
                 <label>Safety Card Expiry</label>
                 <input type="date" class="form-control" id="addSafetyCardExpiry" name="SafetyCardExpiry">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Aadhar <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="addAadhar" name="Aadhar" required>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Applicable for PF & ESIC <span class="text-danger">*</span></label>
+                <select class="form-control" id="addPfEsicApplicable" name="PfEsicApplicable" required>
+                  <option value="0">No</option>
+                  <option value="1">Yes</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6" id="addUanWrapper" style="display: none;">
+              <div class="form-group">
+                <label>UAN</label>
+                <input type="text" class="form-control" id="addUan" name="Uan">
+              </div>
+            </div>
+            <div class="col-md-6" id="addEsicWrapper" style="display: none;">
+              <div class="form-group">
+                <label>ESIC</label>
+                <input type="text" class="form-control" id="addEsic" name="Esic">
               </div>
             </div>
             <div class="col-md-12">
@@ -673,6 +883,7 @@
                     <label>Skill</label>
                     <select class="form-control" id="addSkill" name="Skill">
                       <option value="">Select Skill</option>
+                      <option value="HIGH-SKILLED">High-Skilled</option>
                       <option value="SKILLED">Skilled</option>
                       <option value="UN-SKILLED">Un-Skilled</option>
                       <option value="SEMI-SKILLED">Semi-Skilled</option>
@@ -750,24 +961,6 @@
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label>Aadhar</label>
-                    <input type="text" class="form-control" id="addAadhar" name="Aadhar">
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label>UAN</label>
-                    <input type="text" class="form-control" id="addUan" name="Uan">
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label>ESIC</label>
-                    <input type="text" class="form-control" id="addEsic" name="Esic">
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group">
                     <label>Employee Safety Card</label>
                     <input type="text" class="form-control" id="addEmpSafetyCard" name="EmpSafetyCard">
                   </div>
@@ -832,18 +1025,6 @@
             {{-- Additional Settings Tab --}}
             <div class="tab-pane fade" id="add-settings" role="tabpanel" aria-labelledby="add-settings-tab">
               <div class="row mt-3">
-                <div class="col-md-4">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="addPfApplicable" name="PfApplicable" value="1">
-                    <label class="form-check-label" for="addPfApplicable">PF Applicable</label>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="addEsicApplicable" name="EsicApplicable" value="1">
-                    <label class="form-check-label" for="addEsicApplicable">ESIC Applicable</label>
-                  </div>
-                </div>
                 <div class="col-md-4">
                   <div class="form-check">
                     <input type="checkbox" class="form-check-input" id="addPRFTax" name="PRFTax" value="1">
@@ -911,6 +1092,128 @@
   </div>
 </div>
 
+<!-- Import Employee Modal -->
+<div class="modal fade" id="importEmployeeModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl" role="document" style="max-width: 95%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Import Employee</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <form id="importEmployeeForm" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div id="employeeUploadSection">
+            <div class="form-group">
+              <label for="employeeFile">Select Excel File <span class="text-danger">*</span></label>
+              <input type="file" class="form-control-file" id="employeeFile" name="file" accept=".xlsx,.xls" required>
+              <small class="form-text text-muted">Please upload an Excel file (.xlsx or .xls format)</small>
+            </div>
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i> Make sure your Excel file matches the sample format.
+            </div>
+          </div>
+          
+          <div id="employeePreviewSection" style="display: none;">
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle"></i> Please review the data below. You can remove rows you don't want to import.
+            </div>
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+              <table class="table table-bordered table-striped table-sm" id="employeePreviewTable">
+                <thead class="thead-light" style="position: sticky; top: 0; z-index: 10;">
+                  <tr id="employeePreviewHeaders"></tr>
+                </thead>
+                <tbody id="employeePreviewBody"></tbody>
+              </table>
+            </div>
+            <div class="mt-2">
+              <strong>Total Rows:</strong> <span id="employeeTotalRows">0</span> | 
+              <strong>Rows to Import:</strong> <span id="employeeRowsToImport">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-success" id="downloadEmployeeSample">
+            <i class="fas fa-download"></i> Download Sample Excel
+          </button>
+          <button type="button" class="btn btn-info" id="employeeBackToUpload" style="display: none;">
+            <i class="fas fa-arrow-left"></i> Back to Upload
+          </button>
+          <button type="submit" class="btn btn-primary" id="employeeUploadBtn">
+            <i class="fas fa-upload"></i> Upload & Preview
+          </button>
+          <button type="button" class="btn btn-success" id="employeeSaveBtn" style="display: none;">
+            <i class="fas fa-save"></i> Save & Import
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Import Rate Modal -->
+<div class="modal fade" id="importRateModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl" role="document" style="max-width: 95%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Import Rate</h5>
+        <button type="button" class="close" data-dismiss="modal">
+          <span>&times;</span>
+        </button>
+      </div>
+      <form id="importRateForm" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div id="rateUploadSection">
+            <div class="form-group">
+              <label for="rateFile">Select Excel File <span class="text-danger">*</span></label>
+              <input type="file" class="form-control-file" id="rateFile" name="file" accept=".xlsx,.xls" required>
+              <small class="form-text text-muted">Please upload an Excel file (.xlsx or .xls format)</small>
+            </div>
+            <div class="alert alert-info">
+              <i class="fas fa-info-circle"></i> Make sure your Excel file matches the sample format.
+            </div>
+          </div>
+          
+          <div id="ratePreviewSection" style="display: none;">
+            <div class="alert alert-warning">
+              <i class="fas fa-exclamation-triangle"></i> Please review the data below. You can remove rows you don't want to import.
+            </div>
+            <div class="table-responsive" style="max-height: 500px; overflow-y: auto;">
+              <table class="table table-bordered table-striped table-sm" id="ratePreviewTable">
+                <thead class="thead-light" style="position: sticky; top: 0; z-index: 10;">
+                  <tr id="ratePreviewHeaders"></tr>
+                </thead>
+                <tbody id="ratePreviewBody"></tbody>
+              </table>
+            </div>
+            <div class="mt-2">
+              <strong>Total Rows:</strong> <span id="rateTotalRows">0</span> | 
+              <strong>Rows to Import:</strong> <span id="rateRowsToImport">0</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-success" id="downloadRateSample">
+            <i class="fas fa-download"></i> Download Sample Excel
+          </button>
+          <button type="button" class="btn btn-info" id="rateBackToUpload" style="display: none;">
+            <i class="fas fa-arrow-left"></i> Back to Upload
+          </button>
+          <button type="submit" class="btn btn-primary" id="rateUploadBtn">
+            <i class="fas fa-upload"></i> Upload & Preview
+          </button>
+          <button type="button" class="btn btn-success" id="rateSaveBtn" style="display: none;">
+            <i class="fas fa-save"></i> Save & Import
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -920,7 +1223,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/stc/stc_payroll/public/master/employees/list",
+            url: "/stc/stc_payroll/master/employees/list",
             type: 'GET',
             data: function(d) {
                 d.site_id = $('#filterSite').val();
@@ -929,6 +1232,15 @@ $(document).ready(function() {
             }
         },
         columns: [
+            {
+                data: null,
+                orderable: false,
+                searchable: false,
+                width: '30px',
+                render: function(data, type, row) {
+                    return '<input type="checkbox" class="row-checkbox" value="' + row.id + '">';
+                }
+            },
             { data: 'EmpId', name: 'EmpId' },
             { data: 'Name', name: 'Name' },
             { data: 'Father', name: 'Father' },
@@ -945,12 +1257,12 @@ $(document).ready(function() {
                 render: function(data, type, row) {
                     var id = row.id || data;
                     return '<button class="btn btn-info btn-sm view-btn" data-id="' + id + '" title="View"><i class="fas fa-eye"></i></button> ' +
-                           '<button class="btn btn-warning btn-sm edit-btn" data-id="' + id + '" title="Edit"><i class="fas fa-edit"></i></button> ' +
-                           '<button class="btn btn-danger btn-sm delete-btn" data-id="' + id + '" title="Delete"><i class="fas fa-trash"></i></button>';
+                           (@json($permissions['edit'] ?? false) ? '<button class="btn btn-warning btn-sm edit-btn" data-id="' + id + '" title="Edit"><i class="fas fa-edit"></i></button> ' : '<button class="btn btn-warning btn-sm" disabled title="No permission"><i class="fas fa-edit"></i></button> ') +
+                           (@json($permissions['delete'] ?? false) ? '<button class="btn btn-danger btn-sm delete-btn" data-id="' + id + '" title="Delete"><i class="fas fa-trash"></i></button>' : '<button class="btn btn-danger btn-sm" disabled title="No permission"><i class="fas fa-trash"></i></button>');
                 }
             }
         ],
-        order: [[1, 'asc']],
+        order: [[2, 'asc']], // Changed to column 2 (EmpId) since checkbox is now column 0
         pageLength: 10,
         lengthMenu: [[10, 25, 50, 100], [10, 25, 50, 100]]
     });
@@ -958,19 +1270,141 @@ $(document).ready(function() {
     // Filter change events
     $('#filterSite, #filterDepartment, #filterStatus').on('change', function() {
         table.draw();
+        // Uncheck all when filters change
+        $('#selectAll').prop('checked', false);
+        setTimeout(updateSelectedCount, 100);
     });
 
     // Reset filters
     $('#resetFilters').on('click', function() {
         $('#filterSite, #filterDepartment, #filterStatus').val('');
         table.draw();
+        $('#selectAll').prop('checked', false);
+        setTimeout(updateSelectedCount, 100);
     });
+    
+    // Select All checkbox
+    $('#selectAll').on('change', function() {
+        var isChecked = $(this).prop('checked');
+        $('.row-checkbox').prop('checked', isChecked);
+        updateSelectedCount();
+    });
+    
+    // Individual row checkbox
+    $(document).on('change', '.row-checkbox', function() {
+        updateSelectedCount();
+        // Update select all checkbox state
+        var totalCheckboxes = $('.row-checkbox').length;
+        var checkedCheckboxes = $('.row-checkbox:checked').length;
+        $('#selectAll').prop('checked', totalCheckboxes > 0 && totalCheckboxes === checkedCheckboxes);
+    });
+    
+    // Update selected count
+    function updateSelectedCount() {
+        var count = $('.row-checkbox:checked').length;
+        $('#selectedCount').text(count + ' selected');
+    }
+    
+    // Update count when table redraws
+    table.on('draw', function() {
+        updateSelectedCount();
+        // Uncheck select all when table redraws
+        $('#selectAll').prop('checked', false);
+    });
+    
+    // Export dropdown options
+    $(document).on('click', '.export-option', function(e) {
+        e.preventDefault();
+        var format = $(this).data('format');
+        var selectedIds = [];
+        $('.row-checkbox:checked').each(function() {
+            selectedIds.push($(this).val());
+        });
+        
+        if (selectedIds.length === 0) {
+            // Export all records with warning
+            Swal.fire({
+                title: 'Export All Records?',
+                text: 'No rows selected. All records from the database will be exported as ' + format.toUpperCase() + '. This may take a while if there are many records.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, export all',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    exportEmployees([], format);
+                }
+            });
+        } else {
+            // Export selected records
+            exportEmployees(selectedIds, format);
+        }
+    });
+    
+    // Export function
+    function exportEmployees(selectedIds, format) {
+        var form = $('<form>', {
+            'method': 'POST',
+            'action': '/stc/stc_payroll/master/employees/export'
+        });
+        
+        form.append($('<input>', {
+            'type': 'hidden',
+            'name': '_token',
+            'value': $('meta[name="csrf-token"]').attr('content')
+        }));
+        
+        form.append($('<input>', {
+            'type': 'hidden',
+            'name': 'format',
+            'value': format
+        }));
+        
+        if (selectedIds.length > 0) {
+            selectedIds.forEach(function(id) {
+                form.append($('<input>', {
+                    'type': 'hidden',
+                    'name': 'ids[]',
+                    'value': id
+                }));
+            });
+        }
+        
+        // Add filters
+        if ($('#filterSite').val()) {
+            form.append($('<input>', {
+                'type': 'hidden',
+                'name': 'site_id',
+                'value': $('#filterSite').val()
+            }));
+        }
+        if ($('#filterDepartment').val()) {
+            form.append($('<input>', {
+                'type': 'hidden',
+                'name': 'department_id',
+                'value': $('#filterDepartment').val()
+            }));
+        }
+        if ($('#filterStatus').val()) {
+            form.append($('<input>', {
+                'type': 'hidden',
+                'name': 'status',
+                'value': $('#filterStatus').val()
+            }));
+        }
+        
+        $('body').append(form);
+        form.submit();
+        form.remove();
+    }
 
     // View Employee
     $(document).on('click', '.view-btn', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: "/stc/stc_payroll/public/master/employees/show/" + id,
+            url: "/stc/stc_payroll/master/employees/show/" + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -1003,6 +1437,7 @@ $(document).ready(function() {
                         '<li class="nav-item"><a class="nav-link" id="view-identity-tab" data-toggle="tab" href="#view-identity" role="tab"><i class="fas fa-id-card"></i> Identity & Documents</a></li>' +
                         '<li class="nav-item"><a class="nav-link" id="view-employment-tab" data-toggle="tab" href="#view-employment" role="tab"><i class="fas fa-briefcase"></i> Employment Settings</a></li>' +
                         '<li class="nav-item"><a class="nav-link" id="view-settings-tab" data-toggle="tab" href="#view-settings" role="tab"><i class="fas fa-cog"></i> Additional Settings</a></li>' +
+                        '<li class="nav-item"><a class="nav-link" id="view-rate-tab" data-toggle="tab" href="#view-rate" role="tab"><i class="fas fa-money-bill-wave"></i> Rate</a></li>' +
                         '</ul>' +
                         '<div class="tab-content" id="viewEmployeeTabsContent">' +
                         '<div class="tab-pane fade show active" id="view-org" role="tabpanel">' +
@@ -1054,6 +1489,33 @@ $(document).ready(function() {
                         '<div class="col-md-6 mb-3"><strong>Is Employee:</strong><br>' + formatBoolean(emp.is_employee) + '</div>' +
                         '<div class="col-md-6 mb-3"><strong>Is Supervisor:</strong><br>' + formatBoolean(emp.is_supervisor) + '</div>' +
                         '<div class="col-md-6 mb-3"><strong>Is Office Staff:</strong><br>' + formatBoolean(emp.is_officeStaff) + '</div>' +
+                        '</div></div>' +
+                        '<div class="tab-pane fade" id="view-rate" role="tabpanel">' +
+                        '<div class="row mt-3">' +
+                        '<div class="col-md-4 mb-3"><strong>CTC:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.ctc ? parseFloat(emp.rate.ctc).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Basic:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.basic ? parseFloat(emp.rate.basic).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>DA:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.da ? parseFloat(emp.rate.da).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Attendance Rate:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.arate ? parseFloat(emp.rate.arate).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>OT Rate:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.otrate ? parseFloat(emp.rate.otrate).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>HRA:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.hra ? parseFloat(emp.rate.hra).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Medical:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.madical ? parseFloat(emp.rate.madical).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Exgratia Retention:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.ExgratiaRetention ? parseFloat(emp.rate.ExgratiaRetention).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>LTA Retention:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.LTARetention ? parseFloat(emp.rate.LTARetention).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>LTA:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.LTA ? parseFloat(emp.rate.LTA).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>CA:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.CA ? parseFloat(emp.rate.CA).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Fooding:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.Fooding ? parseFloat(emp.rate.Fooding).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Misc:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.Misc ? parseFloat(emp.rate.Misc).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>CEA:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.CEA ? parseFloat(emp.rate.CEA).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Washing Allowance:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.WashingAllowance ? parseFloat(emp.rate.WashingAllowance).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Professional Pursuits:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.ProfessionalPursuits ? parseFloat(emp.rate.ProfessionalPursuits).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Special Allowance:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.SpecialAllowance ? parseFloat(emp.rate.SpecialAllowance).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Income Tax:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.IncomeTax ? parseFloat(emp.rate.IncomeTax).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Personal Pay:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.personalpay ? parseFloat(emp.rate.personalpay).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Petrol:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.petrol ? parseFloat(emp.rate.petrol).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Mobile:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.mobile ? parseFloat(emp.rate.mobile).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Incentive:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.incentive ? parseFloat(emp.rate.incentive).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Fixed Amount:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.fixedamt ? parseFloat(emp.rate.fixedamt).toFixed(2) : '0.00') + '</span></div>' +
+                        '<div class="col-md-4 mb-3"><strong>Net Amount:</strong><br><span class="text-muted">' + (emp.rate && emp.rate.netamt ? parseFloat(emp.rate.netamt).toFixed(2) : '0.00') + '</span></div>' +
                         '</div></div></div>';
                     $('#viewEmployeeContent').html(html);
                     $('#viewEmployeeModal').modal('show');
@@ -1077,7 +1539,7 @@ $(document).ready(function() {
         $('#editEmployeeForm').data('loading', true);
         
         $.ajax({
-            url: "/stc/stc_payroll/public/master/employees/show/" + id,
+            url: "/stc/stc_payroll/master/employees/show/" + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -1122,8 +1584,9 @@ $(document).ready(function() {
                     $('#editWeekoff').val(emp.Weekoff || '');
                     $('#editOttype').val(emp.Ottype || '');
                     $('#editOtslave').val(emp.Otslave || '');
-                    $('#editPfApplicable').prop('checked', emp.PfApplicable || false);
-                    $('#editEsicApplicable').prop('checked', emp.EsicApplicable || false);
+                    // Set PF & ESIC Applicable dropdown (show if either PF or ESIC is applicable)
+                    var pfEsicApplicable = (emp.PfApplicable || emp.EsicApplicable) ? '1' : '0';
+                    $('#editPfEsicApplicable').val(pfEsicApplicable).trigger('change');
                     $('#editPRFTax').prop('checked', emp.PRFTax || false);
                     $('#editAttendAllow').prop('checked', emp.AttendAllow || false);
                     $('#editOtAppl').prop('checked', emp.OtAppl || false);
@@ -1133,6 +1596,37 @@ $(document).ready(function() {
                     $('#editIsEmployee').prop('checked', emp.is_employee || false);
                     $('#editIsSupervisor').prop('checked', emp.is_supervisor || false);
                     $('#editIsOfficeStaff').prop('checked', emp.is_officeStaff || false);
+                    
+                    // Load rate data if available
+                    if (emp.rate) {
+                        $('#editCtc').val(emp.rate.ctc || '');
+                        $('#editBasic').val(emp.rate.basic || '');
+                        $('#editDa').val(emp.rate.da || '');
+                        $('#editArate').val(emp.rate.arate || '');
+                        $('#editOtrate').val(emp.rate.otrate || '');
+                        $('#editHra').val(emp.rate.hra || '');
+                        $('#editMadical').val(emp.rate.madical || '');
+                        $('#editExgratiaRetention').val(emp.rate.ExgratiaRetention || '');
+                        $('#editLTARetention').val(emp.rate.LTARetention || '');
+                        $('#editLTA').val(emp.rate.LTA || '');
+                        $('#editCA').val(emp.rate.CA || '');
+                        $('#editFooding').val(emp.rate.Fooding || '');
+                        $('#editMisc').val(emp.rate.Misc || '');
+                        $('#editCEA').val(emp.rate.CEA || '');
+                        $('#editWashingAllowance').val(emp.rate.WashingAllowance || '');
+                        $('#editProfessionalPursuits').val(emp.rate.ProfessionalPursuits || '');
+                        $('#editSpecialAllowance').val(emp.rate.SpecialAllowance || '');
+                        $('#editIncomeTax').val(emp.rate.IncomeTax || '');
+                        $('#editPersonalpay').val(emp.rate.personalpay || '');
+                        $('#editPetrol').val(emp.rate.petrol || '');
+                        $('#editRateMobile').val(emp.rate.mobile || '');
+                        $('#editIncentive').val(emp.rate.incentive || '');
+                        $('#editFixedamt').val(emp.rate.fixedamt || '');
+                        $('#editNetamt').val(emp.rate.netamt || '');
+                    } else {
+                        // Clear rate fields if no rate data
+                        $('#editCtc, #editBasic, #editDa, #editArate, #editOtrate, #editHra, #editMadical, #editExgratiaRetention, #editLTARetention, #editLTA, #editCA, #editFooding, #editMisc, #editCEA, #editWashingAllowance, #editProfessionalPursuits, #editSpecialAllowance, #editIncomeTax, #editPersonalpay, #editPetrol, #editRateMobile, #editIncentive, #editFixedamt, #editNetamt').val('');
+                    }
                     
                     // Update searchable dropdowns after a short delay to ensure they're initialized
                     setTimeout(function() {
@@ -1172,8 +1666,8 @@ $(document).ready(function() {
     });
     
     // Setup auto-save for edit form
-    var updateUrl = '/stc/stc_payroll/public/master/employees/' + ($('#editEmployeeId').val() || '');
-    window.setupAutoSave('#editEmployeeForm', '/stc/stc_payroll/public/master/employees');
+    var updateUrl = '/stc/stc_payroll/master/employees/' + ($('#editEmployeeId').val() || '');
+    window.setupAutoSave('#editEmployeeForm', '/stc/stc_payroll/master/employees');
     
     // Override saveField callback to refresh table
     var originalSaveField = window.saveField;
@@ -1203,7 +1697,7 @@ $(document).ready(function() {
         });
         
         $.ajax({
-            url: "/stc/stc_payroll/public/master/employees",
+            url: "/stc/stc_payroll/master/employees",
             type: 'POST',
             data: formData,
             headers: {
@@ -1257,7 +1751,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "/stc/stc_payroll/public/master/employees/" + id,
+                    url: "/stc/stc_payroll/master/employees/" + id,
                     type: 'POST',
                     data: {
                         _method: 'DELETE',
@@ -1301,27 +1795,417 @@ $(document).ready(function() {
     $(document).ready(function() {
         // Site dropdowns
         $('#editSiteId, #addSiteId').each(function() {
-            window.initSearchableDropdown(this, '/stc/stc_payroll/public/master/sites/store');
+            window.initSearchableDropdown(this, '/stc/stc_payroll/master/sites/store');
         });
         
         // Department dropdowns
         $('#editDepartmentId, #addDepartmentId').each(function() {
-            window.initSearchableDropdown(this, '/stc/stc_payroll/public/master/departments/store');
+            window.initSearchableDropdown(this, '/stc/stc_payroll/master/departments/store');
         });
         
         // Designation dropdowns
         $('#editDesignationId, #addDesignationId').each(function() {
-            window.initSearchableDropdown(this, '/stc/stc_payroll/public/master/designations/store');
+            window.initSearchableDropdown(this, '/stc/stc_payroll/master/designations/store');
         });
         
         // Gang dropdowns
         $('#editGangId, #addGangId').each(function() {
-            window.initSearchableDropdown(this, '/stc/stc_payroll/public/master/gangs/store');
+            window.initSearchableDropdown(this, '/stc/stc_payroll/master/gangs/store');
         });
         
         // Other searchable dropdowns (Gender, Marital Status, Payment Mode, Weekoff, OT Type, Skill, Status)
         $('#editGender, #addGender, #editMaritalStatus, #addMaritalStatus, #editPaymentmode, #addPaymentmode, #editWeekoff, #addWeekoff, #editOttype, #addOttype, #editSkill, #addSkill, #editStatus, #addStatus').each(function() {
             window.initSearchableDropdown(this); // No createUrl for these
+        });
+    });
+    
+    // PF/ESIC Applicable Show/Hide Logic for Add Form
+    $('#addPfEsicApplicable').on('change', function() {
+        if ($(this).val() === '1') {
+            $('#addUanWrapper').show();
+            $('#addEsicWrapper').show();
+        } else {
+            $('#addUanWrapper').hide();
+            $('#addEsicWrapper').hide();
+            $('#addUan').val('');
+            $('#addEsic').val('');
+        }
+    });
+    
+    // PF/ESIC Applicable Show/Hide Logic for Edit Form
+    $('#editPfEsicApplicable').on('change', function() {
+        if ($(this).val() === '1') {
+            $('#editUanWrapper').show();
+            $('#editEsicWrapper').show();
+        } else {
+            $('#editUanWrapper').hide();
+            $('#editEsicWrapper').hide();
+            $('#editUan').val('');
+            $('#editEsic').val('');
+        }
+    });
+    
+    // Download Employee Sample Excel
+    $('#downloadEmployeeSample').on('click', function() {
+        window.location.href = '/stc/stc_payroll/master/employees/export-sample?type=employee';
+    });
+    
+    // Download Rate Sample Excel
+    $('#downloadRateSample').on('click', function() {
+        window.location.href = '/stc/stc_payroll/master/employees/export-sample?type=rate';
+    });
+    
+    var employeePreviewData = [];
+    
+    // Import Employee Form Submit - Preview
+    $('#importEmployeeForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = new FormData(this);
+        formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+        formData.append('preview', '1');
+        
+        $.ajax({
+            url: '/stc/stc_payroll/master/employees/import-preview',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                $('#employeeUploadBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+            },
+            success: function(response) {
+                if (response.success) {
+                    employeePreviewData = response.data;
+                    displayEmployeePreview(response.data, response.headers);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Failed to process file'
+                    });
+                }
+            },
+            error: function(xhr) {
+                var message = 'Failed to process file';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: message
+                });
+            },
+            complete: function() {
+                $('#employeeUploadBtn').prop('disabled', false).html('<i class="fas fa-upload"></i> Upload & Preview');
+            }
+        });
+    });
+    
+    // Display Employee Preview
+    function displayEmployeePreview(data, headers) {
+        // Show preview section, hide upload section
+        $('#employeeUploadSection').hide();
+        $('#employeePreviewSection').show();
+        $('#employeeUploadBtn').hide();
+        $('#employeeSaveBtn').show();
+        $('#employeeBackToUpload').show();
+        
+        // Build headers
+        var headerRow = '<th style="width: 80px;">Remove</th>';
+        headers.forEach(function(header) {
+            headerRow += '<th>' + header + '</th>';
+        });
+        $('#employeePreviewHeaders').html(headerRow);
+        
+        // Build rows
+        var tbody = '';
+        data.forEach(function(row, index) {
+            tbody += '<tr data-index="' + index + '">';
+            tbody += '<td><button type="button" class="btn btn-danger btn-sm remove-row" data-index="' + index + '"><i class="fas fa-times"></i></button></td>';
+            headers.forEach(function(header) {
+                var value = row[header.toLowerCase()] || '';
+                tbody += '<td>' + (value !== null && value !== undefined ? value : '') + '</td>';
+            });
+            tbody += '</tr>';
+        });
+        $('#employeePreviewBody').html(tbody);
+        
+        // Update counts
+        $('#employeeTotalRows').text(data.length);
+        $('#employeeRowsToImport').text(data.length);
+    }
+    
+    // Remove Employee Row
+    $(document).on('click', '#employeePreviewTable .remove-row', function() {
+        var index = $(this).data('index');
+        $(this).closest('tr').remove();
+        employeePreviewData = employeePreviewData.filter(function(item, i) {
+            return i !== index;
+        });
+        // Re-index
+        $('#employeePreviewTable tbody tr').each(function(i) {
+            $(this).attr('data-index', i);
+            $(this).find('.remove-row').attr('data-index', i);
+        });
+        $('#employeeRowsToImport').text(employeePreviewData.length);
+    });
+    
+    // Back to Upload - Employee
+    $('#employeeBackToUpload').on('click', function() {
+        $('#employeeUploadSection').show();
+        $('#employeePreviewSection').hide();
+        $('#employeeUploadBtn').show();
+        $('#employeeSaveBtn').hide();
+        $('#employeeBackToUpload').hide();
+        employeePreviewData = [];
+    });
+    
+    // Save Employee Import
+    $('#employeeSaveBtn').on('click', function() {
+        if (employeePreviewData.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Data',
+                text: 'Please select at least one row to import'
+            });
+            return;
+        }
+        
+        $.ajax({
+            url: '/stc/stc_payroll/master/employees/import',
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                data: employeePreviewData
+            },
+            beforeSend: function() {
+                $('#employeeSaveBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Importing...');
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message || 'Employees imported successfully!',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(function() {
+                        $('#importEmployeeModal').modal('hide');
+                        $('#importEmployeeForm')[0].reset();
+                        $('#employeeUploadSection').show();
+                        $('#employeePreviewSection').hide();
+                        $('#employeeUploadBtn').show();
+                        $('#employeeSaveBtn').hide();
+                        $('#employeeBackToUpload').hide();
+                        employeePreviewData = [];
+                        table.ajax.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Failed to import employees'
+                    });
+                }
+            },
+            error: function(xhr) {
+                var message = 'Failed to import employees';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: message
+                });
+            },
+            complete: function() {
+                $('#employeeSaveBtn').prop('disabled', false).html('<i class="fas fa-save"></i> Save & Import');
+            }
+        });
+    });
+    
+    var ratePreviewData = [];
+    
+    // Import Rate Form Submit - Preview
+    $('#importRateForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        var formData = new FormData(this);
+        formData.append('_token', $('meta[name="csrf-token"]').attr('content'));
+        formData.append('preview', '1');
+        
+        $.ajax({
+            url: '/stc/stc_payroll/master/employees/import-rate-preview',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                $('#rateUploadBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+            },
+            success: function(response) {
+                if (response.success) {
+                    ratePreviewData = response.data;
+                    displayRatePreview(response.data, response.headers);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Failed to process file'
+                    });
+                }
+            },
+            error: function(xhr) {
+                var message = 'Failed to process file';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: message
+                });
+            },
+            complete: function() {
+                $('#rateUploadBtn').prop('disabled', false).html('<i class="fas fa-upload"></i> Upload & Preview');
+            }
+        });
+    });
+    
+    // Display Rate Preview
+    function displayRatePreview(data, headers) {
+        // Show preview section, hide upload section
+        $('#rateUploadSection').hide();
+        $('#ratePreviewSection').show();
+        $('#rateUploadBtn').hide();
+        $('#rateSaveBtn').show();
+        $('#rateBackToUpload').show();
+        
+        // Build headers
+        var headerRow = '<th style="width: 80px;">Remove</th>';
+        headers.forEach(function(header) {
+            headerRow += '<th>' + header + '</th>';
+        });
+        $('#ratePreviewHeaders').html(headerRow);
+        
+        // Build rows
+        var tbody = '';
+        data.forEach(function(row, index) {
+            tbody += '<tr data-index="' + index + '">';
+            tbody += '<td><button type="button" class="btn btn-danger btn-sm remove-row" data-index="' + index + '"><i class="fas fa-times"></i></button></td>';
+            headers.forEach(function(header) {
+                var value = '';
+                if (header === 'Employee Name') {
+                    value = row['employee_name'] || '';
+                } else {
+                    value = row[header.toLowerCase()] || '';
+                }
+                // Highlight "Not Found" in red
+                if (header === 'Employee Name' && value === 'Not Found') {
+                    tbody += '<td style="color: red; font-weight: bold;">' + value + '</td>';
+                } else {
+                    tbody += '<td>' + (value !== null && value !== undefined ? value : '') + '</td>';
+                }
+            });
+            tbody += '</tr>';
+        });
+        $('#ratePreviewBody').html(tbody);
+        
+        // Update counts
+        $('#rateTotalRows').text(data.length);
+        $('#rateRowsToImport').text(data.length);
+    }
+    
+    // Remove Rate Row
+    $(document).on('click', '#ratePreviewTable .remove-row', function() {
+        var index = $(this).data('index');
+        $(this).closest('tr').remove();
+        ratePreviewData = ratePreviewData.filter(function(item, i) {
+            return i !== index;
+        });
+        // Re-index
+        $('#ratePreviewTable tbody tr').each(function(i) {
+            $(this).attr('data-index', i);
+            $(this).find('.remove-row').attr('data-index', i);
+        });
+        $('#rateRowsToImport').text(ratePreviewData.length);
+    });
+    
+    // Back to Upload - Rate
+    $('#rateBackToUpload').on('click', function() {
+        $('#rateUploadSection').show();
+        $('#ratePreviewSection').hide();
+        $('#rateUploadBtn').show();
+        $('#rateSaveBtn').hide();
+        $('#rateBackToUpload').hide();
+        ratePreviewData = [];
+    });
+    
+    // Save Rate Import
+    $('#rateSaveBtn').on('click', function() {
+        if (ratePreviewData.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'No Data',
+                text: 'Please select at least one row to import'
+            });
+            return;
+        }
+        
+        $.ajax({
+            url: '/stc/stc_payroll/master/employees/import-rate',
+            type: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content'),
+                data: ratePreviewData
+            },
+            beforeSend: function() {
+                $('#rateSaveBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Importing...');
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: response.message || 'Rates imported successfully!',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(function() {
+                        $('#importRateModal').modal('hide');
+                        $('#importRateForm')[0].reset();
+                        $('#rateUploadSection').show();
+                        $('#ratePreviewSection').hide();
+                        $('#rateUploadBtn').show();
+                        $('#rateSaveBtn').hide();
+                        $('#rateBackToUpload').hide();
+                        ratePreviewData = [];
+                        table.ajax.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Failed to import rates'
+                    });
+                }
+            },
+            error: function(xhr) {
+                var message = 'Failed to import rates';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    html: message
+                });
+            },
+            complete: function() {
+                $('#rateSaveBtn').prop('disabled', false).html('<i class="fas fa-save"></i> Save & Import');
+            }
         });
     });
 });

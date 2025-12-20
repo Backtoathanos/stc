@@ -57,7 +57,7 @@ If this shows PHP info, PHP is working. If you see the code, PHP is not enabled.
 
 If .htaccess still doesn't work, you can always access:
 ```
-http://localhost/stc/stc_payroll/public/
+http://localhost/stc/stc_payroll/
 ```
 
 This will always work regardless of Apache configuration.

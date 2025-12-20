@@ -25,7 +25,7 @@
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="/stc/stc_payroll/public/">Home</a></li>
+              <li class="breadcrumb-item"><a href="/stc/stc_payroll/">Home</a></li>
               @if(!empty($breadcrumb))
                 @foreach($breadcrumb as $item)
                   <li class="breadcrumb-item {{ $loop->last ? 'active' : '' }}">
