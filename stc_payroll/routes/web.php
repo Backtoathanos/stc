@@ -13,6 +13,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\PayrollParameterController;
 use App\Http\Controllers\RateController;
+use App\Http\Controllers\PayrollController;
 
 /*
 |--------------------------------------------------------------------------
@@ -92,22 +93,14 @@ Route::middleware(['auth.user'])->group(function () {
 
     // Transaction Routes
     Route::prefix('transaction')->group(function () {
-        Route::get('/payroll', function () {
-            $user = auth()->user();
-            
-            // Check if user has view permission (root user always has access)
-            if (!$user || (!$user->hasPermission('transaction.payroll.view') && $user->email !== 'root@stcassociate.com')) {
-                if (request()->expectsJson()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'You do not have permission to access this page'
-                    ], 403);
-                }
-                return redirect('/stc/stc_payroll/')->with('error', 'You do not have permission to access this page');
-            }
-            
-            return view('pages.transaction.payroll', ['page_title' => 'Payroll']);
-        })->name('transaction.payroll');
+        Route::get('/payroll', [PayrollController::class, 'index'])->name('transaction.payroll');
+        Route::post('/payroll/list', [PayrollController::class, 'list'])->name('transaction.payroll.list');
+        Route::post('/payroll/summary', [PayrollController::class, 'summary'])->name('transaction.payroll.summary');
+        Route::post('/payroll/slip', [PayrollController::class, 'slip'])->name('transaction.payroll.slip');
+        Route::post('/payroll/bank', [PayrollController::class, 'bank'])->name('transaction.payroll.bank');
+        Route::post('/payroll/bank-other', [PayrollController::class, 'bankOther'])->name('transaction.payroll.bank-other');
+        Route::post('/payroll/pf', [PayrollController::class, 'pf'])->name('transaction.payroll.pf');
+        Route::post('/payroll/esic', [PayrollController::class, 'esic'])->name('transaction.payroll.esic');
         
         // Attendance routes
         Route::get('/attendance', [AttendanceController::class, 'index'])->name('transaction.attendance');
@@ -116,7 +109,8 @@ Route::middleware(['auth.user'])->group(function () {
         Route::get('/attendance/export-sample', [AttendanceController::class, 'exportSample'])->name('transaction.attendance.export-sample');
         Route::post('/attendance/import-preview', [AttendanceController::class, 'importPreview'])->name('transaction.attendance.import-preview');
         Route::post('/attendance/import', [AttendanceController::class, 'import'])->name('transaction.attendance.import');
-        Route::delete('/attendance/{id}', [AttendanceController::class, 'destroy'])->name('transaction.attendance.destroy');
+            Route::delete('/attendance/{id}', [AttendanceController::class, 'destroy'])->name('transaction.attendance.destroy');
+            Route::post('/attendance/process', [AttendanceController::class, 'processAttendance'])->name('transaction.attendance.process');
     });
 
     // Reports Routes

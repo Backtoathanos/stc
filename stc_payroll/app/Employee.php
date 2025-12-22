@@ -57,6 +57,6 @@ class Employee extends Model
     
     public function rate()
     {
-        return $this->hasOne(Rate::class);
+        return $this->hasOne(Rate::class, 'employee_id');
     }
 }

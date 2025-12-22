@@ -7,6 +7,10 @@ use App\Attendance;
 use App\Overtime;
 use App\Employee;
 use App\Site;
+use App\Payroll;
+use App\PayrollParameter;
+use App\Rate;
+use App\CalendarLeaveType;
 use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -694,8 +698,6 @@ class AttendanceController extends Controller
             if ($otValue !== null && $otValue > 0) {
                 $displayValue .= '+' . $otValue;
                 $totalOTHours += $otValue;
-            } else {
-                $displayValue .= '+0';
             }
             
             $daysData[$day] = $displayValue;
@@ -742,6 +744,269 @@ class AttendanceController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting attendance record: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function processAttendance(Request $request)
+    {
+        $monthYear = $request->input('month_year');
+        
+        if (!$monthYear) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Month/Year is required'
+            ], 400);
+        }
+        
+        try {
+            DB::beginTransaction();
+            
+            // Get payroll parameters
+            $params = PayrollParameter::latest()->first();
+            if (!$params) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Payroll parameters not configured. Please configure payroll parameters first.'
+                ], 400);
+            }
+            
+            // Get all attendance records for the month (all sites)
+            // Use inner join for employees to ensure we only process records with valid employees
+            $attendances = Attendance::join('employees', 'attendances.aadhar', '=', 'employees.Aadhar')
+                ->leftJoin('sites', 'employees.site_id', '=', 'sites.id')
+                ->where('attendances.month_year', $monthYear)
+                ->select('attendances.*', 'employees.id as employee_id', 'employees.Skill', 'employees.site_id', 'employees.PfApplicable', 'employees.EsicApplicable', 'sites.name as site_name')
+                ->get();
+            
+            if ($attendances->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No attendance records found for the selected month'
+                ], 404);
+            }
+            
+            // Get all employee rates keyed by employee_id for quick lookup
+            $employeeRates = \App\Rate::whereIn('employee_id', $attendances->pluck('employee_id')->filter()->unique())
+                ->get()
+                ->keyBy('employee_id');
+            
+            // Calculate days in month
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+            $daysInMonth = $date->daysInMonth;
+            
+            // Count Sundays
+            $sundays = 0;
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $checkDate = \Carbon\Carbon::createFromFormat('Y-m-d', $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT));
+                if ($checkDate->dayOfWeek === \Carbon\Carbon::SUNDAY) {
+                    $sundays++;
+                }
+            }
+            
+            $workingDays = $daysInMonth - $sundays;
+            $processed = 0;
+            $failed = [];
+            
+            foreach ($attendances as $attendance) {
+                try {
+                    // Validate employee exists
+                    if (!$attendance->employee_id) {
+                        $failed[] = [
+                            'employee_name' => $attendance->employee_name,
+                            'aadhar' => $attendance->aadhar,
+                            'site_name' => $attendance->site_name ?? 'N/A',
+                            'reason' => 'Employee not found in employees table'
+                        ];
+                        continue;
+                    }
+                    
+                    // Validate site_id (but don't fail if it's null, we can still process)
+                    $siteId = $attendance->site_id ?? null;
+                    
+                    // Count present, absent, and leave (O) days
+                    $present = 0;
+                    $absent = 0;
+                    $leave = 0; // Leave days (marked as 'O' in attendance)
+                    
+                    for ($day = 1; $day <= 31; $day++) {
+                        $dayValue = $attendance->{'day_' . $day};
+                        if ($dayValue === 'P') {
+                            $present++;
+                        } elseif ($dayValue === 'A') {
+                            $absent++;
+                        } elseif ($dayValue === 'O') {
+                            $leave++;
+                        }
+                    }
+                    
+                    // Count NH (National Holiday) days from calendar for this month
+                    $nh = 0;
+                    $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
+                    $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
+                    $nhRecords = \App\CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                        ->where('leave_type', 'NH')
+                        ->get();
+                    
+                    // Count NH days that fall within the month
+                    $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+                    $daysInMonth = $date->daysInMonth;
+                    for ($day = 1; $day <= $daysInMonth; $day++) {
+                        $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                        foreach ($nhRecords as $nhRecord) {
+                            if ($nhRecord->date->format('Y-m-d') === $checkDate) {
+                                $nh++;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // Total worked days = Present + NH + Leave
+                    $totalWorkedDays = $present + $nh + $leave;
+                    
+                    // Get OT hours
+                    $otHours = 0;
+                    $overtime = Overtime::where('aadhar', $attendance->aadhar)
+                        ->where('month_year', $monthYear)
+                        ->first();
+                    
+                    if ($overtime) {
+                        for ($day = 1; $day <= 31; $day++) {
+                            $otValue = $overtime->{'day_' . $day};
+                            if ($otValue !== null && $otValue > 0) {
+                                $otHours += $otValue;
+                            }
+                        }
+                    }
+                    
+                    // Get employee rate from rates table
+                    $employeeRate = $employeeRates->get($attendance->employee_id);
+                    if (!$employeeRate) {
+                        $failed[] = [
+                            'employee_name' => $attendance->employee_name,
+                            'aadhar' => $attendance->aadhar,
+                            'site_name' => $attendance->site_name ?? 'N/A',
+                            'reason' => 'Employee rate not found in rates table'
+                        ];
+                        continue;
+                    }
+                    
+                    // Validate working days
+                    if ($workingDays <= 0) {
+                        $failed[] = [
+                            'employee_name' => $attendance->employee_name,
+                            'aadhar' => $attendance->aadhar,
+                            'site_name' => $attendance->site_name ?? 'N/A',
+                            'reason' => 'Invalid working days calculation'
+                        ];
+                        continue;
+                    }
+                    
+                    // Get basic and DA from employee's rate
+                    // Note: basic and da in rates table are already daily rates
+                    $basicRate = $employeeRate->basic ?? 0;
+                    $daRate = $employeeRate->da ?? 0;
+                    
+                    // Get employee category/skill for reference
+                    $category = $attendance->Skill ?? 'UN-SKILLED';
+                    if (!in_array($category, ['UN-SKILLED', 'SEMI-SKILLED', 'SKILLED', 'HIGH-SKILLED'])) {
+                        $category = 'UN-SKILLED';
+                    }
+                    
+                    // Calculate amounts based on TOTAL WORKED DAYS (P + NH + L)
+                    // Basic and DA rates are already daily rates, so multiply directly by total worked days
+                    $basicAmount = $basicRate * $totalWorkedDays;
+                    $daAmount = $daRate * $totalWorkedDays;
+                    
+                    // Calculate OT amount
+                    // OT rate per hour = daily basic rate / 8 hours per day
+                    $otRatePerHour = $basicRate / 8;
+                    $otAmount = $otRatePerHour * $otHours;
+                    
+                    // Gross salary
+                    $grossSalary = $basicAmount + $daAmount + $otAmount;
+                    
+                    // Calculate deductions (PF and ESIC are optional - if not applicable, deductions are 0)
+                    $pfEmployee = 0;
+                    $esicEmployee = 0;
+                    
+                    // PF deduction only if employee is PF applicable (check for true/1, not just truthy)
+                    // PF is calculated on basic amount (min of basic and pf_limit) × pf_percentage
+                    $isPfApplicable = !empty($attendance->PfApplicable) && ($attendance->PfApplicable === true || $attendance->PfApplicable === 1 || $attendance->PfApplicable === '1');
+                    if ($isPfApplicable && $basicAmount > 0) {
+                        $pfBase = min($basicAmount, $params->pf_limit);
+                        $pfEmployee = ($pfBase * $params->pf_percentage) / 100;
+                    }
+                    
+                    // ESIC deduction only if employee is ESIC applicable (check for true/1, not just truthy)
+                    // ESIC is calculated on gross salary × esic_employer_percentage (if within limit)
+                    $isEsicApplicable = !empty($attendance->EsicApplicable) && ($attendance->EsicApplicable === true || $attendance->EsicApplicable === 1 || $attendance->EsicApplicable === '1');
+                    if ($isEsicApplicable && $grossSalary <= $params->esic_limit) {
+                        $esicEmployee = ($grossSalary * $params->esic_employer_percentage) / 100;
+                    }
+                    
+                    $totalDeductions = $pfEmployee + $esicEmployee;
+                    $netSalary = $grossSalary - $totalDeductions;
+                    
+                    // Create or update payroll record
+                    // Use site_id if available, otherwise use 0 (site_id is not required for processing)
+                    $payrollSiteId = $siteId ?? 0;
+                    
+                    Payroll::updateOrCreate(
+                        [
+                            'aadhar' => $attendance->aadhar,
+                            'month_year' => $monthYear,
+                            'site_id' => $payrollSiteId
+                        ],
+                        [
+                            'employee_name' => $attendance->employee_name,
+                            'working_days' => $workingDays,
+                            'present_days' => $present,
+                            'absent_days' => $absent,
+                            'nh_days' => $nh,
+                            'leave_days' => $leave,
+                            'total_worked_days' => $totalWorkedDays,
+                            'ot_hours' => $otHours,
+                            'category' => $category,
+                            'basic_rate' => $basicRate,
+                            'da_rate' => $daRate,
+                            'basic_amount' => round($basicAmount, 2),
+                            'da_amount' => round($daAmount, 2),
+                            'ot_amount' => round($otAmount, 2),
+                            'gross_salary' => round($grossSalary, 2),
+                            'pf_employee' => round($pfEmployee, 2),
+                            'esic_employee' => round($esicEmployee, 2),
+                            'total_deductions' => round($totalDeductions, 2),
+                            'net_salary' => round($netSalary, 2)
+                        ]
+                    );
+                    
+                    $processed++;
+                    
+                } catch (\Exception $e) {
+                    $failed[] = [
+                        'employee_name' => $attendance->employee_name ?? 'N/A',
+                        'aadhar' => $attendance->aadhar ?? 'N/A',
+                        'site_name' => $attendance->site_name ?? 'N/A',
+                        'reason' => $e->getMessage()
+                    ];
+                }
+            }
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Successfully processed {$processed} employee(s)" . (count($failed) > 0 ? ". " . count($failed) . " failed." : ""),
+                'processed' => $processed,
+                'failed' => $failed
+            ]);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error processing attendance: ' . $e->getMessage()
             ], 500);
         }
     }

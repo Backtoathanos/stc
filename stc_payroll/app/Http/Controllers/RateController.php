@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Rate;
+use App\SiteRate;
 use App\Site;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +19,7 @@ class RateController extends Controller
 
     public function list(Request $request)
     {
-        $query = Rate::with('site')
+        $query = SiteRate::with('site')
             ->select('site_rates.*', 'sites.name as site_name', 'sites.id as site_id_display')
             ->join('sites', 'site_rates.site_id', '=', 'sites.id');
 
@@ -28,9 +28,9 @@ class RateController extends Controller
             $search = $request->search['value'];
             $query->where(function($q) use ($search) {
                 $q->where('sites.name', 'like', "%{$search}%")
-                  ->orWhere('rates.category', 'like', "%{$search}%")
-                  ->orWhere('rates.basic', 'like', "%{$search}%")
-                  ->orWhere('rates.da', 'like', "%{$search}%");
+                  ->orWhere('site_rates.category', 'like', "%{$search}%")
+                  ->orWhere('site_rates.basic', 'like', "%{$search}%")
+                  ->orWhere('site_rates.da', 'like', "%{$search}%");
             });
         }
 
@@ -53,7 +53,7 @@ class RateController extends Controller
         // Pagination
         $start = $request->start ?? 0;
         $length = $request->length ?? 10;
-        $totalRecords = Rate::count();
+        $totalRecords = SiteRate::count();
         $filteredRecords = $query->count();
         
         $rates = $query->skip($start)->take($length)->get();
@@ -89,7 +89,7 @@ class RateController extends Controller
         ]);
 
         // Check if rate already exists for this site-category combination
-        $existing = Rate::where('site_id', $validated['site_id'])
+        $existing = SiteRate::where('site_id', $validated['site_id'])
             ->where('category', $validated['category'])
             ->first();
 
@@ -101,7 +101,7 @@ class RateController extends Controller
         }
 
         try {
-            $rate = Rate::create($validated);
+            $rate = SiteRate::create($validated);
             return response()->json([
                 'success' => true,
                 'message' => 'Rate created successfully',
@@ -124,10 +124,10 @@ class RateController extends Controller
             'da' => 'required|numeric|min:0',
         ]);
 
-        $rate = Rate::findOrFail($id);
+        $rate = SiteRate::findOrFail($id);
 
         // Check if another rate exists for this site-category combination
-        $existing = Rate::where('site_id', $validated['site_id'])
+        $existing = SiteRate::where('site_id', $validated['site_id'])
             ->where('category', $validated['category'])
             ->where('id', '!=', $id)
             ->first();
@@ -156,7 +156,7 @@ class RateController extends Controller
 
     public function show($id)
     {
-        $rate = Rate::with('site')->findOrFail($id);
+        $rate = SiteRate::with('site')->findOrFail($id);
         return response()->json([
             'success' => true,
             'data' => $rate
@@ -166,7 +166,7 @@ class RateController extends Controller
     public function destroy($id)
     {
         try {
-            $rate = Rate::findOrFail($id);
+            $rate = SiteRate::findOrFail($id);
             $rate->delete();
             return response()->json([
                 'success' => true,

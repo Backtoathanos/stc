@@ -88,6 +88,17 @@
                   </div>
                 </div>
               </div>
+              <div class="col-md-2">
+                <div class="info-box">
+                  <span class="info-box-icon bg-success"><i class="fas fa-calculator"></i></span>
+                  <div class="info-box-content">
+                    <button type="button" class="btn btn-success btn-block" id="processAttendanceBtn" style="margin-top: 10px;">
+                      <i class="fas fa-cog fa-spin d-none" id="processSpinner"></i>
+                      <i class="fas fa-play-circle" id="processIcon"></i> Process Attendance
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -556,14 +567,14 @@ $(document).ready(function() {
                     var data = response.data;
                     var html = '<div class="table-responsive" style="max-height: 600px; overflow-y: auto;">';
                     html += '<table class="table table-bordered table-striped table-sm">';
-                    html += '<thead class="thead-dark" style="position: sticky; top: 0; z-index: 10;">';
+                    html += '<thead class="teext-center" style="position: sticky; top: 0; z-index: 10;">';
                     html += '<tr>';
                     html += '<th>Aadhar</th>';
                     html += '<th>Name</th>';
                     
                     // Add day headers (1-31)
                     for (var day = 1; day <= 31; day++) {
-                        html += '<th style="min-width: 60px;">' + day + '</th>';
+                        html += '<th style="min-width: 35px;">' + day + '</th>';
                     }
                     
                     html += '<th>Total Present</th>';
@@ -683,6 +694,126 @@ $(document).ready(function() {
         attendancePreviewData = [];
         $('#attendanceMonthYear').val('{{ date('Y-m') }}');
     });
+
+    // Process Attendance
+    $('#processAttendanceBtn').on('click', function() {
+        var monthYear = $('#filterMonthYear').val();
+        
+        if (!monthYear) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Filter Required',
+                text: 'Please select Month & Year before processing attendance'
+            });
+            return;
+        }
+        
+        // Show confirmation
+        Swal.fire({
+            title: 'Process Attendance?',
+            html: 'This will calculate payroll for all employees in all sites for:<br><strong>Month:</strong> ' + monthYear,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Process it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading state
+                var $btn = $('#processAttendanceBtn');
+                var $spinner = $('#processSpinner');
+                var $icon = $('#processIcon');
+                
+                $btn.prop('disabled', true);
+                $spinner.removeClass('d-none');
+                $icon.addClass('d-none');
+                $btn.html('<i class="fas fa-cog fa-spin"></i> Processing...');
+                
+                // Make AJAX call
+                $.ajax({
+                    url: '/stc/stc_payroll/transaction/attendance/process',
+                    type: 'POST',
+                    data: {
+                        month_year: monthYear
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            var message = 'Successfully processed ' + response.processed + ' employee(s)';
+                            
+                            if (response.failed && response.failed.length > 0) {
+                                // Show failed records in modal
+                                showFailedRecordsModal(response.failed, response.processed);
+                            } else {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Processing Complete!',
+                                    text: message,
+                                    confirmButtonText: 'OK'
+                                });
+                            }
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Processing Failed',
+                                text: response.message || 'Failed to process attendance'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        var message = 'Failed to process attendance';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: message
+                        });
+                    },
+                    complete: function() {
+                        // Reset button state
+                        $btn.prop('disabled', false);
+                        $spinner.addClass('d-none');
+                        $icon.removeClass('d-none');
+                        $btn.html('<i class="fas fa-play-circle" id="processIcon"></i> Process Attendance');
+                    }
+                });
+            }
+        });
+    });
+
+    // Function to show failed records modal
+    function showFailedRecordsModal(failedRecords, processedCount) {
+        var html = '<div class="alert alert-success mb-3">Successfully processed <strong>' + processedCount + '</strong> employee(s)</div>';
+        html += '<div class="alert alert-warning mb-3"><strong>' + failedRecords.length + '</strong> employee(s) failed to process:</div>';
+        html += '<div class="table-responsive" style="max-height: 400px; overflow-y: auto;">';
+        html += '<table class="table table-bordered table-sm">';
+        html += '<thead class="thead-light"><tr><th>Employee Name</th><th>Aadhar</th><th>Site</th><th>Reason</th></tr></thead>';
+        html += '<tbody>';
+        
+        failedRecords.forEach(function(record) {
+            html += '<tr>';
+            html += '<td>' + (record.employee_name || 'N/A') + '</td>';
+            html += '<td>' + (record.aadhar || 'N/A') + '</td>';
+            html += '<td>' + (record.site_name || 'N/A') + '</td>';
+            html += '<td><span class="text-danger">' + (record.reason || 'Unknown error') + '</span></td>';
+            html += '</tr>';
+        });
+        
+        html += '</tbody></table></div>';
+        
+        Swal.fire({
+            icon: 'warning',
+            title: 'Processing Complete with Errors',
+            html: html,
+            width: '800px',
+            confirmButtonText: 'OK'
+        });
+    }
 });
 </script>
 @endpush

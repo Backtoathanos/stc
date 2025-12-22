@@ -1195,11 +1195,11 @@ class EmployeeController extends Controller
                     }
                     
                     // Update or create rate
-                    $rate = Rate::where('EmpId', $employee->id)->first();
+                    $rate = Rate::where('employee_id', $employee->id)->first();
                     if ($rate) {
                         $rate->update($rateData);
                     } else {
-                        $rateData['EmpId'] = $employee->id;
+                        $rateData['employee_id'] = $employee->id;
                         Rate::create($rateData);
                     }
                     
