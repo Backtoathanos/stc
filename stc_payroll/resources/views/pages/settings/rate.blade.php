@@ -223,8 +223,9 @@ $(document).ready(function() {
                 if (response.success) {
                     var rate = response.data;
                     $('#editRateId').val(rate.id);
-                    $('#editSiteId').val(rate.site_id);
-                    $('#editCategory').val(rate.category);
+                    // Site and category are read-only (from employee data)
+                    $('#editSiteId').val(rate.site_id).prop('disabled', true);
+                    $('#editCategory').val(rate.category).prop('disabled', true);
                     $('#editBasic').val(rate.basic);
                     $('#editDa').val(rate.da);
                     $('#editRateModal').modal('show');
@@ -250,7 +251,11 @@ $(document).ready(function() {
     $('#editRateForm').on('submit', function(e) {
         e.preventDefault();
         var id = $('#editRateId').val();
-        var formData = $(this).serialize();
+        // Only send basic and da (site and category are read-only)
+        var formData = {
+            basic: $('#editBasic').val(),
+            da: $('#editDa').val()
+        };
         
         $.ajax({
             url: '/stc/stc_payroll/settings/rate/' + id,
@@ -269,6 +274,9 @@ $(document).ready(function() {
                         showConfirmButton: false
                     });
                     $('#editRateModal').modal('hide');
+                    // Re-enable fields for next edit
+                    $('#editSiteId').prop('disabled', false);
+                    $('#editCategory').prop('disabled', false);
                     table.ajax.reload();
                 } else {
                     Swal.fire({

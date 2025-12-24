@@ -35,6 +35,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::middleware(['auth.user'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('home');
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
+    Route::get('/dashboard/attendance-data', [DashboardController::class, 'getAttendanceData'])->name('dashboard.attendance-data');
 
     // Master Routes
     Route::prefix('master')->group(function () {
@@ -51,6 +52,10 @@ Route::middleware(['auth.user'])->group(function () {
         Route::get('/sites/show/{id}', [SiteController::class, 'show'])->name('master.sites.show');
         Route::put('/sites/{id}', [SiteController::class, 'update'])->name('master.sites.update');
         Route::delete('/sites/{id}', [SiteController::class, 'destroy'])->name('master.sites.destroy');
+        Route::get('/sites/under-contracts', [SiteController::class, 'getUnderContracts'])->name('master.sites.under-contracts');
+        Route::get('/sites/nature-of-work', [SiteController::class, 'getNatureOfWork'])->name('master.sites.nature-of-work');
+        Route::get('/sites/work-order-no', [SiteController::class, 'getWorkOrderNo'])->name('master.sites.work-order-no');
+        Route::post('/sites/update-contractor-details', [SiteController::class, 'updateContractorDetails'])->name('master.sites.update-contractor-details');
         
         // Departments routes
         Route::get('/departments', [DepartmentController::class, 'index'])->name('master.departments');

@@ -165,7 +165,7 @@
             <div class="header-col header-col-left">
                 <div class="contractor-section">
                     <div class="contractor-label">Name and address of Contractor</div>
-                    <div class="contractor-value">502/A Jawaharnagar Road-17 Azadnagar</div>
+                    <div class="contractor-value">GLOBAL AC SYSTEM <br>502/A Jawaharnagar Road-17 Azadnagar</div>
                     <div class="contractor-value">Mango Jsr-832110</div>
                 </div>
             </div>
@@ -183,7 +183,7 @@
                         <span class="info-label">In/Under which contract is carried on</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-value">{{ $site ? $site->name : 'VOLTAS LIMITED' }}</span>
+                        <span class="info-value">{{ $site && $site->under_contract ? $site->under_contract : ($site ? $site->name : 'VOLTAS LIMITED') }}</span>
                     </div>
                 </div>
             </div>
@@ -195,9 +195,9 @@
                 <div class="info-section">
                     <div class="info-row">
                         <span class="info-label">Nature of Work</span>
-                        <span class="info-value">AIR CONDITIONING (1000)</span><br>
+                        <span class="info-value">{{ $site && $site->natureofwork ? $site->natureofwork : 'AIR CONDITIONING (1000)' }}</span><br>
                         <span class="info-label">Work Order No</span>
-                        <span class="info-value"></span>
+                        <span class="info-value">{{ $site && $site->workorderno ? $site->workorderno : '' }}</span>
                     </div>
                 </div>
             </div>
@@ -222,7 +222,7 @@
                         <span class="info-label">Name and address of principle Employer</span>
                     </div>
                     <div class="info-row">
-                        <span class="info-value">JSR - TATA STEEL LTD</span>
+                        <span class="info-value">{{ $site ? $site->name : 'JSR - TATA STEEL LTD' }}</span>
                     </div>
                 </div>
             </div>

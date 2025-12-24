@@ -20,6 +20,9 @@
           <tr>
             <th>ID</th>
             <th>Name</th>
+            <th>Under Contract</th>
+            <th>Nature of Work</th>
+            <th>Work Order No</th>
             <th>Created At</th>
             <th>Updated At</th>
             <th>Actions</th>
@@ -69,6 +72,18 @@
             <label>Name <span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="editSiteName" name="name" required>
           </div>
+          <div class="form-group">
+            <label>Under Contract</label>
+            <input type="text" class="form-control" id="editSiteUnderContract" name="under_contract">
+          </div>
+          <div class="form-group">
+            <label>Nature of Work</label>
+            <input type="text" class="form-control" id="editSiteNatureOfWork" name="natureofwork">
+          </div>
+          <div class="form-group">
+            <label>Work Order No</label>
+            <input type="text" class="form-control" id="editSiteWorkOrderNo" name="workorderno">
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -95,6 +110,18 @@
             <label>Name <span class="text-danger">*</span></label>
             <input type="text" class="form-control" id="addSiteName" name="name" required>
           </div>
+          <div class="form-group">
+            <label>Under Contract</label>
+            <input type="text" class="form-control" id="addSiteUnderContract" name="under_contract">
+          </div>
+          <div class="form-group">
+            <label>Nature of Work</label>
+            <input type="text" class="form-control" id="addSiteNatureOfWork" name="natureofwork">
+          </div>
+          <div class="form-group">
+            <label>Work Order No</label>
+            <input type="text" class="form-control" id="addSiteWorkOrderNo" name="workorderno">
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -120,6 +147,9 @@ $(document).ready(function() {
         columns: [
             { data: 'id', name: 'id' },
             { data: 'name', name: 'name' },
+            { data: 'under_contract', name: 'under_contract' },
+            { data: 'natureofwork', name: 'natureofwork' },
+            { data: 'workorderno', name: 'workorderno' },
             { data: 'created_at', name: 'created_at' },
             { data: 'updated_at', name: 'updated_at' },
             {
@@ -158,6 +188,9 @@ $(document).ready(function() {
                     var html = '<div class="row">' +
                         '<div class="col-md-6 mb-3"><strong>ID:</strong><br><span class="text-muted">' + (site.id || 'N/A') + '</span></div>' +
                         '<div class="col-md-6 mb-3"><strong>Name:</strong><br><span class="text-muted">' + (site.name || 'N/A') + '</span></div>' +
+                        '<div class="col-md-6 mb-3"><strong>Under Contract:</strong><br><span class="text-muted">' + (site.under_contract || 'N/A') + '</span></div>' +
+                        '<div class="col-md-6 mb-3"><strong>Nature of Work:</strong><br><span class="text-muted">' + (site.natureofwork || 'N/A') + '</span></div>' +
+                        '<div class="col-md-6 mb-3"><strong>Work Order No:</strong><br><span class="text-muted">' + (site.workorderno || 'N/A') + '</span></div>' +
                         '<div class="col-md-6 mb-3"><strong>Created At:</strong><br><span class="text-muted">' + (site.created_at || 'N/A') + '</span></div>' +
                         '<div class="col-md-6 mb-3"><strong>Updated At:</strong><br><span class="text-muted">' + (site.updated_at || 'N/A') + '</span></div>' +
                         '</div>';
@@ -186,6 +219,9 @@ $(document).ready(function() {
                     var site = response.data;
                     $('#editSiteId').val(site.id);
                     $('#editSiteName').val(site.name || '');
+                    $('#editSiteUnderContract').val(site.under_contract || '');
+                    $('#editSiteNatureOfWork').val(site.natureofwork || '');
+                    $('#editSiteWorkOrderNo').val(site.workorderno || '');
                     $('#editSiteModal').modal('show');
                 }
             },

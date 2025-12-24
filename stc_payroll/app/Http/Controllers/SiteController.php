@@ -45,7 +45,10 @@ class SiteController extends Controller
             $search = $request->search['value'];
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('id', 'like', "%{$search}%");
+                  ->orWhere('id', 'like', "%{$search}%")
+                  ->orWhere('under_contract', 'like', "%{$search}%")
+                  ->orWhere('natureofwork', 'like', "%{$search}%")
+                  ->orWhere('workorderno', 'like', "%{$search}%");
             });
         }
 
@@ -56,7 +59,7 @@ class SiteController extends Controller
         if ($request->has('order') && is_array($request->order) && count($request->order) > 0) {
             $orderColumn = $request->order[0]['column'] ?? 0;
             $orderDir = $request->order[0]['dir'] ?? 'asc';
-            $columns = ['id', 'name'];
+            $columns = ['id', 'name', 'under_contract', 'natureofwork', 'workorderno'];
             $orderBy = isset($columns[$orderColumn]) ? $columns[$orderColumn] : 'id';
             $query->orderBy($orderBy, $orderDir);
         } else {
@@ -73,6 +76,9 @@ class SiteController extends Controller
             $data[] = [
                 'id' => $site->id,
                 'name' => $site->name,
+                'under_contract' => $site->under_contract ?? '',
+                'natureofwork' => $site->natureofwork ?? '',
+                'workorderno' => $site->workorderno ?? '',
                 'created_at' => $site->created_at ? $site->created_at->format('Y-m-d H:i:s') : 'N/A',
                 'updated_at' => $site->updated_at ? $site->updated_at->format('Y-m-d H:i:s') : 'N/A',
                 'actions' => $site->id, // For actions column
@@ -102,6 +108,9 @@ class SiteController extends Controller
             // Get the ID directly from database insert
             $id = DB::table('sites')->insertGetId([
                 'name' => $request->name,
+                'under_contract' => $request->under_contract ?? null,
+                'natureofwork' => $request->natureofwork ?? null,
+                'workorderno' => $request->workorderno ?? null,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
@@ -161,7 +170,10 @@ class SiteController extends Controller
             DB::beginTransaction();
             
             $site->update([
-                'name' => $request->name
+                'name' => $request->name,
+                'under_contract' => $request->under_contract ?? null,
+                'natureofwork' => $request->natureofwork ?? null,
+                'workorderno' => $request->workorderno ?? null
             ]);
             
             DB::commit();
@@ -214,6 +226,167 @@ class SiteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting site: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    public function getUnderContracts(Request $request)
+    {
+        $siteId = $request->input('site_id');
+        
+        // Get all distinct under_contract values from all sites
+        $query = Site::whereNotNull('under_contract')
+            ->where('under_contract', '!=', '');
+        
+        // If a specific site is selected, also include that site's values
+        if ($siteId && $siteId !== 'all') {
+            // Get all distinct values, but prioritize the selected site
+            $underContracts = Site::whereNotNull('under_contract')
+                ->where('under_contract', '!=', '')
+                ->select('under_contract')
+                ->distinct()
+                ->pluck('under_contract')
+                ->filter()
+                ->unique()
+                ->values();
+        } else {
+            // Get all distinct values from all sites
+            $underContracts = Site::whereNotNull('under_contract')
+                ->where('under_contract', '!=', '')
+                ->select('under_contract')
+                ->distinct()
+                ->pluck('under_contract')
+                ->filter()
+                ->unique()
+                ->values();
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => $underContracts
+        ]);
+    }
+    
+    public function getNatureOfWork(Request $request)
+    {
+        $siteId = $request->input('site_id');
+        $underContract = $request->input('under_contract');
+        
+        if (!$siteId || $siteId === 'all') {
+            return response()->json([
+                'success' => true,
+                'data' => []
+            ]);
+        }
+        
+        $query = Site::where('id', $siteId)
+            ->whereNotNull('natureofwork')
+            ->where('natureofwork', '!=', '');
+        
+        if ($underContract) {
+            $query->where('under_contract', $underContract);
+        }
+        
+        // Get distinct natureofwork values that match the criteria
+        $natureOfWork = $query->select('natureofwork')
+            ->distinct()
+            ->pluck('natureofwork')
+            ->filter()
+            ->unique()
+            ->values();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $natureOfWork
+        ]);
+    }
+    
+    public function getWorkOrderNo(Request $request)
+    {
+        $siteId = $request->input('site_id');
+        $underContract = $request->input('under_contract');
+        $natureOfWork = $request->input('natureofwork');
+        
+        if (!$siteId || $siteId === 'all') {
+            return response()->json([
+                'success' => true,
+                'data' => ''
+            ]);
+        }
+        
+        $query = Site::where('id', $siteId);
+        
+        if ($underContract) {
+            $query->where('under_contract', $underContract);
+        }
+        
+        if ($natureOfWork) {
+            $query->where('natureofwork', $natureOfWork);
+        }
+        
+        $site = $query->first();
+        
+        return response()->json([
+            'success' => true,
+            'data' => $site ? ($site->workorderno ?? '') : ''
+        ]);
+    }
+    
+    public function updateContractorDetails(Request $request)
+    {
+        $permissionCheck = $this->checkPermission('master.sites.edit', 'update');
+        if ($permissionCheck) return $permissionCheck;
+        
+        $siteId = $request->input('site_id');
+        $underContract = $request->input('under_contract');
+        $natureOfWork = $request->input('natureofwork');
+        $workOrderNo = $request->input('workorderno');
+        
+        if (!$siteId || $siteId === 'all') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Please select a site'
+            ], 400);
+        }
+        
+        $site = Site::find($siteId);
+        
+        if (!$site) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Site not found'
+            ], 404);
+        }
+        
+        try {
+            DB::beginTransaction();
+            
+            $updateData = [];
+            if ($underContract !== null) {
+                $updateData['under_contract'] = $underContract;
+            }
+            if ($natureOfWork !== null) {
+                $updateData['natureofwork'] = $natureOfWork;
+            }
+            if ($workOrderNo !== null) {
+                $updateData['workorderno'] = $workOrderNo;
+            }
+            
+            if (!empty($updateData)) {
+                $site->update($updateData);
+            }
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Contractor details updated successfully'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating contractor details: ' . $e->getMessage()
             ], 500);
         }
     }

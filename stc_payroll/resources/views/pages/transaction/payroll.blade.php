@@ -75,20 +75,52 @@
               </div>
               <div class="col-md-6">
                 <div class="form-group">
+                  <label><strong>Name and Address of Establishment In/Under which contract is carried on:</strong></label>
+                  <div class="dropdown" id="underContractDropdown">
+                    <button class="btn btn-secondary dropdown-toggle form-control text-left" type="button" id="underContractBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
+                      <span id="underContractText">Select...</span>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="underContractBtn" style="max-height: 300px; overflow-y: auto; width: 100%;">
+                      <input type="text" class="form-control form-control-sm m-2" id="underContractSearch" placeholder="Search or type to create...">
+                      <ul class="list-unstyled mb-0" id="underContractList" style="max-height: 250px; overflow-y: auto;">
+                        <li class="px-3 py-2 text-muted">No options available</li>
+                      </ul>
+                    </div>
+                  </div>
+                  <input type="hidden" id="underContractValue" value="">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label><strong>Nature of Work:</strong></label>
+                      <div class="dropdown" id="natureOfWorkDropdown">
+                        <button class="btn btn-secondary dropdown-toggle form-control text-left" type="button" id="natureOfWorkBtn" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
+                          <span id="natureOfWorkText">Select...</span>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="natureOfWorkBtn" style="max-height: 300px; overflow-y: auto; width: 100%;">
+                          <input type="text" class="form-control form-control-sm m-2" id="natureOfWorkSearch" placeholder="Search or type to create...">
+                          <ul class="list-unstyled mb-0" id="natureOfWorkList" style="max-height: 250px; overflow-y: auto;">
+                            <li class="px-3 py-2 text-muted">Select Under Contract first</li>
+                          </ul>
+                        </div>
+                      </div>
+                      <input type="hidden" id="natureOfWorkValue" value="">
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label><strong>Work Order No:</strong></label>
+                      <input type="text" class="form-control" id="workOrderNoInput" placeholder="Work Order No" disabled>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
                   <label><strong>Name & Address of Principal Employer:</strong></label>
                   <p id="principalEmployer">-</p>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label><strong>Name & Address of the Establishment:</strong></label>
-                  <p>Under Which Contract is carried on<br><span id="establishmentName">-</span></p>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="form-group">
-                  <label><strong>Name & Location of Work:</strong></label>
-                  <p id="workLocation">-</p>
                 </div>
               </div>
             </div>
@@ -855,6 +887,76 @@ $(document).ready(function() {
             });
             return;
         }
+        
+        var siteId = $('#filterSite').val();
+        
+        // Enable and load under contract if site is selected
+        if (siteId && siteId !== 'all') {
+            $('#underContractBtn').prop('disabled', false);
+            
+            // Load site data first
+            $.ajax({
+                url: '/stc/stc_payroll/master/sites/show/' + siteId,
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        var site = response.data;
+                        
+                        // Load under contracts and then select the site's value
+                        loadUnderContracts(siteId, function() {
+                            if (site.under_contract) {
+                                $('#underContractValue').val(site.under_contract);
+                                $('#underContractText').text(site.under_contract);
+                                
+                                // Enable nature of work and load it
+                                $('#natureOfWorkBtn').prop('disabled', false);
+                                loadNatureOfWork(siteId, site.under_contract, function() {
+                                    if (site.natureofwork) {
+                                        $('#natureOfWorkValue').val(site.natureofwork);
+                                        $('#natureOfWorkText').text(site.natureofwork);
+                                        
+                                        // Enable and load work order no
+                                        $('#workOrderNoInput').prop('disabled', false);
+                                        loadWorkOrderNo(siteId, site.under_contract, site.natureofwork);
+                                        
+                                        if (site.workorderno) {
+                                            $('#workOrderNoInput').val(site.workorderno);
+                                        }
+                                    } else {
+                                        // Reset nature of work if not set
+                                        $('#natureOfWorkValue').val('');
+                                        $('#natureOfWorkText').text('Select...');
+                                        $('#workOrderNoInput').prop('disabled', true);
+                                    }
+                                });
+                            } else {
+                                // Reset if no under_contract
+                                $('#underContractValue').val('');
+                                $('#underContractText').text('Select...');
+                                $('#natureOfWorkBtn').prop('disabled', true);
+                                $('#natureOfWorkText').text('Select...');
+                                $('#workOrderNoInput').prop('disabled', true);
+                            }
+                        });
+                    }
+                },
+                error: function() {
+                    console.error('Error loading site details');
+                    // Still load under contracts even if site load fails
+                    loadUnderContracts(siteId);
+                }
+            });
+        } else {
+            // Disable if no site selected
+            $('#underContractBtn').prop('disabled', true);
+            $('#underContractValue').val('');
+            $('#underContractText').text('Select...');
+            $('#natureOfWorkBtn').prop('disabled', true);
+            $('#natureOfWorkText').text('Select...');
+            $('#workOrderNoInput').prop('disabled', true);
+            $('#workOrderNoInput').val('');
+        }
+        
         table.draw();
         // Load attendance if attendance tab is active
         if ($('#attendance-tab').hasClass('active')) {
@@ -1616,19 +1718,477 @@ $(document).ready(function() {
         }
     });
 
-    // Update site info when site changes
+    // Update site info when site changes (only update principal employer, don't enable under contract yet)
     $('#filterSite').on('change', function() {
         var siteId = $(this).val();
         var siteName = $(this).find('option:selected').text();
         
         if (siteId && siteId !== 'all') {
             $('#principalEmployer').text(siteName);
-            $('#establishmentName').text(siteName);
-            $('#workLocation').text(siteName + ' (' + siteId + ')');
+            // Disable contractor details fields until form is submitted
+            $('#underContractBtn').prop('disabled', true);
+            $('#natureOfWorkBtn').prop('disabled', true);
+            $('#workOrderNoInput').prop('disabled', true);
+            // Reset values
+            $('#underContractValue').val('');
+            $('#underContractText').text('Select...');
+            $('#natureOfWorkValue').val('');
+            $('#natureOfWorkText').text('Select...');
+            $('#workOrderNoInput').val('');
         } else {
             $('#principalEmployer').text('-');
-            $('#establishmentName').text('-');
-            $('#workLocation').text('-');
+            // Disable all contractor details fields
+            $('#underContractBtn').prop('disabled', true);
+            $('#natureOfWorkBtn').prop('disabled', true);
+            $('#workOrderNoInput').prop('disabled', true);
+            // Reset values
+            $('#underContractValue').val('');
+            $('#underContractText').text('Select...');
+            $('#natureOfWorkValue').val('');
+            $('#natureOfWorkText').text('Select...');
+            $('#workOrderNoInput').val('');
+        }
+    });
+    
+    // Prevent dropdown from closing when clicking inside (but allow item selection)
+    $(document).on('click', '.dropdown-menu', function(e) {
+        // Don't stop propagation if clicking on a dropdown item (let the item handler work)
+        if (!$(e.target).closest('li.dropdown-item').length && !$(e.target).is('input')) {
+            e.stopPropagation();
+        }
+    });
+    
+    // Load Under Contracts - show all from all sites, but will pre-select site's value
+    function loadUnderContracts(siteId, callback) {
+        $.ajax({
+            url: '/stc/stc_payroll/master/sites/under-contracts',
+            type: 'GET',
+            data: { site_id: siteId || 'all' },
+            success: function(response) {
+                if (response.success) {
+                    var options = response.data;
+                    var html = '';
+                    if (options.length > 0) {
+                        options.forEach(function(item) {
+                            var escapedItem = $('<div>').text(item).html();
+                            html += '<li class="dropdown-item" data-value="' + escapedItem + '">' + escapedItem + '</li>';
+                        });
+                    } else {
+                        html = '<li class="px-3 py-2 text-muted">No options available. Type to create new.</li>';
+                    }
+                    $('#underContractList').html(html);
+                    
+                    // Execute callback if provided
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                }
+            },
+            error: function() {
+                $('#underContractList').html('<li class="px-3 py-2 text-danger">Error loading data</li>');
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            }
+        });
+    }
+    
+    // Handle Under Contract selection
+    $(document).on('click', '#underContractList li.dropdown-item:not([data-action="create"])', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        // Get value from data attribute or text content
+        var $item = $(this);
+        var value = $item.attr('data-value') || $item.data('value') || $item.text().trim();
+        var siteId = $('#filterSite').val();
+        
+        // Set the selected value
+        $('#underContractValue').val(value);
+        $('#underContractText').text(value);
+        
+        // Close dropdown manually
+        $('#underContractDropdown .dropdown-menu').removeClass('show');
+        $('#underContractBtn').removeClass('show').attr('aria-expanded', 'false');
+        $('body').off('click.bs.dropdown.data-api');
+        $('#underContractSearch').val('');
+        
+        // Enable Nature of Work if a site is selected
+        if (siteId && siteId !== 'all') {
+            $('#natureOfWorkBtn').prop('disabled', false);
+            loadNatureOfWork(siteId, value);
+        } else {
+            $('#natureOfWorkBtn').prop('disabled', true);
+            $('#natureOfWorkList').html('<li class="px-3 py-2 text-muted">Please select a site first</li>');
+        }
+        
+        // Reset Nature of Work and Work Order No
+        $('#natureOfWorkValue').val('');
+        $('#natureOfWorkText').text('Select...');
+        $('#workOrderNoInput').val('');
+        $('#workOrderNoInput').prop('disabled', true);
+        
+        return false;
+    });
+    
+    // Handle Under Contract search/create
+    $('#underContractSearch').on('keyup', function() {
+        var searchTerm = $(this).val().trim();
+        var siteId = $('#filterSite').val();
+        
+        if (searchTerm.length > 0) {
+            // Filter existing options (exclude create option)
+            var found = false;
+            $('#underContractList li.dropdown-item:not([data-action="create"])').each(function() {
+                var text = $(this).text();
+                if (text.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    $(this).show();
+                    found = true;
+                } else {
+                    $(this).hide();
+                }
+            });
+            
+            // Show create option if not found and search term is long enough
+            if (!found && searchTerm.length > 2) {
+                var escapedTerm = $('<div>').text(searchTerm).html();
+                var createHtml = '<li class="dropdown-item text-primary" data-action="create" data-value="' + escapedTerm + '"><i class="fas fa-plus"></i> Create: ' + escapedTerm + '</li>';
+                if ($('#underContractList li[data-action="create"]').length === 0) {
+                    $('#underContractList').prepend(createHtml);
+                } else {
+                    // Update existing create option
+                    $('#underContractList li[data-action="create"]').attr('data-value', escapedTerm).html('<i class="fas fa-plus"></i> Create: ' + escapedTerm);
+                }
+            } else {
+                $('#underContractList li[data-action="create"]').remove();
+            }
+        } else {
+            // Show all options when search is cleared
+            $('#underContractList li.dropdown-item:not([data-action="create"])').show();
+            $('#underContractList li[data-action="create"]').remove();
+        }
+    });
+    
+    // Handle create new Under Contract
+    $(document).on('click', '#underContractList li[data-action="create"]', function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        
+        // Get value from data attribute
+        var $item = $(this);
+        var value = $item.attr('data-value') || $item.data('value');
+        
+        if (!value) {
+            // Try to extract from text (remove "Create: " prefix)
+            var text = $item.text().trim();
+            value = text.replace(/^Create:\s*/i, '').trim();
+        }
+        
+        var siteId = $('#filterSite').val();
+        
+        if (!siteId || siteId === 'all') {
+            // Close dropdown
+            $('#underContractDropdown .dropdown-menu').removeClass('show');
+            $('#underContractBtn').removeClass('show').attr('aria-expanded', 'false');
+            
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: 'Please select a site first before creating Under Contract'
+            });
+            return false;
+        }
+        
+        // Close dropdown first
+        $('#underContractDropdown .dropdown-menu').removeClass('show');
+        $('#underContractBtn').removeClass('show').attr('aria-expanded', 'false');
+        $('body').off('click.bs.dropdown.data-api');
+        
+        Swal.fire({
+            title: 'Create New Under Contract?',
+            text: 'Do you want to create "' + value + '" for this site?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, create it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Update site with new under_contract
+                $.ajax({
+                    url: '/stc/stc_payroll/master/sites/update-contractor-details',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        site_id: siteId,
+                        under_contract: value
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#underContractValue').val(value);
+                            $('#underContractText').text(value);
+                            $('#underContractSearch').val('');
+                            
+                            // Reload options (all under contracts)
+                            loadUnderContracts(siteId);
+                            
+                            // Enable and load Nature of Work
+                            $('#natureOfWorkBtn').prop('disabled', false);
+                            loadNatureOfWork(siteId, value);
+                            
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Created!',
+                                text: 'Under Contract created successfully',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to create Under Contract'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        var message = 'Failed to create Under Contract';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: message
+                        });
+                    }
+                });
+            }
+        });
+        
+        return false;
+    });
+    
+    // Load Nature of Work based on site and under contract
+    function loadNatureOfWork(siteId, underContract, callback) {
+        $.ajax({
+            url: '/stc/stc_payroll/master/sites/nature-of-work',
+            type: 'GET',
+            data: { 
+                site_id: siteId,
+                under_contract: underContract 
+            },
+            success: function(response) {
+                if (response.success) {
+                    var options = response.data;
+                    var html = '';
+                    if (options.length > 0) {
+                        options.forEach(function(item) {
+                            var escapedItem = $('<div>').text(item).html();
+                            html += '<li class="dropdown-item" data-value="' + escapedItem + '">' + escapedItem + '</li>';
+                        });
+                    } else {
+                        html = '<li class="px-3 py-2 text-muted">No options available. Type to create new.</li>';
+                    }
+                    $('#natureOfWorkList').html(html);
+                    
+                    // Execute callback if provided
+                    if (typeof callback === 'function') {
+                        callback();
+                    }
+                }
+            },
+            error: function() {
+                $('#natureOfWorkList').html('<li class="px-3 py-2 text-danger">Error loading data</li>');
+                if (typeof callback === 'function') {
+                    callback();
+                }
+            }
+        });
+    }
+    
+    // Handle Nature of Work selection
+    $(document).on('click', '#natureOfWorkList li.dropdown-item:not([data-action="create"])', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        var value = $(this).data('value');
+        $('#natureOfWorkValue').val(value);
+        $('#natureOfWorkText').text(value);
+        $('.dropdown-menu').removeClass('show');
+        $('#natureOfWorkBtn').removeClass('show').attr('aria-expanded', 'false');
+        
+        // Enable and load Work Order No
+        var siteId = $('#filterSite').val();
+        var underContract = $('#underContractValue').val();
+        $('#workOrderNoInput').prop('disabled', false);
+        loadWorkOrderNo(siteId, underContract, value);
+    });
+    
+    // Handle Nature of Work search/create
+    $('#natureOfWorkSearch').on('keyup', function() {
+        var searchTerm = $(this).val().trim();
+        
+        if (searchTerm.length > 0) {
+            // Filter existing options
+            $('#natureOfWorkList li.dropdown-item').each(function() {
+                var text = $(this).text();
+                if (text.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+            
+            // Show create option if not found
+            var found = false;
+            $('#natureOfWorkList li.dropdown-item').each(function() {
+                if ($(this).is(':visible')) {
+                    found = true;
+                    return false;
+                }
+            });
+            
+            if (!found && searchTerm.length > 2) {
+                var createHtml = '<li class="dropdown-item text-primary" data-action="create" data-value="' + searchTerm + '"><i class="fas fa-plus"></i> Create: ' + searchTerm + '</li>';
+                if ($('#natureOfWorkList li[data-action="create"]').length === 0) {
+                    $('#natureOfWorkList').prepend(createHtml);
+                }
+            } else {
+                $('#natureOfWorkList li[data-action="create"]').remove();
+            }
+        } else {
+            $('#natureOfWorkList li.dropdown-item').show();
+            $('#natureOfWorkList li[data-action="create"]').remove();
+        }
+    });
+    
+    // Handle create new Nature of Work
+    $(document).on('click', '#natureOfWorkList li[data-action="create"]', function() {
+        var value = $(this).data('value');
+        var siteId = $('#filterSite').val();
+        var underContract = $('#underContractValue').val();
+        
+        if (!underContract) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Warning',
+                text: 'Please select Under Contract first'
+            });
+            return;
+        }
+        
+        Swal.fire({
+            title: 'Create New Nature of Work?',
+            text: 'Do you want to create "' + value + '" for this site?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, create it!',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Update site with new natureofwork
+                $.ajax({
+                    url: '/stc/stc_payroll/master/sites/update-contractor-details',
+                    type: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        site_id: siteId,
+                        under_contract: underContract,
+                        natureofwork: value
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#natureOfWorkValue').val(value);
+                            $('#natureOfWorkText').text(value);
+                            $('.dropdown-menu').removeClass('show');
+                            $('#natureOfWorkBtn').removeClass('show').attr('aria-expanded', 'false');
+                            $('#natureOfWorkSearch').val('');
+                            
+                            // Reload options
+                            loadNatureOfWork(siteId, underContract);
+                            
+                            // Enable and load Work Order No
+                            $('#workOrderNoInput').prop('disabled', false);
+                            loadWorkOrderNo(siteId, underContract, value);
+                            
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Created!',
+                                text: 'Nature of Work created successfully',
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to create Nature of Work'
+                        });
+                    }
+                });
+            }
+        });
+    });
+    
+    // Load Work Order No based on site, under contract, and nature of work
+    function loadWorkOrderNo(siteId, underContract, natureOfWork) {
+        $.ajax({
+            url: '/stc/stc_payroll/master/sites/work-order-no',
+            type: 'GET',
+            data: { 
+                site_id: siteId,
+                under_contract: underContract,
+                natureofwork: natureOfWork
+            },
+            success: function(response) {
+                if (response.success) {
+                    $('#workOrderNoInput').val(response.data || '');
+                }
+            },
+            error: function() {
+                console.error('Error loading work order no');
+            }
+        });
+    }
+    
+    // Save Work Order No when changed
+    $('#workOrderNoInput').on('blur', function() {
+        var siteId = $('#filterSite').val();
+        var underContract = $('#underContractValue').val();
+        var natureOfWork = $('#natureOfWorkValue').val();
+        var workOrderNo = $(this).val();
+        
+        if (siteId && siteId !== 'all' && underContract && natureOfWork) {
+            $.ajax({
+                url: '/stc/stc_payroll/master/sites/update-contractor-details',
+                type: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    site_id: siteId,
+                    under_contract: underContract,
+                    natureofwork: natureOfWork,
+                    workorderno: workOrderNo
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Optional: Show success message
+                    }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Failed to save Work Order No'
+                    });
+                }
+            });
         }
     });
     

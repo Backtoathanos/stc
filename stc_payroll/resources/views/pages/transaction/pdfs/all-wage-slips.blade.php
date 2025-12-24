@@ -159,11 +159,11 @@
                 <!-- Left Column -->
                 <div class="content-col">
                     <div class="label">Name & Address of Contractor</div>
-                    <div class="value">{{ $site ? $site->name : 'GLOBAL AC SYSTEM' }}</div>
+                    <div class="value">{{ 'GLOBAL AC SYSTEM' }}</div>
                     <div class="value">502/A Jawaharnagar Road-17 Azadnagar Mango Jsr-832110</div>
                     
                     <div class="label" style="margin-top: 5px;">Nature & Location of Work:</div>
-                    <div class="value"></div>
+                    <div class="value">{{ $site && $site->natureofwork ? $site->natureofwork : '' }}</div>
                     
                     <div class="label" style="margin-top: 3px;">Name of the work man:</div>
                     <div class="value">{{ $employee->Name ?? '' }}</div>
@@ -184,7 +184,7 @@
                     <div class="value">{{ $site ? $site->name : 'VOLTAS LIMITED' }}</div>
                     
                     <div class="label" style="margin-top: 5px;">Name & Address of the Principal Employer</div>
-                    <div class="value">JSR - TATA STEEL LTD</div>
+                    <div class="value">{{ $site ? $site->name : 'JSR - TATA STEEL LTD' }}</div>
                     
                     <div class="label" style="margin-top: 5px;">UAN No.:</div>
                     <div class="value">{{ $employee->Uan ?? '' }}</div>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\SiteRate;
 use App\Site;
+use App\Employee;
+use App\Rate;
 use Illuminate\Support\Facades\DB;
 
 class RateController extends Controller
@@ -19,18 +21,32 @@ class RateController extends Controller
 
     public function list(Request $request)
     {
-        $query = SiteRate::with('site')
-            ->select('site_rates.*', 'sites.name as site_name', 'sites.id as site_id_display')
-            ->join('sites', 'site_rates.site_id', '=', 'sites.id');
+        // Query from employees -> rates -> sites
+        // Group by site, category, basic, and da to show unique combinations
+        $query = DB::table('employees')
+            ->join('rates', 'employees.id', '=', 'rates.employee_id')
+            ->join('sites', 'employees.site_id', '=', 'sites.id')
+            ->select(
+                'sites.id as site_id',
+                'sites.name as site_name',
+                'employees.Skill as category',
+                'rates.basic',
+                'rates.da',
+                DB::raw('MIN(rates.id) as rate_id') // Get first rate_id for edit/delete
+            )
+            ->whereNotNull('employees.Skill')
+            ->where('employees.Skill', '!=', '')
+            ->whereNotNull('rates.basic')
+            ->groupBy('sites.id', 'sites.name', 'employees.Skill', 'rates.basic', 'rates.da');
 
         // Search
         if ($request->has('search') && !empty($request->search['value'])) {
             $search = $request->search['value'];
             $query->where(function($q) use ($search) {
                 $q->where('sites.name', 'like', "%{$search}%")
-                  ->orWhere('site_rates.category', 'like', "%{$search}%")
-                  ->orWhere('site_rates.basic', 'like', "%{$search}%")
-                  ->orWhere('site_rates.da', 'like', "%{$search}%");
+                  ->orWhere('employees.Skill', 'like', "%{$search}%")
+                  ->orWhere('rates.basic', 'like', "%{$search}%")
+                  ->orWhere('rates.da', 'like', "%{$search}%");
             });
         }
 
@@ -43,31 +59,85 @@ class RateController extends Controller
             
             if ($orderBy === 'site_name') {
                 $query->orderBy('sites.name', $orderDir);
-            } else {
-                $query->orderBy('site_rates.' . $orderBy, $orderDir);
+            } elseif ($orderBy === 'category') {
+                $query->orderBy('employees.Skill', $orderDir);
+            } elseif ($orderBy === 'basic') {
+                $query->orderBy('rates.basic', $orderDir);
+            } elseif ($orderBy === 'da') {
+                $query->orderBy('rates.da', $orderDir);
             }
         } else {
-            $query->orderBy('sites.name', 'asc');
+            $query->orderBy('sites.name', 'asc')
+                  ->orderBy('employees.Skill', 'asc')
+                  ->orderBy('rates.basic', 'asc')
+                  ->orderBy('rates.da', 'asc');
         }
+
+        // Get total records count (before filtering) - count distinct combinations
+        $totalRecordsBaseQuery = DB::table('employees')
+            ->join('rates', 'employees.id', '=', 'rates.employee_id')
+            ->join('sites', 'employees.site_id', '=', 'sites.id')
+            ->select(
+                'sites.id',
+                'sites.name',
+                'employees.Skill',
+                'rates.basic',
+                'rates.da'
+            )
+            ->whereNotNull('employees.Skill')
+            ->where('employees.Skill', '!=', '')
+            ->whereNotNull('rates.basic')
+            ->groupBy('sites.id', 'sites.name', 'employees.Skill', 'rates.basic', 'rates.da');
+        
+        $totalRecords = DB::table(DB::raw("({$totalRecordsBaseQuery->toSql()}) as sub"))
+            ->mergeBindings($totalRecordsBaseQuery)
+            ->count();
+
+        // Get filtered records count - use same grouping logic
+        $filteredQuery = DB::table('employees')
+            ->join('rates', 'employees.id', '=', 'rates.employee_id')
+            ->join('sites', 'employees.site_id', '=', 'sites.id')
+            ->select(
+                'sites.id',
+                'sites.name',
+                'employees.Skill',
+                'rates.basic',
+                'rates.da'
+            )
+            ->whereNotNull('employees.Skill')
+            ->where('employees.Skill', '!=', '')
+            ->whereNotNull('rates.basic')
+            ->groupBy('sites.id', 'sites.name', 'employees.Skill', 'rates.basic', 'rates.da');
+        
+        // Apply search filter if exists
+        if ($request->has('search') && !empty($request->search['value'])) {
+            $search = $request->search['value'];
+            $filteredQuery->where(function($q) use ($search) {
+                $q->where('sites.name', 'like', "%{$search}%")
+                  ->orWhere('employees.Skill', 'like', "%{$search}%")
+                  ->orWhere('rates.basic', 'like', "%{$search}%")
+                  ->orWhere('rates.da', 'like', "%{$search}%");
+            });
+        }
+        
+        $filteredRecords = DB::table(DB::raw("({$filteredQuery->toSql()}) as sub"))
+            ->mergeBindings($filteredQuery)
+            ->count();
 
         // Pagination
         $start = $request->start ?? 0;
         $length = $request->length ?? 10;
-        $totalRecords = SiteRate::count();
-        $filteredRecords = $query->count();
-        
         $rates = $query->skip($start)->take($length)->get();
 
         $data = [];
         foreach ($rates as $rate) {
             $data[] = [
-                'id' => $rate->id,
-                'site_name' => $rate->site_name . ' (' . $rate->site_id_display . ')',
-                'category' => $rate->category,
+                'id' => $rate->rate_id, // Use rate_id for edit/delete operations
+                'site_name' => $rate->site_name,
+                'category' => $rate->category ? strtoupper($rate->category) : '',
                 'basic' => number_format($rate->basic, 2),
-                'da' => number_format($rate->da, 2),
-                'created_at' => $rate->created_at ? $rate->created_at->format('Y-m-d H:i:s') : 'N/A',
-                'updated_at' => $rate->updated_at ? $rate->updated_at->format('Y-m-d H:i:s') : 'N/A',
+                'da' => number_format($rate->da ?? 0, 2),
+                'site_id' => $rate->site_id
             ];
         }
 
@@ -118,29 +188,17 @@ class RateController extends Controller
     public function update(Request $request, $id)
     {
         $validated = $request->validate([
-            'site_id' => 'required|exists:sites,id',
-            'category' => 'required|string|max:50|in:UN-SKILLED,SEMI-SKILLED,SKILLED,HIGH-SKILLED',
             'basic' => 'required|numeric|min:0',
             'da' => 'required|numeric|min:0',
         ]);
 
-        $rate = SiteRate::findOrFail($id);
-
-        // Check if another rate exists for this site-category combination
-        $existing = SiteRate::where('site_id', $validated['site_id'])
-            ->where('category', $validated['category'])
-            ->where('id', '!=', $id)
-            ->first();
-
-        if ($existing) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Rate already exists for this site and category.'
-            ], 400);
-        }
-
         try {
-            $rate->update($validated);
+            $rate = Rate::findOrFail($id);
+            $rate->update([
+                'basic' => $validated['basic'],
+                'da' => $validated['da']
+            ]);
+            
             return response()->json([
                 'success' => true,
                 'message' => 'Rate updated successfully',
@@ -156,17 +214,26 @@ class RateController extends Controller
 
     public function show($id)
     {
-        $rate = SiteRate::with('site')->findOrFail($id);
+        // Get rate with employee and site info
+        $rate = Rate::with(['employee.site'])->findOrFail($id);
+        
         return response()->json([
             'success' => true,
-            'data' => $rate
+            'data' => [
+                'id' => $rate->id,
+                'site_id' => $rate->employee->site_id ?? null,
+                'category' => $rate->employee->Skill ?? '',
+                'basic' => $rate->basic,
+                'da' => $rate->da,
+                'employee_id' => $rate->employee_id
+            ]
         ]);
     }
 
     public function destroy($id)
     {
         try {
-            $rate = SiteRate::findOrFail($id);
+            $rate = Rate::findOrFail($id);
             $rate->delete();
             return response()->json([
                 'success' => true,

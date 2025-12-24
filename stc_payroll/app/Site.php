@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Site extends Model
 {
     public $incrementing = false;
-    protected $fillable = ['id', 'name'];
+    protected $fillable = ['id', 'name', 'under_contract', 'natureofwork', 'workorderno'];
     
     public function employees()
     {
