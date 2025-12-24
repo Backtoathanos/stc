@@ -1,5 +1,5 @@
 @php
-  $baseUrl = '/stc/stc_payroll';
+  $baseUrl = $baseUrl ?? config('app.base_path', '/');
 @endphp
 <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">

@@ -13,7 +13,7 @@
       <div class="icon">
         <i class="ion ion-person-add"></i>
       </div>
-      <a href="/stc/stc_payroll/master/employees" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      <a href="{{ url('/master/employees') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
     </div>
   </div>
   <!-- ./col -->
@@ -27,7 +27,7 @@
       <div class="icon">
         <i class="ion ion-checkmark"></i>
       </div>
-      <a href="/stc/stc_payroll/master/employees" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      <a href="{{ url('/master/employees') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
     </div>
   </div>
   <!-- ./col -->
@@ -41,7 +41,7 @@
       <div class="icon">
         <i class="ion ion-location"></i>
       </div>
-      <a href="/stc/stc_payroll/master/sites" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      <a href="{{ url('/master/sites') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
     </div>
   </div>
   <!-- ./col -->
@@ -55,7 +55,7 @@
       <div class="icon">
         <i class="ion ion-bag"></i>
       </div>
-      <a href="/stc/stc_payroll/master/departments" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      <a href="{{ url('/master/departments') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
     </div>
   </div>
   <!-- ./col -->
@@ -366,7 +366,7 @@ $(document).ready(function() {
         
         // Fetch new data
         $.ajax({
-            url: '/stc/stc_payroll/dashboard/attendance-data',
+            url: window.appBaseUrl + '/dashboard/attendance-data',
             type: 'GET',
             data: { 
                 month: month,

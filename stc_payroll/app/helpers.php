@@ -9,8 +9,11 @@ if (!function_exists('asset_url')) {
      */
     function asset_url($path)
     {
-        $basePath = '/stc/stc_payroll';
-        return $basePath . '/' . ltrim($path, '/');
+        $basePath = config('app.base_path', '');
+        if (empty($basePath) || $basePath === '/') {
+            return asset($path);
+        }
+        return $basePath . '/public/' . ltrim($path, '/');
     }
 }
 
@@ -23,7 +26,10 @@ if (!function_exists('base_url')) {
      */
     function base_url($path = '')
     {
-        $basePath = '/stc/stc_payroll';
+        $basePath = config('app.base_path', '');
+        if (empty($basePath) || $basePath === '/') {
+            return url($path);
+        }
         if (empty($path)) {
             return $basePath;
         }

@@ -141,7 +141,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/stc/stc_payroll/master/sites/list",
+            url: window.appBaseUrl + "/master/sites/list",
             type: 'GET'
         },
         columns: [

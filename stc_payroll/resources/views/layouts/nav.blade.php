@@ -1,9 +1,6 @@
-  @php
-    $assetBase = '/stc/stc_payroll/public';
-  @endphp
 <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__shake" src="{{ $assetBase }}/dist/img/stc_pre_loader_logo.png" alt="STC Logo" height="60" width="60" onerror="this.style.display='none'">
+    <img class="animation__shake" src="{{ asset('dist/img/stc_pre_loader_logo.png') }}" alt="STC Logo" height="60" width="60" onerror="this.style.display='none'">
   </div>
 
   <!-- Navbar -->
@@ -14,7 +11,7 @@
         <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
       </li>
       <li class="nav-item d-none d-sm-inline-block">
-          <a href="/stc/stc_payroll/" class="nav-link">Home</a>
+          <a href="{{ url('/') }}" class="nav-link">Home</a>
       </li>
     </ul>
 
@@ -25,11 +22,11 @@
         <a class="nav-link" data-toggle="dropdown" href="#">
           <div class="d-flex align-items-center">
             <span class="mr-2">{{ Auth::check() ? Auth::user()->name : 'Guest' }}</span>
-            <img src="{{ $assetBase }}/dist/img/avatar5.png" class="img-circle elevation-2" alt="User Image" style="width: 32px; height: 32px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2215%22 fill=%22%23666%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2212%22%3EG%3C/text%3E%3C/svg%3E'">
+            <img src="{{ asset('dist/img/avatar5.png') }}" class="img-circle elevation-2" alt="User Image" style="width: 32px; height: 32px;" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2215%22 fill=%22%23666%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22white%22 font-size=%2212%22%3EG%3C/text%3E%3C/svg%3E'">
           </div>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <a href="/stc/stc_payroll/profile/edit" class="dropdown-item">
+          <a href="{{ url('/profile/edit') }}" class="dropdown-item">
             <i class="fas fa-user-edit mr-2"></i> Edit Profile
           </a>
           <div class="dropdown-divider"></div>

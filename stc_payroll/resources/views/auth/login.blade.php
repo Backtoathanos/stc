@@ -6,9 +6,9 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>STC Payroll | Login</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
-  <link rel="stylesheet" href="/stc/stc_payroll/public/plugins/fontawesome-free/css/all.min.css">
-  <link rel="stylesheet" href="/stc/stc_payroll/public/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-  <link rel="stylesheet" href="/stc/stc_payroll/public/dist/css/adminlte.min.css">
+  <link rel="stylesheet" href="{{ asset('plugins/fontawesome-free/css/all.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ asset('dist/css/adminlte.min.css') }}">
   <style>
     .login-page {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -81,9 +81,9 @@
   </div>
 </div>
 
-<script src="/stc/stc_payroll/public/plugins/jquery/jquery.min.js"></script>
-<script src="/stc/stc_payroll/public/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<script src="/stc/stc_payroll/public/dist/js/adminlte.min.js"></script>
+<script src="{{ asset('plugins/jquery/jquery.min.js') }}"></script>
+<script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
 $(document).ready(function() {
@@ -108,7 +108,7 @@ $(document).ready(function() {
         $('#loginBtnText').text('Signing in...');
         
         $.ajax({
-            url: '/stc/stc_payroll/login',
+            url: '{{ url("/login") }}',
             type: 'POST',
             data: {
                 email: email,
@@ -125,7 +125,7 @@ $(document).ready(function() {
                         timer: 1500,
                         showConfirmButton: false
                     }).then(function() {
-                        window.location.href = response.redirect || '/stc/stc_payroll/';
+                        window.location.href = response.redirect || '{{ url("/") }}';
                     });
                 } else {
                     Swal.fire({

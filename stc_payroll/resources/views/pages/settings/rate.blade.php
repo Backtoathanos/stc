@@ -138,7 +138,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: '/stc/stc_payroll/settings/rate/list',
+            url: window.appBaseUrl + '/settings/rate/list',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -169,7 +169,7 @@ $(document).ready(function() {
         var formData = $(this).serialize();
         
         $.ajax({
-            url: '/stc/stc_payroll/settings/rate',
+            url: window.appBaseUrl + '/settings/rate',
             type: 'POST',
             data: formData,
             headers: {
