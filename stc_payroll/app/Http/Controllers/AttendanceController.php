@@ -41,12 +41,13 @@ class AttendanceController extends Controller
 
     public function list(Request $request)
     {
-        // Require both month_year and site_id filters
+        // Require month_year filter
         $monthYear = $request->has('month_year') && $request->month_year ? $request->month_year : null;
         $siteId = $request->has('site_id') && $request->site_id ? $request->site_id : null;
+        $includeDays = $request->has('include_days') && $request->include_days == 'true';
         
-        // If both filters are not provided, return empty result
-        if (!$monthYear || !$siteId) {
+        // If month_year is not provided, return empty result
+        if (!$monthYear) {
             return response()->json([
                 'draw' => intval($request->draw),
                 'recordsTotal' => 0,
@@ -63,7 +64,9 @@ class AttendanceController extends Controller
         }
         
         $query = Attendance::leftJoin('employees', 'attendances.aadhar', '=', 'employees.Aadhar')
-            ->leftJoin('sites', 'employees.site_id', '=', 'sites.id');
+            ->leftJoin('sites', 'employees.site_id', '=', 'sites.id')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id');
 
         // Search functionality
         if ($request->has('search') && $request->search['value']) {
@@ -79,11 +82,13 @@ class AttendanceController extends Controller
         // Filter by month_year
         $query->where('attendances.month_year', $monthYear);
 
-        // Filter by site_id
-        $query->where('employees.site_id', $siteId);
+        // Filter by site_id (handle 'all')
+        if ($siteId && $siteId !== 'all') {
+            $query->where('employees.site_id', $siteId);
+        }
 
-        // Select attendance and site columns
-        $query->select('attendances.*', 'sites.name as site_name');
+        // Select attendance, site, and employee columns
+        $query->select('attendances.*', 'sites.name as site_name', 'departments.name as department', 'designations.name as designation', 'employees.EmpId as empid');
 
         // Get total count before pagination
         $totalRecords = $query->count();
@@ -111,7 +116,9 @@ class AttendanceController extends Controller
         // Calculate statistics for filtered data
         $statsQuery = Attendance::leftJoin('employees', 'attendances.aadhar', '=', 'employees.Aadhar');
         $statsQuery->where('attendances.month_year', $monthYear);
-        $statsQuery->where('employees.site_id', $siteId);
+        if ($siteId && $siteId !== 'all') {
+            $statsQuery->where('employees.site_id', $siteId);
+        }
         
         $allAttendances = $statsQuery->select('attendances.*')->get();
         
@@ -199,11 +206,14 @@ class AttendanceController extends Controller
                 }
             }
             
-            $data[] = [
+            $rowData = [
                 'id' => $attendance->id,
                 'site_name' => $attendance->site_name ?? 'N/A',
                 'aadhar' => $attendance->aadhar,
                 'employee_name' => $attendance->employee_name,
+                'empid' => $attendance->empid ?? '',
+                'department' => $attendance->department ?? '',
+                'designation' => $attendance->designation ?? '',
                 'month_year' => $attendance->month_year,
                 'working_days' => $workingDays,
                 'sundays' => $sundays,
@@ -213,6 +223,20 @@ class AttendanceController extends Controller
                 'created_at' => $attendance->created_at ? $attendance->created_at->format('Y-m-d H:i:s') : 'N/A',
                 'updated_at' => $attendance->updated_at ? $attendance->updated_at->format('Y-m-d H:i:s') : 'N/A',
             ];
+            
+            // Include day-by-day data if requested
+            if ($includeDays) {
+                for ($day = 1; $day <= 31; $day++) {
+                    $rowData['day_' . $day] = $attendance->{'day_' . $day} ?? '';
+                    if ($overtime) {
+                        $rowData['ot_day_' . $day] = $overtime->{'day_' . $day} ?? 0;
+                    } else {
+                        $rowData['ot_day_' . $day] = 0;
+                    }
+                }
+            }
+            
+            $data[] = $rowData;
         }
 
         return response()->json([

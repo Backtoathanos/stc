@@ -28,8 +28,8 @@
             $hasGangsView = $user && ($user->hasPermission('master.gangs.view') || $isRoot);
             $hasEmployeesView = $user && ($user->hasPermission('master.employees.view') || $isRoot);
             $hasMasterAccess = $hasSitesView || $hasDepartmentsView || $hasDesignationsView || $hasGangsView || $hasEmployeesView;
-            $hasPayrollView = $user && ($user->hasPermission('transaction.payroll.view') || $isRoot);
-            $hasReportsView = $user && ($user->hasPermission('reports.employee.view') || $isRoot);
+            $hasPayrollView = $user && ($user->hasPermission('transaction.payroll.view') || $user->hasPermission('reports.payroll.view') || $isRoot);
+            $hasReportsView = $user && (($user->hasPermission('reports.employee.view') || $user->hasPermission('reports.payroll.view') || $hasPayrollView) || $isRoot);
           @endphp
           @if($hasMasterAccess)
           <li class="nav-item">
@@ -95,12 +95,6 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{ $baseUrl }}/transaction/payroll" class="nav-link @if(Request::segment(2) == 'payroll') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Payroll</p>
-                </a>
-              </li>
-              <li class="nav-item">
                 <a href="{{ $baseUrl }}/transaction/attendance" class="nav-link @if(Request::segment(2) == 'attendance') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Attendance</p>
@@ -119,6 +113,14 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+              @if($hasPayrollView)
+              <li class="nav-item">
+                <a href="{{ $baseUrl }}/reports/payroll" class="nav-link @if(Request::segment(2) == 'payroll') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Payroll</p>
+                </a>
+              </li>
+              @endif
               <li class="nav-item">
                 <a href="{{ $baseUrl }}/reports/employee" class="nav-link @if(Request::segment(2) == 'employee') active @endif">
                   <i class="far fa-circle nav-icon"></i>

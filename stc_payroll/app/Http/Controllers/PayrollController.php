@@ -11,6 +11,7 @@ use App\CalendarLeaveType;
 use App\Attendance;
 use App\PayrollParameter;
 use Illuminate\Support\Facades\DB;
+use Dompdf\Dompdf;
 
 class PayrollController extends Controller
 {
@@ -19,7 +20,7 @@ class PayrollController extends Controller
         $user = auth()->user();
         
         // Check if user has view permission (root user always has access)
-        if (!$user || (!$user->hasPermission('transaction.payroll.view') && $user->email !== 'root@stcassociate.com')) {
+        if (!$user || ((!$user->hasPermission('transaction.payroll.view') && !$user->hasPermission('reports.payroll.view')) && $user->email !== 'root@stcassociate.com')) {
             if (request()->expectsJson()) {
                 return response()->json([
                     'success' => false,
@@ -1226,5 +1227,645 @@ class PayrollController extends Controller
             'data' => $data
         ]);
     }
+    
+    public function wageSummaryPdf(Request $request)
+    {
+        $monthYear = $request->input('month_year');
+        $siteId = $request->input('site_id', 'all');
+        
+        if (!$monthYear) {
+            return response('Month is required', 400);
+        }
+        
+        // Get payroll data (similar to summary method)
+        $query = Payroll::leftJoin('employees', 'payrolls.aadhar', '=', 'employees.Aadhar')
+            ->leftJoin('sites', 'payrolls.site_id', '=', 'sites.id')
+            ->leftJoin('rates', 'employees.id', '=', 'rates.employee_id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('payrolls.month_year', $monthYear);
+        
+        if ($siteId && $siteId !== 'all') {
+            $query->where('payrolls.site_id', $siteId);
+        }
+        
+        $payrolls = $query->select(
+            'payrolls.*',
+            'employees.EmpId',
+            'employees.Name',
+            'employees.PRFTax',
+            'sites.name as site_name',
+            'rates.SpecialAllowance',
+            'rates.CA',
+            'rates.Fooding',
+            'rates.Misc',
+            'rates.CEA',
+            'rates.WashingAllowance',
+            'rates.ProfessionalPursuits',
+            'designations.name as designation'
+        )->orderBy('employees.EmpId')->get();
+        
+        // Get NH days for the month
+        $nhDays = [];
+        if ($monthYear) {
+            $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
+            $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
+            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->where('leave_type', 'NH')
+                ->pluck('date')
+                ->map(function($date) {
+                    return $date->format('Y-m-d');
+                })
+                ->toArray();
+            $nhDays = $nhRecords;
+        }
+        
+        $siteName = 'All Sites';
+        if ($siteId && $siteId !== 'all') {
+            $site = Site::find($siteId);
+            $siteName = $site ? $site->name : 'All Sites';
+        }
+        
+        // Get site for contractor/establishment info
+        $site = null;
+        if ($siteId && $siteId !== 'all') {
+            $site = Site::find($siteId);
+        } else {
+            // Get first site from payrolls if available
+            $firstPayroll = $payrolls->first();
+            if ($firstPayroll && $firstPayroll->site_id) {
+                $site = Site::find($firstPayroll->site_id);
+            }
+        }
+        
+        // Render view template
+        $html = view('pages.transaction.pdfs.wage-summary', [
+            'payrolls' => $payrolls,
+            'monthYear' => $monthYear,
+            'siteName' => $siteName,
+            'nhDays' => $nhDays,
+            'site' => $site
+        ])->render();
+        
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        
+        // Force download instead of inline display
+        return $dompdf->stream('wage_summary_' . $monthYear . '.pdf', ['Attachment' => 1]);
+    }
+    
+    public function wageSummaryPreview(Request $request)
+    {
+        $monthYear = $request->input('month_year');
+        $siteId = $request->input('site_id', 'all');
+        
+        if (!$monthYear) {
+            return response('Month is required', 400);
+        }
+        
+        // Get payroll data (similar to summary method)
+        $query = Payroll::leftJoin('employees', 'payrolls.aadhar', '=', 'employees.Aadhar')
+            ->leftJoin('sites', 'payrolls.site_id', '=', 'sites.id')
+            ->leftJoin('rates', 'employees.id', '=', 'rates.employee_id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->where('payrolls.month_year', $monthYear);
+        
+        if ($siteId && $siteId !== 'all') {
+            $query->where('payrolls.site_id', $siteId);
+        }
+        
+        $payrolls = $query->select(
+            'payrolls.*',
+            'employees.EmpId',
+            'employees.Name',
+            'employees.PRFTax',
+            'sites.name as site_name',
+            'rates.SpecialAllowance',
+            'rates.CA',
+            'rates.Fooding',
+            'rates.Misc',
+            'rates.CEA',
+            'rates.WashingAllowance',
+            'rates.ProfessionalPursuits',
+            'designations.name as designation'
+        )->orderBy('employees.EmpId')->get();
+        
+        // Get NH days for the month
+        $nhDays = [];
+        if ($monthYear) {
+            $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
+            $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
+            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->where('leave_type', 'NH')
+                ->pluck('date')
+                ->map(function($date) {
+                    return $date->format('Y-m-d');
+                })
+                ->toArray();
+            $nhDays = $nhRecords;
+        }
+        
+        $siteName = 'All Sites';
+        $site = null;
+        if ($siteId && $siteId !== 'all') {
+            $site = Site::find($siteId);
+            $siteName = $site ? $site->name : 'All Sites';
+        } else {
+            // Get first site from payrolls if available
+            $firstPayroll = $payrolls->first();
+            if ($firstPayroll && $firstPayroll->site_id) {
+                $site = Site::find($firstPayroll->site_id);
+            }
+        }
+        
+        // Return HTML view for preview (not PDF)
+        return view('pages.transaction.pdfs.wage-summary', [
+            'payrolls' => $payrolls,
+            'monthYear' => $monthYear,
+            'siteName' => $siteName,
+            'nhDays' => $nhDays,
+            'site' => $site
+        ]);
+    }
+    
+    public function attendancePreview(Request $request)
+    {
+        $monthYear = $request->input('month_year');
+        $siteId = $request->input('site_id', 'all');
+        
+        if (!$monthYear) {
+            return response('Month is required', 400);
+        }
+        
+        // Get attendance data with all employee details
+        $query = Attendance::leftJoin('employees', 'attendances.aadhar', '=', 'employees.Aadhar')
+            ->leftJoin('sites', 'employees.site_id', '=', 'sites.id')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('rates', 'employees.id', '=', 'rates.employee_id')
+            ->where('attendances.month_year', $monthYear);
+        
+        if ($siteId && $siteId !== 'all') {
+            $query->where('employees.site_id', $siteId);
+        }
+        
+        $attendances = $query->select(
+                'attendances.*', 
+                'employees.EmpId', 
+                'employees.Name as employee_name',
+                'employees.Gender',
+                'employees.Dob',
+                'employees.Doj',
+                'employees.Esic',
+                'employees.Uan',
+                'employees.PfApplicable',
+                'sites.name as site_name', 
+                'departments.name as department', 
+                'designations.name as designation',
+                'rates.*'
+            )
+            ->orderBy('employees.EmpId')
+            ->get();
+        
+        // Get payroll data for wage calculations
+        $aadhars = $attendances->pluck('aadhar')->unique();
+        $payrolls = Payroll::whereIn('aadhar', $aadhars)
+            ->where('month_year', $monthYear)
+            ->get()
+            ->keyBy('aadhar');
+        
+        // Get overtime data
+        $overtimes = \App\Overtime::whereIn('aadhar', $aadhars)
+            ->where('month_year', $monthYear)
+            ->get()
+            ->keyBy('aadhar');
+        
+        // Calculate days in month
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+        $daysInMonth = $date->daysInMonth;
+        $monthDisplay = $date->format('F Y');
+        
+        $siteName = 'All Sites';
+        $site = null;
+        if ($siteId && $siteId !== 'all') {
+            $site = Site::find($siteId);
+            $siteName = $site ? $site->name : 'All Sites';
+        }
+        
+        // Get NH days for the month
+        $nhDays = [];
+        if ($monthYear) {
+            $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
+            $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
+            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->where('leave_type', 'NH')
+                ->pluck('date')
+                ->map(function($date) {
+                    return $date->format('Y-m-d');
+                })
+                ->toArray();
+            $nhDays = $nhRecords;
+        }
+        
+        // Return HTML view for preview (not PDF)
+        return view('pages.transaction.pdfs.attendance', [
+            'attendances' => $attendances,
+            'overtimes' => $overtimes,
+            'payrolls' => $payrolls,
+            'monthYear' => $monthYear,
+            'monthDisplay' => $monthDisplay,
+            'siteName' => $siteName,
+            'site' => $site,
+            'daysInMonth' => $daysInMonth,
+            'nhDays' => $nhDays
+        ]);
+    }
+    
+    public function attendancePdf(Request $request)
+    {
+        $monthYear = $request->input('month_year');
+        $siteId = $request->input('site_id', 'all');
+        
+        if (!$monthYear) {
+            return response('Month is required', 400);
+        }
+        
+        // Get attendance data with all employee details
+        $query = Attendance::leftJoin('employees', 'attendances.aadhar', '=', 'employees.Aadhar')
+            ->leftJoin('sites', 'employees.site_id', '=', 'sites.id')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('rates', 'employees.id', '=', 'rates.employee_id')
+            ->where('attendances.month_year', $monthYear);
+        
+        if ($siteId && $siteId !== 'all') {
+            $query->where('employees.site_id', $siteId);
+        }
+        
+        $attendances = $query->select(
+                'attendances.*', 
+                'employees.EmpId', 
+                'employees.Name as employee_name',
+                'employees.Gender',
+                'employees.Dob',
+                'employees.Doj',
+                'employees.Esic',
+                'employees.Uan',
+                'employees.PfApplicable',
+                'sites.name as site_name', 
+                'departments.name as department', 
+                'designations.name as designation',
+                'rates.*'
+            )
+            ->orderBy('employees.EmpId')
+            ->get();
+        
+        // Get payroll data for wage calculations
+        $aadhars = $attendances->pluck('aadhar')->unique();
+        $payrolls = Payroll::whereIn('aadhar', $aadhars)
+            ->where('month_year', $monthYear)
+            ->get()
+            ->keyBy('aadhar');
+        
+        // Get overtime data
+        $overtimes = \App\Overtime::whereIn('aadhar', $aadhars)
+            ->where('month_year', $monthYear)
+            ->get()
+            ->keyBy('aadhar');
+        
+        // Calculate days in month
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+        $daysInMonth = $date->daysInMonth;
+        $monthDisplay = $date->format('F Y');
+        
+        $siteName = 'All Sites';
+        $site = null;
+        if ($siteId && $siteId !== 'all') {
+            $site = Site::find($siteId);
+            $siteName = $site ? $site->name : 'All Sites';
+        }
+        
+        // Get NH days for the month
+        $nhDays = [];
+        if ($monthYear) {
+            $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
+            $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
+            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->where('leave_type', 'NH')
+                ->pluck('date')
+                ->map(function($date) {
+                    return $date->format('Y-m-d');
+                })
+                ->toArray();
+            $nhDays = $nhRecords;
+        }
+        
+        // Render view template
+        $html = view('pages.transaction.pdfs.attendance', [
+            'attendances' => $attendances,
+            'overtimes' => $overtimes,
+            'payrolls' => $payrolls,
+            'monthYear' => $monthYear,
+            'monthDisplay' => $monthDisplay,
+            'siteName' => $siteName,
+            'site' => $site,
+            'daysInMonth' => $daysInMonth,
+            'nhDays' => $nhDays
+        ])->render();
+        
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        
+        // Force download instead of inline display
+        return $dompdf->stream('attendance_' . $monthYear . '.pdf', ['Attachment' => 1]);
+    }
+    
+    public function wageSlipPreview(Request $request)
+    {
+        $aadhar = $request->input('aadhar');
+        $monthYear = $request->input('month_year');
+        
+        if (!$aadhar || !$monthYear) {
+            return response('Aadhar and Month are required', 400);
+        }
+        
+        // Get payroll data
+        $payroll = Payroll::where('aadhar', $aadhar)
+            ->where('month_year', $monthYear)
+            ->first();
+        
+        if (!$payroll) {
+            return response('Payroll data not found', 404);
+        }
+        
+        // Get employee data
+        $employee = Employee::where('Aadhar', $aadhar)->first();
+        if (!$employee) {
+            return response('Employee not found', 404);
+        }
+        
+        // Get site data
+        $site = Site::find($payroll->site_id);
+        
+        // Get attendance record
+        $attendance = Attendance::where('aadhar', $aadhar)
+            ->where('month_year', $monthYear)
+            ->first();
+        
+        // Get overtime data
+        $overtime = \App\Overtime::where('aadhar', $aadhar)
+            ->where('month_year', $monthYear)
+            ->first();
+        
+        // Get rate data
+        $rate = $employee->rate;
+        
+        // Calculate days worked
+        $present = $payroll->present_days ?? 0;
+        $nh = 0;
+        $l = 0;
+        
+        if ($attendance) {
+            for ($day = 1; $day <= 31; $day++) {
+                $dayValue = $attendance->{'day_' . $day};
+                if ($dayValue === 'O') {
+                    $l++;
+                }
+            }
+        }
+        
+        // Get NH days for the month
+        $nhDays = [];
+        if ($monthYear) {
+            $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
+            $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
+            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->where('leave_type', 'NH')
+                ->pluck('date')
+                ->map(function($date) {
+                    return $date->format('Y-m-d');
+                })
+                ->toArray();
+            $nhDays = $nhRecords;
+            
+            // Count NH days
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+            $daysInMonth = $date->daysInMonth;
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                if (in_array($checkDate, $nhDays)) {
+                    $nh++;
+                }
+            }
+        }
+        
+        $totalWorked = $present + $nh + $l;
+        
+        // Calculate wage details
+        $basicRate = $payroll->basic_rate ?? 0;
+        $daRate = $payroll->da_rate ?? 0;
+        $totalRate = $basicRate + $daRate;
+        
+        // Daily rate calculation
+        $dailyRate = $totalRate;
+        
+        // Amount of wages (Basic + DA based on worked days)
+        $basicAmount = $payroll->basic_amount ?? 0;
+        $daAmount = $payroll->da_amount ?? 0;
+        $amountOfWages = $basicAmount + $daAmount;
+        
+        // Other Pay (Special Allowance)
+        $otherPay = $rate ? ($rate->SpecialAllowance ?? 0) : 0;
+        
+        // Overtime
+        $otHours = $payroll->ot_hours ?? 0;
+        $otAmount = $payroll->ot_amount ?? 0;
+        
+        // Gross Wages Payable
+        $grossWages = round($amountOfWages + $otherPay + $otAmount);
+        
+        // Deductions
+        $pfDeduction = $payroll->pf_employee ?? 0;
+        $esicDeduction = $payroll->esic_employee ?? 0;
+        $prfDeduction = 0;
+        if ($employee->PRFTax) {
+            $prfDeduction = 200;
+        }
+        $totalDeductions = $pfDeduction + $esicDeduction + $prfDeduction;
+        
+        // Net Amount Paid
+        $netAmount = round($grossWages - $totalDeductions);
+        
+        // Format month for display
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+        $monthDisplay = $date->format('M - Y');
+        
+        // Return HTML view
+        return view('pages.transaction.pdfs.wage-slip', [
+            'employee' => $employee,
+            'payroll' => $payroll,
+            'site' => $site,
+            'rate' => $rate,
+            'monthYear' => $monthYear,
+            'monthDisplay' => $monthDisplay,
+            'totalWorked' => $totalWorked,
+            'dailyRate' => $dailyRate,
+            'otherPay' => $otherPay,
+            'otHours' => $otHours,
+            'otAmount' => $otAmount,
+            'amountOfWages' => $amountOfWages,
+            'grossWages' => $grossWages,
+            'pfDeduction' => $pfDeduction,
+            'esicDeduction' => $esicDeduction,
+            'prfDeduction' => $prfDeduction,
+            'totalDeductions' => $totalDeductions,
+            'netAmount' => $netAmount
+        ]);
+    }
+    
+    public function allWageSlipsPreview(Request $request)
+    {
+        $monthYear = $request->input('month_year');
+        $siteId = $request->input('site_id', 'all');
+        
+        if (!$monthYear) {
+            return response('Month is required', 400);
+        }
+        
+        // Get all payroll data (similar to slip method)
+        $query = Payroll::leftJoin('employees', 'payrolls.aadhar', '=', 'employees.Aadhar')
+            ->leftJoin('sites', 'payrolls.site_id', '=', 'sites.id')
+            ->leftJoin('rates', 'employees.id', '=', 'rates.employee_id')
+            ->where('payrolls.month_year', $monthYear);
+        
+        if ($siteId && $siteId !== 'all') {
+            $query->where('payrolls.site_id', $siteId);
+        }
+        
+        $payrolls = $query->select(
+            'payrolls.*',
+            'employees.EmpId',
+            'employees.id as employee_id',
+            'employees.PRFTax',
+            'employees.EsicApplicable',
+            'employees.PfApplicable',
+            'sites.name as site_name',
+            'rates.SpecialAllowance'
+        )->orderBy('employees.EmpId')->get();
+        
+        // Get NH days for the month
+        $nhDays = [];
+        if ($monthYear) {
+            $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
+            $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
+            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->where('leave_type', 'NH')
+                ->pluck('date')
+                ->map(function($date) {
+                    return $date->format('Y-m-d');
+                })
+                ->toArray();
+            $nhDays = $nhRecords;
+        }
+        
+        // Format month for display
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+        $monthDisplay = $date->format('M - Y');
+        
+        // Get site info (use first payroll's site)
+        $site = null;
+        if ($payrolls->count() > 0) {
+            $site = Site::find($payrolls->first()->site_id);
+        }
+        
+        // Prepare slip data for each employee
+        $slipsData = [];
+        foreach ($payrolls as $payroll) {
+            $employee = Employee::where('Aadhar', $payroll->aadhar)->first();
+            if (!$employee) continue;
+            
+            $attendance = Attendance::where('aadhar', $payroll->aadhar)
+                ->where('month_year', $monthYear)
+                ->first();
+            
+            $present = $payroll->present_days ?? 0;
+            $nh = 0;
+            $l = 0;
+            
+            if ($attendance) {
+                for ($day = 1; $day <= 31; $day++) {
+                    $dayValue = $attendance->{'day_' . $day};
+                    if ($dayValue === 'O') {
+                        $l++;
+                    }
+                }
+            }
+            
+            // Count NH days
+            if (!empty($nhDays) && $monthYear) {
+                $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+                $daysInMonth = $date->daysInMonth;
+                for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                    if (in_array($checkDate, $nhDays)) {
+                        $nh++;
+                    }
+                }
+            }
+            
+            $totalWorked = $present + $nh + $l;
+            
+            // Calculate wage details
+            $basicRate = $payroll->basic_rate ?? 0;
+            $daRate = $payroll->da_rate ?? 0;
+            $totalRate = $basicRate + $daRate;
+            $dailyRate = $totalRate;
+            
+            $basicAmount = $payroll->basic_amount ?? 0;
+            $daAmount = $payroll->da_amount ?? 0;
+            $amountOfWages = $basicAmount + $daAmount;
+            
+            $otherPay = $payroll->SpecialAllowance ?? 0;
+            $otHours = $payroll->ot_hours ?? 0;
+            $otAmount = $payroll->ot_amount ?? 0;
+            $grossWages = round($amountOfWages + $otherPay + $otAmount);
+            
+            $pfDeduction = $payroll->pf_employee ?? 0;
+            $esicDeduction = $payroll->esic_employee ?? 0;
+            $prfDeduction = 0;
+            if ($employee->PRFTax) {
+                $prfDeduction = 200;
+            }
+            $totalDeductions = $pfDeduction + $esicDeduction + $prfDeduction;
+            $netAmount = round($grossWages - $totalDeductions);
+            
+            $slipsData[] = [
+                'employee' => $employee,
+                'payroll' => $payroll,
+                'rate' => $employee->rate,
+                'totalWorked' => $totalWorked,
+                'dailyRate' => $dailyRate,
+                'otherPay' => $otherPay,
+                'otHours' => $otHours,
+                'otAmount' => $otAmount,
+                'amountOfWages' => $amountOfWages,
+                'grossWages' => $grossWages,
+                'pfDeduction' => $pfDeduction,
+                'esicDeduction' => $esicDeduction,
+                'prfDeduction' => $prfDeduction,
+                'totalDeductions' => $totalDeductions,
+                'netAmount' => $netAmount
+            ];
+        }
+        
+        return view('pages.transaction.pdfs.all-wage-slips', [
+            'slipsData' => $slipsData,
+            'site' => $site,
+            'monthYear' => $monthYear,
+            'monthDisplay' => $monthDisplay
+        ]);
+    }
 }
-

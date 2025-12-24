@@ -40,12 +40,19 @@
         <div class="form-group">
           <label>&nbsp;</label>
           <div>
-            <button type="button" class="btn btn-success" id="downloadBtn">
-              <i class="fas fa-download"></i> Download
-            </button>
-          </div>
-          <div class="mt-1">
-            <a href="#" id="wagesSummaryLink" class="text-primary">Wages Summary</a>
+            <div class="btn-group">
+              <button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-download"></i> Download
+              </button>
+              <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="#" id="downloadWageSummary">
+                  <i class="fas fa-file-invoice-dollar"></i> Wage Summary
+                </a>
+                <a class="dropdown-item" href="#" id="downloadAttendance">
+                  <i class="fas fa-calendar-check"></i> Attendance
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -93,6 +100,9 @@
     <!-- Tabs -->
     <ul class="nav nav-tabs" id="payrollTabs" role="tablist">
       <li class="nav-item">
+        <a class="nav-link" id="attendance-tab" data-toggle="tab" href="#attendance" role="tab">Attendance</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link active" id="payroll-tab" data-toggle="tab" href="#payroll" role="tab">Payroll</a>
       </li>
       <li class="nav-item">
@@ -117,6 +127,46 @@
 
     <!-- Tab Content -->
     <div class="tab-content" id="payrollTabContent">
+      <!-- Attendance Tab -->
+      <div class="tab-pane fade" id="attendance" role="tabpanel">
+        <div class="mt-3">
+          <div class="row mb-2">
+            <div class="col-md-6">
+              <h4>ATTENDANCE</h4>
+            </div>
+          </div>
+          
+          <div class="table-responsive">
+            <table id="attendanceTable" class="table table-bordered table-striped table-sm">
+              <thead class="thead-light">
+                <tr>
+                  <th>SL</th>
+                  <th>EMPID</th>
+                  <th>NAME</th>
+                  <th>SITE</th>
+                  <th>DEPARTMENT</th>
+                  <th>DESIGNATION</th>
+                  <th id="attendanceDayColumns"><!-- Dynamic day columns will be inserted here --></th>
+                  <th>PRESENT</th>
+                  <th>PAYABLE</th>
+                  <th>OT</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+              <tfoot>
+                <tr class="table-info font-weight-bold">
+                  <td colspan="6" id="attendanceTotalColspan" class="text-right">TOTAL:</td>
+                  <td class="text-right" id="attendanceTotalPresent">0</td>
+                  <td class="text-right" id="attendanceTotalPayable">0</td>
+                  <td class="text-right" id="attendanceTotalOT">0</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+      
       <!-- Payroll Tab -->
       <div class="tab-pane fade show active" id="payroll" role="tabpanel">
         <div class="mt-3">
@@ -211,6 +261,11 @@
           <div class="row mb-2">
             <div class="col-md-6">
               <h4>SLIP</h4>
+            </div>
+            <div class="col-md-6 text-right">
+              <button type="button" class="btn btn-success" id="viewAllSlipsBtn">
+                <i class="fas fa-file-invoice"></i> View All Slips
+              </button>
             </div>
           </div>
           
@@ -405,16 +460,165 @@
     </div>
   </div>
 </div>
+
+<!-- Wage Slip View Modal -->
+<div class="modal fade" id="wageSlipModal" tabindex="-1" role="dialog" aria-labelledby="wageSlipModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen" role="document" style="max-width: 98vw; width: 98vw; margin: 1vh auto;">
+    <div class="modal-content" style="height: 98vh; display: flex; flex-direction: column;">
+      <div class="modal-header" style="flex-shrink: 0;">
+        <div class="d-flex align-items-center w-100">
+          <div class="mr-3">
+            <button type="button" class="btn btn-sm btn-primary" id="wageSlipPrintBtn">
+              <i class="fas fa-print"></i> Print
+            </button>
+            <button type="button" class="btn btn-sm btn-info" id="wageSlipFullscreenBtn">
+              <i class="fas fa-expand"></i> Fullscreen
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" id="wageSlipExitFullscreenBtn" style="display: none;">
+              <i class="fas fa-compress"></i> Exit Fullscreen
+            </button>
+          </div>
+          <h5 class="modal-title mb-0 flex-grow-1 text-center" id="wageSlipModalLabel">Wage Slip</h5>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0" style="flex: 1; overflow: auto; position: relative;">
+        <div id="wageSlipZoomContainer" style="width: 100%; height: 100%; overflow: auto; transform-origin: top left;">
+          <iframe id="wageSlipFrame" src="" style="width: 100%; height: 100%; border: none; transform: scale(1); transition: transform 0.1s;"></iframe>
+        </div>
+        <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; z-index: 1000;">
+          <span id="wageSlipZoomLevel">100%</span>
+          <button type="button" class="btn btn-sm btn-light ml-2" id="wageSlipZoomIn" style="padding: 2px 8px;">
+            <i class="fas fa-search-plus"></i>
+          </button>
+          <button type="button" class="btn btn-sm btn-light ml-1" id="wageSlipZoomOut" style="padding: 2px 8px;">
+            <i class="fas fa-search-minus"></i>
+          </button>
+          <button type="button" class="btn btn-sm btn-light ml-1" id="wageSlipZoomReset" style="padding: 2px 8px;">
+            <i class="fas fa-undo"></i>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer" style="flex-shrink: 0;">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PDF View Modal -->
+<div class="modal fade" id="pdfViewModal" tabindex="-1" role="dialog" aria-labelledby="pdfViewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-fullscreen" role="document" style="max-width: 98vw; width: 98vw; margin: 1vh auto;">
+    <div class="modal-content" style="height: 98vh; display: flex; flex-direction: column;">
+      <div class="modal-header" style="flex-shrink: 0;">
+        <div class="d-flex align-items-center w-100">
+          <div class="mr-3">
+            <a href="#" id="pdfDownloadBtn" class="btn btn-sm btn-success" target="_blank">
+              <i class="fas fa-download"></i> Download
+            </a>
+            <button type="button" class="btn btn-sm btn-primary" id="pdfPrintBtn">
+              <i class="fas fa-print"></i> Print
+            </button>
+            <button type="button" class="btn btn-sm btn-info" id="pdfFullscreenBtn">
+              <i class="fas fa-expand"></i> Fullscreen
+            </button>
+            <button type="button" class="btn btn-sm btn-secondary" id="pdfExitFullscreenBtn" style="display: none;">
+              <i class="fas fa-compress"></i> Exit Fullscreen
+            </button>
+          </div>
+          <h5 class="modal-title mb-0 flex-grow-1 text-center" id="pdfViewModalLabel">PDF Preview</h5>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body p-0" style="flex: 1; overflow: auto; position: relative;">
+        <div id="pdfZoomContainer" style="width: 100%; height: 100%; overflow: auto; transform-origin: top left;">
+          <iframe id="pdfFrame" src="" style="width: 100%; height: 100%; border: none; transform: scale(1); transition: transform 0.1s;"></iframe>
+        </div>
+        <div style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; z-index: 1000;">
+          <span id="pdfZoomLevel">100%</span>
+          <button type="button" class="btn btn-sm btn-light ml-2" id="pdfZoomIn" style="padding: 2px 8px;">
+            <i class="fas fa-search-plus"></i>
+          </button>
+          <button type="button" class="btn btn-sm btn-light ml-1" id="pdfZoomOut" style="padding: 2px 8px;">
+            <i class="fas fa-search-minus"></i>
+          </button>
+          <button type="button" class="btn btn-sm btn-light ml-1" id="pdfZoomReset" style="padding: 2px 8px;">
+            <i class="fas fa-undo"></i>
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer" style="flex-shrink: 0;">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
 $(document).ready(function() {
+    // Function to get number of days in a month
+    function getDaysInMonth(year, month) {
+        return new Date(year, month, 0).getDate();
+    }
+    
+    // Function to generate day columns dynamically based on selected month
+    function updateAttendanceDayColumns() {
+        var monthYear = $('#filterMonth').val();
+        var daysInMonth = 31; // Default to 31 days
+        
+        if (monthYear) {
+            var parts = monthYear.split('-');
+            var year = parseInt(parts[0]);
+            var month = parseInt(parts[1]);
+            daysInMonth = getDaysInMonth(year, month);
+        }
+        
+        // Build the header row HTML
+        var headerHtml = '<tr>';
+        headerHtml += '<th>SL</th>';
+        headerHtml += '<th>EMPID</th>';
+        headerHtml += '<th>NAME</th>';
+        headerHtml += '<th>SITE</th>';
+        headerHtml += '<th>DEPARTMENT</th>';
+        headerHtml += '<th>DESIGNATION</th>';
+        
+        // Add day columns
+        for (var day = 1; day <= daysInMonth; day++) {
+            headerHtml += '<th>' + day + '</th>';
+        }
+        
+        headerHtml += '<th>PRESENT</th>';
+        headerHtml += '<th>PAYABLE</th>';
+        headerHtml += '<th>OT</th>';
+        headerHtml += '</tr>';
+        
+        // Replace the header row
+        $('#attendanceTable thead').html(headerHtml);
+        
+        // Update footer colspan (6 fixed columns + daysInMonth)
+        // The colspan should be 6 (SL, EMPID, NAME, SITE, DEPARTMENT, DESIGNATION) + daysInMonth
+        $('#attendanceTotalColspan').attr('colspan', 6 + daysInMonth);
+    }
+    
+    // Initialize day columns on page load
+    updateAttendanceDayColumns();
+    
+    // Update day columns when month changes
+    $('#filterMonth').on('change', function() {
+        updateAttendanceDayColumns();
+    });
+    
     var table = $('#payrollTable').DataTable({
         processing: true,
         serverSide: true,
         ajax: {
-            url: '/stc/stc_payroll/transaction/payroll/list',
+            url: '/stc/stc_payroll/reports/payroll/list',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -487,6 +691,159 @@ $(document).ready(function() {
         deferLoading: 0
     });
 
+    // Attendance table DataTable instance
+    var attendanceTable = null;
+    
+    // Load attendance data
+    function loadAttendance() {
+        var monthYear = $('#filterMonth').val();
+        var siteId = $('#filterSite').val();
+        
+        if (!monthYear) {
+            $('#attendanceTable tbody').html('<tr><td colspan="100" class="text-center text-danger">Please select a month</td></tr>');
+            if ($.fn.DataTable.isDataTable('#attendanceTable')) {
+                $('#attendanceTable').DataTable().destroy();
+            }
+            attendanceTable = null;
+            return;
+        }
+        
+        // Update day columns based on selected month
+        updateAttendanceDayColumns();
+        
+        // Get days in month
+        var parts = monthYear.split('-');
+        var year = parseInt(parts[0]);
+        var month = parseInt(parts[1]);
+        var daysInMonth = getDaysInMonth(year, month);
+        
+        $.ajax({
+            url: '/stc/stc_payroll/transaction/attendance/list',
+            type: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            data: {
+                month_year: monthYear,
+                site_id: siteId || 'all',
+                include_days: 'true', // Request day-by-day data
+                draw: 1,
+                start: 0,
+                length: 10000 // Get all records (large number)
+            },
+            success: function(response) {
+                // Destroy existing DataTable if it exists
+                if ($.fn.DataTable.isDataTable('#attendanceTable')) {
+                    $('#attendanceTable').DataTable().destroy();
+                }
+                attendanceTable = null;
+                
+                if (response.data && response.data.length > 0) {
+                    var data = response.data;
+                    var html = '';
+                    var totalPresent = 0;
+                    var totalPayable = 0;
+                    var totalOT = 0;
+                    var sl = 1;
+                    
+                    // Build table rows
+                    data.forEach(function(row) {
+                        html += '<tr>';
+                        html += '<td>' + sl + '</td>';
+                        html += '<td>' + (row.aadhar || '') + '</td>';
+                        html += '<td>' + (row.employee_name || '') + '</td>';
+                        html += '<td>' + (row.site_name || '') + '</td>';
+                        html += '<td>' + (row.department || '') + '</td>';
+                        html += '<td>' + (row.designation || '') + '</td>';
+                        
+                        // Add day columns
+                        var present = 0;
+                        var payable = 0;
+                        var ot = 0;
+                        
+                        for (var day = 1; day <= daysInMonth; day++) {
+                            var dayValue = row['day_' + day] || '';
+                            var otValue = row['ot_day_' + day] || 0;
+                            
+                            var displayValue = '';
+                            if (dayValue === 'P') {
+                                displayValue = 'P';
+                                present++;
+                                payable++;
+                            } else if (dayValue === 'A') {
+                                displayValue = 'A';
+                            } else if (dayValue === 'O') {
+                                displayValue = 'O';
+                            }
+                            
+                            // Add OT if available
+                            if (otValue && parseFloat(otValue) > 0) {
+                                if (displayValue) {
+                                    displayValue += '+' + otValue;
+                                } else {
+                                    displayValue = otValue;
+                                }
+                                ot += parseFloat(otValue);
+                            }
+                            
+                            html += '<td class="text-center">' + displayValue + '</td>';
+                        }
+                        
+                        // Add summary columns
+                        html += '<td class="text-right">' + present + '</td>';
+                        html += '<td class="text-right">' + payable + '</td>';
+                        html += '<td class="text-right">' + ot.toFixed(2) + '</td>';
+                        html += '</tr>';
+                        
+                        totalPresent += present;
+                        totalPayable += payable;
+                        totalOT += ot;
+                        sl++;
+                    });
+                    
+                    $('#attendanceTable tbody').html(html);
+                    
+                    // Update totals in footer
+                    $('#attendanceTotalPresent').text(totalPresent);
+                    $('#attendanceTotalPayable').text(totalPayable);
+                    $('#attendanceTotalOT').text(totalOT.toFixed(2));
+                    
+                    // Initialize DataTable
+                    attendanceTable = $('#attendanceTable').DataTable({
+                        order: [[1, 'asc']],
+                        pageLength: 25,
+                        lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                        columnDefs: [
+                            { orderable: false, targets: 0 }, // SL column not sortable
+                            { className: 'text-center', targets: '_all' } // Center align all columns
+                        ],
+                        scrollX: true // Enable horizontal scrolling for many columns
+                    });
+                } else {
+                    $('#attendanceTable tbody').html('<tr><td colspan="' + (6 + daysInMonth + 3) + '" class="text-center text-danger">No attendance data available</td></tr>');
+                }
+            },
+            error: function(xhr) {
+                console.error('Error loading attendance:', xhr);
+                $('#attendanceTable tbody').html('<tr><td colspan="100" class="text-center text-danger">Error loading attendance data</td></tr>');
+                if ($.fn.DataTable.isDataTable('#attendanceTable')) {
+                    $('#attendanceTable').DataTable().destroy();
+                }
+                attendanceTable = null;
+            }
+        });
+    }
+    
+    // Load attendance when attendance tab is shown
+    $('#attendance-tab').on('shown.bs.tab', function() {
+        var monthYear = $('#filterMonth').val();
+        if (monthYear) {
+            loadAttendance();
+        } else {
+            $('#attendanceTable tbody').html('<tr><td colspan="100" class="text-center text-warning">Please select a month and click Submit to load attendance data</td></tr>');
+        }
+    });
+    
     // Submit filters
     $('#submitFilters').on('click', function() {
         var monthYear = $('#filterMonth').val();
@@ -499,6 +856,10 @@ $(document).ready(function() {
             return;
         }
         table.draw();
+        // Load attendance if attendance tab is active
+        if ($('#attendance-tab').hasClass('active')) {
+            loadAttendance();
+        }
         // Load summary if summary tab is active
         if ($('#summary-tab').hasClass('active')) {
             loadSummary();
@@ -535,7 +896,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/transaction/payroll/summary',
+            url: '/stc/stc_payroll/reports/payroll/summary',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -635,7 +996,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/transaction/payroll/slip',
+            url: '/stc/stc_payroll/reports/payroll/slip',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -718,16 +1079,127 @@ $(document).ready(function() {
         loadSlip();
     });
     
-    // View slip button click handler (placeholder for future implementation)
+    // View All Slips button click handler
+    $('#viewAllSlipsBtn').on('click', function() {
+        var monthYear = $('#filterMonth').val();
+        var siteId = $('#filterSite').val();
+        
+        if (!monthYear) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Month Required',
+                text: 'Please select a month'
+            });
+            return;
+        }
+        
+        // Build preview URL
+        var previewUrl = '/stc/stc_payroll/reports/payroll/all-wage-slips-preview?month_year=' + encodeURIComponent(monthYear);
+        if (siteId && siteId !== 'all') {
+            previewUrl += '&site_id=' + encodeURIComponent(siteId);
+        }
+        
+        // Set iframe source
+        $('#wageSlipFrame').attr('src', previewUrl);
+        $('#wageSlipModalLabel').text('All Wage Slips - ' + monthYear);
+        
+        // Show modal
+        $('#wageSlipModal').modal('show');
+    });
+    
+    // View slip button click handler
     $(document).on('click', '.view-slip-btn', function() {
         var aadhar = $(this).data('aadhar');
         var month = $(this).data('month');
-        // TODO: Implement view slip modal or page
-        Swal.fire({
-            icon: 'info',
-            title: 'View Slip',
-            text: 'Slip view functionality will be implemented soon for Aadhar: ' + aadhar + ', Month: ' + month
-        });
+        
+        if (!aadhar || !month) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Missing required data'
+            });
+            return;
+        }
+        
+        // Build preview URL
+        var previewUrl = '/stc/stc_payroll/reports/payroll/wage-slip-preview?aadhar=' + encodeURIComponent(aadhar) + '&month_year=' + encodeURIComponent(month);
+        
+        // Set iframe source
+        $('#wageSlipFrame').attr('src', previewUrl);
+        $('#wageSlipModalLabel').text('Wage Slip - ' + month);
+        
+        // Show modal
+        $('#wageSlipModal').modal('show');
+    });
+    
+    // Print Wage Slip
+    $('#wageSlipPrintBtn').on('click', function() {
+        var iframe = document.getElementById('wageSlipFrame');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.print();
+        }
+    });
+    
+    // Fullscreen Wage Slip
+    $('#wageSlipFullscreenBtn').on('click', function() {
+        var modal = document.getElementById('wageSlipModal');
+        
+        // Make modal fullscreen
+        if (modal.requestFullscreen) {
+            modal.requestFullscreen();
+        } else if (modal.webkitRequestFullscreen) {
+            modal.webkitRequestFullscreen();
+        } else if (modal.mozRequestFullScreen) {
+            modal.mozRequestFullScreen();
+        } else if (modal.msRequestFullscreen) {
+            modal.msRequestFullscreen();
+        }
+        
+        // Update button visibility
+        $('#wageSlipFullscreenBtn').hide();
+        $('#wageSlipExitFullscreenBtn').show();
+    });
+    
+    // Exit Fullscreen Wage Slip
+    $('#wageSlipExitFullscreenBtn').on('click', function() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    });
+    
+    // Listen for fullscreen change events for wage slip modal
+    document.addEventListener('fullscreenchange', function() {
+        if (!document.fullscreenElement) {
+            $('#wageSlipFullscreenBtn').show();
+            $('#wageSlipExitFullscreenBtn').hide();
+        }
+    });
+    
+    document.addEventListener('webkitfullscreenchange', function() {
+        if (!document.webkitFullscreenElement) {
+            $('#wageSlipFullscreenBtn').show();
+            $('#wageSlipExitFullscreenBtn').hide();
+        }
+    });
+    
+    document.addEventListener('mozfullscreenchange', function() {
+        if (!document.mozFullScreenElement) {
+            $('#wageSlipFullscreenBtn').show();
+            $('#wageSlipExitFullscreenBtn').hide();
+        }
+    });
+    
+    document.addEventListener('MSFullscreenChange', function() {
+        if (!document.msFullscreenElement) {
+            $('#wageSlipFullscreenBtn').show();
+            $('#wageSlipExitFullscreenBtn').hide();
+        }
     });
     
     // Bank table DataTable instance
@@ -748,7 +1220,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/transaction/payroll/bank',
+            url: '/stc/stc_payroll/reports/payroll/bank',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -845,7 +1317,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/transaction/payroll/bank-other',
+            url: '/stc/stc_payroll/reports/payroll/bank-other',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -942,7 +1414,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/transaction/payroll/pf',
+            url: '/stc/stc_payroll/reports/payroll/pf',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1051,7 +1523,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/transaction/payroll/esic',
+            url: '/stc/stc_payroll/reports/payroll/esic',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1135,8 +1607,12 @@ $(document).ready(function() {
     $('#selectAllSites').on('change', function() {
         if ($(this).is(':checked')) {
             $('#filterSite').val('all').prop('disabled', true);
+            // Also disable the searchable dropdown input
+            $('#filterSite').siblings('.searchable-dropdown').find('.searchable-input').prop('disabled', true);
         } else {
             $('#filterSite').prop('disabled', false);
+            // Also enable the searchable dropdown input
+            $('#filterSite').siblings('.searchable-dropdown').find('.searchable-input').prop('disabled', false);
         }
     });
 
@@ -1176,6 +1652,261 @@ $(document).ready(function() {
         // Update footer (this will show total for current page only in server-side mode)
         $('#payrollTotalNetAmt').text(totalNetAmt.toLocaleString('en-IN', {maximumFractionDigits: 0}));
     });
+    
+    // Store current PDF URL for download/print
+    var currentPdfUrl = '';
+    
+    // Show Wage Summary Preview
+    $('#downloadWageSummary').on('click', function(e) {
+        e.preventDefault();
+        var monthYear = $('#filterMonth').val();
+        var siteId = $('#filterSite').val();
+        
+        if (!monthYear) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Month Required',
+                text: 'Please select a month'
+            });
+            return;
+        }
+        
+        // Build preview URL (HTML) for iframe
+        var previewUrl = '/stc/stc_payroll/reports/payroll/wage-summary-preview?month_year=' + encodeURIComponent(monthYear);
+        if (siteId && siteId !== 'all') {
+            previewUrl += '&site_id=' + encodeURIComponent(siteId);
+        }
+        
+        // Build PDF URL for download
+        var pdfUrl = '/stc/stc_payroll/reports/payroll/wage-summary-pdf?month_year=' + encodeURIComponent(monthYear);
+        if (siteId && siteId !== 'all') {
+            pdfUrl += '&site_id=' + encodeURIComponent(siteId);
+        }
+        
+        // Set iframe source to preview (HTML) and download link to PDF
+        currentPdfUrl = pdfUrl;
+        $('#pdfFrame').attr('src', previewUrl);
+        $('#pdfDownloadBtn').attr('href', pdfUrl);
+        $('#pdfViewModalLabel').text('Wage Summary - ' + monthYear);
+        
+        // Show modal first
+        $('#pdfViewModal').modal('show');
+    });
+    
+    // Show Attendance Preview
+    $('#downloadAttendance').on('click', function(e) {
+        e.preventDefault();
+        var monthYear = $('#filterMonth').val();
+        var siteId = $('#filterSite').val();
+        
+        if (!monthYear) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Month Required',
+                text: 'Please select a month'
+            });
+            return;
+        }
+        
+        // Build preview URL (HTML) for iframe
+        var previewUrl = '/stc/stc_payroll/reports/payroll/attendance-preview?month_year=' + encodeURIComponent(monthYear);
+        if (siteId && siteId !== 'all') {
+            previewUrl += '&site_id=' + encodeURIComponent(siteId);
+        }
+        
+        // Build PDF URL for download
+        var pdfUrl = '/stc/stc_payroll/reports/payroll/attendance-pdf?month_year=' + encodeURIComponent(monthYear);
+        if (siteId && siteId !== 'all') {
+            pdfUrl += '&site_id=' + encodeURIComponent(siteId);
+        }
+        
+        // Set iframe source to preview (HTML) and download link to PDF
+        currentPdfUrl = pdfUrl;
+        $('#pdfFrame').attr('src', previewUrl);
+        $('#pdfDownloadBtn').attr('href', pdfUrl);
+        $('#pdfViewModalLabel').text('Attendance - ' + monthYear);
+        
+        // Show modal first
+        $('#pdfViewModal').modal('show');
+    });
+    
+    // Print PDF
+    $('#pdfPrintBtn').on('click', function() {
+        var iframe = document.getElementById('pdfFrame');
+        if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.print();
+        }
+    });
+    
+    // Download PDF button
+    $('#pdfDownloadBtn').on('click', function(e) {
+        e.preventDefault();
+        if (currentPdfUrl) {
+            // Open PDF in new tab for download
+            window.open(currentPdfUrl, '_blank');
+        }
+    });
+    
+    // Fullscreen PDF
+    $('#pdfFullscreenBtn').on('click', function() {
+        var modal = document.getElementById('pdfViewModal');
+        var modalDialog = modal.querySelector('.modal-dialog');
+        
+        // Make modal fullscreen
+        if (modal.requestFullscreen) {
+            modal.requestFullscreen();
+        } else if (modal.webkitRequestFullscreen) {
+            modal.webkitRequestFullscreen();
+        } else if (modal.mozRequestFullScreen) {
+            modal.mozRequestFullScreen();
+        } else if (modal.msRequestFullscreen) {
+            modal.msRequestFullscreen();
+        }
+        
+        // Update button visibility
+        $('#pdfFullscreenBtn').hide();
+        $('#pdfExitFullscreenBtn').show();
+    });
+    
+    // Exit Fullscreen
+    $('#pdfExitFullscreenBtn').on('click', function() {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    });
+    
+    // Listen for fullscreen change events
+    document.addEventListener('fullscreenchange', function() {
+        if (!document.fullscreenElement) {
+            $('#pdfFullscreenBtn').show();
+            $('#pdfExitFullscreenBtn').hide();
+        }
+    });
+    
+    document.addEventListener('webkitfullscreenchange', function() {
+        if (!document.webkitFullscreenElement) {
+            $('#pdfFullscreenBtn').show();
+            $('#pdfExitFullscreenBtn').hide();
+        }
+    });
+    
+    document.addEventListener('mozfullscreenchange', function() {
+        if (!document.mozFullScreenElement) {
+            $('#pdfFullscreenBtn').show();
+            $('#pdfExitFullscreenBtn').hide();
+        }
+    });
+    
+    document.addEventListener('MSFullscreenChange', function() {
+        if (!document.msFullscreenElement) {
+            $('#pdfFullscreenBtn').show();
+            $('#pdfExitFullscreenBtn').hide();
+        }
+    });
+    
+    // Initialize searchable dropdown for Site filter
+    if (typeof window.initSearchableDropdown === 'function') {
+        window.initSearchableDropdown($('#filterSite'));
+    }
+    
+    // Zoom functionality for PDF Modal
+    var pdfZoomLevel = 1;
+    var pdfMinZoom = 0.5;
+    var pdfMaxZoom = 3;
+    var pdfZoomStep = 0.1;
+    
+    function updatePdfZoom(level) {
+        pdfZoomLevel = Math.max(pdfMinZoom, Math.min(pdfMaxZoom, level));
+        var iframe = document.getElementById('pdfFrame');
+        if (iframe) {
+            iframe.style.transform = 'scale(' + pdfZoomLevel + ')';
+            iframe.style.width = (100 / pdfZoomLevel) + '%';
+            iframe.style.height = (100 / pdfZoomLevel) + '%';
+        }
+        $('#pdfZoomLevel').text(Math.round(pdfZoomLevel * 100) + '%');
+    }
+    
+    // PDF Zoom In
+    $('#pdfZoomIn').on('click', function() {
+        updatePdfZoom(pdfZoomLevel + pdfZoomStep);
+    });
+    
+    // PDF Zoom Out
+    $('#pdfZoomOut').on('click', function() {
+        updatePdfZoom(pdfZoomLevel - pdfZoomStep);
+    });
+    
+    // PDF Zoom Reset
+    $('#pdfZoomReset').on('click', function() {
+        updatePdfZoom(1);
+    });
+    
+    // PDF Mouse wheel zoom
+    $('#pdfZoomContainer, #pdfFrame').on('wheel', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            var delta = e.originalEvent.deltaY > 0 ? -pdfZoomStep : pdfZoomStep;
+            updatePdfZoom(pdfZoomLevel + delta);
+        }
+    });
+    
+    // Zoom functionality for Wage Slip Modal
+    var wageSlipZoomLevel = 1;
+    var wageSlipMinZoom = 0.5;
+    var wageSlipMaxZoom = 3;
+    var wageSlipZoomStep = 0.1;
+    
+    function updateWageSlipZoom(level) {
+        wageSlipZoomLevel = Math.max(wageSlipMinZoom, Math.min(wageSlipMaxZoom, level));
+        var iframe = document.getElementById('wageSlipFrame');
+        if (iframe) {
+            iframe.style.transform = 'scale(' + wageSlipZoomLevel + ')';
+            iframe.style.width = (100 / wageSlipZoomLevel) + '%';
+            iframe.style.height = (100 / wageSlipZoomLevel) + '%';
+        }
+        $('#wageSlipZoomLevel').text(Math.round(wageSlipZoomLevel * 100) + '%');
+    }
+    
+    // Wage Slip Zoom In
+    $('#wageSlipZoomIn').on('click', function() {
+        updateWageSlipZoom(wageSlipZoomLevel + wageSlipZoomStep);
+    });
+    
+    // Wage Slip Zoom Out
+    $('#wageSlipZoomOut').on('click', function() {
+        updateWageSlipZoom(wageSlipZoomLevel - wageSlipZoomStep);
+    });
+    
+    // Wage Slip Zoom Reset
+    $('#wageSlipZoomReset').on('click', function() {
+        updateWageSlipZoom(1);
+
+    });
+    
+    // Wage Slip Mouse wheel zoom
+    $('#wageSlipZoomContainer, #wageSlipFrame').on('wheel', function(e) {
+        if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+            var delta = e.originalEvent.deltaY > 0 ? -wageSlipZoomStep : wageSlipZoomStep;
+            updateWageSlipZoom(wageSlipZoomLevel + delta);
+        }
+    });
+    
+    // Reset zoom when modals are closed
+    $('#pdfViewModal').on('hidden.bs.modal', function() {
+        updatePdfZoom(1);
+    });
+    
+    $('#wageSlipModal').on('hidden.bs.modal', function() {
+        updateWageSlipZoom(1);
+    });
 });
 </script>
 @endpush
+

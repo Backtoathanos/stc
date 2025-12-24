@@ -93,14 +93,6 @@ Route::middleware(['auth.user'])->group(function () {
 
     // Transaction Routes
     Route::prefix('transaction')->group(function () {
-        Route::get('/payroll', [PayrollController::class, 'index'])->name('transaction.payroll');
-        Route::post('/payroll/list', [PayrollController::class, 'list'])->name('transaction.payroll.list');
-        Route::post('/payroll/summary', [PayrollController::class, 'summary'])->name('transaction.payroll.summary');
-        Route::post('/payroll/slip', [PayrollController::class, 'slip'])->name('transaction.payroll.slip');
-        Route::post('/payroll/bank', [PayrollController::class, 'bank'])->name('transaction.payroll.bank');
-        Route::post('/payroll/bank-other', [PayrollController::class, 'bankOther'])->name('transaction.payroll.bank-other');
-        Route::post('/payroll/pf', [PayrollController::class, 'pf'])->name('transaction.payroll.pf');
-        Route::post('/payroll/esic', [PayrollController::class, 'esic'])->name('transaction.payroll.esic');
         
         // Attendance routes
         Route::get('/attendance', [AttendanceController::class, 'index'])->name('transaction.attendance');
@@ -131,6 +123,22 @@ Route::middleware(['auth.user'])->group(function () {
             
             return view('pages.reports.employee', ['page_title' => 'Employee Reports']);
         })->name('reports.employee');
+        
+        // Payroll Routes
+        Route::get('/payroll', [PayrollController::class, 'index'])->name('reports.payroll');
+        Route::post('/payroll/list', [PayrollController::class, 'list'])->name('reports.payroll.list');
+        Route::post('/payroll/summary', [PayrollController::class, 'summary'])->name('reports.payroll.summary');
+        Route::post('/payroll/slip', [PayrollController::class, 'slip'])->name('reports.payroll.slip');
+        Route::post('/payroll/bank', [PayrollController::class, 'bank'])->name('reports.payroll.bank');
+        Route::post('/payroll/bank-other', [PayrollController::class, 'bankOther'])->name('reports.payroll.bank-other');
+        Route::post('/payroll/pf', [PayrollController::class, 'pf'])->name('reports.payroll.pf');
+        Route::post('/payroll/esic', [PayrollController::class, 'esic'])->name('reports.payroll.esic');
+        Route::get('/payroll/wage-summary-preview', [PayrollController::class, 'wageSummaryPreview'])->name('reports.payroll.wage-summary-preview');
+        Route::get('/payroll/attendance-preview', [PayrollController::class, 'attendancePreview'])->name('reports.payroll.attendance-preview');
+        Route::get('/payroll/wage-summary-pdf', [PayrollController::class, 'wageSummaryPdf'])->name('reports.payroll.wage-summary-pdf');
+        Route::get('/payroll/attendance-pdf', [PayrollController::class, 'attendancePdf'])->name('reports.payroll.attendance-pdf');
+        Route::get('/payroll/wage-slip-preview', [PayrollController::class, 'wageSlipPreview'])->name('reports.payroll.wage-slip-preview');
+        Route::get('/payroll/all-wage-slips-preview', [PayrollController::class, 'allWageSlipsPreview'])->name('reports.payroll.all-wage-slips-preview');
     });
 
     // Calendar Routes
