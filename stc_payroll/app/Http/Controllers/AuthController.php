@@ -14,7 +14,7 @@ class AuthController extends Controller
     {
         // If already logged in, redirect to home
         if (Auth::check()) {
-            return redirect('/stc/stc_payroll/');
+            return redirect(route('home'));
         }
         return view('auth.login');
     }
@@ -64,7 +64,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Login successful',
-                'redirect' => '/stc/stc_payroll/'
+                'redirect' => url('/')
             ]);
         }
 
@@ -83,7 +83,7 @@ class AuthController extends Controller
         // Clear remember cookie
         Cookie::queue(Cookie::forget('remember_token'));
         
-        return redirect('/stc/stc_payroll/login');
+        return redirect(route('login'));
     }
 }
 

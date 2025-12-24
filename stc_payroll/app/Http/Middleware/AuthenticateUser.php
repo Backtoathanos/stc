@@ -26,7 +26,7 @@ class AuthenticateUser
                 if ($request->expectsJson()) {
                     return response()->json(['message' => 'Your account is inactive'], 403);
                 }
-                return redirect('/stc/stc_payroll/login')->with('error', 'Your account is inactive. Please contact administrator.');
+                return redirect(route('login'))->with('error', 'Your account is inactive. Please contact administrator.');
             }
             return $next($request);
         }
@@ -46,7 +46,7 @@ class AuthenticateUser
             return response()->json(['message' => 'Unauthenticated'], 401);
         }
         
-        return redirect('/stc/stc_payroll/login');
+        return redirect(route('login'));
     }
 }
 

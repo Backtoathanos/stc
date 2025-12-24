@@ -27,7 +27,7 @@ class PayrollController extends Controller
                     'message' => 'You do not have permission to access this page'
                 ], 403);
             }
-            return redirect('/stc/stc_payroll/')->with('error', 'You do not have permission to access this page');
+            return redirect(route('home'))->with('error', 'You do not have permission to access this page');
         }
         
         return view('pages.transaction.payroll', [

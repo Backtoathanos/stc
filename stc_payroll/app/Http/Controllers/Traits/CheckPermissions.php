@@ -19,7 +19,7 @@ trait CheckPermissions
                     'message' => 'You do not have permission to ' . $operation . ' this resource'
                 ], 403);
             }
-            return redirect('/stc/stc_payroll/')->with('error', 'You do not have permission to ' . $operation . ' this resource');
+            return redirect(route('home'))->with('error', 'You do not have permission to ' . $operation . ' this resource');
         }
         
         return null; // Permission granted
