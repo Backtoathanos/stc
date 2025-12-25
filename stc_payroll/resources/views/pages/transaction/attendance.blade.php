@@ -346,7 +346,7 @@ $(document).ready(function() {
     // Download sample
     $('#downloadAttendanceSample').on('click', function() {
         var type = $('input[name="type"]:checked').val();
-        window.location.href = '/stc/stc_payroll/transaction/attendance/export-sample?type=' + type;
+        window.location.href = window.appBaseUrl + 'transaction/attendance/export-sample?type=' + type;
     });
     
     // Update info text based on type
@@ -374,7 +374,7 @@ $(document).ready(function() {
             formDataWithType.append('type', type);
             
             $.ajax({
-                url: '/stc/stc_payroll/transaction/attendance/import-preview',
+                url: window.appBaseUrl + 'transaction/attendance/import-preview',
                 type: 'POST',
                 data: formDataWithType,
                 processData: false,
@@ -492,7 +492,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/transaction/attendance/import',
+            url: window.appBaseUrl + '/transaction/attendance/import',
             type: 'POST',
             data: {
                 data: attendancePreviewData,
@@ -556,7 +556,7 @@ $(document).ready(function() {
         $('#viewAttendanceContent').html('<div class="text-center"><i class="fas fa-spinner fa-spin fa-2x"></i><p>Loading...</p></div>');
         
         $.ajax({
-            url: '/stc/stc_payroll/transaction/attendance/view-details',
+            url: window.appBaseUrl + '/transaction/attendance/view-details',
             type: 'GET',
             data: {
                 aadhar: aadhar,
@@ -643,7 +643,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/stc/stc_payroll/transaction/attendance/' + id,
+                    url: window.appBaseUrl + '/transaction/attendance/' + id,
                     type: 'POST',
                     data: {
                         _method: 'DELETE',
@@ -732,7 +732,7 @@ $(document).ready(function() {
                 
                 // Make AJAX call
                 $.ajax({
-                    url: '/stc/stc_payroll/transaction/attendance/process',
+                    url: window.appBaseUrl + '/transaction/attendance/process',
                     type: 'POST',
                     data: {
                         month_year: monthYear
