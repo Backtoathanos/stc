@@ -1347,7 +1347,7 @@ $(document).ready(function() {
     function exportEmployees(selectedIds, format) {
         var form = $('<form>', {
             'method': 'POST',
-            'action': '/stc/stc_payroll/master/employees/export'
+            'action': window.appBaseUrl + '/master/employees/export'
         });
         
         form.append($('<input>', {
@@ -1666,8 +1666,8 @@ $(document).ready(function() {
     });
     
     // Setup auto-save for edit form
-    var updateUrl = '/stc/stc_payroll/master/employees/' + ($('#editEmployeeId').val() || '');
-    window.setupAutoSave('#editEmployeeForm', '/stc/stc_payroll/master/employees');
+    var updateUrl = window.appBaseUrl + '/master/employees/' + ($('#editEmployeeId').val() || '');
+    window.setupAutoSave('#editEmployeeForm', window.appBaseUrl + '/master/employees');
     
     // Override saveField callback to refresh table
     var originalSaveField = window.saveField;
@@ -1795,22 +1795,22 @@ $(document).ready(function() {
     $(document).ready(function() {
         // Site dropdowns
         $('#editSiteId, #addSiteId').each(function() {
-            window.initSearchableDropdown(this, '/stc/stc_payroll/master/sites/store');
+            window.initSearchableDropdown(this, window.appBaseUrl + '/master/sites/store');
         });
         
         // Department dropdowns
         $('#editDepartmentId, #addDepartmentId').each(function() {
-            window.initSearchableDropdown(this, '/stc/stc_payroll/master/departments/store');
+            window.initSearchableDropdown(this, window.appBaseUrl + '/master/departments/store');
         });
         
         // Designation dropdowns
         $('#editDesignationId, #addDesignationId').each(function() {
-            window.initSearchableDropdown(this, '/stc/stc_payroll/master/designations/store');
+            window.initSearchableDropdown(this, window.appBaseUrl + '/master/designations/store');
         });
         
         // Gang dropdowns
         $('#editGangId, #addGangId').each(function() {
-            window.initSearchableDropdown(this, '/stc/stc_payroll/master/gangs/store');
+            window.initSearchableDropdown(this, window.appBaseUrl + '/master/gangs/store');
         });
         
         // Other searchable dropdowns (Gender, Marital Status, Payment Mode, Weekoff, OT Type, Skill, Status)
@@ -1847,12 +1847,12 @@ $(document).ready(function() {
     
     // Download Employee Sample Excel
     $('#downloadEmployeeSample').on('click', function() {
-        window.location.href = '/stc/stc_payroll/master/employees/export-sample?type=employee';
+        window.location.href = window.appBaseUrl + '/master/employees/export-sample?type=employee';
     });
     
     // Download Rate Sample Excel
     $('#downloadRateSample').on('click', function() {
-        window.location.href = '/stc/stc_payroll/master/employees/export-sample?type=rate';
+        window.location.href = window.appBaseUrl + '/master/employees/export-sample?type=rate';
     });
     
     var employeePreviewData = [];
@@ -1866,7 +1866,7 @@ $(document).ready(function() {
         formData.append('preview', '1');
         
         $.ajax({
-            url: '/stc/stc_payroll/master/employees/import-preview',
+            url: window.appBaseUrl + '/master/employees/import-preview',
             type: 'POST',
             data: formData,
             processData: false,
@@ -1974,7 +1974,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/master/employees/import',
+            url: window.appBaseUrl + '/master/employees/import',
             type: 'POST',
             data: {
                 _token: $('meta[name="csrf-token"]').attr('content'),
@@ -2038,7 +2038,7 @@ $(document).ready(function() {
         formData.append('preview', '1');
         
         $.ajax({
-            url: '/stc/stc_payroll/master/employees/import-rate-preview',
+            url: window.appBaseUrl + '/master/employees/import-rate-preview',
             type: 'POST',
             data: formData,
             processData: false,
@@ -2156,7 +2156,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/master/employees/import-rate',
+            url: window.appBaseUrl + '/master/employees/import-rate',
             type: 'POST',
             data: {
                 _token: $('meta[name="csrf-token"]').attr('content'),

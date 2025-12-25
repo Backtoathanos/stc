@@ -217,7 +217,7 @@ $(document).ready(function() {
         var id = $(this).data('id');
         
         $.ajax({
-            url: '/stc/stc_payroll/settings/rate/' + id,
+            url: window.appBaseUrl + '/settings/rate/' + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -258,7 +258,7 @@ $(document).ready(function() {
         };
         
         $.ajax({
-            url: '/stc/stc_payroll/settings/rate/' + id,
+            url: window.appBaseUrl + '/settings/rate/' + id,
             type: 'PUT',
             data: formData,
             headers: {
@@ -318,7 +318,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: '/stc/stc_payroll/settings/rate/' + id + '/process',
+                    url: window.appBaseUrl + '/settings/rate/' + id + '/process',
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

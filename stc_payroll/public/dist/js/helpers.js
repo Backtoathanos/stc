@@ -41,7 +41,7 @@
         // Build update URL
         var finalUpdateUrl = updateUrl;
         if (!finalUpdateUrl || !finalUpdateUrl.includes('/' + id)) {
-            var baseUrl = window.baseUrl || '/stc/stc_payroll';
+            var baseUrl = window.baseUrl || window.appBaseUrl;
             if (updateUrl && updateUrl.includes('/master/employees')) {
                 finalUpdateUrl = baseUrl + '/master/employees/' + id;
             } else if (updateUrl) {
@@ -245,7 +245,7 @@
                                     if (fieldName) {
                                         var id = $('#editEmployeeId').val();
                                         if (id) {
-                                            var baseUrl = window.baseUrl || '/stc/stc_payroll';
+                                            var baseUrl = window.baseUrl || window.appBaseUrl;
                                             var updateUrl = baseUrl + '/master/employees/' + id;
                                             window.saveField(fieldName, newId, $input, updateUrl);
                                         }
@@ -407,7 +407,7 @@
 
     // Set base URL if not already set
     if (typeof window.baseUrl === 'undefined') {
-        window.baseUrl = '/stc/stc_payroll';
+        window.baseUrl = window.appBaseUrl;
     }
 
 })(jQuery);

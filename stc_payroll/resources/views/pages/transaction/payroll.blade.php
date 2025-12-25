@@ -650,7 +650,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: '/stc/stc_payroll/reports/payroll/list',
+            url: window.appBaseUrl + '/reports/payroll/list',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -750,7 +750,7 @@ $(document).ready(function() {
         var daysInMonth = getDaysInMonth(year, month);
         
         $.ajax({
-            url: '/stc/stc_payroll/transaction/attendance/list',
+            url: window.appBaseUrl + '/transaction/attendance/list',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -896,7 +896,7 @@ $(document).ready(function() {
             
             // Load site data first
             $.ajax({
-                url: '/stc/stc_payroll/master/sites/show/' + siteId,
+                url: window.appBaseUrl + '/master/sites/show/' + siteId,
                 type: 'GET',
                 success: function(response) {
                     if (response.success && response.data) {
@@ -998,7 +998,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/reports/payroll/summary',
+            url: window.appBaseUrl + '/reports/payroll/summary',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1098,7 +1098,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/reports/payroll/slip',
+            url: window.appBaseUrl + '/reports/payroll/slip',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1196,7 +1196,7 @@ $(document).ready(function() {
         }
         
         // Build preview URL
-        var previewUrl = '/stc/stc_payroll/reports/payroll/all-wage-slips-preview?month_year=' + encodeURIComponent(monthYear);
+        var previewUrl = window.appBaseUrl + '/reports/payroll/all-wage-slips-preview?month_year=' + encodeURIComponent(monthYear);
         if (siteId && siteId !== 'all') {
             previewUrl += '&site_id=' + encodeURIComponent(siteId);
         }
@@ -1224,7 +1224,7 @@ $(document).ready(function() {
         }
         
         // Build preview URL
-        var previewUrl = '/stc/stc_payroll/reports/payroll/wage-slip-preview?aadhar=' + encodeURIComponent(aadhar) + '&month_year=' + encodeURIComponent(month);
+        var previewUrl = window.appBaseUrl + '/reports/payroll/wage-slip-preview?aadhar=' + encodeURIComponent(aadhar) + '&month_year=' + encodeURIComponent(month);
         
         // Set iframe source
         $('#wageSlipFrame').attr('src', previewUrl);
@@ -1322,7 +1322,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/reports/payroll/bank',
+            url: window.appBaseUrl + '/reports/payroll/bank',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1419,7 +1419,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/reports/payroll/bank-other',
+            url: window.appBaseUrl + '/reports/payroll/bank-other',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1516,7 +1516,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/reports/payroll/pf',
+            url: window.appBaseUrl + '/reports/payroll/pf',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1625,7 +1625,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: '/stc/stc_payroll/reports/payroll/esic',
+            url: window.appBaseUrl + '/reports/payroll/esic',
             type: 'POST',
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1761,7 +1761,7 @@ $(document).ready(function() {
     // Load Under Contracts - show all from all sites, but will pre-select site's value
     function loadUnderContracts(siteId, callback) {
         $.ajax({
-            url: '/stc/stc_payroll/master/sites/under-contracts',
+            url: window.appBaseUrl + '/master/sites/under-contracts',
             type: 'GET',
             data: { site_id: siteId || 'all' },
             success: function(response) {
@@ -1915,7 +1915,7 @@ $(document).ready(function() {
             if (result.isConfirmed) {
                 // Update site with new under_contract
                 $.ajax({
-                    url: '/stc/stc_payroll/master/sites/update-contractor-details',
+                    url: window.appBaseUrl + '/master/sites/update-contractor-details',
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1973,7 +1973,7 @@ $(document).ready(function() {
     // Load Nature of Work based on site and under contract
     function loadNatureOfWork(siteId, underContract, callback) {
         $.ajax({
-            url: '/stc/stc_payroll/master/sites/nature-of-work',
+            url: window.appBaseUrl + '/master/sites/nature-of-work',
             type: 'GET',
             data: { 
                 site_id: siteId,
@@ -2089,7 +2089,7 @@ $(document).ready(function() {
             if (result.isConfirmed) {
                 // Update site with new natureofwork
                 $.ajax({
-                    url: '/stc/stc_payroll/master/sites/update-contractor-details',
+                    url: window.appBaseUrl + '/master/sites/update-contractor-details',
                     type: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -2138,7 +2138,7 @@ $(document).ready(function() {
     // Load Work Order No based on site, under contract, and nature of work
     function loadWorkOrderNo(siteId, underContract, natureOfWork) {
         $.ajax({
-            url: '/stc/stc_payroll/master/sites/work-order-no',
+            url: window.appBaseUrl + '/master/sites/work-order-no',
             type: 'GET',
             data: { 
                 site_id: siteId,
@@ -2165,7 +2165,7 @@ $(document).ready(function() {
         
         if (siteId && siteId !== 'all' && underContract && natureOfWork) {
             $.ajax({
-                url: '/stc/stc_payroll/master/sites/update-contractor-details',
+                url: window.appBaseUrl + '/master/sites/update-contractor-details',
                 type: 'POST',
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -2232,13 +2232,13 @@ $(document).ready(function() {
         }
         
         // Build preview URL (HTML) for iframe
-        var previewUrl = '/stc/stc_payroll/reports/payroll/wage-summary-preview?month_year=' + encodeURIComponent(monthYear);
+        var previewUrl = window.appBaseUrl + '/reports/payroll/wage-summary-preview?month_year=' + encodeURIComponent(monthYear);
         if (siteId && siteId !== 'all') {
             previewUrl += '&site_id=' + encodeURIComponent(siteId);
         }
         
         // Build PDF URL for download
-        var pdfUrl = '/stc/stc_payroll/reports/payroll/wage-summary-pdf?month_year=' + encodeURIComponent(monthYear);
+        var pdfUrl = window.appBaseUrl + '/reports/payroll/wage-summary-pdf?month_year=' + encodeURIComponent(monthYear);
         if (siteId && siteId !== 'all') {
             pdfUrl += '&site_id=' + encodeURIComponent(siteId);
         }
@@ -2269,13 +2269,13 @@ $(document).ready(function() {
         }
         
         // Build preview URL (HTML) for iframe
-        var previewUrl = '/stc/stc_payroll/reports/payroll/attendance-preview?month_year=' + encodeURIComponent(monthYear);
+        var previewUrl = window.appBaseUrl + '/reports/payroll/attendance-preview?month_year=' + encodeURIComponent(monthYear);
         if (siteId && siteId !== 'all') {
             previewUrl += '&site_id=' + encodeURIComponent(siteId);
         }
         
         // Build PDF URL for download
-        var pdfUrl = '/stc/stc_payroll/reports/payroll/attendance-pdf?month_year=' + encodeURIComponent(monthYear);
+        var pdfUrl = window.appBaseUrl + '/reports/payroll/attendance-pdf?month_year=' + encodeURIComponent(monthYear);
         if (siteId && siteId !== 'all') {
             pdfUrl += '&site_id=' + encodeURIComponent(siteId);
         }

@@ -258,7 +258,7 @@ $(document).ready(function() {
         });
         
         $.ajax({
-            url: '/stc/stc_payroll/settings/payroll-parameter',
+            url: window.appBaseUrl + '/settings/payroll-parameter',
             type: 'POST',
             data: data,
             headers: {
