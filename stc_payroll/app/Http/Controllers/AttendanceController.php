@@ -172,8 +172,8 @@ class AttendanceController extends Controller
         $totalWorkingDays = $workingDaysInMonth * $allAttendances->count();
         
         foreach ($allAttendances as $attendance) {
-            // Count attendance codes
-            for ($day = 1; $day <= 31; $day++) {
+            // Count attendance codes - only for actual days in the month
+            for ($day = 1; $day <= $daysInMonth; $day++) {
                 $dayValue = $attendance->{'day_' . $day};
                 if ($dayValue === 'P') {
                     $totalPresent++;
@@ -208,8 +208,8 @@ class AttendanceController extends Controller
             
             $workingDays = $daysInMonth - $sundays;
             
-            // Count attendance codes
-            for ($day = 1; $day <= 31; $day++) {
+            // Count attendance codes - only for actual days in the month
+            for ($day = 1; $day <= $daysInMonth; $day++) {
                 $dayValue = $attendance->{'day_' . $day};
                 if ($dayValue === 'P') {
                     $present++;
@@ -220,13 +220,13 @@ class AttendanceController extends Controller
                 }
             }
             
-            // Get OT hours from overtime table
+            // Get OT hours from overtime table - only for actual days in the month
             $overtime = Overtime::where('aadhar', $attendance->aadhar)
                 ->where('month_year', $attMonthYear)
                 ->first();
             
             if ($overtime) {
-                for ($day = 1; $day <= 31; $day++) {
+                for ($day = 1; $day <= $daysInMonth; $day++) {
                     $otValue = $overtime->{'day_' . $day};
                     if ($otValue !== null && $otValue > 0) {
                         $otHours += $otValue;
@@ -252,9 +252,9 @@ class AttendanceController extends Controller
                 'updated_at' => $attendance->updated_at ? $attendance->updated_at->format('Y-m-d H:i:s') : 'N/A',
             ];
             
-            // Include day-by-day data if requested
+            // Include day-by-day data if requested - only for actual days in the month
             if ($includeDays) {
-                for ($day = 1; $day <= 31; $day++) {
+                for ($day = 1; $day <= $daysInMonth; $day++) {
                     $rowData['day_' . $day] = $attendance->{'day_' . $day} ?? '';
                     if ($overtime) {
                         $rowData['ot_day_' . $day] = $overtime->{'day_' . $day} ?? 0;
@@ -622,6 +622,10 @@ class AttendanceController extends Controller
     private function importAttendance($dataRows, $monthYear)
     {
         try {
+            // Calculate actual days in the month
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+            $daysInMonth = $date->daysInMonth;
+            
             $imported = 0;
             $updated = 0;
             $errors = [];
@@ -661,8 +665,8 @@ class AttendanceController extends Controller
                         'month_year' => $monthYear
                     ];
                     
-                    // Extract day values (1-31)
-                    for ($day = 1; $day <= 31; $day++) {
+                    // Extract day values - only for actual days in the month
+                    for ($day = 1; $day <= $daysInMonth; $day++) {
                         $dayKey = (string)$day;
                         $dayValue = '';
                         
@@ -677,6 +681,11 @@ class AttendanceController extends Controller
                         }
                         
                         $attendanceData['day_' . $day] = !empty($dayValue) ? $dayValue : null;
+                    }
+                    
+                    // Set days beyond the month to null (e.g., day_31 for months with 30 days)
+                    for ($day = $daysInMonth + 1; $day <= 31; $day++) {
+                        $attendanceData['day_' . $day] = null;
                     }
                     
                     // Check if attendance already exists for this aadhar and month_year
@@ -727,6 +736,10 @@ class AttendanceController extends Controller
     private function importOT($dataRows, $monthYear)
     {
         try {
+            // Calculate actual days in the month
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+            $daysInMonth = $date->daysInMonth;
+            
             $imported = 0;
             $updated = 0;
             $errors = [];
@@ -766,8 +779,8 @@ class AttendanceController extends Controller
                         'month_year' => $monthYear
                     ];
                     
-                    // Extract day values (1-31) - should be numbers 0-8
-                    for ($day = 1; $day <= 31; $day++) {
+                    // Extract day values - only for actual days in the month (should be numbers 0-8)
+                    for ($day = 1; $day <= $daysInMonth; $day++) {
                         $dayKey = (string)$day;
                         $dayValue = null;
                         
@@ -795,6 +808,11 @@ class AttendanceController extends Controller
                         }
                         
                         $otData['day_' . $day] = $dayValue;
+                    }
+                    
+                    // Set days beyond the month to null (e.g., day_31 for months with 30 days)
+                    for ($day = $daysInMonth + 1; $day <= 31; $day++) {
+                        $otData['day_' . $day] = null;
                     }
                     
                     // Check if OT already exists for this aadhar and month_year
@@ -1152,14 +1170,14 @@ class AttendanceController extends Controller
                     $employee->leave_balance = $newLeaveBalance;
                     $employee->save();
                     
-                    // Get OT hours
+                    // Get OT hours - only for actual days in the month
                     $otHours = 0;
                     $overtime = Overtime::where('aadhar', $attendance->aadhar)
                         ->where('month_year', $monthYear)
                         ->first();
                     
                     if ($overtime) {
-                        for ($day = 1; $day <= 31; $day++) {
+                        for ($day = 1; $day <= $daysInMonth; $day++) {
                             $otValue = $overtime->{'day_' . $day};
                             if ($otValue !== null && $otValue > 0) {
                                 $otHours += $otValue;
