@@ -374,7 +374,7 @@ $(document).ready(function() {
             formDataWithType.append('type', type);
             
             $.ajax({
-                url: window.appBaseUrl + 'transaction/attendance/import-preview',
+                url: window.appBaseUrl + '/transaction/attendance/import-preview',
                 type: 'POST',
                 data: formDataWithType,
                 processData: false,
