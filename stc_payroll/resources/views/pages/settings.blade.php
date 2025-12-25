@@ -1,9 +1,6 @@
 @extends('layouts.header')
 
 @section('content')
-@php
-  $baseUrl = '/stc/stc_payroll';
-@endphp
 <div class="row">
   <!-- Company Card -->
   <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
@@ -22,7 +19,7 @@
 
   <!-- Payroll Parameter Card -->
   <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-    <a href="{{ $baseUrl }}/settings/payroll-parameter" style="text-decoration: none; color: inherit;">
+    <a href="{{ url('/settings/payroll-parameter') }}" style="text-decoration: none; color: inherit;">
       <div class="card h-100 shadow-sm" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
         <div class="card-body text-center">
           <div class="mb-3">
@@ -84,7 +81,7 @@
 
   <!-- Rate Card -->
   <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-    <a href="{{ $baseUrl }}/settings/rate" style="text-decoration: none; color: inherit;">
+    <a href="{{ url('/settings/rate') }}" style="text-decoration: none; color: inherit;">
       <div class="card h-100 shadow-sm" style="cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
         <div class="card-body text-center">
           <div class="mb-3">
