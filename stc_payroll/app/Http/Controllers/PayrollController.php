@@ -115,59 +115,35 @@ class PayrollController extends Controller
         ->take($length)
         ->get();
         
-        // Get NH days for the month from calendar
-        $nhDays = [];
+        // Get NH and FL days for the month from calendar
+        $holidayDays = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
+            $holidayDays = $holidayRecords->pluck('date')
                 ->map(function($date) {
                     return $date->format('Y-m-d');
                 })
                 ->toArray();
-            $nhDays = $nhRecords;
         }
         
         $data = [];
         $serial = $start + 1;
         
         foreach ($payrolls as $payroll) {
-            // Get attendance record to calculate NH and Leave
-            $attendance = Attendance::where('aadhar', $payroll->aadhar)
-                ->where('month_year', $monthYear)
-                ->first();
-            
-            // Calculate worked days breakdown
+            // Use stored values from payroll table (already processed and validated correctly)
+            // These values were calculated during attendance processing with proper validation
             $present = $payroll->present_days ?? 0;
             $absent = $payroll->absent_days ?? 0;
-            $nh = 0; // NH (National Holiday) - count from calendar
-            $l = 0; // Leave days - count 'O' days from attendance
+            $nh = $payroll->nh_days ?? 0;
+            $fl = $payroll->fl_days ?? 0;
+            $l = $payroll->leave_days ?? 0; // Use stored leave_days (already validated during processing)
             
-            if ($attendance) {
-                // Count 'O' (Off/Holiday) days from attendance
-                for ($day = 1; $day <= 31; $day++) {
-                    $dayValue = $attendance->{'day_' . $day};
-                    if ($dayValue === 'O') {
-                        $l++;
-                    }
-                }
-            }
-            
-            // Count NH days in this month (if any dates match)
-            if (!empty($nhDays) && $monthYear) {
-                $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
-                $daysInMonth = $date->daysInMonth;
-                for ($day = 1; $day <= $daysInMonth; $day++) {
-                    $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                    if (in_array($checkDate, $nhDays)) {
-                        $nh++;
-                    }
-                }
-            }
-            
-            $totalWorked = $present + $nh + $l;
+            // Total worked days = Present + NH + FL + Leave (all from stored values)
+            $totalWorked = $present + $nh + $fl + $l;
             
             // Rate breakdown
             $basicRate = $payroll->basic_rate ?? 0;
@@ -236,6 +212,7 @@ class PayrollController extends Controller
                 'worked' => [
                     'present' => $present,
                     'nh' => $nh,
+                    'fl' => $fl,
                     'l' => $l,
                     'total' => $totalWorked
                 ],
@@ -310,19 +287,20 @@ class PayrollController extends Controller
             'rates.IncomeTax'
         )->get();
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayDays = [];
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
+            $holidayDays = $holidayRecords->pluck('date')
                 ->map(function($date) {
                     return $date->format('Y-m-d');
                 })
                 ->toArray();
-            $nhDays = $nhRecords;
         }
         
         // Initialize totals
@@ -330,6 +308,7 @@ class PayrollController extends Controller
             'total_employees' => 0,
             'total_present' => 0,
             'total_nh' => 0,
+            'total_fl' => 0,
             'total_leave' => 0,
             'total_worked' => 0,
             'total_basic' => 0,
@@ -351,37 +330,14 @@ class PayrollController extends Controller
         foreach ($payrolls as $payroll) {
             $totals['total_employees']++;
             
-            // Get attendance record
-            $attendance = Attendance::where('aadhar', $payroll->aadhar)
-                ->where('month_year', $monthYear)
-                ->first();
-            
+            // Use stored values from payroll table (already processed and validated correctly)
             $present = $payroll->present_days ?? 0;
-            $nh = 0;
-            $l = 0;
+            $nh = $payroll->nh_days ?? 0;
+            $fl = $payroll->fl_days ?? 0;
+            $l = $payroll->leave_days ?? 0; // Use stored leave_days (already validated during processing)
             
-            if ($attendance) {
-                for ($day = 1; $day <= 31; $day++) {
-                    $dayValue = $attendance->{'day_' . $day};
-                    if ($dayValue === 'O') {
-                        $l++;
-                    }
-                }
-            }
-            
-            // Count NH days
-            if (!empty($nhDays) && $monthYear) {
-                $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
-                $daysInMonth = $date->daysInMonth;
-                for ($day = 1; $day <= $daysInMonth; $day++) {
-                    $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                    if (in_array($checkDate, $nhDays)) {
-                        $nh++;
-                    }
-                }
-            }
-            
-            $totalWorked = $present + $nh + $l;
+            // Total worked days = Present + NH + FL + Leave (all from stored values)
+            $totalWorked = $present + $nh + $fl + $l;
             
             // Calculate values same as list method
             $otherCash = ($payroll->CA ?? 0) + 
@@ -418,6 +374,7 @@ class PayrollController extends Controller
             // Accumulate totals
             $totals['total_present'] += $present;
             $totals['total_nh'] += $nh;
+            $totals['total_fl'] += $fl;
             $totals['total_leave'] += $l;
             $totals['total_worked'] += $totalWorked;
             $totals['total_basic'] += ($payroll->basic_amount ?? 0);
@@ -441,37 +398,14 @@ class PayrollController extends Controller
         $serial = 1;
         
         foreach ($payrolls as $payroll) {
-            // Get attendance record
-            $attendance = Attendance::where('aadhar', $payroll->aadhar)
-                ->where('month_year', $monthYear)
-                ->first();
-            
+            // Use stored values from payroll table (already processed and validated correctly)
             $present = $payroll->present_days ?? 0;
-            $nh = 0;
-            $l = 0;
+            $nh = $payroll->nh_days ?? 0;
+            $fl = $payroll->fl_days ?? 0;
+            $l = $payroll->leave_days ?? 0; // Use stored leave_days (already validated during processing)
             
-            if ($attendance) {
-                for ($day = 1; $day <= 31; $day++) {
-                    $dayValue = $attendance->{'day_' . $day};
-                    if ($dayValue === 'O') {
-                        $l++;
-                    }
-                }
-            }
-            
-            // Count NH days
-            if (!empty($nhDays) && $monthYear) {
-                $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
-                $daysInMonth = $date->daysInMonth;
-                for ($day = 1; $day <= $daysInMonth; $day++) {
-                    $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                    if (in_array($checkDate, $nhDays)) {
-                        $nh++;
-                    }
-                }
-            }
-            
-            $totalWorked = $present + $nh + $l;
+            // Total worked days = Present + NH + FL + Leave (all from stored values)
+            $totalWorked = $present + $nh + $fl + $l;
             
             // Calculate values
             $basicRate = $payroll->basic_rate ?? 0;
@@ -551,19 +485,14 @@ class PayrollController extends Controller
             'rates.IncomeTax'
         )->get();
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
         }
         
         // Return data in slip format
@@ -571,37 +500,14 @@ class PayrollController extends Controller
         $serial = 1;
         
         foreach ($payrolls as $payroll) {
-            // Get attendance record
-            $attendance = Attendance::where('aadhar', $payroll->aadhar)
-                ->where('month_year', $monthYear)
-                ->first();
-            
+            // Use stored values from payroll table (already processed and validated correctly)
             $present = $payroll->present_days ?? 0;
-            $nh = 0;
-            $l = 0;
+            $nh = $payroll->nh_days ?? 0;
+            $fl = $payroll->fl_days ?? 0;
+            $l = $payroll->leave_days ?? 0; // Use stored leave_days (already validated during processing)
             
-            if ($attendance) {
-                for ($day = 1; $day <= 31; $day++) {
-                    $dayValue = $attendance->{'day_' . $day};
-                    if ($dayValue === 'O') {
-                        $l++;
-                    }
-                }
-            }
-            
-            // Count NH days
-            if (!empty($nhDays) && $monthYear) {
-                $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
-                $daysInMonth = $date->daysInMonth;
-                for ($day = 1; $day <= $daysInMonth; $day++) {
-                    $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                    if (in_array($checkDate, $nhDays)) {
-                        $nh++;
-                    }
-                }
-            }
-            
-            $totalWorked = $present + $nh + $l;
+            // Total worked days = Present + NH + FL + Leave (all from stored values)
+            $totalWorked = $present + $nh + $fl + $l;
             
             // Calculate values
             $basic = $payroll->basic_amount ?? 0;
@@ -698,19 +604,14 @@ class PayrollController extends Controller
             'rates.IncomeTax'
         )->get();
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
         }
         
         // Return data in bank statement format
@@ -725,10 +626,16 @@ class PayrollController extends Controller
             
             $present = $payroll->present_days ?? 0;
             $nh = 0;
+            $fl = 0;
             $l = 0;
             
+            // Calculate days in month
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+            $daysInMonth = $date->daysInMonth;
+            
             if ($attendance) {
-                for ($day = 1; $day <= 31; $day++) {
+                // Count 'O' (Off/Holiday) days - ONLY for days within the month
+                for ($day = 1; $day <= $daysInMonth; $day++) {
                     $dayValue = $attendance->{'day_' . $day};
                     if ($dayValue === 'O') {
                         $l++;
@@ -736,14 +643,19 @@ class PayrollController extends Controller
                 }
             }
             
-            // Count NH days
-            if (!empty($nhDays) && $monthYear) {
-                $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
-                $daysInMonth = $date->daysInMonth;
+            // Count NH and FL days
+            if (!empty($holidayRecords) && $monthYear) {
                 for ($day = 1; $day <= $daysInMonth; $day++) {
                     $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                    if (in_array($checkDate, $nhDays)) {
-                        $nh++;
+                    foreach ($holidayRecords as $holidayRecord) {
+                        if ($holidayRecord->date->format('Y-m-d') === $checkDate) {
+                            if ($holidayRecord->leave_type === 'NH') {
+                                $nh++;
+                            } elseif ($holidayRecord->leave_type === 'FL') {
+                                $fl++;
+                            }
+                            break;
+                        }
                     }
                 }
             }
@@ -849,19 +761,14 @@ class PayrollController extends Controller
             'rates.IncomeTax'
         )->get();
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
         }
         
         // Return data in bank other statement format
@@ -979,19 +886,14 @@ class PayrollController extends Controller
             'rates.IncomeTax'
         )->get();
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
         }
         
         // Return data in PF report format
@@ -1127,19 +1029,14 @@ class PayrollController extends Controller
             'rates.IncomeTax'
         )->get();
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
         }
         
         // Return data in ESIC report format
@@ -1147,37 +1044,14 @@ class PayrollController extends Controller
         $serial = 1;
         
         foreach ($payrolls as $payroll) {
-            // Get attendance record
-            $attendance = Attendance::where('aadhar', $payroll->aadhar)
-                ->where('month_year', $monthYear)
-                ->first();
-            
+            // Use stored values from payroll table (already processed and validated correctly)
             $present = $payroll->present_days ?? 0;
-            $nh = 0;
-            $l = 0;
+            $nh = $payroll->nh_days ?? 0;
+            $fl = $payroll->fl_days ?? 0;
+            $l = $payroll->leave_days ?? 0; // Use stored leave_days (already validated during processing)
             
-            if ($attendance) {
-                for ($day = 1; $day <= 31; $day++) {
-                    $dayValue = $attendance->{'day_' . $day};
-                    if ($dayValue === 'O') {
-                        $l++;
-                    }
-                }
-            }
-            
-            // Count NH days
-            if (!empty($nhDays) && $monthYear) {
-                $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
-                $daysInMonth = $date->daysInMonth;
-                for ($day = 1; $day <= $daysInMonth; $day++) {
-                    $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                    if (in_array($checkDate, $nhDays)) {
-                        $nh++;
-                    }
-                }
-            }
-            
-            $totalWorked = $present + $nh + $l;
+            // Total worked days = Present + NH + FL + Leave (all from stored values)
+            $totalWorked = $present + $nh + $fl + $l;
             
             // Calculate gross salary for ESIC
             $basic = $payroll->basic_amount ?? 0;
@@ -1264,19 +1138,14 @@ class PayrollController extends Controller
             'designations.name as designation'
         )->orderBy('employees.EmpId')->get();
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
         }
         
         $siteName = 'All Sites';
@@ -1302,7 +1171,7 @@ class PayrollController extends Controller
             'payrolls' => $payrolls,
             'monthYear' => $monthYear,
             'siteName' => $siteName,
-            'nhDays' => $nhDays,
+            'holidayRecords' => $holidayRecords,
             'site' => $site
         ])->render();
         
@@ -1351,19 +1220,14 @@ class PayrollController extends Controller
             'designations.name as designation'
         )->orderBy('employees.EmpId')->get();
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
         }
         
         $siteName = 'All Sites';
@@ -1384,7 +1248,7 @@ class PayrollController extends Controller
             'payrolls' => $payrolls,
             'monthYear' => $monthYear,
             'siteName' => $siteName,
-            'nhDays' => $nhDays,
+            'holidayRecords' => $holidayRecords,
             'site' => $site
         ]);
     }
@@ -1453,19 +1317,14 @@ class PayrollController extends Controller
             $siteName = $site ? $site->name : 'All Sites';
         }
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
         }
         
         // Return HTML view for preview (not PDF)
@@ -1478,7 +1337,7 @@ class PayrollController extends Controller
             'siteName' => $siteName,
             'site' => $site,
             'daysInMonth' => $daysInMonth,
-            'nhDays' => $nhDays
+            'holidayRecords' => $holidayRecords
         ]);
     }
     
@@ -1546,19 +1405,14 @@ class PayrollController extends Controller
             $siteName = $site ? $site->name : 'All Sites';
         }
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
         }
         
         // Render view template
@@ -1571,7 +1425,7 @@ class PayrollController extends Controller
             'siteName' => $siteName,
             'site' => $site,
             'daysInMonth' => $daysInMonth,
-            'nhDays' => $nhDays
+            'holidayRecords' => $holidayRecords
         ])->render();
         
         $dompdf = new Dompdf();
@@ -1626,10 +1480,16 @@ class PayrollController extends Controller
         // Calculate days worked
         $present = $payroll->present_days ?? 0;
         $nh = 0;
+        $fl = 0;
         $l = 0;
         
+        // Calculate days in month
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+        $daysInMonth = $date->daysInMonth;
+        
         if ($attendance) {
-            for ($day = 1; $day <= 31; $day++) {
+            // Count 'O' (Off/Holiday) days - ONLY for days within the month
+            for ($day = 1; $day <= $daysInMonth; $day++) {
                 $dayValue = $attendance->{'day_' . $day};
                 if ($dayValue === 'O') {
                     $l++;
@@ -1637,32 +1497,32 @@ class PayrollController extends Controller
             }
         }
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
             
-            // Count NH days
-            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
-            $daysInMonth = $date->daysInMonth;
+            // Count NH and FL days
             for ($day = 1; $day <= $daysInMonth; $day++) {
                 $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                if (in_array($checkDate, $nhDays)) {
-                    $nh++;
+                foreach ($holidayRecords as $holidayRecord) {
+                    if ($holidayRecord->date->format('Y-m-d') === $checkDate) {
+                        if ($holidayRecord->leave_type === 'NH') {
+                            $nh++;
+                        } elseif ($holidayRecord->leave_type === 'FL') {
+                            $fl++;
+                        }
+                        break;
+                    }
                 }
             }
         }
         
-        $totalWorked = $present + $nh + $l;
+        $totalWorked = $present + $nh + $fl + $l;
         
         // Calculate wage details
         $basicRate = $payroll->basic_rate ?? 0;
@@ -1756,19 +1616,14 @@ class PayrollController extends Controller
             'rates.SpecialAllowance'
         )->orderBy('employees.EmpId')->get();
         
-        // Get NH days for the month
-        $nhDays = [];
+        // Get NH and FL days for the month
+        $holidayRecords = [];
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-            $nhRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                ->where('leave_type', 'NH')
-                ->pluck('date')
-                ->map(function($date) {
-                    return $date->format('Y-m-d');
-                })
-                ->toArray();
-            $nhDays = $nhRecords;
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
         }
         
         // Format month for display
@@ -1793,10 +1648,16 @@ class PayrollController extends Controller
             
             $present = $payroll->present_days ?? 0;
             $nh = 0;
+            $fl = 0;
             $l = 0;
             
+            // Calculate days in month
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+            $daysInMonth = $date->daysInMonth;
+            
             if ($attendance) {
-                for ($day = 1; $day <= 31; $day++) {
+                // Count 'O' (Off/Holiday) days - ONLY for days within the month
+                for ($day = 1; $day <= $daysInMonth; $day++) {
                     $dayValue = $attendance->{'day_' . $day};
                     if ($dayValue === 'O') {
                         $l++;
@@ -1804,19 +1665,24 @@ class PayrollController extends Controller
                 }
             }
             
-            // Count NH days
-            if (!empty($nhDays) && $monthYear) {
-                $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
-                $daysInMonth = $date->daysInMonth;
+            // Count NH and FL days
+            if (!empty($holidayRecords) && $monthYear) {
                 for ($day = 1; $day <= $daysInMonth; $day++) {
                     $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                    if (in_array($checkDate, $nhDays)) {
-                        $nh++;
+                    foreach ($holidayRecords as $holidayRecord) {
+                        if ($holidayRecord->date->format('Y-m-d') === $checkDate) {
+                            if ($holidayRecord->leave_type === 'NH') {
+                                $nh++;
+                            } elseif ($holidayRecord->leave_type === 'FL') {
+                                $fl++;
+                            }
+                            break;
+                        }
                     }
                 }
             }
             
-            $totalWorked = $present + $nh + $l;
+            $totalWorked = $present + $nh + $fl + $l;
             
             // Calculate wage details
             $basicRate = $payroll->basic_rate ?? 0;

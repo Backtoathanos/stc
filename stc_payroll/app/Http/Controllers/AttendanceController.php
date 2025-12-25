@@ -848,12 +848,23 @@ class AttendanceController extends Controller
                     // Validate site_id (but don't fail if it's null, we can still process)
                     $siteId = $attendance->site_id ?? null;
                     
-                    // Count present, absent, and leave (O) days
+                    // Calculate days in month (recalculate for each attendance)
+                    $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+                    $daysInMonth = $date->daysInMonth;
+                    
+                    // Count present, absent, and leave (O) days - ONLY for days within the month
+                    // IMPORTANT: Only count for working days (exclude Sundays)
                     $present = 0;
                     $absent = 0;
                     $leave = 0; // Leave days (marked as 'O' in attendance)
                     
-                    for ($day = 1; $day <= 31; $day++) {
+                    for ($day = 1; $day <= $daysInMonth; $day++) {
+                        $checkDate = \Carbon\Carbon::createFromFormat('Y-m-d', $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT));
+                        // Skip Sundays - they are not working days, so attendance doesn't count
+                        if ($checkDate->dayOfWeek === \Carbon\Carbon::SUNDAY) {
+                            continue;
+                        }
+                        
                         $dayValue = $attendance->{'day_' . $day};
                         if ($dayValue === 'P') {
                             $present++;
@@ -864,29 +875,96 @@ class AttendanceController extends Controller
                         }
                     }
                     
-                    // Count NH (National Holiday) days from calendar for this month
+                    // Count NH (National Holiday) and FL (Festival Leave) days from calendar for this month
                     $nh = 0;
+                    $fl = 0;
                     $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
                     $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
-                    $nhRecords = \App\CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
-                        ->where('leave_type', 'NH')
+                    $holidayRecords = \App\CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                        ->whereIn('leave_type', ['NH', 'FL'])
                         ->get();
                     
-                    // Count NH days that fall within the month
-                    $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
-                    $daysInMonth = $date->daysInMonth;
+                    // Count NH and FL days that fall within the month AND on working days (not Sundays)
                     for ($day = 1; $day <= $daysInMonth; $day++) {
-                        $checkDate = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                        foreach ($nhRecords as $nhRecord) {
-                            if ($nhRecord->date->format('Y-m-d') === $checkDate) {
-                                $nh++;
+                        $checkDate = \Carbon\Carbon::createFromFormat('Y-m-d', $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT));
+                        // Skip Sundays - holidays on Sundays don't count as worked days
+                        if ($checkDate->dayOfWeek === \Carbon\Carbon::SUNDAY) {
+                            continue;
+                        }
+                        
+                        $checkDateStr = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                        foreach ($holidayRecords as $holidayRecord) {
+                            if ($holidayRecord->date->format('Y-m-d') === $checkDateStr) {
+                                if ($holidayRecord->leave_type === 'NH') {
+                                    $nh++;
+                                } elseif ($holidayRecord->leave_type === 'FL') {
+                                    $fl++;
+                                }
                                 break;
                             }
                         }
                     }
                     
-                    // Total worked days = Present + NH + Leave
-                    $totalWorkedDays = $present + $nh + $leave;
+                    // Calculate total worked days = Present + NH + FL + Leave
+                    // Note: NH and FL are holidays, so they count as worked days
+                    // But we need to validate that total doesn't exceed working days
+                    $totalWorkedDays = $present + $nh + $fl + $leave;
+                    
+                    // Calculate missing days (working days - total worked days)
+                    // This represents days that should have been worked but weren't
+                    $missingDays = $workingDays - $totalWorkedDays;
+                    
+                    // Get current leave balance for employee
+                    $employee = \App\Employee::find($attendance->employee_id);
+                    $currentLeaveBalance = $employee->leave_balance ?? 0;
+                    
+                    // IMPORTANT: Validate leave days
+                    // If totalWorkedDays > workingDays, it means we have invalid leave days
+                    // The excess leave days should be converted back to absent
+                    if ($totalWorkedDays > $workingDays) {
+                        $excessLeave = $totalWorkedDays - $workingDays;
+                        // Convert excess leave back to absent
+                        $leave = max(0, $leave - $excessLeave);
+                        $absent += $excessLeave;
+                        // Recalculate
+                        $totalWorkedDays = $present + $nh + $fl + $leave;
+                        $missingDays = $workingDays - $totalWorkedDays;
+                    }
+                    
+                    // Process missing days and absent days:
+                    // 1. If there are absent days, try to convert them to leave using leave balance
+                    // 2. If leave balance is available, use it to cover absent days
+                    // 3. If leave balance is exhausted, remaining days stay as absent
+                    // 4. If totalWorkedDays > workingDays (extra days worked), add to leave balance
+                    $leaveUsed = 0;
+                    $newLeaveBalance = $currentLeaveBalance;
+                    
+                    if ($missingDays > 0 && $absent > 0) {
+                        // Employee has missing days and some are marked as absent
+                        // Try to convert absent days to leave using leave balance
+                        $daysToConvert = min($absent, $missingDays, $currentLeaveBalance);
+                        
+                        if ($daysToConvert > 0) {
+                            // Convert absent days to leave days
+                            $leaveUsed = $daysToConvert;
+                            $newLeaveBalance = $currentLeaveBalance - $daysToConvert;
+                            $absent -= $daysToConvert;
+                            $leave += $daysToConvert;
+                            // Recalculate total worked days
+                            $totalWorkedDays = $present + $nh + $fl + $leave;
+                        }
+                    } elseif ($missingDays < 0) {
+                        // Employee worked more than working days (extra days worked)
+                        // This shouldn't happen after validation, but handle it
+                        // Add excess to leave balance as earned leave
+                        $earnedLeave = abs($missingDays);
+                        $newLeaveBalance = $currentLeaveBalance + $earnedLeave;
+                    }
+                    // If missingDays == 0 or no absent days, no change to balance
+                    
+                    // Update employee's leave balance
+                    $employee->leave_balance = $newLeaveBalance;
+                    $employee->save();
                     
                     // Get OT hours
                     $otHours = 0;
@@ -988,8 +1066,12 @@ class AttendanceController extends Controller
                             'present_days' => $present,
                             'absent_days' => $absent,
                             'nh_days' => $nh,
+                            'fl_days' => $fl,
                             'leave_days' => $leave,
                             'total_worked_days' => $totalWorkedDays,
+                            'leave_balance_before' => $currentLeaveBalance,
+                            'leave_used' => $leaveUsed,
+                            'leave_balance_after' => $newLeaveBalance,
                             'ot_hours' => $otHours,
                             'category' => $category,
                             'basic_rate' => $basicRate,

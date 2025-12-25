@@ -14,7 +14,7 @@ class Employee extends Model
         'EsicApplicable', 'Esic', 'PRFTax', 'Mobile', 'Email', 'EmpSafetyCard',
         'Address', 'AttendAllow', 'OtAppl', 'MrOtAppl', 'AllowAsPer', 'ReversePF',
         'Bank', 'Branch', 'Ifsc', 'Ac', 'Aadhar', 'Pan', 'Otslave', 'Ottype',
-        'Paymentmode', 'Weekoff', 'Skill', 'Status', 'is_employee', 'is_supervisor', 'is_officeStaff'
+        'Paymentmode', 'Weekoff', 'Skill', 'Status', 'leave_balance', 'is_employee', 'is_supervisor', 'is_officeStaff'
     ];
     
     protected $casts = [
@@ -29,6 +29,7 @@ class Employee extends Model
         'is_employee' => 'boolean',
         'is_supervisor' => 'boolean',
         'is_officeStaff' => 'boolean',
+        'leave_balance' => 'decimal:2',
         'Dob' => 'date',
         'Doj' => 'date',
         'Doe' => 'date',
