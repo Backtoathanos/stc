@@ -56,20 +56,26 @@ class AppServiceProvider extends ServiceProvider
             $appUrl = rtrim($appUrl, '/') . '/public';
         }
         
-        // Set base URL
-        URL::forceRootUrl($appUrl);
-        
-        // Set scheme (http/https)
-        $scheme = parse_url($appUrl, PHP_URL_SCHEME);
-        if ($scheme) {
-            URL::forceScheme($scheme);
-        }
-        
         // Calculate base path for views (without /public)
         $parsedPath = parse_url($appUrl, PHP_URL_PATH);
         $basePath = $parsedPath ? rtrim($parsedPath, '/public') : '/';
         if (empty($basePath) || $basePath === '/') {
             $basePath = '/';
+        }
+        
+        // Create user-facing URL (without /public) for URL generation
+        $scheme = parse_url($appUrl, PHP_URL_SCHEME) ?: 'http';
+        $host = parse_url($appUrl, PHP_URL_HOST) ?: 'localhost';
+        $userFacingUrl = rtrim($scheme . '://' . $host . $basePath, '/');
+        
+        // Set base URL for Laravel's url() helper (without /public)
+        // This ensures url() and route() generate clean URLs without /public/
+        URL::forceRootUrl($userFacingUrl);
+        
+        // Set scheme (http/https)
+        $scheme = parse_url($appUrl, PHP_URL_SCHEME);
+        if ($scheme) {
+            URL::forceScheme($scheme);
         }
         
         // Share base URL with all views
