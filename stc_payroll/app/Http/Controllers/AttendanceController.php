@@ -12,6 +12,7 @@ use App\PayrollParameter;
 use App\Rate;
 use App\CalendarLeaveType;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -384,7 +385,7 @@ class AttendanceController extends Controller
             ]);
             
         } catch (\Exception $e) {
-            \Log::error('Import Preview Error: ' . $e->getMessage(), [
+            Log::error('Import Preview Error: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()

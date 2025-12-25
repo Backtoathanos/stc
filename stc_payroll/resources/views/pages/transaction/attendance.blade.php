@@ -346,7 +346,7 @@ $(document).ready(function() {
     // Download sample
     $('#downloadAttendanceSample').on('click', function() {
         var type = $('input[name="type"]:checked').val();
-        window.location.href = window.appBaseUrl + 'transaction/attendance/export-sample?type=' + type;
+        window.location.href = window.appBaseUrl + '/transaction/attendance/export-sample?type=' + type;
     });
     
     // Update info text based on type
