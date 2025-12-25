@@ -173,7 +173,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/stc/stc_payroll/admin/users/list",
+            url: window.appBaseUrl + "/admin/users/list",
             type: 'GET'
         },
         columns: [
@@ -277,7 +277,7 @@ $(document).ready(function() {
     $(document).on('click', '.view-btn', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: "/stc/stc_payroll/admin/users/show/" + id,
+            url: window.appBaseUrl + "/admin/users/show/" + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -331,7 +331,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: "/stc/stc_payroll/admin/users/show/" + id,
+            url: window.appBaseUrl + "/admin/users/show/" + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -378,7 +378,7 @@ $(document).ready(function() {
         
         // Double check - prevent root user modification
         $.ajax({
-            url: "/stc/stc_payroll/admin/users/show/" + id,
+            url: window.appBaseUrl + "/admin/users/show/" + id,
             type: 'GET',
             success: function(checkResponse) {
                 if (checkResponse.success && checkResponse.data.is_root) {
@@ -405,7 +405,7 @@ $(document).ready(function() {
                 }
                 
                 $.ajax({
-                    url: "/stc/stc_payroll/admin/users/" + id,
+                    url: window.appBaseUrl + "/admin/users/" + id,
                     type: 'PUT',
                     data: formData,
                     success: function(response) {
@@ -453,7 +453,7 @@ $(document).ready(function() {
         };
         
         $.ajax({
-            url: "/stc/stc_payroll/admin/users",
+            url: window.appBaseUrl + "/admin/users",
             type: 'POST',
             data: formData,
             success: function(response) {
@@ -508,7 +508,7 @@ $(document).ready(function() {
         
         // Check if root user before showing confirmation
         $.ajax({
-            url: "/stc/stc_payroll/admin/users/show/" + id,
+            url: window.appBaseUrl + "/admin/users/show/" + id,
             type: 'GET',
             success: function(checkResponse) {
                 if (checkResponse.success && checkResponse.data.is_root) {
@@ -532,7 +532,7 @@ $(document).ready(function() {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         $.ajax({
-                            url: "/stc/stc_payroll/admin/users/" + id,
+                            url: window.appBaseUrl + "/admin/users/" + id,
                             type: 'DELETE',
                             data: {
                                 _token: $('meta[name="csrf-token"]').attr('content')
@@ -601,7 +601,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "/stc/stc_payroll/admin/users/" + id + "/toggle-status",
+                    url: window.appBaseUrl + "/admin/users/" + id + "/toggle-status",
                     type: 'POST',
                     data: {
                         _token: $('meta[name="csrf-token"]').attr('content')
@@ -654,7 +654,7 @@ $(document).ready(function() {
         }
         
         $.ajax({
-            url: "/stc/stc_payroll/admin/users/" + id + "/permissions",
+            url: window.appBaseUrl + "/admin/users/" + id + "/permissions",
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -790,7 +790,7 @@ $(document).ready(function() {
         };
         
         $.ajax({
-            url: "/stc/stc_payroll/admin/users/" + userId + "/permissions",
+            url: window.appBaseUrl + "/admin/users/" + userId + "/permissions",
             type: 'POST',
             data: formData,
             success: function(response) {

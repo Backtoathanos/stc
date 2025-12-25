@@ -1223,7 +1223,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/stc/stc_payroll/master/employees/list",
+            url: window.appBaseUrl + "/master/employees/list",
             type: 'GET',
             data: function(d) {
                 d.site_id = $('#filterSite').val();
@@ -1404,7 +1404,7 @@ $(document).ready(function() {
     $(document).on('click', '.view-btn', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: "/stc/stc_payroll/master/employees/show/" + id,
+            url: window.appBaseUrl + "/master/employees/show/" + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -1539,7 +1539,7 @@ $(document).ready(function() {
         $('#editEmployeeForm').data('loading', true);
         
         $.ajax({
-            url: "/stc/stc_payroll/master/employees/show/" + id,
+            url: window.appBaseUrl + "/master/employees/show/" + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -1697,7 +1697,7 @@ $(document).ready(function() {
         });
         
         $.ajax({
-            url: "/stc/stc_payroll/master/employees",
+            url: window.appBaseUrl + "/master/employees",
             type: 'POST',
             data: formData,
             headers: {
@@ -1751,7 +1751,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "/stc/stc_payroll/master/employees/" + id,
+                    url: window.appBaseUrl + "/master/employees/" + id,
                     type: 'POST',
                     data: {
                         _method: 'DELETE',

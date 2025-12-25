@@ -114,7 +114,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/stc/stc_payroll/master/departments/list",
+            url: window.appBaseUrl + "/master/departments/list",
             type: 'GET'
         },
         columns: [
@@ -150,7 +150,7 @@ $(document).ready(function() {
     $(document).on('click', '.view-btn', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: "/stc/stc_payroll/master/departments/show/" + id,
+            url: window.appBaseUrl + "/master/departments/show/" + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -179,7 +179,7 @@ $(document).ready(function() {
     $(document).on('click', '.edit-btn', function() {
         var id = $(this).data('id');
         $.ajax({
-            url: "/stc/stc_payroll/master/departments/show/" + id,
+            url: window.appBaseUrl + "/master/departments/show/" + id,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -206,7 +206,7 @@ $(document).ready(function() {
         var formData = $(this).serialize();
         
         $.ajax({
-            url: "/stc/stc_payroll/master/departments/" + id,
+            url: window.appBaseUrl + "/master/departments/" + id,
             type: 'POST',
             data: formData + '&_method=PUT',
             headers: {
@@ -255,7 +255,7 @@ $(document).ready(function() {
         var formData = $(this).serialize();
         
         $.ajax({
-            url: "/stc/stc_payroll/master/departments",
+            url: window.appBaseUrl + "/master/departments",
             type: 'POST',
             data: formData,
             headers: {
@@ -312,7 +312,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: "/stc/stc_payroll/master/departments/" + id,
+                    url: window.appBaseUrl + "/master/departments/" + id,
                     type: 'POST',
                     data: {
                         _method: 'DELETE',

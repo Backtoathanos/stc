@@ -254,7 +254,7 @@ $(document).ready(function() {
         processing: true,
         serverSide: true,
         ajax: {
-            url: "/stc/stc_payroll/transaction/attendance/list",
+            url: window.appBaseUrl + "/transaction/attendance/list",
             type: 'GET',
             data: function(d) {
                 d.month_year = $('#filterMonthYear').val();
