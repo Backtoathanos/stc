@@ -35,14 +35,14 @@ class PermissionsSeeder extends Seeder
             ['section' => 'Master', 'page' => 'Employees', 'operation' => 'delete', 'slug' => 'master.employees.delete'],
             
             // Transaction Section
-            ['section' => 'Transaction', 'page' => 'Payroll', 'operation' => 'view', 'slug' => 'transaction.payroll.view'],
-            ['section' => 'Transaction', 'page' => 'Payroll', 'operation' => 'edit', 'slug' => 'transaction.payroll.edit'],
-            ['section' => 'Transaction', 'page' => 'Payroll', 'operation' => 'delete', 'slug' => 'transaction.payroll.delete'],
+            ['section' => 'Transaction', 'page' => 'Attendance', 'operation' => 'view', 'slug' => 'transaction.attendance.view'],
+            ['section' => 'Transaction', 'page' => 'Attendance', 'operation' => 'edit', 'slug' => 'transaction.attendance.edit'],
+            ['section' => 'Transaction', 'page' => 'Attendance', 'operation' => 'delete', 'slug' => 'transaction.attendance.delete'],
             
             // Reports Section
-            ['section' => 'Reports', 'page' => 'Employee Reports', 'operation' => 'view', 'slug' => 'reports.employee.view'],
-            ['section' => 'Reports', 'page' => 'Employee Reports', 'operation' => 'edit', 'slug' => 'reports.employee.edit'],
-            ['section' => 'Reports', 'page' => 'Employee Reports', 'operation' => 'delete', 'slug' => 'reports.employee.delete'],
+            ['section' => 'Reports', 'page' => 'Payroll', 'operation' => 'view', 'slug' => 'reports.payroll.view'],
+            ['section' => 'Reports', 'page' => 'Payroll', 'operation' => 'edit', 'slug' => 'reports.payroll.edit'],
+            ['section' => 'Reports', 'page' => 'Payroll', 'operation' => 'delete', 'slug' => 'reports.payroll.delete'],
             
             // Admin Section
             ['section' => 'Admin', 'page' => 'Users', 'operation' => 'view', 'slug' => 'admin.users.view'],

@@ -25,8 +25,9 @@
             $hasGangsView = $user && ($user->hasPermission('master.gangs.view') || $isRoot);
             $hasEmployeesView = $user && ($user->hasPermission('master.employees.view') || $isRoot);
             $hasMasterAccess = $hasSitesView || $hasDepartmentsView || $hasDesignationsView || $hasGangsView || $hasEmployeesView;
-            $hasPayrollView = $user && ($user->hasPermission('transaction.payroll.view') || $user->hasPermission('reports.payroll.view') || $isRoot);
-            $hasReportsView = $user && (($user->hasPermission('reports.employee.view') || $user->hasPermission('reports.payroll.view') || $hasPayrollView) || $isRoot);
+            $hasAttendanceView = $user && ($user->hasPermission('transaction.attendance.view') || $isRoot);
+            $hasPayrollView = $user && ($user->hasPermission('reports.payroll.view') || $isRoot);
+            $hasReportsView = $user && ($hasPayrollView || $isRoot);
           @endphp
           @if($hasMasterAccess)
           <li class="nav-item">
@@ -81,7 +82,7 @@
             </ul>
           </li>
           @endif
-          @if($hasPayrollView)
+          @if($hasAttendanceView)
           <li class="nav-item">
             <a href="javascript:void(0)" class="nav-link @if(Request::segment(1) == 'transaction') active @endif">
               <i class="nav-icon fas fa-file-invoice"></i>
@@ -118,12 +119,6 @@
                 </a>
               </li>
               @endif
-              <!-- <li class="nav-item">
-                <a href="{{ url('/reports/employee') }}" class="nav-link @if(Request::segment(2) == 'employee') active @endif">
-                  <i class="far fa-circle nav-icon"></i>
-                  <p>Employee Reports</p>
-                </a>
-              </li> -->
             </ul>
           </li>
           @endif
