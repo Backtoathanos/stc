@@ -13,12 +13,39 @@ use App\Rate;
 use App\CalendarLeaveType;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AttendanceController extends Controller
 {
+    /**
+     * Check if required PHP extensions are available
+     * 
+     * @return array|null Returns null if all extensions are available, or an error response array
+     */
+    private function checkRequiredExtensions()
+    {
+        if (!class_exists('ZipArchive')) {
+            return [
+                'success' => false,
+                'message' => 'Server configuration error: PHP Zip extension is not installed or enabled. Please contact your server administrator to enable the PHP zip extension. This is required to read Excel (.xlsx) files.',
+                'error_code' => 'MISSING_ZIP_EXTENSION'
+            ];
+        }
+        
+        if (!extension_loaded('xml')) {
+            return [
+                'success' => false,
+                'message' => 'Server configuration error: PHP XML extension is not installed or enabled. Please contact your server administrator to enable the PHP xml extension.',
+                'error_code' => 'MISSING_XML_EXTENSION'
+            ];
+        }
+        
+        return null;
+    }
+    
     public function index()
     {
         $user = auth()->user();
@@ -327,24 +354,85 @@ class AttendanceController extends Controller
 
     public function importPreview(Request $request)
     {
-        $request->validate([
-            'file' => 'required|mimes:xlsx,xls|max:10240'
-        ]);
-        
         try {
-            $file = $request->file('file');
-            if (!$file || !$file->isValid()) {
+            // Validate request with better error handling
+            try {
+                $request->validate([
+                    'file' => 'required|mimes:xlsx,xls|max:10240'
+                ]);
+            } catch (ValidationException $e) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Invalid file uploaded'
+                    'message' => 'Validation failed: ' . implode(', ', $e->validator->errors()->all()),
+                    'errors' => $e->validator->errors()
+                ], 422);
+            }
+            
+            $file = $request->file('file');
+            if (!$file) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No file uploaded'
                 ], 400);
             }
             
-            $spreadsheet = IOFactory::load($file->getRealPath());
-            $worksheet = $spreadsheet->getActiveSheet();
-            $rows = $worksheet->toArray();
+            if (!$file->isValid()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid file uploaded: ' . $file->getError()
+                ], 400);
+            }
             
-            if (count($rows) < 2) {
+            $filePath = $file->getRealPath();
+            if (!$filePath || !file_exists($filePath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File path is invalid or file does not exist'
+                ], 400);
+            }
+            
+            // Check file size
+            $fileSize = filesize($filePath);
+            if ($fileSize === false || $fileSize > 10240 * 1024) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File size exceeds maximum allowed size (10MB)'
+                ], 400);
+            }
+            
+            // Check if required PHP extensions are available
+            $extensionCheck = $this->checkRequiredExtensions();
+            if ($extensionCheck !== null) {
+                Log::error('Required PHP extension missing', $extensionCheck);
+                return response()->json($extensionCheck, 500);
+            }
+            
+            // Increase memory limit for large files
+            $originalMemoryLimit = ini_get('memory_limit');
+            ini_set('memory_limit', '256M');
+            
+            try {
+                $spreadsheet = IOFactory::load($filePath);
+                $worksheet = $spreadsheet->getActiveSheet();
+                $rows = $worksheet->toArray();
+            } catch (\Exception $e) {
+                ini_set('memory_limit', $originalMemoryLimit);
+                // Check if it's a PhpSpreadsheet related error
+                $exceptionClass = get_class($e);
+                if (strpos($exceptionClass, 'PhpOffice') !== false || strpos($exceptionClass, 'PhpSpreadsheet') !== false) {
+                    Log::error('PhpSpreadsheet Error: ' . $e->getMessage());
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Failed to read Excel file. Please ensure the file is a valid Excel file (.xlsx or .xls format).'
+                    ], 400);
+                }
+                throw $e;
+            }
+            
+            // Restore memory limit
+            ini_set('memory_limit', $originalMemoryLimit);
+            
+            if (empty($rows) || count($rows) < 2) {
                 return response()->json([
                     'success' => false,
                     'message' => 'File is empty or has no data rows'
@@ -353,6 +441,13 @@ class AttendanceController extends Controller
             
             // Get headers from first row
             $headers = array_filter($rows[0]);
+            if (empty($headers)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'File has no headers in the first row'
+                ], 400);
+            }
+            
             $headersLower = array_map('strtolower', $headers);
             
             // Skip header row
@@ -360,7 +455,7 @@ class AttendanceController extends Controller
             
             $parsedData = [];
             
-            foreach ($dataRows as $row) {
+            foreach ($dataRows as $rowIndex => $row) {
                 if (empty(array_filter($row))) {
                     continue; // Skip empty rows
                 }
@@ -384,19 +479,61 @@ class AttendanceController extends Controller
                 'data' => $parsedData
             ]);
             
-        } catch (\Exception $e) {
-            Log::error('Import Preview Error: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
+        } catch (ValidationException $e) {
+            Log::error('Import Preview Validation Error', [
+                'errors' => $e->validator->errors()->all()
             ]);
             
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to parse file: ' . $e->getMessage(),
+                'message' => 'Validation failed: ' . implode(', ', $e->validator->errors()->all()),
+                'errors' => $e->validator->errors()
+            ], 422);
+            
+        } catch (\Exception $e) {
+            // Check for ZipArchive missing error
+            if (strpos($e->getMessage(), 'ZipArchive') !== false || strpos($e->getMessage(), 'Class "ZipArchive" not found') !== false) {
+                Log::error('ZipArchive extension not available: ' . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Server configuration error: PHP Zip extension is not installed or enabled. Please contact your server administrator to enable the PHP zip extension. This is required to read Excel (.xlsx) files.',
+                    'error_code' => 'MISSING_ZIP_EXTENSION'
+                ], 500);
+            }
+            
+            // Check if it's a PhpSpreadsheet related error
+            $exceptionClass = get_class($e);
+            if (strpos($exceptionClass, 'PhpOffice') !== false || strpos($exceptionClass, 'PhpSpreadsheet') !== false) {
+                Log::error('Import Preview PhpSpreadsheet Error: ' . $e->getMessage(), [
+                    'trace' => $e->getTraceAsString(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine()
+                ]);
+                
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to parse Excel file: ' . $e->getMessage(),
+                    'error_details' => config('app.debug') ? [
+                        'file' => $e->getFile(),
+                        'line' => $e->getLine(),
+                        'trace' => $e->getTraceAsString()
+                    ] : null
+                ], 500);
+            }
+            Log::error('Import Preview Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'class' => get_class($e)
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process file: ' . $e->getMessage(),
                 'error_details' => config('app.debug') ? [
                     'file' => $e->getFile(),
                     'line' => $e->getLine(),
+                    'class' => get_class($e),
                     'trace' => $e->getTraceAsString()
                 ] : null
             ], 500);
@@ -416,8 +553,29 @@ class AttendanceController extends Controller
                 'file' => 'required|mimes:xlsx,xls|max:10240'
             ]);
             
+            // Check if required PHP extensions are available
+            $extensionCheck = $this->checkRequiredExtensions();
+            if ($extensionCheck !== null) {
+                Log::error('Required PHP extension missing during import', $extensionCheck);
+                return response()->json($extensionCheck, 500);
+            }
+            
             $file = $request->file('file');
-            $spreadsheet = IOFactory::load($file->getRealPath());
+            
+            try {
+                $spreadsheet = IOFactory::load($file->getRealPath());
+            } catch (\Exception $e) {
+                // Check for ZipArchive missing error
+                if (strpos($e->getMessage(), 'ZipArchive') !== false || strpos($e->getMessage(), 'Class "ZipArchive" not found') !== false) {
+                    Log::error('ZipArchive extension not available during import: ' . $e->getMessage());
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Server configuration error: PHP Zip extension is not installed or enabled. Please contact your server administrator to enable the PHP zip extension. This is required to read Excel (.xlsx) files.',
+                        'error_code' => 'MISSING_ZIP_EXTENSION'
+                    ], 500);
+                }
+                throw $e;
+            }
             $worksheet = $spreadsheet->getActiveSheet();
             $rows = $worksheet->toArray();
             
