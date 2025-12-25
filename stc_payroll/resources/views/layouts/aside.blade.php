@@ -1,6 +1,3 @@
-@php
-  $baseUrl = $baseUrl ?? config('app.base_path', '/');
-@endphp
 <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
@@ -14,7 +11,7 @@
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <li class="nav-item">
-            <a href="{{ $baseUrl }}" class="nav-link @if(Request::segment(1) == '' || Request::segment(1) == 'home') active @endif">
+            <a href="{{ url('/') }}" class="nav-link @if(Request::segment(1) == '' || Request::segment(1) == 'home') active @endif">
               <i class="nav-icon fas fa-home"></i>
               <p>Home</p>
             </a>
@@ -43,7 +40,7 @@
             <ul class="nav nav-treeview">
               @if($hasSitesView)
               <li class="nav-item">
-                <a href="{{ $baseUrl }}/master/sites" class="nav-link @if(Request::segment(2) == 'sites') active @endif">
+                <a href="{{ url('/master/sites') }}" class="nav-link @if(Request::segment(2) == 'sites') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Sites</p>
                 </a>
@@ -51,7 +48,7 @@
               @endif
               @if($hasDepartmentsView)
               <li class="nav-item">
-                <a href="{{ $baseUrl }}/master/departments" class="nav-link @if(Request::segment(2) == 'departments') active @endif">
+                <a href="{{ url('/master/departments') }}" class="nav-link @if(Request::segment(2) == 'departments') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Departments</p>
                 </a>
@@ -59,7 +56,7 @@
               @endif
               @if($hasDesignationsView)
               <li class="nav-item">
-                <a href="{{ $baseUrl }}/master/designations" class="nav-link @if(Request::segment(2) == 'designations') active @endif">
+                <a href="{{ url('/master/designations') }}" class="nav-link @if(Request::segment(2) == 'designations') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Designations</p>
                 </a>
@@ -67,7 +64,7 @@
               @endif
               @if($hasGangsView)
               <li class="nav-item">
-                <a href="{{ $baseUrl }}/master/gangs" class="nav-link @if(Request::segment(2) == 'gangs') active @endif">
+                <a href="{{ url('/master/gangs') }}" class="nav-link @if(Request::segment(2) == 'gangs') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Gangs</p>
                 </a>
@@ -75,7 +72,7 @@
               @endif
               @if($hasEmployeesView)
               <li class="nav-item">
-                <a href="{{ $baseUrl }}/master/employees" class="nav-link @if(Request::segment(2) == 'employees') active @endif">
+                <a href="{{ url('/master/employees') }}" class="nav-link @if(Request::segment(2) == 'employees') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Employees</p>
                 </a>
@@ -95,7 +92,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <a href="{{ $baseUrl }}/transaction/attendance" class="nav-link @if(Request::segment(2) == 'attendance') active @endif">
+                <a href="{{ url('/transaction/attendance') }}" class="nav-link @if(Request::segment(2) == 'attendance') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Attendance</p>
                 </a>
@@ -115,14 +112,14 @@
             <ul class="nav nav-treeview">
               @if($hasPayrollView)
               <li class="nav-item">
-                <a href="{{ $baseUrl }}/reports/payroll" class="nav-link @if(Request::segment(2) == 'payroll') active @endif">
+                <a href="{{ url('/reports/payroll') }}" class="nav-link @if(Request::segment(2) == 'payroll') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Payroll</p>
                 </a>
               </li>
               @endif
               <!-- <li class="nav-item">
-                <a href="{{ $baseUrl }}/reports/employee" class="nav-link @if(Request::segment(2) == 'employee') active @endif">
+                <a href="{{ url('/reports/employee') }}" class="nav-link @if(Request::segment(2) == 'employee') active @endif">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Employee Reports</p>
                 </a>
@@ -136,20 +133,20 @@
           @endphp
           @if($hasAdminAccess)
           <li class="nav-item">
-            <a href="{{ $baseUrl }}/admin/users" class="nav-link @if(Request::segment(1) == 'admin') active @endif">
+            <a href="{{ url('/admin/users') }}" class="nav-link @if(Request::segment(1) == 'admin') active @endif">
               <i class="nav-icon fas fa-user-shield"></i>
               <p>Admin</p>
             </a>
           </li>
           @endif
           <li class="nav-item">
-            <a href="{{ $baseUrl }}/calendar" class="nav-link @if(Request::segment(1) == 'calendar') active @endif">
+            <a href="{{ url('/calendar') }}" class="nav-link @if(Request::segment(1) == 'calendar') active @endif">
               <i class="nav-icon fas fa-calendar"></i>
               <p>Calendar</p>
             </a>
           </li>
           <li class="nav-item">
-            <a href="{{ $baseUrl }}/settings" class="nav-link @if(Request::segment(1) == 'settings') active @endif">
+            <a href="{{ url('/settings') }}" class="nav-link @if(Request::segment(1) == 'settings') active @endif">
               <i class="nav-icon fas fa-cog"></i>
               <p>Settings</p>
             </a>
