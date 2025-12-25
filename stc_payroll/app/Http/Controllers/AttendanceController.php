@@ -332,6 +332,13 @@ class AttendanceController extends Controller
         
         try {
             $file = $request->file('file');
+            if (!$file || !$file->isValid()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid file uploaded'
+                ], 400);
+            }
+            
             $spreadsheet = IOFactory::load($file->getRealPath());
             $worksheet = $spreadsheet->getActiveSheet();
             $rows = $worksheet->toArray();
@@ -377,9 +384,20 @@ class AttendanceController extends Controller
             ]);
             
         } catch (\Exception $e) {
+            \Log::error('Import Preview Error: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+            
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to parse file: ' . $e->getMessage()
+                'message' => 'Failed to parse file: ' . $e->getMessage(),
+                'error_details' => config('app.debug') ? [
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                    'trace' => $e->getTraceAsString()
+                ] : null
             ], 500);
         }
     }
@@ -916,7 +934,16 @@ class AttendanceController extends Controller
                     
                     // Get current leave balance for employee
                     $employee = \App\Employee::find($attendance->employee_id);
-                    $currentLeaveBalance = $employee->leave_balance ?? 0;
+                    // Safely get leave_balance - check if column exists
+                    $currentLeaveBalance = 0;
+                    if ($employee) {
+                        try {
+                            $currentLeaveBalance = $employee->leave_balance ?? 0;
+                        } catch (\Exception $e) {
+                            // Column might not exist on server, default to 0
+                            $currentLeaveBalance = 0;
+                        }
+                    }
                     
                     // IMPORTANT: Validate leave days
                     // If totalWorkedDays > workingDays, it means we have invalid leave days
