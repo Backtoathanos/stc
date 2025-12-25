@@ -203,7 +203,7 @@ $(document).ready(function() {
     // Load leaves for the selected year
     function loadLeaves() {
         $.ajax({
-            url: baseUrl + '/calendar/leaves',
+            url: window.appBaseUrl + "/calendar/leaves",
             type: 'GET',
             data: { year: currentYear },
             success: function(response) {
@@ -312,7 +312,7 @@ $(document).ready(function() {
     // Load leaves for a specific date
     function loadDateLeaves(date) {
         $.ajax({
-            url: baseUrl + '/calendar/leaves/' + date,
+            url: window.appBaseUrl + "/calendar/leaves/" + date,
             type: 'GET',
             success: function(response) {
                 if (response.success) {
@@ -360,7 +360,7 @@ $(document).ready(function() {
         var formData = $(this).serialize();
 
         $.ajax({
-            url: baseUrl + '/calendar/leaves',
+            url: window.appBaseUrl + "/calendar/leaves",
             type: 'POST',
             data: formData,
             headers: {
@@ -420,7 +420,7 @@ $(document).ready(function() {
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
-                    url: baseUrl + '/calendar/leaves/' + id,
+                    url: window.appBaseUrl + "/calendar/leaves/" + id,
                     type: 'POST',
                     data: {
                         _method: 'DELETE',
