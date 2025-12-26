@@ -16,6 +16,9 @@
       <button type="button" class="btn btn-warning btn-sm ml-2" data-toggle="modal" data-target="#importRateModal">
         <i class="fas fa-file-import"></i> Import Rate
       </button>
+      <button type="button" class="btn btn-danger btn-sm ml-2" id="resetLeaveBalanceBtn" title="Reset leave balance to 22 for all employees (Only available in February, first 10 days)">
+        <i class="fas fa-redo"></i> Reset Leave Balance
+      </button>
     </div>
   </div>
   <div class="card-body">
@@ -2213,6 +2216,114 @@ $(document).ready(function() {
             },
             complete: function() {
                 $('#rateSaveBtn').prop('disabled', false).html('<i class="fas fa-save"></i> Save & Import');
+            }
+        });
+    });
+
+    // Reset Leave Balance Button - Validation and Handler
+    function checkResetLeaveBalanceAvailability() {
+        var now = new Date();
+        var currentMonth = now.getMonth() + 1; // JavaScript months are 0-indexed (0-11)
+        var currentDay = now.getDate();
+        
+        // Check if it's January (month 1) and within first 10 days
+        var isAvailable = (currentMonth === 1 && currentDay <= 10);
+        
+        var $btn = $('#resetLeaveBalanceBtn');
+        if (!isAvailable) {
+            $btn.prop('disabled', true);
+            $btn.css('opacity', '0.5');
+            $btn.attr('title', 'Reset leave balance is only available in February, first 10 days of the month');
+        } else {
+            $btn.prop('disabled', false);
+            $btn.css('opacity', '1');
+            $btn.attr('title', 'Reset leave balance to 22 for all employees (Only available in February, first 10 days)');
+        }
+    }
+
+    // Check availability on page load
+    checkResetLeaveBalanceAvailability();
+
+    // Reset Leave Balance Button Click Handler
+    $('#resetLeaveBalanceBtn').on('click', function() {
+        var now = new Date();
+        var currentMonth = now.getMonth() + 1;
+        var currentDay = now.getDate();
+        
+        // Double check validation
+        if (currentMonth !== 1 || currentDay > 10) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Not Available',
+                text: 'Reset leave balance is only available in February, first 10 days of the month.',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+
+        // Show confirmation dialog
+        Swal.fire({
+            icon: 'warning',
+            title: 'Reset Leave Balance?',
+            html: '<p>This will reset <strong>leave balance to 22</strong> for <strong>ALL employees</strong>.</p><p class="text-danger"><strong>This action cannot be undone!</strong></p>',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, Reset All',
+            cancelButtonText: 'Cancel'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Show loading
+                Swal.fire({
+                    title: 'Processing...',
+                    html: 'Resetting leave balance for all employees. Please wait...',
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                // Make AJAX request
+                $.ajax({
+                    url: window.appBaseUrl + '/master/employees/reset-leave-balance',
+                    type: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: response.message || 'Leave balance reset to 22 for all employees successfully.',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                // Reload table if it exists
+                                if (typeof table !== 'undefined') {
+                                    table.ajax.reload();
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.message || 'Failed to reset leave balance'
+                            });
+                        }
+                    },
+                    error: function(xhr) {
+                        var message = 'Failed to reset leave balance';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            html: message
+                        });
+                    }
+                });
             }
         });
     });

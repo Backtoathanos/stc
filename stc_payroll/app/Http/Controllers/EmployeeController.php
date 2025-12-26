@@ -10,6 +10,7 @@ use App\Designation;
 use App\Gang;
 use App\Rate;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -413,6 +414,41 @@ class EmployeeController extends Controller
                 'name' => $department->name
             ]
         ]);
+    }
+
+    public function resetLeaveBalance(Request $request)
+    {
+        // Validate that it's January and within first 10 days
+        $now = Carbon::now();
+        $currentMonth = $now->month;
+        $currentDay = $now->day;
+        
+        if ($currentMonth !== 1 || $currentDay > 10) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Reset leave balance is only available in February, first 10 days of the month.'
+            ], 400);
+        }
+
+        try {
+            DB::beginTransaction();
+            
+            // Reset leave_balance to 22 for all employees
+            $updated = Employee::query()->update(['leave_balance' => 22.00]);
+            
+            DB::commit();
+            
+            return response()->json([
+                'success' => true,
+                'message' => "Leave balance reset to 22 for {$updated} employee(s) successfully."
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error resetting leave balance: ' . $e->getMessage()
+            ], 500);
+        }
     }
     
     public function createDesignation(Request $request)

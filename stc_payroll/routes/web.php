@@ -91,6 +91,7 @@ Route::middleware(['auth.user'])->group(function () {
         Route::post('/employees/import', [EmployeeController::class, 'import'])->name('master.employees.import');
         Route::post('/employees/import-rate-preview', [EmployeeController::class, 'importRatePreview'])->name('master.employees.import-rate-preview');
         Route::post('/employees/import-rate', [EmployeeController::class, 'importRate'])->name('master.employees.import-rate');
+        Route::post('/employees/reset-leave-balance', [EmployeeController::class, 'resetLeaveBalance'])->name('master.employees.reset-leave-balance');
         Route::get('/employees/show/{id}', [EmployeeController::class, 'show'])->name('master.employees.show');
         Route::put('/employees/{id}', [EmployeeController::class, 'update'])->name('master.employees.update');
         Route::delete('/employees/{id}', [EmployeeController::class, 'destroy'])->name('master.employees.destroy');
