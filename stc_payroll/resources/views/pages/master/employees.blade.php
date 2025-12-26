@@ -459,6 +459,12 @@
                     <input type="text" class="form-control" id="editOtslave" name="Otslave">
                   </div>
                 </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Leave Balance</label>
+                    <input type="number" step="0.01" class="form-control" id="editLeaveBalance" name="leave_balance" placeholder="0.00">
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1475,6 +1481,7 @@ $(document).ready(function() {
                         '<div class="col-md-6 mb-3"><strong>Weekoff:</strong><br><span class="text-muted">' + (emp.Weekoff || 'N/A') + '</span></div>' +
                         '<div class="col-md-6 mb-3"><strong>OT Type:</strong><br><span class="text-muted">' + (emp.Ottype || 'N/A') + '</span></div>' +
                         '<div class="col-md-6 mb-3"><strong>OT Slave:</strong><br><span class="text-muted">' + (emp.Otslave || 'N/A') + '</span></div>' +
+                        '<div class="col-md-6 mb-3"><strong>Leave Balance:</strong><br><span class="text-muted">' + (emp.leave_balance !== null && emp.leave_balance !== undefined ? parseFloat(emp.leave_balance).toFixed(2) : '0.00') + '</span></div>' +
                         '</div></div>' +
                         '<div class="tab-pane fade" id="view-settings" role="tabpanel">' +
                         '<div class="row mt-3">' +
@@ -1584,6 +1591,7 @@ $(document).ready(function() {
                     $('#editWeekoff').val(emp.Weekoff || '');
                     $('#editOttype').val(emp.Ottype || '');
                     $('#editOtslave').val(emp.Otslave || '');
+                    $('#editLeaveBalance').val(emp.leave_balance !== null && emp.leave_balance !== undefined ? parseFloat(emp.leave_balance).toFixed(2) : '0.00');
                     // Set PF & ESIC Applicable dropdown (show if either PF or ESIC is applicable)
                     var pfEsicApplicable = (emp.PfApplicable || emp.EsicApplicable) ? '1' : '0';
                     $('#editPfEsicApplicable').val(pfEsicApplicable).trigger('change');

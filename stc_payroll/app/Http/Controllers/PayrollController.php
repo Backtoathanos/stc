@@ -100,6 +100,7 @@ class PayrollController extends Controller
             'employees.PRFTax',
             'employees.EsicApplicable',
             'employees.PfApplicable',
+            'employees.leave_balance',
             'sites.name as site_name',
             'rates.hra',
             'rates.CA',
@@ -117,6 +118,8 @@ class PayrollController extends Controller
         
         // Get NH and FL days for the month from calendar
         $holidayDays = [];
+        $holidayRecords = collect([]);
+        $daysInMonth = 0;
         if ($monthYear) {
             $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
             $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
@@ -128,21 +131,76 @@ class PayrollController extends Controller
                     return $date->format('Y-m-d');
                 })
                 ->toArray();
+            
+            // Calculate days in month once
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+            $daysInMonth = $date->daysInMonth;
         }
         
         $data = [];
         $serial = $start + 1;
         
         foreach ($payrolls as $payroll) {
-            // Use stored values from payroll table (already processed and validated correctly)
-            // These values were calculated during attendance processing with proper validation
-            $present = $payroll->present_days ?? 0;
-            $absent = $payroll->absent_days ?? 0;
-            $nh = $payroll->nh_days ?? 0;
-            $fl = $payroll->fl_days ?? 0;
-            $l = $payroll->leave_days ?? 0; // Use stored leave_days (already validated during processing)
+            // Get present days from attendance table (count 'P' days)
+            $present = 0;
+            $attendance = Attendance::where('aadhar', $payroll->aadhar)
+                ->where('month_year', $monthYear)
+                ->first();
             
-            // Total worked days = Present + NH + FL + Leave (all from stored values)
+            if ($attendance) {
+                // Count present days (only for working days, exclude Sundays)
+                for ($day = 1; $day <= $daysInMonth; $day++) {
+                    $checkDate = \Carbon\Carbon::createFromFormat('Y-m-d', $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT));
+                    // Skip Sundays - they are not working days
+                    if ($checkDate->dayOfWeek === \Carbon\Carbon::SUNDAY) {
+                        continue;
+                    }
+                    
+                    $dayValue = $attendance->{'day_' . $day};
+                    if ($dayValue === 'P') {
+                        $present++;
+                    }
+                }
+            }
+            
+            // Get NH and FL days from calendar table (reuse already fetched holidayRecords)
+            $nh = 0;
+            $fl = 0;
+            
+            // Count NH and FL days (only for working days, exclude Sundays)
+            for ($day = 1; $day <= $daysInMonth; $day++) {
+                $checkDate = \Carbon\Carbon::createFromFormat('Y-m-d', $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT));
+                // Skip Sundays - holidays on Sundays don't count as worked days
+                if ($checkDate->dayOfWeek === \Carbon\Carbon::SUNDAY) {
+                    continue;
+                }
+                
+                $checkDateStr = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                foreach ($holidayRecords as $holidayRecord) {
+                    if ($holidayRecord->date->format('Y-m-d') === $checkDateStr) {
+                        if ($holidayRecord->leave_type === 'NH') {
+                            $nh++;
+                        } elseif ($holidayRecord->leave_type === 'FL') {
+                            $fl++;
+                        }
+                        break;
+                    }
+                }
+            }
+            
+            // Get leave days used to cover absent days from payroll table
+            // This shows how many leave days were used from leave balance to cover absent days
+            // Example: If employee has 5 leave balance, 1 absent day, then 1 leave is used to cover it
+            // So l = 1 (leave used), not 5 (total leave balance)
+            // $l = $payroll->leave_balance ?? 0;
+            $absent = $payroll->absent_days ?? 0;
+            $leaveBalance = (int) ($payroll->leave_balance ?? 0);
+            $absentDays   = (int) ($payroll->absent_days ?? 0);
+
+            // Leave used to cover absences
+            $l = min($leaveBalance, $absentDays);
+            
+            // Total worked days = Present + NH + FL + Leave (leave used to cover absent)
             $totalWorked = $present + $nh + $fl + $l;
             
             // Rate breakdown

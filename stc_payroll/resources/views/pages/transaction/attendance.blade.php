@@ -373,6 +373,23 @@ $(document).ready(function() {
             formDataWithType.append('file', $('#attendanceFile')[0].files[0]);
             formDataWithType.append('type', type);
             
+            // Get CSRF token - try multiple methods
+            var csrfToken = $('meta[name="csrf-token"]').attr('content') || 
+                           $('input[name="_token"]').val() || 
+                           $('input[name="csrf_token"]').val();
+            
+            if (!csrfToken) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'CSRF token not found. Please refresh the page and try again.'
+                });
+                return;
+            }
+            
+            // Add CSRF token to both header and form data
+            formDataWithType.append('_token', csrfToken);
+            
             $.ajax({
                 url: window.appBaseUrl + '/transaction/attendance/import-preview',
                 type: 'POST',
@@ -380,7 +397,7 @@ $(document).ready(function() {
                 processData: false,
                 contentType: false,
                 headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    'X-CSRF-TOKEN': csrfToken
                 },
                 beforeSend: function() {
                     $('#attendanceUploadBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
@@ -402,6 +419,21 @@ $(document).ready(function() {
                     if (xhr.responseJSON && xhr.responseJSON.message) {
                         message = xhr.responseJSON.message;
                     }
+                    
+                    // Handle CSRF token mismatch
+                    if (xhr.status === 419 || (xhr.responseJSON && xhr.responseJSON.message && xhr.responseJSON.message.includes('CSRF'))) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Session Expired',
+                            html: 'Your session has expired. The page will be refreshed to get a new token.',
+                            confirmButtonText: 'Refresh Page',
+                            allowOutsideClick: false
+                        }).then(function() {
+                            window.location.reload();
+                        });
+                        return;
+                    }
+                    
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -491,6 +523,20 @@ $(document).ready(function() {
             return;
         }
         
+        // Get CSRF token - try multiple methods
+        var csrfToken = $('meta[name="csrf-token"]').attr('content') || 
+                       $('input[name="_token"]').val() || 
+                       $('input[name="csrf_token"]').val();
+        
+        if (!csrfToken) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'CSRF token not found. Please refresh the page and try again.'
+            });
+            return;
+        }
+        
         $.ajax({
             url: window.appBaseUrl + '/transaction/attendance/import',
             type: 'POST',
@@ -498,7 +544,10 @@ $(document).ready(function() {
                 data: attendancePreviewData,
                 month_year: monthYear,
                 type: type,
-                _token: $('meta[name="csrf-token"]').attr('content')
+                _token: csrfToken
+            },
+            headers: {
+                'X-CSRF-TOKEN': csrfToken
             },
             beforeSend: function() {
                 $('#attendanceSaveBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Importing...');
@@ -535,6 +584,21 @@ $(document).ready(function() {
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     message = xhr.responseJSON.message;
                 }
+                
+                // Handle CSRF token mismatch
+                if (xhr.status === 419 || (xhr.responseJSON && xhr.responseJSON.message && xhr.responseJSON.message.includes('CSRF'))) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Session Expired',
+                        html: 'Your session has expired. The page will be refreshed to get a new token.',
+                        confirmButtonText: 'Refresh Page',
+                        allowOutsideClick: false
+                    }).then(function() {
+                        window.location.reload();
+                    });
+                    return;
+                }
+                
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',

@@ -53,6 +53,28 @@
   <script src="{{ asset('dist/js/helpers.js') }}"></script>
 
   <script>
+    // Global AJAX setup - automatically include CSRF token in all AJAX requests
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+    
+    // Handle CSRF token expiration globally
+    $(document).ajaxError(function(event, xhr, settings) {
+      if (xhr.status === 419 || (xhr.responseJSON && xhr.responseJSON.message && xhr.responseJSON.message.includes('CSRF'))) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Session Expired',
+          html: 'Your session has expired. The page will be refreshed to get a new token.',
+          confirmButtonText: 'Refresh Page',
+          allowOutsideClick: false
+        }).then(function() {
+          window.location.reload();
+        });
+      }
+    });
+    
     $(function () {
       if ($("#example1").length) {
         $("#example1").DataTable({
