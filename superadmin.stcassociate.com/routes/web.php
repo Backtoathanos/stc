@@ -234,6 +234,7 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/stc/equipment', [EquipmentController::class, 'show']);    
     Route::post('/branch/stc/equipment/list', [EquipmentController::class, 'list']);
     Route::get('/branch/stc/equipment/delete', [EquipmentController::class, 'delete']);
+    Route::post('/branch/stc/equipment/logs', [EquipmentController::class, 'logs']);
     
     // for stc po adhoc
     Route::get('/branch/stc/poadhoc', [POAdhocController::class, 'show']);    

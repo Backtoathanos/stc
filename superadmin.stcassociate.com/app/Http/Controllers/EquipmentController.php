@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Equipment;
+use Illuminate\Support\Facades\DB;
 
 class EquipmentController extends Controller
 {
@@ -149,5 +150,459 @@ class EquipmentController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Record deletion failed!']);
         }
+    }
+
+    // Get equipment logs - same format as stc_get_equipmentdetails_logs
+    public function logs(Request $request){
+        try {
+            $equipmentId = $request->get('equipment_id');
+            $fromDate = $request->get('from_date');
+            $toDate = $request->get('to_date');
+            $search = $request->get('search', '');
+            
+            // Pagination parameters
+            $page = $request->get('page', 1);
+            $perPage = $request->get('per_page', 25);
+            
+            // Sorting parameters
+            $sortColumn = $request->get('sort_column', 'created_date');
+            $sortDirection = strtolower($request->get('sort_direction', 'desc'));
+            
+            // Validate sort direction
+            if (!in_array($sortDirection, ['asc', 'desc'])) {
+                $sortDirection = 'desc';
+            }
+
+            // Build base query
+            $query = DB::table('equipment_details_log as EDL')
+                ->join('equipment_details as ED', 'EDL.equipment_details_id', '=', 'ED.id')
+                ->leftJoin('stc_status_down_list_department as SDLD', 'SDLD.stc_status_down_list_department_id', '=', 'ED.department')
+                ->join('stc_cust_pro_supervisor as S', 'EDL.created_by', '=', 'S.stc_cust_pro_supervisor_id')
+                ->select(
+                    'EDL.*',
+                    'ED.unit_no',
+                    'ED.department',
+                    'ED.area',
+                    'ED.sub_location',
+                    'ED.model_no',
+                    'ED.equipment_name',
+                    'ED.slno',
+                    'ED.equipment_no',
+                    'ED.equipment_type',
+                    'SDLD.stc_status_down_list_department_id',
+                    'SDLD.stc_status_down_list_department_location',
+                    'SDLD.stc_status_down_list_department_dept',
+                    'EDL.creator_name as creator'
+                );
+
+            // Apply filters
+            if (!empty($equipmentId)) {
+                $query->where('EDL.equipment_details_id', $equipmentId);
+            }
+
+            if (!empty($fromDate)) {
+                $query->whereDate('EDL.created_date', '>=', $fromDate);
+            }
+
+            if (!empty($toDate)) {
+                $query->whereDate('EDL.created_date', '<=', $toDate);
+            }
+
+            // Apply search filter
+            if (!empty($search)) {
+                $searchTerm = '%' . $search . '%';
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('SDLD.stc_status_down_list_department_location', 'like', $searchTerm)
+                      ->orWhere('SDLD.stc_status_down_list_department_dept', 'like', $searchTerm)
+                      ->orWhere('ED.sub_location', 'like', $searchTerm)
+                      ->orWhere('ED.slno', 'like', $searchTerm)
+                      ->orWhere('ED.equipment_no', 'like', $searchTerm)
+                      ->orWhere('ED.equipment_type', 'like', $searchTerm)
+                      ->orWhere('ED.area', 'like', $searchTerm)
+                      ->orWhere('ED.model_no', 'like', $searchTerm)
+                      ->orWhere('ED.equipment_name', 'like', $searchTerm)
+                      ->orWhere('ED.unit_no', 'like', $searchTerm);
+                });
+            }
+
+            // Get total count for pagination
+            $totalRecords = $query->count();
+            
+            // Apply sorting
+            $allowedSortColumns = ['created_date', 'voltage', 'equipment_name', 'unit_no', 'area', 'model_no'];
+            if (in_array($sortColumn, $allowedSortColumns)) {
+                if ($sortColumn == 'created_date') {
+                    $query->orderBy('EDL.created_date', $sortDirection);
+                } else {
+                    $query->orderBy('ED.' . $sortColumn, $sortDirection);
+                }
+            } else {
+                $query->orderBy('EDL.created_date', 'DESC');
+            }
+
+            // Apply pagination
+            $offset = ($page - 1) * $perPage;
+            $logs = $query->skip($offset)->take($perPage)->get();
+            
+            $totalPages = ceil($totalRecords / $perPage);
+
+            if ($logs->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'html' => '<p class="text-center">No log entries found.</p>'
+                ]);
+            }
+
+            $rowsHtml = '';
+            $maxCompCnt = 0;
+            $maxCompCntA = 0;
+            $maxCompCntB = 0;
+            $maxCompCntC = 0;
+            $dataRows = [];
+
+            foreach ($logs as $row) {
+                // Get compressor data
+                $comps = DB::table('equipment_details_log_comp')
+                    ->where('equipment_details_log_id', $row->id)
+                    ->get();
+
+                $compCols = [];
+                $compCnt = $comps->count();
+                $maxCompCnt = max($maxCompCnt, $compCnt);
+
+                foreach ($comps as $cr) {
+                    $compCols[] = [
+                        $cr->suction_pr_psig ?? '',
+                        $cr->disc_pr ?? '',
+                        $cr->disc_temp_degC ?? '',
+                        $cr->dsh ?? '',
+                        $cr->oil_level ?? '',
+                        $cr->comp_load ?? '',
+                        $cr->comp_amp ?? ''
+                    ];
+                }
+
+                // Get CD water pump data
+                $cd_pumps = [];
+                $cdPumpsData = DB::table('equipment_details_log_cd_waterpump')
+                    ->where('equipment_details_log_id', $row->id)
+                    ->select('numb', 'amp')
+                    ->get();
+                $cdPumpCnt = $cdPumpsData->count();
+                $maxCompCntA = max($maxCompCntA, $cdPumpCnt);
+                foreach ($cdPumpsData as $cd) {
+                    $cd_pumps[] = [$cd->numb ?? '', $cd->amp ?? ''];
+                }
+
+                // Get CH water pump data
+                $ch_pumps = [];
+                $chPumpsData = DB::table('equipment_details_log_ch_waterpump')
+                    ->where('equipment_details_log_id', $row->id)
+                    ->select('numb', 'amp')
+                    ->get();
+                $chPumpCnt = $chPumpsData->count();
+                $maxCompCntB = max($maxCompCntB, $chPumpCnt);
+                foreach ($chPumpsData as $ch) {
+                    $ch_pumps[] = [$ch->numb ?? '', $ch->amp ?? ''];
+                }
+
+                // Get cooling tower data
+                $ctowers = [];
+                $ctData = DB::table('equipment_details_log_coolingtower')
+                    ->where('equipment_details_log_id', $row->id)
+                    ->select('numb', 'amp')
+                    ->get();
+                $ctCnt = $ctData->count();
+                $maxCompCntC = max($maxCompCntC, $ctCnt);
+                foreach ($ctData as $ct) {
+                    $ctowers[] = [$ct->numb ?? '', $ct->amp ?? ''];
+                }
+
+                $dataRows[] = [
+                    'date' => date('d-m-Y', strtotime($row->created_date)),
+                    'time' => date('h:i A', strtotime($row->created_date)),
+                    'department_location' => $row->stc_status_down_list_department_location ?? '',
+                    'department_dept' => $row->stc_status_down_list_department_dept ?? '',
+                    'area' => $row->area ?? '',
+                    'sub_location' => $row->sub_location ?? '',
+                    'model_no' => $row->model_no ?? '',
+                    'equipment_name' => $row->equipment_name ?? '',
+                    'slno' => $row->slno ?? '',
+                    'unit' => $row->unit_no ?? '',
+                    'equipment_no' => $row->equipment_no ?? '',
+                    'equipment_type' => $row->equipment_type ?? '',
+                    'voltage' => $row->voltage ?? '',
+                    'comps' => $compCols,
+                    'chw' => [
+                        $row->chw_inlet_temp ?? '',
+                        $row->chw_outlet_temp ?? '',
+                        $row->chw_inlet_pr ?? '',
+                        $row->chw_outlet_pr ?? ''
+                    ],
+                    'cow' => [
+                        $row->cow_inlet_temp ?? '',
+                        $row->cow_outlet_temp ?? '',
+                        $row->cow_inlet_pr ?? '',
+                        $row->cow_outlet_pr ?? ''
+                    ],
+                    'cd_pumps' => $cd_pumps,
+                    'ch_pumps' => $ch_pumps,
+                    'ctowers' => $ctowers,
+                    'creator' => $row->creator ?? ''
+                ];
+            }
+
+            // Build header with sorting
+            $getSortIcon = function($col) use ($sortColumn, $sortDirection) {
+                if ($sortColumn == $col) {
+                    return $sortDirection == 'asc' ? ' <i class="fas fa-sort-up"></i>' : ' <i class="fas fa-sort-down"></i>';
+                }
+                return ' <i class="fas fa-sort text-muted"></i>';
+            };
+            
+            $getSortClass = function($col) use ($sortColumn) {
+                return $sortColumn == $col ? 'sortable-header active' : 'sortable-header';
+            };
+            
+            $thead = '<thead><tr>
+                    <th class="text-center sortable-header ' . ($sortColumn == 'created_date' ? 'active' : '') . '" rowspan="2" data-sort="created_date" style="cursor: pointer;">DATE' . $getSortIcon('created_date') . '</th>
+                    <th class="text-center" rowspan="2">TIME</th>
+                    <th class="text-center" rowspan="2">DEPT LOCATION</th>
+                    <th class="text-center" rowspan="2">DEPT NAME</th>
+                    <th class="text-center sortable-header ' . ($sortColumn == 'area' ? 'active' : '') . '" rowspan="2" data-sort="area" style="cursor: pointer;">AREA' . $getSortIcon('area') . '</th>
+                    <th class="text-center" rowspan="2">SUB LOCATION</th>
+                    <th class="text-center sortable-header ' . ($sortColumn == 'model_no' ? 'active' : '') . '" rowspan="2" data-sort="model_no" style="cursor: pointer;">MODEL NO' . $getSortIcon('model_no') . '</th>
+                    <th class="text-center sortable-header ' . ($sortColumn == 'equipment_name' ? 'active' : '') . '" rowspan="2" data-sort="equipment_name" style="cursor: pointer;">EQUIPMENT NAME' . $getSortIcon('equipment_name') . '</th>
+                    <th class="text-center" rowspan="2">SL NO</th>
+                    <th class="text-center sortable-header ' . ($sortColumn == 'unit_no' ? 'active' : '') . '" rowspan="2" data-sort="unit_no" style="cursor: pointer;">UNIT NO' . $getSortIcon('unit_no') . '</th>
+                    <th class="text-center" rowspan="2">EQUIPMENT NO</th>
+                    <th class="text-center" rowspan="2">EQUIPMENT TYPE</th>
+                    <th class="text-center sortable-header ' . ($sortColumn == 'voltage' ? 'active' : '') . '" rowspan="2" data-sort="voltage" style="cursor: pointer;">VOLTAGE' . $getSortIcon('voltage') . '</th>';
+
+            for ($i = 1; $i <= $maxCompCnt; $i++) {
+                $thead .= '<th class="text-center" colspan="7">COMP #'.$i.'</th>';
+            }
+            $thead .= '<th class="text-center" colspan="4">CHILLER WATER</th>
+                    <th class="text-center" colspan="4">CONDENSER WATER</th>';
+            for ($i = 1; $i <= $maxCompCntA; $i++) {
+                $thead .= '<th class="text-center" colspan="2">CHILLER WATER PUMP #'.$i.'</th>';
+            }
+
+            for ($i = 1; $i <= $maxCompCntB; $i++) {
+                $thead .= '<th class="text-center" colspan="2">CONDENSER WATER PUMP #'.$i.'</th>';
+            }
+
+            for ($i = 1; $i <= $maxCompCntC; $i++) {
+                $thead .= '<th class="text-center" colspan="2">COOLING TOWER #'.$i.'</th>';
+            }
+
+            $thead .= '<th class="text-center" rowspan="2">Operator Name</th></tr><tr>';
+
+            for ($i = 1; $i <= $maxCompCnt; $i++) {
+                $thead .= '<th class="text-center">SUCTION PR. PSIG</th>
+                        <th class="text-center">DISC.PR. PSIG</th>
+                        <th class="text-center">DISC TEM./°C</th>
+                        <th class="text-center">DSH</th>
+                        <th class="text-center">OIL LEVEL %</th>
+                        <th class="text-center">COMP. LOAD %</th>
+                        <th class="text-center">COMP. AMP</th>';
+            }
+            
+            $chw_thead = '';
+            for ($i = 0; $i < $maxCompCntA; $i++) {
+                $chw_thead .= '<th class="text-center">NUMB</th><th class="text-center">AMP</th>';
+            }
+            
+            $cdw_thead = '';
+            for ($i = 0; $i < $maxCompCntB; $i++) {
+                $cdw_thead .= '<th class="text-center">NUMB</th><th class="text-center">AMP</th>';
+            }
+            
+            $ct_thead = '';
+            for ($i = 0; $i < $maxCompCntC; $i++) {
+                $ct_thead .= '<th class="text-center">NUMB</th><th class="text-center">AMP</th>';
+            }
+            $thead .= '<th class="text-center">INLET TEMP</th>
+                    <th class="text-center">OUTLET TEMP</th>
+                    <th class="text-center">INLET PR</th>
+                    <th class="text-center">OUTLET PR</th>
+                    <th class="text-center">INLET TEMP</th>
+                    <th class="text-center">OUTLET TEMP</th>
+                    <th class="text-center">INLET PR</th>
+                    <th class="text-center">OUTLET PR</th>
+                    '.$chw_thead.$cdw_thead.$ct_thead.'
+                    </tr></thead>';
+
+            // Build rows
+            foreach ($dataRows as $dr) {
+                $rowsHtml .= "<tr>
+                    <td class='text-center'>{$dr['date']}</td>
+                    <td class='text-center'>{$dr['time']}</td>
+                    <td class='text-center'>{$dr['department_location']}</td>
+                    <td class='text-center'>{$dr['department_dept']}</td>
+                    <td class='text-center'>{$dr['area']}</td>
+                    <td class='text-center'>{$dr['sub_location']}</td>
+                    <td class='text-center'>{$dr['model_no']}</td>
+                    <td class='text-left'>{$dr['equipment_name']}</td>
+                    <td class='text-center'>{$dr['slno']}</td>
+                    <td class='text-center'>{$dr['unit']}</td>
+                    <td class='text-center'>{$dr['equipment_no']}</td>
+                    <td class='text-center'>{$dr['equipment_type']}</td>
+                    <td class='text-right'>{$dr['voltage']}</td>";
+
+                for ($i = 0; $i < $maxCompCnt; $i++) {
+                    if (isset($dr['comps'][$i])) {
+                        $j = 0;
+                        foreach ($dr['comps'][$i] as $val) {
+                            $percent_sign = '';
+                            if ($j == 4 || $j == 5) {
+                                $percent_sign = '%';
+                            }
+                            $rowsHtml .= "<td class='text-right'>{$val}{$percent_sign}</td>";
+                            $j++;
+                        }
+                    } else {
+                        $rowsHtml .= '<td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td><td class="text-right">0</td>';
+                    }
+                }
+
+                foreach ($dr['chw'] as $val) {
+                    $rowsHtml .= "<td class='text-right'>{$val}</td>";
+                }
+                foreach ($dr['cow'] as $val) {
+                    $rowsHtml .= "<td class='text-right'>{$val}</td>";
+                }
+                
+
+                for ($i = 0; $i < $maxCompCntA; $i++) {
+                    if (isset($dr['cd_pumps'][$i])) {
+                        $j = 0;
+                        foreach ($dr['cd_pumps'][$i] as $val) {
+                            $rowsHtml .= "<td class='text-right'>{$val}</td>";
+                            $j++;
+                        }
+                    } else {
+                        $rowsHtml .= "<td class='text-right'></td><td class='text-right'>0</td>";
+                    }
+                }
+
+                for ($i = 0; $i < $maxCompCntB; $i++) {
+                    if (isset($dr['ch_pumps'][$i])) {
+                        $j = 0;
+                        foreach ($dr['ch_pumps'][$i] as $val) {
+                            $rowsHtml .= "<td class='text-right'>{$val}</td>";
+                            $j++;
+                        }
+                    } else {
+                        $rowsHtml .= "<td class='text-right'></td><td class='text-right'>0</td>";
+                    }
+                }
+
+                for ($i = 0; $i < $maxCompCntC; $i++) {
+                    if (isset($dr['ctowers'][$i])) {
+                        $j = 0;
+                        foreach ($dr['ctowers'][$i] as $val) {
+                            $rowsHtml .= "<td class='text-right'>{$val}</td>";
+                            $j++;
+                        }
+                    } else {
+                        $rowsHtml .= "<td class='text-right'></td><td class='text-right'>0</td>";
+                    }
+                }
+                $rowsHtml .= "<td class='text-right'>{$dr['creator']}</td>";
+
+                $rowsHtml .= "</tr>";
+            }
+
+            // Build pagination HTML
+            $paginationHtml = $this->buildPagination($page, $totalPages, $totalRecords, $perPage);
+            
+            $html = '<div class="table-responsive"><table id="equipment-logs-table" class="table table-bordered table-striped">'.$thead.'<tbody>'.$rowsHtml.'</tbody></table></div>';
+            $html .= $paginationHtml;
+
+            return response()->json([
+                'success' => true,
+                'html' => $html,
+                'pagination' => [
+                    'current_page' => $page,
+                    'total_pages' => $totalPages,
+                    'total_records' => $totalRecords,
+                    'per_page' => $perPage
+                ],
+                'sorting' => [
+                    'column' => $sortColumn,
+                    'direction' => $sortDirection
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching logs: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // Build pagination HTML
+    private function buildPagination($currentPage, $totalPages, $totalRecords, $perPage)
+    {
+        if ($totalPages <= 1) {
+            return '<div class="row mt-3">
+                        <div class="col-md-6">
+                            <p class="text-muted">Showing ' . $totalRecords . ' entries</p>
+                        </div>
+                    </div>';
+        }
+
+        $html = '<div class="row mt-3">
+                    <div class="col-md-6">
+                        <p class="text-muted">Showing ' . (($currentPage - 1) * $perPage + 1) . ' to ' . min($currentPage * $perPage, $totalRecords) . ' of ' . $totalRecords . ' entries</p>
+                    </div>
+                    <div class="col-md-6">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-end">';
+
+        // Previous button
+        if ($currentPage > 1) {
+            $html .= '<li class="page-item"><a class="page-link pagination-link" href="#" data-page="' . ($currentPage - 1) . '">Previous</a></li>';
+        } else {
+            $html .= '<li class="page-item disabled"><span class="page-link">Previous</span></li>';
+        }
+
+        // Page numbers
+        $startPage = max(1, $currentPage - 2);
+        $endPage = min($totalPages, $currentPage + 2);
+
+        if ($startPage > 1) {
+            $html .= '<li class="page-item"><a class="page-link pagination-link" href="#" data-page="1">1</a></li>';
+            if ($startPage > 2) {
+                $html .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+        }
+
+        for ($i = $startPage; $i <= $endPage; $i++) {
+            if ($i == $currentPage) {
+                $html .= '<li class="page-item active"><span class="page-link">' . $i . '</span></li>';
+            } else {
+                $html .= '<li class="page-item"><a class="page-link pagination-link" href="#" data-page="' . $i . '">' . $i . '</a></li>';
+            }
+        }
+
+        if ($endPage < $totalPages) {
+            if ($endPage < $totalPages - 1) {
+                $html .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+            }
+            $html .= '<li class="page-item"><a class="page-link pagination-link" href="#" data-page="' . $totalPages . '">' . $totalPages . '</a></li>';
+        }
+
+        // Next button
+        if ($currentPage < $totalPages) {
+            $html .= '<li class="page-item"><a class="page-link pagination-link" href="#" data-page="' . ($currentPage + 1) . '">Next</a></li>';
+        } else {
+            $html .= '<li class="page-item disabled"><span class="page-link">Next</span></li>';
+        }
+
+        $html .= '</ul></nav></div></div>';
+
+        return $html;
     } 
 }

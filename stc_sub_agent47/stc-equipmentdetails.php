@@ -207,9 +207,12 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                     edit_buttons = '';
                                     log_buttons = '';
                                     delete_buttons = '';
-                                    if(parseInt(response[i].status) === 1 && response[i].equipment_name == "CHILLER UNIT" && response[i].equipment_type == "SCREW CHILLER"){
+                                    if(parseInt(response[i].status) === 1 && response[i].equipment_name == "CHILLER UNIT"){
                                         log_buttons='<a href="#" class="btn btn-primary ed-logequipment" title="Logs" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
                                     }
+                                }
+                                if(response[i].equipment_type == "RECIPROCATIG CHILLER"){
+                                    log_buttons='<a href="#" class="btn btn-primary ed-logequipment" title="Logs" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
                                 }
                                 var isRunning = String(response[i].status) === '1';
                                 // Toggle button: Pause when running, Run when standby
