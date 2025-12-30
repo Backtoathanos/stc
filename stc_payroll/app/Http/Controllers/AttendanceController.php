@@ -17,9 +17,11 @@ use Illuminate\Validation\ValidationException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Http\Controllers\Traits\HasCompanyFilter;
 
 class AttendanceController extends Controller
 {
+    use HasCompanyFilter;
     /**
      * Check if required PHP extensions are available
      * 
