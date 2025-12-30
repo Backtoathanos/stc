@@ -8,7 +8,7 @@ class Employee extends Model
 {
     public $incrementing = false;
     protected $fillable = [
-        'site_id', 'department_id', 'designation_id', 'gang_id',
+        'company_id', 'site_id', 'department_id', 'designation_id', 'gang_id',
         'Dob', 'Doj', 'Doe', 'SafetyCardExpiry', 'Imageurl', 'EmpId', 'Name',
         'Father', 'Gender', 'MaritalStatus', 'PfApplicable', 'Uan',
         'EsicApplicable', 'Esic', 'PRFTax', 'Mobile', 'Email', 'EmpSafetyCard',
@@ -59,5 +59,10 @@ class Employee extends Model
     public function rate()
     {
         return $this->hasOne(Rate::class, 'employee_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 }

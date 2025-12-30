@@ -12,9 +12,11 @@ use App\Attendance;
 use App\PayrollParameter;
 use Illuminate\Support\Facades\DB;
 use Dompdf\Dompdf;
+use App\Http\Controllers\Traits\HasCompanyFilter;
 
 class PayrollController extends Controller
 {
+    use HasCompanyFilter;
     public function index()
     {
         $user = auth()->user();
@@ -30,9 +32,16 @@ class PayrollController extends Controller
             return redirect(route('home'))->with('error', 'You do not have permission to access this page');
         }
         
+        // Filter sites by selected company
+        $companyId = $this->getSelectedCompanyId();
+        $sitesQuery = Site::query();
+        if ($companyId) {
+            $sitesQuery->where('company_id', $companyId);
+        }
+        
         return view('pages.transaction.payroll', [
             'page_title' => 'Payroll',
-            'sites' => Site::orderBy('name')->get()
+            'sites' => $sitesQuery->orderBy('name')->get()
         ]);
     }
 
@@ -50,13 +59,23 @@ class PayrollController extends Controller
             ]);
         }
         
-        // Get payroll parameters for ESIC recalculation
-        $params = PayrollParameter::latest()->first();
+        // Get payroll parameters for selected company
+        $companyId = $this->getSelectedCompanyId();
+        $params = null;
+        if ($companyId) {
+            $params = PayrollParameter::where('company_id', $companyId)->first();
+        }
         
         $query = Payroll::leftJoin('employees', 'payrolls.aadhar', '=', 'employees.Aadhar')
             ->leftJoin('sites', 'payrolls.site_id', '=', 'sites.id')
             ->leftJoin('rates', 'employees.id', '=', 'rates.employee_id')
             ->where('payrolls.month_year', $monthYear);
+        
+        // Filter by selected company
+        $companyId = $this->getSelectedCompanyId();
+        if ($companyId) {
+            $query->where('employees.company_id', $companyId);
+        }
         
         // Filter by site if provided
         if ($siteId && $siteId !== 'all') {
@@ -73,13 +92,19 @@ class PayrollController extends Controller
             });
         }
         
-        // Get total count before pagination
-        $totalRecords = Payroll::where('month_year', $monthYear)->count();
-        if ($siteId && $siteId !== 'all') {
-            $totalRecords = Payroll::where('month_year', $monthYear)
-                ->where('site_id', $siteId)
-                ->count();
+        // Get total count before pagination (with company filter)
+        $totalRecordsQuery = Payroll::leftJoin('employees', 'payrolls.aadhar', '=', 'employees.Aadhar')
+            ->where('payrolls.month_year', $monthYear);
+        
+        if ($companyId) {
+            $totalRecordsQuery->where('employees.company_id', $companyId);
         }
+        
+        if ($siteId && $siteId !== 'all') {
+            $totalRecordsQuery->where('payrolls.site_id', $siteId);
+        }
+        
+        $totalRecords = $totalRecordsQuery->count();
         
         // Ordering
         $orderColumn = $request->order[0]['column'] ?? 0;
@@ -901,8 +926,12 @@ class PayrollController extends Controller
             ], 400);
         }
         
-        // Get payroll parameters for PF calculations
-        $params = PayrollParameter::latest()->first();
+        // Get payroll parameters for selected company
+        $companyId = $this->getSelectedCompanyId();
+        $params = null;
+        if ($companyId) {
+            $params = PayrollParameter::where('company_id', $companyId)->first();
+        }
         
         // Build query similar to list method
         $query = Payroll::leftJoin('employees', 'payrolls.aadhar', '=', 'employees.Aadhar')
@@ -1044,8 +1073,12 @@ class PayrollController extends Controller
             ], 400);
         }
         
-        // Get payroll parameters for ESIC calculations
-        $params = PayrollParameter::latest()->first();
+        // Get payroll parameters for selected company
+        $companyId = $this->getSelectedCompanyId();
+        $params = null;
+        if ($companyId) {
+            $params = PayrollParameter::where('company_id', $companyId)->first();
+        }
         
         // Build query similar to list method but filter for ESIC applicable employees
         $query = Payroll::leftJoin('employees', 'payrolls.aadhar', '=', 'employees.Aadhar')

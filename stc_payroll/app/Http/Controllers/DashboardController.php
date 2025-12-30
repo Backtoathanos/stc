@@ -9,22 +9,37 @@ use App\Department;
 use App\Attendance;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Http\Controllers\Traits\HasCompanyFilter;
 
 class DashboardController extends Controller
 {
+    use HasCompanyFilter;
     public function index(Request $request)
     {
-        $total_employees = Employee::count();
-        $active_employees = Employee::where('Status', 'ACTIVE')->count();
-        $total_sites = Site::count();
-        $total_departments = Department::count();
+        // Filter by selected company
+        $companyId = $this->getSelectedCompanyId();
+        
+        $employeesQuery = Employee::query();
+        $sitesQuery = Site::query();
+        $departmentsQuery = Department::query();
+        
+        if ($companyId) {
+            $employeesQuery->where('company_id', $companyId);
+            $sitesQuery->where('company_id', $companyId);
+            $departmentsQuery->where('company_id', $companyId);
+        }
+        
+        $total_employees = $employeesQuery->count();
+        $active_employees = $employeesQuery->where('Status', 'ACTIVE')->count();
+        $total_sites = $sitesQuery->count();
+        $total_departments = $departmentsQuery->count();
         
         // Get selected month and site from request
         $selectedMonth = $request->input('month', date('Y-m'));
         $selectedSite = $request->input('site_id', 'all');
         
-        // Get all sites for dropdown
-        $sites = Site::orderBy('name')->get();
+        // Get all sites for dropdown (filtered by company)
+        $sites = $sitesQuery->orderBy('name')->get();
         
         // Get attendance data grouped by month for the last 12 months from selected month
         $attendanceData = $this->getMonthlyAttendanceData($selectedMonth, $selectedSite);
@@ -78,16 +93,30 @@ class DashboardController extends Controller
             
             $months[] = $monthName;
             
+            // Filter by selected company
+            $companyId = $this->getSelectedCompanyId();
+            
             // Get attendance records for this month, optionally filtered by site
             if ($selectedSite && $selectedSite !== 'all') {
                 // Filter by site - join with employees table
-                $aadhars = Employee::where('site_id', $selectedSite)->pluck('Aadhar')->toArray();
+                $employeeQuery = Employee::where('site_id', $selectedSite);
+                if ($companyId) {
+                    $employeeQuery->where('company_id', $companyId);
+                }
+                $aadhars = $employeeQuery->pluck('Aadhar')->toArray();
                 $attendances = Attendance::where('month_year', $monthYear)
                     ->whereIn('aadhar', $aadhars)
                     ->get();
             } else {
-                // Get all attendance records
-                $attendances = Attendance::where('month_year', $monthYear)->get();
+                // Get all attendance records for selected company
+                if ($companyId) {
+                    $aadhars = Employee::where('company_id', $companyId)->pluck('Aadhar')->toArray();
+                    $attendances = Attendance::where('month_year', $monthYear)
+                        ->whereIn('aadhar', $aadhars)
+                        ->get();
+                } else {
+                    $attendances = Attendance::where('month_year', $monthYear)->get();
+                }
             }
             
             $totalPresent = 0;

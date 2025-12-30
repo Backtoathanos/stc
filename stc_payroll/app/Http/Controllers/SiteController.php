@@ -7,10 +7,11 @@ use App\Site;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Traits\HasPermissions;
 use App\Http\Controllers\Traits\CheckPermissions;
+use App\Http\Controllers\Traits\HasCompanyFilter;
 
 class SiteController extends Controller
 {
-    use HasPermissions, CheckPermissions;
+    use HasPermissions, CheckPermissions, HasCompanyFilter;
     
     public function index()
     {
@@ -39,6 +40,9 @@ class SiteController extends Controller
         if ($permissionCheck) return $permissionCheck;
         
         $query = Site::query();
+        
+        // Filter by selected company
+        $this->applyCompanyFilter($query);
 
         // Search functionality
         if ($request->has('search') && $request->search['value']) {
@@ -85,9 +89,14 @@ class SiteController extends Controller
             ];
         }
 
+        // Get total records count with company filter
+        $totalCountQuery = Site::query();
+        $this->applyCompanyFilter($totalCountQuery);
+        $totalCount = $totalCountQuery->count();
+        
         return response()->json([
             'draw' => intval($request->draw),
-            'recordsTotal' => Site::count(),
+            'recordsTotal' => $totalCount,
             'recordsFiltered' => $totalRecords,
             'data' => $data
         ]);
@@ -105,9 +114,13 @@ class SiteController extends Controller
         try {
             DB::beginTransaction();
             
+            // Set company_id from session
+            $companyId = $this->getSelectedCompanyId();
+            
             // Get the ID directly from database insert
             $id = DB::table('sites')->insertGetId([
                 'name' => $request->name,
+                'company_id' => $companyId,
                 'under_contract' => $request->under_contract ?? null,
                 'natureofwork' => $request->natureofwork ?? null,
                 'workorderno' => $request->workorderno ?? null,

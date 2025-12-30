@@ -4,18 +4,35 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\PayrollParameter;
+use App\Company;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Traits\HasCompanyFilter;
 
 class PayrollParameterController extends Controller
 {
+    use HasCompanyFilter;
     public function index()
     {
-        // Get the latest payroll parameter or create a new one with defaults
-        $parameter = PayrollParameter::latest()->first();
+        // Get selected company ID
+        $companyId = $this->getSelectedCompanyId();
+        
+        if (!$companyId) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please select a company first'
+                ], 400);
+            }
+            return redirect(route('home'))->with('error', 'Please select a company first');
+        }
+        
+        // Get payroll parameter for the selected company
+        $parameter = PayrollParameter::where('company_id', $companyId)->first();
         
         if (!$parameter) {
-            // Create default parameter
+            // Create default parameter for this company
             $parameter = PayrollParameter::create([
+                'company_id' => $companyId,
                 'pf_percentage' => 12.00,
                 'ppf_percentage' => 3.67,
                 'ac_no_2_pf_percentage' => 0.85,
@@ -34,9 +51,13 @@ class PayrollParameterController extends Controller
             ]);
         }
         
+        // Get company name for display
+        $company = Company::find($companyId);
+        
         return view('pages.settings.payroll-parameter', [
             'page_title' => 'Payroll Parameter',
-            'parameter' => $parameter
+            'parameter' => $parameter,
+            'company' => $company
         ]);
     }
 
@@ -67,8 +88,21 @@ class PayrollParameterController extends Controller
         try {
             DB::beginTransaction();
             
-            // Get existing parameter or create new
-            $parameter = PayrollParameter::latest()->first();
+            // Get selected company ID
+            $companyId = $this->getSelectedCompanyId();
+            
+            if (!$companyId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please select a company first'
+                ], 400);
+            }
+            
+            // Add company_id to validated data
+            $validated['company_id'] = $companyId;
+            
+            // Get existing parameter for this company or create new
+            $parameter = PayrollParameter::where('company_id', $companyId)->first();
             
             if ($parameter) {
                 $parameter->update($validated);

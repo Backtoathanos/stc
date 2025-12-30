@@ -17,6 +17,23 @@
 
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
+      <!-- Company Switcher -->
+      <li class="nav-item dropdown" id="companySwitcherContainer">
+        <a class="nav-link" data-toggle="dropdown" href="#" id="companySwitcherBtn" title="Change Company">
+          <i class="fas fa-building mr-1"></i>
+          <span id="selectedCompanyName">{{ session('selected_company_name', 'Select Company') }}</span>
+          <i class="fas fa-chevron-down ml-1"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right" id="companySwitcherDropdown">
+          <h6 class="dropdown-header">Select Company</h6>
+          <div id="companyListContainer">
+            <div class="dropdown-item-text text-center">
+              <i class="fas fa-spinner fa-spin"></i> Loading companies...
+            </div>
+          </div>
+        </div>
+      </li>
+      
       <!-- User Dropdown Menu -->
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">

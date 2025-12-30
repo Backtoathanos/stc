@@ -61,9 +61,16 @@ class AttendanceController extends Controller
             return redirect(route('home'))->with('error', 'You do not have permission to access this page');
         }
         
+        // Filter sites by selected company
+        $companyId = $this->getSelectedCompanyId();
+        $sitesQuery = Site::query();
+        if ($companyId) {
+            $sitesQuery->where('company_id', $companyId);
+        }
+        
         return view('pages.transaction.attendance', [
             'page_title' => 'Attendance Management',
-            'sites' => Site::all()
+            'sites' => $sitesQuery->get()
         ]);
     }
 
@@ -109,7 +116,15 @@ class AttendanceController extends Controller
 
         // Filter by month_year
         $query->where('attendances.month_year', $monthYear);
+        
+        // Get company ID for filtering
+        $companyId = $this->getSelectedCompanyId();
 
+        // Filter by selected company
+        if ($companyId) {
+            $query->where('employees.company_id', $companyId);
+        }
+        
         // Filter by site_id (handle 'all')
         if ($siteId && $siteId !== 'all') {
             $query->where('employees.site_id', $siteId);
@@ -144,6 +159,12 @@ class AttendanceController extends Controller
         // Calculate statistics for filtered data
         $statsQuery = Attendance::leftJoin('employees', 'attendances.aadhar', '=', 'employees.Aadhar');
         $statsQuery->where('attendances.month_year', $monthYear);
+        
+        // Filter by selected company
+        if ($companyId) {
+            $statsQuery->where('employees.company_id', $companyId);
+        }
+        
         if ($siteId && $siteId !== 'all') {
             $statsQuery->where('employees.site_id', $siteId);
         }
@@ -280,10 +301,25 @@ class AttendanceController extends Controller
             
             $data[] = $rowData;
         }
+        
+        // Get total records count with company filter (via employees)
+        $totalCountQuery = Attendance::join('employees', 'attendances.aadhar', '=', 'employees.Aadhar')
+            ->where('attendances.month_year', $monthYear);
+        
+        if ($siteId && $siteId !== 'all') {
+            $totalCountQuery->where('employees.site_id', $siteId);
+        }
+        
+        // Filter by selected company
+        if ($companyId) {
+            $totalCountQuery->where('employees.company_id', $companyId);
+        }
+        
+        $totalCount = $totalCountQuery->count();
 
         return response()->json([
             'draw' => intval($request->draw),
-            'recordsTotal' => Attendance::count(),
+            'recordsTotal' => $totalCount,
             'recordsFiltered' => $totalRecords,
             'data' => $data,
             'statistics' => [
@@ -995,21 +1031,36 @@ class AttendanceController extends Controller
         try {
             DB::beginTransaction();
             
-            // Get payroll parameters
-            $params = PayrollParameter::latest()->first();
+            // Get payroll parameters for selected company
+            $companyId = $this->getSelectedCompanyId();
+            if (!$companyId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please select a company first'
+                ], 400);
+            }
+            
+            $params = PayrollParameter::where('company_id', $companyId)->first();
             if (!$params) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Payroll parameters not configured. Please configure payroll parameters first.'
+                    'message' => 'Payroll parameters not configured for this company. Please configure payroll parameters first.'
                 ], 400);
             }
             
             // Get all attendance records for the month (all sites)
             // Use inner join for employees to ensure we only process records with valid employees
-            $attendances = Attendance::join('employees', 'attendances.aadhar', '=', 'employees.Aadhar')
+            $attendancesQuery = Attendance::join('employees', 'attendances.aadhar', '=', 'employees.Aadhar')
                 ->leftJoin('sites', 'employees.site_id', '=', 'sites.id')
-                ->where('attendances.month_year', $monthYear)
-                ->select('attendances.*', 'employees.id as employee_id', 'employees.Skill', 'employees.site_id', 'employees.PfApplicable', 'employees.EsicApplicable', 'sites.name as site_name')
+                ->where('attendances.month_year', $monthYear);
+            
+            // Filter by selected company
+            $companyId = $this->getSelectedCompanyId();
+            if ($companyId) {
+                $attendancesQuery->where('employees.company_id', $companyId);
+            }
+            
+            $attendances = $attendancesQuery->select('attendances.*', 'employees.id as employee_id', 'employees.Skill', 'employees.site_id', 'employees.PfApplicable', 'employees.EsicApplicable', 'sites.name as site_name')
                 ->get();
             
             if ($attendances->isEmpty()) {

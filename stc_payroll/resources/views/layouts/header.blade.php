@@ -70,6 +70,31 @@
 </div>
 <!-- ./wrapper -->
 
+<!-- Company Selection Modal -->
+<div class="modal fade" id="companySelectionModal" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="companySelectionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-primary">
+        <h5 class="modal-title" id="companySelectionModalLabel">
+          <i class="fas fa-building mr-2"></i> Select Company
+        </h5>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted mb-3">Please select a company to continue. You must select a company before accessing the system.</p>
+        <div id="companySelectionList" class="list-group">
+          <div class="text-center py-3">
+            <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+            <p class="mt-2 text-muted">Loading companies...</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <small class="text-muted mr-auto">You cannot proceed without selecting a company.</small>
+      </div>
+    </div>
+  </div>
+</div>
+
 @include('layouts.foot')
 </body>
 </html>

@@ -17,10 +17,11 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use Dompdf\Dompdf;
 use App\Http\Controllers\Traits\HasPermissions;
 use App\Http\Controllers\Traits\CheckPermissions;
+use App\Http\Controllers\Traits\HasCompanyFilter;
 
 class EmployeeController extends Controller
 {
-    use HasPermissions, CheckPermissions;
+    use HasPermissions, CheckPermissions, HasCompanyFilter;
     
     public function index()
     {
@@ -37,12 +38,26 @@ class EmployeeController extends Controller
             return redirect(route('home'))->with('error', 'You do not have permission to access this page');
         }
         
+        // Filter by selected company
+        $companyId = $this->getSelectedCompanyId();
+        $sitesQuery = Site::query();
+        $departmentsQuery = Department::query();
+        $designationsQuery = Designation::query();
+        $gangsQuery = Gang::query();
+        
+        if ($companyId) {
+            $sitesQuery->where('company_id', $companyId);
+            $departmentsQuery->where('company_id', $companyId);
+            $designationsQuery->where('company_id', $companyId);
+            $gangsQuery->where('company_id', $companyId);
+        }
+        
         return view('pages.master.employees', [
             'page_title' => 'Employees',
-            'sites' => Site::all(),
-            'departments' => Department::all(),
-            'designations' => Designation::all(),
-            'gangs' => Gang::all(),
+            'sites' => $sitesQuery->get(),
+            'departments' => $departmentsQuery->get(),
+            'designations' => $designationsQuery->get(),
+            'gangs' => $gangsQuery->get(),
             'permissions' => $this->getPermissions('master', 'employees')
         ]);
     }
@@ -50,6 +65,9 @@ class EmployeeController extends Controller
     public function list(Request $request)
     {
         $query = Employee::with(['site', 'department', 'designation', 'gang']);
+        
+        // Filter by selected company
+        $this->applyCompanyFilter($query);
 
         // Search functionality
         if ($request->has('search') && $request->search['value']) {
@@ -153,9 +171,14 @@ class EmployeeController extends Controller
             ];
         }
 
+        // Get total records count with company filter
+        $totalCountQuery = Employee::query();
+        $this->applyCompanyFilter($totalCountQuery);
+        $totalCount = $totalCountQuery->count();
+        
         return response()->json([
             'draw' => intval($request->draw),
-            'recordsTotal' => Employee::count(),
+            'recordsTotal' => $totalCount,
             'recordsFiltered' => $totalRecords,
             'data' => $data
         ]);
@@ -198,6 +221,12 @@ class EmployeeController extends Controller
             $booleanFields = ['PRFTax', 'AttendAllow', 'OtAppl', 'MrOtAppl', 'AllowAsPer', 'ReversePF', 'is_employee', 'is_supervisor', 'is_officeStaff'];
             foreach ($booleanFields as $field) {
                 $data[$field] = $request->has($field) && ($request->input($field) == '1' || $request->input($field) === true);
+            }
+            
+            // Set company_id from session
+            $companyId = $this->getSelectedCompanyId();
+            if ($companyId) {
+                $data['company_id'] = $companyId;
             }
             
             $employee = Employee::create($data);
@@ -391,7 +420,11 @@ class EmployeeController extends Controller
     public function createSite(Request $request)
     {
         $request->validate(['name' => 'required|string|max:255']);
-        $site = Site::create(['name' => $request->name]);
+        $companyId = $this->getSelectedCompanyId();
+        $site = Site::create([
+            'name' => $request->name,
+            'company_id' => $companyId
+        ]);
         $site->refresh(); // Refresh to ensure ID is available
         return response()->json([
             'success' => true, 
@@ -405,7 +438,11 @@ class EmployeeController extends Controller
     public function createDepartment(Request $request)
     {
         $request->validate(['name' => 'required|string|max:255']);
-        $department = Department::create(['name' => $request->name]);
+        $companyId = $this->getSelectedCompanyId();
+        $department = Department::create([
+            'name' => $request->name,
+            'company_id' => $companyId
+        ]);
         $department->refresh(); // Refresh to ensure ID is available
         return response()->json([
             'success' => true, 
@@ -454,7 +491,11 @@ class EmployeeController extends Controller
     public function createDesignation(Request $request)
     {
         $request->validate(['name' => 'required|string|max:255']);
-        $designation = Designation::create(['name' => $request->name]);
+        $companyId = $this->getSelectedCompanyId();
+        $designation = Designation::create([
+            'name' => $request->name,
+            'company_id' => $companyId
+        ]);
         $designation->refresh(); // Refresh to ensure ID is available
         return response()->json([
             'success' => true, 
@@ -468,7 +509,11 @@ class EmployeeController extends Controller
     public function createGang(Request $request)
     {
         $request->validate(['name' => 'required|string|max:255']);
-        $gang = Gang::create(['name' => $request->name]);
+        $companyId = $this->getSelectedCompanyId();
+        $gang = Gang::create([
+            'name' => $request->name,
+            'company_id' => $companyId
+        ]);
         $gang->refresh(); // Refresh to ensure ID is available
         return response()->json([
             'success' => true, 

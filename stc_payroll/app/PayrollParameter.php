@@ -6,7 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 
 class PayrollParameter extends Model
 {
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
     protected $fillable = [
+        'company_id',
         'pf_percentage',
         'ppf_percentage',
         'ac_no_2_pf_percentage',

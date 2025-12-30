@@ -7,6 +7,8 @@ use App\Http\Controllers\SiteController;
 use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\DesignationController;
 use App\Http\Controllers\GangController;
+use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\CompanySelectionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CalendarController;
@@ -37,8 +39,25 @@ Route::middleware(['auth.user'])->group(function () {
     Route::get('/home', [DashboardController::class, 'index'])->name('home');
     Route::get('/dashboard/attendance-data', [DashboardController::class, 'getAttendanceData'])->name('dashboard.attendance-data');
 
+    // Company Selection Routes
+    Route::prefix('company')->group(function () {
+        Route::post('/set-company', [CompanySelectionController::class, 'setCompany'])->name('company.set');
+        Route::get('/get-selected-company', [CompanySelectionController::class, 'getSelectedCompany'])->name('company.get-selected');
+        Route::post('/clear-company', [CompanySelectionController::class, 'clearCompany'])->name('company.clear');
+        Route::get('/get-user-companies', [CompanyController::class, 'getUserCompanies'])->name('company.get-user-companies');
+    });
+
     // Master Routes
     Route::prefix('master')->group(function () {
+        // Companies routes
+        Route::get('/companies', [CompanyController::class, 'index'])->name('master.companies');
+        Route::match(['get', 'post'], '/companies/list', [CompanyController::class, 'list'])->name('master.companies.list');
+        Route::post('/companies', [CompanyController::class, 'store'])->name('master.companies.store');
+        Route::get('/companies/show/{id}', [CompanyController::class, 'show'])->name('master.companies.show');
+        Route::put('/companies/{id}', [CompanyController::class, 'update'])->name('master.companies.update');
+        Route::delete('/companies/{id}', [CompanyController::class, 'destroy'])->name('master.companies.destroy');
+        Route::get('/companies/all', [CompanyController::class, 'getAll'])->name('master.companies.all');
+        
         // Quick create endpoints for use in employee form dropdowns (must be before other routes to avoid conflicts)
         Route::post('/sites/store', [SiteController::class, 'store'])->name('master.sites.store');
         Route::post('/departments/store', [DepartmentController::class, 'store'])->name('master.departments.store');

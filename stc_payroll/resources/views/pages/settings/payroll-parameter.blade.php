@@ -4,6 +4,13 @@
 <div class="card">
   <div class="card-header">
     <h3 class="card-title">Payroll Parameter</h3>
+    @if(isset($company))
+    <div class="card-tools">
+      <span class="badge badge-primary">
+        <i class="fas fa-building mr-1"></i> {{ $company->name }}
+      </span>
+    </div>
+    @endif
   </div>
   <div class="card-body">
     <form id="payrollParameterForm">

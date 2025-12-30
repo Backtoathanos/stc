@@ -7,10 +7,11 @@ use App\Designation;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Traits\HasPermissions;
 use App\Http\Controllers\Traits\CheckPermissions;
+use App\Http\Controllers\Traits\HasCompanyFilter;
 
 class DesignationController extends Controller
 {
-    use HasPermissions, CheckPermissions;
+    use HasPermissions, CheckPermissions, HasCompanyFilter;
     
     public function index()
     {
@@ -39,6 +40,9 @@ class DesignationController extends Controller
         if ($permissionCheck) return $permissionCheck;
         
         $query = Designation::query();
+        
+        // Filter by selected company
+        $this->applyCompanyFilter($query);
 
         // Search functionality
         if ($request->has('search') && $request->search['value']) {
@@ -79,9 +83,14 @@ class DesignationController extends Controller
             ];
         }
 
+        // Get total records count with company filter
+        $totalCountQuery = Designation::query();
+        $this->applyCompanyFilter($totalCountQuery);
+        $totalCount = $totalCountQuery->count();
+        
         return response()->json([
             'draw' => intval($request->draw),
-            'recordsTotal' => Designation::count(),
+            'recordsTotal' => $totalCount,
             'recordsFiltered' => $totalRecords,
             'data' => $data
         ]);
@@ -99,9 +108,13 @@ class DesignationController extends Controller
         try {
             DB::beginTransaction();
             
+            // Set company_id from session
+            $companyId = $this->getSelectedCompanyId();
+            
             // Get the ID directly from database insert
             $id = DB::table('designations')->insertGetId([
                 'name' => $request->name,
+                'company_id' => $companyId,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);

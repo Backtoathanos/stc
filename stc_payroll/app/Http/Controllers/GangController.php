@@ -7,10 +7,11 @@ use App\Gang;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Traits\HasPermissions;
 use App\Http\Controllers\Traits\CheckPermissions;
+use App\Http\Controllers\Traits\HasCompanyFilter;
 
 class GangController extends Controller
 {
-    use HasPermissions, CheckPermissions;
+    use HasPermissions, CheckPermissions, HasCompanyFilter;
     
     public function index()
     {
@@ -79,9 +80,14 @@ class GangController extends Controller
             ];
         }
 
+        // Get total records count with company filter
+        $totalCountQuery = Gang::query();
+        $this->applyCompanyFilter($totalCountQuery);
+        $totalCount = $totalCountQuery->count();
+        
         return response()->json([
             'draw' => intval($request->draw),
-            'recordsTotal' => Gang::count(),
+            'recordsTotal' => $totalCount,
             'recordsFiltered' => $totalRecords,
             'data' => $data
         ]);
@@ -99,9 +105,13 @@ class GangController extends Controller
         try {
             DB::beginTransaction();
             
+            // Set company_id from session
+            $companyId = $this->getSelectedCompanyId();
+            
             // Get the ID directly from database insert
             $id = DB::table('gangs')->insertGetId([
                 'name' => $request->name,
+                'company_id' => $companyId,
                 'created_at' => now(),
                 'updated_at' => now()
             ]);

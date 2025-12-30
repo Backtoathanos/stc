@@ -7,10 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class Gang extends Model
 {
     public $incrementing = false;
-    protected $fillable = ['id', 'name'];
+    protected $fillable = ['id', 'company_id', 'name'];
     
     public function employees()
     {
         return $this->hasMany(Employee::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
     }
 }

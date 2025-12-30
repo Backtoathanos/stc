@@ -19,12 +19,13 @@
           @php
             $user = auth()->user();
             $isRoot = $user && $user->email === 'root@stcassociate.com';
+            $hasCompaniesView = $user && ($user->hasPermission('master.companies.view') || $isRoot);
             $hasSitesView = $user && ($user->hasPermission('master.sites.view') || $isRoot);
             $hasDepartmentsView = $user && ($user->hasPermission('master.departments.view') || $isRoot);
             $hasDesignationsView = $user && ($user->hasPermission('master.designations.view') || $isRoot);
             $hasGangsView = $user && ($user->hasPermission('master.gangs.view') || $isRoot);
             $hasEmployeesView = $user && ($user->hasPermission('master.employees.view') || $isRoot);
-            $hasMasterAccess = $hasSitesView || $hasDepartmentsView || $hasDesignationsView || $hasGangsView || $hasEmployeesView;
+            $hasMasterAccess = $hasCompaniesView || $hasSitesView || $hasDepartmentsView || $hasDesignationsView || $hasGangsView || $hasEmployeesView;
             $hasAttendanceView = $user && ($user->hasPermission('transaction.attendance.view') || $isRoot);
             $hasPayrollView = $user && ($user->hasPermission('reports.payroll.view') || $isRoot);
             $hasReportsView = $user && ($hasPayrollView || $isRoot);
@@ -39,6 +40,14 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+              @if($hasCompaniesView)
+              <li class="nav-item">
+                <a href="{{ url('/master/companies') }}" class="nav-link @if(Request::segment(2) == 'companies') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Companies</p>
+                </a>
+              </li>
+              @endif
               @if($hasSitesView)
               <li class="nav-item">
                 <a href="{{ url('/master/sites') }}" class="nav-link @if(Request::segment(2) == 'sites') active @endif">

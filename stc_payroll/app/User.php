@@ -16,7 +16,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'status',
+        'name', 'email', 'password', 'status', 'company_id',
     ];
 
     /**
@@ -50,5 +50,17 @@ class User extends Authenticatable
         }
         
         return $this->permissions()->where('slug', $slug)->exists();
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function companies()
+    {
+        // Users can belong to multiple companies (for future multi-company access)
+        // For now, return single company
+        return $this->belongsTo(Company::class, 'company_id');
     }
 }
