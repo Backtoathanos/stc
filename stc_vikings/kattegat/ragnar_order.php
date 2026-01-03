@@ -3775,7 +3775,7 @@ class ragnarRequisitionPertAdd extends tesseract{
 				$location = $requisition_data['location'];
 				
 				// Check if item_type is "Tools & Tackles" and get tools & tackles ID from poa_id
-				if($item_type == "Tools & Tackles" && $poadhocitem != '0'){
+				if($item_type == "Tools & Tackles" && $poadhocitem != '0' && $poadhocitem != ''){
 					$get_tools_tackles_id=mysqli_query($this->stc_dbs, "
 						SELECT `id` FROM `stc_tooldetails` WHERE `poa_id`='".mysqli_real_escape_string($this->stc_dbs, $poadhocitem)."'
 					");
