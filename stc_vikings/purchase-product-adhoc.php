@@ -396,6 +396,7 @@ include("kattegat/role_check.php");
                                                                   >
                                                                     <option>HASIBUL MONDAL</option>
                                                                     <option>GAUTAM</option>
+                                                                    <option>JOYDEEP</option>
                                                                     <option>KASEM</option>
                                                                     <option>MURTUZA</option>
                                                                     <option>MANSOOR</option>
@@ -405,6 +406,7 @@ include("kattegat/role_check.php");
                                                                     <option>RAJESH MUNSHI</option>
                                                                     <option>RAVI</option>
                                                                     <option>RAZA</option>
+                                                                    <option>RAZi</option>
                                                                     <option>SUBHDIP</option>
                                                                     <option>ZUBER</option>
                                                                 </select>
