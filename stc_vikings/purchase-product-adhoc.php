@@ -381,6 +381,7 @@ include("kattegat/role_check.php");
                                                                 >
                                                                     <option>DHATKIDIH SHOP NO 2</option>
                                                                     <option>DHATKIDIH STORE</option>
+                                                                    <option>DURGAPUR MAIN HOSPITAL</option>
                                                                     <option>KOLKATA STORE</option>
                                                                     <option selected>MANGO 17 NO STORE</option>
                                                                     <option>MANGO SHOP NO-1</option>
