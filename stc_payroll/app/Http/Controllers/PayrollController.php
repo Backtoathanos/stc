@@ -183,6 +183,10 @@ class PayrollController extends Controller
         foreach ($payrolls as $payroll) {
             // Get present days from attendance table (count 'P' days)
             $present = 0;
+            
+            // Get NH and FL days from calendar table (reuse already fetched holidayRecords)
+            $nh = 0;
+            $fl = 0;
             $attendance = Attendance::where('aadhar', $payroll->aadhar)
                 ->where('month_year', $monthYear)
                 ->first();
@@ -199,13 +203,13 @@ class PayrollController extends Controller
                     $dayValue = $attendance->{'day_' . $day};
                     if ($dayValue === 'P') {
                         $present++;
+                    }elseif ($dayValue === 'F') {
+                        $fl++;
+                    }elseif ($dayValue === 'N') {
+                        $nh++;
                     }
                 }
             }
-            
-            // Get NH and FL days from calendar table (reuse already fetched holidayRecords)
-            $nh = 0;
-            $fl = 0;
             
             // Count NH and FL days (only for working days, exclude Sundays)
             for ($day = 1; $day <= $daysInMonth; $day++) {
@@ -327,24 +331,24 @@ class PayrollController extends Controller
                     'total' => $totalWorked
                 ],
                 'rate' => [
-                    'basic' => number_format($basicRate, 2),
-                    'da' => number_format($daRate, 2),
-                    'total' => number_format($totalRate, 2)
+                    'basic' => number_format(round($basicRate, 0), 2),
+                    'da' => number_format(round($daRate, 0), 2),
+                    'total' => number_format(round($totalRate, 0, 2))
                 ],
-                'basic' => number_format($payroll->basic_amount ?? 0, 2),
-                'da' => number_format($payroll->da_amount ?? 0, 2),
-                'hra' => number_format($hra, 2),
-                'other_cash' => number_format($otherCash, 2),
-                'ot_hrs' => number_format($otHours, 2),
-                'ot_amt' => number_format($otAmount, 2),
-                'other_allowance' => number_format($otherAllowance, 2),
-                'gross' => number_format($gross, 2),
-                'pf' => number_format($pf, 2),
-                'esic' => number_format($esic, 2),
-                'prf_tax' => number_format($prfTax, 2),
-                'advance' => number_format($advance, 2),
-                'deduction' => number_format($totalDeduction, 2),
-                'net_amt' => number_format($netAmt, 2)
+                'basic' => number_format(round($payroll->basic_amount ?? 0, 0), 2),
+                'da' => number_format(round($payroll->da_amount ?? 0, 0), 2),
+                'hra' => number_format(round($hra, 0), 2),
+                'other_cash' => number_format(round($otherCash, 0), 2),
+                'ot_hrs' => number_format(round($otHours, 0), 2),
+                'ot_amt' => number_format(round($otAmount, 0), 2),
+                'other_allowance' => number_format(round($otherAllowance, 0), 2),
+                'gross' => number_format(round($gross, 0), 2),
+                'pf' => number_format(round($pf, 0), 2),
+                'esic' => number_format(round($esic, 0), 2),
+                'prf_tax' => number_format(round($prfTax, 0), 2),
+                'advance' => number_format(round($advance, 0), 2),
+                'deduction' => number_format(round($totalDeduction, 0), 2),
+                'net_amt' => number_format(round($netAmt, 0), 2)
             ];
         }
         

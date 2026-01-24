@@ -719,6 +719,7 @@ $(document).ready(function() {
                         html += '<div style="display: table; width: 100%;">';
                         html += '<div style="display: table-row;"><div style="display: table-cell; text-align: left; width: 30%;">P</div><div style="display: table-cell; text-align: center; width: 10%;">-</div><div style="display: table-cell; text-align: right; width: 60%;">' + data.present + '</div></div>';
                         html += '<div style="display: table-row;"><div style="display: table-cell; text-align: left;">NH</div><div style="display: table-cell; text-align: center;">-</div><div style="display: table-cell; text-align: right;">' + data.nh + '</div></div>';
+                        html += '<div style="display: table-row;"><div style="display: table-cell; text-align: left;">FL</div><div style="display: table-cell; text-align: center;">-</div><div style="display: table-cell; text-align: right;">' + data.fl + '</div></div>';
                         html += '<div style="display: table-row;"><div style="display: table-cell; text-align: left;">L</div><div style="display: table-cell; text-align: center;">-</div><div style="display: table-cell; text-align: right;">' + data.l + '</div></div>';
                         html += '<div style="display: table-row; border-top: 1px solid #ddd; padding-top: 3px; margin-top: 3px;"><div style="display: table-cell; text-align: left; padding-top: 3px;"><strong>Total</strong></div><div style="display: table-cell; text-align: center; padding-top: 3px;">-</div><div style="display: table-cell; text-align: right; padding-top: 3px;"><strong>' + data.total + '</strong></div></div>';
                         html += '</div></div>';
@@ -743,20 +744,20 @@ $(document).ready(function() {
                     return data;
                 }
             },
-            { data: 'basic', name: 'basic' },
-            { data: 'da', name: 'da' },
-            { data: 'hra', name: 'hra' },
-            { data: 'other_cash', name: 'other_cash' },
-            { data: 'ot_hrs', name: 'ot_hrs' },
-            { data: 'ot_amt', name: 'ot_amt' },
-            { data: 'other_allowance', name: 'other_allowance' },
-            { data: 'gross', name: 'gross' },
-            { data: 'pf', name: 'pf' },
-            { data: 'esic', name: 'esic' },
-            { data: 'prf_tax', name: 'prf_tax' },
-            { data: 'advance', name: 'advance' },
-            { data: 'deduction', name: 'deduction' },
-            { data: 'net_amt', name: 'net_amt' }
+            { data: 'basic', name: 'basic', className: 'text-right' },
+            { data: 'da', name: 'da', className: 'text-right' },
+            { data: 'hra', name: 'hra', className: 'text-right' },
+            { data: 'other_cash', name: 'other_cash', className: 'text-right' },
+            { data: 'ot_hrs', name: 'ot_hrs', className: 'text-right' },
+            { data: 'ot_amt', name: 'ot_amt', className: 'text-right' },
+            { data: 'other_allowance', name: 'other_allowance', className: 'text-right' },
+            { data: 'gross', name: 'gross', className: 'text-right' },
+            { data: 'pf', name: 'pf', className: 'text-right' },
+            { data: 'esic', name: 'esic', className: 'text-right' },
+            { data: 'prf_tax', name: 'prf_tax', className: 'text-right' },
+            { data: 'advance', name: 'advance', className: 'text-right' },
+            { data: 'deduction', name: 'deduction', className: 'text-right' },
+            { data: 'net_amt', name: 'net_amt', className: 'text-right' }
         ],
         order: [[1, 'asc']],
         pageLength: 10,
