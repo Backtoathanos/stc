@@ -322,7 +322,7 @@ if(isset($_GET['requi_id'])){
                                   INNER JOIN `stc_cust_super_requisition_list_items_rec`
                                   ON stc_purchase_product_adhoc_id = stc_cust_super_requisition_list_items_rec_list_poaid
                                   WHERE stc_cust_super_requisition_list_items_rec_list_item_id = '".$row['stc_cust_super_requisition_list_id']."'
-                                  $datefilter
+                                  AND DATE(stc_cust_super_requisition_list_items_rec_date) BETWEEN '$begdate' AND '$enddate'
                               ");
                               $rack = mysqli_num_rows($query2)>0?mysqli_fetch_assoc($query2): array('stc_rack_name' => 'N/A');
                               $rack = $rack['stc_rack_name'];
