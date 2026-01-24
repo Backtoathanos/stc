@@ -313,7 +313,7 @@ if(isset($_GET['requi_id'])){
                           if($row['dispatchqty'] > 0) {
                               $sl++;
                               $priority = ($row['stc_cust_super_requisition_items_priority'] == 2) ? "Urgent" : "";
-                              $filterdate="AND DATE(stc_cust_super_requisition_list_items_rec_date) BETWEEN '$begdate' AND '$enddate'";
+                              $filterdate=($begdate && $enddate) ? "AND DATE(stc_cust_super_requisition_list_items_rec_date) BETWEEN '$begdate' AND '$enddate'" : '';
                               $query2=mysqli_query($con, "
                                   SELECT 
                                       stc_rack_name
