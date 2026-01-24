@@ -1330,16 +1330,17 @@ class AttendanceController extends Controller
                     // PF deduction only if employee is PF applicable (check for true/1, not just truthy)
                     // PF is calculated on basic amount (min of basic and pf_limit) × pf_percentage
                     $isPfApplicable = !empty($attendance->PfApplicable) && ($attendance->PfApplicable === true || $attendance->PfApplicable === 1 || $attendance->PfApplicable === '1');
-                    if ($isPfApplicable && $basicAmount > 0) {
-                        $pfBase = min($basicAmount, $params->pf_limit);
+                    // if ($isPfApplicable && $basicAmount > 0) {
+                        $pfBase = $basicAmount + $daAmount;//min($basicAmount, $params->pf_limit);
                         $pfEmployee = ($pfBase * $params->pf_percentage) / 100;
-                    }
+                    // }
                     
                     // ESIC deduction only if employee is ESIC applicable (check for true/1, not just truthy)
                     // ESIC is calculated on gross salary × esic_employer_percentage (if within limit)
                     $isEsicApplicable = !empty($attendance->EsicApplicable) && ($attendance->EsicApplicable === true || $attendance->EsicApplicable === 1 || $attendance->EsicApplicable === '1');
                     if ($isEsicApplicable && $grossSalary <= $params->esic_limit) {
-                        $esicEmployee = ($grossSalary * $params->esic_employer_percentage) / 100;
+                        $esicBase = $basicAmount + $daAmount;//min($basicAmount, $params->pf_limit);
+                        $esicEmployee = ($esicBase * $params->esic_employer_percentage) / 100;
                     }
                     
                     $totalDeductions = $pfEmployee + $esicEmployee;

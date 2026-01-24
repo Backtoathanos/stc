@@ -193,41 +193,10 @@
             <tr>
                 <th rowspan="2">Sl</th>
                 <th rowspan="2">Name</th>
-                <th rowspan="2">Sex</th>
-                <th rowspan="2">DOB</th>
-                <th rowspan="2">Emp No</th>
-                <th rowspan="2">Desig</th>
-                <th rowspan="2">DOJ</th>
-                <th rowspan="2">ESIC</th>
-                <th rowspan="2">PF</th>
-                <th rowspan="2">UAN</th>
+                <th rowspan="2">Fathers Name</th>
                 <th colspan="31">Attendance</th>
                 <th rowspan="2">Pay Days</th>
-                <th rowspan="2">Rate</th>
-                <th rowspan="2">Basic</th>
-                <th rowspan="2">DA</th>
-                <th rowspan="2">HRA</th>
-                <th rowspan="2">Con</th>
-                <th rowspan="2">Med</th>
-                <th rowspan="2">Wash</th>
-                <th rowspan="2">Att Allow</th>
-                <th rowspan="2">Sp Allow</th>
-                <th rowspan="2">OT</th>
-                <th rowspan="2">Misc</th>
-                <th rowspan="2">Other</th>
-                <th rowspan="2">Gross</th>
-                <th rowspan="2">ESIC</th>
-                <th rowspan="2">PF</th>
-                <th rowspan="2">Soc Ins</th>
-                <th rowspan="2">Adv</th>
-                <th rowspan="2">PT</th>
-                <th rowspan="2">TDS</th>
-                <th rowspan="2">Fine</th>
-                <th rowspan="2">Damage</th>
-                <th rowspan="2">Other</th>
-                <th rowspan="2">Total Ded</th>
-                <th rowspan="2">Net Pay</th>
-                <th rowspan="2">Pay Date</th>
+                <th rowspan="2">Total Attnd.</th>
                 <th rowspan="2">Sign</th>
             </tr>
             <tr>
@@ -331,14 +300,7 @@
                 <tr>
                     <td>{{ $sl }}</td>
                     <td class="text-left">{{ $attendance->employee_name ?? '' }}</td>
-                    <td>{{ strtoupper(substr($attendance->Gender ?? 'MALE', 0, 1)) }}</td>
-                    <td class="text-left">{{ $dob }}</td>
-                    <td>{{ $attendance->EmpId ?? '' }}</td>
-                    <td class="text-left">{{ strtoupper($attendance->designation ?? '') }}</td>
-                    <td class="text-left">{{ $doj }}</td>
-                    <td>{{ $attendance->Esic ?? '0' }}</td>
-                    <td>{{ $attendance->PfApplicable ? ($attendance->Uan ?? '0') : '0' }}</td>
-                    <td>{{ $attendance->Uan ?? '' }}</td>
+                    <td>{{ $attendance->Father }}</td>
                     @for($day = 1; $day <= 31; $day++)
                         @php
                             $dayValue = $attendance->{'day_' . $day} ?? '';
@@ -351,30 +313,6 @@
                         <td>{{ $displayValue }}</td>
                     @endfor
                     <td>{{ $totalWorked }}</td>
-                    <td>{{ number_format($rate, 2) }}</td>
-                    <td>{{ number_format($basic, 2) }}</td>
-                    <td>{{ number_format($da, 2) }}</td>
-                    <td>{{ number_format($hra, 2) }}</td>
-                    <td>{{ number_format($con, 2) }}</td>
-                    <td>{{ number_format($med, 2) }}</td>
-                    <td>{{ number_format($wash, 2) }}</td>
-                    <td>{{ number_format($attAllow, 1) }}</td>
-                    <td>{{ number_format($spAllow, 2) }}</td>
-                    <td>{{ number_format($otAmount, 2) }}</td>
-                    <td>{{ number_format($misc, 2) }}</td>
-                    <td>{{ number_format($other, 2) }}</td>
-                    <td>{{ number_format($gross, 2) }}</td>
-                    <td>{{ number_format($esicDed, 2) }}</td>
-                    <td>{{ number_format($pfDed, 2) }}</td>
-                    <td>{{ number_format($socIns, 2) }}</td>
-                    <td>{{ number_format($adv, 2) }}</td>
-                    <td>{{ number_format($pt, 2) }}</td>
-                    <td>{{ number_format($tds, 2) }}</td>
-                    <td>{{ number_format($fine, 2) }}</td>
-                    <td>{{ number_format($damage, 2) }}</td>
-                    <td>{{ number_format($otherDed, 2) }}</td>
-                    <td>{{ number_format($totalDed, 2) }}</td>
-                    <td>{{ number_format($netPay, 2) }}</td>
                     <td>.</td>
                     <td>.</td>
                 </tr>
@@ -385,20 +323,18 @@
 
     <div class="footer" style="margin-top: 5px; font-size: 12px;">
         <div class="footer-row" style="display: flex; margin-bottom: 2px;">
-            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-right: 10px;">Total Basic:</span>
-            <span class="footer-value">{{ number_format($totalBasic, 2) }}</span>
-            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-left: 20px; margin-right: 10px;">Total DA:</span>
-            <span class="footer-value">{{ number_format($totalDA, 2) }}</span>
+            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-right: 10px;"></span>
+            <span class="footer-value">{{ 0 }}</span>
+            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-left: 20px; margin-right: 10px;"></span>
+            <span class="footer-value">{{ 0 }}</span>
             <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-left: 20px; margin-right: 10px;">Total Days:</span>
             <span class="footer-value">{{ $totalDays }}</span>
-            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-left: 20px; margin-right: 10px;">Total Gross:</span>
-            <span class="footer-value">{{ number_format($totalGross, 2) }}</span>
-            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-left: 20px; margin-right: 10px;">Total PF:</span>
-            <span class="footer-value">{{ number_format($totalPF, 2) }}</span>
-            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-left: 20px; margin-right: 10px;">Total ESIC:</span>
-            <span class="footer-value">{{ number_format($totalESIC, 2) }}</span>
-            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-left: 20px; margin-right: 10px;">Total Net:</span>
-            <span class="footer-value">{{ number_format($totalNet, 2) }}</span>
+            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-left: 20px; margin-right: 10px;"></span>
+            <span class="footer-value">{{ 0 }}</span>
+            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-left: 20px; margin-right: 10px;"></span>
+            <span class="footer-value">{{ 0 }}</span>
+            <span class="footer-label" style="font-weight: bold; min-width: 60px; margin-left: 20px; margin-right: 10px;"></span>
+            <span class="footer-value">{{ 0 }}</span>
         </div>
     </div>
 

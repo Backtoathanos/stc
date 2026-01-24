@@ -164,6 +164,21 @@ class PayrollController extends Controller
         
         $data = [];
         $serial = $start + 1;
+        $totals = [
+            'basic'           => 0,
+            'da'              => 0,
+            'hra'             => 0,
+            'other_cash'      => 0,
+            'ot_amt'          => 0,
+            'other_allowance' => 0,
+            'gross'           => 0,
+            'pf'              => 0,
+            'esic'            => 0,
+            'prf_tax'         => 0,
+            'advance'         => 0,
+            'deduction'       => 0,
+            'net_amt'         => 0,
+        ];
         
         foreach ($payrolls as $payroll) {
             // Get present days from attendance table (count 'P' days)
@@ -243,7 +258,7 @@ class PayrollController extends Controller
                         ($payroll->ProfessionalPursuits ?? 0);
             
             // Other allowance (Special Allowance from rates table - separate from Other Cash)
-            $otherAllowance = $payroll->SpecialAllowance ?? 0;
+            $otherAllowance = ($payroll->SpecialAllowance / 26) * ($totalWorked + $l) ?? 0;
             
             // HRA
             $hra = $payroll->hra ?? 0;
@@ -269,12 +284,9 @@ class PayrollController extends Controller
             // The stored ESIC is already correct, no need to recalculate
             $esic = $payroll->esic_employee ?? 0;
             
-            // PRF Tax - get from employee table (boolean, typically a fixed amount if applicable)
-            $prfTax = 0;
-            if (!empty($payroll->PRFTax) && ($payroll->PRFTax === true || $payroll->PRFTax === 1 || $payroll->PRFTax === '1')) {
-                // PRF Tax is typically a fixed amount (e.g., 200 per month) - you may need to configure this
-                $prfTax = 200; // Default PRF Tax amount, can be made configurable
-            }
+            // PRF Tax - calculate based on gross salary ranges
+            $isPRFTaxApplicable = !empty($payroll->PRFTax) && ($payroll->PRFTax === true || $payroll->PRFTax === 1 || $payroll->PRFTax === '1');
+            $prfTax = $this->calculatePRFTax($gross + $otherAllowance, $isPRFTaxApplicable);
             
             // Advance and Deduction - these might be in rates table or need to be added
             // For now, set to 0 if not available
@@ -284,8 +296,23 @@ class PayrollController extends Controller
             // Total Deduction = PF + ESIC + PRF Tax + Advance + Other Deductions
             $totalDeduction = $pf + $esic + $prfTax + $advance + $deduction;
             
+            $gross += $otherAllowance;
             // Net amount = Gross - Total Deduction
             $netAmt = $gross - $totalDeduction;
+            $totals['basic']           += ($payroll->basic_amount ?? 0);
+            $totals['da']              += ($payroll->da_amount ?? 0);
+            $totals['hra']             += $hra;
+            $totals['other_cash']      += $otherCash;
+            $totals['ot_amt']          += $otAmount;
+            $totals['other_allowance'] += $otherAllowance;
+            $totals['gross']           += $gross;
+            $totals['pf']              += $pf;
+            $totals['esic']            += $esic;
+            $totals['prf_tax']         += $prfTax;
+            $totals['advance']         += $advance;
+            $totals['deduction']       += $totalDeduction;
+            $totals['net_amt']         += $netAmt;
+
             
             $data[] = [
                 'sl' => $serial++,
@@ -316,7 +343,7 @@ class PayrollController extends Controller
                 'esic' => number_format($esic, 2),
                 'prf_tax' => number_format($prfTax, 2),
                 'advance' => number_format($advance, 2),
-                'deduction' => number_format($deduction, 2),
+                'deduction' => number_format($totalDeduction, 2),
                 'net_amt' => number_format($netAmt, 2)
             ];
         }
@@ -325,7 +352,22 @@ class PayrollController extends Controller
             'draw' => intval($request->draw),
             'recordsTotal' => $totalRecords,
             'recordsFiltered' => $filteredRecords,
-            'data' => $data
+            'data' => $data,
+            'totals' => [
+                'basic'           => round($totals['basic'], 2),
+                'da'              => round($totals['da'], 2),
+                'hra'             => round($totals['hra'], 2),
+                'other_cash'      => round($totals['other_cash'], 2),
+                'ot_amt'          => round($totals['ot_amt'], 2),
+                'other_allowance' => round($totals['other_allowance'], 2),
+                'gross'           => round($totals['gross'], 2),
+                'pf'              => round($totals['pf'], 2),
+                'esic'            => round($totals['esic'], 2),
+                'prf_tax'         => round($totals['prf_tax'], 2),
+                'advance'         => round($totals['advance'], 2),
+                'deduction'       => round($totals['deduction'], 2),
+                'net_amt'         => round($totals['net_amt'], 2),
+            ]
         ]);
     }
     
@@ -444,10 +486,8 @@ class PayrollController extends Controller
             $pf = $payroll->pf_employee ?? 0;
             $esic = $payroll->esic_employee ?? 0;
             
-            $prfTax = 0;
-            if (!empty($payroll->PRFTax) && ($payroll->PRFTax === true || $payroll->PRFTax === 1 || $payroll->PRFTax === '1')) {
-                $prfTax = 200;
-            }
+            $isPRFTaxApplicable = !empty($payroll->PRFTax) && ($payroll->PRFTax === true || $payroll->PRFTax === 1 || $payroll->PRFTax === '1');
+            $prfTax = $this->calculatePRFTax($gross, $isPRFTaxApplicable);
             
             $advance = 0;
             $deduction = $payroll->IncomeTax ?? 0;
@@ -611,10 +651,8 @@ class PayrollController extends Controller
             // Deductions
             $pf = $payroll->pf_employee ?? 0;
             $esic = $payroll->esic_employee ?? 0;
-            $prfTax = 0;
-            if (!empty($payroll->PRFTax) && ($payroll->PRFTax === true || $payroll->PRFTax === 1 || $payroll->PRFTax === '1')) {
-                $prfTax = 200;
-            }
+            $isPRFTaxApplicable = !empty($payroll->PRFTax) && ($payroll->PRFTax === true || $payroll->PRFTax === 1 || $payroll->PRFTax === '1');
+            $prfTax = $this->calculatePRFTax($gross, $isPRFTaxApplicable);
             $advance = 0;
             $deduction = $payroll->IncomeTax ?? 0;
             $totalDeduction = $pf + $esic + $prfTax + $advance + $deduction;
@@ -764,10 +802,8 @@ class PayrollController extends Controller
             // Deductions: PF and ESIC are included
             $pf = $payroll->pf_employee ?? 0;
             $esic = $payroll->esic_employee ?? 0;
-            $prfTax = 0;
-            if (!empty($payroll->PRFTax) && ($payroll->PRFTax === true || $payroll->PRFTax === 1 || $payroll->PRFTax === '1')) {
-                $prfTax = 200;
-            }
+            $isPRFTaxApplicable = !empty($payroll->PRFTax) && ($payroll->PRFTax === true || $payroll->PRFTax === 1 || $payroll->PRFTax === '1');
+            $prfTax = $this->calculatePRFTax($gross, $isPRFTaxApplicable);
             $advance = 0;
             $deduction = $payroll->IncomeTax ?? 0;
             $totalDeduction = $pf + $esic + $prfTax + $advance + $deduction;
@@ -886,10 +922,8 @@ class PayrollController extends Controller
             // Deductions: PF and ESIC are included
             $pf = $payroll->pf_employee ?? 0;
             $esic = $payroll->esic_employee ?? 0;
-            $prfTax = 0;
-            if (!empty($payroll->PRFTax) && ($payroll->PRFTax === true || $payroll->PRFTax === 1 || $payroll->PRFTax === '1')) {
-                $prfTax = 200;
-            }
+            $isPRFTaxApplicable = !empty($payroll->PRFTax) && ($payroll->PRFTax === true || $payroll->PRFTax === 1 || $payroll->PRFTax === '1');
+            $prfTax = $this->calculatePRFTax($gross, $isPRFTaxApplicable);
             $advance = 0;
             $deduction = $payroll->IncomeTax ?? 0;
             $totalDeduction = $pf + $esic + $prfTax + $advance + $deduction;
@@ -1528,6 +1562,219 @@ class PayrollController extends Controller
         return $dompdf->stream('attendance_' . $monthYear . '.pdf', ['Attachment' => 1]);
     }
     
+    public function attendanceOdissaPreview(Request $request)
+    {
+        $monthYear = $request->input('month_year');
+        $siteId = $request->input('site_id', 'all');
+        
+        if (!$monthYear) {
+            return response('Month is required', 400);
+        }
+        
+        // Get attendance data with all employee details
+        $query = Attendance::leftJoin('employees', 'attendances.aadhar', '=', 'employees.Aadhar')
+            ->leftJoin('sites', 'employees.site_id', '=', 'sites.id')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('rates', 'employees.id', '=', 'rates.employee_id')
+            ->where('attendances.month_year', $monthYear);
+        
+        if ($siteId && $siteId !== 'all') {
+            $query->where('employees.site_id', $siteId);
+        }
+        
+        $attendances = $query->select(
+                'attendances.*', 
+                'employees.EmpId', 
+                'employees.Name as employee_name',
+                'employees.Gender',
+                'employees.Dob',
+                'employees.Doj',
+                'employees.Esic',
+                'employees.Uan',
+                'employees.PfApplicable',
+                'employees.Skill',
+                'sites.name as site_name', 
+                'departments.name as department', 
+                'designations.name as designation',
+                'rates.*'
+            )
+            ->orderBy('employees.EmpId')
+            ->get();
+        
+        // Get payroll data for wage calculations
+        $aadhars = $attendances->pluck('aadhar')->unique();
+        $payrolls = Payroll::whereIn('aadhar', $aadhars)
+            ->where('month_year', $monthYear)
+            ->get()
+            ->keyBy('aadhar');
+        
+        // Get overtime data
+        $overtimes = \App\Overtime::whereIn('aadhar', $aadhars)
+            ->where('month_year', $monthYear)
+            ->get()
+            ->keyBy('aadhar');
+        
+        // Calculate days in month
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+        $daysInMonth = $date->daysInMonth;
+        $monthDisplay = $date->format('F Y');
+        
+        $siteName = 'All Sites';
+        $site = null;
+        if ($siteId && $siteId !== 'all') {
+            $site = Site::find($siteId);
+            $siteName = $site ? $site->name : 'All Sites';
+        }
+        
+        // Get NH and FL days for the month
+        $holidayRecords = [];
+        if ($monthYear) {
+            $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
+            $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
+        }
+        
+        // Get company data from site or cookie
+        $company = null;
+        if ($site && $site->company_id) {
+            $company = \App\Company::find($site->company_id);
+        }
+        if (!$company) {
+            $companyId = \Cookie::get('company_id');
+            $company = $companyId ? \App\Company::find($companyId) : null;
+        }
+        if (!$company) {
+            $company = \App\Company::first();
+        }
+        
+        // Return HTML view for preview (not PDF)
+        return view('pages.transaction.pdfs.attendance-odissa', [
+            'attendances' => $attendances,
+            'overtimes' => $overtimes,
+            'payrolls' => $payrolls,
+            'monthYear' => $monthYear,
+            'monthDisplay' => $monthDisplay,
+            'siteName' => $siteName,
+            'site' => $site,
+            'daysInMonth' => $daysInMonth,
+            'holidayRecords' => $holidayRecords,
+            'company' => $company
+        ]);
+    }
+    
+    public function attendanceOdissaPdf(Request $request)
+    {
+        $monthYear = $request->input('month_year');
+        $siteId = $request->input('site_id', 'all');
+        
+        if (!$monthYear) {
+            return response('Month is required', 400);
+        }
+        
+        // Get attendance data with all employee details
+        $query = Attendance::leftJoin('employees', 'attendances.aadhar', '=', 'employees.Aadhar')
+            ->leftJoin('sites', 'employees.site_id', '=', 'sites.id')
+            ->leftJoin('departments', 'employees.department_id', '=', 'departments.id')
+            ->leftJoin('designations', 'employees.designation_id', '=', 'designations.id')
+            ->leftJoin('rates', 'employees.id', '=', 'rates.employee_id')
+            ->where('attendances.month_year', $monthYear);
+        
+        if ($siteId && $siteId !== 'all') {
+            $query->where('employees.site_id', $siteId);
+        }
+        
+        $attendances = $query->select(
+                'attendances.*', 
+                'employees.EmpId', 
+                'employees.Name as employee_name',
+                'employees.Gender',
+                'employees.Dob',
+                'employees.Doj',
+                'employees.Esic',
+                'employees.Uan',
+                'employees.PfApplicable',
+                'sites.name as site_name', 
+                'departments.name as department', 
+                'designations.name as designation',
+                'rates.*'
+            )
+            ->orderBy('employees.EmpId')
+            ->get();
+        
+        // Get payroll data for wage calculations
+        $aadhars = $attendances->pluck('aadhar')->unique();
+        $payrolls = Payroll::whereIn('aadhar', $aadhars)
+            ->where('month_year', $monthYear)
+            ->get()
+            ->keyBy('aadhar');
+        
+        // Get overtime data
+        $overtimes = \App\Overtime::whereIn('aadhar', $aadhars)
+            ->where('month_year', $monthYear)
+            ->get()
+            ->keyBy('aadhar');
+        
+        // Calculate days in month
+        $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+        $daysInMonth = $date->daysInMonth;
+        $monthDisplay = $date->format('F Y');
+        
+        $siteName = 'All Sites';
+        $site = null;
+        if ($siteId && $siteId !== 'all') {
+            $site = Site::find($siteId);
+            $siteName = $site ? $site->name : 'All Sites';
+        }
+        
+        // Get NH and FL days for the month
+        $holidayRecords = [];
+        if ($monthYear) {
+            $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
+            $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
+            $holidayRecords = CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
+                ->whereIn('leave_type', ['NH', 'FL'])
+                ->get();
+        }
+        
+        // Get company data from site or cookie
+        $company = null;
+        if ($site && $site->company_id) {
+            $company = \App\Company::find($site->company_id);
+        }
+        if (!$company) {
+            $companyId = \Cookie::get('company_id');
+            $company = $companyId ? \App\Company::find($companyId) : null;
+        }
+        if (!$company) {
+            $company = \App\Company::first();
+        }
+        
+        // Render view template
+        $html = view('pages.transaction.pdfs.attendance-odissa', [
+            'attendances' => $attendances,
+            'overtimes' => $overtimes,
+            'payrolls' => $payrolls,
+            'monthYear' => $monthYear,
+            'monthDisplay' => $monthDisplay,
+            'siteName' => $siteName,
+            'site' => $site,
+            'daysInMonth' => $daysInMonth,
+            'holidayRecords' => $holidayRecords,
+            'company' => $company
+        ])->render();
+        
+        $dompdf = new Dompdf();
+        $dompdf->loadHtml($html);
+        $dompdf->setPaper('A4', 'landscape');
+        $dompdf->render();
+        
+        // Force download instead of inline display
+        return $dompdf->stream('attendance_odissa_' . $monthYear . '.pdf', ['Attachment' => 1]);
+    }
+    
     public function wageSlipPreview(Request $request)
     {
         $aadhar = $request->input('aadhar');
@@ -1641,10 +1888,8 @@ class PayrollController extends Controller
         // Deductions
         $pfDeduction = $payroll->pf_employee ?? 0;
         $esicDeduction = $payroll->esic_employee ?? 0;
-        $prfDeduction = 0;
-        if ($employee->PRFTax) {
-            $prfDeduction = 200;
-        }
+        $isPRFTaxApplicable = !empty($employee->PRFTax) && ($employee->PRFTax === true || $employee->PRFTax === 1 || $employee->PRFTax === '1');
+        $prfDeduction = $this->calculatePRFTax($grossWages, $isPRFTaxApplicable);
         $totalDeductions = $pfDeduction + $esicDeduction + $prfDeduction;
         
         // Net Amount Paid
@@ -1792,10 +2037,8 @@ class PayrollController extends Controller
             
             $pfDeduction = $payroll->pf_employee ?? 0;
             $esicDeduction = $payroll->esic_employee ?? 0;
-            $prfDeduction = 0;
-            if ($employee->PRFTax) {
-                $prfDeduction = 200;
-            }
+            $isPRFTaxApplicable = !empty($employee->PRFTax) && ($employee->PRFTax === true || $employee->PRFTax === 1 || $employee->PRFTax === '1');
+            $prfDeduction = $this->calculatePRFTax($grossWages, $isPRFTaxApplicable);
             $totalDeductions = $pfDeduction + $esicDeduction + $prfDeduction;
             $netAmount = round($grossWages - $totalDeductions);
             
@@ -1824,5 +2067,32 @@ class PayrollController extends Controller
             'monthYear' => $monthYear,
             'monthDisplay' => $monthDisplay
         ]);
+    }
+    
+    /**
+     * Calculate PRF Tax based on gross salary
+     * 
+     * @param float $gross The gross salary amount
+     * @param bool $isPRFTaxApplicable Whether PRF Tax is applicable for the employee
+     * @return float The PRF Tax amount
+     */
+    private function calculatePRFTax($gross, $isPRFTaxApplicable)
+    {
+        if (!$isPRFTaxApplicable) {
+            return 0;
+        }
+        
+        // If gross is more than 13304 and less than 24999: PRF Tax = 125
+        if ($gross > 13304 && $gross < 24999) {
+            return 125;
+        }
+        
+        // If gross is more than 25000 and less than 30000: PRF Tax = 200
+        if ($gross >= 25000 && $gross < 30000) {
+            return 200;
+        }
+        
+        // Default: no PRF Tax for other ranges
+        return 0;
     }
 }

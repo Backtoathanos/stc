@@ -160,8 +160,10 @@ Route::middleware(['auth.user'])->group(function () {
         Route::post('/payroll/esic', [PayrollController::class, 'esic'])->name('reports.payroll.esic');
         Route::get('/payroll/wage-summary-preview', [PayrollController::class, 'wageSummaryPreview'])->name('reports.payroll.wage-summary-preview');
         Route::get('/payroll/attendance-preview', [PayrollController::class, 'attendancePreview'])->name('reports.payroll.attendance-preview');
+        Route::get('/payroll/attendance-odissa-preview', [PayrollController::class, 'attendanceOdissaPreview'])->name('reports.payroll.attendance-odissa-preview');
         Route::get('/payroll/wage-summary-pdf', [PayrollController::class, 'wageSummaryPdf'])->name('reports.payroll.wage-summary-pdf');
         Route::get('/payroll/attendance-pdf', [PayrollController::class, 'attendancePdf'])->name('reports.payroll.attendance-pdf');
+        Route::get('/payroll/attendance-odissa-pdf', [PayrollController::class, 'attendanceOdissaPdf'])->name('reports.payroll.attendance-odissa-pdf');
         Route::get('/payroll/wage-slip-preview', [PayrollController::class, 'wageSlipPreview'])->name('reports.payroll.wage-slip-preview');
         Route::get('/payroll/all-wage-slips-preview', [PayrollController::class, 'allWageSlipsPreview'])->name('reports.payroll.all-wage-slips-preview');
     });

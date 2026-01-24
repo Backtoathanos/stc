@@ -51,6 +51,9 @@
                 <a class="dropdown-item" href="#" id="downloadAttendance">
                   <i class="fas fa-calendar-check"></i> Attendance
                 </a>
+                <a class="dropdown-item" href="#" id="downloadAttendanceOdissa">
+                  <i class="fas fa-calendar-check"></i> Attendance Odissa
+                </a>
               </div>
             </div>
           </div>
@@ -237,9 +240,22 @@
               <tbody>
               </tbody>
               <tfoot>
-                <tr class="table-info font-weight-bold">
-                  <td colspan="19" class="text-right">TOTAL NET AMOUNT:</td>
-                  <td class="text-right" id="payrollTotalNetAmt">0</td>
+                <tr class="table-secondary font-weight-bold">
+                  <td colspan="6" class="text-right">TOTAL</td>
+                  <td id="totalBasic" class="text-right">0</td>
+                  <td id="totalDa" class="text-right">0</td>
+                  <td id="totalHra" class="text-right">0</td>
+                  <td id="totalOtherCash" class="text-right">0</td>
+                  <td></td>
+                  <td id="totalOtAmt" class="text-right">0</td>
+                  <td id="other_allowance" class="text-right">0</td>
+                  <td id="totalGross" class="text-right">0</td>
+                  <td id="totalPf" class="text-right">0</td>
+                  <td id="totalEsic" class="text-right">0</td>
+                  <td id="totalPrfTax" class="text-right">0</td>
+                  <td id="totalAdvance" class="text-right">0</td>
+                  <td id="totalDeduction" class="text-right">0</td>
+                  <td id="payrollTotalNetAmt" class="text-right">0</td>
                 </tr>
               </tfoot>
             </table>
@@ -645,6 +661,12 @@ $(document).ready(function() {
     $('#filterMonth').on('change', function() {
         updateAttendanceDayColumns();
     });
+    function formatINR(val) {
+        return Number(val || 0).toLocaleString('en-IN', {
+            maximumFractionDigits: 0
+        });
+    }
+
     
     var table = $('#payrollTable').DataTable({
         processing: true,
@@ -662,6 +684,25 @@ $(document).ready(function() {
                 // Month input is already in "YYYY-MM" format
                 d.month_year = monthYear || '';
                 d.site_id = siteId || 'all';
+            },
+            dataSrc: function(json) {
+
+                // ✅ Update footer totals
+                $('#totalBasic').text(formatINR(json.totals.basic));
+                $('#totalDa').text(formatINR(json.totals.da));
+                $('#totalHra').text(formatINR(json.totals.hra));
+                $('#totalOtherCash').text(formatINR(json.totals.other_cash));
+                $('#totalOtAmt').text(formatINR(json.totals.ot_amt));
+                $('#other_allowance').text(formatINR(json.totals.other_allowance));
+                $('#totalGross').text(formatINR(json.totals.gross));
+                $('#totalPf').text(formatINR(json.totals.pf));
+                $('#totalEsic').text(formatINR(json.totals.esic));
+                $('#totalPrfTax').text(formatINR(json.totals.prf_tax));
+                $('#totalAdvance').text(formatINR(json.totals.advance));
+                $('#totalDeduction').text(formatINR(json.totals.deduction));
+                $('#payrollTotalNetAmt').text(formatINR(json.totals.net_amt));
+
+                return json.data;
             }
         },
         columns: [
@@ -2285,6 +2326,43 @@ $(document).ready(function() {
         $('#pdfFrame').attr('src', previewUrl);
         $('#pdfDownloadBtn').attr('href', pdfUrl);
         $('#pdfViewModalLabel').text('Attendance - ' + monthYear);
+        
+        // Show modal first
+        $('#pdfViewModal').modal('show');
+    });
+    
+    // Show Attendance Odissa Preview
+    $('#downloadAttendanceOdissa').on('click', function(e) {
+        e.preventDefault();
+        var monthYear = $('#filterMonth').val();
+        var siteId = $('#filterSite').val();
+        
+        if (!monthYear) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Month Required',
+                text: 'Please select a month'
+            });
+            return;
+        }
+        
+        // Build preview URL (HTML) for iframe
+        var previewUrl = window.appBaseUrl + '/reports/payroll/attendance-odissa-preview?month_year=' + encodeURIComponent(monthYear);
+        if (siteId && siteId !== 'all') {
+            previewUrl += '&site_id=' + encodeURIComponent(siteId);
+        }
+        
+        // Build PDF URL for download
+        var pdfUrl = window.appBaseUrl + '/reports/payroll/attendance-odissa-pdf?month_year=' + encodeURIComponent(monthYear);
+        if (siteId && siteId !== 'all') {
+            pdfUrl += '&site_id=' + encodeURIComponent(siteId);
+        }
+        
+        // Set iframe source to preview (HTML) and download link to PDF
+        currentPdfUrl = pdfUrl;
+        $('#pdfFrame').attr('src', previewUrl);
+        $('#pdfDownloadBtn').attr('href', pdfUrl);
+        $('#pdfViewModalLabel').text('Attendance Odissa - ' + monthYear);
         
         // Show modal first
         $('#pdfViewModal').modal('show');
