@@ -313,6 +313,7 @@ if(isset($_GET['requi_id'])){
                           if($row['dispatchqty'] > 0) {
                               $sl++;
                               $priority = ($row['stc_cust_super_requisition_items_priority'] == 2) ? "Urgent" : "";
+                              $filterdate="AND DATE(stc_cust_super_requisition_list_items_rec_date) BETWEEN '$begdate' AND '$enddate'";
                               $query2=mysqli_query($con, "
                                   SELECT 
                                       stc_rack_name
@@ -322,7 +323,7 @@ if(isset($_GET['requi_id'])){
                                   INNER JOIN `stc_cust_super_requisition_list_items_rec`
                                   ON stc_purchase_product_adhoc_id = stc_cust_super_requisition_list_items_rec_list_poaid
                                   WHERE stc_cust_super_requisition_list_items_rec_list_item_id = '".$row['stc_cust_super_requisition_list_id']."'
-                                  AND DATE(stc_cust_super_requisition_list_items_rec_date) BETWEEN '$begdate' AND '$enddate'
+                                  $filterdate
                               ");
                               $rack = mysqli_num_rows($query2)>0?mysqli_fetch_assoc($query2): array('stc_rack_name' => 'N/A');
                               $rack = $rack['stc_rack_name'];
