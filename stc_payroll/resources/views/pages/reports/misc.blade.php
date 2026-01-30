@@ -108,7 +108,7 @@
                 </div>
               </div>
 
-              <div class="form-row mt-2 jh-only">
+              <div class="form-row mt-2">
                 <div class="col-6">
                   <div class="form-check">
                     <input class="form-check-input" type="radio" name="report_choice" id="rOT" value="overtime">
@@ -157,6 +157,7 @@
 $(document).ready(function () {
   var listUrl = "{{ url('/reports/misc/list') }}";
   var finePreviewUrl = "{{ url('/reports/misc/fine-preview') }}";
+  var overtimePreviewUrl = "{{ url('/reports/misc/overtime-preview') }}";
   var selectedCompanyName = "{{ session('selected_company_name') }}";
 
   // searchable dropdown behavior
@@ -210,7 +211,7 @@ $(document).ready(function () {
 
     if (isOdissa) {
       var $checked = $('input[name="report_choice"]:checked');
-      if ($checked.length && ['advance', 'damage', 'overtime'].indexOf($checked.val()) !== -1) {
+      if ($checked.length && ['advance', 'damage'].indexOf($checked.val()) !== -1) {
         $checked.prop('checked', false);
       }
     } else {
@@ -298,6 +299,19 @@ $(document).ready(function () {
       $('#miscModalLabel').text('Fine Register - ' + dateRange);
       $('#miscModalHtml').hide().empty();
       $('#miscPdfFrame').show().attr('src', url);
+      $('#miscModal').modal('show');
+      return;
+    }
+
+    // Over Time Register (Odissa): open preview page inside iframe (landscape print)
+    if (reportChoice === 'overtime') {
+      var url2 = overtimePreviewUrl + '?month_year=' + encodeURIComponent(dateRange);
+      if (siteId && siteId !== 'all') {
+        url2 += '&site_id=' + encodeURIComponent(siteId);
+      }
+      $('#miscModalLabel').text('Over Time Register - ' + dateRange);
+      $('#miscModalHtml').hide().empty();
+      $('#miscPdfFrame').show().attr('src', url2);
       $('#miscModal').modal('show');
       return;
     }

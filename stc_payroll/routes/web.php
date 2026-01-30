@@ -252,6 +252,87 @@ Route::middleware(['auth.user'])->group(function () {
             ]);
         })->name('reports.misc.fine-preview');
 
+        // Overtime Register preview (HTML) - Odissa Form-XIX (landscape)
+        Route::get('/misc/overtime-preview', function (Request $request) {
+            $user = auth()->user();
+            if (!$user || (!$user->hasPermission('reports.misc.view') && $user->email !== 'root@stcassociate.com')) {
+                return response('Forbidden', 403);
+            }
+
+            $companyId = session('selected_company_id');
+            $monthYear = $request->input('month_year'); // YYYY-MM
+            $siteId = $request->input('site_id', 'all');
+
+            if (!$companyId || !$monthYear) {
+                return response('Month is required', 400);
+            }
+
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+            $monthDisplay = $date->format('F Y');
+            $monthShort = strtoupper($date->format('M')) . ' ' . $date->format('Y');
+
+            $site = null;
+            if ($siteId && $siteId !== 'all') {
+                $site = \App\Site::find($siteId);
+            }
+            $company = \App\Company::find($companyId);
+
+            // Base employee list from payroll for the month (so counts match payroll)
+            $rows = DB::table('payrolls as p')
+                ->leftJoin('employees as e', 'p.aadhar', '=', 'e.Aadhar')
+                ->where('p.month_year', $monthYear)
+                ->where('e.company_id', $companyId)
+                ->when($siteId && $siteId !== 'all', function ($q) use ($siteId) {
+                    $q->where('p.site_id', $siteId);
+                })
+                ->select(
+                    'p.aadhar as aadhar',
+                    'e.EmpId as empid',
+                    'p.employee_name as name',
+                    'e.Gender as gender',
+                    'e.Skill as designation',
+                    'p.ot_amount as ot_amount'
+                )
+                ->distinct()
+                ->orderBy('empid')
+                ->get();
+
+            $aadhars = $rows->pluck('aadhar')->filter()->unique()->values();
+            $overtimesByAadhar = DB::table('overtimes')
+                ->where('month_year', $monthYear)
+                ->whereIn('aadhar', $aadhars)
+                ->get()
+                ->keyBy('aadhar');
+
+            // Enrich rows with OT dates + total hours
+            $rows = $rows->map(function ($r) use ($overtimesByAadhar) {
+                $ot = $r->aadhar ? ($overtimesByAadhar->get($r->aadhar) ?? null) : null;
+                $dates = [];
+                $hoursTotal = 0;
+                if ($ot) {
+                    for ($d = 1; $d <= 31; $d++) {
+                        $h = (int)($ot->{'day_' . $d} ?? 0);
+                        if ($h > 0) {
+                            $dates[] = str_pad((string)$d, 2, '0', STR_PAD_LEFT);
+                            $hoursTotal += $h;
+                        }
+                    }
+                }
+                $r->ot_dates = $dates;      // array of "01", "02", ...
+                $r->ot_hours_total = $hoursTotal; // integer
+                return $r;
+            });
+
+            return view('pages.transaction.pdfs.overtime-register', [
+                'rows' => $rows,
+                'monthYear' => $monthYear,
+                'monthDisplay' => $monthDisplay,
+                'monthShort' => $monthShort,
+                'site' => $site,
+                'company' => $company
+            ]);
+        })->name('reports.misc.overtime-preview');
+
         Route::post('/misc/list', function (Request $request) {
             $site = $request->input('site_id');
             $companyId = session('selected_company_id');
