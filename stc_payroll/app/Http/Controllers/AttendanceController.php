@@ -726,13 +726,20 @@ class AttendanceController extends Controller
                         if (isset($rowData[$dayKey])) {
                             $dayValue = strtoupper(trim((string)$rowData[$dayKey]));
                         }
-                        
-                        // Validate day value (P, O, A, or empty)
-                        if (!empty($dayValue) && !in_array($dayValue, ['P', 'O', 'A'])) {
+
+                        // Normalize special codes (Excel) to stored codes
+                        if ($dayValue === 'NH') {
+                            $dayValue = 'N';
+                        } elseif ($dayValue === 'FL') {
+                            $dayValue = 'F';
+                        }
+
+                        // Validate day value (P, O, A, N, F or empty)
+                        if ($dayValue !== '' && !in_array($dayValue, ['P', 'O', 'A', 'N', 'F'], true)) {
                             $dayValue = ''; // Invalid value, set to null
                         }
-                        
-                        $attendanceData['day_' . $day] = !empty($dayValue) ? $dayValue : null;
+
+                        $attendanceData['day_' . $day] = ($dayValue !== '') ? $dayValue : null;
                     }
                     
                     // Set days beyond the month to null (e.g., day_31 for months with 30 days)
@@ -1120,6 +1127,10 @@ class AttendanceController extends Controller
                     $absent = 0;
                     $leave = 0; // Leave days (marked as 'O' in attendance)
                     
+                    // Count NH (National Holiday) and FL (Festival Leave) days from calendar for this month
+                    $nh = 0;
+                    $fl = 0;
+                    
                     for ($day = 1; $day <= $daysInMonth; $day++) {
                         $checkDate = \Carbon\Carbon::createFromFormat('Y-m-d', $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT));
                         // Skip Sundays - they are not working days
@@ -1138,15 +1149,15 @@ class AttendanceController extends Controller
                             $absent++;
                         } elseif ($dayValue === 'O') {
                             $leave++;
+                        } elseif ($dayValue === 'N') {
+                            $nh++;
+                        } elseif ($dayValue === 'F') {
+                            $fl++;
                         }
                     }
                     
                     // Store ORIGINAL absent count from attendance table (before any conversions)
                     $originalAbsent = $absent;
-                    
-                    // Count NH (National Holiday) and FL (Festival Leave) days from calendar for this month
-                    $nh = 0;
-                    $fl = 0;
                     $startDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->startOfMonth();
                     $endDate = \Carbon\Carbon::createFromFormat('Y-m', $monthYear)->endOfMonth();
                     $holidayRecords = \App\CalendarLeaveType::whereBetween('date', [$startDate, $endDate])
@@ -1154,25 +1165,25 @@ class AttendanceController extends Controller
                         ->get();
                     
                     // Count NH and FL days that fall within the month AND on working days (not Sundays)
-                    for ($day = 1; $day <= $daysInMonth; $day++) {
-                        $checkDate = \Carbon\Carbon::createFromFormat('Y-m-d', $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT));
-                        // Skip Sundays - holidays on Sundays don't count as worked days
-                        if ($checkDate->dayOfWeek === \Carbon\Carbon::SUNDAY) {
-                            continue;
-                        }
+                    // for ($day = 1; $day <= $daysInMonth; $day++) {
+                    //     $checkDate = \Carbon\Carbon::createFromFormat('Y-m-d', $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT));
+                    //     // Skip Sundays - holidays on Sundays don't count as worked days
+                    //     if ($checkDate->dayOfWeek === \Carbon\Carbon::SUNDAY) {
+                    //         continue;
+                    //     }
                         
-                        $checkDateStr = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
-                        foreach ($holidayRecords as $holidayRecord) {
-                            if ($holidayRecord->date->format('Y-m-d') === $checkDateStr) {
-                                if ($holidayRecord->leave_type === 'NH') {
-                                    $nh++;
-                                } elseif ($holidayRecord->leave_type === 'FL') {
-                                    $fl++;
-                                }
-                                break;
-                            }
-                        }
-                    }
+                    //     $checkDateStr = $monthYear . '-' . str_pad($day, 2, '0', STR_PAD_LEFT);
+                    //     foreach ($holidayRecords as $holidayRecord) {
+                    //         if ($holidayRecord->date->format('Y-m-d') === $checkDateStr) {
+                    //             if ($holidayRecord->leave_type === 'NH') {
+                    //                 $nh++;
+                    //             } elseif ($holidayRecord->leave_type === 'FL') {
+                    //                 $fl++;
+                    //             }
+                    //             break;
+                    //         }
+                    //     }
+                    // }
                     
                     // Calculate total worked days = Present + NH + FL + Leave
                     // Note: NH and FL are holidays, so they count as worked days

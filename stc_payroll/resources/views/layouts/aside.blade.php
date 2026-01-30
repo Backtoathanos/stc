@@ -128,6 +128,14 @@
                 </a>
               </li>
               @endif
+              @if($hasPayrollView)
+              <li class="nav-item">
+                <a href="{{ url('/reports/misc') }}" class="nav-link @if(Request::segment(2) == 'misc') active @endif">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Miscellaneous</p>
+                </a>
+              </li>
+              @endif
             </ul>
           </li>
           @endif

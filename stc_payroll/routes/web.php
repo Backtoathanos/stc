@@ -16,6 +16,8 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\PayrollParameterController;
 use App\Http\Controllers\RateController;
 use App\Http\Controllers\PayrollController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /*
 |--------------------------------------------------------------------------
@@ -166,6 +168,120 @@ Route::middleware(['auth.user'])->group(function () {
         Route::get('/payroll/attendance-odissa-pdf', [PayrollController::class, 'attendanceOdissaPdf'])->name('reports.payroll.attendance-odissa-pdf');
         Route::get('/payroll/wage-slip-preview', [PayrollController::class, 'wageSlipPreview'])->name('reports.payroll.wage-slip-preview');
         Route::get('/payroll/all-wage-slips-preview', [PayrollController::class, 'allWageSlipsPreview'])->name('reports.payroll.all-wage-slips-preview');
+
+        // Miscellaneous Report
+        Route::get('/misc', function () {
+            $user = auth()->user();
+            if (!$user || (!$user->hasPermission('reports.misc.view') && $user->email !== 'root@stcassociate.com')) {
+                if (request()->expectsJson()) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'You do not have permission to access this page'
+                    ], 403);
+                }
+                return redirect(route('home'))->with('error', 'You do not have permission to access this page');
+            }
+
+            $companyId = session('selected_company_id');
+            $sitesQuery = DB::table('sites')->select('id', 'name')->orderBy('name');
+            if ($companyId) {
+                $sitesQuery->where('company_id', $companyId);
+            } else {
+                // No company selected; return empty list (company selection modal should enforce selection)
+                $sitesQuery->whereRaw('1 = 0');
+            }
+            $sites = $sitesQuery->get();
+            return view('pages.reports.misc', ['page_title' => 'Miscellaneous Reports', 'sites' => $sites]);
+        })->name('reports.misc');
+
+        // Fine Register preview (HTML) - used inside iframe like other pdf previews
+        Route::get('/misc/fine-preview', function (Request $request) {
+            $user = auth()->user();
+            if (!$user || (!$user->hasPermission('reports.misc.view') && $user->email !== 'root@stcassociate.com')) {
+                return response('Forbidden', 403);
+            }
+
+            $companyId = session('selected_company_id');
+            $monthYear = $request->input('month_year'); // YYYY-MM
+            $siteId = $request->input('site_id', 'all');
+
+            if (!$companyId || !$monthYear) {
+                return response('Month is required', 400);
+            }
+
+            $date = \Carbon\Carbon::createFromFormat('Y-m', $monthYear);
+            $monthDisplay = $date->format('F Y');
+            $monthShort = strtoupper($date->format('M')) . ' ' . $date->format('Y');
+
+            $site = null;
+            if ($siteId && $siteId !== 'all') {
+                $site = \App\Site::find($siteId);
+            }
+
+            $company = \App\Company::find($companyId);
+
+            $rows = DB::table('payrolls as p')
+                ->leftJoin('employees as e', 'p.aadhar', '=', 'e.Aadhar')
+                ->where('p.month_year', $monthYear)
+                ->where('e.company_id', $companyId)
+                ->when($siteId && $siteId !== 'all', function ($q) use ($siteId) {
+                    $q->where('p.site_id', $siteId);
+                })
+                ->select(
+                    'e.EmpId as empid',
+                    'p.employee_name as name',
+                    'e.Father as father',
+                    'e.Skill as designation',
+                    'p.category as category'
+                )
+                ->distinct()
+                ->orderBy('empid')
+                ->get();
+
+            return view('pages.transaction.pdfs.fine-register', [
+                'rows' => $rows,
+                'monthYear' => $monthYear,
+                'monthDisplay' => $monthDisplay,
+                'monthShort' => $monthShort,
+                'companyName' => $company->name ?? '',
+                'natureOfWork' => $site && $site->natureofwork ? $site->natureofwork : '',
+                'establishment' => $site ? $site->name : '',
+                'principalEmployer' => $site ? $site->name : '',
+                'site' => $site,
+                'company' => $company
+            ]);
+        })->name('reports.misc.fine-preview');
+
+        Route::post('/misc/list', function (Request $request) {
+            $site = $request->input('site_id');
+            $companyId = session('selected_company_id');
+            $monthYear = $request->input('date_range') ?: $request->input('month_year'); // YYYY-MM
+
+            if (!$companyId || !$monthYear) {
+                return response()->json(['data' => []]);
+            }
+
+            // Pull employees from payroll for the selected month (so counts match payroll)
+            $query = DB::table('payrolls as p')
+                ->leftJoin('employees as e', 'p.aadhar', '=', 'e.Aadhar')
+                ->leftJoin('sites as s', 'p.site_id', '=', 's.id')
+                ->where('p.month_year', $monthYear)
+                ->where('e.company_id', $companyId)
+                ->select(
+                    'e.id',
+                    'e.EmpId as empid',
+                    'p.employee_name as name',
+                    's.name as site'
+                )
+                ->distinct();
+
+            if ($site && $site !== 'all') {
+                $query->where('p.site_id', $site);
+            }
+
+            $data = $query->orderBy('empid')->get();
+            return response()->json(['data' => $data]);
+        })->name('reports.misc.list');
     });
 
     // Calendar Routes
