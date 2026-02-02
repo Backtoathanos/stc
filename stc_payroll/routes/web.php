@@ -333,6 +333,57 @@ Route::middleware(['auth.user'])->group(function () {
             ]);
         })->name('reports.misc.overtime-preview');
 
+        // Employment Card preview (HTML) - FOR X (portrait, 2 cards per page)
+        Route::get('/misc/employment-card-preview', function (Request $request) {
+            $user = auth()->user();
+            if (!$user || (!$user->hasPermission('reports.misc.view') && $user->email !== 'root@stcassociate.com')) {
+                return response('Forbidden', 403);
+            }
+
+            $companyId = session('selected_company_id');
+            $monthYear = $request->input('month_year'); // YYYY-MM
+            $siteId = $request->input('site_id', 'all');
+
+            if (!$companyId || !$monthYear) {
+                return response('Month is required', 400);
+            }
+
+            $site = null;
+            if ($siteId && $siteId !== 'all') {
+                $site = \App\Site::find($siteId);
+            }
+            $company = \App\Company::find($companyId);
+
+            $rows = DB::table('payrolls as p')
+                ->leftJoin('employees as e', 'p.aadhar', '=', 'e.Aadhar')
+                ->where('p.month_year', $monthYear)
+                ->where('e.company_id', $companyId)
+                ->when($siteId && $siteId !== 'all', function ($q) use ($siteId) {
+                    $q->where('p.site_id', $siteId);
+                })
+                ->select(
+                    'e.EmpId as empid',
+                    'p.employee_name as name',
+                    'e.Father as father',
+                    'e.Doj as doj',
+                    'e.Doe as doe',
+                    'e.Skill as designation',
+                    'p.category as category',
+                    'p.basic_rate as basic_rate',
+                    'p.da_rate as da_rate'
+                )
+                ->distinct()
+                ->orderBy('empid')
+                ->get();
+
+            return view('pages.transaction.pdfs.employment-card', [
+                'rows' => $rows,
+                'monthYear' => $monthYear,
+                'site' => $site,
+                'company' => $company
+            ]);
+        })->name('reports.misc.employment-card-preview');
+
         Route::post('/misc/list', function (Request $request) {
             $site = $request->input('site_id');
             $companyId = session('selected_company_id');

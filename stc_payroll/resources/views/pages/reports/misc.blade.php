@@ -28,7 +28,6 @@
               </div>
             </div>
             <div class="col-md-6 d-flex align-items-center">
-              <label>Month</label>
               <div class="form-check mr-3" style="display:none;">
                 <input class="form-check-input" type="radio" name="scope" id="scopeSite" value="site" checked>
                 <label class="form-check-label" for="scopeSite">SITE</label>
@@ -158,6 +157,7 @@ $(document).ready(function () {
   var listUrl = "{{ url('/reports/misc/list') }}";
   var finePreviewUrl = "{{ url('/reports/misc/fine-preview') }}";
   var overtimePreviewUrl = "{{ url('/reports/misc/overtime-preview') }}";
+  var employmentCardPreviewUrl = "{{ url('/reports/misc/employment-card-preview') }}";
   var selectedCompanyName = "{{ session('selected_company_name') }}";
 
   // searchable dropdown behavior
@@ -312,6 +312,19 @@ $(document).ready(function () {
       $('#miscModalLabel').text('Over Time Register - ' + dateRange);
       $('#miscModalHtml').hide().empty();
       $('#miscPdfFrame').show().attr('src', url2);
+      $('#miscModal').modal('show');
+      return;
+    }
+
+    // Employment Card: open preview page inside iframe (portrait, 2 cards per page)
+    if (reportChoice === 'employment') {
+      var url3 = employmentCardPreviewUrl + '?month_year=' + encodeURIComponent(dateRange);
+      if (siteId && siteId !== 'all') {
+        url3 += '&site_id=' + encodeURIComponent(siteId);
+      }
+      $('#miscModalLabel').text('Employment Card - ' + dateRange);
+      $('#miscModalHtml').hide().empty();
+      $('#miscPdfFrame').show().attr('src', url3);
       $('#miscModal').modal('show');
       return;
     }
