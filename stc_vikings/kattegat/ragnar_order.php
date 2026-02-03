@@ -2611,11 +2611,38 @@ class ragnarRequisitionPertView extends tesseract{
 				$checkqty=$requisrow["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
 				
 					// <a class="req-product-Modal" style="font-size:25px;color:black;" title="Dispatch by inventory" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-truck"></i></a>
+				$gldanddispatch='<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" itemtype="'.$requisrow['stc_cust_super_requisition_items_type'].'"  id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>
+					<a class="stc_add_togld" style="font-size:25px;color:black;" title="Add to GLD" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-shopping-cart"></i></a>';
+				$pending_check='';
+				// date range: enddate = today, begdate = before 2 months
+				$enddate = date('Y-m-d');
+				$begdate = date('Y-m-d', strtotime('-1 months'));
+				$qry="
+					SELECT A.stc_cust_super_requisition_list_id as listitemid, B.stc_cust_super_requisition_list_id as listid, A.stc_cust_super_requisition_items_finalqty FROM `stc_cust_super_requisition_list_items` A INNER JOIN `stc_cust_super_requisition_list` B ON A.stc_cust_super_requisition_list_items_req_id=B.stc_cust_super_requisition_list_id WHERE A.stc_cust_super_requisition_list_items_status<>9 AND DATE(B.stc_cust_super_requisition_list_date) BETWEEN '".$begdate."' AND '".$enddate."'
+				";
+				$pending_check=mysqli_query($this->stc_dbs, $qry);
+				if(mysqli_num_rows($pending_check)==0){
+					$pendingcounter=0;
+					foreach($pending_check as $pendingrow){
+						$rowlistid=$pendingrow['listid'];
+						$rowlistitemid=$pendingrow['listitemid'];
+						$qry2="
+							SELECT `stc_cust_super_requisition_list_items_rec_recqty` FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_list_id`='".$rowlistid."' AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$rowlistitemid."'
+						";
+						$pending_check2=mysqli_query($this->stc_dbs, $qry2);
+						$pending_check2=mysqli_fetch_assoc($pending_check2);
+						if($pendingrow['stc_cust_super_requisition_items_finalqty']-$pending_check2['stc_cust_super_requisition_list_items_rec_recqty']>0){
+							$pendingcounter++;
+						}
+					}
+					if($pendingcounter>0){
+						$gldanddispatch='';
+					}
+				}
+				
 				$actiondeliver='
 					<a class="btn-change-status" data-toggle="modal" data-target="#statusRemarkModal" style="font-size:25px;color:black;" status="'.$requisrow['stc_cust_super_requisition_list_items_status'].'" title="Update to pending" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-clock-o"></i></a>
-					<a class="req-product-Modal-cash-close" style="font-size:25px;color:black;" title="Dispatch by direct" itemtype="'.$requisrow['stc_cust_super_requisition_items_type'].'"  id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" orderqty="'.$checkqty.'" href="#"><i class="fa fa-file"></i></a>
-					<a class="stc_add_togld" style="font-size:25px;color:black;" title="Add to GLD" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-shopping-cart"></i></a>
-				';
+				'.$gldanddispatch;
 				$calculation=$requisrow["stc_cust_super_requisition_list_items_approved_qty"] - $dispatchedgqty;
 				$actiondeliver= $calculation>0.1 ? $actiondeliver.'<a class="req-recieving-Modal" title="Recieving" style="font-size:25px;color:black;" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-hand-grab-o"></i></a>' : '<a class="req-recieving-Modal" title="Recieving" style="font-size:25px;color:black;" id="'.$requisrow['list_item_id'].'" list-id="'.$requisrow["stc_cust_super_requisition_list_items_req_id"].'" href="#"><i class="fa fa-hand-grab-o"></i></a>';
 				$lokigetappritemqry=mysqli_query($this->stc_dbs, "

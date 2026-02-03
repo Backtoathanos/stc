@@ -920,7 +920,7 @@ class witcher_supervisor extends tesseract{
 					`status`, 
 					`created_by`
 				) VALUES (
-					'".mysqli_real_escape_string($this->stc_dbs, $req_item_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $req_id)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
 					'1',
