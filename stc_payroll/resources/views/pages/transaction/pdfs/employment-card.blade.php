@@ -150,12 +150,28 @@
                     <td class="label">7. Remarks</td>
                     <td class="value">
                         <div class="stamp-area">
-                            <div class="stamp">
+                            <div class="">
                                 <div>
                                     {{ $companyName ?: 'CONTRACTOR' }}
                                 </div>
                             </div>
-                            <div class="signature-text">Signature of Contractor</div>
+                            <div class="signature-text">    @php
+                                    $signaturePath = public_path('dist/img/signature.jpeg');
+                                    $signatureDataUri = null;
+                                    if (file_exists($signaturePath)) {
+                                        $ext = strtolower(pathinfo($signaturePath, PATHINFO_EXTENSION));
+                                        $mime = $ext === 'png' ? 'image/png' : ($ext === 'jpg' || $ext === 'jpeg' ? 'image/jpeg' : null);
+                                        if ($mime) {
+                                            $signatureDataUri = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($signaturePath));
+                                        }
+                                    }
+                                @endphp
+                                @if(!empty($signatureDataUri))
+                                    <div style="margin-top: 0;">
+                                        <img src="{{ $signatureDataUri }}" alt="Signature" style="width: 140px; height: 50px;">
+                                    </div>
+                                @endif
+                                Signature of Contractor</div>
                         </div>
                     </td>
                 </tr>

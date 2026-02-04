@@ -130,6 +130,22 @@
 
     <div class="mt-10 right small">
         <div style="margin-top: 30px;" class="bold">
+            @php
+                $signaturePath = public_path('dist/img/signature.jpeg');
+                $signatureDataUri = null;
+                if (file_exists($signaturePath)) {
+                    $ext = strtolower(pathinfo($signaturePath, PATHINFO_EXTENSION));
+                    $mime = $ext === 'png' ? 'image/png' : ($ext === 'jpg' || $ext === 'jpeg' ? 'image/jpeg' : null);
+                    if ($mime) {
+                        $signatureDataUri = 'data:' . $mime . ';base64,' . base64_encode(file_get_contents($signaturePath));
+                    }
+                }
+            @endphp
+            @if(!empty($signatureDataUri))
+                <div style="margin-top: 10px;">
+                    <img src="{{ $signatureDataUri }}" alt="Signature" style="width: 140px; height: 50px;">
+                </div>
+            @endif
             Signature of the Employer/Principal Employer/<br>
             Authorized signatory
         </div>
