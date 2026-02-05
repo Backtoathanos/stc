@@ -306,6 +306,8 @@
                     $nh = 0;
                     $l = 0;
                     $fl = 0;
+                    $cl = 0;
+                    $el = 0; // EL/PL stored as E
                     
                     if ($attendance) {
                         for ($day = 1; $day <= 31; $day++) {
@@ -319,6 +321,10 @@
                                 $fl++;
                             } elseif ($dayValue === 'N') {
                                 $nh++;
+                            } elseif ($dayValue === 'C' || $dayValue === 'CL') {
+                                $cl++;
+                            } elseif ($dayValue === 'E' || $dayValue === 'EL' || $dayValue === 'PL') {
+                                $el++;
                             }
                         }
                     }
@@ -338,11 +344,12 @@
                     $nh += $nhHoliday;
                     
                     // Total worked = Present + Festival Leave + National Holiday
-                    $totalWorked = $present + $fl + $nh;
+                    $totalWorked = $present + $fl + $nh + $cl + $el;
                     $totalmanday += $totalWorked;
                     // Accumulate day totals
                     $totalflday += $fl;
-                    $totalclday += 0;
+                    $totalclday += $cl;
+                    $totalelday += $el;
                     $totalnhday += $nh;
                     
                     // Wage calculations
@@ -441,7 +448,7 @@
                         @endphp
                         <td>{{ $displayValue }}</td>
                     @endfor
-                    <td class="text-right" style="font-size: 6px;padding-right:3px;">P:{{ $present }}<br>FL:{{ $fl }}<br>NH:{{ $nh }}<br>Total:{{ $totalWorked }}</td>
+                    <td class="text-right" style="font-size: 6px;padding-right:3px;">P:{{ $present }}<br>CL:{{ $cl }}<br>PL:{{ $el }}<br>FL:{{ $fl }}<br>NH:{{ $nh }}<br>Total:{{ $totalWorked }}</td>
                     <td class="text-right">{{ round($wageRate, 0) }}</td>
                     <td class="text-right">{{ round($basic, 0) }}</td>
                     <td class="text-right">{{ round($da, 0) }}</td>

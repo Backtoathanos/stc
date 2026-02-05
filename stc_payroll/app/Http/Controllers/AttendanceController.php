@@ -730,12 +730,16 @@ class AttendanceController extends Controller
                         // Normalize special codes (Excel) to stored codes
                         if ($dayValue === 'NH') {
                             $dayValue = 'N';
+                        } elseif ($dayValue === 'PL' || $dayValue === 'EL') {
+                            $dayValue = 'E';
+                        } elseif ($dayValue === 'CL') {
+                            $dayValue = 'C';
                         } elseif ($dayValue === 'FL') {
                             $dayValue = 'F';
                         }
 
                         // Validate day value (P, O, A, N, F or empty)
-                        if ($dayValue !== '' && !in_array($dayValue, ['P', 'O', 'A', 'N', 'F'], true)) {
+                        if ($dayValue !== '' && !in_array($dayValue, ['P', 'O', 'A', 'N', 'F', 'E', 'C'], true)) {
                             $dayValue = ''; // Invalid value, set to null
                         }
 
@@ -1151,6 +1155,10 @@ class AttendanceController extends Controller
                             $leave++;
                         } elseif ($dayValue === 'N') {
                             $nh++;
+                        } elseif ($dayValue === 'E') {
+                            $leave++;
+                        } elseif ($dayValue === 'C') {
+                            $leave++;
                         } elseif ($dayValue === 'F') {
                             $fl++;
                         }
