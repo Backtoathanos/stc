@@ -63,27 +63,27 @@
           <div class="row mt-2">
             <div class="col-md-6">
               <div class="form-row jh-only">
-                <div class="col-6">
+                <!-- <div class="col-6">
                   <div class="form-check">
                     <input class="form-check-input" type="radio" name="report_choice" id="rAdvance" value="advance">
                     <label class="form-check-label" for="rAdvance">Advance Register</label>
                   </div>
-                </div>
-                <div class="col-6">
+                </div> -->
+                <!-- <div class="col-6">
                   <div class="form-check">
                     <input class="form-check-input" type="radio" name="report_choice" id="rDamage" value="damage">
                     <label class="form-check-label" for="rDamage">Damage Register</label>
                   </div>
-                </div>
+                </div> -->
               </div>
 
               <div class="form-row mt-2">
-                <div class="col-6">
+                <!-- <div class="col-6">
                   <div class="form-check">
                     <input class="form-check-input" type="radio" name="report_choice" id="rWorkMan" value="workman">
                     <label class="form-check-label" for="rWorkMan">Work Man Register</label>
                   </div>
-                </div>
+                </div> -->
                 <div class="col-6">
                   <div class="form-check">
                     <input class="form-check-input" type="radio" name="report_choice" id="rEmployment" value="employment">
@@ -99,12 +99,12 @@
                     <label class="form-check-label" for="rFine">Fine Register</label>
                   </div>
                 </div>
-                <div class="col-6">
+                <!-- <div class="col-6">
                   <div class="form-check">
                     <input class="form-check-input" type="radio" name="report_choice" id="rService" value="service">
                     <label class="form-check-label" for="rService">Service Certificate</label>
                   </div>
-                </div>
+                </div> -->
               </div>
 
               <div class="form-row mt-2">
