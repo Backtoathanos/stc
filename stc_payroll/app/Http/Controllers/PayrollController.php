@@ -187,6 +187,8 @@ class PayrollController extends Controller
             // Get NH and FL days from calendar table (reuse already fetched holidayRecords)
             $nh = 0;
             $fl = 0;
+            $cl = 0; // CL stored as 'C'
+            $pl = 0; // PL/EL stored as 'E'
             $attendance = Attendance::where('aadhar', $payroll->aadhar)
                 ->where('month_year', $monthYear)
                 ->first();
@@ -207,9 +209,16 @@ class PayrollController extends Controller
                         $fl++;
                     }elseif ($dayValue === 'N') {
                         $nh++;
+                    }elseif ($dayValue === 'E') {
+                        $pl++;
+                    }elseif ($dayValue === 'C') {
+                        $cl++;
                     }
                 }
             }
+
+            // Leave as per attendance sheet
+            $leaveFromAttendance = $cl + $pl;
             
             // Count NH and FL days (only for working days, exclude Sundays)
             for ($day = 1; $day <= $daysInMonth; $day++) {
@@ -237,12 +246,14 @@ class PayrollController extends Controller
             // Example: If employee has 5 leave balance, 1 absent day, then 1 leave is used to cover it
             // So l = 1 (leave used), not 5 (total leave balance)
             // $l = $payroll->leave_balance ?? 0;
-            $absent = $payroll->absent_days ?? 0;
             $leaveBalance = (int) ($payroll->leave_balance ?? 0);
             $absentDays   = (int) ($payroll->absent_days ?? 0);
 
             // Leave used to cover absences
-            $l = min($leaveBalance, $absentDays);
+            $leaveUsedToCoverAbsence = min($leaveBalance, $absentDays);
+
+            // Total leave to show = leave marked in attendance + leave used to cover absences
+            $l = $leaveFromAttendance + $leaveUsedToCoverAbsence;
             
             // Total worked days = Present + NH + FL + Leave (leave used to cover absent)
             $totalWorked = $present + $nh + $fl + $l;
@@ -262,7 +273,7 @@ class PayrollController extends Controller
                         ($payroll->ProfessionalPursuits ?? 0);
             
             // Other allowance (Special Allowance from rates table - separate from Other Cash)
-            $otherAllowance = ($payroll->SpecialAllowance / 26) * ($totalWorked + $l) ?? 0;
+            $otherAllowance = ($payroll->SpecialAllowance / 26) * $totalWorked;
             
             // HRA
             $hra = $payroll->hra ?? 0;
