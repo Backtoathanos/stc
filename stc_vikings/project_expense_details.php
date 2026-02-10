@@ -1,11 +1,3 @@
-<?php
-ini_set("session.gc_maxlifetime", 21600);
-session_set_cookie_params(21600);
-session_start();
-// Include authentication helper
-require_once 'kattegat/auth_helper.php';
-STCAuthHelper::checkAuth(); 
-?>
 <?php 
 if(isset($_GET['pro_id'])){
     $num = $_GET['pro_id'];
@@ -71,7 +63,7 @@ if(isset($_GET['pro_id'])){
         .invoice table td,
         .invoice table th {
             padding: 5px;
-            background: ##7d6161;
+            background: #7d6161;
             border-bottom: 1px solid #fff;
         }
 
@@ -103,11 +95,6 @@ if(isset($_GET['pro_id'])){
 
         .invoice table .unit {
             background: #ddd;
-        }
-
-        .invoice table .total {
-            /*background: #3989c6;*/
-            /*color: #fff;*/
         }
 
         .invoice table tbody tr:last-child td {
@@ -183,6 +170,7 @@ if(isset($_GET['pro_id'])){
 
         .page-break {
             page-break-before: always;
+            break-before: page;
         }
 
         .table-row {
@@ -194,6 +182,30 @@ if(isset($_GET['pro_id'])){
                 margin-top: -5px;
                 font-size: 15px !important;
                 overflow: hidden !important;
+            }
+
+            /* Repeat header on every printed page */
+            .print-page {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 0;
+            }
+
+            .print-page thead {
+                display: table-header-group;
+            }
+
+            .print-page tbody {
+                display: table-row-group;
+            }
+
+            /* IMPORTANT: only reset the OUTER wrapper cells (not nested table cells) */
+            .print-page > thead > tr > td,
+            .print-page > tbody > tr > td {
+                padding: 0 !important;
+                border: none !important;
+                background: transparent !important;
+                color: black;
             }
 
             .invoice footer {
@@ -211,7 +223,7 @@ if(isset($_GET['pro_id'])){
             }
 
             .hidden-print {
-                visibility: hidden;
+                display: none !important;
             }
 
             .tm-footer {
@@ -268,186 +280,252 @@ if(isset($_GET['pro_id'])){
     </div>
 
     <div class="container-fluid tm-mt-big tm-mb-big invoice">
-        <div class="row header">
-            <!-- Create order -->
-            <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4">
-                <div style="height: 50px;"><img style="height: 50px;"
-                        src="https://stcassociate.com/stc_symbiote/img/stc-header.png"></div>
-                <p>
-                    Rajmahal Apartment, D/304 3rd Floor, Block No 1, Pardih, Jamshedpur, Jharkhand 832110
-                </p>
-                <p>
-                    Mobile No. : +91-8986811304<br>
-                    E.Mail:stc111213@gmail.com<br>
-                    GSTIN: 20JCBPS6008G1ZT
-                </p>
-            </div>
-            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
-                <h2 align="center">Project Expense Summary</h2>
-                <div style="text-align: center;">
-                    <h4 align="center">Project ID: STC/P/
-                        <?php echo $str; ?>
-                    </h4>
-                    <h4 align="center">Date:
-                        <?php echo date('d-m-Y'); ?>
-                    </h4>
-                </div>
-            </div>
-            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2" style="text-align: right;">
-                <a target="_blank" id="logo_print_pre" href="#" style="float: right;">
-                    <img src="https://stcassociate.com/stc_symbiote/img/stc_logo.png"
-                        style="max-height: 120px; width: auto;">
-                </a>
-            </div>
-        </div>
+        <div class="print-footer"></div>
+        <table class="print-page">
+            <thead>
+                <tr>
+                    <td>
+                        <div class="row header">
+                            <!-- Create order -->
+                            <div class="col-xl-4 col-lg-4 col-md-4 col-sm-4">
+                                <div style="height: 50px;"><img style="height: 50px;"
+                                        src="https://stcassociate.com/stc_symbiote/img/stc-header.png"></div>
+                                <p>
+                                    Rajmahal Apartment, D/304 3rd Floor, Block No 1, Pardih, Jamshedpur, Jharkhand
+                                    832110
+                                </p>
+                                <p>
+                                    Mobile No. : +91-8986811304<br>
+                                    E.Mail:stc111213@gmail.com<br>
+                                    GSTIN: 20JCBPS6008G1ZT
+                                </p>
+                            </div>
+                            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
+                                <h2 align="center">Project Expense Summary</h2>
+                                <div style="text-align: center;">
+                                    <h4 align="center">Project ID: STC/P/
+                                        <?php echo $str; ?>
+                                    </h4>
+                                    <h4 align="center">Date:
+                                        <?php echo date('d-m-Y'); ?>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2" style="text-align: right;">
+                                <a target="_blank" id="logo_print_pre" href="#" style="float: right;">
+                                    <img src="https://stcassociate.com/stc_symbiote/img/stc_logo.png"
+                                        style="max-height: 120px; width: auto;">
+                                </a>
+                            </div>
+                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
+                                <div style="font-size: 18px; margin-bottom: 20px;" class="">
+                                    <p><strong>Project:</strong>
+                                        <?php echo $get_stc_purchase_product['stc_cust_project_title']; ?>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <!-- main area -->
+                        <div class="row med">
+                            <div class="container-fluid">
+                                <!-- Create order -->
+                                <div class="row" style="margin-top: 10px;">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                        <div class="">
+                                            <h4><b>Kind Attn: Mr/Miss.
+                                                    <?php echo $get_stc_purchase_product['stc_cust_project_responsive_person']; ?>
+                                                </b></h4>
+                                        </div>
+                                        <div
+                                            style="font-size: 16px; margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #3989c6; border-radius: 5px;">
+                                            <p style="margin: 0; font-style: italic; color: #555;">
+                                                <strong>"Excellence in project management is not just about meeting
+                                                    deadlines, but about
+                                                    delivering value that exceeds expectations and builds lasting
+                                                    partnerships."</strong>
+                                            </p>
+                                            <p
+                                                style="margin: 10px 0 0 0; text-align: right; color: #666; font-size: 14px;">
+                                                - STC Associates
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <!-- Requisitions for Current Month -->
+                                    <div class="row" style="margin-top: 30px;">
+                                        <div class="col-xl-12 col-lg-12 col-md-12">
+                                            <table border="0" cellspacing="0" cellpadding="0"
+                                                style="width: 100%; border-collapse: collapse; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); table-layout: fixed;">
+                                                <thead>
+                                                    <tr style="background-color: #3989c6; color: white;">
+                                                        <th
+                                                            style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 8%;">
+                                                            SL
+                                                            No</th>
+                                                        <th
+                                                            style="padding: 10px; text-align: left; border: 1px solid #ddd; width: 50%;">
+                                                            Item Name</th>
+                                                        <th
+                                                            style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 12%;">
+                                                            Unit</th>
+                                                        <th
+                                                            style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 12%;">
+                                                            Qty</th>
+                                                        <th
+                                                            style="padding: 10px; text-align: right; border: 1px solid #ddd; width: 15%;">
+                                                            Rate</th>
+                                                        <th
+                                                            style="padding: 10px; text-align: right; border: 1px solid #ddd; width: 15%;">
+                                                            Total</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                <?php
+                                                    // Get requisitions with proper joins and rate calculation
+                                                    $query="
+                                                        SELECT 
+                                                        D.stc_cust_project_id,
+                                                        B.stc_cust_super_requisition_list_items_title as item_name,
+                                                        B.stc_cust_super_requisition_list_items_unit as unit,
+                                                        A.stc_cust_super_requisition_list_items_rec_recqty as qty,
+                                                        E.stc_purchase_product_adhoc_rate as rate,
+                                                        A.stc_cust_super_requisition_list_items_rec_recqty * E.stc_purchase_product_adhoc_rate as total,
+                                                        A.stc_cust_super_requisition_list_items_rec_date as rec_date
+                                                        FROM stc_cust_super_requisition_list_items_rec A 
+                                                        INNER JOIN stc_cust_super_requisition_list_items B
+                                                        ON A.stc_cust_super_requisition_list_items_rec_list_item_id = B.stc_cust_super_requisition_list_id
+                                                        INNER JOIN stc_cust_super_requisition_list C
+                                                        ON A.stc_cust_super_requisition_list_items_rec_list_id = C.stc_cust_super_requisition_list_id
+                                                        INNER JOIN stc_cust_project D
+                                                        ON C.stc_cust_super_requisition_list_project_id = D.stc_cust_project_id
+                                                        INNER JOIN stc_purchase_product_adhoc E
+                                                        ON A.stc_cust_super_requisition_list_items_rec_list_poaid = E.stc_purchase_product_adhoc_id
+                                                        WHERE DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '".$dateFrom."' AND '".$dateTo."'
+                                                        AND D.stc_cust_project_id = '".mysqli_real_escape_string($con, $_GET['pro_id'])."' AND E.stc_purchase_product_adhoc_rate > 0
+                                                        ORDER BY D.stc_cust_project_title, B.stc_cust_super_requisition_list_items_title ASC
+                                                    ";
+                                                    // echo $query;
+                                                    $requisition_query = mysqli_query($con, $query);
+                                                    $rows_per_page = 20;
+                                                    $grand_total = 0;
+                                                    $rows = array();
 
-        <!-- main area -->
-        <div class="row med">
-            <div class="container-fluid">
-                <!-- Create order -->
-                <div class="row" style="margin-top: 10px;">
-                    <div class="col-xl-12 col-lg-12 col-md-12">
-                        <div style="font-size: 18px; margin-bottom: 20px;" class="">
-                            <p><strong>Project:</strong>
-                                <?php echo $get_stc_purchase_product['stc_cust_project_title']; ?>
-                            </p>
+                                                    if ($requisition_query) {
+                                                        while ($req_row = mysqli_fetch_assoc($requisition_query)) {
+                                                            $rows[] = $req_row;
+                                                            $grand_total += (float) $req_row['total'];
+                                                        }
+                                                    }
+
+                                                    $total_rows = count($rows);
+                                                    $total_pages = ($total_rows > 0) ? (int) ceil($total_rows / $rows_per_page) : 1;
+                                                    $sl = 0;
+
+                                                    if ($total_rows > 0) {
+                                                        foreach ($rows as $req_row) {
+                                                            $sl++;
+                                                            $rate = $req_row['rate'];
+                                                            $total = $req_row['total'];
+                                                            $row_break_class = (($sl > 1) && (($sl - 1) % $rows_per_page === 0)) ? ' page-break' : '';
+                                                ?>
+                                                <tr class="table-row<?php echo $row_break_class; ?>">
+                                                    <td
+                                                        style="padding: 12px; text-align: center; border: 1px solid #ddd; background-color: #f8f9fa;">
+                                                        <?php echo $sl; ?>
+                                                    </td>
+                                                    <td
+                                                        style="padding: 12px; text-align: left; border: 1px solid #ddd;">
+                                                        <?php echo htmlspecialchars($req_row['item_name']); ?>
+                                                    </td>
+                                                    <td
+                                                        style="padding: 12px; text-align: left; border: 1px solid #ddd;">
+                                                        <?php echo htmlspecialchars($req_row['unit']); ?>
+                                                    </td>
+                                                    <td
+                                                        style="padding: 12px; text-align: center; border: 1px solid #ddd;">
+                                                        <?php echo number_format($req_row['qty'], 2); ?>
+                                                    </td>
+                                                    <td
+                                                        style="padding: 12px; text-align: right; border: 1px solid #ddd;">
+                                                        ₹
+                                                        <?php echo number_format($rate, 2); ?>
+                                                    </td>
+                                                    <td
+                                                        style="padding: 12px; text-align: right; border: 1px solid #ddd; font-weight: bold;">
+                                                        ₹
+                                                        <?php echo number_format($total, 2); ?>
+                                                    </td>
+                                                </tr>
+                                                <?php
+                                                            if (($sl % $rows_per_page === 0) && ($sl < $total_rows)) {
+                                                                $page_no = (int) ($sl / $rows_per_page);
+                                                ?>
+                                                <tr>
+                                                    <td colspan="6"
+                                                        style="padding: 8px 0; text-align: right; border: none; font-size: 12px; color: #333;">
+                                                        Page <?php echo $page_no; ?> of <?php echo $total_pages; ?>
+                                                    </td>
+                                                </tr>
+                                                <?php
+                                                            }
+                                                        }
+                                                ?>
+                                                <tr
+                                                    style="background-color: #f8f9fa; font-weight: bold; border-top: 2px solid #3989c6;">
+                                                    <td colspan="5"
+                                                        style="padding: 15px; text-align: right; border: 1px solid #ddd; font-size: 16px;">
+                                                        Grand Total:</td>
+                                                    <td
+                                                        style="padding: 15px; text-align: right; border: 1px solid #ddd; font-size: 16px; color: #3989c6;">
+                                                        ₹
+                                                        <?php echo number_format($grand_total, 2); ?>
+                                                    </td>
+                                                </tr>
+                                                <?php
+                                                    } else {
+                                                ?>
+                                                <tr>
+                                                    <td colspan="6"
+                                                        style="padding: 40px; text-align: center; border: 1px solid #ddd; color: #666; background-color: #f8f9fa;">
+                                                        <i class="fas fa-inbox"
+                                                            style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
+                                                        <h4 style="color: #666; margin: 15px 0;">No Requisitions Found
+                                                        </h4>
+                                                        <p style="margin: 0;">No requisitions were found for the date range (
+                                                            <?php echo date('d M Y', strtotime($dateFrom)); ?> to
+                                                            <?php echo date('d M Y', strtotime($dateTo)); ?>)
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                                <?php
+                                                    }
+
+                                                    $last_page_no = ($total_rows > 0) ? $total_pages : 1;
+                                                ?>
+                                                <tr>
+                                                    <td colspan="6"
+                                                        style="padding: 8px 0; text-align: right; border: none; font-size: 12px; color: #333;">
+                                                        Page <?php echo $last_page_no; ?> of <?php echo $total_pages; ?>
+                                                    </td>
+                                                </tr>
+                                                <?php
+                                                ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="">
-                            <h4><b>Kind Attn: Mr/Miss.
-                                    <?php echo $get_stc_purchase_product['stc_cust_project_responsive_person']; ?>
-                                </b></h4>
-                        </div>
-                        <div
-                            style="font-size: 16px; margin: 20px 0; padding: 15px; background-color: #f8f9fa; border-left: 4px solid #3989c6; border-radius: 5px;">
-                            <p style="margin: 0; font-style: italic; color: #555;">
-                                <strong>"Excellence in project management is not just about meeting deadlines, but about
-                                    delivering value that exceeds expectations and builds lasting
-                                    partnerships."</strong>
-                            </p>
-                            <p style="margin: 10px 0 0 0; text-align: right; color: #666; font-size: 14px;">
-                                - STC Associates
-                            </p>
-                        </div>
-                    </div>
-                    <!-- Requisitions for Current Month -->
-                    <div class="row" style="margin-top: 30px;">
-                        <div class="col-xl-12 col-lg-12 col-md-12">
-                            <table border="0" cellspacing="0" cellpadding="0"
-                                style="width: 100%; border-collapse: collapse; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); table-layout: fixed;">
-                                <tr style="background-color: #3989c6; color: white;">
-                                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 8%;">SL
-                                        No</th>
-                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd; width: 50%;">
-                                        Item Name</th>
-                                    <th style="padding: 10px; text-align: center; border: 1px solid #ddd; width: 12%;">
-                                        Qty</th>
-                                    <th style="padding: 10px; text-align: right; border: 1px solid #ddd; width: 15%;">
-                                        Rate</th>
-                                    <th style="padding: 10px; text-align: right; border: 1px solid #ddd; width: 15%;">
-                                        Total</th>
-                                </tr>
-                                <?php
-                    // Get requisitions with proper joins and rate calculation
-                    $query="
-                        SELECT 
-                        D.stc_cust_project_id,
-                        B.stc_cust_super_requisition_list_items_title as item_name,
-                        A.stc_cust_super_requisition_list_items_rec_recqty as qty,
-                        E.stc_purchase_product_adhoc_rate as rate,
-                        A.stc_cust_super_requisition_list_items_rec_recqty * E.stc_purchase_product_adhoc_rate as total,
-                        A.stc_cust_super_requisition_list_items_rec_date as rec_date
-                        FROM stc_cust_super_requisition_list_items_rec A 
-                        INNER JOIN stc_cust_super_requisition_list_items B
-                        ON A.stc_cust_super_requisition_list_items_rec_list_item_id = B.stc_cust_super_requisition_list_id
-                        INNER JOIN stc_cust_super_requisition_list C
-                        ON A.stc_cust_super_requisition_list_items_rec_list_id = C.stc_cust_super_requisition_list_id
-                        INNER JOIN stc_cust_project D
-                        ON C.stc_cust_super_requisition_list_project_id = D.stc_cust_project_id
-                        INNER JOIN stc_purchase_product_adhoc E
-                        ON A.stc_cust_super_requisition_list_items_rec_list_poaid = E.stc_purchase_product_adhoc_id
-                        WHERE DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '".$dateFrom."' AND '".$dateTo."'
-                        AND D.stc_cust_project_id = '".mysqli_real_escape_string($con, $_GET['pro_id'])."' AND E.stc_purchase_product_adhoc_rate > 0
-                        ORDER BY D.stc_cust_project_title, B.stc_cust_super_requisition_list_items_title ASC
-                    ";
-                    // echo $query;
-                    $requisition_query = mysqli_query($con, $query);
-                    $sl = 0;
-                    $grand_total = 0;
-                    $rows_per_page = 20; // Adjust based on your page height
-                    $current_page = 1;
-                    $row_count = 0;
-                    
-                    while ($req_row = mysqli_fetch_assoc($requisition_query)) {
-                        $sl++;
-                        $row_count++;
-                        
-                        // Get rate and total directly from the query result
-                        $rate = $req_row['rate'];
-                        $total = $req_row['total'];
-                        $grand_total += $total;
-                    ?>
-                                <tr class="table-row">
-                                    <td
-                                        style="padding: 12px; text-align: center; border: 1px solid #ddd; background-color: #f8f9fa;">
-                                        <?php echo $sl; ?>
-                                    </td>
-                                    <td style="padding: 12px; text-align: left; border: 1px solid #ddd;">
-                                        <?php echo htmlspecialchars($req_row['item_name']); ?>
-                                    </td>
-                                    <td style="padding: 12px; text-align: center; border: 1px solid #ddd;">
-                                        <?php echo number_format($req_row['qty'], 2); ?>
-                                    </td>
-                                    <td style="padding: 12px; text-align: right; border: 1px solid #ddd;">₹
-                                        <?php echo number_format($rate, 2); ?>
-                                    </td>
-                                    <td
-                                        style="padding: 12px; text-align: right; border: 1px solid #ddd; font-weight: bold;">
-                                        ₹
-                                        <?php echo number_format($total, 2); ?>
-                                    </td>
-                                </tr>
-                                <?php
-                        
-                        // No page break logic during data display
-                    }
-                    
-                    if ($sl == 0) {
-                    ?>
-                                <tr>
-                                    <td colspan="5"
-                                        style="padding: 40px; text-align: center; border: 1px solid #ddd; color: #666; background-color: #f8f9fa;">
-                                        <i class="fas fa-inbox"
-                                            style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
-                                        <h4 style="color: #666; margin: 15px 0;">No Requisitions Found</h4>
-                                        <p style="margin: 0;">No requisitions were found for the date range (
-                                            <?php echo date('d M Y', strtotime($dateFrom)); ?> to
-                                            <?php echo date('d M Y', strtotime($dateTo)); ?>)
-                                        </p>
-                                    </td>
-                                </tr>
-                                <?php
-                    } else {
-                    ?>
-                                <tr
-                                    style="background-color: #f8f9fa; font-weight: bold; border-top: 2px solid #3989c6;">
-                                    <td colspan="4"
-                                        style="padding: 15px; text-align: right; border: 1px solid #ddd; font-size: 16px;">
-                                        Grand Total:</td>
-                                    <td
-                                        style="padding: 15px; text-align: right; border: 1px solid #ddd; font-size: 16px; color: #3989c6;">
-                                        ₹
-                                        <?php echo number_format($grand_total, 2); ?>
-                                    </td>
-                                </tr>
-                                <?php
-                    }
-                    ?>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script>
