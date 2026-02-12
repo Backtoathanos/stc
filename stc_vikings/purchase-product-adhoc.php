@@ -1196,6 +1196,7 @@ include("kattegat/role_check.php");
             var item_rack = $(this).closest('tr').find('td:eq(5)').html().trim();
             var item_unit=$(this).closest('tr').find('td:eq(6)').html();
             var item_qty=$(this).closest('tr').find('td:eq(7)').html();
+            var item_remarks=$(this).closest('tr').find('td:eq(18)').html();
             var item_id=$(this).attr("id");
             $('#edit-pro-id').remove();
             $('#stcpoadhoceitemname').val(item_name);
@@ -1204,6 +1205,7 @@ include("kattegat/role_check.php");
             }).prop('selected', true);
             $('#stcpoadhoceitemunit').val(item_unit);
             $('#stcpoadhoceitemqty').val(item_qty);
+            $('#stcpoadhoceitemremarks').val(item_remarks);
             $('#stc-poadhocedit-id').val(item_id);
           });
           
@@ -1213,6 +1215,7 @@ include("kattegat/role_check.php");
             var adhoc_rack=$('#stcpoadhoceitemrack').val();
             var adhoc_unit=$('#stcpoadhoceitemunit').val();
             var adhoc_qty=$('#stcpoadhoceitemqty').val();
+            var adhoc_remarks=$('#stcpoadhoceitemremarks').val();
             $.ajax({
               url     : "kattegat/ragnar_purchase.php",
               method  : "POST",
@@ -1222,7 +1225,8 @@ include("kattegat/role_check.php");
                 adhoc_name:adhoc_name,
                 adhoc_rack:adhoc_rack,
                 adhoc_unit:adhoc_unit,
-                adhoc_qty:adhoc_qty
+                adhoc_qty:adhoc_qty,
+                adhoc_remarks:adhoc_remarks
               },
               success : function(response_items){
                 var response=response_items.trim();
@@ -2386,7 +2390,16 @@ include("kattegat/role_check.php");
                       class="form-control validate"
                     />
                   </div>
-                </div>                
+                </div>    
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5
+                      for=""
+                      >Remarks
+                    </h5>
+                    <textarea class="form-control" id="stcpoadhoceitemremarks"></textarea>
+                  </div>
+                </div>  
                 <div class="col-xl-12 col-md-12 col-sm-12">
                   <div class="card-border mb-3 card card-body border-success">
                     <button type="button"  data-dismiss="modal" class="btn btn-success stc-poadhoc-edititemname">Save</button>

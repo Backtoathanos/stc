@@ -2562,7 +2562,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}
 
 	// update po adhoc item name
-	public function stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty){
+	public function stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty, $adhoc_remarks){
 		$odin='';
 		// Remove commas and ensure proper decimal formatting
 		$adhoc_qty = str_replace(',', '', $adhoc_qty);
@@ -2570,7 +2570,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$adhoc_qty = number_format((float)$adhoc_qty, 2, '.', '');
 		
 		$checkqry=mysqli_query($this->stc_dbs, "
-			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."', `stc_purchase_product_adhoc_qty`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_qty)."', `stc_purchase_product_adhoc_unit`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_unit)."', `stc_purchase_product_adhoc_rackid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_rack)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."', `stc_purchase_product_adhoc_qty`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_qty)."', `stc_purchase_product_adhoc_unit`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_unit)."', `stc_purchase_product_adhoc_rackid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_rack)."', `stc_purchase_product_adhoc_remarks`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_remarks)."'  WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
 		");
 		if($checkqry){
 			$odin='success';
@@ -4183,8 +4183,9 @@ if(isset($_POST['stc_po_adhoc_update'])){
 	$adhoc_rack=$_POST['adhoc_rack'];
 	$adhoc_unit=$_POST['adhoc_unit'];
 	$adhoc_qty=$_POST['adhoc_qty'];
+	$adhoc_remarks=$_POST['adhoc_remarks'];
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty);
+	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty, $adhoc_remarks);
 	echo $outbjornestocking;
 }
 
