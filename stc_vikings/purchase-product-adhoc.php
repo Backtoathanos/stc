@@ -388,6 +388,7 @@ include("kattegat/role_check.php");
                                                                     <option>PARDIH STORE</option>
                                                                     <option>RAMGARH WAREHOUSE</option>
                                                                     <option>SARA INTERNATIONAL SCHOOL</option>
+                                                                    <option>SARA GIRLS MISSION SCHOOL</option>
                                                                 </select>
                                                             </td>
                                                             <td>
