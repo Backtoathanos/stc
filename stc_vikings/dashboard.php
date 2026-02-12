@@ -529,6 +529,7 @@ STCAuthHelper::checkAuth();
                                     ON `item_id`=`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
                                     WHERE `stc_cust_super_requisition_items_finalqty`!=0 AND `stc_cust_super_requisition_list_items_status`='9' AND `title`='Pending' 
                                     AND `stc_requisition_combiner_date` >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
+                                    GROUP BY `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_items_title`
                                     ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
                                  ";
                                  $getrequisitionsqry=mysqli_query($con, $query);
