@@ -58,20 +58,20 @@ include("kattegat/role_check.php");
                                 </a>
                             </li> -->
             <li class="nav-item">
-              <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#tab-content-2">
+              <a role="tab" class="nav-link active" id="tab-2" data-toggle="tab" href="#tab-content-2">
                 <span>Check Requisition</span>
               </a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a role="tab" class="nav-link" id="tab-5" data-toggle="tab" href="#tab-content-5">
                 <span>Check Requisition By List</span>
               </a>
-            </li>
-            <li class="nav-item">
-              <a role="tab" class="nav-link active" id="tab-3" data-toggle="tab" href="#tab-content-3">
+            </li> -->
+            <!-- <li class="nav-item">
+              <a role="tab" class="nav-link" id="tab-3" data-toggle="tab" href="#tab-content-3">
                 <span>Process Requisition</span>
               </a>
-            </li>
+            </li> -->
             <li class="nav-item">
               <a role="tab" class="nav-link" id="tab-4" data-toggle="tab" href="#tab-content-4">
                 <span>Requisitions Item Track </span>
@@ -1974,7 +1974,6 @@ include("kattegat/role_check.php");
           }
         });
       }
-      item_tracker_call('', 1);
       function item_tracker_call(searchTerm, page = 1) {
         $.ajax({
           url: "kattegat/ragnar_order.php",
@@ -1988,6 +1987,20 @@ include("kattegat/role_check.php");
             $('.item-tracker-show').html(response);
           }
         });
+      }
+
+      // Load PPE Track only when its tab is opened
+      var ppeTrackLoaded = false;
+      function loadPPETrackIfNeeded() {
+        if (ppeTrackLoaded) return;
+        ppeTrackLoaded = true;
+        item_tracker_call('', 1);
+      }
+      $('a#tab-6').on('shown.bs.tab', function () {
+        loadPPETrackIfNeeded();
+      });
+      if ($('a#tab-6').hasClass('active')) {
+        loadPPETrackIfNeeded();
       }
 
       $('body').delegate('#searchInputppebtn', 'click', function (e) {
@@ -2080,7 +2093,6 @@ include("kattegat/role_check.php");
         $('.formcontrol').find('input, textarea').val('');
         $('.formcontrol').find('input:checked').prop('checked', false);
       }
-      call_tools_tracker('');
       // Search button click event
       $('body').delegate('#itt-toolssearchInputbtn', 'click', function (e) {
         var searchTerm = $('#itt-toolssearchInput').val().toLowerCase();
@@ -2143,6 +2155,20 @@ include("kattegat/role_check.php");
             $('.spinner').hide();
           }
         });
+      }
+
+      // Load Tools Track only when its tab is opened
+      var toolsTrackLoaded = false;
+      function loadToolsTrackIfNeeded() {
+        if (toolsTrackLoaded) return;
+        toolsTrackLoaded = true;
+        call_tools_tracker('');
+      }
+      $('a#tab-7').on('shown.bs.tab', function () {
+        loadToolsTrackIfNeeded();
+      });
+      if ($('a#tab-7').hasClass('active')) {
+        loadToolsTrackIfNeeded();
       }
 
       // for edit tools tracker
@@ -2332,7 +2358,6 @@ include("kattegat/role_check.php");
   </script>
   <script>
     $(document).ready(function () {
-      stc_call_advanceorderlist();
       function stc_call_advanceorderlist(){
         $.ajax({
           url: "kattegat/ragnar_order.php",
@@ -2353,6 +2378,20 @@ include("kattegat/role_check.php");
             $('.stc-call-advanceorderlist').html(data);
           }
         });
+      }
+
+      // Load Advance Order Material List only when its tab is opened
+      var advanceOrderListLoaded = false;
+      function loadAdvanceOrderListIfNeeded() {
+        if (advanceOrderListLoaded) return;
+        advanceOrderListLoaded = true;
+        stc_call_advanceorderlist();
+      }
+      $('a#tab-8').on('shown.bs.tab', function () {
+        loadAdvanceOrderListIfNeeded();
+      });
+      if ($('a#tab-8').hasClass('active')) {
+        loadAdvanceOrderListIfNeeded();
       }
 
       // Function to filter table rows
@@ -2439,8 +2478,20 @@ include("kattegat/role_check.php");
           stc_call_b2corders(searchQuery, currentPage);
       });
 
-      // Initial load
-      stc_call_b2corders();
+      // Load B2C Orders only when its tab is opened
+      var b2cOrdersLoaded = false;
+      function loadB2COrdersIfNeeded() {
+        if (b2cOrdersLoaded) return;
+        b2cOrdersLoaded = true;
+        stc_call_b2corders();
+      }
+      $('a#tab-9').on('shown.bs.tab', function () {
+        loadB2COrdersIfNeeded();
+      });
+      if ($('a#tab-9').hasClass('active')) {
+        loadB2COrdersIfNeeded();
+      }
+
       $('body').delegate('.orderaction-handler', 'click', function () {
         var id = $(this).attr('id');
         var status = $(this).attr('status');

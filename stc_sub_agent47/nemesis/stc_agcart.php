@@ -197,6 +197,22 @@ class witcher_supervisor extends tesseract{
 		");
 		if($optimusprimequery){
 			$last_id = mysqli_insert_id($this->stc_dbs);
+			$qry=mysqli_query($this->stc_dbs, "
+				SELECT A.stc_cust_super_requisition_list_items_product_id, C.stc_purchase_product_adhoc_productid 
+				FROM `stc_cust_super_requisition_list_items` A 
+				LEFT JOIN `stc_cust_super_requisition_list_items_rec` B ON A.stc_cust_super_requisition_list_id=B.stc_cust_super_requisition_list_items_rec_list_item_id 
+				LEFT JOIN `stc_purchase_product_adhoc` C ON B.stc_cust_super_requisition_list_items_rec_list_poaid=C.stc_purchase_product_adhoc_id 
+				WHERE (A.stc_cust_super_requisition_list_items_product_id<>0 OR A.stc_cust_super_requisition_list_items_product_id<>NULL) AND (A.stc_cust_super_requisition_list_items_title regexp '".mysqli_real_escape_string($this->stc_dbs, $desc)."' OR A.stc_cust_super_requisition_list_items_title='".mysqli_real_escape_string($this->stc_dbs, $desc)."')
+			");
+			$product_id=0;
+			if(mysqli_num_rows($qry)>0){
+				foreach($qry as $row){
+					$product_id=$row['stc_cust_super_requisition_list_items_product_id'];
+					if($product_id!=0){
+						break;
+					}
+				}
+			}
 			$optimusprimequery=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_cust_super_requisition_list_items`(
 					`stc_cust_super_requisition_list_items_req_id`, 
@@ -206,7 +222,8 @@ class witcher_supervisor extends tesseract{
 					`stc_cust_super_requisition_list_items_approved_qty`, 
 					`stc_cust_super_requisition_items_type`,
 					`stc_cust_super_requisition_items_priority`,
-					`stc_cust_super_requisition_list_items_status`
+					`stc_cust_super_requisition_list_items_status`,
+					`stc_cust_super_requisition_list_items_product_id`
 				) VALUES (
 					'".$last_id."',
 					'".mysqli_real_escape_string($this->stc_dbs, $desc)."',
@@ -215,7 +232,8 @@ class witcher_supervisor extends tesseract{
 					'0',
 					'".mysqli_real_escape_string($this->stc_dbs, $type)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $priority)."',
-					'1'
+					'1',
+					'".mysqli_real_escape_string($this->stc_dbs, $product_id)."'
 				)
 			");
 			$last_itemid = mysqli_insert_id($this->stc_dbs);
@@ -887,14 +905,21 @@ class witcher_supervisor extends tesseract{
 
 	public function stc_search_item($search){
 		$odin=[];
-		$query=mysqli_query($this->stc_dbs, "
-			SELECT DISTINCT `stc_cust_super_requisition_list_items_title` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_items_title`<>'' AND `stc_cust_super_requisition_list_items_title` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $search)."' ORDER BY `stc_cust_super_requisition_list_items_title` ASC
+		$query = mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT 
+				IFNULL(P.stc_product_name, A.stc_cust_super_requisition_list_items_title) AS stc_cust_super_requisition_list_items_title
+			FROM stc_cust_super_requisition_list_items A
+			LEFT JOIN stc_product P 
+				ON P.stc_product_name = A.stc_cust_super_requisition_list_items_title
+			WHERE A.stc_cust_super_requisition_list_items_title <> ''
+			AND A.stc_cust_super_requisition_list_items_title REGEXP '$search'
+			ORDER BY stc_cust_super_requisition_list_items_title ASC
 		");
-		if(mysqli_num_rows($query)>0){
-			while($row=mysqli_fetch_assoc($query)){
-				$odin[] = $row['stc_cust_super_requisition_list_items_title'];
-			}
+
+		while($row = mysqli_fetch_assoc($query)){
+			$odin[] = $row['stc_cust_super_requisition_list_items_title'];
 		}
+
 		return $odin;
 	}
 

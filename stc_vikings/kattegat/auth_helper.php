@@ -118,7 +118,7 @@ class STCAuthHelper {
      * Redirect to login page
      */
     private static function redirectToLogin() {
-        header("Location: index.html");
+        header("Location: ../index.html");
         exit();
     }
     
