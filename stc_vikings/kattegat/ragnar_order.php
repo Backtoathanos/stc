@@ -5678,6 +5678,814 @@ if(isset($_POST['call_tool_trackertrack'])){
 	$odin_req_out=$odin_req->stc_tool_trackertrack_get($itt_id);
 	echo json_encode($odin_req_out);
 }
+// Daily requisitions (AJAX)
+class ragnarCallDailyRequisitions extends tesseract{
+	public function stc_call_daily_requisitions($search = '', $page = 1, $limit = 25, $datefrom = '', $dateto = ''){
+		$page = (int)$page;
+		$limit = (int)$limit;
+		if($page < 1){ $page = 1; }
+		if($limit < 1 || $limit > 200){ $limit = 25; }
+		$offset = ($page - 1) * $limit;
+
+		// Default to a recent range so the page shows data
+		$datefrom = $datefrom == '' ? date('Y-m-d', strtotime('-7 days')) : $datefrom;
+		$dateto = $dateto == '' ? date('Y-m-d') : $dateto;
+
+		$search = trim((string)$search);
+		// Keep joining pattern consistent with requisition listing (combiner -> list -> items)
+		$where = " WHERE DATE(L.`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $datefrom)."' AND '".mysqli_real_escape_string($this->stc_dbs, $dateto)."' 
+			AND L.`stc_cust_super_requisition_list_status`!='1'
+		";
+		if($search !== ''){
+			$esc = mysqli_real_escape_string($this->stc_dbs, $search);
+			$where .= " AND (
+				P.`stc_cust_project_title` LIKE '%".$esc."%' OR
+				S.`stc_cust_pro_supervisor_fullname` LIKE '%".$esc."%' OR
+				S.`stc_cust_pro_supervisor_contact` LIKE '%".$esc."%' OR
+				L.`stc_cust_super_requisition_list_id` LIKE '%".$esc."%' OR
+				C.`stc_requisition_combiner_id` LIKE '%".$esc."%' OR
+				C.`stc_requisition_combiner_refrence` LIKE '%".$esc."%' OR
+				I.`stc_cust_super_requisition_list_items_title` LIKE '%".$esc."%'
+			) ";
+		}
+
+		$count_q = mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) AS total
+			FROM `stc_cust_super_requisition_list_items` I
+			INNER JOIN `stc_cust_super_requisition_list` L
+				ON I.`stc_cust_super_requisition_list_items_req_id` = L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_cust_project` P
+				ON L.`stc_cust_super_requisition_list_project_id` = P.`stc_cust_project_id`
+			INNER JOIN `stc_cust_pro_supervisor` S
+				ON L.`stc_cust_super_requisition_list_super_id` = S.`stc_cust_pro_supervisor_id`
+			INNER JOIN `stc_agents` A
+				ON S.`stc_cust_pro_supervisor_created_by` = A.`stc_agents_id`
+			INNER JOIN `stc_requisition_combiner_req` CR
+				ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_requisition_combiner` C
+				ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+			".$where."
+		");
+		$total = 0;
+		if($count_q){
+			$total_row = mysqli_fetch_assoc($count_q);
+			$total = (int)($total_row['total'] ?? 0);
+		}
+		$total_pages = (int)ceil($total / $limit);
+
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT
+				I.`stc_cust_super_requisition_list_id` AS item_id,
+				L.`stc_cust_super_requisition_list_id` AS requisition_number,
+				L.`stc_cust_super_requisition_list_date` AS req_datetime,
+				C.`stc_requisition_combiner_id` AS combiner_id,
+				C.`stc_requisition_combiner_date` AS combiner_date,
+				C.`stc_requisition_combiner_refrence` AS combiner_reference,
+				P.`stc_cust_project_title` AS project_name,
+				A.`stc_agents_name` AS manager_name,
+				S.`stc_cust_pro_supervisor_fullname` AS sent_by_name,
+				S.`stc_cust_pro_supervisor_contact` AS sent_by_contact,
+				I.`stc_cust_super_requisition_list_items_title` AS item_desc,
+				I.`stc_cust_super_requisition_list_items_unit` AS unit,
+				I.`stc_cust_super_requisition_list_items_approved_qty` AS ordered_qty,
+				I.`stc_cust_super_requisition_list_items_approved_qty` AS req_qty,
+				I.`stc_cust_super_requisition_list_items_status` AS status_code,
+				I.`stc_cust_super_requisition_items_priority` AS priority_code,
+				I.`stc_cust_super_requisition_items_type` AS item_type,
+				IFNULL(R.dispatched_qty, 0) AS dispatched_qty,
+				IFNULL(LG.logs_count, 0) AS logs_count
+			FROM `stc_cust_super_requisition_list_items` I
+			INNER JOIN `stc_cust_super_requisition_list` L
+				ON I.`stc_cust_super_requisition_list_items_req_id` = L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_cust_project` P
+				ON L.`stc_cust_super_requisition_list_project_id` = P.`stc_cust_project_id`
+			INNER JOIN `stc_cust_pro_supervisor` S
+				ON L.`stc_cust_super_requisition_list_super_id` = S.`stc_cust_pro_supervisor_id`
+			INNER JOIN `stc_agents` A
+				ON S.`stc_cust_pro_supervisor_created_by` = A.`stc_agents_id`
+			INNER JOIN `stc_requisition_combiner_req` CR
+				ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_requisition_combiner` C
+				ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+			LEFT JOIN (
+				SELECT
+					`stc_cust_super_requisition_list_items_rec_list_item_id` AS item_id,
+					SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+				FROM `stc_cust_super_requisition_list_items_rec`
+				GROUP BY `stc_cust_super_requisition_list_items_rec_list_item_id`
+			) R ON R.item_id = I.`stc_cust_super_requisition_list_id`
+			LEFT JOIN (
+				SELECT `item_id`, COUNT(*) AS logs_count
+				FROM `stc_cust_super_requisition_list_items_log`
+				GROUP BY `item_id`
+			) LG ON LG.item_id = I.`stc_cust_super_requisition_list_id`
+			".$where."
+			ORDER BY TIMESTAMP(L.`stc_cust_super_requisition_list_date`) DESC, I.`stc_cust_super_requisition_list_id` DESC
+			LIMIT ".$offset.", ".$limit."
+		");
+
+		$data = [];
+		if($q && mysqli_num_rows($q) > 0){
+			while($row = mysqli_fetch_assoc($q)){
+				$status_code = (int)($row['status_code'] ?? 0);
+				$status_text = 'Closed';
+				if($status_code === 1){ $status_text = 'Ordered'; }
+				elseif($status_code === 2){ $status_text = 'Approved'; }
+				elseif($status_code === 3){ $status_text = 'Accepted'; }
+				elseif($status_code === 4){ $status_text = 'Dispatched'; }
+				elseif($status_code === 5){ $status_text = 'Received'; }
+				elseif($status_code === 6){ $status_text = 'Rejected'; }
+				elseif($status_code === 7){ $status_text = 'Canceled'; }
+				elseif($status_code === 8){ $status_text = 'Returned'; }
+				elseif($status_code === 9){ $status_text = 'Pending'; }
+
+				$priority_code = (int)($row['priority_code'] ?? 1);
+				$priority_text = $priority_code === 2 ? 'Urgent' : 'Normal';
+
+				$data[] = [
+					'item_id' => (int)$row['item_id'],
+					'requisition_number' => (string)$row['requisition_number'],
+					'date_time' => $row['req_datetime'] == '' ? '' : date('d-m-Y h:i A', strtotime($row['req_datetime'])),
+					'combiner_id' => (int)($row['combiner_id'] ?? 0),
+					'combiner_date' => $row['combiner_date'] == '' ? '' : date('d-m-Y h:i A', strtotime($row['combiner_date'])),
+					'combiner_reference' => (string)($row['combiner_reference'] ?? ''),
+					'project_name' => (string)$row['project_name'],
+					'manager_name' => (string)$row['manager_name'],
+					'sent_by_name' => (string)$row['sent_by_name'],
+					'sent_by_contact' => (string)$row['sent_by_contact'],
+					'item_desc' => (string)$row['item_desc'],
+					'unit' => (string)$row['unit'],
+					'ordered_qty' => number_format((float)$row['ordered_qty'], 2),
+					'req_qty' => number_format((float)$row['req_qty'], 2),
+					'dispatched_qty' => number_format((float)$row['dispatched_qty'], 2),
+					'status_code' => $status_code,
+					'status_text' => $status_text,
+					'priority_code' => $priority_code,
+					'priority_text' => $priority_text,
+					'item_type' => (string)($row['item_type'] ?? ''),
+					'logs_count' => (int)$row['logs_count']
+				];
+			}
+		}
+
+		return [
+			'page' => $page,
+			'total_pages' => $total_pages,
+			'total' => $total,
+			'data' => $data
+		];
+	}
+
+	public function stc_call_daily_requisition_logs($item_id = 0){
+		$item_id = (int)$item_id;
+		if($item_id <= 0){
+			return ['data' => []];
+		}
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT `title`, `message`, `created_date`
+			FROM `stc_cust_super_requisition_list_items_log`
+			WHERE `item_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+			ORDER BY `id` DESC
+			LIMIT 50
+		");
+		$data = [];
+		if($q && mysqli_num_rows($q) > 0){
+			while($row = mysqli_fetch_assoc($q)){
+				$data[] = [
+					'title' => (string)($row['title'] ?? ''),
+					'message' => (string)($row['message'] ?? ''),
+					'created_date' => $row['created_date'] == '' ? '' : date('d-m-Y h:i A', strtotime($row['created_date']))
+				];
+			}
+		}
+		return ['data' => $data];
+	}
+
+	public function stc_call_daily_requisition_balance($item_id = 0){
+		$item_id = (int)$item_id;
+		if($item_id <= 0){
+			return ['data' => []];
+		}
+
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT 
+				P.`stc_product_id` AS product_id,
+				P.`stc_product_name` AS product_name,
+				P.`stc_product_unit` AS product_unit,
+				SUM(RP.`stc_cust_super_requisition_items_finalqty`) AS connected_qty
+			FROM `stc_cust_super_requisition_list_items` RP
+			INNER JOIN `stc_product` P
+				ON P.`stc_product_id` = RP.`stc_cust_super_requisition_list_items_product_id`
+			WHERE RP.`stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+			GROUP BY P.`stc_product_id`
+			ORDER BY P.`stc_product_name` ASC
+		");
+
+		$data = [];
+		if($q && mysqli_num_rows($q) > 0){
+			while($row = mysqli_fetch_assoc($q)){
+				$product_id = (int)$row['product_id'];
+
+				$adhocQty = 0.0;
+				$gldQty = 0.0;
+				$directQty = 0.0;
+				$dispatchedForItemProduct = 0.0;
+
+				$q1 = mysqli_query($this->stc_dbs, "SELECT SUM(`stc_purchase_product_adhoc_qty`) AS total_qty FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid` = '".$product_id."'");
+				if($q1){
+					$r1 = mysqli_fetch_assoc($q1);
+					$adhocQty = (float)($r1['total_qty'] ?? 0);
+				}
+
+				$q2 = mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = '".$product_id."'");
+				if($q2){
+					$r2 = mysqli_fetch_assoc($q2);
+					$gldQty = (float)($r2['total_qty'] ?? 0);
+				}
+
+				$q3 = mysqli_query($this->stc_dbs, "
+					SELECT SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`) AS total_qty
+					FROM `stc_cust_super_requisition_list_items_rec` R
+					WHERE R.`stc_cust_super_requisition_list_items_rec_list_poaid` IN (
+						SELECT `stc_purchase_product_adhoc_id`
+						FROM `stc_purchase_product_adhoc`
+						WHERE `stc_purchase_product_adhoc_productid` = '".$product_id."'
+					)
+				");
+				if($q3){
+					$r3 = mysqli_fetch_assoc($q3);
+					$directQty = (float)($r3['total_qty'] ?? 0);
+				}
+
+				// Dispatched for this requisition item + product (via adhoc ids)
+				$q4 = mysqli_query($this->stc_dbs, "
+					SELECT SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`) AS total_qty
+					FROM `stc_cust_super_requisition_list_items_rec` R
+					INNER JOIN `stc_purchase_product_adhoc` A
+						ON A.`stc_purchase_product_adhoc_id` = R.`stc_cust_super_requisition_list_items_rec_list_poaid`
+					WHERE R.`stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+						AND A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+				");
+				if($q4){
+					$r4 = mysqli_fetch_assoc($q4);
+					$dispatchedForItemProduct = (float)($r4['total_qty'] ?? 0);
+				}
+
+				$balanceQty = $adhocQty - ($gldQty + $directQty);
+				$reqBalanceQty = ((float)($row['connected_qty'] ?? 0)) - $dispatchedForItemProduct;
+				if($reqBalanceQty < 0){ $reqBalanceQty = 0; }
+
+				$data[] = [
+					'product_id' => $product_id,
+					'product_name' => (string)($row['product_name'] ?? ''),
+					'product_unit' => (string)($row['product_unit'] ?? ''),
+					'connected_qty' => number_format((float)($row['connected_qty'] ?? 0), 2),
+					'dispatched_qty' => number_format((float)$dispatchedForItemProduct, 2),
+					'req_balance_qty' => number_format((float)$reqBalanceQty, 2),
+					'balance_qty' => number_format((float)$balanceQty, 2),
+					'can_dispatch' => ($reqBalanceQty > 0.0001 && $balanceQty > 0.0001) ? 1 : 0
+				];
+			}
+		}
+
+		return ['data' => $data];
+	}
+
+	private function stc_daily_req_log($item_id, $title, $message){
+		$item_id = (int)$item_id;
+		if($item_id <= 0){ return; }
+		mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_cust_super_requisition_list_items_log`(
+				`item_id`, 
+				`title`, 
+				`message`, 
+				`status`, 
+				`created_by`,
+				`created_date`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $item_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $title)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $message)."',
+				'1',
+				'".$_SESSION['stc_empl_id']."',
+				'".date("Y-m-d H:i:s")."'
+			)
+		");
+	}
+
+	public function stc_dispatch_daily_requisition_balance($item_id = 0, $product_id = 0){
+		$item_id = (int)$item_id;
+		$product_id = (int)$product_id;
+		if($item_id <= 0 || $product_id <= 0){
+			return ['success' => false, 'message' => 'Invalid parameters.'];
+		}
+
+		// Get requisition(list) id + unit + item type + required qty for this product (connected qty)
+		$item_q = mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_cust_super_requisition_list_items_req_id` AS list_id,
+				`stc_cust_super_requisition_list_items_unit` AS unit,
+				`stc_cust_super_requisition_items_type` AS item_type,
+				SUM(`stc_cust_super_requisition_items_finalqty`) AS required_qty
+			FROM `stc_cust_super_requisition_list_items`
+			WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+				AND `stc_cust_super_requisition_list_items_product_id` = '".$product_id."'
+			GROUP BY `stc_cust_super_requisition_list_items_req_id`, `stc_cust_super_requisition_list_items_unit`, `stc_cust_super_requisition_items_type`
+			LIMIT 1
+		");
+		if(!$item_q || mysqli_num_rows($item_q) === 0){
+			return ['success' => false, 'message' => 'No connected product found for this requisition item.'];
+		}
+		$item_row = mysqli_fetch_assoc($item_q);
+		$list_id = (int)$item_row['list_id'];
+		$item_unit = (string)($item_row['unit'] ?? '');
+		$item_type = (string)($item_row['item_type'] ?? '');
+		$required_qty = (float)($item_row['required_qty'] ?? 0);
+
+		// Already dispatched qty for this item+product (via adhoc ids)
+		$dispatchedForItemProduct = 0.0;
+		$dis_q = mysqli_query($this->stc_dbs, "
+			SELECT SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`) AS total_qty
+			FROM `stc_cust_super_requisition_list_items_rec` R
+			INNER JOIN `stc_purchase_product_adhoc` A
+				ON A.`stc_purchase_product_adhoc_id` = R.`stc_cust_super_requisition_list_items_rec_list_poaid`
+			WHERE R.`stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+				AND A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+		");
+		if($dis_q){
+			$dis_row = mysqli_fetch_assoc($dis_q);
+			$dispatchedForItemProduct = (float)($dis_row['total_qty'] ?? 0);
+		}
+
+		$remaining_to_dispatch = $required_qty - $dispatchedForItemProduct;
+		if($remaining_to_dispatch <= 0){
+			return ['success' => false, 'message' => 'Nothing pending to dispatch for this product.'];
+		}
+
+		// Build adhoc rows with remaining per adhoc_id (ignoring GLD for now, we subtract it from effective stock)
+		$adhoc_rows = [];
+		$adhoc_q = mysqli_query($this->stc_dbs, "
+			SELECT 
+				A.`stc_purchase_product_adhoc_id` AS adhoc_id,
+				A.`stc_purchase_product_adhoc_qty` AS adhoc_qty,
+				IFNULL(SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`),0) AS used_qty
+			FROM `stc_purchase_product_adhoc` A
+			LEFT JOIN `stc_cust_super_requisition_list_items_rec` R
+				ON R.`stc_cust_super_requisition_list_items_rec_list_poaid` = A.`stc_purchase_product_adhoc_id`
+			WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+			GROUP BY A.`stc_purchase_product_adhoc_id`
+			HAVING (A.`stc_purchase_product_adhoc_qty` - IFNULL(SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`),0)) > 0
+			ORDER BY A.`stc_purchase_product_adhoc_id` ASC
+		");
+		if($adhoc_q && mysqli_num_rows($adhoc_q) > 0){
+			while($r = mysqli_fetch_assoc($adhoc_q)){
+				$adhoc_rows[] = [
+					'adhoc_id' => (int)$r['adhoc_id'],
+					'remaining' => (float)$r['adhoc_qty'] - (float)$r['used_qty']
+				];
+			}
+		}
+		if(count($adhoc_rows) === 0){
+			return ['success' => false, 'message' => 'No Adhoc stock available for this product.'];
+		}
+
+		// Subtract GLD consumption from effective remaining
+		$gldQty = 0.0;
+		$gld_q = mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = '".$product_id."'");
+		if($gld_q){
+			$gld_row = mysqli_fetch_assoc($gld_q);
+			$gldQty = (float)($gld_row['total_qty'] ?? 0);
+		}
+
+		$now = date("Y-m-d H:i:s");
+		$total_dispatched_now = 0.0;
+
+		// Fetch requisition meta for Tools & Tackles track (if needed)
+		$meta = null;
+		if($item_type === "Tools & Tackles"){
+			$meta_q = mysqli_query($this->stc_dbs, "
+				SELECT 
+					`stc_cust_super_requisition_list_project_id` as project_id,
+					`stc_cust_super_requisition_list_super_id` as user_id,
+					`stc_cust_pro_supervisor_fullname` as username,
+					`stc_cust_project_title` as location
+				FROM `stc_cust_super_requisition_list` 
+				INNER JOIN `stc_cust_pro_supervisor` 
+					ON `stc_cust_super_requisition_list_super_id`=`stc_cust_pro_supervisor_id` 
+				INNER JOIN `stc_cust_project` 
+					ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id` 
+				WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $list_id)."'
+				LIMIT 1
+			");
+			if($meta_q && mysqli_num_rows($meta_q) > 0){
+				$meta = mysqli_fetch_assoc($meta_q);
+			}
+		}
+
+		foreach($adhoc_rows as $ar){
+			if($remaining_to_dispatch <= 0){ break; }
+			$adhoc_id = (int)$ar['adhoc_id'];
+			$effective_remaining = (float)$ar['remaining'];
+
+			// Apply GLD consumption first (not linked to adhoc ids; consume from oldest stock)
+			if($gldQty > 0){
+				$consume = $effective_remaining > $gldQty ? $gldQty : $effective_remaining;
+				$effective_remaining -= $consume;
+				$gldQty -= $consume;
+			}
+			if($effective_remaining <= 0){ continue; }
+
+			$dispatch_qty = $effective_remaining > $remaining_to_dispatch ? $remaining_to_dispatch : $effective_remaining;
+			if($dispatch_qty <= 0){ continue; }
+
+			$ins = mysqli_query($this->stc_dbs, "
+				INSERT INTO `stc_cust_super_requisition_list_items_rec`(
+					`stc_cust_super_requisition_list_items_rec_list_id`, 
+					`stc_cust_super_requisition_list_items_rec_list_item_id`, 
+					`stc_cust_super_requisition_list_items_rec_list_pd_id`, 
+					`stc_cust_super_requisition_list_items_rec_list_poaid`,
+					`stc_cust_super_requisition_list_items_rec_recqty`, 
+					`stc_cust_super_requisition_list_items_rec_date`
+				) VALUES (
+					'".mysqli_real_escape_string($this->stc_dbs, $list_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $item_id)."',
+					'0',
+					'".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $dispatch_qty)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $now)."'
+				)
+			");
+			if(!$ins){
+				continue;
+			}
+
+			$total_dispatched_now += (float)$dispatch_qty;
+			$remaining_to_dispatch -= (float)$dispatch_qty;
+
+			// Update adhoc status if fully used
+			mysqli_query($this->stc_dbs, "
+				UPDATE `stc_purchase_product_adhoc`
+				SET `stc_purchase_product_adhoc_status` = '2'
+				WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+				AND `stc_purchase_product_adhoc_qty`<=(
+					SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`)
+					FROM `stc_cust_super_requisition_list_items_rec`
+					WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`=`stc_purchase_product_adhoc_id`
+				)
+			");
+
+			// Tools & Tackles tracking insertion (if tool exists for this adhoc id)
+			if($item_type === "Tools & Tackles" && $meta){
+				$get_tools_id = mysqli_query($this->stc_dbs, "SELECT `id` FROM `stc_tooldetails` WHERE `poa_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."' LIMIT 1");
+				if($get_tools_id && mysqli_num_rows($get_tools_id) > 0){
+					$tools_data = mysqli_fetch_assoc($get_tools_id);
+					$tools_tackles_id = $tools_data['id'];
+					mysqli_query($this->stc_dbs, "
+						INSERT INTO `stc_tooldetails_track`(
+							`toolsdetails_id`, 
+							`issuedby`, 
+							`project_id`, 
+							`user_id`, 
+							`status`, 
+							`location`, 
+							`issueddate`, 
+							`receivedby`, 
+							`handoverto`, 
+							`created_date`, 
+							`created_by`, 
+							`id_type`
+						) VALUES (
+							'".mysqli_real_escape_string($this->stc_dbs, $tools_tackles_id)."',
+							'".mysqli_real_escape_string($this->stc_dbs, $meta['username'])."',
+							'".mysqli_real_escape_string($this->stc_dbs, $meta['project_id'])."',
+							'".mysqli_real_escape_string($this->stc_dbs, $meta['user_id'])."',
+							'1',
+							'".mysqli_real_escape_string($this->stc_dbs, $meta['location'])."',
+							'".mysqli_real_escape_string($this->stc_dbs, $now)."',
+							'".mysqli_real_escape_string($this->stc_dbs, $meta['username'])."',
+							'".mysqli_real_escape_string($this->stc_dbs, $meta['username'])."',
+							'".mysqli_real_escape_string($this->stc_dbs, $now)."',
+							'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."',
+							'vikings'
+						)
+					");
+				}
+			}
+		}
+
+		if($total_dispatched_now <= 0){
+			return ['success' => false, 'message' => 'No Adhoc balance available to dispatch.'];
+		}
+
+		// Update item status to dispatched (4)
+		mysqli_query($this->stc_dbs, "
+			UPDATE `stc_cust_super_requisition_list_items`
+			SET `stc_cust_super_requisition_list_items_status` = 4
+			WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+				AND `stc_cust_super_requisition_list_items_req_id` = '".mysqli_real_escape_string($this->stc_dbs, $list_id)."'
+				AND `stc_cust_super_requisition_list_items_product_id` = '".$product_id."'
+		");
+
+		// Log
+		$title = "Dispatched";
+		$message = "Dispatched by ".$_SESSION['stc_empl_name']." on ".date('d-m-Y h:i A')." <br> Quantity :".number_format($total_dispatched_now,2)." ".$item_unit;
+		$this->stc_daily_req_log($item_id, $title, $message);
+
+		return ['success' => true, 'message' => 'Balance dispatched successfully.', 'dispatched_qty' => number_format($total_dispatched_now, 2)];
+	}
+
+	public function stc_update_daily_requisition_item_code($item_id = 0, $product_id = 0, $old_product_id = 0){
+		$item_id = (int)$item_id;
+		$product_id = (int)$product_id;
+		$old_product_id = (int)$old_product_id;
+		if($item_id <= 0 || $product_id <= 0){
+			return ['success' => false, 'message' => 'Invalid parameters.'];
+		}
+
+		// Ensure item exists
+		$item_q = mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_super_requisition_list_id`
+			FROM `stc_cust_super_requisition_list_items`
+			WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+			LIMIT 1
+		");
+		if(!$item_q || mysqli_num_rows($item_q) === 0){
+			return ['success' => false, 'message' => 'Requisition item not found.'];
+		}
+
+		// Ensure product exists
+		$pd_q = mysqli_query($this->stc_dbs, "
+			SELECT `stc_product_id`, `stc_product_name`
+			FROM `stc_product`
+			WHERE `stc_product_id`='".mysqli_real_escape_string($this->stc_dbs, $product_id)."'
+			LIMIT 1
+		");
+		if(!$pd_q || mysqli_num_rows($pd_q) === 0){
+			return ['success' => false, 'message' => 'Invalid item code (product not found).'];
+		}
+		$pd_row = mysqli_fetch_assoc($pd_q);
+
+		$old_filter = '';
+		if($old_product_id > 0){
+			$old_filter = " AND `stc_cust_super_requisition_list_items_product_id`='".mysqli_real_escape_string($this->stc_dbs, $old_product_id)."' ";
+		}else{
+			// For "add item code" flow when product was missing/0
+			$old_filter = " AND (`stc_cust_super_requisition_list_items_product_id` IS NULL OR `stc_cust_super_requisition_list_items_product_id`=0) ";
+		}
+
+		$up = mysqli_query($this->stc_dbs, "
+			UPDATE `stc_cust_super_requisition_list_items`
+			SET `stc_cust_super_requisition_list_items_product_id`='".mysqli_real_escape_string($this->stc_dbs, $product_id)."'
+			WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+			".$old_filter."
+		");
+		if(!$up){
+			return ['success' => false, 'message' => 'Failed to update item code.'];
+		}
+		if(mysqli_affected_rows($this->stc_dbs) === 0){
+			return ['success' => false, 'message' => 'No rows updated (item code may already be set).'];
+		}
+
+		$logMsg = 'Item code updated by '.$_SESSION['stc_empl_name'].' on '.date('d-m-Y h:i A').' <br> Product: '.$pd_row['stc_product_name'].' ('.$product_id.')';
+		if($old_product_id > 0){
+			$logMsg .= ' <br> Old Product ID: '.$old_product_id;
+		}
+		$this->stc_daily_req_log($item_id, 'Item Code Updated', $logMsg);
+		return ['success' => true, 'message' => 'Item code updated successfully.'];
+	}
+}
+
+// Verify dispatch (AJAX): show only items dispatched on selected day with racks
+class ragnarCallVerifyDispatch extends tesseract{
+	public function stc_call_verify_dispatch($search = '', $date = '', $page = 1, $limit = 25){
+		$page = (int)$page;
+		$limit = (int)$limit;
+		if($page < 1){ $page = 1; }
+		if($limit < 1 || $limit > 200){ $limit = 25; }
+		$offset = ($page - 1) * $limit;
+
+		$date = $date == '' ? date('Y-m-d') : $date;
+		$search = trim((string)$search);
+
+		$where = " WHERE DATE(R.`stc_cust_super_requisition_list_items_rec_date`) = '".mysqli_real_escape_string($this->stc_dbs, $date)."' ";
+		if($search !== ''){
+			$esc = mysqli_real_escape_string($this->stc_dbs, $search);
+			$where .= " AND (
+				P.`stc_cust_project_title` LIKE '%".$esc."%' OR
+				S.`stc_cust_pro_supervisor_fullname` LIKE '%".$esc."%' OR
+				S.`stc_cust_pro_supervisor_contact` LIKE '%".$esc."%' OR
+				L.`stc_cust_super_requisition_list_id` LIKE '%".$esc."%' OR
+				C.`stc_requisition_combiner_id` LIKE '%".$esc."%' OR
+				C.`stc_requisition_combiner_refrence` LIKE '%".$esc."%' OR
+				I.`stc_cust_super_requisition_list_items_title` LIKE '%".$esc."%'
+			) ";
+		}
+
+		$count_q = mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) AS total FROM (
+				SELECT R.`stc_cust_super_requisition_list_items_rec_list_item_id` AS item_id
+				FROM `stc_cust_super_requisition_list_items_rec` R
+				INNER JOIN `stc_cust_super_requisition_list_items` I
+					ON I.`stc_cust_super_requisition_list_id` = R.`stc_cust_super_requisition_list_items_rec_list_item_id`
+				INNER JOIN `stc_cust_super_requisition_list` L
+					ON L.`stc_cust_super_requisition_list_id` = R.`stc_cust_super_requisition_list_items_rec_list_id`
+				INNER JOIN `stc_cust_project` P
+					ON L.`stc_cust_super_requisition_list_project_id` = P.`stc_cust_project_id`
+				INNER JOIN `stc_cust_pro_supervisor` S
+					ON L.`stc_cust_super_requisition_list_super_id` = S.`stc_cust_pro_supervisor_id`
+				INNER JOIN `stc_agents` A
+					ON S.`stc_cust_pro_supervisor_created_by` = A.`stc_agents_id`
+				LEFT JOIN `stc_requisition_combiner_req` CR
+					ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
+				LEFT JOIN `stc_requisition_combiner` C
+					ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+				LEFT JOIN (
+					SELECT `item_id`, COUNT(*) AS logs_count
+					FROM `stc_cust_super_requisition_list_items_log`
+					GROUP BY `item_id`
+				) LG ON LG.item_id = I.`stc_cust_super_requisition_list_id`
+				".$where."
+				GROUP BY R.`stc_cust_super_requisition_list_items_rec_list_item_id`
+			) X
+		");
+		$total = 0;
+		if($count_q){
+			$total_row = mysqli_fetch_assoc($count_q);
+			$total = (int)($total_row['total'] ?? 0);
+		}
+		$total_pages = (int)ceil($total / $limit);
+		$query="
+			SELECT
+				I.`stc_cust_super_requisition_list_id` AS item_id,
+				L.`stc_cust_super_requisition_list_id` AS requisition_number,
+				L.`stc_cust_super_requisition_list_date` AS req_datetime,
+				C.`stc_requisition_combiner_id` AS combiner_id,
+				C.`stc_requisition_combiner_refrence` AS combiner_reference,
+				P.`stc_cust_project_title` AS project_name,
+				A.`stc_agents_name` AS manager_name,
+				S.`stc_cust_pro_supervisor_fullname` AS sent_by_name,
+				S.`stc_cust_pro_supervisor_contact` AS sent_by_contact,
+				I.`stc_cust_super_requisition_list_items_title` AS item_desc,
+				I.`stc_cust_super_requisition_list_items_unit` AS unit,
+				I.`stc_cust_super_requisition_list_items_approved_qty` AS req_qty,
+				I.`stc_cust_super_requisition_list_items_status` AS status_code,
+				I.`stc_cust_super_requisition_items_type` AS item_type,
+				SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty,
+				MAX(R.`stc_cust_super_requisition_list_items_rec_date`) AS dispatched_date,
+				GROUP_CONCAT(DISTINCT RK.`stc_rack_name` ORDER BY RK.`stc_rack_name` SEPARATOR ', ') AS racks,
+				IFNULL(LG.logs_count, 0) AS logs_count,
+				IF(VA.`id` IS NULL, 0, 1) AS is_accepted,
+				IFNULL(VA.`qty`, 0) AS accepted_qty,
+				VA.`created_date` AS accepted_date
+			FROM `stc_cust_super_requisition_list_items_rec` R
+			INNER JOIN `stc_cust_super_requisition_list_items` I
+				ON I.`stc_cust_super_requisition_list_id` = R.`stc_cust_super_requisition_list_items_rec_list_item_id`
+			INNER JOIN `stc_cust_super_requisition_list` L
+				ON L.`stc_cust_super_requisition_list_id` = R.`stc_cust_super_requisition_list_items_rec_list_id`
+			INNER JOIN `stc_cust_project` P
+				ON L.`stc_cust_super_requisition_list_project_id` = P.`stc_cust_project_id`
+			INNER JOIN `stc_cust_pro_supervisor` S
+				ON L.`stc_cust_super_requisition_list_super_id` = S.`stc_cust_pro_supervisor_id`
+			INNER JOIN `stc_agents` A
+				ON S.`stc_cust_pro_supervisor_created_by` = A.`stc_agents_id`
+			LEFT JOIN `stc_requisition_combiner_req` CR
+				ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
+			LEFT JOIN `stc_requisition_combiner` C
+				ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+			LEFT JOIN `stc_purchase_product_adhoc` AD
+				ON AD.`stc_purchase_product_adhoc_id` = R.`stc_cust_super_requisition_list_items_rec_list_poaid`
+			LEFT JOIN `stc_rack` RK
+				ON RK.`stc_rack_id` = AD.`stc_purchase_product_adhoc_rackid`
+			LEFT JOIN (
+				SELECT `item_id`, COUNT(*) AS logs_count
+				FROM `stc_cust_super_requisition_list_items_log`
+				GROUP BY `item_id`
+			) LG ON LG.item_id = I.`stc_cust_super_requisition_list_id`
+			LEFT JOIN `stc_verify_dispatch_accept` VA
+				ON VA.`item_id` = I.`stc_cust_super_requisition_list_id`
+			".$where."
+			GROUP BY I.`stc_cust_super_requisition_list_id`
+			ORDER BY I.`stc_cust_super_requisition_list_id` DESC
+			LIMIT ".$offset.", ".$limit."
+		";
+		$q = mysqli_query($this->stc_dbs, $query);
+
+		// echo $query;
+		$data = [];
+		if($q && mysqli_num_rows($q) > 0){
+			while($row = mysqli_fetch_assoc($q)){
+				$status_code = (int)($row['status_code'] ?? 0);
+				$status_text = 'Closed';
+				if($status_code === 1){ $status_text = 'Ordered'; }
+				elseif($status_code === 2){ $status_text = 'Approved'; }
+				elseif($status_code === 3){ $status_text = 'Accepted'; }
+				elseif($status_code === 4){ $status_text = 'Dispatched'; }
+				elseif($status_code === 5){ $status_text = 'Received'; }
+				elseif($status_code === 6){ $status_text = 'Rejected'; }
+				elseif($status_code === 7){ $status_text = 'Canceled'; }
+				elseif($status_code === 8){ $status_text = 'Returned'; }
+				elseif($status_code === 9){ $status_text = 'Pending'; }
+
+				$data[] = [
+					'item_id' => (int)$row['item_id'],
+					'requisition_number' => (string)$row['requisition_number'],
+					'combiner_id' => (int)($row['combiner_id'] ?? 0),
+					'combiner_reference' => (string)($row['combiner_reference'] ?? ''),
+					'project_name' => (string)($row['project_name'] ?? ''),
+					'manager_name' => (string)($row['manager_name'] ?? ''),
+					'sent_by_name' => (string)($row['sent_by_name'] ?? ''),
+					'sent_by_contact' => (string)($row['sent_by_contact'] ?? ''),
+					'item_desc' => (string)($row['item_desc'] ?? ''),
+					'unit' => (string)($row['unit'] ?? ''),
+					'req_qty' => number_format((float)($row['req_qty'] ?? 0), 2),
+					'dispatched_qty' => number_format((float)($row['dispatched_qty'] ?? 0), 2),
+					'dispatched_date_time' => $row['dispatched_date'] == '' ? '' : date('d-m-Y h:i A', strtotime($row['dispatched_date'])),
+					'racks' => (string)($row['racks'] ?? '-'),
+					'status_code' => $status_code,
+					'status_text' => $status_text,
+					'item_type' => (string)($row['item_type'] ?? ''),
+					'logs_count' => (int)($row['logs_count'] ?? 0),
+					'is_accepted' => (int)($row['is_accepted'] ?? 0),
+					'accepted_qty' => number_format((float)($row['accepted_qty'] ?? 0), 2),
+					'accepted_date_time' => $row['accepted_date'] == '' ? '' : date('d-m-Y h:i A', strtotime($row['accepted_date']))
+				];
+			}
+		}
+
+		return [
+			'page' => $page,
+			'total_pages' => $total_pages,
+			'total' => $total,
+			'data' => $data
+		];
+	}
+}
+
+// Verify dispatch accept (AJAX)
+class ragnarVerifyDispatchAccept extends tesseract{
+	private function ensureTable(){
+		// Best-effort table create (in case migration not run)
+		@mysqli_query($this->stc_dbs, "
+			CREATE TABLE IF NOT EXISTS `stc_verify_dispatch_accept` (
+				`id` INT NOT NULL AUTO_INCREMENT,
+				`item_id` INT NOT NULL,
+				`qty` DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+				`created_by` INT NOT NULL,
+				`created_date` DATETIME NOT NULL,
+				PRIMARY KEY (`id`),
+				UNIQUE KEY `uniq_item` (`item_id`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+		");
+	}
+
+	public function acceptItem($item_id = 0, $date = ''){
+		$this->ensureTable();
+		$item_id = (int)$item_id;
+		$date = $date == '' ? date('Y-m-d') : $date;
+		if($item_id <= 0){
+			return ['success' => false, 'message' => 'Invalid item id.'];
+		}
+
+		// Check already accepted
+		$chk = mysqli_query($this->stc_dbs, "SELECT `id` FROM `stc_verify_dispatch_accept` WHERE `item_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."' LIMIT 1");
+		if($chk && mysqli_num_rows($chk) > 0){
+			return ['success' => true, 'message' => 'Already accepted.', 'already' => 1];
+		}
+
+		// Compute dispatched qty for this item on given date (same as verify listing day filter)
+		$qty = 0.0;
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatched_qty
+			FROM `stc_cust_super_requisition_list_items_rec`
+			WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+				AND DATE(`stc_cust_super_requisition_list_items_rec_date`)='".mysqli_real_escape_string($this->stc_dbs, $date)."'
+		");
+		if($q){
+			$r = mysqli_fetch_assoc($q);
+			$qty = (float)($r['dispatched_qty'] ?? 0);
+		}
+		if($qty <= 0){
+			return ['success' => false, 'message' => 'No dispatched qty found for this item on selected date.'];
+		}
+
+		$now = date('Y-m-d H:i:s');
+		$ins = mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_verify_dispatch_accept`(`item_id`,`qty`,`created_by`,`created_date`)
+			VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $item_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $qty)."',
+				'".$_SESSION['stc_empl_id']."',
+				'".mysqli_real_escape_string($this->stc_dbs, $now)."'
+			)
+		");
+		if(!$ins){
+			return ['success' => false, 'message' => 'Failed to accept item.'];
+		}
+
+		return ['success' => true, 'message' => 'Accepted successfully.', 'qty' => number_format($qty, 2)];
+	}
+}
+
 #<-----------------Object section of b2corders Class------------------->
 if (isset($_POST['stc_call_B2COrders'])) {
     $searchQuery = $_POST['search'] ?? '';
@@ -5702,6 +6510,96 @@ if(isset($_POST['stc_call_advanceorderlist'])){
 	$odin_req=new ragnarCallB2COrders();
 	$odin_req_out=$odin_req->stc_call_advanceorderlist();
 	echo json_encode($odin_req_out);
+}
+
+#<-----------------Object section of Daily Requisitions Class------------------->
+if(isset($_POST['stc_call_daily_requisitions'])){
+	$search = isset($_POST['search']) ? $_POST['search'] : '';
+	$page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+	$limit = isset($_POST['limit']) ? (int)$_POST['limit'] : 25;
+	$datefrom = isset($_POST['datefrom']) ? $_POST['datefrom'] : '';
+	$dateto = isset($_POST['dateto']) ? $_POST['dateto'] : '';
+
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarCallDailyRequisitions();
+		$odin_req_out = $odin_req->stc_call_daily_requisitions($search, $page, $limit, $datefrom, $dateto);
+		echo json_encode($odin_req_out);
+	}
+}
+
+if(isset($_POST['stc_call_daily_requisition_logs'])){
+	$item_id = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarCallDailyRequisitions();
+		$odin_req_out = $odin_req->stc_call_daily_requisition_logs($item_id);
+		echo json_encode($odin_req_out);
+	}
+}
+
+if(isset($_POST['stc_call_daily_requisition_balance'])){
+	$item_id = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarCallDailyRequisitions();
+		$odin_req_out = $odin_req->stc_call_daily_requisition_balance($item_id);
+		echo json_encode($odin_req_out);
+	}
+}
+
+if(isset($_POST['stc_dispatch_daily_requisition_balance'])){
+	$item_id = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
+	$product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarCallDailyRequisitions();
+		$odin_req_out = $odin_req->stc_dispatch_daily_requisition_balance($item_id, $product_id);
+		echo json_encode($odin_req_out);
+	}
+}
+
+if(isset($_POST['stc_update_daily_requisition_item_code'])){
+	$item_id = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
+	$product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+	$old_product_id = isset($_POST['old_product_id']) ? (int)$_POST['old_product_id'] : 0;
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarCallDailyRequisitions();
+		$odin_req_out = $odin_req->stc_update_daily_requisition_item_code($item_id, $product_id, $old_product_id);
+		echo json_encode($odin_req_out);
+	}
+}
+
+if(isset($_POST['stc_call_verify_dispatch'])){
+	$search = isset($_POST['search']) ? $_POST['search'] : '';
+	$date = isset($_POST['date']) ? $_POST['date'] : '';
+	$page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+	$limit = isset($_POST['limit']) ? (int)$_POST['limit'] : 25;
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarCallVerifyDispatch();
+		$odin_req_out = $odin_req->stc_call_verify_dispatch($search, $date, $page, $limit);
+		echo json_encode($odin_req_out);
+	}
+}
+
+if(isset($_POST['stc_accept_verify_dispatch'])){
+	$item_id = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
+	$date = isset($_POST['date']) ? $_POST['date'] : '';
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarVerifyDispatchAccept();
+		$odin_req_out = $odin_req->acceptItem($item_id, $date);
+		echo json_encode($odin_req_out);
+	}
 }
 
 #<-----------------Object section of GLD Requisitions Class------------------->

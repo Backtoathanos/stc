@@ -78,6 +78,9 @@
                                     </div>
                                 </div>
                                 <div class="widget-content-right print-preview-hide header-user-info ml-3">
+                                    <a href="daily-requisition.php" style="font-size: 25px;" target="__blank" class="print-preview-hide" title="Daily Requisition">
+                                        <i class="fa fa-shopping-cart"></i>
+                                    </a>
                                     <a href="agent-order.php" style="font-size: 25px;" class="print-preview-hide">
                                         <i class="metismenu-icon pe-7s-bell"></i>
                                         <span class="stc-notf-badge-for-order-left print-preview-hide" style="

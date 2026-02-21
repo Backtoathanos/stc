@@ -316,7 +316,7 @@ include("kattegat/role_check.php");
                 </div>
               </div>
             </div>
-            <div class="tab-pane tabs-animation fade" id="tab-content-2" role="tabpanel">
+            <div class="tab-pane tabs-animation fade show active" id="tab-content-2" role="tabpanel">
               <div class="row">
                 <div class="col-xl-12 col-lg-12 col-md-12">
                   <div class="card-border mb-3 card card-body border-success">
@@ -492,7 +492,7 @@ include("kattegat/role_check.php");
                 </div>
               </div>
             </div>
-            <div class="tab-pane tabs-animation fade show active" id="tab-content-3" role="tabpanel">
+            <div class="tab-pane tabs-animation fade" id="tab-content-3" role="tabpanel">
               <div class="row">
                 <div class="col-xl-12 col-lg-12 col-md-12">
                   <div class="card-border mb-3 card card-body border-success">
