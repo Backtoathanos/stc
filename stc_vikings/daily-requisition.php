@@ -140,7 +140,6 @@ include("kattegat/role_check.php");
               <thead>
                 <tr>
                   <th class="text-center">Product</th>
-                  <th class="text-center">Unit</th>
                   <th class="text-center">Requisition Balance Qty</th>
                   <th class="text-center">Adhoc Balance</th>
                   <th class="text-center">Action</th>
@@ -421,11 +420,19 @@ include("kattegat/role_check.php");
                   'style="margin-left:6px;" ' +
                   'data-item-id="' + escapeHtml(itemId) + '" data-old-product-id="' + escapeHtml(row.product_id) + '" ' +
                   'title="Change Item Code"><i class="fa fa-edit"></i></button>';
+                var HideSHow="none";
+                if(row.item_unit != row.product_unit){
+                  btn = '';
+                  HideSHow="block";
+                }
+                
+                if(row.balance_qty!=row.req_balance_qty){
+                  changeBtn = '';
+                }
                 html += '<tr>' +
-                  '<td>' + escapeHtml(row.product_name) + '</td>' +
-                  '<td class="text-center">' + escapeHtml(row.product_unit) + '</td>' +
-                  '<td class="text-right"><b>' + escapeHtml(row.req_balance_qty) + '</b></td>' +
-                  '<td class="text-right"><b>' + escapeHtml(row.balance_qty) + '</b></td>' +
+                  '<td>' + escapeHtml(row.product_name) + '<span style="display:' + HideSHow + ';font-size: 12px; color: Red;">* Units not matching please change product or update unit of requisition</span></td>' +
+                  '<td class="text-right"><b>' + escapeHtml(row.req_balance_qty) + '/' + escapeHtml(row.item_unit) + '</b></td>' +
+                  '<td class="text-right"><b>' + escapeHtml(row.balance_qty) + '/' + escapeHtml(row.product_unit) + '</b></td>' +
                   '<td class="text-center">' + btn + changeBtn + '</td>' +
                   '</tr>';
               });

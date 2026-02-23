@@ -5872,6 +5872,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 				P.`stc_product_id` AS product_id,
 				P.`stc_product_name` AS product_name,
 				P.`stc_product_unit` AS product_unit,
+				RP.`stc_cust_super_requisition_list_items_unit` AS item_unit,
 				SUM(RP.`stc_cust_super_requisition_items_finalqty`) AS connected_qty
 			FROM `stc_cust_super_requisition_list_items` RP
 			INNER JOIN `stc_product` P
@@ -5939,6 +5940,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 					'product_id' => $product_id,
 					'product_name' => (string)($row['product_name'] ?? ''),
 					'product_unit' => (string)($row['product_unit'] ?? ''),
+					'item_unit' => (string)($row['item_unit'] ?? ''),
 					'connected_qty' => number_format((float)($row['connected_qty'] ?? 0), 2),
 					'dispatched_qty' => number_format((float)$dispatchedForItemProduct, 2),
 					'req_balance_qty' => number_format((float)$reqBalanceQty, 2),

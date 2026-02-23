@@ -16,7 +16,7 @@ if(isset($_GET['date']) && $_GET['date'] != ''){
   $date = date('Y-m-d');
 }
 
-$pm_no = 'STC/DC/VERIFY/'.date('dmY', strtotime($date));
+$pm_no = 'STC/DC/'.date('dmY', strtotime($date));
 $pm_date = date('d-m-Y', strtotime($date));
 $site_name = 'Multiple';
 ?>
@@ -106,9 +106,8 @@ $site_name = 'Multiple';
         <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6">
           <h2 align="center" style="font-size:40px;">Delivery Challan</h2>
           <div>
-            <h4 align="left">P.M No : <?php echo $pm_no; ?></h4>
+            <h4 align="left">P.M No : <span id="pmNoDisplay"><?php echo $pm_no; ?></span></h4>
             <h4 align="left">P.M Date : <?php echo $pm_date; ?></h4>
-            <h4 align="left">Site Name : <?php echo $site_name; ?></h4>
           </div>
         </div>
         <div class="col-xl-2 col-lg-2 col-md-2 col-sm-2">
@@ -120,8 +119,11 @@ $site_name = 'Multiple';
 
       <div class="row">
         <div class="col-xl-12 col-lg-12 col-md-12">
+          <div class="hidden-print mb-2">
+            <input type="text" id="tableSearch" class="form-control" placeholder="Search table..." style="background-color: #e5f3b2;color:black">
+          </div>
           <div style="overflow-x:auto;">
-            <table class="table table-bordered table-hover" style="color:#000;">
+            <table class="table table-bordered table-hover" style="color:#000;" id="verifyChallanTable">
               <thead>
                 <tr>
                   <th>Sl No</th>
@@ -217,6 +219,23 @@ $site_name = 'Multiple';
         $('.filterbydate').on('click', function(){
           var date=$('.vdate').val();
           window.location.href="verify-challan.php?date=" + encodeURIComponent(date);
+        });
+
+        var basePmNo = '<?php echo addslashes($pm_no); ?>';
+        $('#tableSearch').on('keyup', function(){
+          var val = $(this).val().trim();
+          var valLower = val.toLowerCase();
+          $('#verifyChallanTable tbody tr').each(function(){
+            var text = $(this).text().toLowerCase();
+            $(this).toggle(text.indexOf(valLower) > -1);
+          });
+          var pmNo = basePmNo;
+          if (val.length >= 2) {
+            pmNo += ' (' + val.charAt(0).toUpperCase() + '-' + val.charAt(val.length - 1).toUpperCase() + ')';
+          } else if (val.length === 1) {
+            pmNo += ' (' + val.charAt(0).toUpperCase() + ')';
+          }
+          $('#pmNoDisplay').text(pmNo);
         });
       });
     </script>
