@@ -6255,6 +6255,88 @@ class ragnarCallDailyRequisitions extends tesseract{
 		$this->stc_daily_req_log($item_id, 'Item Code Updated', $logMsg);
 		return ['success' => true, 'message' => 'Item code updated successfully.'];
 	}
+
+	public function stc_update_daily_requisition_qty_unit($item_id = 0, $product_id = 0, $pending_qty = 0, $unit = ''){
+		$item_id = (int)$item_id;
+		$product_id = (int)$product_id;
+		$pending_qty = (float)$pending_qty;
+		$unit = trim((string)$unit);
+		if($item_id <= 0 || $product_id <= 0){
+			return ['success' => false, 'message' => 'Invalid parameters.'];
+		}
+		if($pending_qty < 0){
+			return ['success' => false, 'message' => 'Qty must be >= 0.'];
+		}
+		if($unit === ''){
+			return ['success' => false, 'message' => 'Unit is required.'];
+		}
+		if(strlen($unit) > 50){
+			return ['success' => false, 'message' => 'Unit too long.'];
+		}
+
+		// Ensure requisition item exists for this product
+		$item_q = mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_cust_super_requisition_list_items_unit` AS old_unit
+			FROM `stc_cust_super_requisition_list_items`
+			WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+				AND `stc_cust_super_requisition_list_items_product_id`='".mysqli_real_escape_string($this->stc_dbs, $product_id)."'
+			LIMIT 1
+		");
+		if(!$item_q || mysqli_num_rows($item_q) === 0){
+			return ['success' => false, 'message' => 'Requisition item not found for this product.'];
+		}
+		$item_row = mysqli_fetch_assoc($item_q);
+		$old_unit = (string)($item_row['old_unit'] ?? '');
+
+		// Already dispatched qty for this item+product (via adhoc ids)
+		$dispatchedForItemProduct = 0.0;
+		$dis_q = mysqli_query($this->stc_dbs, "
+			SELECT SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`) AS total_qty
+			FROM `stc_cust_super_requisition_list_items_rec` R
+			INNER JOIN `stc_purchase_product_adhoc` A
+				ON A.`stc_purchase_product_adhoc_id` = R.`stc_cust_super_requisition_list_items_rec_list_poaid`
+			WHERE R.`stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+				AND A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+		");
+		if($dis_q){
+			$dis_row = mysqli_fetch_assoc($dis_q);
+			$dispatchedForItemProduct = (float)($dis_row['total_qty'] ?? 0);
+		}
+
+		// We store total required qty in the item row, so keep it consistent with current dispatched + new pending
+		$new_finalqty = $dispatchedForItemProduct + $pending_qty;
+		if($new_finalqty < $dispatchedForItemProduct){
+			$new_finalqty = $dispatchedForItemProduct;
+		}
+
+		$up = mysqli_query($this->stc_dbs, "
+			UPDATE `stc_cust_super_requisition_list_items`
+			SET
+				`stc_cust_super_requisition_list_items_unit`='".mysqli_real_escape_string($this->stc_dbs, $unit)."',
+				`stc_cust_super_requisition_list_items_reqqty`='".mysqli_real_escape_string($this->stc_dbs, $new_finalqty)."',
+				`stc_cust_super_requisition_list_items_approved_qty`='".mysqli_real_escape_string($this->stc_dbs, $new_finalqty)."',
+				`stc_cust_super_requisition_items_finalqty`='".mysqli_real_escape_string($this->stc_dbs, $new_finalqty)."'
+			WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+				AND `stc_cust_super_requisition_list_items_product_id`='".mysqli_real_escape_string($this->stc_dbs, $product_id)."'
+			LIMIT 1
+		");
+		if(!$up){
+			return ['success' => false, 'message' => 'Failed to update qty/unit.'];
+		}
+		if(mysqli_affected_rows($this->stc_dbs) === 0){
+			return ['success' => true, 'message' => 'No change detected.'];
+		}
+
+		$logMsg = 'Qty/Unit updated by '.$_SESSION['stc_empl_name'].' on '.date('d-m-Y h:i A').
+			' <br> Unit: '.htmlspecialchars($old_unit).' -> '.htmlspecialchars($unit).
+			' <br> Pending Qty set to: '.number_format((float)$pending_qty, 2).' '.$unit.
+			' <br> Total Required Qty: '.number_format((float)$new_finalqty, 2).' '.$unit.
+			' <br> Dispatched Qty already: '.number_format((float)$dispatchedForItemProduct, 2).' '.$unit;
+		$this->stc_daily_req_log($item_id, 'Qty/Unit Updated', $logMsg);
+
+		return ['success' => true, 'message' => 'Qty/unit updated successfully.'];
+	}
 }
 
 // Verify dispatch (AJAX): show only items dispatched on selected day with racks
@@ -6574,6 +6656,20 @@ if(isset($_POST['stc_update_daily_requisition_item_code'])){
 	}else{
 		$odin_req = new ragnarCallDailyRequisitions();
 		$odin_req_out = $odin_req->stc_update_daily_requisition_item_code($item_id, $product_id, $old_product_id);
+		echo json_encode($odin_req_out);
+	}
+}
+
+if(isset($_POST['stc_update_daily_requisition_qty_unit'])){
+	$item_id = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
+	$product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+	$pending_qty = isset($_POST['pending_qty']) ? (float)$_POST['pending_qty'] : 0;
+	$unit = isset($_POST['unit']) ? (string)$_POST['unit'] : '';
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarCallDailyRequisitions();
+		$odin_req_out = $odin_req->stc_update_daily_requisition_qty_unit($item_id, $product_id, $pending_qty, $unit);
 		echo json_encode($odin_req_out);
 	}
 }

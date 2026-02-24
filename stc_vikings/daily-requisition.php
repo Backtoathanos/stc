@@ -421,7 +421,9 @@ include("kattegat/role_check.php");
                   'data-item-id="' + escapeHtml(itemId) + '" data-old-product-id="' + escapeHtml(row.product_id) + '" ' +
                   'title="Change Item Code"><i class="fa fa-edit"></i></button>';
                 var HideSHow="none";
-                if(row.item_unit != row.product_unit){
+                var itemUnitNorm = String(row.item_unit || '').toLowerCase().trim();
+                var productUnitNorm = String(row.product_unit || '').toLowerCase().trim();
+                if(itemUnitNorm != productUnitNorm){
                   btn = '';
                   HideSHow="block";
                 }
@@ -429,9 +431,16 @@ include("kattegat/role_check.php");
                 if(row.balance_qty!=row.req_balance_qty){
                   changeBtn = '';
                 }
+                var reqQtyLink = '<a href=\"#\" class=\"dr-edit-qtyunit\" ' +
+                  'data-item-id=\"' + escapeHtml(itemId) + '\" ' +
+                  'data-product-id=\"' + escapeHtml(row.product_id) + '\" ' +
+                  'data-qty=\"' + escapeHtml(row.req_balance_qty) + '\" ' +
+                  'data-item-unit=\"' + escapeHtml(row.item_unit) + '\" ' +
+                  'data-product-unit=\"' + escapeHtml(row.product_unit) + '\">' +
+                  '<b>' + escapeHtml(row.req_balance_qty) + '/' + escapeHtml(row.item_unit) + '</b></a>';
                 html += '<tr>' +
                   '<td>' + escapeHtml(row.product_name) + '<span style="display:' + HideSHow + ';font-size: 12px; color: Red;">* Units not matching please change product or update unit of requisition</span></td>' +
-                  '<td class="text-right"><b>' + escapeHtml(row.req_balance_qty) + '/' + escapeHtml(row.item_unit) + '</b></td>' +
+                  '<td class="text-right dr-qtyunit-cell">' + reqQtyLink + '</td>' +
                   '<td class="text-right"><b>' + escapeHtml(row.balance_qty) + '/' + escapeHtml(row.product_unit) + '</b></td>' +
                   '<td class="text-center">' + btn + changeBtn + '</td>' +
                   '</tr>';
@@ -534,6 +543,112 @@ include("kattegat/role_check.php");
         $('#dr-itemcode-label').text('Change Item Code (Old Product ID: ' + oldProductId + ')');
         $('.dr-add-itemcode-form').show();
         $('#dr-itemcode-input').focus();
+      });
+
+      $('body').delegate('.dr-edit-qtyunit', 'click', function (e) {
+        e.preventDefault();
+        var $a = $(this);
+        var itemId = parseInt($a.data('item-id'), 10) || 0;
+        var productId = parseInt($a.data('product-id'), 10) || 0;
+        var qty = String($a.data('qty') || '').trim();
+        var itemUnit = String($a.data('item-unit') || '').trim();
+        var productUnit = String($a.data('product-unit') || '').trim();
+        if (itemId <= 0 || productId <= 0) return;
+
+        // Close any other open editor in modal
+        $('#dailyReqBalanceModal .dr-qtyunit-editor').each(function () {
+          var $ed = $(this);
+          var $tdOld = $ed.closest('td');
+          var originalHtml = $tdOld.data('drOriginalHtml');
+          if (originalHtml) $tdOld.html(originalHtml);
+        });
+
+        var $td = $a.closest('td');
+        var original = $td.html();
+        $td.data('drOriginalHtml', original);
+        var units = ['NOS', 'KG', 'MTR', 'Bag', 'Box', 'Bundle', 'Case', 'Cft', 'CuMtr', 'Drum', 'Feet', 'Gm', 'Jar', 'Kgs', 'Ltr', 'Mtr', 'Mts', 'Pkt', 'Roll', 'Set', 'Sqft', 'Sqmm', 'Sqmt', 'Pair'];
+        if (itemUnit) units.push(itemUnit);
+        if (productUnit && productUnit.toLowerCase() !== itemUnit.toLowerCase()) units.push(productUnit);
+        if (units.length === 0) units = [''];
+
+        var options = '';
+        units.forEach(function (u) {
+          var sel = (itemUnit && String(u).toLowerCase() === itemUnit.toLowerCase()) ? ' selected' : '';
+          options += '<option value="' + escapeHtml(u) + '"' + sel + '>' + escapeHtml(u) + '</option>';
+        });
+
+        var editor =
+          '<span class="dr-qtyunit-editor">' +
+          '<input type="number" step="0.01" min="0" class="form-control input-sm dr-qtyunit-input" ' +
+          'style="width:110px;display:inline-block;" value="' + escapeHtml(qty) + '">' +
+          '<select class="form-control input-sm dr-qtyunit-unit" style="width:90px;display:inline-block;margin-left:6px;">' +
+          options +
+          '</select>' +
+          '<button type="button" class="btn btn-success btn-sm dr-qtyunit-update" ' +
+          'style="margin-left:6px;" data-item-id="' + escapeHtml(itemId) + '" data-product-id="' + escapeHtml(productId) + '">Update</button>' +
+          '<button type="button" class="btn btn-default btn-sm dr-qtyunit-cancel" style="margin-left:6px;">Cancel</button>' +
+          '</span>';
+
+        $td.html(editor);
+        $td.find('.dr-qtyunit-input').focus().select();
+      });
+
+      $('body').delegate('.dr-qtyunit-cancel', 'click', function () {
+        var $td = $(this).closest('td');
+        var original = $td.data('drOriginalHtml') || '';
+        $td.html(original);
+      });
+
+      $('body').delegate('.dr-qtyunit-update', 'click', function () {
+        var $btn = $(this);
+        var itemId = parseInt($btn.data('item-id'), 10) || 0;
+        var productId = parseInt($btn.data('product-id'), 10) || 0;
+        var $td = $btn.closest('td');
+        var qtyVal = String($td.find('.dr-qtyunit-input').val() || '').trim();
+        var unitVal = String($td.find('.dr-qtyunit-unit').val() || '').trim();
+        if (itemId <= 0 || productId <= 0) {
+          showSwal('error', 'Invalid', 'Invalid item or product.');
+          return;
+        }
+        if (qtyVal === '' || isNaN(Number(qtyVal)) || Number(qtyVal) < 0) {
+          showSwal('warning', 'Invalid', 'Please enter a valid qty (>= 0).');
+          return;
+        }
+        if (unitVal === '') {
+          showSwal('warning', 'Invalid', 'Please select unit.');
+          return;
+        }
+
+        $btn.prop('disabled', true).text('Updating...');
+        $.ajax({
+          url: 'kattegat/ragnar_order.php',
+          method: 'POST',
+          data: {
+            stc_update_daily_requisition_qty_unit: 1,
+            item_id: itemId,
+            product_id: productId,
+            pending_qty: Number(qtyVal),
+            unit: unitVal
+          },
+          dataType: 'json',
+          success: function (response) {
+            if (response && response.reload) {
+              window.location.reload();
+              return;
+            }
+            if (response && response.success) {
+              showSwal('success', 'Updated', response.message || 'Updated.');
+              loadBalanceModal(itemId);
+            } else {
+              showSwal('error', 'Failed', (response && response.message) ? response.message : 'Update failed.');
+              $btn.prop('disabled', false).text('Update');
+            }
+          },
+          error: function () {
+            showSwal('error', 'Failed', 'Update failed.');
+            $btn.prop('disabled', false).text('Update');
+          }
+        });
       });
 
       $('body').delegate('.dr-dispatch-balance-btn', 'click', function () {
