@@ -83,16 +83,6 @@
                                     </a>
                                     <a href="agent-order.php" style="font-size: 25px;" class="print-preview-hide">
                                         <i class="metismenu-icon pe-7s-bell"></i>
-                                        <span class="stc-notf-badge-for-order-left print-preview-hide" style="
-                                            font-size: 17px;
-                                            background: #ff7676;
-                                            position: relative;
-                                            padding: 0px;
-                                            border-radius: 100%;
-                                            margin: 0;
-                                            left: -37px;
-                                            top: -16px;
-                                        ">0</span>
                                         <span class="stc-notf-badge-for-order-right print-preview-hide" style="
                                             font-size: 17px;
                                             background: #72df70;

@@ -32,6 +32,14 @@ include("kattegat/role_check.php");
       overflow-wrap: anywhere;
       word-break: break-word;
     }
+    .dr-pr-list li {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+    .dr-pr-list li:hover, .dr-pr-list li.dr-pr-selected {
+      background: #f0f8ff;
+    }
   </style>
 </head>
 
@@ -54,15 +62,22 @@ include("kattegat/role_check.php");
             <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
               <div class="card-border mb-3 card card-body border-success" style="overflow-x: auto; white-space: nowrap;">
                 <div class="row" style="margin-bottom: 10px; white-space: normal;">
-                  <div class="col-md-3 col-sm-6" style="margin-bottom: 6px;">
+                  <div class="col-md-2 col-sm-6" style="margin-bottom: 6px;">
                     <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">From</label>
                     <input type="date" class="form-control" id="dr-datefrom">
                   </div>
-                  <div class="col-md-3 col-sm-6" style="margin-bottom: 6px;">
+                  <div class="col-md-2 col-sm-6" style="margin-bottom: 6px;">
                     <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">To</label>
                     <input type="date" class="form-control" id="dr-dateto">
                   </div>
-                  <div class="col-md-4 col-sm-8" style="margin-bottom: 6px;">
+                  <div class="col-md-3 col-sm-8" style="margin-bottom: 6px;">
+                    <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">PR Name</label>
+                    <div class="dr-pr-combobox" style="position:relative;">
+                      <input type="text" class="form-control" id="dr-pr-name" placeholder="Type to search PR Name..." autocomplete="off">
+                      <ul class="dr-pr-list list-unstyled" id="dr-pr-list" style="display:none; position:absolute; top:100%; left:0; right:0; z-index:999; max-height:200px; overflow-y:auto; background:#fff; border:1px solid #ccc; margin:0; padding:0; box-shadow:0 4px 8px rgba(0,0,0,0.15);"></ul>
+                    </div>
+                  </div>
+                  <div class="col-md-3 col-sm-8" style="margin-bottom: 6px;">
                     <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">Search</label>
                     <input type="text" class="form-control" id="dr-search" placeholder="Project, supervisor, req#, item...">
                   </div>
@@ -86,6 +101,7 @@ include("kattegat/role_check.php");
                       <th class="text-center">Unit</th>
                       <th class="text-center">Req Qty</th>
                       <th class="text-center">Dispatched Qty</th>
+                      <th class="text-center dr-col-project">Item Code / Balance Qty / Rack</th>
                       <th class="text-center">Status</th>
                       <th class="text-center">Item Type</th>
                       <th class="text-center">Action</th>
@@ -139,14 +155,16 @@ include("kattegat/role_check.php");
             <table class="table table-bordered table-hover">
               <thead>
                 <tr>
-                  <th class="text-center">Product</th>
+                  <th class="text-center">Item Code</th>
+                  <th class="text-center">Item Description</th>
                   <th class="text-center">Requisition Balance Qty</th>
                   <th class="text-center">Adhoc Balance</th>
+                  <th class="text-center">Rack</th>
                   <th class="text-center">Action</th>
                 </tr>
               </thead>
               <tbody class="stc-daily-req-balance-body">
-                <tr><td colspan="5" class="text-center">Loading...</td></tr>
+                <tr><td colspan="6" class="text-center">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -174,6 +192,26 @@ include("kattegat/role_check.php");
     </div>
   </div>
 
+  <!-- Status Change Modal (Pending remarks) -->
+  <div class="modal fade" id="statusRemarkModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Remarks for Pending</h5>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <textarea class="form-control" id="statusRemarkInput" placeholder="Enter remarks"></textarea>
+          <input type="hidden" id="statusChangeId">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" id="saveStatusRemark">Save</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
   <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
   <script type="text/javascript" src="./assets/scripts/main.js"></script>
@@ -184,6 +222,7 @@ include("kattegat/role_check.php");
     $(document).ready(function () {
       var currentPage = 1;
       var perPage = 25;
+      var prNamesList = [];
 
       function showSwal(icon, title, text) {
         if (typeof Swal !== 'undefined' && Swal && Swal.fire) {
@@ -252,6 +291,7 @@ include("kattegat/role_check.php");
         $('.stc-daily-requisition-body').html('<tr><td colspan="13" class="text-center">Loading...</td></tr>');
         var datefrom = $('#dr-datefrom').val() || '';
         var dateto = $('#dr-dateto').val() || '';
+        var prName = $('#dr-pr-name').val() ? $('#dr-pr-name').val().trim() : '';
         $.ajax({
           url: 'kattegat/ragnar_order.php',
           method: 'POST',
@@ -261,7 +301,8 @@ include("kattegat/role_check.php");
             page: page || 1,
             limit: perPage,
             datefrom: datefrom,
-            dateto: dateto
+            dateto: dateto,
+            pr_name: prName
           },
           dataType: 'json',
           success: function (response) {
@@ -300,6 +341,18 @@ include("kattegat/role_check.php");
                 if (pendingQty <= 0.0001) {
                   actionHtml = '<span class="text-muted">-</span>';
                 }
+                var itemCode = (parseInt(item.product_id, 10) > 0) ? String(item.product_id) : '-';
+                var racks = (item.racks && String(item.racks).trim() !== '') ? String(item.racks) : '-';
+                var codeBalRackHtml =
+                  '<div><a href="#" class="dr-balance-btn" data-item-id="' + escapeHtml(item.item_id) + '" data-toggle="modal" data-target="#dailyReqBalanceModal" title="View Adhoc Balance"><b>' + escapeHtml(itemCode) + '</b></a></div>' +
+                  '<div style="font-size:12px;color:#555;">' + escapeHtml(pendingQty.toFixed(2)) + '/' + escapeHtml(item.unit) + '</div>' +
+                  '<div style="font-size:12px;color:#555;">' + escapeHtml(racks) + '</div>';
+                if (itemCode === '-') {
+                  codeBalRackHtml =
+                    '<div class="text-muted">-</div>' +
+                    '<div style="font-size:12px;color:#555;">' + escapeHtml(pendingQty.toFixed(2)) + '/' + escapeHtml(item.unit) + '</div>' +
+                    '<div style="font-size:12px;color:#555;">' + escapeHtml(racks) + '</div>';
+                }
 
                 rows += '<tr>' +
                   '<td class="text-center">' + escapeHtml(slno) + '</td>' +
@@ -310,6 +363,7 @@ include("kattegat/role_check.php");
                   '<td class="text-center">' + escapeHtml(item.unit) + '</td>' +
                   '<td class="text-right">' + escapeHtml(item.req_qty) + '</td>' +
                   '<td class="text-right">' + escapeHtml(item.dispatched_qty) + '</td>' +
+                  '<td class="text-center dr-col-project">' + codeBalRackHtml + '</td>' +
                   '<td class="text-center">' + statusBadge(item.status_code, item.status_text) + '</td>' +
                   '<td class="text-center">' + escapeHtml(item.item_type) + '</td>' +
                   '<td class="text-center">' + actionHtml + '</td>' +
@@ -321,12 +375,50 @@ include("kattegat/role_check.php");
             }
             $('.stc-daily-requisition-body').html(rows);
             renderPagination(parseInt(response.total_pages || 0, 10), parseInt(response.page || 1, 10));
+            prNamesList = response.pr_names || [];
           },
           error: function () {
             $('.stc-daily-requisition-body').html('<tr><td colspan="13" class="text-center">Error loading data.</td></tr>');
           }
         });
       }
+
+      function filterAndShowPrList() {
+        var q = $('#dr-pr-name').val().toLowerCase().trim();
+        var matches = q === '' ? prNamesList : prNamesList.filter(function (n) { return n.toLowerCase().indexOf(q) > -1; });
+        var $ul = $('#dr-pr-list');
+        $ul.empty();
+        if (matches.length === 0) {
+          $ul.append('<li class="text-muted" style="cursor:default;">No matches</li>');
+        } else {
+          matches.forEach(function (n) {
+            $ul.append('<li data-value="' + escapeHtml(n) + '">' + escapeHtml(n) + '</li>');
+          });
+        }
+        $ul.show();
+      }
+
+      $('#dr-pr-name').on('focus', function () {
+        if (prNamesList.length > 0) filterAndShowPrList();
+      }).on('keyup', function (e) {
+        if (e.keyCode === 13) {
+          $('#dr-pr-list').hide();
+          runSearch();
+          return;
+        }
+        filterAndShowPrList();
+      });
+
+      $('body').on('click', '#dr-pr-list li[data-value]', function () {
+        $(this).closest('.dr-pr-combobox').find('#dr-pr-name').val($(this).data('value'));
+        $('#dr-pr-list').hide();
+      });
+
+      $(document).on('click', function (e) {
+        if (!$(e.target).closest('.dr-pr-combobox').length) {
+          $('#dr-pr-list').hide();
+        }
+      });
 
       $('body').delegate('.stc-daily-req-page', 'click', function (e) {
         e.preventDefault();
@@ -397,7 +489,7 @@ include("kattegat/role_check.php");
         $('#dr-itemcode-oldproductid').val('0');
         $('#dr-itemcode-label').text('Item Code (Product ID)');
         $('.dr-add-itemcode-form').hide();
-        $('.stc-daily-req-balance-body').html('<tr><td colspan="5" class="text-center">Loading...</td></tr>');
+        $('.stc-daily-req-balance-body').html('<tr><td colspan="6" class="text-center">Loading...</td></tr>');
         $.ajax({
           url: 'kattegat/ragnar_order.php',
           method: 'POST',
@@ -438,16 +530,27 @@ include("kattegat/role_check.php");
                   'data-item-unit=\"' + escapeHtml(row.item_unit) + '\" ' +
                   'data-product-unit=\"' + escapeHtml(row.product_unit) + '\">' +
                   '<b>' + escapeHtml(row.req_balance_qty) + '/' + escapeHtml(row.item_unit) + '</b></a>';
+
+                var balQtyNum = parseNumber(row.balance_qty);
+                var pendingBtn = '';
+                if (balQtyNum <= 0.0001) {
+                  pendingBtn =
+                    '<br><a class="btn-change-status" data-toggle="modal" data-target="#statusRemarkModal" ' +
+                    'style="font-size:18px;color:black;" title="Update to pending" id="' + escapeHtml(itemId) + '" href="#">' +
+                    '<i class="fa fa-clock-o"></i> Pending</a>';
+                }
                 html += '<tr>' +
+                  '<td class="text-center"><b>' + escapeHtml(row.product_id) + '</b></td>' +
                   '<td>' + escapeHtml(row.product_name) + '<span style="display:' + HideSHow + ';font-size: 12px; color: Red;">* Units not matching please change product or update unit of requisition</span></td>' +
                   '<td class="text-right dr-qtyunit-cell">' + reqQtyLink + '</td>' +
-                  '<td class="text-right"><b>' + escapeHtml(row.balance_qty) + '/' + escapeHtml(row.product_unit) + '</b></td>' +
+                  '<td class="text-right"><b>' + escapeHtml(row.balance_qty) + '/' + escapeHtml(row.product_unit) + '</b>' + pendingBtn + '</td>' +
+                  '<td>' + escapeHtml(row.racks || '-') + '</td>' +
                   '<td class="text-center">' + btn + changeBtn + '</td>' +
                   '</tr>';
               });
             } else {
               html =
-                '<tr><td colspan="5" class="text-center">' +
+                '<tr><td colspan="6" class="text-center">' +
                 'No connected product found. ' +
                 '<button type="button" class="btn btn-primary btn-sm dr-show-itemcode-form" data-item-id="' + escapeHtml(itemId) + '">Add Item Code</button>' +
                 '</td></tr>';
@@ -455,14 +558,58 @@ include("kattegat/role_check.php");
             $('.stc-daily-req-balance-body').html(html);
           },
           error: function () {
-            $('.stc-daily-req-balance-body').html('<tr><td colspan="5" class="text-center">Error loading balance.</td></tr>');
+            $('.stc-daily-req-balance-body').html('<tr><td colspan="6" class="text-center">Error loading balance.</td></tr>');
           }
         });
       }
 
-      $('body').delegate('.dr-balance-btn', 'click', function () {
+      $('body').delegate('.dr-balance-btn', 'click', function (e) {
+        if (e && e.preventDefault) e.preventDefault();
         var itemId = $(this).data('item-id');
         loadBalanceModal(itemId);
+      });
+
+      // Pending status with remarks (same flow as combiner page)
+      $('body').on('click', '.btn-change-status', function () {
+        var preq_id = $(this).attr('id');
+        $('#statusChangeId').val(preq_id);
+        $('#statusRemarkInput').val('');
+      });
+      $('#saveStatusRemark').on('click', function () {
+        var remarks = $('#statusRemarkInput').val();
+        var preq_id = parseInt($('#statusChangeId').val(), 10) || 0;
+        if (remarks.trim() === '') {
+          showSwal('warning', 'Required', 'Please enter remarks for pending status.');
+          return;
+        }
+        if (preq_id <= 0) {
+          showSwal('error', 'Invalid', 'Invalid requisition item id.');
+          return;
+        }
+
+        $('#saveStatusRemark').prop('disabled', true).text('Saving...');
+        $.ajax({
+          url: 'kattegat/ragnar_order.php',
+          method: 'POST',
+          data: { update_requisition_status: 1, id: preq_id, status: 9, remarks: remarks },
+          dataType: 'json',
+          success: function (response) {
+            $('#saveStatusRemark').prop('disabled', false).text('Save');
+            if (response && response.reload) { window.location.reload(); return; }
+            if (response && response.success) {
+              $('#statusRemarkModal').modal('hide');
+              showSwal('success', 'Updated', response.message || 'Status updated.');
+              loadBalanceModal(preq_id);
+              loadDailyRequisitions($('#dr-search').val() || '', currentPage);
+            } else {
+              showSwal('error', 'Failed', (response && response.message) ? response.message : 'Failed to update status.');
+            }
+          },
+          error: function () {
+            $('#saveStatusRemark').prop('disabled', false).text('Save');
+            showSwal('error', 'Failed', 'Failed to update status.');
+          }
+        });
       });
 
       $('body').delegate('.dr-show-itemcode-form', 'click', function () {

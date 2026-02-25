@@ -5680,7 +5680,7 @@ if(isset($_POST['call_tool_trackertrack'])){
 }
 // Daily requisitions (AJAX)
 class ragnarCallDailyRequisitions extends tesseract{
-	public function stc_call_daily_requisitions($search = '', $page = 1, $limit = 25, $datefrom = '', $dateto = ''){
+	public function stc_call_daily_requisitions($search = '', $page = 1, $limit = 25, $datefrom = '', $dateto = '', $pr_name = ''){
 		$page = (int)$page;
 		$limit = (int)$limit;
 		if($page < 1){ $page = 1; }
@@ -5692,6 +5692,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 		$dateto = $dateto == '' ? date('Y-m-d') : $dateto;
 
 		$search = trim((string)$search);
+		$pr_name = trim((string)$pr_name);
 		// Keep joining pattern consistent with requisition listing (combiner -> list -> items)
 		$where = " WHERE DATE(L.`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $datefrom)."' AND '".mysqli_real_escape_string($this->stc_dbs, $dateto)."' 
 			AND L.`stc_cust_super_requisition_list_status`!='1'
@@ -5707,6 +5708,10 @@ class ragnarCallDailyRequisitions extends tesseract{
 				C.`stc_requisition_combiner_refrence` LIKE '%".$esc."%' OR
 				I.`stc_cust_super_requisition_list_items_title` LIKE '%".$esc."%'
 			) ";
+		}
+		if($pr_name !== ''){
+			$pr_esc = mysqli_real_escape_string($this->stc_dbs, $pr_name);
+			$where .= " AND C.`stc_requisition_combiner_refrence` = '".$pr_esc."' ";
 		}
 
 		$count_q = mysqli_query($this->stc_dbs, "
@@ -5747,6 +5752,16 @@ class ragnarCallDailyRequisitions extends tesseract{
 				S.`stc_cust_pro_supervisor_contact` AS sent_by_contact,
 				I.`stc_cust_super_requisition_list_items_title` AS item_desc,
 				I.`stc_cust_super_requisition_list_items_unit` AS unit,
+				IFNULL(I.`stc_cust_super_requisition_list_items_product_id`, 0) AS product_id,
+				IF(IFNULL(I.`stc_cust_super_requisition_list_items_product_id`, 0) = 0, '-',
+					IFNULL((SELECT RK.`stc_rack_name`
+					FROM `stc_purchase_product_adhoc` AD
+					LEFT JOIN `stc_rack` RK
+						ON RK.`stc_rack_id` = AD.`stc_purchase_product_adhoc_rackid`
+					WHERE AD.`stc_purchase_product_adhoc_productid` = I.`stc_cust_super_requisition_list_items_product_id`
+					ORDER BY AD.`stc_purchase_product_adhoc_id` DESC
+					LIMIT 1), '-')
+				) AS racks,
 				I.`stc_cust_super_requisition_list_items_approved_qty` AS ordered_qty,
 				I.`stc_cust_super_requisition_list_items_approved_qty` AS req_qty,
 				I.`stc_cust_super_requisition_list_items_status` AS status_code,
@@ -5815,6 +5830,8 @@ class ragnarCallDailyRequisitions extends tesseract{
 					'sent_by_contact' => (string)$row['sent_by_contact'],
 					'item_desc' => (string)$row['item_desc'],
 					'unit' => (string)$row['unit'],
+					'product_id' => (int)($row['product_id'] ?? 0),
+					'racks' => (string)($row['racks'] ?? '-'),
 					'ordered_qty' => number_format((float)$row['ordered_qty'], 2),
 					'req_qty' => number_format((float)$row['req_qty'], 2),
 					'dispatched_qty' => number_format((float)$row['dispatched_qty'], 2),
@@ -5828,11 +5845,39 @@ class ragnarCallDailyRequisitions extends tesseract{
 			}
 		}
 
+		// Distinct PR names (combiner_reference) for date range with same search
+		$pr_names = [];
+		$pr_q = mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT C.`stc_requisition_combiner_refrence` AS pr_name
+			FROM `stc_cust_super_requisition_list_items` I
+			INNER JOIN `stc_cust_super_requisition_list` L
+				ON I.`stc_cust_super_requisition_list_items_req_id` = L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_cust_project` P
+				ON L.`stc_cust_super_requisition_list_project_id` = P.`stc_cust_project_id`
+			INNER JOIN `stc_cust_pro_supervisor` S
+				ON L.`stc_cust_super_requisition_list_super_id` = S.`stc_cust_pro_supervisor_id`
+			INNER JOIN `stc_agents` A
+				ON S.`stc_cust_pro_supervisor_created_by` = A.`stc_agents_id`
+			INNER JOIN `stc_requisition_combiner_req` CR
+				ON CR.`stc_requisition_combiner_req_requisition_id` = L.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_requisition_combiner` C
+				ON C.`stc_requisition_combiner_id` = CR.`stc_requisition_combiner_req_comb_id`
+			".$where."
+			ORDER BY C.`stc_requisition_combiner_refrence` ASC
+		");
+		if($pr_q && mysqli_num_rows($pr_q) > 0){
+			while($pr_row = mysqli_fetch_assoc($pr_q)){
+				$nm = trim((string)($pr_row['pr_name'] ?? ''));
+				if($nm !== ''){ $pr_names[] = $nm; }
+			}
+		}
+
 		return [
 			'page' => $page,
 			'total_pages' => $total_pages,
 			'total' => $total,
-			'data' => $data
+			'data' => $data,
+			'pr_names' => $pr_names
 		];
 	}
 
@@ -5891,11 +5936,27 @@ class ragnarCallDailyRequisitions extends tesseract{
 				$gldQty = 0.0;
 				$directQty = 0.0;
 				$dispatchedForItemProduct = 0.0;
+				$rackNames = '-';
 
 				$q1 = mysqli_query($this->stc_dbs, "SELECT SUM(`stc_purchase_product_adhoc_qty`) AS total_qty FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid` = '".$product_id."'");
 				if($q1){
 					$r1 = mysqli_fetch_assoc($q1);
 					$adhocQty = (float)($r1['total_qty'] ?? 0);
+				}
+
+				// Racks for this product (for display) - single rack, order by adhoc id desc
+				$rk_q = mysqli_query($this->stc_dbs, "
+					SELECT RK.`stc_rack_name` AS racks
+					FROM `stc_purchase_product_adhoc` A
+					LEFT JOIN `stc_rack` RK
+						ON RK.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid`
+					WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+					ORDER BY A.`stc_purchase_product_adhoc_id` DESC
+					LIMIT 1
+				");
+				if($rk_q && $rk_row = mysqli_fetch_assoc($rk_q)){
+					$rackNames = trim((string)($rk_row['racks'] ?? ''));
+					if($rackNames === ''){ $rackNames = '-'; }
 				}
 
 				$q2 = mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = '".$product_id."'");
@@ -5941,6 +6002,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 					'product_name' => (string)($row['product_name'] ?? ''),
 					'product_unit' => (string)($row['product_unit'] ?? ''),
 					'item_unit' => (string)($row['item_unit'] ?? ''),
+					'racks' => $rackNames,
 					'connected_qty' => number_format((float)($row['connected_qty'] ?? 0), 2),
 					'dispatched_qty' => number_format((float)$dispatchedForItemProduct, 2),
 					'req_balance_qty' => number_format((float)$reqBalanceQty, 2),
@@ -6603,12 +6665,13 @@ if(isset($_POST['stc_call_daily_requisitions'])){
 	$limit = isset($_POST['limit']) ? (int)$_POST['limit'] : 25;
 	$datefrom = isset($_POST['datefrom']) ? $_POST['datefrom'] : '';
 	$dateto = isset($_POST['dateto']) ? $_POST['dateto'] : '';
+	$pr_name = isset($_POST['pr_name']) ? trim((string)$_POST['pr_name']) : '';
 
 	if(empty($_SESSION['stc_empl_id'])){
 		echo json_encode(['reload' => true]);
 	}else{
 		$odin_req = new ragnarCallDailyRequisitions();
-		$odin_req_out = $odin_req->stc_call_daily_requisitions($search, $page, $limit, $datefrom, $dateto);
+		$odin_req_out = $odin_req->stc_call_daily_requisitions($search, $page, $limit, $datefrom, $dateto, $pr_name);
 		echo json_encode($odin_req_out);
 	}
 }
