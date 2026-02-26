@@ -85,9 +85,15 @@ include("kattegat/role_check.php");
                     <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">&nbsp;</label>
                     <button class="btn btn-primary form-control" id="dr-search-btn">Search</button>
                   </div>
+                  <?php if(isset($_SESSION['stc_empl_id']) && ((int)$_SESSION['stc_empl_id'] === 20 || (int)$_SESSION['stc_empl_id'] === 1)): ?>
                   <div class="col-md-2 col-sm-4" style="margin-bottom: 6px;">
                     <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">&nbsp;</label>
                     <a class="btn btn-warning form-control" href="verify.php" target="_blank">Verify</a>
+                  </div>
+                  <?php endif; ?>
+                  <div class="col-md-2 col-sm-4" style="margin-bottom: 6px;">
+                    <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">&nbsp;</label>
+                    <a class="btn btn-warning form-control" id="vd-challan-btn" href="verify-challan.php" target="_blank">Challan</a>
                   </div>
                 </div>
                 <table class="table table-hover table-bordered">
@@ -316,9 +322,9 @@ include("kattegat/role_check.php");
               var slno = (parseInt(response.page || 1, 10) - 1) * perPage;
               response.data.forEach(function (item) {
                 slno++;
-                var prCell = '<div><b>' + escapeHtml(item.combiner_reference || '-') + '</b></div>' +
+                var prCell = '<a href="stc-requisition-combiner-fsale.php?requi_id=' + escapeHtml(item.combiner_id) + '" target="_blank"><div><b>' + escapeHtml(item.combiner_reference || '-') + '</b></div>' +
                   '<div style="font-size: 12px; color: #555;">PR# ' + escapeHtml(item.combiner_id || '-') + '</div>' +
-                  '<div style="font-size: 12px; color: #555;">' + escapeHtml(item.combiner_date) + '</div>';
+                  '<div style="font-size: 12px; color: #555;">' + escapeHtml(item.combiner_date) + '</div></a>';
 
                 var projectAndManager = '<div><b>' + escapeHtml(item.project_name) + '</b></div>' +
                   '<div style="font-size: 12px; color: #555;">' + escapeHtml(item.manager_name) + '</div>';
