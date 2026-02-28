@@ -26,8 +26,8 @@ include("kattegat/role_check.php");
   <link href="assets/css/style.css" rel="stylesheet">
   <style>
     .vd-col-narrow {
-      width: 70px;
-      max-width: 70px;
+      width: 200px;
+      max-width: 200px;
       white-space: normal !important;
       overflow-wrap: anywhere;
       word-break: break-word;

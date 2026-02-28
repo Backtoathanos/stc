@@ -26,8 +26,8 @@ include("kattegat/role_check.php");
   <link href="assets/css/style.css" rel="stylesheet">
   <style>
     .dr-col-project {
-      width: 130px;
-      max-width: 150px;
+      width: 200px;
+      max-width: 200px;
       white-space: normal !important;
       overflow-wrap: anywhere;
       word-break: break-word;
