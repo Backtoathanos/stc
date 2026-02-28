@@ -1947,6 +1947,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                foreach($qry as $result){
                   $pendingreason.=$result['message'].'<br>';
                }
+               if($requisitionrow['stc_cust_super_requisition_list_items_status']==8){
+                  $stcpendingqty=0.00;
+                  $stcbalqtymark=0;
+               }
                $pendingreason.='</a>';
                     $optimusprime.='
                             <tr>
@@ -1975,6 +1979,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                                 <td align="right">'.number_format($stcrecievedqty, 2).'</td>
                                 <td align="right">'.number_format($stcconsumedqty, 2).'</td>
                                 <td align="right">'.$stcbalqtymark.'</td>
+                                <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
                                 <td>'.$rqitemstts.'</td>
                                 <td>'.$pendingreason.'</td>
                             </tr>

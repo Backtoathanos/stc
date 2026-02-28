@@ -438,6 +438,7 @@ STCAuthHelper::checkAuth();?>
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Recieved Qty</div></th>
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Consumption Qty</div></th>
                                                 <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Balance Qty</div></th>
+                                                <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Returned Qty</div></th>
                                                 <th class="text-center">Status</th>
                                                 <th class="text-center" style="width: 80px;">Pending Reason</th>
                                             </tr>

@@ -930,7 +930,7 @@ class witcher_supervisor extends tesseract{
 		");
 		if(mysqli_num_rows($query)>0){
 			while($row=mysqli_fetch_assoc($query)){
-				mysqli_query($this->stc_dbs, "UPDATE `stc_cust_super_requisition_list_items_rec` SET `stc_cust_super_requisition_list_items_rec_status`='2' WHERE `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_items_rec_id'])."'");
+				mysqli_query($this->stc_dbs, "DELETE FROM `stc_cust_super_requisition_list_items_rec` WHERE `stc_cust_super_requisition_list_items_rec_list_item_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."' AND `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $row['stc_cust_super_requisition_list_items_rec_id'])."'");
 				
 			}
 			mysqli_query($this->stc_dbs, "UPDATE `stc_cust_super_requisition_list_items` SET `stc_cust_super_requisition_list_items_status`='8' WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'");
