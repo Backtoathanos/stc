@@ -5694,7 +5694,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 		$search = trim((string)$search);
 		$pr_name = trim((string)$pr_name);
 		// Keep joining pattern consistent with requisition listing (combiner -> list -> items)
-		$where = " WHERE DATE(L.`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $datefrom)."' AND '".mysqli_real_escape_string($this->stc_dbs, $dateto)."' 
+		$where = " WHERE DATE(C.`stc_requisition_combiner_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $datefrom)."' AND '".mysqli_real_escape_string($this->stc_dbs, $dateto)."' 
 			AND L.`stc_cust_super_requisition_list_status`!='1'
 		";
 		if($search !== ''){
@@ -5795,7 +5795,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 				GROUP BY `item_id`
 			) LG ON LG.item_id = I.`stc_cust_super_requisition_list_id`
 			".$where."
-			ORDER BY TIMESTAMP(L.`stc_cust_super_requisition_list_date`) DESC, I.`stc_cust_super_requisition_list_id` DESC
+			ORDER BY TIMESTAMP(C.`stc_requisition_combiner_date`) DESC, I.`stc_cust_super_requisition_list_id` DESC
 			LIMIT ".$offset.", ".$limit."
 		");
 
