@@ -5918,10 +5918,11 @@ class ragnarCallDailyRequisitions extends tesseract{
 				P.`stc_product_name` AS product_name,
 				P.`stc_product_unit` AS product_unit,
 				RP.`stc_cust_super_requisition_list_items_unit` AS item_unit,
-				SUM(RP.`stc_cust_super_requisition_items_finalqty`) AS connected_qty
+				SUM(RP.`stc_cust_super_requisition_items_finalqty`) AS connected_qty,
+				C.stc_sub_cat_name
 			FROM `stc_cust_super_requisition_list_items` RP
-			INNER JOIN `stc_product` P
-				ON P.`stc_product_id` = RP.`stc_cust_super_requisition_list_items_product_id`
+			INNER JOIN `stc_product` P ON P.`stc_product_id` = RP.`stc_cust_super_requisition_list_items_product_id`
+			INNER JOIN `stc_sub_category` C ON P.`stc_product_sub_cat_id` = C.`stc_sub_cat_id`
 			WHERE RP.`stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
 			GROUP BY P.`stc_product_id`
 			ORDER BY P.`stc_product_name` ASC
@@ -5996,10 +5997,13 @@ class ragnarCallDailyRequisitions extends tesseract{
 				$balanceQty = $adhocQty - ($gldQty + $directQty);
 				$reqBalanceQty = ((float)($row['connected_qty'] ?? 0)) - $dispatchedForItemProduct;
 				if($reqBalanceQty < 0){ $reqBalanceQty = 0; }
-
+				$product_name = (string)($row['product_name'] ?? '');
+				if($row['stc_sub_cat_name'] != "OTHERS"){
+					$product_name = $row['stc_sub_cat_name'] . ' ' . $product_name;
+				}
 				$data[] = [
 					'product_id' => $product_id,
-					'product_name' => (string)($row['product_name'] ?? ''),
+					'product_name' => $product_name,
 					'product_unit' => (string)($row['product_unit'] ?? ''),
 					'item_unit' => (string)($row['item_unit'] ?? ''),
 					'racks' => $rackNames,
