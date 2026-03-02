@@ -2495,7 +2495,14 @@ class ragnarPurchaseAdhoc extends tesseract{
 			$slno=0;
 			foreach($odin_query as $odin_row){
 				$slno++;
-				$odin.='<tr><td>'.$slno.'</td><td>'.$odin_row['stc_cust_super_requisition_list_items_rec_list_id'].'</td><td>'.$odin_row['stc_cust_super_requisition_list_items_rec_date'].'</td><td>'.$odin_row['stc_cust_project_title'].'</td><td>'.$odin_row['stc_cust_pro_supervisor_fullname'].'</td><td class="text-right">'.number_format($odin_row['stc_cust_super_requisition_list_items_rec_recqty'], 2).'</td></tr>';
+				$query=mysqli_query($this->stc_dbs, "SELECT `stc_requisition_combiner_req_comb_id` FROM `stc_requisition_combiner_req` WHERE `stc_requisition_combiner_req_requisition_id`='".$odin_row['stc_cust_super_requisition_list_items_rec_list_id']."'");
+				if(mysqli_num_rows($query)>0){
+					$row=mysqli_fetch_assoc($query);
+					$pr_no=$row['stc_requisition_combiner_req_comb_id'];
+				}else{
+					$pr_no='';
+				}
+				$odin.='<tr><td>'.$slno.'</td><td><a href="stc-requisition-combiner-fsale.php?requi_id='.$pr_no.'" target="__blank">'.$odin_row['stc_cust_super_requisition_list_items_rec_list_id'].'</a></td><td>'.$odin_row['stc_cust_super_requisition_list_items_rec_date'].'</td><td>'.$odin_row['stc_cust_project_title'].'</td><td>'.$odin_row['stc_cust_pro_supervisor_fullname'].'</td><td class="text-right">'.number_format($odin_row['stc_cust_super_requisition_list_items_rec_recqty'], 2).'</td></tr>';
 			}
 		}else{
 			$odin='<tr><td>No record found.</td></tr>';

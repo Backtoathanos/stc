@@ -127,7 +127,7 @@ $site_name = 'Multiple';
               <thead>
                 <tr>
                   <th>Sl No</th>
-                  <th>PR No &amp; Date</th>
+                  <th>Req &amp; Date</th>
                   <th>PR Location</th>
                   <th>Sitename</th>
                   <th>Item Desc</th>
@@ -178,7 +178,7 @@ $site_name = 'Multiple';
                     $prLocation = $row['pr_location'] ? $row['pr_location'] : '-';
                     $prNoDate = '-';
                     if($row['pr_no']){
-                      $prNoDate = $row['pr_no'].' <br>'.date('d-m-Y', strtotime($row['pr_date']));
+                      $prNoDate = $row['requisition_id'].' <br>'.date('d-m-Y', strtotime($row['requisition_date']));
                     }
                     $reqFrom = $row['req_from'];
                     if($row['req_from_contact']){
