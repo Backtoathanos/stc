@@ -526,9 +526,9 @@ include("kattegat/role_check.php");
                   HideSHow="block";
                 }
                 
-                if(row.balance_qty!=row.req_balance_qty){
-                  changeBtn = '';
-                }
+                // if(row.balance_qty!=row.req_balance_qty){
+                //   changeBtn = '';
+                // }
                 var reqQtyLink = '<a href=\"#\" class=\"dr-edit-qtyunit\" ' +
                   'data-item-id=\"' + escapeHtml(itemId) + '\" ' +
                   'data-product-id=\"' + escapeHtml(row.product_id) + '\" ' +

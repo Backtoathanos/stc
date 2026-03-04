@@ -243,7 +243,7 @@ include("kattegat/role_check.php");
                 var projectAndManager = '<div><b>' + escapeHtml(item.project_name) + '</b></div>' +
                   '<div style="font-size: 12px; color: #555;">' + escapeHtml(item.manager_name) + '</div>';
 
-                var sentByAndNumber = '<div><b>' + escapeHtml(item.sent_by_name) + '</b> <span style="font-size: 12px; color: #555;">(' + escapeHtml(item.sent_by_contact) + ')</span></div>' +
+                var sentByAndNumber = '<div><b>' + escapeHtml(item.sent_by_name) + '</b> <br><span style="font-size: 12px; color: #555;">(' + escapeHtml(item.sent_by_contact) + ')</span></div>' +
                   '<div style="font-size: 12px; color: #555;">Req# ' + escapeHtml(item.requisition_number) + '</div>';
 
                 var logsBtn = '<span class="text-muted">-</span>';
