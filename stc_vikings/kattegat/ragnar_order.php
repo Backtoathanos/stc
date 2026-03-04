@@ -6041,9 +6041,10 @@ class ragnarCallDailyRequisitions extends tesseract{
 		");
 	}
 
-	public function stc_dispatch_daily_requisition_balance($item_id = 0, $product_id = 0){
+	public function stc_dispatch_daily_requisition_balance($item_id = 0, $product_id = 0, $dispatch_qty = 0){
 		$item_id = (int)$item_id;
 		$product_id = (int)$product_id;
+		$dispatch_qty = (float)$dispatch_qty;
 		if($item_id <= 0 || $product_id <= 0){
 			return ['success' => false, 'message' => 'Invalid parameters.'];
 		}
@@ -6088,6 +6089,9 @@ class ragnarCallDailyRequisitions extends tesseract{
 		$remaining_to_dispatch = $required_qty - $dispatchedForItemProduct;
 		if($remaining_to_dispatch <= 0){
 			return ['success' => false, 'message' => 'Nothing pending to dispatch for this product.'];
+		}
+		if($dispatch_qty > 0){
+			$remaining_to_dispatch = min($remaining_to_dispatch, $dispatch_qty);
 		}
 
 		// Build adhoc rows with remaining per adhoc_id (ignoring GLD for now, we subtract it from effective stock)
@@ -6294,12 +6298,12 @@ class ragnarCallDailyRequisitions extends tesseract{
 		$pd_row = mysqli_fetch_assoc($pd_q);
 
 		$old_filter = '';
-		if($old_product_id > 0){
-			$old_filter = " AND `stc_cust_super_requisition_list_items_product_id`='".mysqli_real_escape_string($this->stc_dbs, $old_product_id)."' ";
-		}else{
-			// For "add item code" flow when product was missing/0
-			$old_filter = " AND (`stc_cust_super_requisition_list_items_product_id` IS NULL OR `stc_cust_super_requisition_list_items_product_id`=0) ";
-		}
+		// if($old_product_id > 0){
+		// 	$old_filter = " AND `stc_cust_super_requisition_list_items_product_id`='".mysqli_real_escape_string($this->stc_dbs, $old_product_id)."' ";
+		// }else{
+		// 	// For "add item code" flow when product was missing/0
+		// 	$old_filter = " AND (`stc_cust_super_requisition_list_items_product_id` IS NULL OR `stc_cust_super_requisition_list_items_product_id`=0) ";
+		// }
 
 		$up = mysqli_query($this->stc_dbs, "
 			UPDATE `stc_cust_super_requisition_list_items`
@@ -6714,11 +6718,12 @@ if(isset($_POST['stc_call_daily_requisition_balance'])){
 if(isset($_POST['stc_dispatch_daily_requisition_balance'])){
 	$item_id = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
 	$product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+	$dispatch_qty = isset($_POST['dispatch_qty']) ? (float)$_POST['dispatch_qty'] : 0;
 	if(empty($_SESSION['stc_empl_id'])){
 		echo json_encode(['reload' => true]);
 	}else{
 		$odin_req = new ragnarCallDailyRequisitions();
-		$odin_req_out = $odin_req->stc_dispatch_daily_requisition_balance($item_id, $product_id);
+		$odin_req_out = $odin_req->stc_dispatch_daily_requisition_balance($item_id, $product_id, $dispatch_qty);
 		echo json_encode($odin_req_out);
 	}
 }

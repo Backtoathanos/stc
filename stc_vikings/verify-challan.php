@@ -127,8 +127,6 @@ $site_name = 'Multiple';
               <thead>
                 <tr>
                   <th>Sl No</th>
-                  <th>Req &amp; Date</th>
-                  <th>PR Location</th>
                   <th>Sitename</th>
                   <th>Item Desc</th>
                   <th>Unit</th>
@@ -184,12 +182,11 @@ $site_name = 'Multiple';
                     if($row['req_from_contact']){
                       $reqFrom .= '<br>'.$row['req_from_contact'];
                     }
+                    $sitename = $prLocation==$row['sitename']?htmlspecialchars($prLocation):$prLocation." <span style='font-size: 10px; color: #555;'>(".htmlspecialchars($row['sitename']).")</span>";
                 ?>
                   <tr>
                     <td class="text-center dr-slno"><?php echo $sl; ?></td>
-                    <td class="text-center"><?php echo $prNoDate; ?></td>
-                    <td><?php echo htmlspecialchars($prLocation); ?></td>
-                    <td><?php echo htmlspecialchars($row['sitename']); ?></td>
+                    <td><?php echo $sitename; ?></td>
                     <td><?php echo nl2br(htmlspecialchars($row['item_desc'])); ?></td>
                     <td class="text-center"><?php echo htmlspecialchars($row['unit']); ?></td>
                     <td class="text-right"><b><?php echo number_format((float)$row['accepted_qty'], 2); ?></b></td>

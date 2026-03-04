@@ -40,6 +40,71 @@ include("kattegat/role_check.php");
     .dr-pr-list li:hover, .dr-pr-list li.dr-pr-selected {
       background: #f0f8ff;
     }
+    /* Adhoc Balance modal design */
+    #dailyReqBalanceModal .modal-content {
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+    }
+    #dailyReqBalanceModal .modal-header {
+      background: linear-gradient(135deg, #2c5282 0%, #2b6cb0 100%);
+      color: #fff;
+      border-radius: 10px 10px 0 0;
+      padding: 14px 20px;
+    }
+    #dailyReqBalanceModal .modal-header .close {
+      color: #fff;
+      opacity: 0.9;
+      text-shadow: none;
+    }
+    #dailyReqBalanceModal .modal-header .close:hover {
+      opacity: 1;
+    }
+    #dailyReqBalanceModal .table {
+      margin-bottom: 0;
+    }
+    #dailyReqBalanceModal .table thead th {
+      background: #f7fafc;
+      font-weight: 600;
+      color: #2d3748;
+      border-bottom: 2px solid #e2e8f0;
+      padding: 12px 10px;
+      font-size: 13px;
+    }
+    #dailyReqBalanceModal .table tbody td {
+      padding: 12px 10px;
+      vertical-align: middle;
+    }
+    #dailyReqBalanceModal .dr-balance-row:hover {
+      background: #f8fafc;
+    }
+    #dailyReqBalanceModal .dr-balance-cell {
+      min-width: 140px;
+    }
+    #dailyReqBalanceModal .dr-pending-reason-inline {
+      max-width: 140px;
+      display: inline-block !important;
+      margin-right: 6px;
+      margin-top: 6px;
+    }
+    #dailyReqBalanceModal .dr-update-pending-inline {
+      margin-top: 6px;
+    }
+    #dailyReqBalanceModal .dr-rack-input {
+      max-width: 100px;
+      text-align: center;
+    }
+    #dailyReqBalanceModal .dr-dispatch-balance-btn {
+      font-weight: 600;
+    }
+    #dailyReqBalanceModal .dr-change-itemcode-btn {
+      margin-left: 6px !important;
+    }
+    #dailyReqBalanceModal .modal-body {
+      padding: 20px;
+    }
+    #dailyReqBalanceModal .table tbody td.py-4 {
+      background: #f8fafc;
+    }
   </style>
 </head>
 
@@ -166,11 +231,12 @@ include("kattegat/role_check.php");
                   <th class="text-center">Requisition Balance Qty</th>
                   <th class="text-center">Adhoc Balance</th>
                   <th class="text-center">Rack</th>
+                  <th class="text-center">Adjust Quantity</th>
                   <th class="text-center">Action</th>
                 </tr>
               </thead>
               <tbody class="stc-daily-req-balance-body">
-                <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                <tr><td colspan="7" class="text-center">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -495,7 +561,7 @@ include("kattegat/role_check.php");
         $('#dr-itemcode-oldproductid').val('0');
         $('#dr-itemcode-label').text('Item Code (Product ID)');
         $('.dr-add-itemcode-form').hide();
-        $('.stc-daily-req-balance-body').html('<tr><td colspan="6" class="text-center">Loading...</td></tr>');
+        $('.stc-daily-req-balance-body').html('<tr><td colspan="7" class="text-center">Loading...</td></tr>');
         $.ajax({
           url: 'kattegat/ragnar_order.php',
           method: 'POST',
@@ -515,7 +581,6 @@ include("kattegat/role_check.php");
                   (canDispatch ? '' : 'disabled') + '>Dispatch Balance</button>';
 
                 var changeBtn = '<button type="button" class="btn btn-warning btn-sm dr-change-itemcode-btn" ' +
-                  'style="margin-left:6px;" ' +
                   'data-item-id="' + escapeHtml(itemId) + '" data-old-product-id="' + escapeHtml(row.product_id) + '" ' +
                   'title="Change Item Code"><i class="fa fa-edit"></i></button>';
                 var HideSHow="none";
@@ -541,30 +606,36 @@ include("kattegat/role_check.php");
                 var pendingBtn = '';
                 if (balQtyNum <= 0.0001) {
                   pendingBtn =
-                    '<br><a class="btn-change-status" data-toggle="modal" data-target="#statusRemarkModal" ' +
-                    'style="font-size:18px;color:black;" title="Update to pending" id="' + escapeHtml(itemId) + '" href="#">' +
-                    '<i class="fa fa-clock-o"></i> Pending</a>';
+                    '<div class="dr-pending-inline-wrap" style="margin-top:8px;display:flex;flex-wrap:wrap;align-items:center;gap:6px;">' +
+                    '<input type="text" class="form-control input-sm dr-pending-reason-inline" placeholder="Reason for pending...">' +
+                    '<button type="button" class="btn btn-warning btn-xs dr-update-pending-inline" data-item-id="' + escapeHtml(itemId) + '"><i class="fa fa-clock-o"></i> Update Pending</button>' +
+                    '</div>';
                 }
-                html += '<tr>' +
+                html += '<tr class="dr-balance-row" data-product-id="' + escapeHtml(row.product_id) + '" data-balance="' + escapeHtml(row.balance_qty) + '" data-unit="' + escapeHtml(row.product_unit) + '">' +
                   '<td class="text-center"><b>' + escapeHtml(row.product_id) + '</b></td>' +
                   '<td>' + escapeHtml(row.product_name) + '<span style="display:' + HideSHow + ';font-size: 12px; color: Red;">* Units not matching please change product or update unit of requisition</span></td>' +
                   '<td class="text-right dr-qtyunit-cell">' + reqQtyLink + '</td>' +
-                  '<td class="text-right"><b>' + escapeHtml(row.balance_qty) + '/' + escapeHtml(row.product_unit) + '</b>' + pendingBtn + '</td>' +
+                  '<td class="text-right dr-balance-cell"><b>' + escapeHtml(row.balance_qty) + '/' + escapeHtml(row.product_unit) + '</b>' + pendingBtn + '</td>' +
                   '<td>' + escapeHtml(row.racks || '-') + '</td>' +
-                  '<td class="text-center">' + btn + changeBtn + '</td>' +
+                  '<td><input type="number" class="form-control input-sm dr-rack-input" value="' + escapeHtml(row.req_balance_qty) + '"></td>' +
+                  '<td class="text-center"><div class="dr-action-btns" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;">' + btn + changeBtn + '</div></td>' +
                   '</tr>';
               });
             } else {
               html =
-                '<tr><td colspan="6" class="text-center">' +
-                'No connected product found. ' +
-                '<button type="button" class="btn btn-primary btn-sm dr-show-itemcode-form" data-item-id="' + escapeHtml(itemId) + '">Add Item Code</button>' +
+                '<tr><td colspan="7" class="text-center py-4">' +
+                '<div class="text-muted mb-3"><i class="fa fa-info-circle"></i> No connected product found.</div>' +
+                '<div class="dr-action-btns" style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:10px;">' +
+                '<button type="button" class="btn btn-primary btn-sm dr-show-itemcode-form" data-item-id="' + escapeHtml(itemId) + '"><i class="fa fa-plus"></i> Add Item Code</button>' +
+                '<button type="button" class="btn btn-warning btn-sm dr-update-pending-inline" data-item-id="' + escapeHtml(itemId) + '"><i class="fa fa-clock-o"></i> Update Pending</button>' +
+                '</div>' +
+                '<div><input type="text" class="form-control dr-pending-reason-inline" placeholder="Enter reason for pending..." style="max-width:280px;margin:0 auto;"></div>' +
                 '</td></tr>';
             }
             $('.stc-daily-req-balance-body').html(html);
           },
           error: function () {
-            $('.stc-daily-req-balance-body').html('<tr><td colspan="6" class="text-center">Error loading balance.</td></tr>');
+            $('.stc-daily-req-balance-body').html('<tr><td colspan="7" class="text-center">Error loading balance.</td></tr>');
           }
         });
       }
@@ -575,7 +646,44 @@ include("kattegat/role_check.php");
         loadBalanceModal(itemId);
       });
 
-      // Pending status with remarks (same flow as combiner page)
+      $('body').delegate('.dr-update-pending-inline', 'click', function () {
+        var itemId = parseInt($(this).data('item-id'), 10) || 0;
+        var $cell = $(this).closest('td');
+        var remarks = ($cell.find('.dr-pending-reason-inline').val() || '').trim();
+        if (remarks === '') {
+          showSwal('warning', 'Required', 'Please enter reason for pending status.');
+          return;
+        }
+        if (itemId <= 0) {
+          showSwal('error', 'Invalid', 'Invalid requisition item id.');
+          return;
+        }
+        var $btn = $(this);
+        $btn.prop('disabled', true);
+        $.ajax({
+          url: 'kattegat/ragnar_order.php',
+          method: 'POST',
+          data: { update_requisition_status: 1, id: itemId, status: 9, remarks: remarks },
+          dataType: 'json',
+          success: function (response) {
+            $btn.prop('disabled', false);
+            if (response && response.reload) { window.location.reload(); return; }
+            if (response && response.success) {
+              showSwal('success', 'Updated', response.message || 'Status updated.');
+              loadBalanceModal(itemId);
+              loadDailyRequisitions($('#dr-search').val() || '', currentPage);
+            } else {
+              showSwal('error', 'Failed', (response && response.message) ? response.message : 'Failed to update status.');
+            }
+          },
+          error: function () {
+            $btn.prop('disabled', false);
+            showSwal('error', 'Failed', 'Failed to update status.');
+          }
+        });
+      });
+
+      // Pending status with remarks (modal - used elsewhere if needed)
       $('body').on('click', '.btn-change-status', function () {
         var preq_id = $(this).attr('id');
         $('#statusChangeId').val(preq_id);
@@ -808,8 +916,10 @@ include("kattegat/role_check.php");
         var $btn = $(this);
         var itemId = $btn.data('item-id');
         var productId = $btn.data('product-id');
+        var $row = $btn.closest('tr');
+        var dispatchQty = parseFloat($row.find('.dr-rack-input').val(), 10) || 0;
         if (typeof Swal === 'undefined' || !Swal.fire) {
-          if (!confirm('Dispatch balance qty from Adhoc?')) return;
+          if (!confirm('Dispatch ' + dispatchQty + ' from Adhoc?')) return;
           $btn.prop('disabled', true).text('Dispatching...');
           doDispatch();
           return;
@@ -818,7 +928,7 @@ include("kattegat/role_check.php");
         Swal.fire({
           icon: 'warning',
           title: 'Confirm dispatch',
-          text: 'Dispatch balance qty from Adhoc?',
+          text: 'Dispatch ' + dispatchQty + ' from Adhoc?',
           showCancelButton: true,
           confirmButtonText: 'Yes, dispatch',
           cancelButtonText: 'Cancel'
@@ -835,7 +945,8 @@ include("kattegat/role_check.php");
           data: {
             stc_dispatch_daily_requisition_balance: 1,
             item_id: itemId,
-            product_id: productId
+            product_id: productId,
+            dispatch_qty: dispatchQty
           },
           dataType: 'json',
           success: function (response) {
@@ -845,9 +956,18 @@ include("kattegat/role_check.php");
             }
             if (response && response.success) {
               showSwal('success', 'Dispatched', response.message || 'Dispatched.');
-              // Refresh modal + main table
-              loadBalanceModal(itemId);
-              loadDailyRequisitions($('#dr-search').val() || '', currentPage);
+              var dispatched = parseFloat(String(response.dispatched_qty || dispatchQty).replace(/,/g, '')) || dispatchQty;
+              var curBal = parseFloat($row.data('balance'), 10) || 0;
+              var unit = $row.data('unit') || '';
+              var newBal = Math.round((curBal - dispatched) * 100) / 100;
+              if (newBal <= 0.0001) {
+                $row.slideUp(200, function () { $(this).remove(); });
+              } else {
+                $row.data('balance', newBal);
+                $row.find('.dr-balance-cell b').first().replaceWith('<b>' + newBal + '/' + unit + '</b>');
+                $row.find('.dr-rack-input').val(newBal);
+              }
+              $btn.prop('disabled', false).text('Dispatch Balance');
             } else {
               showSwal('error', 'Failed', (response && response.message) ? response.message : 'Dispatch failed.');
               $btn.prop('disabled', false).text('Dispatch Balance');
