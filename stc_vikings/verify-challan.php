@@ -186,7 +186,7 @@ $site_name = 'Multiple';
                     }
                 ?>
                   <tr>
-                    <td class="text-center"><?php echo $sl; ?></td>
+                    <td class="text-center dr-slno"><?php echo $sl; ?></td>
                     <td class="text-center"><?php echo $prNoDate; ?></td>
                     <td><?php echo htmlspecialchars($prLocation); ?></td>
                     <td><?php echo htmlspecialchars($row['sitename']); ?></td>
@@ -222,13 +222,23 @@ $site_name = 'Multiple';
         });
 
         var basePmNo = '<?php echo addslashes($pm_no); ?>';
+        var $rows = $('#verifyChallanTable tbody tr');
+        $rows.each(function(i){ $(this).data('origSl', i + 1); });
+        function renumberSlNo(){
+          var sl = 0;
+          $('#verifyChallanTable tbody tr:visible').each(function(){
+            sl++;
+            $(this).find('.dr-slno').text(sl);
+          });
+        }
         $('#tableSearch').on('keyup', function(){
           var val = $(this).val().trim();
           var valLower = val.toLowerCase();
-          $('#verifyChallanTable tbody tr').each(function(){
+          $rows.each(function(){
             var text = $(this).text().toLowerCase();
             $(this).toggle(text.indexOf(valLower) > -1);
           });
+          renumberSlNo();
           var pmNo = basePmNo;
           if (val.length >= 2) {
             pmNo += ' (' + val.charAt(0).toUpperCase() + '-' + val.charAt(val.length - 1).toUpperCase() + ')';

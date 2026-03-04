@@ -32,6 +32,24 @@ include("kattegat/role_check.php");
       overflow-wrap: anywhere;
       word-break: break-word;
     }
+    .vd-bulk-status-panel {
+      display: none;
+      position: fixed;
+      top: 80px;
+      right: 24px;
+      z-index: 1050;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+      color: #fff;
+      min-width: 260px;
+    }
+    .vd-bulk-status-panel.show { display: block; }
+    .vd-bulk-status-panel h6 { margin: 0 0 12px; font-weight: 600; color: #fff; }
+    .vd-bulk-status-panel .form-control { border-radius: 6px; }
+    .vd-bulk-status-panel .btn-update-bulk { margin-top: 10px; background: #fff; color: #667eea; font-weight: 600; border: none; }
+    .vd-bulk-status-panel .btn-update-bulk:hover { background: #f0f0f0; color: #764ba2; }
   </style>
 </head>
 
@@ -58,9 +76,16 @@ include("kattegat/role_check.php");
                     <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">Date</label>
                     <input type="date" class="form-control" id="vd-date">
                   </div>
-                  <div class="col-md-5 col-sm-8" style="margin-bottom: 6px;">
+                  <div class="col-md-4 col-sm-8" style="margin-bottom: 6px;">
                     <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">Search</label>
                     <input type="text" class="form-control" id="vd-search" placeholder="PR, project, supervisor, req#, item...">
+                  </div>
+                  <div class="col-md-2 col-sm-6" style="margin-bottom: 6px;">
+                    <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">Status</label>
+                    <select class="form-control" id="vd-accept-status">
+                      <option value="accept" selected>Accept</option>
+                      <option value="accepted">Accepted</option>
+                    </select>
                   </div>
                   <div class="col-md-2 col-sm-4" style="margin-bottom: 6px;">
                     <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">&nbsp;</label>
@@ -75,6 +100,7 @@ include("kattegat/role_check.php");
                 <table class="table table-hover table-bordered">
                   <thead>
                     <tr>
+                      <th class="text-center" style="width:40px;"><input type="checkbox" id="vd-select-all" title="Select all"></th>
                       <th class="text-center">Sl No</th>
                       <th class="text-center vd-col-narrow">PR Name<br>PR No<br>Date &amp; Time</th>
                       <th class="text-center vd-col-narrow">Project<br>Manager</th>
@@ -91,9 +117,15 @@ include("kattegat/role_check.php");
                     </tr>
                   </thead>
                   <tbody class="vd-body">
-                    <tr><td colspan="13" class="text-center">Loading...</td></tr>
+                    <tr><td colspan="14" class="text-center">Loading...</td></tr>
                   </tbody>
                 </table>
+
+                <div class="vd-bulk-status-panel" id="vd-bulk-panel">
+                  <h6><i class="fa fa-check-circle"></i> Bulk Accept</h6>
+                  <p style="margin:0 0 12px;font-size:13px;opacity:0.95;">Accept selected items for printing</p>
+                  <button type="button" class="btn btn-update-bulk btn-block" id="vd-bulk-update-btn">Update</button>
+                </div>
 
                 <div class="vd-pagination"></div>
               </div>
@@ -183,7 +215,8 @@ include("kattegat/role_check.php");
 
       function loadVerify(search, page) {
         var date = $('#vd-date').val() || '';
-        $('.vd-body').html('<tr><td colspan="13" class="text-center">Loading...</td></tr>');
+        var acceptStatus = $('#vd-accept-status').val() || 'accept';
+        $('.vd-body').html('<tr><td colspan="14" class="text-center">Loading...</td></tr>');
         $.ajax({
           url: 'kattegat/ragnar_order.php',
           method: 'POST',
@@ -192,7 +225,8 @@ include("kattegat/role_check.php");
             search: search || '',
             date: date,
             page: page || 1,
-            limit: perPage
+            limit: perPage,
+            accept_status: acceptStatus
           },
           dataType: 'json',
           success: function (response) {
@@ -222,7 +256,8 @@ include("kattegat/role_check.php");
                   acceptBtn = '<span class="badge badge-success" style="background:#28a745;color:#fff;padding:6px 10px;">Accepted</span>';
                 }
 
-                rows += '<tr>' +
+                rows += '<tr data-item-id="' + escapeHtml(item.item_id) + '">' +
+                  '<td class="text-center"><input type="checkbox" class="vd-row-check" value="' + escapeHtml(item.item_id) + '"></td>' +
                   '<td class="text-center">' + escapeHtml(slno) + '</td>' +
                   '<td class="text-center vd-col-narrow">' + prCell + '</td>' +
                   '<td class="vd-col-narrow">' + projectAndManager + '</td>' +
@@ -239,13 +274,15 @@ include("kattegat/role_check.php");
                   '</tr>';
               });
             } else {
-              rows = '<tr><td colspan="13" class="text-center">No dispatched items found for this date.</td></tr>';
+              rows = '<tr><td colspan="14" class="text-center">No dispatched items found for this date.</td></tr>';
             }
             $('.vd-body').html(rows);
             renderPagination(parseInt(response.total_pages || 0, 10), parseInt(response.page || 1, 10));
+            $('#vd-select-all').prop('checked', false);
+            $('#vd-bulk-panel').removeClass('show');
           },
           error: function () {
-            $('.vd-body').html('<tr><td colspan="13" class="text-center">Error loading data.</td></tr>');
+            $('.vd-body').html('<tr><td colspan="14" class="text-center">Error loading data.</td></tr>');
           }
         });
       }
@@ -255,9 +292,75 @@ include("kattegat/role_check.php");
         loadVerify($('#vd-search').val() || '', currentPage);
       }
 
+      function toggleBulkPanel() {
+        var n = $('.vd-row-check:checked').length;
+        if (n > 0) {
+          $('#vd-bulk-panel').addClass('show');
+          $('#vd-bulk-panel h6').html('<i class="fa fa-check-circle"></i> Bulk Accept <span style="opacity:0.9;">(' + n + ' selected)</span>');
+        } else {
+          $('#vd-bulk-panel').removeClass('show');
+          $('#vd-select-all').prop('checked', false);
+        }
+      }
+
+      $('#vd-select-all').on('change', function () {
+        var checked = $(this).prop('checked');
+        $('.vd-row-check').prop('checked', checked);
+        toggleBulkPanel();
+      });
+
+      $('body').delegate('.vd-row-check', 'change', function () {
+        var total = $('.vd-row-check').length;
+        var checked = $('.vd-row-check:checked').length;
+        $('#vd-select-all').prop('checked', total > 0 && total === checked);
+        toggleBulkPanel();
+      });
+
+      $('#vd-bulk-update-btn').on('click', function () {
+        var ids = [];
+        $('.vd-row-check:checked').each(function () { ids.push(parseInt($(this).val(), 10)); });
+        if (ids.length === 0) {
+          showSwal('warning', 'No selection', 'Please select at least one row.');
+          return;
+        }
+        var date = $('#vd-date').val() || '';
+        var $btn = $(this);
+        $btn.prop('disabled', true).text('Updating...');
+        var done = 0, failed = 0;
+        function doNext(i) {
+          if (i >= ids.length) {
+            $btn.prop('disabled', false).text('Update');
+            if (failed > 0) {
+              showSwal('warning', 'Partial update', done + ' accepted, ' + failed + ' failed.');
+            } else {
+              showSwal('success', 'Accepted', done + ' item(s) accepted.');
+              $('.vd-row-check:checked').prop('checked', false);
+              toggleBulkPanel();
+              loadVerify($('#vd-search').val() || '', currentPage);
+            }
+            return;
+          }
+          $.ajax({
+            url: 'kattegat/ragnar_order.php',
+            method: 'POST',
+            data: { stc_accept_verify_dispatch: 1, item_id: ids[i], date: date },
+            dataType: 'json',
+            success: function (r) {
+              if (r && r.success) done++; else failed++;
+              doNext(i + 1);
+            },
+            error: function () {
+              failed++;
+              doNext(i + 1);
+            }
+          });
+        }
+        doNext(0);
+      });
+
       $('#vd-search-btn').on('click', function (e) { e.preventDefault(); runSearch(); });
       $('#vd-search').on('keydown', function (e) { if (e.keyCode === 13) { e.preventDefault(); runSearch(); } });
-      $('#vd-date').on('change', function () { runSearch(); });
+      $('#vd-date, #vd-accept-status').on('change', function () { runSearch(); });
       $('#vd-date').on('change', function () {
         var d = $('#vd-date').val() || '';
         $('#vd-challan-btn').attr('href', 'verify-challan.php?date=' + encodeURIComponent(d));
@@ -289,7 +392,10 @@ include("kattegat/role_check.php");
               if (response && response.reload) { window.location.reload(); return; }
               if (response && response.success) {
                 Swal.fire({ icon: 'success', title: 'Accepted', text: response.message || 'Accepted.' });
-                loadVerify($('#vd-search').val() || '', currentPage);
+                var $row = $('.vd-body tr[data-item-id="' + itemId + '"]');
+                if ($row.length) {
+                  $row.find('.vd-accept-btn').closest('td').html('<span class="badge badge-success" style="background:#28a745;color:#fff;padding:6px 10px;">Accepted</span>');
+                }
               } else {
                 Swal.fire({ icon: 'error', title: 'Failed', text: (response && response.message) ? response.message : 'Accept failed.' });
               }

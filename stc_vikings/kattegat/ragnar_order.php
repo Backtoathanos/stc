@@ -6407,7 +6407,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 
 // Verify dispatch (AJAX): show only items dispatched on selected day with racks
 class ragnarCallVerifyDispatch extends tesseract{
-	public function stc_call_verify_dispatch($search = '', $date = '', $page = 1, $limit = 25){
+	public function stc_call_verify_dispatch($search = '', $date = '', $page = 1, $limit = 25, $accept_status = 'accept'){
 		$page = (int)$page;
 		$limit = (int)$limit;
 		if($page < 1){ $page = 1; }
@@ -6416,6 +6416,8 @@ class ragnarCallVerifyDispatch extends tesseract{
 
 		$date = $date == '' ? date('Y-m-d') : $date;
 		$search = trim((string)$search);
+		$accept_status = trim((string)$accept_status);
+		if($accept_status !== 'accepted'){ $accept_status = 'accept'; }
 
 		$where = " WHERE DATE(R.`stc_cust_super_requisition_list_items_rec_date`) = '".mysqli_real_escape_string($this->stc_dbs, $date)."' ";
 		if($search !== ''){
@@ -6429,6 +6431,11 @@ class ragnarCallVerifyDispatch extends tesseract{
 				C.`stc_requisition_combiner_refrence` LIKE '%".$esc."%' OR
 				I.`stc_cust_super_requisition_list_items_title` LIKE '%".$esc."%'
 			) ";
+		}
+		if($accept_status === 'accept'){
+			$where .= " AND VA.`id` IS NULL ";
+		} else {
+			$where .= " AND VA.`id` IS NOT NULL ";
 		}
 
 		$count_q = mysqli_query($this->stc_dbs, "
@@ -6454,6 +6461,8 @@ class ragnarCallVerifyDispatch extends tesseract{
 					FROM `stc_cust_super_requisition_list_items_log`
 					GROUP BY `item_id`
 				) LG ON LG.item_id = I.`stc_cust_super_requisition_list_id`
+				LEFT JOIN `stc_verify_dispatch_accept` VA
+					ON VA.`item_id` = I.`stc_cust_super_requisition_list_id`
 				".$where."
 				GROUP BY R.`stc_cust_super_requisition_list_items_rec_list_item_id`
 			) X
@@ -6746,11 +6755,12 @@ if(isset($_POST['stc_call_verify_dispatch'])){
 	$date = isset($_POST['date']) ? $_POST['date'] : '';
 	$page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
 	$limit = isset($_POST['limit']) ? (int)$_POST['limit'] : 25;
+	$accept_status = isset($_POST['accept_status']) ? trim((string)$_POST['accept_status']) : 'accept';
 	if(empty($_SESSION['stc_empl_id'])){
 		echo json_encode(['reload' => true]);
 	}else{
 		$odin_req = new ragnarCallVerifyDispatch();
-		$odin_req_out = $odin_req->stc_call_verify_dispatch($search, $date, $page, $limit);
+		$odin_req_out = $odin_req->stc_call_verify_dispatch($search, $date, $page, $limit, $accept_status);
 		echo json_encode($odin_req_out);
 	}
 }
