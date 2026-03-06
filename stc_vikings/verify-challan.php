@@ -40,18 +40,21 @@ $site_name = 'Multiple';
       .invoice table td,.invoice table th {
         padding: 5px;
         background: #bbbed4;
-        border-bottom: 1px solid #fff;
         border: 1px solid #000;
+        border-bottom: 1px solid #000;
+        color: #000;
       }
       .invoice table th {
         white-space: nowrap;
         font-weight: 600;
         font-size: 14px;
         text-align: center;
+        color: #000;
       }
       .invoice table td {
         background: #fff;
         font-size: 13px;
+        color: #000;
       }
       .invoice{
         margin-top: 0 !important;
@@ -70,6 +73,12 @@ $site_name = 'Multiple';
           position: relative;
           float: right;
           right: -180px;
+        }
+        #verifyChallanTable, #verifyChallanTable th, #verifyChallanTable td {
+          color: #000 !important;
+          border: 1px solid #000 !important;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
         }
       }
       @media screen {
@@ -123,7 +132,7 @@ $site_name = 'Multiple';
             <input type="text" id="tableSearch" class="form-control" placeholder="Search table..." style="background-color: #e5f3b2;color:black">
           </div>
           <div style="overflow-x:auto;">
-            <table class="table table-bordered table-hover" style="color:#000;" id="verifyChallanTable">
+            <table class="table table-bordered table-hover" style="color:#000; border:1px solid #000;" id="verifyChallanTable">
               <thead>
                 <tr>
                   <th>Sl No</th>
@@ -131,6 +140,7 @@ $site_name = 'Multiple';
                   <th>Item Desc</th>
                   <th>Unit</th>
                   <th>Dispatched Qty</th>
+                  <th>Rack</th>
                   <th>Req From</th>
                   <th>Sign</th>
                 </tr>
@@ -145,6 +155,7 @@ $site_name = 'Multiple';
                     VA.`created_date` AS accepted_date,
                     I.`stc_cust_super_requisition_list_items_title` AS item_desc,
                     I.`stc_cust_super_requisition_list_items_unit` AS unit,
+                    I.`stc_cust_super_requisition_list_id` AS item_id,
                     L.`stc_cust_super_requisition_list_id` AS requisition_id,
                     L.`stc_cust_super_requisition_list_date` AS requisition_date,
                     P.`stc_cust_project_title` AS sitename,
@@ -182,7 +193,17 @@ $site_name = 'Multiple';
                     if($row['req_from_contact']){
                       $reqFrom .= '<br>'.$row['req_from_contact'];
                     }
-                    $sitename = $prLocation==$row['sitename']?htmlspecialchars($prLocation):$prLocation." <span style='font-size: 10px; color: #555;'>(".htmlspecialchars($row['sitename']).")</span>";
+                    $sitename = $prLocation==$row['sitename']?htmlspecialchars($prLocation):htmlspecialchars($row['sitename'])." <span style='font-size: 10px; color: black;'>(".$prLocation.")</span>";
+                    $item_id_esc = mysqli_real_escape_string($con, $row['item_id']);
+                    $query2 = mysqli_query($con, "
+                        SELECT GROUP_CONCAT(DISTINCT RK.`stc_rack_name` ORDER BY RK.`stc_rack_name` SEPARATOR ', ') AS stc_rack_name
+                        FROM `stc_cust_super_requisition_list_items_rec` REC
+                        INNER JOIN `stc_purchase_product_adhoc` APA ON APA.`stc_purchase_product_adhoc_id` = REC.`stc_cust_super_requisition_list_items_rec_list_poaid`
+                        LEFT JOIN `stc_rack` RK ON RK.`stc_rack_id` = APA.`stc_purchase_product_adhoc_rackid`
+                        WHERE REC.`stc_cust_super_requisition_list_items_rec_list_item_id` = '".$item_id_esc."'
+                    ");
+                    $rackRow = mysqli_num_rows($query2)>0 ? mysqli_fetch_assoc($query2) : array();
+                    $rack = ($rackRow['stc_rack_name'] ?? '') ?: '-';
                 ?>
                   <tr>
                     <td class="text-center dr-slno"><?php echo $sl; ?></td>
@@ -190,6 +211,7 @@ $site_name = 'Multiple';
                     <td><?php echo nl2br(htmlspecialchars($row['item_desc'])); ?></td>
                     <td class="text-center"><?php echo htmlspecialchars($row['unit']); ?></td>
                     <td class="text-right"><b><?php echo number_format((float)$row['accepted_qty'], 2); ?></b></td>
+                    <td><?php echo htmlspecialchars($rack); ?></td>
                     <td><?php echo $reqFrom; ?></td>
                     <td></td>
                   </tr>
