@@ -27,6 +27,8 @@ use App\Http\Controllers\RequisitionController;
 use App\Http\Controllers\STDController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\POAdhocController;
+use App\Http\Controllers\PPETrackerController;
+use App\Http\Controllers\ToolTrackerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -242,4 +244,23 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/stc/poadhoc/get', [POAdhocController::class, 'get']);
     Route::post('/branch/stc/poadhoc/edit', [POAdhocController::class, 'update']);
     Route::get('/branch/stc/poadhoc/delete', [POAdhocController::class, 'delete']);
+
+    // for stc ppe tracker
+    Route::get('/branch/stc/ppetracker', [PPETrackerController::class, 'show']);    
+    Route::post('/branch/stc/ppetracker/list', [PPETrackerController::class, 'list']);
+    Route::get('/branch/stc/ppetracker/get', [PPETrackerController::class, 'get']);
+    Route::post('/branch/stc/ppetracker/edit', [PPETrackerController::class, 'update']);
+    Route::get('/branch/stc/ppetracker/delete', [PPETrackerController::class, 'delete']);
+
+    // for stc tool tracker
+    Route::get('/branch/stc/tooltracker', [ToolTrackerController::class, 'show']);    
+    Route::post('/branch/stc/tooltracker/list', [ToolTrackerController::class, 'list']);
+    Route::get('/branch/stc/tooltracker/get', [ToolTrackerController::class, 'get']);
+    Route::post('/branch/stc/tooltracker/edit', [ToolTrackerController::class, 'update']);
+    Route::get('/branch/stc/tooltracker/delete', [ToolTrackerController::class, 'delete']);
+    Route::get('/branch/stc/tooltracker/list-track', [ToolTrackerController::class, 'listTrack']);
+    Route::get('/branch/stc/tooltracker/get-track', [ToolTrackerController::class, 'getTrack']);
+    Route::post('/branch/stc/tooltracker/edit-track', [ToolTrackerController::class, 'updateTrack']);
+    Route::get('/branch/stc/tooltracker/delete-track', [ToolTrackerController::class, 'deleteTrack']);
+    Route::post('/branch/stc/tooltracker/delete-track-bulk', [ToolTrackerController::class, 'deleteTrackBulk']);
 });

@@ -184,6 +184,18 @@
                       <p>PO Adhoc</p>
                     </a>
                   </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/stc/ppetracker') }}" class="nav-link @if(Request::segment(3) == 'ppetracker') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>PPE Tracker</p>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/stc/tooltracker') }}" class="nav-link @if(Request::segment(3) == 'tooltracker') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>Tool Tracker</p>
+                    </a>
+                  </li>
                 </ul>
               </li>
             </ul>

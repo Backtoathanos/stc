@@ -5494,7 +5494,7 @@ if(isset($_POST['stc_dispatch_hit'])){
 	$stc_req_id=$_POST['stc_req_id'];
 	$stc_req_item_id=$_POST['stc_req_item_id'];
 	$item_type=$_POST['item_type'];
-	$stc_tools_id=isset($_POST['stc_tools_id']) || 'NA';
+	$stc_tools_id = (isset($_POST['stc_tools_id']) && trim($_POST['stc_tools_id']) !== '' && $_POST['stc_tools_id'] !== 'NA') ? trim($_POST['stc_tools_id']) : 'NA';
 	$poadhocitem=$_POST['poadhocitem'];
 	$raven=new ragnarRequisitionPertAdd();
 	$outraven=$raven->stc_ag_req_direct($stc_req_id, $stc_req_item_id, $stc_tools_id, $dispatch_qty, $poadhocitem, $item_type);
