@@ -1302,21 +1302,40 @@ class pirates_project extends tesseract{
 		$blackpearl='';
 		$blackpearl_query="
 			SELECT
-			    `stc_item_tracker_id`,
-			    `stc_item_tracker_user_id`,
-			    `stc_cust_pro_supervisor_fullname`,
-			    `stc_item_tracker_toppe`,
-			    `stc_item_tracker_qty`,
-			    `stc_item_tracker_unit`,
-			    `stc_item_tracker_issuedate`,
-			    `stc_item_tracker_validity`,
-			    `stc_item_tracker_remarks`,
-			    `stc_item_tracker_createdby`,
-			    `stc_item_tracker_created_date`
-			FROM `stc_item_tracker`
-			LEFT JOIN `stc_cust_pro_supervisor`
-			ON `stc_cust_pro_supervisor_id`=`stc_item_tracker_user_id`
-			ORDER BY DATE(`stc_item_tracker_created_date`) DESC
+			    it.`stc_item_tracker_id`,
+			    it.`stc_item_tracker_user_id`,
+			    it.`stc_cust_pro_supervisor_fullname`,
+			    it.`stc_item_tracker_toppe`,
+			    it.`stc_item_tracker_qty`,
+			    it.`stc_item_tracker_unit`,
+			    it.`stc_item_tracker_issuedate`,
+			    it.`stc_item_tracker_validity`,
+			    it.`stc_item_tracker_remarks`,
+			    it.`stc_item_tracker_createdby`,
+			    it.`stc_item_tracker_created_date`
+			FROM (
+			    SELECT
+			        `stc_item_tracker_id`,
+			        `stc_item_tracker_user_id`,
+			        `stc_cust_pro_supervisor_fullname`,
+			        `stc_item_tracker_toppe`,
+			        `stc_item_tracker_qty`,
+			        `stc_item_tracker_unit`,
+			        `stc_item_tracker_issuedate`,
+			        `stc_item_tracker_validity`,
+			        `stc_item_tracker_remarks`,
+			        `stc_item_tracker_createdby`,
+			        `stc_item_tracker_created_date`
+			    FROM `stc_item_tracker`
+			    LEFT JOIN `stc_cust_pro_supervisor`
+			    ON `stc_cust_pro_supervisor_id`=`stc_item_tracker_user_id`
+			) it
+			LEFT JOIN (
+			    SELECT `user_id`, MAX(`created_date`) AS `sort_created_date`
+			    FROM `stc_tooldetails_track`
+			    GROUP BY `user_id`
+			) tdt ON tdt.`user_id` = it.`stc_item_tracker_user_id`
+			ORDER BY COALESCE(tdt.`sort_created_date`, it.`stc_item_tracker_created_date`) DESC
 		";
 		$blackpearl_result=mysqli_query($this->stc_dbs, $blackpearl_query);
 
