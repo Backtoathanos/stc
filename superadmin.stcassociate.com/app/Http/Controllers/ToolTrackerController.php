@@ -5,12 +5,42 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\StcTooldetails;
 use App\StcTooldetailsTrack;
+use App\Project;
 
 class ToolTrackerController extends Controller
 {
     public function show(){
         $data['page_title'] = "Tool Tracker";
+        $data['supervisors'] = \DB::table('stc_cust_pro_supervisor')
+            ->where('stc_cust_pro_supervisor_status', 1)
+            ->orderBy('stc_cust_pro_supervisor_fullname', 'asc')
+            ->get(['stc_cust_pro_supervisor_id as id', 'stc_cust_pro_supervisor_fullname as name']);
         return view('pages.tooltracker', $data);
+    }
+
+    public function getProjectsByUser(Request $request){
+        $userId = $request->user_id;
+        if (!empty($userId)) {
+            $projectIds = \DB::table('stc_cust_pro_attend_supervise')
+                ->where('stc_cust_pro_attend_supervise_super_id', $userId)
+                ->pluck('stc_cust_pro_attend_supervise_pro_id')
+                ->toArray();
+            if (!empty($projectIds)) {
+                $projects = Project::select('stc_cust_project_id', 'stc_cust_project_title')
+                    ->whereIn('stc_cust_project_id', $projectIds)
+                    ->orderBy('stc_cust_project_title', 'asc')
+                    ->get();
+            } else {
+                $projects = Project::select('stc_cust_project_id', 'stc_cust_project_title')
+                    ->orderBy('stc_cust_project_title', 'asc')
+                    ->get();
+            }
+        } else {
+            $projects = Project::select('stc_cust_project_id', 'stc_cust_project_title')
+                ->orderBy('stc_cust_project_title', 'asc')
+                ->get();
+        }
+        return response()->json(['success' => true, 'data' => $projects]);
     }
 
     public function list(Request $request)
@@ -146,8 +176,15 @@ class ToolTrackerController extends Controller
 
     public function listTrack(Request $request){
         $toolsdetailsId = $request->toolsdetails_id;
-        $records = StcTooldetailsTrack::where('toolsdetails_id', $toolsdetailsId)
-            ->orderBy('created_date', 'desc')
+        $records = StcTooldetailsTrack::where('stc_tooldetails_track.toolsdetails_id', $toolsdetailsId)
+            ->leftJoin('stc_cust_pro_supervisor', 'stc_cust_pro_supervisor.stc_cust_pro_supervisor_id', '=', 'stc_tooldetails_track.user_id')
+            ->leftJoin('stc_cust_project', 'stc_cust_project.stc_cust_project_id', '=', 'stc_tooldetails_track.project_id')
+            ->select(
+                'stc_tooldetails_track.*',
+                'stc_cust_pro_supervisor.stc_cust_pro_supervisor_fullname as supervisor_name',
+                'stc_cust_project.stc_cust_project_title as project_name'
+            )
+            ->orderBy('stc_tooldetails_track.created_date', 'desc')
             ->get();
 
         $statusLabels = [0 => 'Issued', 1 => 'Accepted'];
@@ -157,6 +194,45 @@ class ToolTrackerController extends Controller
                 'id' => $r->id,
                 'issuedby' => $r->issuedby ?? '-',
                 'user_id' => $r->user_id ?? '-',
+                'supervisor_name' => $r->supervisor_name ?? '-',
+                'project_name' => $r->project_name ?? '-',
+                'status' => $statusLabels[$r->status] ?? $r->status,
+                'location' => $r->location ?? '-',
+                'issueddate' => $r->issueddate ? date('d-m-Y', strtotime($r->issueddate)) : '-',
+                'receivedby' => $r->receivedby ?? '-',
+                'created_date' => $r->created_date ? date('d-m-Y H:i', strtotime($r->created_date)) : '-',
+            ];
+        }
+        return response()->json(['success' => true, 'data' => $data]);
+    }
+
+    public function listTrackNoProject(Request $request){
+        $records = StcTooldetailsTrack::where(function($q) {
+                $q->whereNull('project_id')->orWhere('project_id', 0);
+            })
+            ->leftJoin('stc_cust_pro_supervisor', 'stc_cust_pro_supervisor.stc_cust_pro_supervisor_id', '=', 'stc_tooldetails_track.user_id')
+            ->leftJoin('stc_cust_project', 'stc_cust_project.stc_cust_project_id', '=', 'stc_tooldetails_track.project_id')
+            ->leftJoin('stc_tooldetails', 'stc_tooldetails.id', '=', 'stc_tooldetails_track.toolsdetails_id')
+            ->select(
+                'stc_tooldetails_track.*',
+                'stc_cust_pro_supervisor.stc_cust_pro_supervisor_fullname as supervisor_name',
+                'stc_cust_project.stc_cust_project_title as project_name',
+                'stc_tooldetails.unique_id as tool_unique_id'
+            )
+            ->orderBy('stc_tooldetails_track.created_date', 'desc')
+            ->get();
+
+        $statusLabels = [0 => 'Issued', 1 => 'Accepted'];
+        $data = [];
+        foreach ($records as $r) {
+            $data[] = [
+                'id' => $r->id,
+                'toolsdetails_id' => $r->toolsdetails_id,
+                'tool_unique_id' => $r->tool_unique_id ?? '-',
+                'issuedby' => $r->issuedby ?? '-',
+                'user_id' => $r->user_id ?? '-',
+                'supervisor_name' => $r->supervisor_name ?? '-',
+                'project_name' => $r->project_name ?? '-',
                 'status' => $statusLabels[$r->status] ?? $r->status,
                 'location' => $r->location ?? '-',
                 'issueddate' => $r->issueddate ? date('d-m-Y', strtotime($r->issueddate)) : '-',
@@ -168,7 +244,10 @@ class ToolTrackerController extends Controller
     }
 
     public function getTrack(Request $request){
-        $record = StcTooldetailsTrack::where('id', $request->id)->first();
+        $record = StcTooldetailsTrack::where('stc_tooldetails_track.id', $request->id)
+            ->leftJoin('stc_cust_pro_supervisor', 'stc_cust_pro_supervisor.stc_cust_pro_supervisor_id', '=', 'stc_tooldetails_track.user_id')
+            ->select('stc_tooldetails_track.*', 'stc_cust_pro_supervisor.stc_cust_pro_supervisor_fullname as supervisor_name')
+            ->first();
         if($record){
             return response()->json(['success' => true, 'data' => $record]);
         } else {
@@ -180,6 +259,7 @@ class ToolTrackerController extends Controller
         $update = [
             'issuedby' => $request->issuedby ?? '',
             'user_id' => $request->user_id ?? '',
+            'project_id' => $request->project_id ?: null,
             'status' => $request->status ?? 0,
             'location' => $request->location ?? '',
             'issueddate' => $request->issueddate ?? null,

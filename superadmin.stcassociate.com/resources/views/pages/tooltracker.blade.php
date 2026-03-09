@@ -11,10 +11,20 @@
         position: sticky;
         top: 0;
     }
-    #view-track-modal .modal-body {
+    #view-track-modal .modal-body,
+    #no-project-track-modal .modal-body {
         max-height: 70vh;
         overflow-y: auto;
     }
+    .suggestion-wrapper{ position: relative; }
+    .suggestion-list{
+        position: absolute; top: 100%; left: 0; right: 0; z-index: 1051;
+        max-height: 200px; overflow-y: auto; background: #fff;
+        border: 1px solid #ced4da; border-top: none;
+        list-style: none; margin: 0; padding: 0; display: none;
+    }
+    .suggestion-list li{ padding: 8px 12px; cursor: pointer; }
+    .suggestion-list li:hover{ background: #f4f6f9; }
   </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -50,6 +60,9 @@
         </div>
         <div class="row">
           <div class="col-lg-12 col-12">
+            <button type="button" class="btn btn-warning btn-sm mb-2" id="btn-no-project-track">
+              <i class="fas fa-list"></i> Track Records (No Project)
+            </button>
             <div class="card">
                 <div class="card-body">
                   <table id="example1" class="table table-bordered table-striped">
@@ -99,7 +112,6 @@
   @include('layouts.footer')
 </div>
 @include('layouts.ajax_foot')
-
 <script>
     $(document).ready(function() {
         function swalSuccess(icon, message) {
@@ -154,6 +166,97 @@
 
         table.buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
 
+        function bindSuggestion(wrapper){
+            var input = wrapper.find('.suggestion-input');
+            var list = wrapper.find('.suggestion-list');
+            var hiddenFor = list.data('hiddenFor');
+            input.on('input', function(){
+                if (hiddenFor) $('#' + hiddenFor).val('');
+            });
+            input.on('focus keyup', function(){
+                var term = $(this).val().toLowerCase();
+                var hasVisible = false;
+                list.children('li').each(function(){
+                    var text = $(this).data('value').toLowerCase();
+                    if(term === '' || text.indexOf(term) !== -1){
+                        $(this).show();
+                        hasVisible = true;
+                    }else{
+                        $(this).hide();
+                    }
+                });
+                list.toggle(hasVisible);
+            });
+            list.on('mousedown', 'li', function(e){
+                e.preventDefault();
+                var $li = $(this);
+                input.val($li.data('value'));
+                if (hiddenFor && $li.data('id') !== undefined) {
+                    $('#' + hiddenFor).val($li.data('id')).trigger('change');
+                }
+                list.hide();
+            });
+            $(document).on('click', function(e){
+                if(!wrapper.is(e.target) && wrapper.has(e.target).length === 0){
+                    list.hide();
+                }
+            });
+        }
+        bindSuggestion($('#edit-track-supervisor-wrapper'));
+
+        $('#edit-track-user_id').on('change', function(){
+            var uid = $(this).val();
+            var $projectSelect = $('#edit-track-project_id');
+            $projectSelect.html('<option value="">-- Select Project --</option>');
+            if (!uid) return;
+            $.ajax({
+                type: 'GET',
+                url: "{{ url('/branch/stc/tooltracker/projects-by-user') }}",
+                data: { user_id: uid },
+                success: function(r) {
+                    if(r.success && r.data && r.data.length > 0) {
+                        r.data.forEach(function(p) {
+                            $projectSelect.append('<option value="' + p.stc_cust_project_id + '">' + (p.stc_cust_project_title || '') + '</option>');
+                        });
+                    }
+                }
+            });
+        });
+
+        $('#btn-no-project-track').on('click', function(){
+            $.ajax({
+                type: 'GET',
+                url: "{{ url('/branch/stc/tooltracker/list-track-no-project') }}",
+                success: function(response) {
+                    if(response.success && response.data) {
+                        var html = '';
+                        response.data.forEach(function(row) {
+                            html += '<tr>' +
+                                '<td class="text-center">' + row.id + '</td>' +
+                                '<td>' + (row.tool_unique_id || '-') + '</td>' +
+                                '<td>' + row.issuedby + '</td>' +
+                                '<td>' + (row.supervisor_name || '-') + '</td>' +
+                                '<td>' + (row.project_name || '-') + '</td>' +
+                                '<td class="text-center">' + row.status + '</td>' +
+                                '<td>' + row.location + '</td>' +
+                                '<td class="text-center">' + row.issueddate + '</td>' +
+                                '<td>' + row.receivedby + '</td>' +
+                                '<td class="text-center">' + row.created_date + '</td>' +
+                                '<td class="text-center">' +
+                                    '<a href="javascript:void(0)" class="btn btn-primary btn-xs edit-track-row-btn" data-track-id="' + row.id + '" data-source="no-project" title="Edit"><i class="fas fa-edit"></i></a> ' +
+                                    '<a href="javascript:void(0)" class="btn btn-danger btn-xs delete-track-row-btn" data-track-id="' + row.id + '" data-toolsdetails-id="' + (row.toolsdetails_id || '') + '" data-source="no-project" title="Delete"><i class="fas fa-trash"></i></a>' +
+                                '</td></tr>';
+                        });
+                        $('#no-project-track-tbody').html(html);
+                        $('#no-project-track-modal').modal('show');
+                    } else {
+                        swalSuccess('error', response.message || 'Failed to load records');
+                    }
+                },
+                error: function() { swalSuccess('error', 'Failed to load records'); }
+            });
+        });
+
         $('body').delegate('.edit-tool-btn','click', function(){
             var edit_id = $(this).data('id');
             $.ajax({
@@ -194,14 +297,15 @@
                     if(response.success && response.data) {
                         var html = '';
                         if(response.data.length === 0) {
-                            html = '<tr><td colspan="10" class="text-center">No track records found.</td></tr>';
+                            html = '<tr><td colspan="11" class="text-center">No track records found.</td></tr>';
                         } else {
                             response.data.forEach(function(row) {
                                 html += '<tr>' +
                                     '<td class="text-center"><input type="checkbox" class="view-track-row-check" value="' + row.id + '"></td>' +
                                     '<td class="text-center">' + row.id + '</td>' +
                                     '<td>' + row.issuedby + '</td>' +
-                                    '<td>' + row.user_id + '</td>' +
+                                    '<td>' + (row.supervisor_name || '-') + '</td>' +
+                                    '<td>' + (row.project_name || '-') + '</td>' +
                                     '<td class="text-center">' + row.status + '</td>' +
                                     '<td>' + row.location + '</td>' +
                                     '<td class="text-center">' + row.issueddate + '</td>' +
@@ -229,6 +333,8 @@
 
         $('body').delegate('.edit-track-row-btn','click', function(){
             var track_id = $(this).data('track-id');
+            var fromNoProject = $(this).data('source') === 'no-project';
+            $('#edit_track_source').val(fromNoProject ? 'no-project' : 'view-track');
             $.ajax({
                 type: 'GET',
                 url: "{{ url('/branch/stc/tooltracker/get-track') }}",
@@ -238,13 +344,37 @@
                         var record = response.data;
                         $('#edit_track_id').val(record.id);
                         $('#edit-track-issuedby').val(record.issuedby || '');
+                        $('#edit-track-supervisor-display').val(record.supervisor_name || '');
                         $('#edit-track-user_id').val(record.user_id || '');
                         $('#edit-track-status').val(record.status);
                         $('#edit-track-location').val(record.location || '');
                         $('#edit-track-issueddate').val(record.issueddate ? record.issueddate.split(' ')[0] : '');
                         $('#edit-track-receivedby').val(record.receivedby || '');
-                        $('#view-track-modal').modal('hide');
-                        $('#edit-track-modal').modal('show');
+                        var $projectSelect = $('#edit-track-project_id');
+                        $projectSelect.html('<option value="">-- Select Project --</option>');
+                        $.ajax({
+                            type: 'GET',
+                            url: "{{ url('/branch/stc/tooltracker/projects-by-user') }}",
+                            data: { user_id: record.user_id || '' },
+                            success: function(projResp) {
+                                if(projResp.success && projResp.data && projResp.data.length > 0) {
+                                    projResp.data.forEach(function(p) {
+                                        var pid = p.stc_cust_project_id;
+                                        $projectSelect.append('<option value="' + pid + '">' + (p.stc_cust_project_title || '') + '</option>');
+                                    });
+                                }
+                                $projectSelect.val(record.project_id || '');
+                                if (fromNoProject) $('#no-project-track-modal').modal('hide');
+                                else $('#view-track-modal').modal('hide');
+                                $('#edit-track-modal').modal('show');
+                            },
+                            error: function() {
+                                $projectSelect.val(record.project_id || '');
+                                if (fromNoProject) $('#no-project-track-modal').modal('hide');
+                                else $('#view-track-modal').modal('hide');
+                                $('#edit-track-modal').modal('show');
+                            }
+                        });
                     } else {
                         swalSuccess('error', response.message || 'Failed to load record');
                     }
@@ -257,10 +387,13 @@
 
         $('body').delegate('.delete-track-row-btn','click', function(){
             var track_id = $(this).data('track-id');
-            var toolsdetails_id = $('#view-track-toolsdetails-id').val();
+            var fromNoProject = $(this).data('source') === 'no-project';
+            var toolsdetails_id = fromNoProject ? $(this).data('toolsdetails-id') : $('#view-track-toolsdetails-id').val();
             $('#delete_track_id').val(track_id);
-            $('#delete_track_toolsdetails_id').val(toolsdetails_id);
-            $('#view-track-modal').modal('hide');
+            $('#delete_track_toolsdetails_id').val(toolsdetails_id || '');
+            $('#delete_track_from_no_project').val(fromNoProject ? '1' : '0');
+            if (fromNoProject) $('#no-project-track-modal').modal('hide');
+            else $('#view-track-modal').modal('hide');
             $('#delete-track-modal').modal('show');
         });
 
@@ -293,6 +426,7 @@
 
         $('body').delegate('.edit-track-save-btn','click', function(){
             var id = $('#edit_track_id').val();
+            var fromNoProject = $('#edit_track_source').val() === 'no-project';
             $.ajax({
                 type: 'POST',
                 data: {
@@ -300,6 +434,7 @@
                     issuedby: $('#edit-track-issuedby').val() || '',
                     user_id: $('#edit-track-user_id').val() || '',
                     status: $('#edit-track-status').val() || 0,
+                    project_id: $('#edit-track-project_id').val() || null,
                     location: $('#edit-track-location').val() || '',
                     issueddate: $('#edit-track-issueddate').val() || null,
                     receivedby: $('#edit-track-receivedby').val() || '',
@@ -311,8 +446,12 @@
                         swalSuccess('success', response.message);
                         $('#edit-track-modal').modal('hide');
                         table.ajax.reload(null, false);
-                        var toolsdetails_id = $('#view-track-toolsdetails-id').val();
-                        if(toolsdetails_id) { $('.view-track-btn[data-id="' + toolsdetails_id + '"]').trigger('click'); }
+                        if (fromNoProject) {
+                            $('#btn-no-project-track').trigger('click');
+                        } else {
+                            var toolsdetails_id = $('#view-track-toolsdetails-id').val();
+                            if(toolsdetails_id) { $('.view-track-btn[data-id="' + toolsdetails_id + '"]').trigger('click'); }
+                        }
                     } else {
                         swalSuccess('error', response.message);
                     }
@@ -349,6 +488,7 @@
             e.preventDefault();
             var id = $('#delete_track_id').val();
             var toolsdetails_id = $('#delete_track_toolsdetails_id').val();
+            var fromNoProject = $('#delete_track_from_no_project').val() === '1';
             $.ajax({
                 type: 'GET',
                 data: { id: id },
@@ -357,9 +497,12 @@
                     if(response.success) {
                         swalSuccess('success', response.message);
                         $('#delete-track-modal').modal('hide');
-                        table.ajax.reload(function() {
-                            if(toolsdetails_id) $('.view-track-btn[data-id="' + toolsdetails_id + '"]').trigger('click');
-                        }, false);
+                        table.ajax.reload(null, false);
+                        if (fromNoProject) {
+                            $('#btn-no-project-track').trigger('click');
+                        } else if (toolsdetails_id) {
+                            $('.view-track-btn[data-id="' + toolsdetails_id + '"]').trigger('click');
+                        }
                     } else {
                         swalSuccess('error', response.message);
                     }
@@ -420,6 +563,43 @@
 </body>
 </html>
 
+<!-- no-project track records modal -->
+<div class="modal fade" id="no-project-track-modal">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Track Records (No Project) - stc_tooldetails_track</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm">
+            <thead>
+              <tr>
+                <th class="text-center">ID</th>
+                <th>Tool Unique ID</th>
+                <th>Issued By</th>
+                <th>Supervisor</th>
+                <th>Project</th>
+                <th class="text-center">Status</th>
+                <th>Location</th>
+                <th class="text-center">Issued Date</th>
+                <th>Received By</th>
+                <th class="text-center">Created Date</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="no-project-track-tbody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- view track history modal -->
 <div class="modal fade" id="view-track-modal">
   <div class="modal-dialog modal-xl">
@@ -446,7 +626,8 @@
                 </th>
                 <th class="text-center">ID</th>
                 <th>Issued By</th>
-                <th>User ID</th>
+                <th>Supervisor</th>
+                <th>Project</th>
                 <th class="text-center">Status</th>
                 <th>Location</th>
                 <th class="text-center">Issued Date</th>
@@ -502,6 +683,7 @@
         <p class="text-warning"><small>The tool will remain, only this tracking history entry will be removed.</small></p>
         <input type="hidden" id="delete_track_id">
         <input type="hidden" id="delete_track_toolsdetails_id">
+        <input type="hidden" id="delete_track_from_no_project" value="0">
       </div>
       <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-default close-btn" data-dismiss="modal">Cancel</button>
@@ -596,9 +778,15 @@
               </div>
             </div>
             <div class="col-md-6">
-              <div class="form-group">
-                <label for="edit-track-user_id">User ID</label>
-                <input type="text" class="form-control" id="edit-track-user_id" name="edit-track-user_id" placeholder="Enter User ID">
+              <div class="form-group suggestion-wrapper" id="edit-track-supervisor-wrapper">
+                <label for="edit-track-supervisor-display">Supervisor</label>
+                <input type="text" class="form-control suggestion-input" id="edit-track-supervisor-display" placeholder="Type to search">
+                <input type="hidden" id="edit-track-user_id" name="edit-track-user_id">
+                <ul class="suggestion-list" data-input="edit-track-supervisor-display" data-hidden-for="edit-track-user_id">
+                  @foreach(isset($supervisors) ? $supervisors : [] as $s)
+                    <li data-id="{{ $s->id }}" data-value="{{ $s->name }}">{{ $s->name }}</li>
+                  @endforeach
+                </ul>
               </div>
             </div>
           </div>
@@ -614,18 +802,28 @@
             </div>
             <div class="col-md-6">
               <div class="form-group">
-                <label for="edit-track-location">Location</label>
-                <input type="text" class="form-control" id="edit-track-location" name="edit-track-location" placeholder="Enter Location">
+                <label for="edit-track-project_id">Project</label>
+                <select class="form-control" id="edit-track-project_id" name="edit-track-project_id">
+                  <option value="">-- Select Project --</option>
+                </select>
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-md-6">
               <div class="form-group">
+                <label for="edit-track-location">Location</label>
+                <input type="text" class="form-control" id="edit-track-location" name="edit-track-location" placeholder="Enter Location">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
                 <label for="edit-track-issueddate">Issued Date</label>
                 <input type="date" class="form-control" id="edit-track-issueddate" name="edit-track-issueddate" placeholder="Issued Date">
               </div>
             </div>
+          </div>
+          <div class="row">
             <div class="col-md-6">
               <div class="form-group">
                 <label for="edit-track-receivedby">Received By</label>
@@ -635,6 +833,7 @@
           </div>
         </div>
         <input type="hidden" id="edit_track_id">
+        <input type="hidden" id="edit_track_source" value="view-track">
       </div>
       <div class="modal-footer justify-content-between">
         <button type="button" class="btn btn-default close-btn" data-dismiss="modal">Cancel</button>

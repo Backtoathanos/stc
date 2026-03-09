@@ -259,7 +259,9 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/branch/stc/tooltracker/edit', [ToolTrackerController::class, 'update']);
     Route::get('/branch/stc/tooltracker/delete', [ToolTrackerController::class, 'delete']);
     Route::get('/branch/stc/tooltracker/list-track', [ToolTrackerController::class, 'listTrack']);
+    Route::get('/branch/stc/tooltracker/list-track-no-project', [ToolTrackerController::class, 'listTrackNoProject']);
     Route::get('/branch/stc/tooltracker/get-track', [ToolTrackerController::class, 'getTrack']);
+    Route::get('/branch/stc/tooltracker/projects-by-user', [ToolTrackerController::class, 'getProjectsByUser']);
     Route::post('/branch/stc/tooltracker/edit-track', [ToolTrackerController::class, 'updateTrack']);
     Route::get('/branch/stc/tooltracker/delete-track', [ToolTrackerController::class, 'deleteTrack']);
     Route::post('/branch/stc/tooltracker/delete-track-bulk', [ToolTrackerController::class, 'deleteTrackBulk']);
