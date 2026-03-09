@@ -351,7 +351,7 @@ class prime extends tesseract{
 	
 		// Check for duplicate unique ID
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "
-			SELECT tdt.`id` tdt_id, tdt.`user_id`, tdt.`status`, td.`id`, td.`unique_id`, td.`itemdescription`, td.`machinesrno`, td.`make`, td.`tooltype`, td.`remarks` FROM `stc_tooldetails_track` tdt INNER JOIN `stc_tooldetails` td ON tdt.`toolsdetails_id`=td.`id` WHERE tdt.`user_id`='".$_SESSION['stc_agent_sub_id']."' ".$search." ORDER BY DATE(`tdt.`created_date`) DESC
+			SELECT tdt.`id` tdt_id, tdt.`user_id`, tdt.`status`, td.`id`, td.`unique_id`, td.`itemdescription`, td.`machinesrno`, td.`make`, td.`tooltype`, td.`remarks` FROM `stc_tooldetails_track` tdt INNER JOIN `stc_tooldetails` td ON tdt.`toolsdetails_id`=td.`id` WHERE tdt.`user_id`='".$_SESSION['stc_agent_sub_id']."' ".$search." ORDER BY DATE(`tdt`.`created_date`) DESC
 		");
 		$blackpearl=[];
 		if(mysqli_num_rows($blackpearl_qry)>0){
