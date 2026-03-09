@@ -1316,6 +1316,7 @@ class pirates_project extends tesseract{
 			FROM `stc_item_tracker`
 			LEFT JOIN `stc_cust_pro_supervisor`
 			ON `stc_cust_pro_supervisor_id`=`stc_item_tracker_user_id`
+			ORDER BY DATE(`stc_item_tracker_created_date`) DESC
 		";
 		$blackpearl_result=mysqli_query($this->stc_dbs, $blackpearl_query);
 
