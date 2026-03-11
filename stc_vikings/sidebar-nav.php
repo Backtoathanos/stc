@@ -273,3 +273,29 @@
         </div>
     </div>
 </div>
+<script>
+(function(){
+  var KEY = 'stc_sidebar_closed';
+  var container = document.querySelector('.app-container');
+  if (!container) return;
+  function restore() {
+    if (localStorage.getItem(KEY) === '1') {
+      container.classList.add('closed-sidebar');
+      var btns = document.querySelectorAll('.close-sidebar-btn');
+      for (var i = 0; i < btns.length; i++) btns[i].classList.add('is-active');
+    }
+  }
+  function save() {
+    localStorage.setItem(KEY, container.classList.contains('closed-sidebar') ? '1' : '0');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(restore, 50); });
+  } else {
+    setTimeout(restore, 50);
+  }
+  if (window.MutationObserver) {
+    var obs = new MutationObserver(save);
+    obs.observe(container, { attributes: true, attributeFilter: ['class'] });
+  }
+})();
+</script>
