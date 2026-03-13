@@ -297,6 +297,16 @@ include("kattegat/role_check.php");
       var perPage = 25;
       var prNamesList = [];
 
+      // Fix: Bootstrap modal leaves padding-right on body/fixed elements, causing app-main__outer to shrink on each close
+      $('#dailyReqBalanceModal, #dailyReqLogsModal, #statusRemarkModal').on('hidden.bs.modal', function () {
+        setTimeout(function () {
+          if ($('.modal.in').length === 0) {
+            $('body').removeClass('modal-open').css({ 'padding-right': '', 'overflow': '' });
+            $('.fixed-top, .fixed-bottom, .fixed-header, .fixed-sidebar, .app-header, .app-main__outer').css('padding-right', '');
+          }
+        }, 10);
+      });
+
       function showSwal(icon, title, text) {
         if (typeof Swal !== 'undefined' && Swal && Swal.fire) {
           return Swal.fire({

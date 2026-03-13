@@ -24,16 +24,9 @@
                 <span>
                     <a href="agent-order.php" style="width: 100%;font-size: 25px;position: relative;top: 10px;left: 30px;">
                         <i class="metismenu-icon pe-7s-bell"></i>
-                        <span class="stc-notf-badge-for-order-left" style="
-                            font-size: 12px;
-                            background: #ff7676;
-                            position: relative;
-                            padding: 5px;
-                            border-radius: 100%;
-                            margin: 0;
-                            left: -45px;
-                            top: -16px;
-                        ">0</span>
+                        <a href="daily-requisition.php" style="font-size: 25px;position: relative;left: 30px;top: 6px;" target="__blank" class="print-preview-hide" title="Daily Requisition">
+                            <i class="fa fa-shopping-cart"></i>
+                        </a>                                    
                         <span class="stc-notf-badge-for-order-right" style="
                             font-size: 12px;
                             background: #72df70;
