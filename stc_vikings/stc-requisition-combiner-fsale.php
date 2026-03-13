@@ -123,6 +123,7 @@ STCAuthHelper::checkAuth();?>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
+    <script type="text/javascript" src="./assets/scripts/sidebar-persist.js"></script>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
     <script type="text/javascript" src="./assets/scripts/jarvis.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>

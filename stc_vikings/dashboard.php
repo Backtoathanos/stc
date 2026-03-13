@@ -794,6 +794,7 @@ STCAuthHelper::checkAuth();
     <script type="text/javascript" src="./assets/scripts/fusioncharts.charts.js"></script>
     <script type="text/javascript" src="./assets/scripts/themes/fusioncharts.theme.zune.js"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
+    <script type="text/javascript" src="./assets/scripts/sidebar-persist.js"></script>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
     <script type="text/javascript" src="./assets/scripts/jarvis.js"></script>
     <script>
