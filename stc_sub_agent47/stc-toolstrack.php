@@ -145,10 +145,14 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         for (var i = 0; i < response.length; i++) {
                             slno++;
                             var recieve='';
+                            var transfer='';
                             if(response[i].status==0){
                                 recieve='<a href="javascript:void(0)" class="btn btn-success itt-toolsrecieve" title="Click to recieve" id="' + response[i].tdt_id + '"><i class="fa fa-check"></i></a>';
                             }
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].machinesrno + '</td><td>' + response[i].make + '</td><td>' + response[i].tooltype + '</td><td>' + response[i].remarks + '</td><td class="text-center">' + recieve + '<a href="javascript:void(0)" class="btn btn-primary itt-toolstracking" title="Click to handover" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertracker-modal-lg"><i class="fa fa-plus"></i></a><a href="javascript:void(0)" class="btn btn-secondary itt-toolstrackingshow" title="Click to show details" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertrackershow-modal-lg"><i class="fa fa-shipping-fast"></i></a></td></tr>';
+                            if(response[i].status==1){
+                                transfer='<a href="javascript:void(0)" class="btn btn-primary itt-toolstracking" title="Click to handover" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertracker-modal-lg"><i class="fa fa-plus"></i></a>';
+                            }
+                            data+='<tr><td>' + slno + '</td><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].machinesrno + '</td><td>' + response[i].make + '</td><td>' + response[i].tooltype + '</td><td>' + response[i].remarks + '</td><td class="text-center">' + recieve + transfer + '<a href="javascript:void(0)" class="btn btn-secondary itt-toolstrackingshow" title="Click to show details" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertrackershow-modal-lg"><i class="fa fa-shipping-fast"></i></a></td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";
@@ -298,6 +302,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
 
             // call tools tracker
             $('body').delegate('.itt-toolsrecieve', 'click', function(e){
+                $(this).hide();
                 var itt_id=$(this).attr('id');
                 $.ajax({
                     url : "nemesis/stc_product.php",
