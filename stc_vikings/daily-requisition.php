@@ -370,11 +370,17 @@ include("kattegat/role_check.php");
         $('.stc-daily-requisition-pagination').html(html);
       }
 
-      function loadDailyRequisitions(search, page) {
+      var cachedTotalPages = 0;
+
+      function loadDailyRequisitions(search, page, skipCount) {
+        if (skipCount === undefined) skipCount = true;
         $('.stc-daily-requisition-body').html('<tr><td colspan="13" class="text-center">Loading...</td></tr>');
         var datefrom = $('#dr-datefrom').val() || '';
         var dateto = $('#dr-dateto').val() || '';
         var prName = $('#dr-pr-name').val() ? $('#dr-pr-name').val().trim() : '';
+        var isFirstPage = !page || page <= 1;
+
+        // Data request (skip count for faster initial display)
         $.ajax({
           url: 'kattegat/ragnar_order.php',
           method: 'POST',
@@ -385,7 +391,8 @@ include("kattegat/role_check.php");
             limit: perPage,
             datefrom: datefrom,
             dateto: dateto,
-            pr_name: prName
+            pr_name: prName,
+            skip_count: skipCount ? '1' : '0'
           },
           dataType: 'json',
           success: function (response) {
@@ -457,13 +464,36 @@ include("kattegat/role_check.php");
               rows = '<tr><td colspan="13" class="text-center">No record found.</td></tr>';
             }
             $('.stc-daily-requisition-body').html(rows);
-            renderPagination(parseInt(response.total_pages || 0, 10), parseInt(response.page || 1, 10));
-            prNamesList = response.pr_names || [];
+            var totalPages = parseInt(response.total_pages || 0, 10) || cachedTotalPages;
+            if (response.total_pages) cachedTotalPages = response.total_pages;
+            renderPagination(totalPages, parseInt(response.page || 1, 10));
           },
           error: function () {
             $('.stc-daily-requisition-body').html('<tr><td colspan="13" class="text-center">Error loading data.</td></tr>');
           }
         });
+
+        // Count request in parallel (for pagination) - only on first page / filter change
+        if (isFirstPage) {
+          $.ajax({
+            url: 'kattegat/ragnar_order.php',
+            method: 'POST',
+            data: {
+              stc_call_daily_requisition_count: 1,
+              search: search || '',
+              limit: perPage,
+              datefrom: datefrom,
+              dateto: dateto,
+              pr_name: prName
+            },
+            dataType: 'json',
+            success: function (res) {
+              if (res && res.reload) return;
+              cachedTotalPages = parseInt(res.total_pages || 0, 10);
+              renderPagination(cachedTotalPages, currentPage);
+            }
+          });
+        }
       }
 
       function filterAndShowPrList() {
@@ -506,12 +536,13 @@ include("kattegat/role_check.php");
       $('body').delegate('.stc-daily-req-page', 'click', function (e) {
         e.preventDefault();
         currentPage = parseInt($(this).data('page'), 10) || 1;
-        loadDailyRequisitions($('#dr-search').val() || '', currentPage);
+        loadDailyRequisitions($('#dr-search').val() || '', currentPage, true);
       });
 
       function runSearch() {
         currentPage = 1;
-        loadDailyRequisitions($('#dr-search').val() || '', currentPage);
+        cachedTotalPages = 0;
+        loadDailyRequisitions($('#dr-search').val() || '', currentPage, true);
       }
 
       $('#dr-search-btn').on('click', function (e) {
@@ -682,7 +713,6 @@ include("kattegat/role_check.php");
             if (response && response.success) {
               showSwal('success', 'Updated', response.message || 'Status updated.');
               loadBalanceModal(itemId);
-              loadDailyRequisitions($('#dr-search').val() || '', currentPage);
             } else {
               showSwal('error', 'Failed', (response && response.message) ? response.message : 'Failed to update status.');
             }
@@ -725,7 +755,6 @@ include("kattegat/role_check.php");
               $('#statusRemarkModal').modal('hide');
               showSwal('success', 'Updated', response.message || 'Status updated.');
               loadBalanceModal(preq_id);
-              loadDailyRequisitions($('#dr-search').val() || '', currentPage);
             } else {
               showSwal('error', 'Failed', (response && response.message) ? response.message : 'Failed to update status.');
             }
@@ -790,7 +819,6 @@ include("kattegat/role_check.php");
               $('#dr-itemcode-label').text('Item Code (Product ID)');
               // Reload balance table (modal is already open)
               loadBalanceModal(itemId);
-              loadDailyRequisitions($('#dr-search').val() || '', currentPage);
             } else {
               showSwal('error', 'Failed', (response && response.message) ? response.message : 'Update failed.');
             }
@@ -1004,7 +1032,26 @@ include("kattegat/role_check.php");
       $('#dr-datefrom').val(toIso(from));
       $('#dr-dateto').val(toIso(today));
 
-      loadDailyRequisitions('', currentPage);
+      // Load all distinct PR names at once (no date filter)
+      function loadPrNames() {
+        $.ajax({
+          url: 'kattegat/ragnar_order.php',
+          method: 'POST',
+          data: { stc_call_daily_requisition_pr_names: 1 },
+          dataType: 'json',
+          success: function (response) {
+            if (response && response.reload) {
+              window.location.reload();
+              return;
+            }
+            prNamesList = response.pr_names || [];
+          }
+        });
+      }
+      loadPrNames();
+
+      cachedTotalPages = 0;
+      loadDailyRequisitions('', currentPage, true);
     });
   </script>
 </body>

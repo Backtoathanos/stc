@@ -354,7 +354,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             }else if(obj_response=="reload"){
                                 window.location.reload();
                             }else if(obj_response=="notfound"){
-                            alert("Siteuser not found.");
+                            alert("Site User not found.");
                             }else if(obj_response=="empty"){
                             alert("Please fill complete details.");
                             }else if(obj_response=="no"){
