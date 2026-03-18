@@ -5714,8 +5714,10 @@ class ragnarCallDailyRequisitions extends tesseract{
 		}
 		if($pr_name !== ''){
 			$pr_esc = mysqli_real_escape_string($this->stc_dbs, $pr_name);
-			$where .= " AND (C.`stc_requisition_combiner_refrence` = '".$pr_esc."' OR C.`stc_requisition_combiner_refrence` LIKE '%".$pr_esc."%') ";
-			$where .= " AND (C.`stc_cust_project_title` = '".$pr_esc."' OR C.`stc_cust_project_title` LIKE '%".$pr_esc."%') ";
+			$where .= " AND (
+				C.`stc_requisition_combiner_refrence` = '".$pr_esc."' OR C.`stc_requisition_combiner_refrence` LIKE '%".$pr_esc."%'
+				OR P.`stc_cust_project_title` = '".$pr_esc."' OR P.`stc_cust_project_title` LIKE '%".$pr_esc."%'
+			) ";
 		}
 
 		$total = 0;
@@ -5912,7 +5914,10 @@ class ragnarCallDailyRequisitions extends tesseract{
 		}
 		if($pr_name !== ''){
 			$pr_esc = mysqli_real_escape_string($this->stc_dbs, $pr_name);
-			$where .= " AND C.`stc_requisition_combiner_refrence` = '".$pr_esc."' ";
+			$where .= " AND (
+				C.`stc_requisition_combiner_refrence` = '".$pr_esc."' OR C.`stc_requisition_combiner_refrence` LIKE '%".$pr_esc."%'
+				OR P.`stc_cust_project_title` = '".$pr_esc."' OR P.`stc_cust_project_title` LIKE '%".$pr_esc."%'
+			) ";
 		}
 		$total = 0;
 		$count_q = mysqli_query($this->stc_dbs, "
