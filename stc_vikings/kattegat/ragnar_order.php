@@ -5715,6 +5715,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 		if($pr_name !== ''){
 			$pr_esc = mysqli_real_escape_string($this->stc_dbs, $pr_name);
 			$where .= " AND C.`stc_requisition_combiner_refrence` = '".$pr_esc."' ";
+			$where .= " AND C.`stc_cust_project_title` = '".$pr_esc."' ";
 		}
 
 		$total = 0;
@@ -5796,7 +5797,6 @@ class ragnarCallDailyRequisitions extends tesseract{
 			ORDER BY C.`stc_requisition_combiner_date` DESC, I.`stc_cust_super_requisition_list_id` DESC
 			LIMIT ".$offset.", ".$limit."
 		");
-
 		$data = [];
 		$product_ids = [];
 		if($q && mysqli_num_rows($q) > 0){
