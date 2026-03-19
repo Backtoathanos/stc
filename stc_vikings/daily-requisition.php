@@ -105,6 +105,28 @@ include("kattegat/role_check.php");
     #dailyReqBalanceModal .table tbody td.py-4 {
       background: #f8fafc;
     }
+    /* Product picker cards - equal height, truncated name */
+    #dailyReqBalanceModal .dr-product-results {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+    #dailyReqBalanceModal .dr-product-results .card {
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+    }
+    #dailyReqBalanceModal .dr-product-results .card .card-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    #dailyReqBalanceModal .dr-product-results .dr-product-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 100%;
+    }
   </style>
 </head>
 
@@ -213,7 +235,7 @@ include("kattegat/role_check.php");
 
   <!-- Balance modal -->
   <div class="modal fade" id="dailyReqBalanceModal" tabindex="-1" role="dialog" aria-labelledby="dailyReqBalanceModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="dailyReqBalanceModalLabel">Adhoc Balance</h5>
@@ -242,22 +264,43 @@ include("kattegat/role_check.php");
           </div>
 
           <div class="dr-add-itemcode-form" style="display:none;margin-top:10px; white-space: normal;">
-            <div class="row" style="white-space: normal;">
-              <div class="col-md-6 col-sm-8" style="margin-bottom:6px;">
-                <label style="display:block; position:static; margin:0 0 4px; font-weight:600;" id="dr-itemcode-label">Item Code (Product ID)</label>
-                <input type="number" min="1" step="1" inputmode="numeric" class="form-control" id="dr-itemcode-input" placeholder="Enter product id (integer only)">
-                <input type="hidden" id="dr-itemcode-itemid" value="">
-                <input type="hidden" id="dr-itemcode-oldproductid" value="0">
-              </div>
-              <div class="col-md-3 col-sm-4" style="margin-bottom:6px;">
-                <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">&nbsp;</label>
-                <button type="button" class="btn btn-success form-control" id="dr-itemcode-save-btn">Save</button>
-              </div>
-              <div class="col-md-3 col-sm-4" style="margin-bottom:6px;">
-                <label style="display:block; position:static; margin:0 0 4px; font-weight:600;">&nbsp;</label>
-                <button type="button" class="btn btn-default form-control" id="dr-itemcode-cancel-btn">Cancel</button>
-              </div>
-            </div>
+            <input type="hidden" id="dr-itemcode-itemid" value="">
+            <input type="hidden" id="dr-itemcode-oldproductid" value="0">
+            <table class="table table-sm table-bordered mb-2">
+              <thead>
+                <tr>
+                  <th>By Category</th>
+                  <th>By Name</th>
+                  <th>By Sub Category</th>
+                  <th>Search</th>
+                  <th style="width:80px;"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <select class="form-control form-control-sm call_cat" id="dr-filterbycat" name="stcpdcategory">
+                      <option value="NA">-- Select --</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="text" id="dr-searchbystcname" class="form-control form-control-sm" placeholder="Product Name">
+                  </td>
+                  <td>
+                    <select class="form-control form-control-sm call_sub_cat" id="dr-filterbysubcat" name="stcpdsubcategory">
+                      <option value="NA">-- Select --</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-primary btn-sm btn-block dr-product-search-hit"><i class="fa fa-search"></i> Search</button>
+                  </td>
+                  <td>
+                    <button type="button" class="btn btn-default btn-sm btn-block dr-itemcode-cancel-btn"><i class="fa fa-times"></i> Close</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="row dr-product-results" id="dr-product-results" style="max-height:280px;overflow-y:auto;"></div>
           </div>
         </div>
       </div>
@@ -599,9 +642,7 @@ include("kattegat/role_check.php");
 
       function loadBalanceModal(itemId) {
         $('#dr-itemcode-itemid').val(itemId);
-        $('#dr-itemcode-input').val('');
         $('#dr-itemcode-oldproductid').val('0');
-        $('#dr-itemcode-label').text('Item Code (Product ID)');
         $('.dr-add-itemcode-form').hide();
         $('.stc-daily-req-balance-body').html('<tr><td colspan="7" class="text-center">Loading...</td></tr>');
         $.ajax({
@@ -769,36 +810,51 @@ include("kattegat/role_check.php");
       $('body').delegate('.dr-show-itemcode-form', 'click', function () {
         var itemId = $(this).data('item-id');
         $('#dr-itemcode-itemid').val(itemId);
-        $('#dr-itemcode-oldproductid').val('0');
-        $('#dr-itemcode-label').text('Add Item Code (Product ID)');
+        $('#dr-filterbycat').val('NA');
+        $('#dr-filterbysubcat').val('NA');
+        $('#dr-searchbystcname').val('');
+        $('#dr-product-results').html('<p class="col-12 text-muted small">Select category, subcategory or type product name, then click Search.</p>');
         $('.dr-add-itemcode-form').show();
-        $('#dr-itemcode-input').focus();
       });
 
-      // Integer-only input guard (still validate on save)
-      $('#dr-itemcode-input').on('input', function () {
-        var v = $(this).val();
-        if (v === '') return;
-        // strip decimals and non-digits
-        v = String(v).replace(/[^\d]/g, '');
-        $(this).val(v);
+      $('body').delegate('.dr-product-search-hit', 'click', function (e) {
+        if (e && e.preventDefault) e.preventDefault();
+        var cat = $('#dr-filterbycat').val() || 'NA';
+        var subcat = $('#dr-filterbysubcat').val() || 'NA';
+        var name = $('#dr-searchbystcname').val() || '';
+        $('#dr-product-results').html('<p class="col-12 text-muted small">Loading...</p>');
+        $.ajax({
+          url: 'kattegat/ragnar_order.php',
+          method: 'POST',
+          data: {
+            stc_dr_filter_products: 1,
+            phpfiltercatout: cat,
+            phpfiltersubcatout: subcat,
+            phpfilternameout: name
+          },
+          success: function (html) {
+            $('#dr-product-results').html(html || '<p class="col-12 text-muted small">No products found.</p>');
+          },
+          error: function () {
+            $('#dr-product-results').html('<p class="col-12 text-danger small">Error loading products.</p>');
+          }
+        });
       });
 
-      $('#dr-itemcode-cancel-btn').on('click', function () {
-        $('#dr-itemcode-input').val('');
-        $('#dr-itemcode-oldproductid').val('0');
-        $('#dr-itemcode-label').text('Item Code (Product ID)');
+      $('body').delegate('.dr-itemcode-cancel-btn', 'click', function () {
         $('.dr-add-itemcode-form').hide();
       });
 
-      $('#dr-itemcode-save-btn').on('click', function () {
+      $('body').delegate('.dr-select-product', 'click', function () {
+        var productId = parseInt($(this).data('product-id'), 10) || 0;
         var itemId = parseInt($('#dr-itemcode-itemid').val(), 10) || 0;
-        var productId = parseInt($('#dr-itemcode-input').val(), 10) || 0;
         var oldProductId = parseInt($('#dr-itemcode-oldproductid').val(), 10) || 0;
-        if (itemId <= 0) { showSwal('error', 'Invalid', 'Invalid item id.'); return; }
-        if (productId <= 0) { showSwal('warning', 'Invalid', 'Please enter valid item code (integer).'); return; }
-
-        $(this).prop('disabled', true).text('Saving...');
+        if (itemId <= 0 || productId <= 0) {
+          showSwal('error', 'Invalid', 'Invalid item or product.');
+          return;
+        }
+        var $btn = $(this);
+        $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i>');
         $.ajax({
           url: 'kattegat/ragnar_order.php',
           method: 'POST',
@@ -810,22 +866,19 @@ include("kattegat/role_check.php");
           },
           dataType: 'json',
           success: function (response) {
-            $('#dr-itemcode-save-btn').prop('disabled', false).text('Save');
             if (response && response.reload) { window.location.reload(); return; }
             if (response && response.success) {
-              showSwal('success', 'Updated', response.message || 'Updated.');
+              showSwal('success', 'Updated', response.message || 'Item code added.');
               $('.dr-add-itemcode-form').hide();
-              $('#dr-itemcode-oldproductid').val('0');
-              $('#dr-itemcode-label').text('Item Code (Product ID)');
-              // Reload balance table (modal is already open)
               loadBalanceModal(itemId);
             } else {
               showSwal('error', 'Failed', (response && response.message) ? response.message : 'Update failed.');
+              $btn.prop('disabled', false).html('<i class="fa fa-plus"></i> Select');
             }
           },
           error: function () {
-            $('#dr-itemcode-save-btn').prop('disabled', false).text('Save');
             showSwal('error', 'Failed', 'Update failed.');
+            $btn.prop('disabled', false).html('<i class="fa fa-plus"></i> Select');
           }
         });
       });
@@ -839,10 +892,11 @@ include("kattegat/role_check.php");
         }
         $('#dr-itemcode-itemid').val(itemId);
         $('#dr-itemcode-oldproductid').val(oldProductId);
-        $('#dr-itemcode-input').val('');
-        $('#dr-itemcode-label').text('Change Item Code (Old Product ID: ' + oldProductId + ')');
+        $('#dr-filterbycat').val('NA');
+        $('#dr-filterbysubcat').val('NA');
+        $('#dr-searchbystcname').val('');
+        $('#dr-product-results').html('<p class="col-12 text-muted small">Select category, subcategory or type product name, then click Search.</p>');
         $('.dr-add-itemcode-form').show();
-        $('#dr-itemcode-input').focus();
       });
 
       $('body').delegate('.dr-edit-qtyunit', 'click', function (e) {

@@ -5961,6 +5961,62 @@ class ragnarCallDailyRequisitions extends tesseract{
 		return ['pr_names' => $pr_names];
 	}
 
+	/** Filter products for daily requisition item code picker (category/subcat/name - no 3-char min) */
+	public function stc_dr_filter_products($category = '', $subcategory = '', $name = ''){
+		$category = trim((string)$category);
+		$subcategory = trim((string)$subcategory);
+		$name = trim((string)$name);
+		$cat_sql = '';
+		$subcat_sql = '';
+		$name_sql = '';
+		if($category !== '' && $category !== 'NA'){
+			$cat_sql = " AND P.`stc_product_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $category)."' ";
+		}
+		if($subcategory !== '' && $subcategory !== 'NA'){
+			$subcat_sql = " AND P.`stc_product_sub_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $subcategory)."' ";
+		}
+		if($name !== ''){
+			$esc = mysqli_real_escape_string($this->stc_dbs, $name);
+			$name_sql = " AND (P.`stc_product_name` LIKE '%".$esc."%' OR P.`stc_product_desc` LIKE '%".$esc."%') ";
+		}
+		if($cat_sql === '' && $subcat_sql === '' && $name_sql === ''){
+			return '<div class="col-xl-12"><p class="text-muted small">Select category, subcategory or type product name to search.</p></div>';
+		}
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT P.`stc_product_id`, P.`stc_product_name`, P.`stc_product_image`, P.`stc_product_unit`,
+				C.`stc_cat_name`, P.`stc_product_hsncode`, S.`stc_sub_cat_name`, B.`stc_brand_title`
+			FROM `stc_product` P
+			LEFT JOIN `stc_category` C ON C.`stc_cat_id`=P.`stc_product_cat_id`
+			LEFT JOIN `stc_sub_category` S ON S.`stc_sub_cat_id`=P.`stc_product_sub_cat_id`
+			LEFT JOIN `stc_brand` B ON B.`stc_brand_id`=P.`stc_product_brand_id`
+			WHERE P.`stc_product_avail`='1' ".$cat_sql.$subcat_sql.$name_sql."
+			ORDER BY P.`stc_product_id` ASC LIMIT 50
+		");
+		$out = '';
+		if($q && mysqli_num_rows($q) > 0){
+			while($row = mysqli_fetch_assoc($q)){
+				$img = isset($row['stc_product_image']) && $row['stc_product_image'] !== '' ? $row['stc_product_image'] : 'no-image.png';
+				$subBrand = implode(' / ', array_filter([$row['stc_sub_cat_name']??'', $row['stc_brand_title']??'']));
+				$fullName = $row['stc_product_name'];
+				$displayName = strlen($fullName) > 50 ? substr($fullName, 0, 50) . '...' : $fullName;
+				$out .= '<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mb-3">
+					<div class="card">
+						<img class="card-img-top" style="height:100px;object-fit:contain;" src="../stc_symbiote/stc_product_image/'.$img.'" alt="">
+						<div class="card-body p-2">
+							<div class="small text-muted">'.htmlspecialchars(($row['stc_cat_name']??'').' / '.($row['stc_product_hsncode']??'')).'</div>
+							<div class="small font-weight-bold dr-product-name" title="'.htmlspecialchars($fullName).'">'.htmlspecialchars($displayName).'</div>
+							<div class="small">'.htmlspecialchars($subBrand).'</div>
+							<button type="button" class="btn btn-success btn-sm btn-block mt-1 dr-select-product" data-product-id="'.(int)$row['stc_product_id'].'" data-product-name="'.htmlspecialchars($fullName).'"><i class="fa fa-plus"></i> Select</button>
+						</div>
+					</div>
+				</div>';
+			}
+		}else{
+			$out = '<div class="col-xl-12"><p class="text-muted small">No products found.</p></div>';
+		}
+		return $out;
+	}
+
 	public function stc_call_daily_requisition_logs($item_id = 0){
 		$item_id = (int)$item_id;
 		if($item_id <= 0){
@@ -6796,6 +6852,18 @@ if(isset($_POST['stc_call_daily_requisition_pr_names'])){
 		$odin_req = new ragnarCallDailyRequisitions();
 		$odin_req_out = $odin_req->stc_call_daily_requisition_pr_names();
 		echo json_encode($odin_req_out);
+	}
+}
+
+if(isset($_POST['stc_dr_filter_products'])){
+	if(empty($_SESSION['stc_empl_id'])){
+		echo '';
+	}else{
+		$cat = isset($_POST['phpfiltercatout']) ? $_POST['phpfiltercatout'] : '';
+		$subcat = isset($_POST['phpfiltersubcatout']) ? $_POST['phpfiltersubcatout'] : '';
+		$name = isset($_POST['phpfilternameout']) ? $_POST['phpfilternameout'] : '';
+		$odin_req = new ragnarCallDailyRequisitions();
+		echo $odin_req->stc_dr_filter_products($cat, $subcat, $name);
 	}
 }
 
