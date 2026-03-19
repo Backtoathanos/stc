@@ -6006,7 +6006,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 							<div class="small text-muted">'.htmlspecialchars(($row['stc_cat_name']??'').' / '.($row['stc_product_hsncode']??'')).'</div>
 							<div class="small font-weight-bold dr-product-name" title="'.htmlspecialchars($fullName).'">'.htmlspecialchars($displayName).'</div>
 							<div class="small">'.htmlspecialchars($subBrand).'</div>
-							<button type="button" class="btn btn-success btn-sm btn-block mt-1 dr-select-product" data-product-id="'.(int)$row['stc_product_id'].'" data-product-name="'.htmlspecialchars($fullName).'"><i class="fa fa-plus"></i> Select</button>
+							<button type="button" class="btn btn-success btn-sm btn-block mt-1 dr-select-product" data-product-id="'.(int)$row['stc_product_id'].'" data-product-name="'.htmlspecialchars($fullName).'"><i class="fa fa-plus"></i> Select ('.htmlspecialchars($row['stc_product_unit']).')</button>
 						</div>
 					</div>
 				</div>';
