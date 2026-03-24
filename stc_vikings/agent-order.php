@@ -57,11 +57,11 @@ include("kattegat/role_check.php");
                                     <span>Check Order</span>
                                 </a>
                             </li> -->
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a role="tab" class="nav-link active" id="tab-2" data-toggle="tab" href="#tab-content-2">
                 <span>Check Requisition</span>
               </a>
-            </li>
+            </li> -->
             <!-- <li class="nav-item">
               <a role="tab" class="nav-link" id="tab-5" data-toggle="tab" href="#tab-content-5">
                 <span>Check Requisition By List</span>
@@ -73,7 +73,7 @@ include("kattegat/role_check.php");
               </a>
             </li> -->
             <li class="nav-item">
-              <a role="tab" class="nav-link" id="tab-4" data-toggle="tab" href="#tab-content-4">
+              <a role="tab" class="nav-link active" id="tab-4" data-toggle="tab" href="#tab-content-4">
                 <span>Requisitions Item Track </span>
               </a>
             </li>
@@ -316,7 +316,7 @@ include("kattegat/role_check.php");
                 </div>
               </div>
             </div>
-            <div class="tab-pane tabs-animation fade show active" id="tab-content-2" role="tabpanel">
+            <div class="tab-pane tabs-animation fade" id="tab-content-2" role="tabpanel">
               <div class="row">
                 <div class="col-xl-12 col-lg-12 col-md-12">
                   <div class="card-border mb-3 card card-body border-success">
@@ -545,7 +545,7 @@ include("kattegat/role_check.php");
                 </div>
               </div>
             </div>
-            <div class="tab-pane tabs-animation fade" id="tab-content-4" role="tabpanel">
+            <div class="tab-pane tabs-animation fade show active" id="tab-content-4" role="tabpanel">
               <div class="row">
                 <div class="col-xl-12 col-lg-12 col-md-12">
                   <div class="card-border mb-3 card card-body border-success">

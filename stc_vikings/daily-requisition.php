@@ -102,8 +102,38 @@ include("kattegat/role_check.php");
     #dailyReqBalanceModal .modal-body {
       padding: 20px;
     }
+    #dailyReqBalanceModal .dr-balance-req-summary .dr-balance-req-name {
+      display: inline-block;
+      margin-left: 4px;
+      word-break: break-word;
+      white-space: normal;
+    }
     #dailyReqBalanceModal .table tbody td.py-4 {
       background: #f8fafc;
+    }
+    #drDispatchLinesModal .modal-header {
+      background: linear-gradient(135deg, #285e61 0%, #2c7a7b 100%);
+      color: #fff;
+      border-radius: 4px 4px 0 0;
+    }
+    #drDispatchLinesModal .modal-header .close {
+      color: #fff;
+      opacity: 0.9;
+      text-shadow: none;
+    }
+    /* Above fixed header / sidebar (theme chrome can sit above Bootstrap’s default 1050) */
+    #dailyReqBalanceModal.modal,
+    #dailyReqLogsModal.modal,
+    #statusRemarkModal.modal,
+    #drDispatchLinesModal.modal {
+      z-index: 20050 !important;
+    }
+    body.modal-open .modal-backdrop {
+      z-index: 20040 !important;
+    }
+    /* SweetAlert2: above Bootstrap modals (20050) so alerts show on top; position handled by Swal.mixin */
+    .swal2-container {
+      z-index: 30000 !important;
     }
     /* Product picker cards - equal height, truncated name */
     #dailyReqBalanceModal .dr-product-results {
@@ -244,6 +274,21 @@ include("kattegat/role_check.php");
           </button>
         </div>
         <div class="modal-body">
+          <div id="dr-balance-req-summary" class="alert alert-info dr-balance-req-summary" style="display:none; margin-bottom:16px;">
+            <div style="font-weight:600; margin-bottom:6px;">Required (requisition line)</div>
+            <div class="row">
+              <div class="col-sm-12 col-md-6">
+                <span class="text-muted">Requisition Item name:</span>
+                <span id="dr-balance-req-name" class="dr-balance-req-name"></span>
+              </div>
+              <div class="col-sm-12 col-md-6">
+                <span class="text-muted">Quantity:</span>
+                <strong id="dr-balance-req-qty"></strong>
+                <span class="text-muted">Unit:</span>
+                <strong id="dr-balance-req-unit"></strong>
+              </div>
+            </div>
+          </div>
           <div style="overflow-x:auto;">
             <table class="table table-bordered table-hover">
               <thead>
@@ -307,6 +352,43 @@ include("kattegat/role_check.php");
     </div>
   </div>
 
+  <!-- Dispatched lines (rec table) -->
+  <div class="modal fade" id="drDispatchLinesModal" tabindex="-1" role="dialog" aria-labelledby="drDispatchLinesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="drDispatchLinesModalLabel"><i class="fa fa-truck"></i> Dispatched lines</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="dr-dispatch-lines-item-id" value="">
+          <div id="dr-dispatch-lines-verified-alert" class="alert alert-warning" style="display:none;">
+            This requisition line is <strong>verified</strong> on Verify Dispatch. Quantities cannot be edited or removed here.
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="table table-bordered table-hover table-sm">
+              <thead>
+                <tr>
+                  <th class="text-center">Adhoc ID</th>
+                  <th class="text-center">Product</th>
+                  <th class="text-center">Rack</th>
+                  <th class="text-center">Qty</th>
+                  <th class="text-center">Date</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody class="dr-dispatch-lines-body">
+                <tr><td colspan="6" class="text-center">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Status Change Modal (Pending remarks) -->
   <div class="modal fade" id="statusRemarkModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
@@ -340,8 +422,11 @@ include("kattegat/role_check.php");
       var perPage = 25;
       var prNamesList = [];
 
+      // Ensure dispatch modal stacks above fixed chrome; must be under <body> for reliable Bootstrap 3 display
+      $('#drDispatchLinesModal').appendTo('body');
+
       // Fix: Bootstrap modal leaves padding-right on body/fixed elements, causing app-main__outer to shrink on each close
-      $('#dailyReqBalanceModal, #dailyReqLogsModal, #statusRemarkModal').on('hidden.bs.modal', function () {
+      $('#dailyReqBalanceModal, #dailyReqLogsModal, #statusRemarkModal, #drDispatchLinesModal').on('hidden.bs.modal', function () {
         setTimeout(function () {
           if ($('.modal.in').length === 0) {
             $('body').removeClass('modal-open').css({ 'padding-right': '', 'overflow': '' });
@@ -350,13 +435,22 @@ include("kattegat/role_check.php");
         }, 10);
       });
 
+      if (typeof Swal !== 'undefined' && Swal.mixin) {
+        Swal.mixin({
+          position: 'top',
+          buttonsStyling: true,
+          confirmButtonText: 'OK'
+        });
+      }
+
       function showSwal(icon, title, text) {
         if (typeof Swal !== 'undefined' && Swal && Swal.fire) {
           return Swal.fire({
             icon: icon || 'info',
             title: title || '',
             text: text || '',
-            confirmButtonText: 'OK'
+            confirmButtonText: 'OK',
+            position: 'top'
           });
         }
         alert((title ? title + '\n' : '') + (text || ''));
@@ -470,10 +564,20 @@ include("kattegat/role_check.php");
                 var reqQty = parseNumber(item.req_qty);
                 var dispQty = parseNumber(item.dispatched_qty);
                 var pendingQty = reqQty - dispQty;
-                var actionHtml = '<button type="button" class="btn btn-primary btn-sm dr-balance-btn" data-item-id="' + escapeHtml(item.item_id) + '" data-toggle="modal" data-target="#dailyReqBalanceModal" title="Edit / View Adhoc Balance"><i class="fa fa-edit"></i></button>';
-                if (pendingQty <= 0.0001) {
-                  actionHtml = '<span class="text-muted">-</span>';
+                var actionParts = [];
+                if (pendingQty > 0.0001) {
+                  actionParts.push(
+                    '<button type="button" class="btn btn-primary btn-sm dr-balance-btn" data-item-id="' + escapeHtml(item.item_id) + '" data-toggle="modal" data-target="#dailyReqBalanceModal" title="Edit / View Adhoc Balance"><i class="fa fa-edit"></i></button>'
+                  );
                 }
+                if (dispQty > 0.0001) {
+                  actionParts.push(
+                    '<button type="button" class="btn btn-info btn-sm dr-dispatch-lines-open-btn" data-item-id="' + escapeHtml(item.item_id) + '" data-toggle="modal" data-target="#drDispatchLinesModal" title="Dispatched lines"><i class="fa fa-truck"></i></button>'
+                  );
+                }
+                var actionHtml = actionParts.length
+                  ? '<div style="display:inline-flex;flex-wrap:wrap;gap:4px;justify-content:center;">' + actionParts.join('') + '</div>'
+                  : '<span class="text-muted">-</span>';
                 var itemCode = (parseInt(item.product_id, 10) > 0) ? String(item.product_id) : '-';
                 var racks = (item.racks && String(item.racks).trim() !== '') ? String(item.racks) : '-';
                 var codeBalRackHtml =
@@ -644,6 +748,7 @@ include("kattegat/role_check.php");
         $('#dr-itemcode-itemid').val(itemId);
         $('#dr-itemcode-oldproductid').val('0');
         $('.dr-add-itemcode-form').hide();
+        $('#dr-balance-req-summary').hide();
         $('.stc-daily-req-balance-body').html('<tr><td colspan="7" class="text-center">Loading...</td></tr>');
         $.ajax({
           url: 'kattegat/ragnar_order.php',
@@ -654,6 +759,15 @@ include("kattegat/role_check.php");
             if (response && response.reload) {
               window.location.reload();
               return;
+            }
+            if (response && response.requirement) {
+              var r = response.requirement;
+              $('#dr-balance-req-name').text(r.item_desc || '-');
+              $('#dr-balance-req-qty').text(r.req_qty != null ? r.req_qty : '-');
+              $('#dr-balance-req-unit').text(r.unit || '-');
+              $('#dr-balance-req-summary').show();
+            } else {
+              $('#dr-balance-req-summary').hide();
             }
             var html = '';
             if (response && response.data && response.data.length > 0) {
@@ -718,6 +832,7 @@ include("kattegat/role_check.php");
             $('.stc-daily-req-balance-body').html(html);
           },
           error: function () {
+            $('#dr-balance-req-summary').hide();
             $('.stc-daily-req-balance-body').html('<tr><td colspan="7" class="text-center">Error loading balance.</td></tr>');
           }
         });
@@ -727,6 +842,163 @@ include("kattegat/role_check.php");
         if (e && e.preventDefault) e.preventDefault();
         var itemId = $(this).data('item-id');
         loadBalanceModal(itemId);
+      });
+
+      function loadDispatchLinesModal(itemId) {
+        $('#dr-dispatch-lines-item-id').val(itemId);
+        $('.dr-dispatch-lines-body').html('<tr><td colspan="6" class="text-center">Loading...</td></tr>');
+        $('#dr-dispatch-lines-verified-alert').hide();
+        $.ajax({
+          url: 'kattegat/ragnar_order.php',
+          method: 'POST',
+          data: { stc_call_daily_requisition_dispatch_lines: 1, item_id: itemId },
+          dataType: 'json',
+          success: function (response) {
+            if (response && response.reload) {
+              window.location.reload();
+              return;
+            }
+            if (parseInt(response.verified, 10) === 1) {
+              $('#dr-dispatch-lines-verified-alert').show();
+            } else {
+              $('#dr-dispatch-lines-verified-alert').hide();
+            }
+            var verified = parseInt(response.verified, 10) === 1;
+            var html = '';
+            if (response && response.data && response.data.length > 0) {
+              response.data.forEach(function (row) {
+                var qtyRaw = String(row.qty || '').replace(/,/g, '');
+                var actions = '';
+                if (verified) {
+                  actions = '<span class="text-muted">—</span>';
+                } else {
+                  actions =
+                    '<button type="button" class="btn btn-success btn-xs dr-dispatch-line-save-qty" data-rec-id="' + escapeHtml(row.rec_id) + '">Save</button> ' +
+                    '<button type="button" class="btn btn-danger btn-xs dr-dispatch-line-remove" data-rec-id="' + escapeHtml(row.rec_id) + '"><i class="fa fa-trash"></i></button>';
+                }
+                var qtyCell = '';
+                if (verified) {
+                  qtyCell = escapeHtml(row.qty);
+                } else {
+                  qtyCell =
+                    '<input type="number" step="0.01" min="0.01" class="form-control input-sm dr-dispatch-line-qty" style="max-width:120px;display:inline-block;" value="' + escapeHtml(qtyRaw) + '">';
+                }
+                html +=
+                  '<tr data-rec-id="' + escapeHtml(row.rec_id) + '">' +
+                  '<td class="text-center">' + escapeHtml(row.adhoc_id) + '</td>' +
+                  '<td><b>' + escapeHtml(row.product_id) + '</b> ' + escapeHtml(row.product_name) +
+                  (row.product_unit ? ' <span class="text-muted">(' + escapeHtml(row.product_unit) + ')</span>' : '') +
+                  '</td>' +
+                  '<td class="text-center">' + escapeHtml(row.rack_name) + '</td>' +
+                  '<td class="text-center">' + qtyCell + '</td>' +
+                  '<td class="text-center">' + escapeHtml(row.rec_date) + '</td>' +
+                  '<td class="text-center">' + actions + '</td>' +
+                  '</tr>';
+              });
+            } else {
+              html = '<tr><td colspan="6" class="text-center text-muted">No dispatched lines.</td></tr>';
+            }
+            $('.dr-dispatch-lines-body').html(html);
+          },
+          error: function () {
+            $('.dr-dispatch-lines-body').html('<tr><td colspan="6" class="text-center text-danger">Error loading lines.</td></tr>');
+          }
+        });
+      }
+
+      // Open via Bootstrap 3 data-api (data-toggle / data-target). Never use stopPropagation on this button —
+      // it blocks Bootstrap’s delegated handler on document so the modal never opens.
+      $(document).on('mousedown', '.dr-dispatch-lines-open-btn', function () {
+        $('#dr-dispatch-lines-item-id').val($(this).attr('data-item-id') || '');
+      });
+      $('#drDispatchLinesModal').on('show.bs.modal', function (e) {
+        var $btn = $(e.relatedTarget);
+        var itemId = 0;
+        if ($btn && $btn.length && $btn.hasClass('dr-dispatch-lines-open-btn')) {
+          itemId = parseInt(String($btn.attr('data-item-id') || '0').replace(/,/g, ''), 10) || 0;
+        }
+        if (!itemId) {
+          itemId = parseInt(String($('#dr-dispatch-lines-item-id').val() || '0').replace(/,/g, ''), 10) || 0;
+        }
+        if (itemId) {
+          loadDispatchLinesModal(itemId);
+        }
+      });
+
+      $('body').delegate('.dr-dispatch-line-save-qty', 'click', function () {
+        var recId = parseInt($(this).data('rec-id'), 10) || 0;
+        var $tr = $(this).closest('tr');
+        var qtyVal = parseFloat(String($tr.find('.dr-dispatch-line-qty').val() || '').replace(/,/g, ''), 10);
+        if (recId <= 0 || !qtyVal || qtyVal <= 0) {
+          showSwal('warning', 'Invalid', 'Enter a valid quantity greater than zero.');
+          return;
+        }
+        var $btn = $(this);
+        $btn.prop('disabled', true).text('...');
+        $.ajax({
+          url: 'kattegat/ragnar_order.php',
+          method: 'POST',
+          data: { stc_dr_update_dispatch_line_qty: 1, rec_id: recId, qty: qtyVal },
+          dataType: 'json',
+          success: function (response) {
+            $btn.prop('disabled', false).text('Save');
+            if (response && response.reload) { window.location.reload(); return; }
+            if (response && response.success) {
+              showSwal('success', 'Updated', response.message || 'Updated.');
+              var openItemId = $('#dr-dispatch-lines-item-id').val();
+              loadDispatchLinesModal(openItemId);
+              loadDailyRequisitions($('#dr-search').val() || '', currentPage, true);
+            } else {
+              showSwal('error', 'Failed', (response && response.message) ? response.message : 'Update failed.');
+            }
+          },
+          error: function () {
+            $btn.prop('disabled', false).text('Save');
+            showSwal('error', 'Failed', 'Update failed.');
+          }
+        });
+      });
+
+      $('body').delegate('.dr-dispatch-line-remove', 'click', function () {
+        var recId = parseInt($(this).data('rec-id'), 10) || 0;
+        if (recId <= 0) return;
+        var removeOne = function () {
+          $.ajax({
+            url: 'kattegat/ragnar_order.php',
+            method: 'POST',
+            data: { stc_dr_remove_dispatch_line: 1, rec_id: recId },
+            dataType: 'json',
+            success: function (response) {
+              if (response && response.reload) { window.location.reload(); return; }
+              if (response && response.success) {
+                showSwal('success', 'Removed', response.message || 'Removed.');
+                var openItemId = $('#dr-dispatch-lines-item-id').val();
+                loadDispatchLinesModal(openItemId);
+                loadDailyRequisitions($('#dr-search').val() || '', currentPage, true);
+              } else {
+                showSwal('error', 'Failed', (response && response.message) ? response.message : 'Remove failed.');
+              }
+            },
+            error: function () {
+              showSwal('error', 'Failed', 'Remove failed.');
+            }
+          });
+        };
+        if (typeof Swal === 'undefined' || !Swal.fire) {
+          if (confirm('Remove this dispatched line?')) removeOne();
+          return;
+        }
+        Swal.fire({
+          icon: 'warning',
+          title: 'Remove line?',
+          text: 'This cannot be undone.',
+          position: 'top',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, remove',
+          cancelButtonText: 'Cancel'
+        }).then(function (result) {
+          if (result.isConfirmed) removeOne();
+        });
       });
 
       $('body').delegate('.dr-update-pending-inline', 'click', function () {
@@ -1022,6 +1294,7 @@ include("kattegat/role_check.php");
           icon: 'warning',
           title: 'Confirm dispatch',
           text: 'Dispatch ' + dispatchQty + ' from Adhoc?',
+          position: 'top',
           showCancelButton: true,
           confirmButtonText: 'Yes, dispatch',
           cancelButtonText: 'Cancel'
