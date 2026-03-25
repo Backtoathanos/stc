@@ -289,7 +289,7 @@ include("kattegat/role_check.php");
               </div>
             </div>
           </div>
-          <div style="overflow-x:auto;">
+          <div class="dr-balance-main-wrap" style="overflow-x:auto;">
             <table class="table table-bordered table-hover">
               <thead>
                 <tr>
@@ -748,6 +748,7 @@ include("kattegat/role_check.php");
         $('#dr-itemcode-itemid').val(itemId);
         $('#dr-itemcode-oldproductid').val('0');
         $('.dr-add-itemcode-form').hide();
+        $('.dr-balance-main-wrap').show();
         $('#dr-balance-req-summary').hide();
         $('.stc-daily-req-balance-body').html('<tr><td colspan="7" class="text-center">Loading...</td></tr>');
         $.ajax({
@@ -1086,6 +1087,7 @@ include("kattegat/role_check.php");
         $('#dr-filterbysubcat').val('NA');
         $('#dr-searchbystcname').val('');
         $('#dr-product-results').html('<p class="col-12 text-muted small">Select category, subcategory or type product name, then click Search.</p>');
+        $('.dr-balance-main-wrap').hide();
         $('.dr-add-itemcode-form').show();
       });
 
@@ -1115,6 +1117,7 @@ include("kattegat/role_check.php");
 
       $('body').delegate('.dr-itemcode-cancel-btn', 'click', function () {
         $('.dr-add-itemcode-form').hide();
+        $('.dr-balance-main-wrap').show();
       });
 
       $('body').delegate('.dr-select-product', 'click', function () {
@@ -1142,6 +1145,7 @@ include("kattegat/role_check.php");
             if (response && response.success) {
               showSwal('success', 'Updated', response.message || 'Item code added.');
               $('.dr-add-itemcode-form').hide();
+              $('.dr-balance-main-wrap').show();
               loadBalanceModal(itemId);
             } else {
               showSwal('error', 'Failed', (response && response.message) ? response.message : 'Update failed.');
@@ -1168,6 +1172,7 @@ include("kattegat/role_check.php");
         $('#dr-filterbysubcat').val('NA');
         $('#dr-searchbystcname').val('');
         $('#dr-product-results').html('<p class="col-12 text-muted small">Select category, subcategory or type product name, then click Search.</p>');
+        $('.dr-balance-main-wrap').hide();
         $('.dr-add-itemcode-form').show();
       });
 
