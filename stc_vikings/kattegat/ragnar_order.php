@@ -4399,6 +4399,89 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 		];
 	}
 
+	public function stc_search_projects_tools($q = ''){
+		$q = trim((string)$q);
+		$data = [];
+		if($q === ''){
+			return ['data' => $data];
+		}
+		$esc = mysqli_real_escape_string($this->stc_dbs, $q);
+		$sql = mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_project_id` AS id, `stc_cust_project_title` AS title
+			FROM `stc_cust_project`
+			WHERE `stc_cust_project_title` LIKE '%".$esc."%'
+			ORDER BY `stc_cust_project_title` ASC
+			LIMIT 40
+		");
+		if($sql && mysqli_num_rows($sql) > 0){
+			while($row = mysqli_fetch_assoc($sql)){
+				$data[] = [
+					'id' => (int)$row['id'],
+					'title' => (string)$row['title']
+				];
+			}
+		}
+		return ['data' => $data];
+	}
+
+	/**
+	 * Resolve site supervisor by phone and list projects from requisitions they appear on (latest first).
+	 */
+	public function stc_tool_tracker_check_issuedby($contact = ''){
+		$contact = trim((string)$contact);
+		if($contact === ''){
+			return ['success' => false, 'message' => 'Enter phone number.'];
+		}
+		$esc = mysqli_real_escape_string($this->stc_dbs, $contact);
+		$sq = mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_contact`
+			FROM `stc_cust_pro_supervisor`
+			WHERE `stc_cust_pro_supervisor_contact`='".$esc."'
+			LIMIT 1
+		");
+		if(!$sq || mysqli_num_rows($sq) === 0){
+			return ['success' => false, 'message' => 'No site user found for this number.'];
+		}
+		$row = mysqli_fetch_assoc($sq);
+		$sid = (int)$row['stc_cust_pro_supervisor_id'];
+		$projects = [];
+		$pq = mysqli_query($this->stc_dbs, "
+			SELECT P.`stc_cust_project_id` AS id, P.`stc_cust_project_title` AS title, L.`stc_cust_super_requisition_list_date` AS list_dt
+			FROM `stc_cust_super_requisition_list` L
+			INNER JOIN `stc_cust_project` P ON P.`stc_cust_project_id` = L.`stc_cust_super_requisition_list_project_id`
+			WHERE L.`stc_cust_super_requisition_list_super_id`='".mysqli_real_escape_string($this->stc_dbs, $sid)."'
+			ORDER BY L.`stc_cust_super_requisition_list_date` DESC
+			LIMIT 200
+		");
+		$seen = [];
+		if($pq && mysqli_num_rows($pq) > 0){
+			while($pr = mysqli_fetch_assoc($pq)){
+				$pid = (int)$pr['id'];
+				if(isset($seen[$pid])){
+					continue;
+				}
+				$seen[$pid] = 1;
+				$projects[] = [
+					'id' => $pid,
+					'title' => (string)$pr['title']
+				];
+				if(count($projects) >= 25){
+					break;
+				}
+			}
+		}
+		$primary = count($projects) ? $projects[0] : null;
+		return [
+			'success' => true,
+			'message' => 'User found.',
+			'fullname' => (string)$row['stc_cust_pro_supervisor_fullname'],
+			'contact' => (string)$row['stc_cust_pro_supervisor_contact'],
+			'supervisor_id' => $sid,
+			'projects' => $projects,
+			'primary_project' => $primary
+		];
+	}
+
 	public function stc_tool_tracker_get_bysite($sitefilter){
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "SELECT A.receivedby, A.issueddate, B.itemdescription, B.machinesrno, B.make, B.tooltype,B.unique_id,C.stc_cust_project_title FROM `stc_tooldetails_track` A INNER JOIN `stc_tooldetails` B ON A.toolsdetails_id=B.id INNER JOIN `stc_cust_project` C ON A.project_id=C.stc_cust_project_id WHERE A.`project_id`='".mysqli_real_escape_string($this->stc_dbs, $sitefilter)."' ORDER BY A.`id` DESC");
 		$blackpearl = [];
@@ -4432,9 +4515,16 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	}
 
 	// save tracking
-	public function stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id){
+	public function stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id, $project_id = 0){
 		$blackpearl='';
 		$user_id=$issuedby;
+		$project_id = (int)$project_id;
+		$project_sql = '';
+		if($project_id > 0){
+			$project_sql = "'".mysqli_real_escape_string($this->stc_dbs, $project_id)."'";
+		}else{
+			$project_sql = 'NULL';
+		}
 		$sqlcheck=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_contact`='".mysqli_real_escape_string($this->stc_dbs, $issuedby)."'");
 		if(mysqli_num_rows($sqlcheck)>0){
 			$issedbyname='';
@@ -4453,8 +4543,8 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 				$update_qry = mysqli_query($this->stc_dbs, "UPDATE stc_tooldetails_track SET handoverto = '".mysqli_real_escape_string($this->stc_dbs, $issuedby)."' WHERE id = '".mysqli_real_escape_string($this->stc_dbs, $record['id'])."'");
 			}
 			
-			// Insert the new record
-			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, user_id, status, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."', '".mysqli_real_escape_string($this->stc_dbs, $user_id)."', '0', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."', 'vikings')");
+			// Insert the new record (project_id links to stc_cust_project when set)
+			$blackpearl_qry = mysqli_query($this->stc_dbs, "INSERT INTO stc_tooldetails_track (toolsdetails_id, issuedby, user_id, status, location, issueddate, receivedby, `handoverto`, created_date, created_by, id_type, project_id) VALUES ('".mysqli_real_escape_string($this->stc_dbs, $itt_id)."', '".mysqli_real_escape_string($this->stc_dbs, $issedbyname)."', '".mysqli_real_escape_string($this->stc_dbs, $user_id)."', '0', '".mysqli_real_escape_string($this->stc_dbs, $location)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $receivedby)."', '', '".mysqli_real_escape_string($this->stc_dbs, $date1)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."', 'vikings', ".$project_sql.")");
 
 			if($blackpearl_qry){
 				$blackpearl='yes';
@@ -5660,14 +5750,35 @@ if(isset($_POST['save_tool_trackertrack'])){
 	$receivedby=$_POST['receivedby'];
 	$handoverto=$_POST['handoverto'];
 	$itt_id=$_POST['itt_id'];
+	$project_id = isset($_POST['project_id']) ? (int)$_POST['project_id'] : 0;
 	$out='';
 	if(empty($_SESSION['stc_empl_id'])){
 		$out='reload';
 	}else{
 		$odin_req=new ragnarCallRequisitionItemTrack();
-		$out=$odin_req->stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id);
+		$out=$odin_req->stc_tool_trackertrack_save($issuedby, $location, $date, $receivedby, $handoverto, $itt_id, $project_id);
 	}
 	echo $out;
+}
+
+if(isset($_POST['stc_search_projects_tools'])){
+	$q = isset($_POST['q']) ? $_POST['q'] : '';
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarCallRequisitionItemTrack();
+		echo json_encode($odin_req->stc_search_projects_tools($q));
+	}
+}
+
+if(isset($_POST['stc_tool_tracker_check_issuedby'])){
+	$contact = isset($_POST['contact']) ? $_POST['contact'] : '';
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarCallRequisitionItemTrack();
+		echo json_encode($odin_req->stc_tool_tracker_check_issuedby($contact));
+	}
 }
 
 

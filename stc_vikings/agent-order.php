@@ -38,6 +38,153 @@ include("kattegat/role_check.php");
     .fade:not(.show) {
       opacity: 10;
     }
+
+    .ittt-location-input-wrap {
+      position: relative;
+      width: 100%;
+      flex: 0 0 auto;
+    }
+
+    .ittt-location-input-wrap .ittt-project-suggest {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      z-index: 1050;
+      max-height: 220px;
+      overflow-y: auto;
+      margin: 2px 0 0;
+      padding: 0;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+
+    .ittt-location-input-wrap .ittt-project-suggest li {
+      padding: 8px 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+
+    .ittt-location-input-wrap .ittt-project-suggest li:hover,
+    .ittt-location-input-wrap .ittt-project-suggest li.ittt-proj-active {
+      background: #f0f8ff;
+    }
+
+    .ittt-issuedby-wrap {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      flex-wrap: nowrap !important;
+      width: 100%;
+    }
+
+    .ittt-issuedby-wrap > .input-group {
+      width: 100%;
+      flex: 0 0 auto;
+    }
+
+    .ittt-issuedby-wrap .ittt-check-user {
+      white-space: nowrap;
+    }
+
+    .ittt-issuedby-wrap .ittt-issuedby-status {
+      width: 100%;
+      flex: 0 0 auto;
+    }
+
+    .ittt-location-wrap {
+      position: relative;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: stretch !important;
+      width: 100%;
+    }
+
+    /* Multi-site project picker (shown in Location after Issued By Check finds several projects) */
+    .ittt-location-wrap .ittt-project-pick-panel {
+      display: none;
+      width: 100%;
+      flex: 0 0 auto;
+      align-self: stretch;
+      box-sizing: border-box;
+      margin-top: 10px;
+      padding: 12px 14px;
+      background: linear-gradient(145deg, #f7fafc 0%, #edf2f7 55%, #e8f0f8 100%);
+      border: 1px solid #cbd5e0;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+      border-left: 4px solid #2b6cb0;
+    }
+
+    .ittt-location-wrap .ittt-project-select-row {
+      display: block;
+      width: 100%;
+      margin-top: 4px;
+      clear: both;
+    }
+
+    .ittt-location-wrap .ittt-project-pick-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 0;
+      width: 100%;
+    }
+
+    .ittt-location-wrap .ittt-project-pick-head .fa {
+      margin-top: 2px;
+      font-size: 18px;
+      color: #2b6cb0;
+    }
+
+    .ittt-location-wrap .ittt-project-pick-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #2d3748;
+      margin: 0 0 4px 0;
+      line-height: 1.3;
+    }
+
+    .ittt-location-wrap .ittt-project-pick-sub {
+      font-size: 12px;
+      font-weight: 500;
+      color: #718096;
+      line-height: 1.35;
+      margin: 0;
+    }
+
+    .ittt-location-wrap .ittt-project-from-user {
+      display: block;
+      width: 100% !important;
+      max-width: 100%;
+      height: auto;
+      min-height: 38px;
+      padding: 8px 12px;
+      font-size: 13px;
+      line-height: 1.4;
+      color: #1a202c;
+      background-color: #fff;
+      border: 1px solid #a0aec0;
+      border-radius: 8px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04);
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .ittt-location-wrap .ittt-project-from-user:focus {
+      border-color: #2b6cb0;
+      outline: 0;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.04), 0 0 0 3px rgba(43, 108, 176, 0.2);
+    }
+
+    .ittt-location-wrap .ittt-project-pick-hint {
+      margin-top: 6px;
+      font-size: 11px;
+      color: #718096;
+    }
   </style>
 </head>
 
@@ -2279,6 +2426,159 @@ include("kattegat/role_check.php");
         var itemdescription = $(this).closest('tr').find('td:eq(2)').html();
         $('.ittt-unique-idtracking').val(unique);
         $('.ittt-itemdescriptiontracking').val(itemdescription);
+        $('.ittt-project-id').val('');
+        $('.ittt-location').val('');
+        $('.ittt-project-suggest').hide().empty();
+        $('.ittt-issuedby-status').removeClass('text-success text-danger text-warning').text('');
+        $('.ittt-check-user').hide();
+        $('.ittt-project-from-user').empty();
+        $('.ittt-project-pick-panel').hide().attr('aria-hidden', 'true');
+      });
+
+      function itttApplyProjectFromCheck(proj) {
+        if (!proj || !proj.id) {
+          return;
+        }
+        $('.ittt-project-id').val(proj.id);
+        $('.ittt-location').val(proj.title);
+        $('.ittt-project-suggest').hide().empty();
+      }
+
+      $('body').on('input', '.ittt-issuedby', function () {
+        var v = ($(this).val() || '').trim();
+        $(this).closest('.ittt-issuedby-wrap').find('.ittt-check-user').toggle(v.length >= 5);
+        if (v.length < 5) {
+          $(this).closest('.ittt-issuedby-wrap').find('.ittt-issuedby-status').removeClass('text-success text-danger text-warning').text('');
+        }
+      });
+
+      $('body').on('click', '.ittt-check-user', function (e) {
+        e.preventDefault();
+        var $wrap = $(this).closest('.ittt-issuedby-wrap');
+        var $locWrap = $('.ittt-location-wrap');
+        var contact = ($wrap.find('.ittt-issuedby').val() || '').trim();
+        var $st = $wrap.find('.ittt-issuedby-status');
+        var $sel = $locWrap.find('.ittt-project-from-user');
+        var $panel = $locWrap.find('.ittt-project-pick-panel');
+        $panel.hide().attr('aria-hidden', 'true');
+        $sel.empty();
+        if (contact.length < 5) {
+          $st.removeClass('text-success').addClass('text-danger').text('Enter at least 5 digits.');
+          return;
+        }
+        $st.removeClass('text-success text-danger text-warning').text('Checking…');
+        $.ajax({
+          url: 'kattegat/ragnar_order.php',
+          method: 'POST',
+          data: { stc_tool_tracker_check_issuedby: 1, contact: contact },
+          dataType: 'json',
+          success: function (res) {
+            if (res && res.reload) {
+              window.location.reload();
+              return;
+            }
+            if (!res || !res.success) {
+              $st.removeClass('text-success text-warning').addClass('text-danger').text((res && res.message) ? res.message : 'Not found.');
+              $('.ittt-project-id').val('');
+              $panel.hide().attr('aria-hidden', 'true');
+              return;
+            }
+            var name = res.fullname || '';
+            var projs = res.projects || [];
+            $st.removeClass('text-danger').addClass('text-success').text('✓ ' + name + ' — site user OK.');
+            if (projs.length === 0) {
+              $st.removeClass('text-success').addClass('text-warning').text('✓ ' + name + ' — no project on requisitions yet. Search location manually.');
+              $('.ittt-project-id').val('');
+              $panel.hide().attr('aria-hidden', 'true');
+              return;
+            }
+            if (projs.length === 1) {
+              $panel.hide().attr('aria-hidden', 'true');
+              itttApplyProjectFromCheck(projs[0]);
+              return;
+            }
+            projs.forEach(function (p) {
+              $sel.append($('<option></option>').attr('value', p.id).text(p.title));
+            });
+            itttApplyProjectFromCheck(projs[0]);
+            $sel.val(String(projs[0].id));
+            $panel.show().attr('aria-hidden', 'false');
+          },
+          error: function () {
+            $st.removeClass('text-success text-warning').addClass('text-danger').text('Request failed.');
+            $panel.hide().attr('aria-hidden', 'true');
+          }
+        });
+      });
+
+      $('body').on('change', '.ittt-project-from-user', function () {
+        var $opt = $(this).find('option:selected');
+        var id = parseInt($(this).val(), 10) || 0;
+        var title = $opt.text() || '';
+        if (id && title) {
+          $('.ittt-project-id').val(id);
+          $('.ittt-location').val(title);
+        }
+      });
+
+      var itttProjectSearchTimer = null;
+      $('body').on('input', '.ittt-location', function () {
+        var $inp = $(this);
+        var q = ($inp.val() || '').trim();
+        $('.ittt-project-id').val('');
+        var $locWrap = $inp.closest('.ittt-location-wrap');
+        $locWrap.find('.ittt-project-pick-panel').hide().attr('aria-hidden', 'true');
+        $locWrap.find('.ittt-project-from-user').empty();
+        if (itttProjectSearchTimer) clearTimeout(itttProjectSearchTimer);
+        var $ul = $inp.closest('.ittt-location-input-wrap').find('.ittt-project-suggest');
+        if (q.length < 2) {
+          $ul.hide().empty();
+          return;
+        }
+        itttProjectSearchTimer = setTimeout(function () {
+          $.ajax({
+            url: 'kattegat/ragnar_order.php',
+            method: 'POST',
+            data: { stc_search_projects_tools: 1, q: q },
+            dataType: 'json',
+            success: function (res) {
+              if (res && res.reload) {
+                window.location.reload();
+                return;
+              }
+              $ul.empty();
+              var rows = res && res.data ? res.data : [];
+              if (rows.length === 0) {
+                $ul.append('<li class="text-muted" style="cursor:default;">No projects found</li>');
+              } else {
+                rows.forEach(function (row) {
+                  var $li = $('<li class="ittt-proj-pick"></li>');
+                  $li.attr('data-id', row.id).text(row.title);
+                  $ul.append($li);
+                });
+              }
+              $ul.show();
+            },
+            error: function () {
+              $ul.hide().empty();
+            }
+          });
+        }, 280);
+      });
+      $('body').on('click', '.ittt-proj-pick', function (e) {
+        e.preventDefault();
+        var $li = $(this);
+        var id = $li.attr('data-id') || $li.data('id');
+        var title = $li.text();
+        var $wrap = $li.closest('.ittt-location-wrap');
+        $wrap.find('.ittt-project-id').val(id);
+        $wrap.find('.ittt-location').val(title);
+        $wrap.find('.ittt-project-suggest').hide().empty();
+      });
+      $(document).on('click', function (e) {
+        if (!$(e.target).closest('.ittt-location-wrap').length) {
+          $('.ittt-project-suggest').hide();
+        }
       });
 
       // call tools tracker
@@ -2327,7 +2627,8 @@ include("kattegat/role_check.php");
             date: date,
             receivedby: receivedby,
             handoverto: handoverto,
-            itt_id: itt_id
+            itt_id: itt_id,
+            project_id: $('.ittt-project-id').val() || '0'
           };
           $.ajax({
             url: "kattegat/ragnar_order.php",
@@ -3473,14 +3774,35 @@ $(document).ready(function () {
                   </div>
                   <div class="col-md-3">
                     <h5>Issued By</h5><br>
-                    <div class="card mb-3 widget-content">
-                      <input type="number" class="form-control ittt-issuedby" placeholder="Enter users phone number">
+                    <div class="card mb-3 widget-content ittt-issuedby-wrap">
+                      <div class="input-group input-group-sm">
+                        <input type="text" class="form-control ittt-issuedby" placeholder="Site user phone" inputmode="tel" autocomplete="off">
+                        <div class="input-group-append">
+                          <button type="button" class="btn btn-outline-primary ittt-check-user" style="display:none;" title="Check user &amp; load project">Check</button>
+                        </div>
+                      </div>
+                      <small class="ittt-issuedby-status d-block mt-1" style="min-height:1.2em;"></small>
                     </div>
                   </div>
                   <div class="col-md-3">
-                    <h5>Location</h5><br>
-                    <div class="card mb-3 widget-content">
-                      <input type="text" class="form-control ittt-location" placeholder="Enter Location">
+                    <h5>Location (project)</h5><br>
+                    <div class="card mb-3 widget-content ittt-location-wrap">
+                      <input type="hidden" class="ittt-project-id" value="">
+                      <div class="ittt-location-input-wrap">
+                        <input type="text" class="form-control ittt-location" placeholder="Search project name…" autocomplete="off">
+                        <ul class="ittt-project-suggest list-unstyled" style="display:none;"></ul>
+                      </div>
+                      <div class="ittt-project-pick-panel" aria-hidden="true">
+                        <div class="ittt-project-pick-head">
+                          <i class="fa fa-building-o" aria-hidden="true"></i>
+                          <div>
+                            <p class="ittt-project-pick-title">Choose project</p>
+                          </div>
+                        </div>
+                        <div class="ittt-project-select-row">
+                          <select id="ittt-project-from-user-select" class="form-control ittt-project-from-user" title="Select project site" aria-label="Choose project for location"></select>
+                        </div>
+                      </div>
                     </div>
                   </div>
                   <div class="col-md-3">
