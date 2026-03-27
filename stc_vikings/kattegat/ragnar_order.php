@@ -4483,7 +4483,16 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 	}
 
 	public function stc_tool_tracker_get_bysite($sitefilter){
-		$blackpearl_qry = mysqli_query($this->stc_dbs, "SELECT A.receivedby, A.issueddate, B.itemdescription, B.machinesrno, B.make, B.tooltype,B.unique_id,C.stc_cust_project_title FROM `stc_tooldetails_track` A INNER JOIN `stc_tooldetails` B ON A.toolsdetails_id=B.id INNER JOIN `stc_cust_project` C ON A.project_id=C.stc_cust_project_id WHERE A.`project_id`='".mysqli_real_escape_string($this->stc_dbs, $sitefilter)."' ORDER BY A.`id` DESC");
+		$blackpearl_qry = mysqli_query($this->stc_dbs, "
+			SELECT A.`receivedby`, A.`issueddate`, A.`status` AS `track_status`,
+				B.`itemdescription`, B.`machinesrno`, B.`make`, B.`tooltype`, B.`unique_id`,
+				C.`stc_cust_project_title`
+			FROM `stc_tooldetails_track` A
+			INNER JOIN `stc_tooldetails` B ON A.`toolsdetails_id` = B.`id`
+			INNER JOIN `stc_cust_project` C ON A.`project_id` = C.`stc_cust_project_id`
+			WHERE A.`project_id`='".mysqli_real_escape_string($this->stc_dbs, (string)$sitefilter)."'
+			ORDER BY A.`id` DESC
+		");
 		$blackpearl = [];
 		$i=0;
 		$project_name='';
@@ -4492,6 +4501,14 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
 				$project_name=$blackpearl_row['stc_cust_project_title'];
 				$blackpearl[$i] = $blackpearl_row;
+				$ts = (string)($blackpearl_row['track_status'] ?? '');
+				if($ts === '2'){
+					$blackpearl[$i]['status_label'] = 'Returned';
+				}elseif($ts === '1'){
+					$blackpearl[$i]['status_label'] = 'Received';
+				}else{
+					$blackpearl[$i]['status_label'] = 'Pending';
+				}
 				$i++;
 			}
 		}
@@ -4580,6 +4597,14 @@ class ragnarCallRequisitionItemTrack extends tesseract{
 					$username=$result['name'];
 				}
 				$blackpearl[$i]['name'] = $username;
+				$ts = (string)($blackpearl_row['status'] ?? '');
+				if($ts === '2'){
+					$blackpearl[$i]['status_label'] = 'Returned';
+				}elseif($ts === '1'){
+					$blackpearl[$i]['status_label'] = 'Received';
+				}else{
+					$blackpearl[$i]['status_label'] = 'Pending';
+				}
 				$i++;
 			}
 		}
@@ -6171,7 +6196,8 @@ class ragnarCallDailyRequisitions extends tesseract{
 			SELECT
 				`stc_cust_super_requisition_list_items_title` AS item_desc,
 				`stc_cust_super_requisition_list_items_approved_qty` AS req_qty,
-				`stc_cust_super_requisition_list_items_unit` AS unit
+				`stc_cust_super_requisition_list_items_unit` AS unit,
+				`stc_cust_super_requisition_items_type` AS item_type
 			FROM `stc_cust_super_requisition_list_items`
 			WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
 			LIMIT 1
@@ -6181,7 +6207,8 @@ class ragnarCallDailyRequisitions extends tesseract{
 			$requirement = [
 				'item_desc' => (string)($req_row['item_desc'] ?? ''),
 				'req_qty' => number_format((float)($req_row['req_qty'] ?? 0), 2),
-				'unit' => (string)($req_row['unit'] ?? '')
+				'unit' => (string)($req_row['unit'] ?? ''),
+				'item_type' => (string)($req_row['item_type'] ?? '')
 			];
 		}
 
@@ -6192,12 +6219,13 @@ class ragnarCallDailyRequisitions extends tesseract{
 				P.`stc_product_unit` AS product_unit,
 				RP.`stc_cust_super_requisition_list_items_unit` AS item_unit,
 				SUM(RP.`stc_cust_super_requisition_items_finalqty`) AS connected_qty,
-				C.stc_sub_cat_name
+				C.stc_sub_cat_name,
+				MAX(RP.`stc_cust_super_requisition_items_type`) AS item_type
 			FROM `stc_cust_super_requisition_list_items` RP
 			INNER JOIN `stc_product` P ON P.`stc_product_id` = RP.`stc_cust_super_requisition_list_items_product_id`
 			INNER JOIN `stc_sub_category` C ON P.`stc_product_sub_cat_id` = C.`stc_sub_cat_id`
 			WHERE RP.`stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
-			GROUP BY P.`stc_product_id`
+			GROUP BY P.`stc_product_id`, P.`stc_product_name`, P.`stc_product_unit`, RP.`stc_cust_super_requisition_list_items_unit`, C.stc_sub_cat_name
 			ORDER BY P.`stc_product_name` ASC
 		");
 
@@ -6274,11 +6302,18 @@ class ragnarCallDailyRequisitions extends tesseract{
 				if($row['stc_sub_cat_name'] != "OTHERS"){
 					$product_name = $row['stc_sub_cat_name'] . ' ' . $product_name;
 				}
+				$item_type_row = (string)($row['item_type'] ?? '');
+				$tools_track_options = [];
+				if($item_type_row === 'Tools & Tackles'){
+					$tools_track_options = $this->stc_dr_tools_track_options_for_product($product_id);
+				}
 				$data[] = [
 					'product_id' => $product_id,
 					'product_name' => $product_name,
 					'product_unit' => (string)($row['product_unit'] ?? ''),
 					'item_unit' => (string)($row['item_unit'] ?? ''),
+					'item_type' => $item_type_row,
+					'tools_track_options' => $tools_track_options,
 					'racks' => $rackNames,
 					'connected_qty' => number_format((float)($row['connected_qty'] ?? 0), 2),
 					'dispatched_qty' => number_format((float)$dispatchedForItemProduct, 2),
@@ -6290,6 +6325,37 @@ class ragnarCallDailyRequisitions extends tesseract{
 		}
 
 		return ['data' => $data, 'requirement' => $requirement];
+	}
+
+	/**
+	 * Tools registered under PPO adhoc lines for this product (for Tools & Tackles copy-to-track UI).
+	 */
+	private function stc_dr_tools_track_options_for_product($product_id = 0){
+		$product_id = (int)$product_id;
+		$out = [];
+		if($product_id <= 0){
+			return $out;
+		}
+		$tq = mysqli_query($this->stc_dbs, "
+			SELECT td.`id` AS toolsdetails_id, td.`poa_id` AS adhoc_id, td.`unique_id`, td.`itemdescription`
+			FROM `stc_tooldetails` td
+			INNER JOIN `stc_purchase_product_adhoc` A
+				ON A.`stc_purchase_product_adhoc_id` = td.`poa_id`
+			WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+			ORDER BY td.`id` DESC
+		");
+		if($tq && mysqli_num_rows($tq) > 0){
+			while($tr = mysqli_fetch_assoc($tq)){
+				$adh = (int)$tr['adhoc_id'];
+				$label = 'PPO '.$adh.' — '.(string)($tr['unique_id'] ?? '').' — '.(string)($tr['itemdescription'] ?? '');
+				$out[] = [
+					'toolsdetails_id' => (int)$tr['toolsdetails_id'],
+					'adhoc_id' => $adh,
+					'label' => $label
+				];
+			}
+		}
+		return $out;
 	}
 
 	private function stc_daily_req_log($item_id, $title, $message){
@@ -6322,17 +6388,16 @@ class ragnarCallDailyRequisitions extends tesseract{
 			return ['success' => false, 'message' => 'Invalid parameters.'];
 		}
 
-		// Get requisition(list) id + unit + item type + required qty for this product (connected qty)
+		// Get requisition(list) id + unit + required qty for this product (connected qty)
 		$item_q = mysqli_query($this->stc_dbs, "
 			SELECT 
 				`stc_cust_super_requisition_list_items_req_id` AS list_id,
 				`stc_cust_super_requisition_list_items_unit` AS unit,
-				`stc_cust_super_requisition_items_type` AS item_type,
 				SUM(`stc_cust_super_requisition_items_finalqty`) AS required_qty
 			FROM `stc_cust_super_requisition_list_items`
 			WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
 				AND `stc_cust_super_requisition_list_items_product_id` = '".$product_id."'
-			GROUP BY `stc_cust_super_requisition_list_items_req_id`, `stc_cust_super_requisition_list_items_unit`, `stc_cust_super_requisition_items_type`
+			GROUP BY `stc_cust_super_requisition_list_items_req_id`, `stc_cust_super_requisition_list_items_unit`
 			LIMIT 1
 		");
 		if(!$item_q || mysqli_num_rows($item_q) === 0){
@@ -6341,7 +6406,6 @@ class ragnarCallDailyRequisitions extends tesseract{
 		$item_row = mysqli_fetch_assoc($item_q);
 		$list_id = (int)$item_row['list_id'];
 		$item_unit = (string)($item_row['unit'] ?? '');
-		$item_type = (string)($item_row['item_type'] ?? '');
 		$required_qty = (float)($item_row['required_qty'] ?? 0);
 
 		// Already dispatched qty for this item+product (via adhoc ids)
@@ -6405,28 +6469,6 @@ class ragnarCallDailyRequisitions extends tesseract{
 		$now = date("Y-m-d H:i:s");
 		$total_dispatched_now = 0.0;
 
-		// Fetch requisition meta for Tools & Tackles track (if needed)
-		$meta = null;
-		if($item_type === "Tools & Tackles"){
-			$meta_q = mysqli_query($this->stc_dbs, "
-				SELECT 
-					`stc_cust_super_requisition_list_project_id` as project_id,
-					`stc_cust_super_requisition_list_super_id` as user_id,
-					`stc_cust_pro_supervisor_fullname` as username,
-					`stc_cust_project_title` as location
-				FROM `stc_cust_super_requisition_list` 
-				INNER JOIN `stc_cust_pro_supervisor` 
-					ON `stc_cust_super_requisition_list_super_id`=`stc_cust_pro_supervisor_id` 
-				INNER JOIN `stc_cust_project` 
-					ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id` 
-				WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $list_id)."'
-				LIMIT 1
-			");
-			if($meta_q && mysqli_num_rows($meta_q) > 0){
-				$meta = mysqli_fetch_assoc($meta_q);
-			}
-		}
-
 		foreach($adhoc_rows as $ar){
 			if($remaining_to_dispatch <= 0){ break; }
 			$adhoc_id = (int)$ar['adhoc_id'];
@@ -6479,43 +6521,6 @@ class ragnarCallDailyRequisitions extends tesseract{
 				)
 			");
 
-			// Tools & Tackles tracking insertion (if tool exists for this adhoc id)
-			if($item_type === "Tools & Tackles" && $meta){
-				$get_tools_id = mysqli_query($this->stc_dbs, "SELECT `id` FROM `stc_tooldetails` WHERE `poa_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."' LIMIT 1");
-				if($get_tools_id && mysqli_num_rows($get_tools_id) > 0){
-					$tools_data = mysqli_fetch_assoc($get_tools_id);
-					$tools_tackles_id = $tools_data['id'];
-					mysqli_query($this->stc_dbs, "
-						INSERT INTO `stc_tooldetails_track`(
-							`toolsdetails_id`, 
-							`issuedby`, 
-							`project_id`, 
-							`user_id`, 
-							`status`, 
-							`location`, 
-							`issueddate`, 
-							`receivedby`, 
-							`handoverto`, 
-							`created_date`, 
-							`created_by`, 
-							`id_type`
-						) VALUES (
-							'".mysqli_real_escape_string($this->stc_dbs, $tools_tackles_id)."',
-							'".mysqli_real_escape_string($this->stc_dbs, $meta['username'])."',
-							'".mysqli_real_escape_string($this->stc_dbs, $meta['project_id'])."',
-							'".mysqli_real_escape_string($this->stc_dbs, $meta['user_id'])."',
-							'1',
-							'".mysqli_real_escape_string($this->stc_dbs, $meta['location'])."',
-							'".mysqli_real_escape_string($this->stc_dbs, $now)."',
-							'".mysqli_real_escape_string($this->stc_dbs, $meta['username'])."',
-							'".mysqli_real_escape_string($this->stc_dbs, $meta['username'])."',
-							'".mysqli_real_escape_string($this->stc_dbs, $now)."',
-							'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."',
-							'vikings'
-						)
-					");
-				}
-			}
 		}
 
 		if($total_dispatched_now <= 0){
@@ -6537,6 +6542,112 @@ class ragnarCallDailyRequisitions extends tesseract{
 		$this->stc_daily_req_log($item_id, $title, $message);
 
 		return ['success' => true, 'message' => 'Balance dispatched successfully.', 'dispatched_qty' => number_format($total_dispatched_now, 2)];
+	}
+
+	/**
+	 * Insert stc_tooldetails_track for Tools & Tackles with requisition + PPO adhoc binding (explicit copy from Daily Requisition).
+	 */
+	public function stc_dr_copy_tool_track($item_id = 0, $product_id = 0, $toolsdetails_id = 0){
+		$item_id = (int)$item_id;
+		$product_id = (int)$product_id;
+		$toolsdetails_id = (int)$toolsdetails_id;
+		if($item_id <= 0 || $product_id <= 0 || $toolsdetails_id <= 0){
+			return ['success' => false, 'message' => 'Invalid parameters.'];
+		}
+
+		$item_q = mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_cust_super_requisition_list_items_req_id` AS list_id,
+				`stc_cust_super_requisition_items_type` AS item_type
+			FROM `stc_cust_super_requisition_list_items`
+			WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+				AND `stc_cust_super_requisition_list_items_product_id` = '".$product_id."'
+			LIMIT 1
+		");
+		if(!$item_q || mysqli_num_rows($item_q) === 0){
+			return ['success' => false, 'message' => 'Requisition line not found for this product.'];
+		}
+		$item_row = mysqli_fetch_assoc($item_q);
+		if((string)($item_row['item_type'] ?? '') !== 'Tools & Tackles'){
+			return ['success' => false, 'message' => 'Tools track copy applies only to Tools & Tackles lines.'];
+		}
+		$list_id = (int)$item_row['list_id'];
+
+		$tq = mysqli_query($this->stc_dbs, "
+			SELECT td.`id`, td.`poa_id`
+			FROM `stc_tooldetails` td
+			INNER JOIN `stc_purchase_product_adhoc` A 
+				ON A.`stc_purchase_product_adhoc_id` = td.`poa_id`
+			WHERE td.`id` = '".mysqli_real_escape_string($this->stc_dbs, $toolsdetails_id)."'
+				AND A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+			LIMIT 1
+		");
+		if(!$tq || mysqli_num_rows($tq) === 0){
+			return ['success' => false, 'message' => 'Selected tool does not belong to this product/PPO line.'];
+		}
+		$tool_row = mysqli_fetch_assoc($tq);
+		$poa_adhoc_id = (int)$tool_row['poa_id'];
+
+		$meta_q = mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_cust_super_requisition_list_project_id` as project_id,
+				`stc_cust_super_requisition_list_super_id` as user_id,
+				`stc_cust_pro_supervisor_fullname` as username,
+				`stc_cust_project_title` as location
+			FROM `stc_cust_super_requisition_list` 
+			INNER JOIN `stc_cust_pro_supervisor` 
+				ON `stc_cust_super_requisition_list_super_id`=`stc_cust_pro_supervisor_id` 
+			INNER JOIN `stc_cust_project` 
+				ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id` 
+			WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $list_id)."'
+			LIMIT 1
+		");
+		if(!$meta_q || mysqli_num_rows($meta_q) === 0){
+			return ['success' => false, 'message' => 'Requisition header not found.'];
+		}
+		$meta = mysqli_fetch_assoc($meta_q);
+		$now = date("Y-m-d H:i:s");
+
+		$ins = mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_tooldetails_track`(
+				`toolsdetails_id`, 
+				`issuedby`, 
+				`project_id`, 
+				`user_id`, 
+				`status`, 
+				`location`, 
+				`issueddate`, 
+				`receivedby`, 
+				`handoverto`, 
+				`created_date`, 
+				`created_by`, 
+				`id_type`,
+				`req_requisition_list_id`,
+				`req_requisition_item_id`,
+				`req_poa_adhoc_id`
+			) VALUES (
+				'".mysqli_real_escape_string($this->stc_dbs, $toolsdetails_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $meta['username'])."',
+				'".mysqli_real_escape_string($this->stc_dbs, $meta['project_id'])."',
+				'".mysqli_real_escape_string($this->stc_dbs, $meta['user_id'])."',
+				'0',
+				'".mysqli_real_escape_string($this->stc_dbs, $meta['location'])."',
+				'".mysqli_real_escape_string($this->stc_dbs, $now)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $meta['username'])."',
+				'".mysqli_real_escape_string($this->stc_dbs, $meta['username'])."',
+				'".mysqli_real_escape_string($this->stc_dbs, $now)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."',
+				'vikings',
+				'".mysqli_real_escape_string($this->stc_dbs, $list_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $item_id)."',
+				'".mysqli_real_escape_string($this->stc_dbs, $poa_adhoc_id)."'
+			)
+		");
+		if(!$ins){
+			return ['success' => false, 'message' => 'Could not save Tools Track row. Run DB migration: stc_vikings/migrations/20250324_stc_tooldetails_track_requisition.sql'];
+		}
+		$this->stc_daily_req_log($item_id, 'Tools Track', 'Copied to Tools Track for PPO '.$poa_adhoc_id.' (tool #'.$toolsdetails_id.') by '.$_SESSION['stc_empl_name'].' on '.date('d-m-Y h:i A'));
+		return ['success' => true, 'message' => 'Saved to Tools Track (details) with requisition link.'];
 	}
 
 	public function stc_update_daily_requisition_item_code($item_id = 0, $product_id = 0, $old_product_id = 0){
@@ -7294,6 +7405,19 @@ if(isset($_POST['stc_dispatch_daily_requisition_balance'])){
 	}else{
 		$odin_req = new ragnarCallDailyRequisitions();
 		$odin_req_out = $odin_req->stc_dispatch_daily_requisition_balance($item_id, $product_id, $dispatch_qty);
+		echo json_encode($odin_req_out);
+	}
+}
+
+if(isset($_POST['stc_dr_copy_tool_track'])){
+	$item_id = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
+	$product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
+	$toolsdetails_id = isset($_POST['toolsdetails_id']) ? (int)$_POST['toolsdetails_id'] : 0;
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarCallDailyRequisitions();
+		$odin_req_out = $odin_req->stc_dr_copy_tool_track($item_id, $product_id, $toolsdetails_id);
 		echo json_encode($odin_req_out);
 	}
 }

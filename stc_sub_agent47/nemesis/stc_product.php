@@ -349,13 +349,32 @@ class prime extends tesseract{
 		$filter=" AND (td.`unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR td.`itemdescription` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR td.`machinesrno` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR td.`make` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR td.`tooltype` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."') ";
 		$search=$search==''?'':$filter;
 	
-		// Check for duplicate unique ID
+		// One row per tool: latest track row only (avoids duplicate lines when history has Received + Returned)
+		$uid = mysqli_real_escape_string($this->stc_dbs, (string)$_SESSION['stc_agent_sub_id']);
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "
-			SELECT tdt.`id` tdt_id, tdt.`user_id`, tdt.`status`, td.`id`, td.`unique_id`, td.`itemdescription`, td.`machinesrno`, td.`make`, td.`tooltype`, td.`remarks` FROM `stc_tooldetails_track` tdt INNER JOIN `stc_tooldetails` td ON tdt.`toolsdetails_id`=td.`id` WHERE tdt.`user_id`='".$_SESSION['stc_agent_sub_id']."' ".$search." ORDER BY DATE(`tdt`.`created_date`) DESC
+			SELECT tdt.`id` AS tdt_id, tdt.`user_id`, tdt.`status`, td.`id`, td.`unique_id`, td.`itemdescription`, td.`machinesrno`, td.`make`, td.`tooltype`, td.`remarks`
+			FROM `stc_tooldetails_track` tdt
+			INNER JOIN `stc_tooldetails` td ON tdt.`toolsdetails_id` = td.`id`
+			INNER JOIN (
+				SELECT `toolsdetails_id`, MAX(`id`) AS `max_tid`
+				FROM `stc_tooldetails_track`
+				WHERE `user_id` = '".$uid."'
+				GROUP BY `toolsdetails_id`
+			) `latest` ON `latest`.`toolsdetails_id` = tdt.`toolsdetails_id` AND `latest`.`max_tid` = tdt.`id`
+			WHERE tdt.`user_id` = '".$uid."' ".$search."
+			ORDER BY tdt.`id` DESC
 		");
 		$blackpearl=[];
 		if(mysqli_num_rows($blackpearl_qry)>0){
 			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
+				$ts = (string)($blackpearl_row['status'] ?? '');
+				if($ts === '2'){
+					$blackpearl_row['status_label'] = 'Returned';
+				}elseif($ts === '1'){
+					$blackpearl_row['status_label'] = 'Received';
+				}else{
+					$blackpearl_row['status_label'] = 'Pending';
+				}
 				$blackpearl[] = $blackpearl_row;
 			}
 		}
@@ -431,6 +450,14 @@ class prime extends tesseract{
 					$username=$result['name'];
 				}
 				$blackpearl[$i]['name'] = $username;
+				$ts = (string)($blackpearl_row['status'] ?? '');
+				if($ts === '2'){
+					$blackpearl[$i]['status_label'] = 'Returned';
+				}elseif($ts === '1'){
+					$blackpearl[$i]['status_label'] = 'Received';
+				}else{
+					$blackpearl[$i]['status_label'] = 'Pending';
+				}
 				$i++;
 			}
 		}

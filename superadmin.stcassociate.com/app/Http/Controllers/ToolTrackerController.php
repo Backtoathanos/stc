@@ -82,17 +82,15 @@ class ToolTrackerController extends Controller
             ->get();
 
         $data_arr = array();
-        $statusLabels = [0 => 'Issued', 1 => 'Accepted'];
-        $statusColors = [0 => 'badge bg-warning', 1 => 'badge bg-success'];
 
         foreach ($records as $record) {
             $latestTrack = StcTooldetailsTrack::where('toolsdetails_id', $record->id)
                 ->orderBy('created_date', 'desc')
                 ->first();
 
-            $statusLabel = $latestTrack ? ($statusLabels[$latestTrack->status] ?? $latestTrack->status) : 'N/A';
-            $statusBadge = $latestTrack 
-                ? '<span class="'.($statusColors[$latestTrack->status] ?? 'badge bg-secondary').'">'.$statusLabel.'</span>'
+            $statusLabel = $latestTrack ? $this->trackStatusLabel($latestTrack->status) : 'N/A';
+            $statusBadge = $latestTrack
+                ? '<span class="'.$this->trackStatusBadgeClass($latestTrack->status).'">'.$statusLabel.'</span>'
                 : '<span class="badge bg-secondary">N/A</span>';
 
             $issuedby = $latestTrack ? $latestTrack->issuedby : '-';
@@ -187,7 +185,6 @@ class ToolTrackerController extends Controller
             ->orderBy('stc_tooldetails_track.created_date', 'desc')
             ->get();
 
-        $statusLabels = [0 => 'Issued', 1 => 'Accepted'];
         $data = [];
         foreach ($records as $r) {
             $data[] = [
@@ -196,7 +193,8 @@ class ToolTrackerController extends Controller
                 'user_id' => $r->user_id ?? '-',
                 'supervisor_name' => $r->supervisor_name ?? '-',
                 'project_name' => $r->project_name ?? '-',
-                'status' => $statusLabels[$r->status] ?? $r->status,
+                'status' => $this->trackStatusLabel($r->status),
+                'status_badge' => $this->trackStatusBadgeHtml($r->status),
                 'location' => $r->location ?? '-',
                 'issueddate' => $r->issueddate ? date('d-m-Y', strtotime($r->issueddate)) : '-',
                 'receivedby' => $r->receivedby ?? '-',
@@ -222,7 +220,6 @@ class ToolTrackerController extends Controller
             ->orderBy('stc_tooldetails_track.created_date', 'desc')
             ->get();
 
-        $statusLabels = [0 => 'Issued', 1 => 'Accepted'];
         $data = [];
         foreach ($records as $r) {
             $data[] = [
@@ -233,7 +230,8 @@ class ToolTrackerController extends Controller
                 'user_id' => $r->user_id ?? '-',
                 'supervisor_name' => $r->supervisor_name ?? '-',
                 'project_name' => $r->project_name ?? '-',
-                'status' => $statusLabels[$r->status] ?? $r->status,
+                'status' => $this->trackStatusLabel($r->status),
+                'status_badge' => $this->trackStatusBadgeHtml($r->status),
                 'location' => $r->location ?? '-',
                 'issueddate' => $r->issueddate ? date('d-m-Y', strtotime($r->issueddate)) : '-',
                 'receivedby' => $r->receivedby ?? '-',
@@ -297,5 +295,27 @@ class ToolTrackerController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Track record deletion failed!']);
         }
+    }
+
+    /**
+     * Track status: 0 = Pending, 1 = Received, 2 = Returned (aligned with stc_vikings / sub-agent tools flow).
+     */
+    private function trackStatusLabel($status)
+    {
+        $s = (int) $status;
+        $map = [0 => 'Pending', 1 => 'Received', 2 => 'Returned'];
+        return isset($map[$s]) ? $map[$s] : (string) $status;
+    }
+
+    private function trackStatusBadgeClass($status)
+    {
+        $s = (int) $status;
+        $map = [0 => 'badge bg-secondary', 1 => 'badge bg-success', 2 => 'badge bg-warning text-dark'];
+        return isset($map[$s]) ? $map[$s] : 'badge bg-secondary';
+    }
+
+    private function trackStatusBadgeHtml($status)
+    {
+        return '<span class="'.$this->trackStatusBadgeClass($status).'">'.$this->trackStatusLabel($status).'</span>';
     }
 }

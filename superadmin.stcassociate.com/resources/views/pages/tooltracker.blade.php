@@ -237,7 +237,7 @@
                                 '<td>' + row.issuedby + '</td>' +
                                 '<td>' + (row.supervisor_name || '-') + '</td>' +
                                 '<td>' + (row.project_name || '-') + '</td>' +
-                                '<td class="text-center">' + row.status + '</td>' +
+                                '<td class="text-center">' + (row.status_badge || row.status) + '</td>' +
                                 '<td>' + row.location + '</td>' +
                                 '<td class="text-center">' + row.issueddate + '</td>' +
                                 '<td>' + row.receivedby + '</td>' +
@@ -306,7 +306,7 @@
                                     '<td>' + row.issuedby + '</td>' +
                                     '<td>' + (row.supervisor_name || '-') + '</td>' +
                                     '<td>' + (row.project_name || '-') + '</td>' +
-                                    '<td class="text-center">' + row.status + '</td>' +
+                                    '<td class="text-center">' + (row.status_badge || row.status) + '</td>' +
                                     '<td>' + row.location + '</td>' +
                                     '<td class="text-center">' + row.issueddate + '</td>' +
                                     '<td>' + row.receivedby + '</td>' +
@@ -795,8 +795,9 @@
               <div class="form-group">
                 <label for="edit-track-status">Status</label>
                 <select class="form-control" id="edit-track-status" name="edit-track-status">
-                  <option value="0">Issued</option>
-                  <option value="1">Accepted</option>
+                  <option value="0">Pending</option>
+                  <option value="1">Received</option>
+                  <option value="2">Returned</option>
                 </select>
               </div>
             </div>

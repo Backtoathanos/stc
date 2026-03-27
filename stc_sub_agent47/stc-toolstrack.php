@@ -65,6 +65,7 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                         <th class="text-center">MAKE</th>
                                                         <th class="text-center">TYPE</th>
                                                         <th class="text-center">REMARKS</th>
+                                                        <th class="text-center">STATUS</th>
                                                         <th class="text-center">ACTION</th>
                                                     </tr>
                                                 </thead>
@@ -146,13 +147,17 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                             slno++;
                             var recieve='';
                             var transfer='';
-                            if(response[i].status==0){
+                            var st = response[i].status_label || '';
+                            var trCls = (st === 'Returned') ? ' class="warning"' : '';
+                            var stCell = st || '-';
+                            if(response[i].status==2 || response[i].status=='2'){
+                                /* Returned — no receive/handover actions */
+                            } else if(response[i].status==0 || response[i].status=='0'){
                                 recieve='<a href="javascript:void(0)" class="btn btn-success itt-toolsrecieve" title="Click to recieve" id="' + response[i].tdt_id + '"><i class="fa fa-check"></i></a>';
-                            }
-                            if(response[i].status==1){
+                            } else if(response[i].status==1 || response[i].status=='1'){
                                 transfer='<a href="javascript:void(0)" class="btn btn-primary itt-toolstracking" title="Click to handover" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertracker-modal-lg"><i class="fa fa-plus"></i></a>';
                             }
-                            data+='<tr><td>' + slno + '</td><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].machinesrno + '</td><td>' + response[i].make + '</td><td>' + response[i].tooltype + '</td><td>' + response[i].remarks + '</td><td class="text-center">' + recieve + transfer + '<a href="javascript:void(0)" class="btn btn-secondary itt-toolstrackingshow" title="Click to show details" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertrackershow-modal-lg"><i class="fa fa-shipping-fast"></i></a></td></tr>';
+                            data+='<tr' + trCls + '><td>' + slno + '</td><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].machinesrno + '</td><td>' + response[i].make + '</td><td>' + response[i].tooltype + '</td><td>' + response[i].remarks + '</td><td class="text-center">' + stCell + '</td><td class="text-center">' + recieve + transfer + '<a href="javascript:void(0)" class="btn btn-secondary itt-toolstrackingshow" title="Click to show details" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-toolstrackertrackershow-modal-lg"><i class="fa fa-shipping-fast"></i></a></td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";
@@ -290,7 +295,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                         var slno=0;
                         for (var i = 0; i < response.length; i++) {
                             slno++;
-                            data+='<tr><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].issuedby + '</td><td>' + response[i].issueddate + '</td><td>' + response[i].receivedby + '</td><td>' + response[i].location + '</td><td>' + response[i].handoverto + '</td></tr>';
+                            var st = response[i].status_label || '';
+                            var trCls = (st === 'Returned') ? ' class="warning"' : '';
+                            data+='<tr' + trCls + '><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].issuedby + '</td><td>' + response[i].issueddate + '</td><td>' + response[i].receivedby + '</td><td>' + response[i].location + '</td><td>' + response[i].handoverto + '</td><td>' + (st || '-') + '</td><td>' + (response[i].name || '-') + '</td></tr>';
                         }
                     } else {
                         data="<td>No data found.</td>";
@@ -462,6 +469,8 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                   <th class="text-center">RECEIVED BY</th>
                                                   <th class="text-center">LOCATION</th>
                                                   <th class="text-center">HANDOVER TO</th>
+                                                  <th class="text-center">STATUS</th>
+                                                  <th class="text-center">CREATED BY</th>
                                                 </tr>
                                               </thead>
                                               <tbody class="itt-showtrackingdetails"></tbody>

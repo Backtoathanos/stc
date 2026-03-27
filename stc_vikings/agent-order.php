@@ -2600,7 +2600,9 @@ include("kattegat/role_check.php");
               var slno = 0;
               for (var i = 0; i < response.length; i++) {
                 slno++;
-                data += '<tr><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].issuedby + '</td><td>' + response[i].issueddate + '</td><td>' + response[i].receivedby + '</td><td>' + response[i].location + '</td><td>' + response[i].handoverto + '</td><td>' + response[i].name + '</td></tr>';
+                var st = response[i].status_label || '';
+                var trCls = (st === 'Returned') ? ' class="warning"' : '';
+                data += '<tr' + trCls + '><td>' + response[i].unique_id + '</td><td>' + response[i].itemdescription + '</td><td>' + response[i].issuedby + '</td><td>' + response[i].issueddate + '</td><td>' + response[i].receivedby + '</td><td>' + response[i].location + '</td><td>' + response[i].handoverto + '</td><td>' + (st || '-') + '</td><td>' + response[i].name + '</td></tr>';
               }
             } else {
               data = "<td>No data found.</td>";
@@ -3077,20 +3079,23 @@ $(document).ready(function () {
      
      if (data && data.length > 0) {
        data.forEach(function(item, index) {
-         var row = '<tr>' +
+         var st = item.status_label || '';
+         var trCls = (st === 'Returned') ? ' class="warning"' : '';
+         var row = '<tr' + trCls + '>' +
            '<td class="text-center">' + (index + 1) + '</td>' +
            '<td class="text-center">GTT/' + (item.unique_id || 'N/A') + '</td>' +
            '<td class="text-center">' + (item.itemdescription || 'N/A') + '</td>' +
            '<td class="text-center">' + (item.machinesrno || 'N/A') + '</td>' +
            '<td class="text-center">' + (item.make || 'N/A') + '</td>' +
            '<td class="text-center">' + (item.tooltype || 'N/A') + '</td>' +
+           '<td class="text-center">' + (st || '-') + '</td>' +
            '<td class="text-center">' + (item.receivedby || 'N/A') + '</td>' +
            '<td class="text-center">' + formatDate(item.issueddate) + '</td>' +
            '</tr>';
          tbody.append(row);
        });
      } else {
-       tbody.append('<tr><td colspan="10" class="text-center text-muted">No data available</td></tr>');
+       tbody.append('<tr><td colspan="9" class="text-center text-muted">No data available</td></tr>');
      }
    }
    
@@ -3117,11 +3122,11 @@ $(document).ready(function () {
           $('.project-name-title').html(response.project_name);
            bindToolsDetailsTable(response.data);
          } else {
-           $('#tools-details-tbody').html('<tr><td colspan="10" class="text-center text-muted">No data available</td></tr>');
+           $('#tools-details-tbody').html('<tr><td colspan="9" class="text-center text-muted">No data available</td></tr>');
          }
        },
        error: function() {
-         $('#tools-details-tbody').html('<tr><td colspan="10" class="text-center text-danger">Error loading data</td></tr>');
+         $('#tools-details-tbody').html('<tr><td colspan="9" class="text-center text-danger">Error loading data</td></tr>');
        }
      });
    });
@@ -3870,6 +3875,7 @@ $(document).ready(function () {
                             <th class="text-center">RECEIVED BY</th>
                             <th class="text-center">LOCATION</th>
                             <th class="text-center">HANDOVER TO</th>
+                            <th class="text-center">STATUS</th>
                             <th class="text-center">CREATED BY</th>
                           </tr>
                         </thead>
@@ -3953,6 +3959,7 @@ $(document).ready(function () {
                       <th class="text-center">Machine SL No</th>
                       <th class="text-center">Make</th>
                       <th class="text-center">Type</th>
+                      <th class="text-center">Status</th>
                       <th class="text-center">Received Person</th>
                       <th class="text-center">Dispatch Date</th>
                     </tr>
@@ -3960,7 +3967,7 @@ $(document).ready(function () {
                   <tbody id="tools-details-tbody">
                     <!-- Data will be populated here -->
                     <tr>
-                      <td colspan="10" class="text-center text-muted">No data available</td>
+                      <td colspan="9" class="text-center text-muted">No data available</td>
                     </tr>
                   </tbody>
                 </table>

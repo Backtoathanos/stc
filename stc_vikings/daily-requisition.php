@@ -299,11 +299,12 @@ include("kattegat/role_check.php");
                   <th class="text-center">Adhoc Balance</th>
                   <th class="text-center">Rack</th>
                   <th class="text-center">Adjust Quantity</th>
+                  <th class="text-center">Tools track <span class="text-muted" style="font-weight:normal;font-size:11px;">(PPO)</span></th>
                   <th class="text-center">Action</th>
                 </tr>
               </thead>
               <tbody class="stc-daily-req-balance-body">
-                <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                <tr><td colspan="8" class="text-center">Loading...</td></tr>
               </tbody>
             </table>
           </div>
@@ -750,7 +751,7 @@ include("kattegat/role_check.php");
         $('.dr-add-itemcode-form').hide();
         $('.dr-balance-main-wrap').show();
         $('#dr-balance-req-summary').hide();
-        $('.stc-daily-req-balance-body').html('<tr><td colspan="7" class="text-center">Loading...</td></tr>');
+        $('.stc-daily-req-balance-body').html('<tr><td colspan="8" class="text-center">Loading...</td></tr>');
         $.ajax({
           url: 'kattegat/ragnar_order.php',
           method: 'POST',
@@ -766,6 +767,21 @@ include("kattegat/role_check.php");
               $('#dr-balance-req-name').text(r.item_desc || '-');
               $('#dr-balance-req-qty').text(r.req_qty != null ? r.req_qty : '-');
               $('#dr-balance-req-unit').text(r.unit || '-');
+              var ttHint = $('#dr-balance-tools-tackles-hint');
+              if (String(r.item_type || '') === 'Tools & Tackles') {
+                if (!ttHint.length) {
+                  $('#dr-balance-req-summary .row').last().after(
+                    '<div class="col-sm-12" id="dr-balance-tools-tackles-hint" style="margin-top:8px;">' +
+                    '<span class="label label-default">Tools &amp; Tackles</span> ' +
+                    '<span class="text-muted">After dispatch, pick the PPO tool below and click <strong>Copy</strong> to record it in Tools Track with this requisition.</span>' +
+                    '</div>'
+                  );
+                } else {
+                  ttHint.show();
+                }
+              } else if (ttHint.length) {
+                ttHint.hide();
+              }
               $('#dr-balance-req-summary').show();
             } else {
               $('#dr-balance-req-summary').hide();
@@ -809,6 +825,21 @@ include("kattegat/role_check.php");
                     '<button type="button" class="btn btn-warning btn-xs dr-update-pending-inline" data-item-id="' + escapeHtml(itemId) + '"><i class="fa fa-clock-o"></i> Update Pending</button>' +
                     '</div>';
                 }
+                var toolsCell = '<span class="text-muted">—</span>';
+                if (String(row.item_type || '') === 'Tools & Tackles') {
+                  if (row.tools_track_options && row.tools_track_options.length > 0) {
+                    var opts = '<option value="">— PPO / unique id —</option>';
+                    row.tools_track_options.forEach(function (o) {
+                      opts += '<option value="' + escapeHtml(o.toolsdetails_id) + '">' + escapeHtml(o.label) + '</option>';
+                    });
+                    toolsCell =
+                      '<select class="form-control input-sm dr-tools-track-select" style="max-width:240px;display:inline-block;vertical-align:middle;">' + opts + '</select> ' +
+                      '<button type="button" class="btn btn-primary btn-xs dr-copy-tool-track-btn" data-item-id="' + escapeHtml(itemId) + '" data-product-id="' + escapeHtml(row.product_id) + '" title="Copy to stc_tooldetails_track">' +
+                      '<i class="fa fa-copy"></i> Copy</button>';
+                  } else {
+                    toolsCell = '<span class="text-warning" title="Add tool on purchase (PPO) first"><i class="fa fa-exclamation-triangle"></i> No tool rows</span>';
+                  }
+                }
                 html += '<tr class="dr-balance-row" data-product-id="' + escapeHtml(row.product_id) + '" data-balance="' + escapeHtml(row.balance_qty) + '" data-unit="' + escapeHtml(row.product_unit) + '">' +
                   '<td class="text-center"><b>' + escapeHtml(row.product_id) + '</b></td>' +
                   '<td>' + escapeHtml(row.product_name) + '<span style="display:' + HideSHow + ';font-size: 12px; color: Red;">* Units not matching please change product or update unit of requisition</span></td>' +
@@ -816,12 +847,13 @@ include("kattegat/role_check.php");
                   '<td class="text-right dr-balance-cell"><b>' + escapeHtml(row.balance_qty) + '/' + escapeHtml(row.product_unit) + '</b>' + pendingBtn + '</td>' +
                   '<td>' + escapeHtml(row.racks || '-') + '</td>' +
                   '<td><input type="number" class="form-control input-sm dr-rack-input" value="' + escapeHtml(row.req_balance_qty) + '"></td>' +
+                  '<td class="text-center" style="white-space:normal;">' + toolsCell + '</td>' +
                   '<td class="text-center"><div class="dr-action-btns" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;">' + btn + changeBtn + '</div></td>' +
                   '</tr>';
               });
             } else {
               html =
-                '<tr><td colspan="7" class="text-center py-4">' +
+                '<tr><td colspan="8" class="text-center py-4">' +
                 '<div class="text-muted mb-3"><i class="fa fa-info-circle"></i> No connected product found.</div>' +
                 '<div class="dr-action-btns" style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:10px;">' +
                 '<button type="button" class="btn btn-primary btn-sm dr-show-itemcode-form" data-item-id="' + escapeHtml(itemId) + '"><i class="fa fa-plus"></i> Add Item Code</button>' +
@@ -834,7 +866,7 @@ include("kattegat/role_check.php");
           },
           error: function () {
             $('#dr-balance-req-summary').hide();
-            $('.stc-daily-req-balance-body').html('<tr><td colspan="7" class="text-center">Error loading balance.</td></tr>');
+            $('.stc-daily-req-balance-body').html('<tr><td colspan="8" class="text-center">Error loading balance.</td></tr>');
           }
         });
       }
@@ -1350,6 +1382,46 @@ include("kattegat/role_check.php");
           }
         });
         }
+      });
+
+      $('body').delegate('.dr-copy-tool-track-btn', 'click', function () {
+        var $btn = $(this);
+        var itemId = parseInt($btn.data('item-id'), 10) || 0;
+        var productId = parseInt($btn.data('product-id'), 10) || 0;
+        var $tr = $btn.closest('tr');
+        var toolsdetailsId = parseInt(String($tr.find('.dr-tools-track-select').val() || '0'), 10) || 0;
+        if (toolsdetailsId <= 0) {
+          showSwal('warning', 'Select tool', 'Choose a PPO line / tool from the dropdown first.');
+          return;
+        }
+        $btn.prop('disabled', true);
+        $.ajax({
+          url: 'kattegat/ragnar_order.php',
+          method: 'POST',
+          data: {
+            stc_dr_copy_tool_track: 1,
+            item_id: itemId,
+            product_id: productId,
+            toolsdetails_id: toolsdetailsId
+          },
+          dataType: 'json',
+          success: function (response) {
+            if (response && response.reload) {
+              window.location.reload();
+              return;
+            }
+            if (response && response.success) {
+              showSwal('success', 'Tools Track', response.message || 'Saved.');
+            } else {
+              showSwal('error', 'Failed', (response && response.message) ? response.message : 'Could not copy to Tools Track.');
+            }
+            $btn.prop('disabled', false);
+          },
+          error: function () {
+            showSwal('error', 'Failed', 'Could not copy to Tools Track.');
+            $btn.prop('disabled', false);
+          }
+        });
       });
 
       // Prefill dates to last 7 days (matches backend default)

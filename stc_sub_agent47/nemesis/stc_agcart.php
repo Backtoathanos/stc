@@ -725,6 +725,102 @@ class witcher_supervisor extends tesseract{
 		return $transformers;
 	}
 
+	/** After receive: mark Tools Track row(s) for this requisition — `status` = 1. */
+	private function stc_tooldetails_track_on_supervisor_receive($req_list_id, $req_item_id){
+		$req_list_id = (int)$req_list_id;
+		$req_item_id = (int)$req_item_id;
+		if($req_list_id <= 0 || $req_item_id <= 0){
+			return;
+		}
+		$esc_list = mysqli_real_escape_string($this->stc_dbs, (string)$req_list_id);
+		$esc_item = mysqli_real_escape_string($this->stc_dbs, (string)$req_item_id);
+		mysqli_query($this->stc_dbs, "
+			UPDATE `stc_tooldetails_track`
+			SET `status` = '1'
+			WHERE `req_requisition_list_id` = '".$esc_list."'
+			  AND `req_requisition_item_id` = '".$esc_item."'
+		");
+	}
+
+	/**
+	 * Tools & Tackles return: insert new `stc_tooldetails_track` row with `status` = 2 (returned).
+	 * Latest row for this requisition must not already be a return (status 2).
+	 */
+	private function stc_tooldetails_track_on_requisition_return($req_item_id){
+		$req_item_id = (int)$req_item_id;
+		if($req_item_id <= 0){
+			return;
+		}
+		$e_item = mysqli_real_escape_string($this->stc_dbs, (string)$req_item_id);
+		$ity = mysqli_query($this->stc_dbs, "
+			SELECT `stc_cust_super_requisition_list_items_req_id` AS list_id,
+				`stc_cust_super_requisition_items_type` AS item_type
+			FROM `stc_cust_super_requisition_list_items`
+			WHERE `stc_cust_super_requisition_list_id` = '".$e_item."'
+			LIMIT 1
+		");
+		if(!$ity || mysqli_num_rows($ity) === 0){
+			return;
+		}
+		$ir = mysqli_fetch_assoc($ity);
+		if((string)($ir['item_type'] ?? '') !== 'Tools & Tackles'){
+			return;
+		}
+		$list_id = (int)($ir['list_id'] ?? 0);
+		if($list_id <= 0){
+			return;
+		}
+		$e_list = mysqli_real_escape_string($this->stc_dbs, (string)$list_id);
+		$bq = mysqli_query($this->stc_dbs, "
+			SELECT * FROM `stc_tooldetails_track`
+			WHERE `req_requisition_list_id` = '".$e_list."'
+			  AND `req_requisition_item_id` = '".$e_item."'
+			ORDER BY `id` DESC
+			LIMIT 1
+		");
+		if(!$bq || mysqli_num_rows($bq) === 0){
+			return;
+		}
+		$b = mysqli_fetch_assoc($bq);
+		if((string)($b['status'] ?? '') === '2'){
+			return;
+		}
+		$now = date('Y-m-d H:i:s');
+		$sub = mysqli_real_escape_string($this->stc_dbs, (string)($_SESSION['stc_agent_sub_id'] ?? ''));
+		$snm = mysqli_real_escape_string($this->stc_dbs, (string)($_SESSION['stc_agent_sub_name'] ?? ''));
+		$tools = mysqli_real_escape_string($this->stc_dbs, (string)($b['toolsdetails_id'] ?? ''));
+		$iss = mysqli_real_escape_string($this->stc_dbs, (string)($b['issuedby'] ?? ''));
+		$pid = mysqli_real_escape_string($this->stc_dbs, (string)($b['project_id'] ?? '0'));
+		$uid = mysqli_real_escape_string($this->stc_dbs, (string)($b['user_id'] ?? '0'));
+		$loc = mysqli_real_escape_string($this->stc_dbs, (string)($b['location'] ?? ''));
+		$rb = mysqli_real_escape_string($this->stc_dbs, (string)($b['receivedby'] ?? ''));
+		$poa = (isset($b['req_poa_adhoc_id']) && $b['req_poa_adhoc_id'] !== '' && $b['req_poa_adhoc_id'] !== null)
+			? "'".mysqli_real_escape_string($this->stc_dbs, (string)$b['req_poa_adhoc_id'])."'" : 'NULL';
+		mysqli_query($this->stc_dbs, "
+			INSERT INTO `stc_tooldetails_track`(
+				`toolsdetails_id`, `issuedby`, `project_id`, `user_id`, `status`, `location`,
+				`issueddate`, `receivedby`, `handoverto`, `created_date`, `created_by`, `id_type`,
+				`req_requisition_list_id`, `req_requisition_item_id`, `req_poa_adhoc_id`
+			) VALUES (
+				'".$tools."',
+				'".$iss."',
+				'".$pid."',
+				'".$uid."',
+				'2',
+				'".$loc."',
+				'".mysqli_real_escape_string($this->stc_dbs, $now)."',
+				'".$rb."',
+				'Returned (requisition)',
+				'".mysqli_real_escape_string($this->stc_dbs, $now)."',
+				'".$sub."',
+				'subagent',
+				'".$e_list."',
+				'".$e_item."',
+				".$poa."
+			)
+		");
+	}
+
 	public function stc_supervisor_list_rec_items_hit($stc_req_id, $stc_req_item_id, $stc_rec_qty, $stc_req_item_cqty){
 		$returnrecieve='';
 		$stcinitvalue=0;
@@ -799,6 +895,7 @@ class witcher_supervisor extends tesseract{
 							'".$_SESSION['stc_agent_sub_id']."'
 						)
 					");
+					$this->stc_tooldetails_track_on_supervisor_receive($stc_req_id, $stc_req_item_id);
 					$returnrecieve="yes";
 				}else{
 					$stcinsertqry="Hmmm!!! Something went wrong. Please check quantity & try again.";
@@ -952,6 +1049,7 @@ class witcher_supervisor extends tesseract{
 					'".$_SESSION['stc_agent_sub_id']."'
 				)
 			");
+			$this->stc_tooldetails_track_on_requisition_return($req_id);
 			$odin='success';
 		}
 		return $odin;
