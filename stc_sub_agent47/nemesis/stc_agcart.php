@@ -203,7 +203,7 @@ class witcher_supervisor extends tesseract{
 			// Sanitize for REGEXP context — escape regex special chars
 			$desc = mysqli_real_escape_string(
 				$this->stc_dbs, 
-				preg_quote($desc, '/')
+				preg_quote($desc, '')
 			);
 			$qry=mysqli_query($this->stc_dbs, "
 				SELECT A.stc_cust_super_requisition_list_items_product_id, C.stc_purchase_product_adhoc_productid 
