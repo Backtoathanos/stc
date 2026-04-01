@@ -275,7 +275,7 @@ include_once("../MCU/db.php");
                                                                                             <td>'.$requisrow['stc_cust_project_title'].'</td>
                                                                                             <td>'.$requisrow['stc_cust_pro_supervisor_fullname'].'
                                                                                             </td>
-                                                                                            <td>'.$requisrow['stc_cust_super_requisition_list_items_title'].'</td>
+                                                                                            <td><a href="#" class="stc-req-item-name-open-edit" data-item-id="'.htmlspecialchars($requisrow['item_list_id'], ENT_QUOTES, 'UTF-8').'" data-item-name="'.htmlspecialchars($requisrow['stc_cust_super_requisition_list_items_title'], ENT_QUOTES, 'UTF-8').'" data-item-priority="'.(int)$requisrow['stc_cust_super_requisition_items_priority'].'">'.htmlspecialchars($requisrow['stc_cust_super_requisition_list_items_title'], ENT_QUOTES, 'UTF-8').'</a></td>
                                                                                             <td class="text-center">'.$requisrow['stc_cust_super_requisition_list_items_unit'].'</td>
                                                                                             <td class="text-right">
                                                                                                 '.number_format($requisrow['stc_cust_super_requisition_list_items_reqqty'], 2).'
@@ -603,8 +603,25 @@ include_once("../MCU/db.php");
                         // console.log(response_items);
                         $(".stc-super-own-name-text").val(response_items);
                         $('.stc-super-own-req-id-hidd').val(req_id);
+                        $('#stc-sup-requisition-item-edit-modal').modal('show');
                     }
                 });
+            });
+
+            // open edit modal from item name (order-management table)
+            $('body').delegate('.stc-req-item-name-open-edit', 'click', function(e){
+                e.preventDefault();
+                var $a = $(this);
+                var itemId = $a.attr('data-item-id');
+                var itemName = $a.attr('data-item-name');
+                var priority = $a.attr('data-item-priority');
+                if (priority === undefined || priority === '') {
+                    priority = 1;
+                }
+                $('.stc-super-own-name-text').val(itemName);
+                $('.stc-super-own-req-id-hidd').val(itemId);
+                $('.stc-sup-priority').val(String(priority));
+                $('#stc-sup-requisition-item-edit-modal').modal('show');
             });
 
             var req_id=0;
@@ -690,12 +707,13 @@ include_once("../MCU/db.php");
                 <div class="col-sm-12 col-md-6 col-lg-6">
                    <input type="text" class="form-control stc-super-own-name-text">
                 </div>
-                <div class="col-sm-12 col-md-6 col-lg-6">
+                <div class="col-sm-12 col-md-6 col-lg-6" style="display:none;">
                     <h4>Item Priority :</h4>
                 </div>
-                <div class="col-sm-12 col-md-6 col-lg-6">
+                <div class="col-sm-12 col-md-6 col-lg-6" style="display:none;">
                 <select class="form-control stc-sup-priority">
                     <option value="1">Normal</option>
+                    <option value="2">Urgent</option>
                 </select>
                 </div>
                 <div class="col-sm-12 col-md-6 col-lg-6">
