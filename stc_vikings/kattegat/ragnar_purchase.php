@@ -2415,7 +2415,25 @@ class ragnarPurchaseAdhoc extends tesseract{
 					$updatestatus='';
 					$cherrypick='';
 				}
-				$addtoollist='<a href="javascript:void(0)" class="btn btn-success itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" title="Add to Toollist"><i class="fa fa-tools"></i></a>';
+				$adhoc_qty_attr = htmlspecialchars((string) $odinrow['stc_purchase_product_adhoc_qty'], ENT_QUOTES, 'UTF-8');
+				$tool_cnt_q = mysqli_query($this->stc_dbs, "
+					SELECT COUNT(*) AS c FROM `stc_tooldetails` WHERE `poa_id`='".mysqli_real_escape_string($this->stc_dbs, (string)$odinrow['stc_purchase_product_adhoc_id'])."'
+				");
+				$tool_cnt = 0;
+				if($tool_cnt_q && mysqli_num_rows($tool_cnt_q) > 0){
+					$tc_row = mysqli_fetch_assoc($tool_cnt_q);
+					$tool_cnt = (int)($tc_row['c'] ?? 0);
+				}
+				$adhoc_qty_floor = (int)floor((float)$odinrow['stc_purchase_product_adhoc_qty']);
+				$remaining_tools = max(0, $adhoc_qty_floor - $tool_cnt);
+				$product_name_attr = htmlspecialchars($product_name, ENT_QUOTES, 'UTF-8');
+				$source_attr = htmlspecialchars((string)$odinrow['stc_purchase_product_adhoc_source'], ENT_QUOTES, 'UTF-8');
+				if($remaining_tools <= 0){
+					$addtoollist='<span class="text-muted" style="cursor:help;" title="Tool Tracker already has '.$tool_cnt.' record(s); matches ad-hoc quantity ('.$adhoc_qty_floor.')."><i class="fa fa-tools"></i></span>';
+				}else{
+					$rem_attr = (string)$remaining_tools;
+					$addtoollist='<a href="javascript:void(0)" class="btn btn-success itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-adhoc-qty="'.$adhoc_qty_attr.'" data-remaining="'.$rem_attr.'" data-product-name="'.$product_name_attr.'" data-purchase-source="'.$source_attr.'" title="Add to Toollist (up to '.$remaining_tools.' more)"><i class="fa fa-tools"></i></a>';
+				}
 				$checkbox = '';
 				if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==6){
 					$checkbox="<div class='card-border mb-3 card-body border-success'><input type='checkbox' class='material-icons form-control common_selector' style='width:50px;' value='".$odinrow['stc_purchase_product_adhoc_id']."'></div>";
@@ -3241,24 +3259,78 @@ class ragnarPurchaseAdhoc extends tesseract{
 		return ['html' => $html, 'query' => $query, 'pagination' => $pagination];
 	}
 
-	// save tool track
-	public function stc_tool_tracker_save($repid, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks){
-		$date=date("Y-m-d H:i:s");
-	
-		// Check for duplicate unique ID
-		$duplicate_check_qry = mysqli_query($this->stc_dbs, "
-			SELECT `unique_id` FROM `stc_tooldetails` WHERE `unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $unique)."'
+	/** Tool rows for this ad-hoc line vs quantity (floor). */
+	public function get_tool_tracker_remaining_for_poa($poa_id){
+		$poa_id = mysqli_real_escape_string($this->stc_dbs, (string)$poa_id);
+		$adhoc_qty = 0;
+		$q1 = mysqli_query($this->stc_dbs, "
+			SELECT `stc_purchase_product_adhoc_qty` FROM `stc_purchase_product_adhoc`
+			WHERE `stc_purchase_product_adhoc_id` = '".$poa_id."'
+			LIMIT 1
 		");
-		// // Check for duplicate unique ID
-		// $duplicate_check_qry2 = mysqli_query($this->stc_dbs, "
-		// 	SELECT `unique_id` FROM `stc_tooldetails` WHERE `poa_id` = '".mysqli_real_escape_string($this->stc_dbs, $repid)."'
-		// ");
-		// If a duplicate is found, set $blackpearl to "duplicate"
-		if(mysqli_num_rows($duplicate_check_qry) > 0) {
-			$blackpearl = "duplicate";
-		// } else if(mysqli_num_rows($duplicate_check_qry2) > 0){
-		// 	$blackpearl = "duplicate";
-		} else {
+		if($q1 && mysqli_num_rows($q1) > 0){
+			$r = mysqli_fetch_assoc($q1);
+			$adhoc_qty = (int)floor((float)($r['stc_purchase_product_adhoc_qty'] ?? 0));
+		}
+		$existing = 0;
+		$q2 = mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) AS c FROM `stc_tooldetails` WHERE `poa_id` = '".$poa_id."'
+		");
+		if($q2 && mysqli_num_rows($q2) > 0){
+			$r2 = mysqli_fetch_assoc($q2);
+			$existing = (int)($r2['c'] ?? 0);
+		}
+		$remaining = max(0, $adhoc_qty - $existing);
+		return ['adhoc_qty' => $adhoc_qty, 'existing' => $existing, 'remaining' => $remaining];
+	}
+
+	/** Next numeric GTT id: max(GTT/n) + 1, or 1 if none */
+	public function get_next_gtt_start_number(){
+		$qry = mysqli_query($this->stc_dbs, "
+			SELECT MAX(CAST(SUBSTRING_INDEX(`unique_id`, '/', -1) AS UNSIGNED)) AS mx
+			FROM `stc_tooldetails`
+			WHERE `unique_id` REGEXP '^GTT/[0-9]+$'
+		");
+		$mx = 0;
+		if($qry && mysqli_num_rows($qry) > 0){
+			$row = mysqli_fetch_assoc($qry);
+			$mx = (int)($row['mx'] ?? 0);
+		}
+		return $mx + 1;
+	}
+
+	// save tool track — unique GTT numbers auto-assigned; qty = ad-hoc units (one row per unit)
+	public function stc_tool_tracker_save($repid, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks, $qty = 1){
+		$date = date("Y-m-d H:i:s");
+		$qty = (int)$qty;
+		if($qty < 1){
+			$qty = 1;
+		}
+		if($qty > 500){
+			$qty = 500;
+		}
+
+		$cap = $this->get_tool_tracker_remaining_for_poa($repid);
+		if($cap['remaining'] <= 0){
+			return "complete";
+		}
+		if($qty > $cap['remaining']){
+			$qty = $cap['remaining'];
+		}
+
+		$start_num = $this->get_next_gtt_start_number();
+		$ok_count = 0;
+
+		for($i = 0; $i < $qty; $i++){
+			$gtt_unique = 'GTT/' . ($start_num + $i);
+
+			$duplicate_check_qry = mysqli_query($this->stc_dbs, "
+				SELECT `unique_id` FROM `stc_tooldetails` WHERE `unique_id` = '".mysqli_real_escape_string($this->stc_dbs, $gtt_unique)."'
+			");
+			if(mysqli_num_rows($duplicate_check_qry) > 0){
+				return "duplicate";
+			}
+
 			$query="
 				INSERT INTO `stc_tooldetails`(
 					`poa_id`,
@@ -3276,7 +3348,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 					`created_date`
 				)VALUES(
 					'".mysqli_real_escape_string($this->stc_dbs, $repid)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $unique)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $gtt_unique)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $itemdescription)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $machineslno)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $make)."',
@@ -3291,17 +3363,14 @@ class ragnarPurchaseAdhoc extends tesseract{
 				)
 			";
 			$blackpearl_qry = mysqli_query($this->stc_dbs, $query);
-	
-			// If the INSERT query is successful, set $blackpearl to "yes"
-			if($blackpearl_qry) {
-				$blackpearl = "yes";
+			if($blackpearl_qry){
+				$ok_count++;
 			} else {
-				// If the INSERT query fails, set $blackpearl to "no"
-				$blackpearl = "no";
+				return "no";
 			}
 		}
-	
-		return $blackpearl;
+
+		return ($ok_count === $qty) ? "yes" : "no";
 	}
 
 	public function stc_reset_items(){
@@ -4323,7 +4392,7 @@ if(isset($_POST['stc_getinventory'])){
 // save procurment tracker payment
 if(isset($_POST['save_tool_tracker'])){
 	$repid=$_POST['repid'];
-	$unique=$_POST['unique'];
+	$unique=isset($_POST['unique']) ? $_POST['unique'] : '';
 	$itemdescription=$_POST['itemdescription'];
 	$machineslno=$_POST['machineslno'];
 	$make=$_POST['make'];
@@ -4333,12 +4402,13 @@ if(isset($_POST['save_tool_tracker'])){
 	$tinnumber=$_POST['tinnumber'];
 	$tindate=$_POST['tindate'];
 	$remarks=$_POST['remarks'];
+	$qty = isset($_POST['qty']) ? (int)$_POST['qty'] : 1;
 	$out='';
 	if(empty($_SESSION['stc_empl_id'])){
 		$out='reload';
 	}else{
 		$odin_req=new ragnarPurchaseAdhoc();
-		$out=$odin_req->stc_tool_tracker_save($repid, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks);
+		$out=$odin_req->stc_tool_tracker_save($repid, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks, $qty);
 	}
 	echo $out;
 }

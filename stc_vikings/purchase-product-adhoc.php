@@ -1984,16 +1984,26 @@ include("kattegat/role_check.php");
           });
 
           var repid=0;
+          var ittAdhocQty = 1;
           $(document).on('click', '.itt-create', function () {
-            repid=$(this).attr('id');            
+            repid = $(this).attr('id');
+            var rem = parseInt($(this).attr('data-remaining'), 10);
+            if (isNaN(rem) || rem < 1) {
+              var q = parseFloat($(this).attr('data-adhoc-qty'));
+              rem = (isNaN(q) || q < 1) ? 1 : Math.floor(q);
+            }
+            ittAdhocQty = rem;
+            if (ittAdhocQty > 500) { ittAdhocQty = 500; }
+            $('.itt-qty-badge').text(ittAdhocQty);
+            var pname = $(this).attr('data-product-name') || '';
+            var psrc = $(this).attr('data-purchase-source') || '';
+            $('.itt-itemdescription').val(pname);
+            $('.itt-purdetails').val(psrc);
           });
-
-          
 
           // save dispatch
           $('body').delegate('.itt-save', 'click', function (e) {
             e.preventDefault();
-            var unique = $('.itt-unique-id').val();
             var itemdescription = $('.itt-itemdescription').val();
             var machineslno = $('.itt-machinesrno').val();
             var make = $('.itt-make').val();
@@ -2003,10 +2013,10 @@ include("kattegat/role_check.php");
             var tinnumber = $('.itt-tinnumber').val();
             var tindate = $('.itt-tindate').val();
             var remarks = $('.itt-remarks').val();
-            if (unique != '' && itemdescription != '') {
+            if (itemdescription != '') {
               var data = {
                 save_tool_tracker: 1,
-                unique: unique,
+                unique: '',
                 itemdescription: itemdescription,
                 machineslno: machineslno,
                 make: make,
@@ -2016,7 +2026,8 @@ include("kattegat/role_check.php");
                 tinnumber: tinnumber,
                 tindate: tindate,
                 remarks: remarks,
-                repid: repid
+                repid: repid,
+                qty: ittAdhocQty
               };
               $.ajax({
                 url       : "kattegat/ragnar_purchase.php",
@@ -2025,16 +2036,22 @@ include("kattegat/role_check.php");
                 success: function (response) {
                   var obj_response = response.trim();
                   if (obj_response == "yes") {
-                    alert("Record updated successfully!!!");
+                    var msg = (ittAdhocQty > 1)
+                      ? ittAdhocQty + " tool records saved with consecutive GTT numbers (same details). You can edit Machine SR No. per row in Tool Tracker if needed."
+                      : "Record saved successfully. GTT number assigned automatically. You can edit Machine SR No. in Tool Tracker if needed.";
+                    alert(msg);
                     Pagination.loadData(pagenumber);
                   } else if (obj_response == "duplicate") {
-                    alert("This tool is already in records.");
+                    alert("A GTT number collision occurred. Please try again.");
                   } else if (obj_response == "reload") {
                     window.location.reload();
                   } else if (obj_response == "empty") {
                     alert("Please fill complete details.");
                   } else if (obj_response == "no") {
                     alert("Something went wrong. Record not updated");
+                  } else if (obj_response == "complete") {
+                    alert("Tool Tracker already has the maximum rows for this ad-hoc quantity. Refresh the list.");
+                    Pagination.loadData(pagenumber);
                   }
                 }
               });
@@ -3234,14 +3251,16 @@ include("kattegat/role_check.php");
               <div class="card-body">
                 <div class="row formcontrol">
                   <div class="col-md-4">
-                    <h5>Unique Id</h5><br>
+                    <h5>Unique Id (GTT)</h5><br>
                     <div class="card mb-3 widget-content">
-                      <input type="text" class="form-control itt-unique-id" placeholder="Enter unique id" value="GTT/"
-                        required>
+                      <p class="small text-muted mb-1">Assigned automatically: next free GTT number(s). One Tools Track row per ad-hoc quantity unit.</p>
+                      <p class="mb-0"><span class="badge badge-info">Rows to create: <span class="itt-qty-badge">1</span></span></p>
+                      <input type="hidden" class="itt-unique-id" value="">
                     </div>
                   </div>
                   <div class="col-md-8">
-                    <h5>Item Description</h5><br>
+                    <h5>Item Description</h5>
+                    <p class="small text-muted mb-1">Filled from Product Name column (you can edit).</p>
                     <div class="card mb-3 widget-content">
                       <textarea class="form-control itt-itemdescription"
                         placeholder="Enter Item Description"></textarea>
@@ -3273,7 +3292,8 @@ include("kattegat/role_check.php");
                     </div>
                   </div>
                   <div class="col-md-6">
-                    <h5>Purchase Details</h5><br>
+                    <h5>Purchase Details</h5>
+                    <p class="small text-muted mb-1">Filled from From Source (Supplier / Location) column (you can edit).</p>
                     <div class="card mb-3 widget-content">
                       <input type="text" class="form-control itt-purdetails" placeholder="Enter Purchase Details"
                         required>
