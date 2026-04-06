@@ -27,6 +27,119 @@ if(isset($_SESSION["stc_agent_sub_id"])){
         .fade:not(.show) {
             opacity: 10;
         }
+        .equipment-pagination-wrap {
+            margin-top: 1.25rem;
+            padding: 0 4px;
+        }
+        .eq-pager {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 14px 20px;
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 12px 16px;
+            background: linear-gradient(180deg, #fbfcfb 0%, #f3f7f4 100%);
+            border: 1px solid rgba(40, 167, 69, 0.28);
+            border-radius: 12px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(40, 167, 69, 0.06);
+        }
+        .eq-pager-meta {
+            font-size: 13px;
+            color: #4a5f52;
+            letter-spacing: 0.01em;
+        }
+        .eq-pager-meta strong {
+            color: #1e3d2f;
+            font-weight: 600;
+        }
+        .eq-pager-controls-inner {
+            display: inline-flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+        .eq-pager-nums {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0 4px;
+        }
+        .eq-pager-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            min-height: 36px;
+            padding: 0 14px;
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.2;
+            color: #2d4a3e;
+            background: #fff;
+            border: 1px solid #c5d9cc;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .eq-pager-btn:hover:not(:disabled) {
+            background: #e8f5ec;
+            border-color: #28a745;
+            color: #155d2e;
+            box-shadow: 0 1px 3px rgba(40, 167, 69, 0.15);
+        }
+        .eq-pager-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.25);
+        }
+        .eq-pager-btn:disabled {
+            opacity: 0.42;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .eq-pager-btn.eq-page-num {
+            min-width: 40px;
+            padding-left: 10px;
+            padding-right: 10px;
+            font-variant-numeric: tabular-nums;
+        }
+        .eq-pager-btn.eq-page-num.active {
+            background: #28a745;
+            border-color: #218838;
+            color: #fff;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .eq-pager-btn.eq-page-num.active:hover {
+            background: #218838;
+            border-color: #1c7430;
+            color: #fff;
+        }
+        .eq-pager-nav .fa {
+            font-size: 12px;
+            opacity: 0.85;
+        }
+        @media (max-width: 520px) {
+            .eq-pager {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+        .eq-filter-status-wrap {
+            margin-bottom: 0;
+        }
+        .eq-filter-status-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #4a5f52;
+            margin-bottom: 4px;
+            letter-spacing: 0.02em;
+        }
+        .eq-filter-status-wrap .form-control {
+            height: 34px;
+        }
     </style>
 </head>
 
@@ -65,9 +178,17 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     }
                                                 ?>
                                             </div>
-                                            <div class="col-md-8">
+                                            <div class="col-md-6">
                                                 <input type="text" id="itt-toolssearchInput" class="form-control"
-                                                    placeholder="Type to search...">
+                                                    placeholder="Type to search (min. 4 characters)...">
+                                            </div>
+                                            <div class="col-md-4 eq-filter-status-wrap">
+                                                <!-- <label class="eq-filter-status-label" for="itt-eq-status-filter">Status</label> -->
+                                                <select id="itt-eq-status-filter" class="form-control" title="Filter by Running or Stand By (combined with search)">
+                                                    <option value="all">All Status</option>
+                                                    <option value="running">Running</option>
+                                                    <option value="standby">Stand By</option>
+                                                </select>
                                             </div>
                                             <div class="col-md-12">
                                                 <table class="table table-stripped table-bordered table-hover">
@@ -87,6 +208,9 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                     </thead>
                                                     <tbody class="equipement-details-show"></tbody>
                                                 </table>
+                                                <div class="equipment-pagination-wrap">
+                                                    <div class="equipment-pagination"></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -172,64 +296,147 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                 });
             }
 
-            $('body').delegate('#itt-toolssearchInput', 'keyup', function (e) {
-                var search = $(this).val();
-                if (search.length > 3) {
-                    call_equipementdetails(search);
+            var eqListSearch = '';
+            var eqListPage = 1;
+            var EQ_LIST_LIMIT = 15;
+            var EQ_PAGE_BUTTONS = 3;
+
+            function renderEquipmentPagination(meta) {
+                var $wrap = $('.equipment-pagination');
+                $wrap.empty();
+                if (!meta || meta.total_pages < 1) {
+                    return;
+                }
+                var p = meta.page;
+                var tp = meta.total_pages;
+                var lim = meta.limit || EQ_LIST_LIMIT;
+                var tot = meta.total || 0;
+                var startRow = tot === 0 ? 0 : (p - 1) * lim + 1;
+                var endRow = Math.min(p * lim, tot);
+                var prevDis = (p <= 1);
+                var nextDis = (p >= tp);
+                var prevAttr = prevDis ? ' disabled="disabled" aria-disabled="true"' : '';
+                var nextAttr = nextDis ? ' disabled="disabled" aria-disabled="true"' : '';
+                var numsHtml = '';
+                var start = 1;
+                if (tp > EQ_PAGE_BUTTONS) {
+                    start = Math.max(1, Math.min(p - 1, tp - EQ_PAGE_BUTTONS + 1));
+                }
+                var end = Math.min(tp, start + EQ_PAGE_BUTTONS - 1);
+                for (var n = start; n <= end; n++) {
+                    var isActive = (n === p);
+                    var activeCls = isActive ? ' active' : '';
+                    var ariaCur = isActive ? ' aria-current="page"' : '';
+                    numsHtml += '<button type="button" class="eq-pager-btn eq-page-num' + activeCls + '" data-page="' + n + '"' + ariaCur + '>' + n + '</button>';
+                }
+                var html =
+                    '<div class="eq-pager" role="navigation" aria-label="Equipment list pagination">' +
+                    '<div class="eq-pager-meta">Showing <strong>' + startRow + '–' + endRow + '</strong> of <strong>' + tot + '</strong></div>' +
+                    '<div class="eq-pager-controls-inner">' +
+                    '<button type="button" class="eq-pager-btn eq-pager-nav eq-page-prev"' + prevAttr + ' aria-label="Previous page"><i class="fa fa-angle-left" aria-hidden="true"></i> Prev</button>' +
+                    '<div class="eq-pager-nums">' + numsHtml + '</div>' +
+                    '<button type="button" class="eq-pager-btn eq-pager-nav eq-page-next"' + nextAttr + ' aria-label="Next page">Next <i class="fa fa-angle-right" aria-hidden="true"></i></button>' +
+                    '</div></div>';
+                $wrap.html(html);
+            }
+
+            $('body').on('click', '.eq-page-prev:not(:disabled)', function () {
+                if (eqListPage > 1) {
+                    call_equipementdetails(eqListSearch, eqListPage - 1);
+                }
+            });
+            $('body').on('click', '.eq-page-next:not(:disabled)', function () {
+                call_equipementdetails(eqListSearch, eqListPage + 1);
+            });
+            $('body').on('click', '.eq-page-num:not(.active)', function () {
+                var pg = parseInt($(this).attr('data-page'), 10);
+                if (!isNaN(pg)) {
+                    call_equipementdetails(eqListSearch, pg);
                 }
             });
 
-            call_equipementdetails('');
+            $('body').delegate('#itt-toolssearchInput', 'keyup', function (e) {
+                var search = $(this).val();
+                if (search.length > 3) {
+                    call_equipementdetails(search, 1);
+                }
+            });
+
+            $('body').on('change', '#itt-eq-status-filter', function () {
+                call_equipementdetails(eqListSearch, 1);
+            });
+
+            call_equipementdetails('', 1);
             // call tools tracker
-            function call_equipementdetails(search) {
+            function call_equipementdetails(search, page) {
+                if (arguments.length === 0) {
+                    // keep eqListSearch, eqListPage
+                } else if (arguments.length === 1) {
+                    var search = $(this).val();
+                    eqListSearch = search;
+                    eqListPage = 1;
+                } else {
+                    eqListSearch = search;
+                    eqListPage = parseInt(page, 10) || 1;
+                }
                 $.ajax({
                     url: "nemesis/stc_product.php",
                     method: "POST",
                     data: {
                         call_equipementdetails: 1,
-                        search: search
+                        search: eqListSearch,
+                        page: eqListPage,
+                        limit: EQ_LIST_LIMIT,
+                        status_filter: $('#itt-eq-status-filter').val() || 'all'
                     },
                     dataType: "JSON",
                     success: function (response) {
+                        var rows = response.rows !== undefined ? response.rows : response;
+                        var meta = response.total !== undefined ? response : null;
+                        if (meta) {
+                            eqListPage = meta.page;
+                        }
                         var data = '';
                         // Check if response is valid
-                        if (response.length > 0) {
+                        if (rows.length > 0) {
                             // Loop through the JSON data
+                            var baseSl = (eqListPage - 1) * EQ_LIST_LIMIT;
                             var slno = 0;
-                            for (var i = 0; i < response.length; i++) {
-                                slno++;
-                                var category = response[i].stc_agent_sub_category;
-                                var edit_buttons = '<a href="#" class="btn btn-primary ed-editequipment" title="Edit" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a>';
+                            for (var i = 0; i < rows.length; i++) {
+                                slno = baseSl + i + 1;
+                                var category = rows[i].stc_agent_sub_category;
+                                var edit_buttons = '<a href="#" class="btn btn-primary ed-editequipment" title="Edit" id="' + rows[i].id + '" data-toggle="modal" data-target=".bd-editequipmentdetails-modal-lg"><i class="fa fa-edit"></i></a>';
                                 var log_buttons = '';
-                                var delete_buttons = '<a href="javascript:void(0)" title="Delete" class="btn btn-danger ed-delete" id="' + response[i].id + '"><i class="fa fa-trash"></i></a>';
+                                var delete_buttons = '<a href="javascript:void(0)" title="Delete" class="btn btn-danger ed-delete" id="' + rows[i].id + '"><i class="fa fa-trash"></i></a>';
                                 var status_buttons = '';
                                 if (category == "Operator" || category == "Service Group") {
                                     edit_buttons = '';
                                     log_buttons = '';
                                     delete_buttons = '';
-                                    if(parseInt(response[i].status) === 1 && response[i].equipment_name == "CHILLER UNIT"){
-                                        log_buttons='<a href="#" class="btn btn-primary ed-logequipment" title="Logs" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
+                                    if(parseInt(rows[i].status) === 1 && rows[i].equipment_name == "CHILLER UNIT"){
+                                        log_buttons='<a href="#" class="btn btn-primary ed-logequipment" title="Logs" id="' + rows[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
                                     }
                                 }
-                                if(response[i].equipment_type == "RECIPROCATIG CHILLER"){
-                                    log_buttons='<a href="#" class="btn btn-primary ed-logequipment" title="Logs" id="' + response[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
+                                if(rows[i].equipment_type == "RECIPROCATIG CHILLER"){
+                                    log_buttons='<a href="#" class="btn btn-primary ed-logequipment" title="Logs" id="' + rows[i].id + '" data-toggle="modal" data-target=".bd-logequipmentdetails-modal-lg"><i class="fa fa-book"></i></a>';
                                 }
-                                var isRunning = String(response[i].status) === '1';
+                                var isRunning = String(rows[i].status) === '1';
                                 // Toggle button: Pause when running, Run when standby
                                 if(isRunning){
-                                    status_buttons = '<a href="javascript:void(0)" title="make it Running" class="btn btn-warning ed-set-standby" id="' + response[i].id + '"><i class="fa fa-pause"></i></a>';
+                                    status_buttons = '<a href="javascript:void(0)" title="make it Running" class="btn btn-warning ed-set-standby" id="' + rows[i].id + '"><i class="fa fa-pause"></i></a>';
                                 }else{
-                                    status_buttons = '<a href="javascript:void(0)" title="Make it Stand By" class="btn btn-success ed-set-running" id="' + response[i].id + '"><i class="fa fa-play"></i></a>';
+                                    status_buttons = '<a href="javascript:void(0)" title="Make it Stand By" class="btn btn-success ed-set-running" id="' + rows[i].id + '"><i class="fa fa-play"></i></a>';
                                 }
                                 var statusHtml = isRunning
                                     ? '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#28a745;color:#fff;font-weight:600;">Running</span>'
                                     : '<span style="display:inline-block;padding:2px 8px;border-radius:12px;background:#ffc107;color:#212529;font-weight:600;">Stand By</span>';
-                                data += '<tr><td>' + slno + '</td><td>' + response[i].stc_status_down_list_department_location + '</td><td>' + response[i].stc_status_down_list_department_dept + '</td><td>' + response[i].area + '</td><td>' + response[i].sub_location + '</td><td>' + response[i].equipment_name + '</td><td>' + response[i].equipment_type + '</td><td class="text-center">' + statusHtml + '</td><td>' + response[i].equipment_no + '</td><td class="text-center">' + status_buttons + log_buttons + edit_buttons + delete_buttons + '</td></tr>';
+                                data += '<tr><td>' + slno + '</td><td>' + rows[i].stc_status_down_list_department_location + '</td><td>' + rows[i].stc_status_down_list_department_dept + '</td><td>' + rows[i].area + '</td><td>' + rows[i].sub_location + '</td><td>' + rows[i].equipment_name + '</td><td>' + rows[i].equipment_type + '</td><td class="text-center">' + statusHtml + '</td><td>' + rows[i].equipment_no + '</td><td class="text-center">' + status_buttons + log_buttons + edit_buttons + delete_buttons + '</td></tr>';
                             }
                         } else {
-                            data = "<td>No data found.</td>";
+                            data = '<tr><td colspan="10" class="text-center">No data found.</td></tr>';
                         }
                         $('.equipement-details-show').html(data);
+                        renderEquipmentPagination(meta);
                     }
                 });
             }

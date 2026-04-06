@@ -530,24 +530,79 @@ class prime extends tesseract{
 		return $blackpearl;
 	}
 
-	// show equipmentdetails 
-	public function stc_equipement_details_get($search){
-		$filter=" AND (`equipment_name` = '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `equipment_type` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `area` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `sub_location` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."' OR `stc_status_down_list_department_dept` regexp '".mysqli_real_escape_string($this->stc_dbs, $search)."')";
-		$search=$search==''?'':$filter;
-	
-		// Check for duplicate unique ID
+	// show equipmentdetails (paginated); $status_filter: all | running | standby (AND with text search)
+	public function stc_equipement_details_get($search, $page = 1, $limit = 15, $status_filter = 'all'){
+		$rawSearch = trim((string)$search);
+		$textFilter = '';
+		if ($rawSearch !== '') {
+			// LIKE (not REGEXP) so characters like [ ] ( ) - are literal; escape LIKE wildcards
+			$like = str_replace(array('\\', '%', '_'), array('\\\\', '\\%', '\\_'), $rawSearch);
+			$like = mysqli_real_escape_string($this->stc_dbs, $like);
+			$textFilter = " AND (
+				`equipment_details`.`equipment_name` LIKE '%".$like."%'
+				OR `equipment_details`.`equipment_type` LIKE '%".$like."%'
+				OR `equipment_details`.`area` LIKE '%".$like."%'
+				OR `equipment_details`.`sub_location` LIKE '%".$like."%'
+				OR `equipment_details`.`equipment_no` LIKE '%".$like."%'
+				OR `stc_status_down_list_department_dept` LIKE '%".$like."%'
+				OR `stc_status_down_list_department_location` LIKE '%".$like."%'
+			)";
+		}
+
+		$status_filter = strtolower(trim((string)$status_filter));
+		if (!in_array($status_filter, array('all', 'running', 'standby'), true)) {
+			$status_filter = 'all';
+		}
+		$statusSql = '';
+		if ($status_filter === 'running') {
+			$statusSql = " AND `equipment_details`.`status` = '1'";
+		} elseif ($status_filter === 'standby') {
+			$statusSql = " AND `equipment_details`.`status` = '0'";
+		}
+
+		$sid = mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id']);
+		$baseSql = "
+			FROM `equipment_details`
+			INNER JOIN `stc_cust_project` ON `stc_cust_project_id`=`equipment_details`.`location`
+			INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id`=`equipment_details`.`department`
+			INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by`=`stc_cust_pro_supervisor_id`
+			WHERE `equipment_details`.`department` IN (SELECT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_loc_id`=`stc_cust_pro_attend_supervise_pro_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$sid."') ".$textFilter.$statusSql;
+
+		$count_qry = mysqli_query($this->stc_dbs, "SELECT COUNT(DISTINCT `equipment_details`.`id`) AS cnt ".$baseSql);
+		$total = 0;
+		if ($count_qry && ($crow = mysqli_fetch_assoc($count_qry))) {
+			$total = (int)$crow['cnt'];
+		}
+
+		$limit = max(1, min(100, (int)$limit));
+		$page = max(1, (int)$page);
+		$total_pages = $total > 0 ? (int)ceil($total / $limit) : 0;
+		if ($total_pages > 0 && $page > $total_pages) {
+			$page = $total_pages;
+		}
+		$offset = ($page - 1) * $limit;
+
 		$blackpearl_qry = mysqli_query($this->stc_dbs, "
-			SELECT `id`, `area`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `sub_location`, `model_no`, `capacity`, `equipment_name`, `equipment_no`, `equipment_type`, `status`, `stc_cust_pro_supervisor_fullname`, `created_date` FROM `equipment_details` INNER JOIN `stc_cust_project` ON `stc_cust_project_id`=`equipment_details`.`location` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_id`=`equipment_details`.`department` INNER JOIN `stc_cust_pro_supervisor` ON `equipment_details`.`created_by`=`stc_cust_pro_supervisor_id` WHERE `department` IN (SELECT `stc_status_down_list_department_id` FROM `stc_cust_pro_attend_supervise` INNER JOIN `stc_status_down_list_department` ON `stc_status_down_list_department_loc_id`=`stc_cust_pro_attend_supervise_pro_id` WHERE `stc_cust_pro_attend_supervise_super_id`='".$_SESSION['stc_agent_sub_id']."') ".$search." ORDER BY TIMESTAMP(`created_date`) DESC
+			SELECT `equipment_details`.`id`, `equipment_details`.`area`, `stc_status_down_list_department_location`, `stc_status_down_list_department_dept`, `equipment_details`.`sub_location`, `equipment_details`.`model_no`, `equipment_details`.`capacity`, `equipment_details`.`equipment_name`, `equipment_details`.`equipment_no`, `equipment_details`.`equipment_type`, `equipment_details`.`status`, `stc_cust_pro_supervisor_fullname`, `equipment_details`.`created_date`
+			".$baseSql."
+			ORDER BY TIMESTAMP(`equipment_details`.`created_date`) DESC
+			LIMIT ".$limit." OFFSET ".$offset."
 		");
 		$blackpearl=[];
-		if(mysqli_num_rows($blackpearl_qry)>0){
+		if($blackpearl_qry && mysqli_num_rows($blackpearl_qry)>0){
 			while ($blackpearl_row = mysqli_fetch_assoc($blackpearl_qry)) {
 				$blackpearl_row['stc_agent_sub_category'] = $_SESSION['stc_agent_sub_category'];
 				$blackpearl[] = $blackpearl_row;
 			}
 		}
-	
-		return $blackpearl;
+
+		return array(
+			'rows' => $blackpearl,
+			'total' => $total,
+			'page' => $page,
+			'limit' => $limit,
+			'total_pages' => $total_pages
+		);
 	}
 
 	// call location	
@@ -917,8 +972,11 @@ if(isset($_POST['get_equipementdetails'])){
 // call equipment details
 if(isset($_POST['call_equipementdetails'])){
 	$search=isset($_POST['search']) ? $_POST['search'] : '';
+	$page=isset($_POST['page']) ? max(1, (int)$_POST['page']) : 1;
+	$limit=isset($_POST['limit']) ? max(1, min(100, (int)$_POST['limit'])) : 15;
+	$status_filter=isset($_POST['status_filter']) ? $_POST['status_filter'] : 'all';
 	$odin_req=new prime();
-	$odin_req_out=$odin_req->stc_equipement_details_get($search);
+	$odin_req_out=$odin_req->stc_equipement_details_get($search, $page, $limit, $status_filter);
 	echo json_encode($odin_req_out);
 }
 
