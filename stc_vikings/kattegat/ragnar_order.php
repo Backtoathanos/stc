@@ -6125,7 +6125,15 @@ class ragnarCallDailyRequisitions extends tesseract{
 					( SELECT COALESCE(SUM(A.stc_purchase_product_adhoc_qty), 0) FROM stc_purchase_product_adhoc A WHERE A.stc_purchase_product_adhoc_productid = P.stc_product_id )
 					- ( SELECT COALESCE(SUM(G.qty), 0) FROM gld_challan G WHERE G.product_id = P.stc_product_id )
 					- ( SELECT COALESCE(SUM(R.stc_cust_super_requisition_list_items_rec_recqty), 0) FROM stc_cust_super_requisition_list_items_rec R INNER JOIN stc_purchase_product_adhoc A2 ON A2.stc_purchase_product_adhoc_id = R.stc_cust_super_requisition_list_items_rec_list_poaid WHERE A2.stc_purchase_product_adhoc_productid = P.stc_product_id )
-				) AS adhoc_left
+				) AS adhoc_left,
+				(
+					SELECT IFNULL(RK.`stc_rack_name`, '-')
+					FROM `stc_purchase_product_adhoc` AD
+					LEFT JOIN `stc_rack` RK ON RK.`stc_rack_id` = AD.`stc_purchase_product_adhoc_rackid`
+					WHERE AD.`stc_purchase_product_adhoc_productid` = P.`stc_product_id`
+					ORDER BY AD.`stc_purchase_product_adhoc_id` DESC
+					LIMIT 1
+				) AS adhoc_rack_name
 			FROM `stc_product` P
 			LEFT JOIN `stc_category` C ON C.`stc_cat_id`=P.`stc_product_cat_id`
 			LEFT JOIN `stc_sub_category` S ON S.`stc_sub_cat_id`=P.`stc_product_sub_cat_id`
@@ -6142,13 +6150,15 @@ class ragnarCallDailyRequisitions extends tesseract{
 				$displayName = strlen($fullName) > 50 ? substr($fullName, 0, 50) . '...' : $fullName;
 				$adhocLeft = (float)($row['adhoc_left'] ?? 0);
 				$adhocLeftStr = $adhocLeft > 0 ? number_format($adhocLeft, 2) : '0';
+				$adhocRack = trim((string)($row['adhoc_rack_name'] ?? ''));
+				if($adhocRack === ''){ $adhocRack = '-'; }
 				$out .= '<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mb-3">
 					<div class="card">
 						<img class="card-img-top" style="height:100px;object-fit:contain;" src="../stc_symbiote/stc_product_image/'.$img.'" alt="">
 						<div class="card-body p-2">
 							<div class="small text-muted text-center">'.$row['stc_product_id'].' / '.htmlspecialchars($subBrand).' / '.htmlspecialchars(($row['stc_cat_name']??'').' / '.($row['stc_product_hsncode']??'')).'</div>
-							<div class="small font-weight-bold dr-product-name" title="'.htmlspecialchars($fullName).'">'.htmlspecialchars($displayName).'</div>
-							<div class="small text-info mb-1"><strong>Adhoc Left:</strong> '.$adhocLeftStr.' '.htmlspecialchars($row['stc_product_unit']).'</div>
+							<div class="small font-weight-bold dr-product-name" style="font-size:14px;" title="'.htmlspecialchars($fullName).'">'.htmlspecialchars($displayName).'</div>
+							<div class="small text-info mb-1" style="font-size:14px;"><strong>Adhoc Left:</strong> '.$adhocLeftStr.' '.htmlspecialchars($row['stc_product_unit']).' &nbsp; <strong>Rack:</strong> '.htmlspecialchars($adhocRack).'</div>
 							<button type="button" class="btn btn-success btn-sm btn-block mt-1 dr-select-product" data-product-id="'.(int)$row['stc_product_id'].'" data-product-name="'.htmlspecialchars($fullName).'"><i class="fa fa-plus"></i> Select ('.htmlspecialchars($row['stc_product_unit']).')</button>
 						</div>
 					</div>

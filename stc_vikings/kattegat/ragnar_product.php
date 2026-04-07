@@ -163,7 +163,19 @@ class ragnarProduct extends tesseract{
 		$endfilterqry='ORDER BY `stc_product_id` ASC LIMIT 0,30';
 
 		$ivarfilterquery=mysqli_query($this->stc_dbs, "
-			SELECT DISTINCT * FROM `stc_product` 
+			SELECT DISTINCT *,
+				( SELECT CASE WHEN EXISTS (
+					SELECT 1 FROM `stc_purchase_product_adhoc` A
+					WHERE A.`stc_purchase_product_adhoc_productid` = `stc_product`.`stc_product_id`
+					AND A.`stc_purchase_product_adhoc_status` = 1
+					AND A.`stc_purchase_product_adhoc_qty` > 0
+				) THEN 1 ELSE 0 END ) AS adhoc_badge_green,
+				( SELECT CASE WHEN EXISTS (
+					SELECT 1 FROM `stc_purchase_product_adhoc` A
+					WHERE A.`stc_purchase_product_adhoc_productid` = `stc_product`.`stc_product_id`
+					AND A.`stc_purchase_product_adhoc_status` != 1
+				) THEN 1 ELSE 0 END ) AS adhoc_badge_red
+			FROM `stc_product`
 			LEFT JOIN `stc_category` ON `stc_cat_id`=`stc_product_cat_id` 
 			LEFT JOIN `stc_sub_category` ON `stc_sub_cat_id`=`stc_product_sub_cat_id` 
 			LEFT JOIN `stc_rack` ON `stc_rack_id`=`stc_product_rack_id` 
@@ -182,6 +194,14 @@ class ragnarProduct extends tesseract{
 				}else{
 					$stcqty;
 				}
+				$adhoc_green = (int)($filterrow['adhoc_badge_green'] ?? 0);
+				$adhoc_red = (int)($filterrow['adhoc_badge_red'] ?? 0);
+				$adhoc_mark = '';
+				if($adhoc_green === 1){
+					$adhoc_mark = '<span class="ml-1 align-middle d-inline-block" title="Adhoc: active with quantity" style="width:10px;height:10px;border-radius:50%;background:#28a745;vertical-align:middle;"></span>';
+				}elseif($adhoc_red === 1){
+					$adhoc_mark = '<span class="ml-1 align-middle d-inline-block" title="Adhoc: line exists (status not active)" style="width:10px;height:10px;border-radius:50%;background:#dc3545;vertical-align:middle;"></span>';
+				}
 				$ivar.='
 					<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3">
 		        		<div class="row">
@@ -197,7 +217,7 @@ class ragnarProduct extends tesseract{
 		        								'.$filterrow["stc_product_hsncode"].' / 
 		        								'.$filterrow["stc_product_gst"].'%
 		        							</span>
-		        							<span class="p-qty" >'.$stcqty.' '.$filterrow["stc_product_unit"].'</span>
+		        							<span class="p-qty" >'.$stcqty.' '.$filterrow["stc_product_unit"].'</span>'.$adhoc_mark.'
 		        							<span>
 												<a href="javascript:void(0)" id="'.$filterrow["stc_product_id"].'" class="btn btn-success view-purchase-mod-btn"  data-toggle="modal" data-target="#view-products-purchase-modal"><i class="fas fa-eye"></i> Purchase</a>
 												<a href="javascript:void(0)" id="'.$filterrow["stc_product_id"].'" class="btn btn-success view-sale-mod-btn"  data-toggle="modal" data-target="#view-products-sale-modal"><i class="fas fa-eye"></i> Sale</a>
