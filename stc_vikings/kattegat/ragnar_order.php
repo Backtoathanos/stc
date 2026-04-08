@@ -6725,7 +6725,8 @@ class ragnarCallDailyRequisitions extends tesseract{
 		$product_id = (int)$product_id;
 		$pending_qty = (float)$pending_qty;
 		$unit = trim((string)$unit);
-		if($item_id <= 0 || $product_id <= 0){
+		// item_id is stc_cust_super_requisition_list_items.stc_cust_super_requisition_list_id (line PK), not parent list id
+		if($item_id <= 0){
 			return ['success' => false, 'message' => 'Invalid parameters.'];
 		}
 		if($pending_qty < 0){
@@ -6738,20 +6739,24 @@ class ragnarCallDailyRequisitions extends tesseract{
 			return ['success' => false, 'message' => 'Unit too long.'];
 		}
 
-		// Ensure requisition item exists for this product
+		// Load line by primary key only (do not scope by product_id — item code may have changed)
 		$item_q = mysqli_query($this->stc_dbs, "
 			SELECT
-				`stc_cust_super_requisition_list_items_unit` AS old_unit
+				`stc_cust_super_requisition_list_items_unit` AS old_unit,
+				IFNULL(`stc_cust_super_requisition_list_items_product_id`, 0) AS line_product_id
 			FROM `stc_cust_super_requisition_list_items`
 			WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
-				AND `stc_cust_super_requisition_list_items_product_id`='".mysqli_real_escape_string($this->stc_dbs, $product_id)."'
 			LIMIT 1
 		");
 		if(!$item_q || mysqli_num_rows($item_q) === 0){
-			return ['success' => false, 'message' => 'Requisition item not found for this product.'];
+			return ['success' => false, 'message' => 'Requisition item not found.'];
 		}
 		$item_row = mysqli_fetch_assoc($item_q);
 		$old_unit = (string)($item_row['old_unit'] ?? '');
+		$db_product_id = (int)($item_row['line_product_id'] ?? 0);
+		if($product_id > 0 && $db_product_id > 0 && $product_id !== $db_product_id){
+			return ['success' => false, 'message' => 'Product does not match this line (refresh and try again).'];
+		}
 
 		// Already dispatched qty for this item+product (via adhoc ids)
 		$dispatchedForItemProduct = 0.0;
@@ -6761,7 +6766,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 			INNER JOIN `stc_purchase_product_adhoc` A
 				ON A.`stc_purchase_product_adhoc_id` = R.`stc_cust_super_requisition_list_items_rec_list_poaid`
 			WHERE R.`stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
-				AND A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+				AND A.`stc_purchase_product_adhoc_productid` = '".mysqli_real_escape_string($this->stc_dbs, $db_product_id)."'
 		");
 		if($dis_q){
 			$dis_row = mysqli_fetch_assoc($dis_q);
@@ -6782,7 +6787,6 @@ class ragnarCallDailyRequisitions extends tesseract{
 				`stc_cust_super_requisition_list_items_approved_qty`='".mysqli_real_escape_string($this->stc_dbs, $new_finalqty)."',
 				`stc_cust_super_requisition_items_finalqty`='".mysqli_real_escape_string($this->stc_dbs, $new_finalqty)."'
 			WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
-				AND `stc_cust_super_requisition_list_items_product_id`='".mysqli_real_escape_string($this->stc_dbs, $product_id)."'
 			LIMIT 1
 		");
 		if(!$up){
