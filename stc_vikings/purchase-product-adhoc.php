@@ -2475,6 +2475,7 @@ include("kattegat/role_check.php");
                                                 <th>Project Name</th>
                                                 <th>User Name</th>
                                                 <th>Dispatched Quantity</th>
+                                                <th>Unit</th>
                                             </tr>
                                         </thead>
                                         <tbody class="show-dispatchdetails-table">

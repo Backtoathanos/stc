@@ -2508,9 +2508,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 
 	public function stc_call_poadhoc_ddetails($poaid){
 		$odin='';
-		$odin_query=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_super_requisition_list_items_rec_list_id`, `stc_cust_project_title`, `stc_cust_pro_supervisor_fullname`, `stc_cust_super_requisition_list_items_rec_recqty`, `stc_cust_super_requisition_list_items_rec_date` FROM `stc_cust_super_requisition_list_items_rec` LEFT JOIN `stc_cust_super_requisition_list` ON `stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_rec_list_id` LEFT JOIN `stc_cust_project` ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id` WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`=".$poaid." ORDER BY TIMESTAMP(`stc_cust_super_requisition_list_items_rec_date`) DESC");
+		$odin_query=mysqli_query($this->stc_dbs, "SELECT DISTINCT `stc_cust_super_requisition_list_items_rec_list_id`, `stc_cust_project_title`, `stc_cust_pro_supervisor_fullname`, `stc_cust_super_requisition_list_items_rec_recqty`, `stc_cust_super_requisition_list_items_rec_date`, RI.`stc_cust_super_requisition_list_items_unit` FROM `stc_cust_super_requisition_list_items_rec` LEFT JOIN `stc_cust_super_requisition_list` ON `stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_rec_list_id` LEFT JOIN `stc_cust_project` ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id` LEFT JOIN `stc_cust_pro_supervisor` ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id` LEFT JOIN `stc_cust_super_requisition_list_items` RI ON `stc_cust_super_requisition_list_items_rec_list_item_id`=RI.`stc_cust_super_requisition_list_id` WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`=".$poaid." ORDER BY TIMESTAMP(`stc_cust_super_requisition_list_items_rec_date`) DESC");
 		if(mysqli_num_rows($odin_query)>0){
 			$slno=0;
+			$total_qty=0;
 			foreach($odin_query as $odin_row){
 				$slno++;
 				$query=mysqli_query($this->stc_dbs, "SELECT `stc_requisition_combiner_req_comb_id` FROM `stc_requisition_combiner_req` WHERE `stc_requisition_combiner_req_requisition_id`='".$odin_row['stc_cust_super_requisition_list_items_rec_list_id']."'");
@@ -2520,8 +2521,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 				}else{
 					$pr_no='';
 				}
-				$odin.='<tr><td>'.$slno.'</td><td><a href="stc-requisition-combiner-fsale.php?requi_id='.$pr_no.'" target="__blank">'.$odin_row['stc_cust_super_requisition_list_items_rec_list_id'].'</a></td><td>'.$odin_row['stc_cust_super_requisition_list_items_rec_date'].'</td><td>'.$odin_row['stc_cust_project_title'].'</td><td>'.$odin_row['stc_cust_pro_supervisor_fullname'].'</td><td class="text-right">'.number_format($odin_row['stc_cust_super_requisition_list_items_rec_recqty'], 2).'</td></tr>';
+				$total_qty+=$odin_row['stc_cust_super_requisition_list_items_rec_recqty'];
+				$odin.='<tr><td>'.$slno.'</td><td><a href="stc-requisition-combiner-fsale.php?requi_id='.$pr_no.'" target="__blank">'.$odin_row['stc_cust_super_requisition_list_items_rec_list_id'].'</a></td><td>'.$odin_row['stc_cust_super_requisition_list_items_rec_date'].'</td><td>'.$odin_row['stc_cust_project_title'].'</td><td>'.$odin_row['stc_cust_pro_supervisor_fullname'].'</td><td class="text-right">'.number_format($odin_row['stc_cust_super_requisition_list_items_rec_recqty'], 2).'</td><td><span class="text-muted">'.$odin_row['stc_cust_super_requisition_list_items_unit'].'</span></td></tr>';
 			}
+			$odin.='<tr><td colspan="5" class="text-right"><b>Total</b></td><td class="text-right"><b>'.number_format($total_qty, 2).'</b></td></tr>';
 		}else{
 			$odin='<tr><td>No record found.</td></tr>';
 		}
