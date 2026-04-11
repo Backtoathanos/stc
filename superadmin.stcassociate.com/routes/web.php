@@ -242,6 +242,10 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/branch/stc/poadhoc', [POAdhocController::class, 'show']);    
     Route::post('/branch/stc/poadhoc/list', [POAdhocController::class, 'list']);
     Route::get('/branch/stc/poadhoc/get', [POAdhocController::class, 'get']);
+    Route::get('/branch/stc/poadhoc/shops', [POAdhocController::class, 'shopsByAdhoc']);
+    Route::post('/branch/stc/poadhoc/shop', [POAdhocController::class, 'shopStore']);
+    Route::post('/branch/stc/poadhoc/shop/update', [POAdhocController::class, 'shopUpdate']);
+    Route::post('/branch/stc/poadhoc/shop/delete', [POAdhocController::class, 'shopDestroy']);
     Route::post('/branch/stc/poadhoc/edit', [POAdhocController::class, 'update']);
     Route::get('/branch/stc/poadhoc/delete', [POAdhocController::class, 'delete']);
 

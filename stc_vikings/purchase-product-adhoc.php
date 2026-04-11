@@ -1865,15 +1865,16 @@ include("kattegat/role_check.php");
                       if(inv_type=="warehouse"){
                         $('#dataContainer').html(res.html);
                         $('#paginations').html(res.pagination);
-                      } else if(inv_type=="Dhatkidih"){
-                        $('#dataContainer2').html(res.html);
-                        $('#paginations2').html(res.pagination);
-                      } else if(inv_type=="Kolkata"){
-                        $('#dataContainer3').html(res.html);
-                        $('#paginations3').html(res.pagination);
-                      } else if(inv_type=="Sehrabazar"){
-                        $('#dataContainer4').html(res.html);
-                        $('#paginations4').html(res.pagination);
+                      } else {
+                        var $branchTab = $('.InvTypeBtns').filter(function () {
+                          return $(this).attr('type') === inv_type;
+                        }).first();
+                        var dc = $branchTab.attr('data-dc');
+                        var pg = $branchTab.attr('data-pg');
+                        if (dc && pg) {
+                          $('#' + dc).html(res.html);
+                          $('#' + pg).html(res.pagination);
+                        }
                       }
                   }
               });
@@ -1903,22 +1904,7 @@ include("kattegat/role_check.php");
           });
           $(document).on('click', '.InvTypeBtns', function () {
               inv_type = $(this).attr('type');
-              let search = '';
-              if(inv_type == 'warehouse'){
-                search=$('.searchKey').val();
-              }
-              if(inv_type == 'Dhatkidih'){
-                search=$('.searchKey').val();
-              }
-              if(inv_type == 'Kolkata'){
-                search=$('.searchKey').val();
-              }
-              if(inv_type == 'Sehrabazar'){
-                search=$('.searchKey').val();
-              }
-              if(inv_type == 'Pardih'){
-                search=$('.searchKey').val();
-              }
+              var search = $('.searchKey').val();
               loadInventories(1, search, inv_type);
           });
           
@@ -2851,11 +2837,57 @@ include("kattegat/role_check.php");
                       >Shop Name
                     </h5>
                     <input type="hidden" class="stc-poadhocshop-id">
+                    <?php
+                    if (!isset($con)) {
+                        include_once __DIR__ . '/../MCU/db.php';
+                    }
+                    $poadhoc_shop_names = [];
+                    if (!empty($con)) {
+                        $seen = [];
+                        $pushPoadhocShopLoc = function ($loc) use (&$seen, &$poadhoc_shop_names) {
+                            $loc = trim((string) $loc);
+                            if ($loc === '') {
+                                return;
+                            }
+                            $k = strtolower($loc);
+                            if (isset($seen[$k])) {
+                                return;
+                            }
+                            $seen[$k] = true;
+                            $poadhoc_shop_names[] = $loc;
+                        };
+                        $q = mysqli_query($con, "SELECT DISTINCT TRIM(`shopname`) AS loc FROM `stc_shop` WHERE `shopname` IS NOT NULL AND TRIM(`shopname`) <> ''");
+                        if ($q) {
+                            while ($row = mysqli_fetch_assoc($q)) {
+                                $pushPoadhocShopLoc($row['loc']);
+                            }
+                        }
+                        $qBranch = mysqli_query($con, "SELECT DISTINCT TRIM(`branch`) AS loc FROM `stc_shop` WHERE `branch` IS NOT NULL AND TRIM(`branch`) <> ''");
+                        if ($qBranch) {
+                            while ($row = mysqli_fetch_assoc($qBranch)) {
+                                $pushPoadhocShopLoc($row['loc']);
+                            }
+                        }
+                        $qTu = mysqli_query($con, "SELECT DISTINCT TRIM(`stc_trading_user_location`) AS loc FROM `stc_trading_user` WHERE `stc_trading_user_location` IS NOT NULL AND TRIM(`stc_trading_user_location`) <> ''");
+                        if ($qTu) {
+                            while ($row = mysqli_fetch_assoc($qTu)) {
+                                $pushPoadhocShopLoc($row['loc']);
+                            }
+                        }
+                        natcasesort($poadhoc_shop_names);
+                        $poadhoc_shop_names = array_values($poadhoc_shop_names);
+                    }
+                    ?>
                     <select
                       id="stcpoadhocnameshop"
                       placeholder="Shop Name"
                       class="form-control validate"
-                    ><option>Dhatkidih</option><option>Kolkata</option><option>Pardih</option><option>Sehrabazar</option></select>
+                    >
+                      <option value="">Select shop name</option>
+                      <?php foreach ($poadhoc_shop_names as $poadhoc_sn) : ?>
+                      <option value="<?php echo htmlspecialchars($poadhoc_sn, ENT_QUOTES, 'UTF-8'); ?>"><?php echo htmlspecialchars($poadhoc_sn, ENT_QUOTES, 'UTF-8'); ?></option>
+                      <?php endforeach; ?>
+                    </select>
                   </div>
                 </div>
                 <div class="col-xl-12 col-md-12 col-sm-12">
@@ -2909,26 +2941,22 @@ include("kattegat/role_check.php");
                                 <span>Warehouse</span>
                             </a>
                         </li>
+                        <?php
+                        if (!isset($poadhoc_shop_names)) {
+                            $poadhoc_shop_names = [];
+                        }
+                        $inv_branch_tab_idx = 2;
+                        foreach ($poadhoc_shop_names as $poadhoc_inv_sn) :
+                            $poadhoc_inv_esc = htmlspecialchars($poadhoc_inv_sn, ENT_QUOTES, 'UTF-8');
+                            $inv_tab_id = (int) $inv_branch_tab_idx;
+                            $inv_branch_tab_idx++;
+                        ?>
                         <li class="nav-item">
-                            <a role="tab" type="Dhatkidih" class="nav-link InvTypeBtns" id="tab-modal-2" data-toggle="tab" href="#tab-content-modal-2">
-                                <span>Dhatkidih</span>
+                            <a role="tab" type="<?php echo $poadhoc_inv_esc; ?>" class="nav-link InvTypeBtns" id="tab-modal-<?php echo $inv_tab_id; ?>" data-toggle="tab" href="#tab-content-modal-<?php echo $inv_tab_id; ?>" data-dc="dataContainer<?php echo $inv_tab_id; ?>" data-pg="paginations<?php echo $inv_tab_id; ?>">
+                                <span><?php echo $poadhoc_inv_esc; ?></span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a role="tab" type="Kolkata" class="nav-link InvTypeBtns" id="tab-modal-3" data-toggle="tab" href="#tab-content-modal-3">
-                                <span>Kolkata</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a role="tab" type="Pardih" class="nav-link InvTypeBtns" id="tab-modal-5" data-toggle="tab" href="#tab-content-modal-5">
-                                <span>Pardih</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a role="tab" type="Sehrabazar" class="nav-link InvTypeBtns" id="tab-modal-4" data-toggle="tab" href="#tab-content-modal-4">
-                                <span>Sehrabazar</span>
-                            </a>
-                        </li>
+                        <?php endforeach; ?>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane tabs-animation fade active" id="tab-content-modal-1" role="tabpanel">
@@ -2936,26 +2964,19 @@ include("kattegat/role_check.php");
                           <div id="dataContainer"></div>
                           <div id="paginations"></div>
                         </div>
-                        <div class="tab-pane tabs-animation fade" id="tab-content-modal-2" role="tabpanel">
+                        <?php
+                        $inv_branch_tab_idx = 2;
+                        foreach ($poadhoc_shop_names as $poadhoc_inv_sn) :
+                            $poadhoc_inv_esc = htmlspecialchars($poadhoc_inv_sn, ENT_QUOTES, 'UTF-8');
+                            $inv_tab_id = (int) $inv_branch_tab_idx;
+                            $inv_branch_tab_idx++;
+                        ?>
+                        <div class="tab-pane tabs-animation fade" id="tab-content-modal-<?php echo $inv_tab_id; ?>" role="tabpanel">
                           <input type="text" class="searchKey" placeholder="Search product..." />
-                          <div id="dataContainer2">I am Dhatkidih Shop, will coming soon</div>
-                          <div id="paginations2"></div>
+                          <div id="dataContainer<?php echo $inv_tab_id; ?>"></div>
+                          <div id="paginations<?php echo $inv_tab_id; ?>"></div>
                         </div>
-                        <div class="tab-pane tabs-animation fade" id="tab-content-modal-3" role="tabpanel">
-                          <input type="text" class="searchKey" placeholder="Search product..." />
-                          <div id="dataContainer3">I am Kolkata Shop, will coming soon</div>
-                          <div id="paginations3"></div>
-                        </div>
-                        <div class="tab-pane tabs-animation fade" id="tab-content-modal-4" role="tabpanel">
-                          <input type="text" class="searchKey" placeholder="Search product..." />
-                          <div id="dataContainer4">I am Sehrabazar Shop, will coming soon</div>
-                          <div id="paginations4"></div>
-                        </div>
-                        <div class="tab-pane tabs-animation fade" id="tab-content-modal-5" role="tabpanel">
-                          <input type="text" class="searchKey" placeholder="Search product..." />
-                          <div id="dataContainer5">I am Pardih Shop, will coming soon</div>
-                          <div id="paginations5"></div>
-                        </div>
+                        <?php endforeach; ?>
                     </div>
                   </div>
                 </div>

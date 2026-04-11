@@ -234,13 +234,12 @@ export default function Dashboard() {
         },
         {
             name: 'Inv Qty.',
-            selector: row => row.stc_item_inventory_pd_qty + ' ' + row.stc_product_unit,
+            selector: row => `${row.stc_item_inventory_pd_qty} ${row.stc_product_unit}`,
             sortable: true,
             right: true,
             cell: row => (
                 <span className="inventory-qty-pill">
                     <span className="inventory-qty-value">{row.stc_item_inventory_pd_qty}</span>
-                    <span className="inventory-qty-unit">{row.stc_product_unit}</span>
                 </span>
             ),
         },
@@ -259,7 +258,7 @@ export default function Dashboard() {
             cell: row => (
                 locationcookie !== 'Root' ? (
                     <>
-                        {row.stc_item_inventory_pd_qty > 0 && (
+                        {Number(row.stc_item_inventory_pd_qty) > 0 && (
                             <Button
                                 variant="info"
                                 size="sm"
@@ -269,7 +268,7 @@ export default function Dashboard() {
                                 Transfer
                             </Button>
                         )}
-                        {row.stc_item_inventory_pd_qty === 0 ? (
+                        {Number(row.stc_item_inventory_pd_qty) === 0 ? (
                             <Button
                                 variant="warning"
                                 size="sm"
@@ -284,7 +283,7 @@ export default function Dashboard() {
                                 onClick={() => {
                                     setSelectedProductId(row.stc_product_id);
                                     setSelectedProductRate(row.rate_including_gst);
-                                    setSelectedProductQuantity(row.stc_item_inventory_pd_qty);
+                                    setSelectedProductQuantity(Number(row.stc_item_inventory_pd_qty));
                                     setModalShow(true);
                                 }}
                             >

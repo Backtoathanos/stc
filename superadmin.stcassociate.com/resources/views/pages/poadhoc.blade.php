@@ -37,6 +37,10 @@
     .suggestion-list li:hover{
         background: #f4f6f9;
     }
+    #example1 td.shop-qty-cell-clickable:hover {
+        background-color: #f0f7ff;
+    }
+    #shop-qty-modal .table td { vertical-align: middle; }
   </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -90,6 +94,7 @@
                         <th class="text-center">Product ID</th>
                         <th class="text-center">Item Description</th>
                         <th class="text-center">Quantity</th>
+                        <th class="text-left">Qty by shop</th>
                         <th class="text-center">Purchase Rate</th>
                         <th class="text-center">Rate</th>
                         <th class="text-center">Unit</th>
@@ -117,6 +122,7 @@
                         <th class="text-center">Product ID</th>
                         <th class="text-center">Item Description</th>
                         <th class="text-center">Quantity</th>
+                        <th class="text-left">Qty by shop</th>
                         <th class="text-center">Purchase Rate</th>
                         <th class="text-center">Rate</th>
                         <th class="text-center">Unit</th>
@@ -158,6 +164,7 @@
   @include('layouts.ajax_foot')
 
   <script>
+    var STC_VIKINGS_CHALLAN_BASE = {!! json_encode($stc_vikings_challan_base ?? '') !!};
     $(document).ready(function() {
         function swalSuccess(icon, message) {
             var Toast = Swal.mixin({
@@ -191,6 +198,7 @@
                 { data: 'stc_purchase_product_adhoc_productid' },
                 { data: 'stc_purchase_product_adhoc_itemdesc' },
                 { data: 'stc_purchase_product_adhoc_qty', render: function(data){ return parseFloat(data).toFixed(2); } },
+                { data: 'stc_shop_breakdown', orderable: false, searchable: false, render: function(data){ return data || '—'; } },
                 { data: 'stc_purchase_product_adhoc_prate', render: function(data){ return parseFloat(data).toFixed(2); } },
                 { data: 'stc_purchase_product_adhoc_rate', render: function(data){ return parseFloat(data).toFixed(2); } },
                 { data: 'stc_purchase_product_adhoc_unit' },
@@ -211,10 +219,17 @@
             ],
             order: [[0, 'desc']],
             columnDefs: [
-                { "targets": [0, 6, 7, 13], "className": "text-center" },
-                { "targets": [3, 4, 5], "className": "text-right" },
-                { "targets": [1, 2, 8, 9, 10, 11, 12, 14, 15, 16, 17, 18, 19], "className": "text-left" },
-                { "targets": [20], "orderable": false }
+                { "targets": [0, 7, 8, 14], "className": "text-center" },
+                { "targets": [3, 5, 6], "className": "text-right" },
+                { "targets": [1, 2, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20], "className": "text-left" },
+                {
+                    "targets": [4],
+                    "className": "text-left shop-qty-cell-clickable",
+                    "createdCell": function (td, cellData, rowData) {
+                        $(td).css('cursor', 'pointer').attr('data-adhoc-id', rowData.stc_purchase_product_adhoc_id).attr('title', 'Open branch quantities');
+                    }
+                },
+                { "targets": [21], "orderable": false }
             ],
             dom: 'Bfrtip',
             buttons: ["copy", "csv", "excel", "pdf", "print", "colvis"]
@@ -222,6 +237,13 @@
 
         // Add buttons to container
         table.buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+
+        $('#example1 tbody').on('click', 'td.shop-qty-cell-clickable', function () {
+            var id = $(this).data('adhoc-id');
+            if (id) {
+                openShopQtyModal(id);
+            }
+        });
 
         // Display for edit modal
         $('body').delegate('.edit-modal-btn','click', function(){
@@ -370,11 +392,334 @@
         $('.suggestion-wrapper').each(function(){
             bindSuggestion($(this));
         });
+
+        var _shopModalAdhoc = {};
+        var _shopModalShopNames = [];
+        var _shopModalCanAdd = false;
+
+        function transferChallanUrl(shopRowId) {
+            if (!STC_VIKINGS_CHALLAN_BASE) {
+                return '';
+            }
+            return STC_VIKINGS_CHALLAN_BASE + '/stc-print-preview-transferchallan.php?transfer_id=' + encodeURIComponent(shopRowId);
+        }
+
+        function shopBranchLabel(r) {
+            if (!r) {
+                return '';
+            }
+            var b = (r.branch !== undefined && r.branch !== null) ? String(r.branch).trim() : '';
+            if (b) {
+                return b;
+            }
+            return (r.shopname !== undefined && r.shopname !== null) ? String(r.shopname).trim() : '';
+        }
+
+        function buildShopNameSelect(selected, className) {
+            var cls = className || 'form-control form-control-sm shop-edit-name';
+            var $sel = $('<select/>').addClass(cls);
+            $sel.append($('<option value="">— Select branch —</option>'));
+            (_shopModalShopNames || []).forEach(function (name) {
+                if (!name) {
+                    return;
+                }
+                var o = $('<option/>').val(name).text(name);
+                if (name === selected) {
+                    o.prop('selected', true);
+                }
+                $sel.append(o);
+            });
+            if (selected && _shopModalShopNames.indexOf(selected) === -1) {
+                $sel.append($('<option/>').val(selected).text(selected).prop('selected', true));
+            }
+            return $sel;
+        }
+
+        function renderShopViewRow(r, meta) {
+            var rack = (r.stc_rack_name && String(r.stc_rack_name).length) ? r.stc_rack_name : ('#' + (r.rack_id || ''));
+            var challanUrl = transferChallanUrl(r.id);
+            var challanHtml = challanUrl
+                ? '<a href="' + challanUrl + '" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary" title="Challan preview"><i class="fas fa-file-alt"></i></a>'
+                : '<button type="button" class="btn btn-sm btn-outline-secondary" disabled title="Set STC_VIKINGS_CHALLAN_BASE in .env to enable"><i class="fas fa-file-alt"></i></button>';
+
+            var $tr = $('<tr/>').attr('data-shop-row-id', r.id).data('remarks', r.remarks || '').data('rack-id', r.rack_id || 0);
+            $tr.append($('<td/>').text(shopBranchLabel(r)));
+            $tr.append($('<td class="text-right"/>').text(parseFloat(r.qty || 0).toFixed(2)));
+            $tr.append($('<td/>').text(meta.unit || '—'));
+            $tr.append($('<td/>').text(rack));
+            $tr.append($('<td class="text-center"/>').html(challanHtml));
+            $tr.append($('<td class="text-center"/>').html('<button type="button" class="btn btn-sm btn-primary shop-row-edit" title="Edit"><i class="fas fa-edit"></i></button>'));
+            $tr.append($('<td class="text-center"/>').html('<button type="button" class="btn btn-sm btn-danger shop-row-delete" title="Delete"><i class="fas fa-trash"></i></button>'));
+            $tr.append($('<td/>'));
+            return $tr;
+        }
+
+        function renderShopEditRow(r, meta) {
+            var $tr = $('<tr/>').addClass('shop-row-editing').attr('data-shop-row-id', r.id).data('remarks', r.remarks || '');
+            $tr.append($('<td/>').append(buildShopNameSelect(shopBranchLabel(r))));
+            $tr.append($('<td/>').html('<input type="number" class="form-control form-control-sm shop-edit-qty text-right" step="0.01" value="' + parseFloat(r.qty || 0) + '">'));
+            $tr.append($('<td/>').text(meta.unit || '—'));
+            $tr.append($('<td/>').html('<input type="number" class="form-control form-control-sm shop-edit-rack" value="' + (parseInt(r.rack_id, 10) || 0) + '">'));
+            $tr.append($('<td class="text-center text-muted small"/>').text('—'));
+            $tr.append($('<td colspan="2" class="text-center"/>').html('<button type="button" class="btn btn-sm btn-success shop-row-save mr-1">Save</button><button type="button" class="btn btn-sm btn-secondary shop-row-cancel">Cancel</button>'));
+            $tr.append($('<td/>'));
+            return $tr;
+        }
+
+        function renderShopNewRow(meta) {
+            var $tr = $('<tr/>').addClass('shop-row-editing shop-row-new');
+            $tr.append($('<td/>').append(buildShopNameSelect('', 'form-control form-control-sm shop-new-name')));
+            $tr.append($('<td/>').html('<input type="number" class="form-control form-control-sm shop-new-qty text-right" step="0.01" value="0">'));
+            $tr.append($('<td/>').text(meta.unit || '—'));
+            $tr.append($('<td/>').html('<input type="number" class="form-control form-control-sm shop-new-rack" value="0">'));
+            $tr.append($('<td class="text-center text-muted small"/>').text('—'));
+            $tr.append($('<td colspan="2" class="text-center"/>').html('<button type="button" class="btn btn-sm btn-success shop-row-save-new mr-1">Save</button><button type="button" class="btn btn-sm btn-secondary shop-row-cancel">Cancel</button>'));
+            $tr.append($('<td/>'));
+            return $tr;
+        }
+
+        function loadShopQtyModal(adhocId) {
+            var $tbody = $('#shop-qty-table-body');
+            $tbody.html('<tr><td colspan="8" class="text-center text-muted">Loading…</td></tr>');
+            $.get("{{ url('/branch/stc/poadhoc/shops') }}", { adhoc_id: adhocId }, function (res) {
+                if (!res.success) {
+                    $tbody.html('<tr><td colspan="8" class="text-center text-danger">' + (res.message || 'Load failed') + '</td></tr>');
+                    swalSuccess('error', res.message || 'Load failed');
+                    return;
+                }
+                _shopModalShopNames = res.shop_names || [];
+                _shopModalAdhoc = res.adhoc || {};
+                var a = _shopModalAdhoc;
+
+                $('#shop-modal-product-name').text(a.product_name || '—');
+                $('#shop-modal-purchased-qty').text(parseFloat(a.purchased_qty || 0).toFixed(2));
+                $('#shop-modal-unit-suffix').text(a.unit ? ' ' + a.unit : '');
+                $('#shop-modal-allocated-qty').text(parseFloat(a.allocated_qty || 0).toFixed(2));
+                var bal = parseFloat(a.balanced_qty || 0);
+                $('#shop-modal-balanced-qty').text(bal.toFixed(2));
+                var $balEl = $('#shop-modal-balanced-qty');
+                $balEl.removeClass('text-info text-danger text-muted text-warning');
+                if (bal < -1e-6) {
+                    $balEl.addClass('text-danger');
+                } else if (bal > 1e-6) {
+                    $balEl.addClass('text-info');
+                } else {
+                    $balEl.addClass('text-muted');
+                }
+
+                _shopModalCanAdd = bal > 1e-6;
+                var $addTh = $('#shop-qty-col-add-header');
+                if (_shopModalCanAdd) {
+                    $addTh.html('<i class="fas fa-plus text-success"></i>').attr('title', 'Add branch');
+                } else {
+                    $addTh.html('<span class="text-muted">—</span>').attr('title', 'No balance left to allocate');
+                }
+
+                $tbody.empty();
+                $('#shop-qty-add-row-slot').remove();
+
+                if (!res.data || res.data.length === 0) {
+                    var emptyMsg = _shopModalCanAdd
+                        ? 'No branch rows yet. Use + to add.'
+                        : 'No branch rows. No balance available to allocate (purchased qty is fully used or over-allocated).';
+                    $tbody.append('<tr class="shop-qty-empty-placeholder"><td colspan="8" class="text-center text-muted">' + emptyMsg + '</td></tr>');
+                } else {
+                    res.data.forEach(function (r) {
+                        $tbody.append(renderShopViewRow(r, a));
+                    });
+                }
+                var $footer;
+                if (_shopModalCanAdd) {
+                    $footer = $('<tr id="shop-qty-add-row-slot" class="shop-qty-footer-row"><td colspan="7"></td><td class="text-center"><button type="button" class="btn btn-sm btn-success shop-qty-add-row" title="Add branch"><i class="fas fa-plus"></i></button></td></tr>');
+                } else {
+                    $footer = $('<tr id="shop-qty-add-row-slot" class="shop-qty-footer-row"><td colspan="8" class="text-center text-muted small">No balance left to allocate. Reduce quantities in existing rows or increase purchased qty on the PO line.</td></tr>');
+                }
+                $tbody.append($footer);
+            }).fail(function () {
+                $tbody.html('<tr><td colspan="8" class="text-center text-danger">Failed to load</td></tr>');
+                swalSuccess('error', 'Failed to load');
+            });
+        }
+
+        function openShopQtyModal(adhocId) {
+            $('#shop_qty_adhoc_id').val(adhocId);
+            $('#shop-qty-modal-title-adhoc').text(adhocId);
+            $('#shop-qty-modal').modal('show');
+            loadShopQtyModal(adhocId);
+        }
+
+        $('body').delegate('.shop-qty-modal-btn', 'click', function () {
+            openShopQtyModal($(this).data('adhoc-id'));
+        });
+
+        $('#shop-qty-modal').on('click', '.shop-row-edit', function () {
+            if ($('#shop-qty-table-body tr.shop-row-editing').length) {
+                return;
+            }
+            var $tr = $(this).closest('tr');
+            var id = $tr.data('shop-row-id');
+            var label = $tr.find('td').eq(0).text();
+            var r = {
+                id: id,
+                branch: label,
+                shopname: label,
+                qty: parseFloat($tr.find('td').eq(1).text()) || 0,
+                rack_id: parseInt($tr.data('rack-id'), 10) || 0,
+                remarks: $tr.data('remarks') || ''
+            };
+            $tr.replaceWith(renderShopEditRow(r, _shopModalAdhoc));
+        });
+
+        $('#shop-qty-modal').on('click', '.shop-row-cancel', function () {
+            loadShopQtyModal($('#shop_qty_adhoc_id').val());
+        });
+
+        $('#shop-qty-modal').on('click', '.shop-row-save', function () {
+            var $tr = $(this).closest('tr');
+            var adhocId = $('#shop_qty_adhoc_id').val();
+            $.post("{{ url('/branch/stc/poadhoc/shop/update') }}", {
+                _token: "{{ csrf_token() }}",
+                id: $tr.data('shop-row-id'),
+                adhoc_id: adhocId,
+                branch: $tr.find('.shop-edit-name').val(),
+                shopname: $tr.find('.shop-edit-name').val(),
+                qty: $tr.find('.shop-edit-qty').val(),
+                rack_id: $tr.find('.shop-edit-rack').val(),
+                remarks: $tr.data('remarks') || ''
+            }, function (res) {
+                if (res.success) {
+                    swalSuccess('success', res.message);
+                    loadShopQtyModal(adhocId);
+                    table.ajax.reload(null, false);
+                } else {
+                    swalSuccess('error', res.message || 'Update failed');
+                }
+            }).fail(function () {
+                swalSuccess('error', 'Update failed');
+            });
+        });
+
+        $('#shop-qty-modal').on('click', '.shop-row-save-new', function () {
+            var $tr = $(this).closest('tr');
+            var adhocId = $('#shop_qty_adhoc_id').val();
+            $.post("{{ url('/branch/stc/poadhoc/shop') }}", {
+                _token: "{{ csrf_token() }}",
+                adhoc_id: adhocId,
+                branch: $tr.find('.shop-new-name').val(),
+                shopname: $tr.find('.shop-new-name').val(),
+                qty: $tr.find('.shop-new-qty').val(),
+                rack_id: $tr.find('.shop-new-rack').val(),
+                remarks: ''
+            }, function (res) {
+                if (res.success) {
+                    swalSuccess('success', res.message);
+                    loadShopQtyModal(adhocId);
+                    table.ajax.reload(null, false);
+                } else {
+                    swalSuccess('error', res.message || 'Save failed');
+                }
+            }).fail(function () {
+                swalSuccess('error', 'Save failed');
+            });
+        });
+
+        $('#shop-qty-modal').on('click', '.shop-row-delete', function () {
+            if (!window.confirm('Delete this branch row?')) {
+                return;
+            }
+            var $tr = $(this).closest('tr');
+            var adhocId = $('#shop_qty_adhoc_id').val();
+            $.post("{{ url('/branch/stc/poadhoc/shop/delete') }}", {
+                _token: "{{ csrf_token() }}",
+                id: $tr.data('shop-row-id'),
+                adhoc_id: adhocId
+            }, function (res) {
+                if (res.success) {
+                    swalSuccess('success', res.message);
+                    loadShopQtyModal(adhocId);
+                    table.ajax.reload(null, false);
+                } else {
+                    swalSuccess('error', res.message || 'Delete failed');
+                }
+            }).fail(function () {
+                swalSuccess('error', 'Delete failed');
+            });
+        });
+
+        $('#shop-qty-modal').on('click', '.shop-qty-add-row', function () {
+            if (!_shopModalCanAdd) {
+                return;
+            }
+            if ($('#shop-qty-table-body tr.shop-row-editing').length) {
+                return;
+            }
+            $('.shop-qty-empty-placeholder').remove();
+            $('#shop-qty-add-row-slot').before(renderShopNewRow(_shopModalAdhoc));
+        });
     });
   </script>
 
 </body>
 </html>
+
+<!-- shop qty modal (stc_shop) -->
+<div class="modal fade" id="shop-qty-modal">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Branch quantities <small class="text-muted">(Adhoc #<span id="shop-qty-modal-title-adhoc"></span>)</small></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="shop_qty_adhoc_id">
+        <div class="card card-outline card-secondary mb-3">
+          <div class="card-body py-2">
+            <div class="row">
+              <div class="col-md-6">
+                <strong>Product</strong>
+                <div id="shop-modal-product-name" class="text-break">—</div>
+              </div>
+              <div class="col-md-2 col-6">
+                <strong>Purchased qty</strong>
+                <div><span id="shop-modal-purchased-qty">0</span><span id="shop-modal-unit-suffix" class="text-muted"></span></div>
+              </div>
+              <div class="col-md-2 col-6">
+                <strong>Allocated</strong>
+                <div class="text-muted" id="shop-modal-allocated-qty">0</div>
+              </div>
+              <div class="col-md-2 col-6">
+                <strong>Balanced</strong>
+                <div id="shop-modal-balanced-qty">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered table-striped">
+            <thead class="thead-light">
+              <tr>
+                <th>Branch</th>
+                <th class="text-right">Qty</th>
+                <th>Unit</th>
+                <th>Rack</th>
+                <th class="text-center">Challan</th>
+                <th class="text-center">Edit</th>
+                <th class="text-center">Delete</th>
+                <th class="text-center" id="shop-qty-col-add-header" title="Add branch"><i class="fas fa-plus text-success"></i></th>
+              </tr>
+            </thead>
+            <tbody id="shop-qty-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- delete modal -->
 <div class="modal fade" id="delete-modal">

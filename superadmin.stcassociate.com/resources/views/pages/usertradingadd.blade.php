@@ -5,6 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>STC Associates | {{!empty($page_title) ? $page_title : ''}}</title>
   @include('layouts.head')
+  <style>
+    .suggestion-wrapper { position: relative; }
+    .suggestion-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 1051;
+      max-height: 220px;
+      overflow-y: auto;
+      background: #fff;
+      border: 1px solid #ced4da;
+      border-top: none;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: none;
+    }
+    .suggestion-list li {
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+    .suggestion-list li:hover { background: #f4f6f9; }
+  </style>
 </head>
 <body class="hold-transition sidebar-mini layout-fixed">
 <div class="wrapper">
@@ -76,14 +100,32 @@
                         @endforeach
                     </select>
                   </div>
-                  <div class="form-group">
-                    <label for="state">Branch</label>
-                    <select class="form-control" id="branch" name="branch">
-                        <option value="NA">Select</option>
-                        <option value="Dhatkidih">Dhatkidih</option>
-                        <option value="Sehrabazar">Sehrabazar</option>
-                        <option value="Kolkata">Kolkata</option>
-                    </select>
+                  @php
+                    $tradingLocationValAdd = old('branch', '');
+                    $tradingBranchListAdd = $tradingBranchLocations ?? [];
+                    if ($tradingLocationValAdd !== '' && $tradingLocationValAdd !== null && !in_array((string) $tradingLocationValAdd, $tradingBranchListAdd, true)) {
+                      $tradingBranchListAdd = array_values(array_merge([(string) $tradingLocationValAdd], $tradingBranchListAdd));
+                    }
+                    natcasesort($tradingBranchListAdd);
+                    $tradingBranchListAdd = array_values($tradingBranchListAdd);
+                  @endphp
+                  <div class="form-group suggestion-wrapper" id="trading-branch-location-wrapper">
+                    <label for="branch-input">Branch / location</label>
+                    <input
+                      type="text"
+                      class="form-control suggestion-input"
+                      id="branch-input"
+                      name="branch"
+                      autocomplete="off"
+                      placeholder="Type to search or enter a branch name"
+                      value="{{ $tradingLocationValAdd }}"
+                    />
+                    <ul class="suggestion-list">
+                      @foreach ($tradingBranchListAdd as $bloc)
+                        <li data-value="{{ e($bloc) }}">{{ $bloc }}</li>
+                      @endforeach
+                    </ul>
+                    <small class="form-text text-muted">Choose from list or type a name; should match branches used in shop allocations.</small>
                   </div>
                   <div class="form-group">
                     <label for="state">State</label>
@@ -134,5 +176,38 @@
 </div>
   <!-- ./wrapper -->
   @include('layouts.foot')
+  <script>
+    $(function () {
+      function bindTradingBranchSuggestion(wrapper) {
+        var input = wrapper.find('.suggestion-input');
+        var list = wrapper.find('.suggestion-list');
+        input.on('focus keyup', function () {
+          var term = $(this).val().toLowerCase();
+          var hasVisible = false;
+          list.children('li').each(function () {
+            var text = $(this).text().toLowerCase();
+            if (term === '' || text.indexOf(term) !== -1) {
+              $(this).show();
+              hasVisible = true;
+            } else {
+              $(this).hide();
+            }
+          });
+          list.toggle(hasVisible);
+        });
+        list.on('mousedown', 'li', function (e) {
+          e.preventDefault();
+          input.val($(this).data('value'));
+          list.hide();
+        });
+        $(document).on('click.tradingBranchSuggest', function (e) {
+          if (!wrapper.is(e.target) && wrapper.has(e.target).length === 0) {
+            list.hide();
+          }
+        });
+      }
+      bindTradingBranchSuggestion($('#trading-branch-location-wrapper'));
+    });
+  </script>
 </body>
 </html>
