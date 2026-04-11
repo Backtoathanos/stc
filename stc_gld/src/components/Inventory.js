@@ -14,6 +14,47 @@ import { Modal, Button, Form } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import { FaEdit } from 'react-icons/fa';
 
+const INVENTORY_TABLE_STYLES = {
+    table: {
+        style: {
+            borderCollapse: 'collapse'
+        }
+    },
+    headRow: {
+        style: {
+            minHeight: '44px',
+            backgroundColor: '#f8f9fa',
+            borderBottom: '2px solid #dee2e6'
+        }
+    },
+    headCells: {
+        style: {
+            paddingLeft: '12px',
+            paddingRight: '12px',
+            paddingTop: '10px',
+            paddingBottom: '10px',
+            fontWeight: 600,
+            fontSize: '13px',
+            color: '#333'
+        }
+    },
+    rows: {
+        style: {
+            minHeight: '56px',
+            fontSize: '14px'
+        }
+    },
+    cells: {
+        style: {
+            paddingLeft: '12px',
+            paddingRight: '12px',
+            paddingTop: '8px',
+            paddingBottom: '8px',
+            verticalAlign: 'middle'
+        }
+    }
+};
+
 export default function Dashboard() {
     // console.log("Hi");
     const location = useLocation();
@@ -114,47 +155,39 @@ export default function Dashboard() {
             name: 'Product',
             selector: row => row.stc_product_name,
             sortable: true,
-            center: true,
+            minWidth: '240px',
+            grow: 2,
             cell: row => {
                 const imageUrl = `https://stcassociate.com/stc_symbiote/stc_product_image/${row.stc_product_image}`;
                 const defaultImageUrl = 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996';
 
                 return (
-                    <div style={{ position: 'absolute', left: '20px', marginTop: '10px', marginBottom: '10px', display: 'flex', alignItems: 'center', maxWidth: '250px' }}>
-                        <div style={{ width: '60px', flexShrink: 0 }}>
+                    <div className="inventory-product-cell">
+                        <div className="inventory-product-thumb">
                             <img
                                 src={row.stc_product_image ? imageUrl : defaultImageUrl}
-                                alt="Product"
-                                style={{ width: '100%', height: '60px', borderRadius: '5px' }}
-                                onError={(e) => e.target.src = defaultImageUrl} // Use default if image fails to load
+                                alt=""
+                                onError={(e) => {
+                                    e.target.src = defaultImageUrl;
+                                }}
                             />
                         </div>
+                        <a
+                            href="#"
+                            className="inventory-product-name-link"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                setSelectedProductId(row.stc_product_id);
+                                setSecondModalOpen(true);
+                            }}
+                        >
+                            <span className="inventory-product-name" title={row.stc_product_name}>
+                                {row.stc_product_name}
+                            </span>
+                        </a>
                     </div>
                 );
             }
-        },
-        {
-            name: 'Product Name',
-            selector: row => row.stc_product_id,
-            sortable: true,
-            center: true,
-            cell: row => (
-                <a
-                    href="#"
-                    onClick={() => {
-                        setSelectedProductId(row.stc_product_id);
-                        setSecondModalOpen(true);
-                    }}
-                >
-                    <div style={{ marginLeft: '10px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        <strong>
-                            {row.stc_product_name.length > 20
-                                ? `${row.stc_product_name.substring(0, 20)}...`
-                                : row.stc_product_name}
-                        </strong>
-                    </div>
-                </a>
-            )
         },
         {
             name: 'Product Id (SKU)',
@@ -205,24 +238,9 @@ export default function Dashboard() {
             sortable: true,
             right: true,
             cell: row => (
-                <span
-                    style={{
-                        background: '#afafaf',
-                        borderRadius: '10%',
-                        padding: '10px',
-                        color: '#000000',
-                        fontWeight: 'bold',
-                        display: 'inline-block',
-                        minWidth: '100px',
-                        textAlign: 'right'
-                    }}
-                >
-                    {`${row.stc_item_inventory_pd_qty}`}
-                    <i style={{
-                        fontWeight: '400',
-                        minWidth: '100px',
-                        textAlign: 'right'
-                    }}>{` ${row.stc_product_unit}`}</i>
+                <span className="inventory-qty-pill">
+                    <span className="inventory-qty-value">{row.stc_item_inventory_pd_qty}</span>
+                    <span className="inventory-qty-unit">{row.stc_product_unit}</span>
                 </span>
             ),
         },
@@ -490,7 +508,7 @@ export default function Dashboard() {
                                     <div className="card-header">
                                         <h2 className="text-center">Inventory</h2>
                                     </div>
-                                    <div className="card-body">
+                                    <div className="card-body inventory-page">
                                         <div className="form-group">
                                             <input
                                                 type="text"
@@ -512,6 +530,8 @@ export default function Dashboard() {
                                             </div>
                                         ) : (
                                             <DataTable
+                                                className="inventory-datatable"
+                                                customStyles={INVENTORY_TABLE_STYLES}
                                                 columns={columns}
                                                 data={data}
                                                 progressPending={loading}
@@ -519,7 +539,7 @@ export default function Dashboard() {
                                                 paginationServer
                                                 paginationTotalRows={totalRows}
                                                 paginationPerPage={limit}
-                                                paginationDefaultPage={currentPage} // This is crucial!
+                                                paginationDefaultPage={currentPage}
                                                 paginationRowsPerPageOptions={[10, 20, 50, 100]}
                                                 onChangePage={handlePageChange}
                                                 onChangeRowsPerPage={handleLimitChange}

@@ -2226,7 +2226,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$odin='';
 		$filter='';
 		if($itemname!=""){
-			$filter.="AND (`stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_desc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."')";
+			$filter.="AND (`stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_desc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_cat_name`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."')";
 		}
 		if($sourcedestination!=""){
 			$filter.="
@@ -2246,6 +2246,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_productid`,
 				`stc_product_id`,
 				`stc_product_name`,
+				`stc_cat_name`,
 				`stc_sub_cat_name`,
 				`stc_product_image`,
 				`stc_purchase_product_adhoc_itemdesc`,
@@ -2266,6 +2267,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_purchase_product_adhoc_updated_date`
 			FROM `stc_purchase_product_adhoc`
 			LEFT JOIN `stc_product` ON `stc_purchase_product_adhoc_productid`=`stc_product_id`
+			LEFT JOIN `stc_category` ON `stc_product_cat_id`=`stc_cat_id`
 			LEFT JOIN `stc_sub_category` ON `stc_product_sub_cat_id`=`stc_sub_cat_id`
 			LEFT JOIN `stc_rack` ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
 			LEFT JOIN `stc_user` ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
@@ -2276,29 +2278,11 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$odinqry=mysqli_query($this->stc_dbs, $query);
 		$count_numqry=mysqli_query($this->stc_dbs, "
 			SELECT
-				`stc_purchase_product_adhoc_id`,
-				`stc_purchase_product_adhoc_productid`,
-				`stc_product_id`,
-				`stc_product_name`,
-				`stc_product_image`,
-				`stc_purchase_product_adhoc_itemdesc`,
-				`stc_purchase_product_adhoc_qty`,
-				`stc_purchase_product_adhoc_prate`,
-				`stc_purchase_product_adhoc_rate`,
-				`stc_purchase_product_adhoc_unit`,
-				`stc_rack_name`,
-				`stc_purchase_product_adhoc_condition`,
-				`stc_purchase_product_adhoc_source`,
-				`stc_purchase_product_adhoc_destination`,
-				`stc_purchase_product_adhoc_recievedby`,
-				`stc_purchase_product_adhoc_status`,
-				`stc_purchase_product_adhoc_remarks`,
-				`stc_user_name`,
-				`stc_purchase_product_adhoc_created_date`,
-				`stc_purchase_product_adhoc_updated_by`,
-				`stc_purchase_product_adhoc_updated_date`
+				`stc_purchase_product_adhoc_id`
 			FROM `stc_purchase_product_adhoc`
 			LEFT JOIN `stc_product` ON `stc_purchase_product_adhoc_productid`=`stc_product_id`
+			LEFT JOIN `stc_category` ON `stc_product_cat_id`=`stc_cat_id`
+			LEFT JOIN `stc_sub_category` ON `stc_product_sub_cat_id`=`stc_sub_cat_id`
 			LEFT JOIN `stc_rack` ON `stc_purchase_product_adhoc_rackid`=`stc_rack_id`
 			LEFT JOIN `stc_user` ON `stc_purchase_product_adhoc_created_by`=`stc_user_id`
 			WHERE `stc_purchase_product_adhoc_qty`>0 ".$filter."
@@ -2988,7 +2972,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$searchQuery = "";
 		if (!empty($search)) {
 			$searchEscaped = mysqli_real_escape_string($this->stc_dbs, $search);
-			$searchQuery = " AND (P.stc_product_name LIKE '%$searchEscaped%' OR P.stc_product_desc LIKE '%$searchEscaped%' OR B.stc_brand_title LIKE '%$searchEscaped%' OR S.stc_sub_cat_name LIKE '%$searchEscaped%')";
+			$searchQuery = " AND (P.stc_product_name LIKE '%$searchEscaped%' OR P.stc_product_desc LIKE '%$searchEscaped%' OR B.stc_brand_title LIKE '%$searchEscaped%' OR S.stc_sub_cat_name LIKE '%$searchEscaped%' OR C.stc_cat_name LIKE '%$searchEscaped%')";
 		}
 
 		if (is_numeric($search)) {
@@ -3158,7 +3142,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 
 		if ($search) {
 			$searchEscaped = mysqli_real_escape_string($this->stc_dbs, $search);
-			$baseQuery .= " AND (P.stc_product_id = '$searchEscaped' OR P.stc_product_name LIKE '%$searchEscaped%' OR P.stc_product_desc LIKE '%$searchEscaped%')";
+			$baseQuery .= " AND (P.stc_product_id = '$searchEscaped' OR P.stc_product_name LIKE '%$searchEscaped%' OR P.stc_product_desc LIKE '%$searchEscaped%' OR S.stc_sub_cat_name LIKE '%$searchEscaped%' OR C.stc_cat_name LIKE '%$searchEscaped%')";
 		}
 
 		// Count query for pagination

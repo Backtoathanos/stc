@@ -13,7 +13,7 @@ $location_stc = $_GET['location'];
 $offset = ($page - 1) * $limit;
 
 // Base query
-$cquery = "SELECT DISTINCT P.stc_product_id, P.stc_product_name, S.stc_sub_cat_name,   P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image,   P.stc_product_gst, P.stc_product_sale_percentage, B.stc_brand_title FROM stc_product P INNER JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id  WHERE P.stc_product_avail = 1";
+$cquery = "SELECT DISTINCT P.stc_product_id, P.stc_product_name, S.stc_sub_cat_name, C.stc_cat_name, P.stc_product_brand_id, P.stc_product_unit, P.stc_product_image,   P.stc_product_gst, P.stc_product_sale_percentage, B.stc_brand_title FROM stc_product P INNER JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id LEFT JOIN stc_category C ON C.stc_cat_id = P.stc_product_cat_id LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id  WHERE P.stc_product_avail = 1";
 
 if ($search) $cquery .= " AND (P.stc_product_id='$search' OR P.stc_product_name LIKE '%$search%' OR P.stc_product_desc LIKE '%$search%')";
 

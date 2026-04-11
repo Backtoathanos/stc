@@ -393,6 +393,81 @@ function getChallanDetails($conn) {
     }
 }
 
+/**
+ * Add commerce fields for GLD product modal (cost / MRP / selling / stock / status label).
+ */
+function enrichProductCommerceFields($conn, $productId, &$productDetails) {
+    $salePct = floatval($productDetails['salePercentage'] ?? 0);
+    $productDetails['costPrice'] = null;
+    $productDetails['mrp'] = null;
+    $productDetails['sellingPrice'] = null;
+
+    $adhocSql = "
+        SELECT stc_purchase_product_adhoc_prate, stc_purchase_product_adhoc_rate
+        FROM stc_purchase_product_adhoc
+        WHERE stc_purchase_product_adhoc_productid = " . $productId . " AND stc_purchase_product_adhoc_status = 1
+        ORDER BY stc_purchase_product_adhoc_id DESC
+        LIMIT 1
+    ";
+    $adhocRes = $conn->query($adhocSql);
+    if (!$adhocRes || $adhocRes->num_rows === 0) {
+        $adhocSql = "
+            SELECT stc_purchase_product_adhoc_prate, stc_purchase_product_adhoc_rate
+            FROM stc_purchase_product_adhoc
+            WHERE stc_purchase_product_adhoc_productid = " . $productId . "
+            ORDER BY stc_purchase_product_adhoc_id DESC
+            LIMIT 1
+        ";
+        $adhocRes = $conn->query($adhocSql);
+    }
+
+    if ($adhocRes && $adhocRes->num_rows > 0) {
+        $row = $adhocRes->fetch_assoc();
+        $prate = $row['stc_purchase_product_adhoc_prate'];
+        $rate = $row['stc_purchase_product_adhoc_rate'];
+        if ($prate !== null && $prate !== '') {
+            $productDetails['costPrice'] = round(floatval($prate), 2);
+        }
+        if ($rate !== null && $rate !== '') {
+            $productDetails['mrp'] = round(floatval($rate), 2);
+            $productDetails['sellingPrice'] = round(floatval($rate) * (1 + $salePct / 100), 2);
+        }
+    } else {
+        $grnSql = "
+            SELECT stc_product_grn_items_rate
+            FROM stc_product_grn_items
+            WHERE stc_product_grn_items_product_id = " . $productId . "
+            ORDER BY stc_product_grn_items_id DESC
+            LIMIT 1
+        ";
+        $grnRes = $conn->query($grnSql);
+        if ($grnRes && $grnRes->num_rows > 0) {
+            $gr = $grnRes->fetch_assoc();
+            $r = floatval($gr['stc_product_grn_items_rate']);
+            $productDetails['costPrice'] = round($r, 2);
+            $productDetails['mrp'] = round($r, 2);
+            $productDetails['sellingPrice'] = round($r * (1 + $salePct / 100), 2);
+        }
+    }
+
+    $stockRes = $conn->query("
+        SELECT SUM(stc_purchase_product_adhoc_qty) AS stock_sum
+        FROM stc_purchase_product_adhoc
+        WHERE stc_purchase_product_adhoc_status = 1
+        AND stc_purchase_product_adhoc_productid = " . $productId . "
+    ");
+    if ($stockRes && $stockRes->num_rows > 0) {
+        $sv = $stockRes->fetch_assoc();
+        $productDetails['stockQty'] = isset($sv['stock_sum']) && $sv['stock_sum'] !== null
+            ? floatval($sv['stock_sum'])
+            : 0;
+    } else {
+        $productDetails['stockQty'] = 0;
+    }
+
+    $productDetails['statusLabel'] = ((int)($productDetails['availability'] ?? 0) === 1) ? 'Active' : 'Inactive';
+}
+
 // get products details
 function getProductDetails($conn) {
     if (!isset($_GET['productId']) || !is_numeric($_GET['productId'])) {
@@ -400,7 +475,13 @@ function getProductDetails($conn) {
         return;
     }
 
-    $productId = $_GET['productId'];
+    // Integer only — safe to embed; avoids mysqli_stmt::get_result() which requires mysqlnd
+    // (many production hosts lack mysqlnd and fatally error on get_result(), causing HTTP 500).
+    $productId = (int) $_GET['productId'];
+    if ($productId < 1) {
+        echo json_encode(['error' => 'Invalid or missing product ID.']);
+        return;
+    }
 
     $query = "
         SELECT 
@@ -422,24 +503,30 @@ function getProductDetails($conn) {
         LEFT JOIN stc_sub_category sc ON p.stc_product_sub_cat_id = sc.stc_sub_cat_id
         LEFT JOIN stc_rack r ON p.stc_product_rack_id = r.stc_rack_id
         LEFT JOIN stc_brand b ON p.stc_product_brand_id = b.stc_brand_id
-        WHERE p.stc_product_id = ?
+        WHERE p.stc_product_id = " . $productId . "
+        LIMIT 1
     ";
 
-    if ($stmt = $conn->prepare($query)) {
-        $stmt->bind_param("i", $productId); // Bind productId as an integer
-        $stmt->execute();
-        $result = $stmt->get_result();
+    $result = $conn->query($query);
+    if ($result === false) {
+        echo json_encode(['error' => 'Failed to load product.']);
+        return;
+    }
 
-        if ($result->num_rows > 0) {
-            $productDetails = $result->fetch_assoc(); // Fetch the single row
-            echo json_encode(['success' => true, 'product' => $productDetails, 'message' => 'Product details fetched successfully.']);
-        } else {
-            echo json_encode(['error' => 'No details found for the selected product.']);
+    if ($result->num_rows > 0) {
+        $productDetails = $result->fetch_assoc();
+        enrichProductCommerceFields($conn, $productId, $productDetails);
+        $jsonOpts = JSON_UNESCAPED_UNICODE;
+        if (defined('JSON_INVALID_UTF8_SUBSTITUTE')) {
+            $jsonOpts |= JSON_INVALID_UTF8_SUBSTITUTE;
         }
-
-        $stmt->close();
+        echo json_encode([
+            'success' => true,
+            'product' => $productDetails,
+            'message' => 'Product details fetched successfully.'
+        ], $jsonOpts);
     } else {
-        echo json_encode(['error' => 'Failed to prepare query.']);
+        echo json_encode(['error' => 'No details found for the selected product.']);
     }
 }
 
