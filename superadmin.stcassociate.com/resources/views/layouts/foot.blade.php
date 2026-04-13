@@ -49,11 +49,13 @@
 
   <script>
     $(function () {
-      $("#example1").DataTable({
-        "responsive": true, 
-        "lengthChange": false, 
-        "autoWidth": true,
-        "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
-      }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+      if ($.fn.DataTable && $('#example1').length) {
+        $("#example1").DataTable({
+          "responsive": true,
+          "lengthChange": false,
+          "autoWidth": true,
+          "buttons": ["copy", "csv", "excel", "pdf", "print", "colvis"]
+        }).buttons().container().appendTo('#example1_wrapper .col-md-6:eq(0)');
+      }
     });
   </script>

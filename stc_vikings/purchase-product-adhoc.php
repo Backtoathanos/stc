@@ -127,6 +127,17 @@ include("kattegat/role_check.php");
           background-color: #e9ecef;
       }
 
+      .stc-purchase-view-table td.shop-qty-cell-clickable {
+          cursor: pointer;
+          vertical-align: middle !important;
+      }
+      .stc-purchase-view-table td.shop-qty-cell-clickable:hover {
+          background-color: #f0f7ff;
+      }
+      #vikings-shop-qty-modal .table td {
+          vertical-align: middle;
+      }
+
       /* Item name autocomplete styling */
       .itemname-autocomplete-wrapper {
           position: relative;
@@ -1762,9 +1773,276 @@ include("kattegat/role_check.php");
             });
           });
 
+          var _vikShopModalAdhoc = {};
+          var _vikShopModalShopNames = [];
+          var _vikShopModalCanAdd = false;
+
+          function vikingsTransferChallanUrl(shopRowId) {
+            return 'stc-print-preview-transferchallan.php?transfer_id=' + encodeURIComponent(shopRowId);
+          }
+
+          function vikingsShopBranchLabel(r) {
+            if (!r) { return ''; }
+            var b = (r.branch !== undefined && r.branch !== null) ? String(r.branch).trim() : '';
+            if (b) { return b; }
+            return (r.shopname !== undefined && r.shopname !== null) ? String(r.shopname).trim() : '';
+          }
+
+          function vikingsBuildShopNameSelect(selected, className) {
+            var cls = className || 'form-control vik-shop-edit-name';
+            var $sel = $('<select/>').addClass(cls);
+            $sel.append($('<option/>').val('').text('— Select branch —'));
+            (_vikShopModalShopNames || []).forEach(function (name) {
+              if (!name) { return; }
+              var o = $('<option/>').val(name).text(name);
+              if (name === selected) { o.prop('selected', true); }
+              $sel.append(o);
+            });
+            if (selected && _vikShopModalShopNames.indexOf(selected) === -1) {
+              $sel.append($('<option/>').val(selected).text(selected).prop('selected', true));
+            }
+            return $sel;
+          }
+
+          function vikingsRenderShopViewRow(r, meta) {
+            var rack = (r.stc_rack_name && String(r.stc_rack_name).length) ? r.stc_rack_name : ('#' + (r.rack_id || ''));
+            var challanUrl = vikingsTransferChallanUrl(r.id);
+            var challanHtml = '<a href="' + challanUrl + '" target="_blank" rel="noopener" class="btn btn-xs btn-default" title="Challan preview" style=" font-size: 21px; padding: 0; margin: 0; "><i class="fa fa-print"></i></a>';
+
+            var $tr = $('<tr/>').attr('data-shop-row-id', r.id).attr('data-rack-id', r.rack_id || 0).data('remarks', r.remarks || '');
+            $tr.append($('<td/>').text(vikingsShopBranchLabel(r)));
+            $tr.append($('<td class="text-right"/>').text(parseFloat(r.qty || 0).toFixed(2)));
+            $tr.append($('<td/>').text(meta.unit || '—'));
+            $tr.append($('<td/>').text(rack));
+            $tr.append($('<td class="text-center"/>').html(challanHtml));
+            $tr.append($('<td class="text-center"/>').html('<button type="button" class="btn btn-xs btn-primary vik-shop-row-edit" title="Edit"><i class="fa fa-edit"></i></button>'));
+            $tr.append($('<td class="text-center"/>').html('<button type="button" class="btn btn-xs btn-danger vik-shop-row-delete" title="Delete"><i class="fa fa-trash"></i></button>'));
+            $tr.append($('<td/>'));
+            return $tr;
+          }
+
+          function vikingsRenderShopEditRow(r, meta) {
+            var $tr = $('<tr/>').addClass('vik-shop-row-editing').attr('data-shop-row-id', r.id).data('remarks', r.remarks || '');
+            $tr.append($('<td/>').append(vikingsBuildShopNameSelect(vikingsShopBranchLabel(r))));
+            $tr.append($('<td/>').html('<input type="number" class="form-control vik-shop-edit-qty text-right" step="0.01" value="' + parseFloat(r.qty || 0) + '">'));
+            $tr.append($('<td/>').text(meta.unit || '—'));
+            $tr.append($('<td/>').html('<input type="number" class="form-control vik-shop-edit-rack" value="' + (parseInt(r.rack_id, 10) || 0) + '">'));
+            $tr.append($('<td class="text-center text-muted"/>').text('—'));
+            $tr.append($('<td colspan="2" class="text-center"/>').html('<button type="button" class="btn btn-xs btn-success vik-shop-row-save" style="margin-right:4px;">Save</button><button type="button" class="btn btn-xs btn-default vik-shop-row-cancel">Cancel</button>'));
+            $tr.append($('<td/>'));
+            return $tr;
+          }
+
+          function vikingsRenderShopNewRow(meta) {
+            var $tr = $('<tr/>').addClass('vik-shop-row-editing vik-shop-row-new');
+            $tr.append($('<td/>').append(vikingsBuildShopNameSelect('', 'form-control vik-shop-new-name')));
+            $tr.append($('<td/>').html('<input type="number" class="form-control vik-shop-new-qty text-right" step="0.01" value="0">'));
+            $tr.append($('<td/>').text(meta.unit || '—'));
+            $tr.append($('<td/>').html('<input type="number" class="form-control vik-shop-new-rack" value="0">'));
+            $tr.append($('<td class="text-center text-muted"/>').text('—'));
+            $tr.append($('<td colspan="2" class="text-center"/>').html('<button type="button" class="btn btn-xs btn-success vik-shop-row-save-new" style="margin-right:4px;">Save</button><button type="button" class="btn btn-xs btn-default vik-shop-row-cancel">Cancel</button>'));
+            $tr.append($('<td/>'));
+            return $tr;
+          }
+
+          function loadVikingsShopQtyModal(adhocId) {
+            var $tbody = $('#vikings-shop-qty-table-body');
+            $tbody.html('<tr><td colspan="8" class="text-center text-muted">Loading…</td></tr>');
+            $.ajax({
+              url: 'kattegat/ragnar_purchase.php',
+              type: 'POST',
+              data: { stc_poadhoc_shops_get: 1, adhoc_id: adhocId },
+              dataType: 'json',
+              success: function (res) {
+                if (!res || !res.success) {
+                  $tbody.html('<tr><td colspan="8" class="text-center text-danger">' + (res && res.message ? res.message : 'Load failed') + '</td></tr>');
+                  return;
+                }
+                _vikShopModalShopNames = res.shop_names || [];
+                _vikShopModalAdhoc = res.adhoc || {};
+                var a = _vikShopModalAdhoc;
+
+                $('#vikings-shop-modal-product-name').text(a.product_name || '—');
+                $('#vikings-shop-modal-purchased-qty').text(parseFloat(a.purchased_qty || 0).toFixed(2));
+                $('#vikings-shop-modal-unit-suffix').text(a.unit ? ' ' + a.unit : '');
+                $('#vikings-shop-modal-allocated-qty').text(parseFloat(a.allocated_qty || 0).toFixed(2));
+                var bal = parseFloat(a.balanced_qty || 0);
+                var $balEl = $('#vikings-shop-modal-balanced-qty');
+                $balEl.text(bal.toFixed(2));
+                $balEl.removeClass('text-info text-danger text-muted text-warning');
+                if (bal < -1e-6) {
+                  $balEl.addClass('text-danger');
+                } else if (bal > 1e-6) {
+                  $balEl.addClass('text-info');
+                } else {
+                  $balEl.addClass('text-muted');
+                }
+
+                _vikShopModalCanAdd = bal > 1e-6;
+                var $addTh = $('#vikings-shop-qty-col-add-header');
+                if (_vikShopModalCanAdd) {
+                  $addTh.html('<i class="fa fa-plus text-success"></i>').attr('title', 'Add branch');
+                } else {
+                  $addTh.html('<span class="text-muted">—</span>').attr('title', 'No balance left to allocate');
+                }
+
+                $tbody.empty();
+                $('#vikings-shop-qty-add-row-slot').remove();
+
+                if (!res.data || res.data.length === 0) {
+                  var emptyMsg = _vikShopModalCanAdd
+                    ? 'No branch rows yet. Use + to add.'
+                    : 'No branch rows. No balance available to allocate.';
+                  $tbody.append('<tr class="vik-shop-qty-empty-placeholder"><td colspan="8" class="text-center text-muted">' + emptyMsg + '</td></tr>');
+                } else {
+                  res.data.forEach(function (r) {
+                    $tbody.append(vikingsRenderShopViewRow(r, a));
+                  });
+                }
+                var $footer;
+                if (_vikShopModalCanAdd) {
+                  $footer = $('<tr id="vikings-shop-qty-add-row-slot" class="vik-shop-qty-footer-row"><td colspan="7"></td><td class="text-center"><button type="button" class="btn btn-xs btn-success vik-shop-qty-add-row" title="Add branch"><i class="fa fa-plus"></i></button></td></tr>');
+                } else {
+                  $footer = $('<tr id="vikings-shop-qty-add-row-slot" class="vik-shop-qty-footer-row"><td colspan="8" class="text-center text-muted small">No balance left to allocate. Reduce quantities in existing rows or increase purchased qty on the PO line.</td></tr>');
+                }
+                $tbody.append($footer);
+              },
+              error: function () {
+                $tbody.html('<tr><td colspan="8" class="text-center text-danger">Failed to load</td></tr>');
+              }
+            });
+          }
+
+          function openVikingsShopQtyModal(adhocId) {
+            $('#vikings_shop_qty_adhoc_id').val(adhocId);
+            $('#vikings-shop-qty-modal-title-adhoc').text(adhocId);
+            $('#vikings-shop-qty-modal').modal('show');
+            loadVikingsShopQtyModal(adhocId);
+          }
+
+          $('body').delegate('.shop-qty-cell-clickable', 'click', function (e) {
+            e.preventDefault();
+            var adhocId = $(this).data('adhoc-id');
+            if (adhocId) { openVikingsShopQtyModal(adhocId); }
+          });
+
           $('body').delegate('.input-shop-item', 'click', function(e){
+            e.preventDefault();
             var id=$(this).attr('id');
             $('.stc-poadhocshop-id').val(id);
+            if (id) { openVikingsShopQtyModal(id); }
+          });
+
+          $('body').on('click', '#vikings-shop-qty-modal .vik-shop-row-edit', function () {
+            if ($('#vikings-shop-qty-table-body tr.vik-shop-row-editing').length) { return; }
+            var $tr = $(this).closest('tr');
+            var id = $tr.attr('data-shop-row-id');
+            var label = $tr.find('td').eq(0).text();
+            var r = {
+              id: id,
+              branch: label,
+              shopname: label,
+              qty: parseFloat($tr.find('td').eq(1).text()) || 0,
+              rack_id: parseInt($tr.attr('data-rack-id'), 10) || 0,
+              remarks: $tr.data('remarks') || ''
+            };
+            $tr.replaceWith(vikingsRenderShopEditRow(r, _vikShopModalAdhoc));
+          });
+
+          $('body').on('click', '#vikings-shop-qty-modal .vik-shop-row-cancel', function () {
+            loadVikingsShopQtyModal($('#vikings_shop_qty_adhoc_id').val());
+          });
+
+          $('body').on('click', '#vikings-shop-qty-modal .vik-shop-row-save', function () {
+            var $tr = $(this).closest('tr');
+            var adhocId = $('#vikings_shop_qty_adhoc_id').val();
+            $.ajax({
+              url: 'kattegat/ragnar_purchase.php',
+              type: 'POST',
+              dataType: 'json',
+              data: {
+                stc_poadhoc_shop_modal_update: 1,
+                id: $tr.attr('data-shop-row-id'),
+                adhoc_id: adhocId,
+                branch: $tr.find('.vik-shop-edit-name').val(),
+                shopname: $tr.find('.vik-shop-edit-name').val(),
+                qty: $tr.find('.vik-shop-edit-qty').val(),
+                rack_id: $tr.find('.vik-shop-edit-rack').val(),
+                remarks: $tr.data('remarks') || ''
+              },
+              success: function (res) {
+                if (res && res.success) {
+                  alert(res.message || 'Updated');
+                  loadVikingsShopQtyModal(adhocId);
+                  Pagination.loadData(pagenumber);
+                } else {
+                  alert((res && res.message) ? res.message : 'Update failed');
+                }
+              },
+              error: function () { alert('Update failed'); }
+            });
+          });
+
+          $('body').on('click', '#vikings-shop-qty-modal .vik-shop-row-save-new', function () {
+            var $tr = $(this).closest('tr');
+            var adhocId = $('#vikings_shop_qty_adhoc_id').val();
+            $.ajax({
+              url: 'kattegat/ragnar_purchase.php',
+              type: 'POST',
+              dataType: 'json',
+              data: {
+                stc_poadhoc_shop_modal_save: 1,
+                adhoc_id: adhocId,
+                branch: $tr.find('.vik-shop-new-name').val(),
+                shopname: $tr.find('.vik-shop-new-name').val(),
+                qty: $tr.find('.vik-shop-new-qty').val(),
+                rack_id: $tr.find('.vik-shop-new-rack').val(),
+                remarks: ''
+              },
+              success: function (res) {
+                if (res && res.success) {
+                  alert(res.message || 'Saved');
+                  loadVikingsShopQtyModal(adhocId);
+                  Pagination.loadData(pagenumber);
+                } else {
+                  alert((res && res.message) ? res.message : 'Save failed');
+                }
+              },
+              error: function () { alert('Save failed'); }
+            });
+          });
+
+          $('body').on('click', '#vikings-shop-qty-modal .vik-shop-row-delete', function () {
+            if (!window.confirm('Delete this branch row?')) { return; }
+            var $tr = $(this).closest('tr');
+            var adhocId = $('#vikings_shop_qty_adhoc_id').val();
+            $.ajax({
+              url: 'kattegat/ragnar_purchase.php',
+              type: 'POST',
+              dataType: 'json',
+              data: {
+                stc_poadhoc_shop_modal_delete: 1,
+                id: $tr.attr('data-shop-row-id'),
+                adhoc_id: adhocId
+              },
+              success: function (res) {
+                if (res && res.success) {
+                  alert(res.message || 'Deleted');
+                  loadVikingsShopQtyModal(adhocId);
+                  Pagination.loadData(pagenumber);
+                } else {
+                  alert((res && res.message) ? res.message : 'Delete failed');
+                }
+              },
+              error: function () { alert('Delete failed'); }
+            });
+          });
+
+          $('body').on('click', '#vikings-shop-qty-modal .vik-shop-qty-add-row', function () {
+            if (!_vikShopModalCanAdd) { return; }
+            if ($('#vikings-shop-qty-table-body tr.vik-shop-row-editing').length) { return; }
+            $('.vik-shop-qty-empty-placeholder').remove();
+            $('#vikings-shop-qty-add-row-slot').before(vikingsRenderShopNewRow(_vikShopModalAdhoc));
           });
 
           $('body').delegate('.stc-poadhoc-addtohshop-hit', 'click', function(e){
@@ -1937,6 +2215,9 @@ include("kattegat/role_check.php");
                         data+='<td class="text-right">'+response[i].stc_cust_super_requisition_list_items_rec_recqty+'</td>';
                         data+='</tr>';
                       }
+                      data+='<tr>';
+                      data+='<td colspan="8">Total Quantity: '+totalQuantity+'</td>';
+                      data+='</tr>';
                       $('.stc-call-view-poadhocpending-row').html(data);
                   }
               });
@@ -2917,6 +3198,61 @@ include("kattegat/role_check.php");
                   <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="vikings-shop-qty-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" style="width:95%; max-width:1100px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Branch quantities <small class="text-muted">(Adhoc #<span id="vikings-shop-qty-modal-title-adhoc"></span>)</small></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="vikings_shop_qty_adhoc_id">
+                <div class="panel panel-default" style="margin-bottom:12px;">
+                    <div class="panel-body" style="padding:10px 15px;">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-12">
+                                <strong>Product</strong>
+                                <div id="vikings-shop-modal-product-name" class="text-break">—</div>
+                            </div>
+                            <div class="col-md-2 col-sm-4 col-xs-6">
+                                <strong>Purchased qty</strong>
+                                <div><span id="vikings-shop-modal-purchased-qty">0</span><span id="vikings-shop-modal-unit-suffix" class="text-muted"></span></div>
+                            </div>
+                            <div class="col-md-2 col-sm-4 col-xs-6">
+                                <strong>Allocated</strong>
+                                <div class="text-muted" id="vikings-shop-modal-allocated-qty">0</div>
+                            </div>
+                            <div class="col-md-2 col-sm-4 col-xs-6">
+                                <strong>Balanced</strong>
+                                <div id="vikings-shop-modal-balanced-qty">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-condensed">
+                        <thead>
+                            <tr>
+                                <th>Branch</th>
+                                <th class="text-right">Qty</th>
+                                <th>Unit</th>
+                                <th>Rack</th>
+                                <th class="text-center">Challan</th>
+                                <th class="text-center">Edit</th>
+                                <th class="text-center">Delete</th>
+                                <th class="text-center" id="vikings-shop-qty-col-add-header" title="Add branch"><i class="fa fa-plus text-success"></i></th>
+                            </tr>
+                        </thead>
+                        <tbody id="vikings-shop-qty-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

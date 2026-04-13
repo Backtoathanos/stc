@@ -5,10 +5,35 @@ header("Access-Control-Allow-Headers: Content-Type");
 
 include "../../MCU/db.php";
 
+/**
+ * stc_shop may or may not have a branch column depending on schema version.
+ */
+function inventoryStcShopHasBranchColumn($con)
+{
+    static $cache = null;
+    if ($cache !== null) {
+        return $cache;
+    }
+    $r = mysqli_query($con, "SHOW COLUMNS FROM `stc_shop` LIKE 'branch'");
+    $cache = ($r && mysqli_num_rows($r) > 0);
+    return $cache;
+}
+
+/**
+ * SQL expression for the inventory "location" label of a stc_shop row (alias without backticks).
+ */
+function inventoryStcShopLocationExpr($con, $alias)
+{
+    if (inventoryStcShopHasBranchColumn($con)) {
+        return "COALESCE(NULLIF(TRIM({$alias}.branch), ''), TRIM({$alias}.shopname))";
+    }
+    return "TRIM({$alias}.shopname)";
+}
+
 $search = mysqli_real_escape_string($con, $_GET['search'] ?? '');
 $page = (int)($_GET['page'] ?? 1);
 $limit = (int)($_GET['limit'] ?? 10);
-$location_stc = $_GET['location'] ?? '';
+$location_stc = isset($_GET['location']) ? trim(rawurldecode((string) $_GET['location'])) : '';
 $location_esc = mysqli_real_escape_string($con, $location_stc);
 $offset = ($page - 1) * $limit;
 
@@ -21,11 +46,29 @@ INNER JOIN stc_sub_category S ON P.stc_product_sub_cat_id = S.stc_sub_cat_id
 LEFT JOIN stc_category C ON C.stc_cat_id = P.stc_product_cat_id
 LEFT JOIN stc_brand B ON B.stc_brand_id = P.stc_product_brand_id
 WHERE P.stc_product_avail = 1
-AND EXISTS (
+AND (";
+
+$productExistsActive = "EXISTS (
     SELECT 1 FROM stc_purchase_product_adhoc spa
     WHERE spa.stc_purchase_product_adhoc_productid = P.stc_product_id
     AND spa.stc_purchase_product_adhoc_status = 1
 )";
+if ($location_stc !== '' && $location_stc !== 'Root') {
+    $coalesceP = inventoryStcShopLocationExpr($con, 'S2');
+    $cquery .= $productExistsActive . " OR EXISTS (
+        SELECT 1 FROM stc_shop S2
+        INNER JOIN stc_purchase_product_adhoc spa2 ON spa2.stc_purchase_product_adhoc_id = S2.adhoc_id
+        WHERE spa2.stc_purchase_product_adhoc_productid = P.stc_product_id
+        AND ABS(S2.qty) > 0.00001
+        AND (
+            TRIM(S2.shopname) = '$location_esc'
+            OR ($coalesceP) = '$location_esc'
+        )
+    )";
+} else {
+    $cquery .= $productExistsActive;
+}
+$cquery .= ")";
 
 if ($search) {
     $cquery .= " AND (P.stc_product_id='$search' OR P.stc_product_name LIKE '%$search%' OR P.stc_product_desc LIKE '%$search%')";
@@ -124,14 +167,29 @@ function loadInventoryAggregateMaps($con, $location_esc, $location_raw)
         }
     }
 
-    // 5) Shop qty per product + branch (prefer branch, else shopname)
-    $sql = "SELECT spa.stc_purchase_product_adhoc_productid AS pid,
-                   COALESCE(NULLIF(TRIM(S.branch), ''), S.shopname) AS shopname,
-                   SUM(S.qty) AS q
+    // 5) Shop qty per product + location label (all stc_shop lines; not gated on adhoc status = 1).
+    // When branch and shopname differ, also key the same qty under TRIM(shopname) for branch-filter UIs.
+    $exprS = inventoryStcShopLocationExpr($con, 'S');
+    $shopUnionParts = [
+        "SELECT spa.stc_purchase_product_adhoc_productid AS pid,
+                {$exprS} AS loc_key,
+                S.qty AS qty
+            FROM stc_purchase_product_adhoc spa
+            JOIN stc_shop S ON S.adhoc_id = spa.stc_purchase_product_adhoc_id",
+    ];
+    if (inventoryStcShopHasBranchColumn($con)) {
+        $shopUnionParts[] = "SELECT spa.stc_purchase_product_adhoc_productid AS pid,
+                TRIM(S.shopname) AS loc_key,
+                S.qty AS qty
             FROM stc_purchase_product_adhoc spa
             JOIN stc_shop S ON S.adhoc_id = spa.stc_purchase_product_adhoc_id
-            WHERE spa.stc_purchase_product_adhoc_status = 1
-            GROUP BY spa.stc_purchase_product_adhoc_productid, COALESCE(NULLIF(TRIM(S.branch), ''), S.shopname)";
+            WHERE TRIM(S.shopname) <> ''
+              AND NULLIF(TRIM(S.branch), '') IS NOT NULL
+              AND TRIM(S.shopname) <> TRIM(S.branch)";
+    }
+    $sql = "SELECT u.pid, u.loc_key AS shopname, SUM(u.qty) AS q
+            FROM (" . implode(' UNION ALL ', $shopUnionParts) . ") u
+            GROUP BY u.pid, u.loc_key";
     $res = mysqli_query($con, $sql);
     if ($res) {
         while ($r = mysqli_fetch_assoc($res)) {
@@ -192,6 +250,8 @@ function loadInventoryAggregateMaps($con, $location_esc, $location_raw)
 
     // 9) Branch rack: latest stc_shop row per product for this shop
     if ($location_raw !== 'Root' && $location_esc !== '') {
+        $exprS = inventoryStcShopLocationExpr($con, 'S');
+        $exprS2 = inventoryStcShopLocationExpr($con, 'S2');
         $sql = "SELECT spa.stc_purchase_product_adhoc_productid AS pid, r.stc_rack_name AS rack_name
                 FROM stc_shop S
                 JOIN stc_purchase_product_adhoc spa ON spa.stc_purchase_product_adhoc_id = S.adhoc_id
@@ -200,10 +260,16 @@ function loadInventoryAggregateMaps($con, $location_esc, $location_raw)
                     SELECT spa2.stc_purchase_product_adhoc_productid AS pid2, MAX(S2.id) AS max_sid
                     FROM stc_shop S2
                     JOIN stc_purchase_product_adhoc spa2 ON spa2.stc_purchase_product_adhoc_id = S2.adhoc_id
-                    WHERE COALESCE(NULLIF(TRIM(S2.branch), ''), S2.shopname) = '$location_esc' AND spa2.stc_purchase_product_adhoc_status = 1
+                    WHERE (
+                        ($exprS2) = '$location_esc'
+                        OR TRIM(S2.shopname) = '$location_esc'
+                      )
                     GROUP BY spa2.stc_purchase_product_adhoc_productid
                 ) t ON t.pid2 = spa.stc_purchase_product_adhoc_productid AND t.max_sid = S.id
-                WHERE COALESCE(NULLIF(TRIM(S.branch), ''), S.shopname) = '$location_esc' AND spa.stc_purchase_product_adhoc_status = 1";
+                WHERE (
+                    ($exprS) = '$location_esc'
+                    OR TRIM(S.shopname) = '$location_esc'
+                  )";
         $res = mysqli_query($con, $sql);
         if ($res) {
             while ($r = mysqli_fetch_assoc($res)) {

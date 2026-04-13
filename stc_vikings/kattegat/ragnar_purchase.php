@@ -2126,6 +2126,316 @@ class ragnarGRNAdd extends tesseract{
 // add po adhoc class
 class ragnarPurchaseAdhoc extends tesseract{
 
+	private static $ragnar_stc_shop_columns = null;
+
+	private function ragnar_stc_shop_load_columns()
+	{
+		if (self::$ragnar_stc_shop_columns !== null) {
+			return self::$ragnar_stc_shop_columns;
+		}
+		self::$ragnar_stc_shop_columns = [];
+		$r = mysqli_query($this->stc_dbs, "SHOW COLUMNS FROM `stc_shop`");
+		if ($r) {
+			while ($row = mysqli_fetch_assoc($r)) {
+				self::$ragnar_stc_shop_columns[$row['Field']] = true;
+			}
+		}
+		return self::$ragnar_stc_shop_columns;
+	}
+
+	private function ragnar_stc_shop_has_column($field)
+	{
+		$c = $this->ragnar_stc_shop_load_columns();
+		return !empty($c[$field]);
+	}
+
+	private function ragnar_stc_shop_branch_label_row($row)
+	{
+		if ($this->ragnar_stc_shop_has_column('branch')) {
+			$b = trim((string)($row['branch'] ?? ''));
+			if ($b !== '') {
+				return $b;
+			}
+		}
+		return trim((string)($row['shopname'] ?? ''));
+	}
+
+	/** Distinct branch / shop / trading locations for shop modal dropdowns. */
+	public function stc_poadhoc_collect_shop_name_options()
+	{
+		$seen = [];
+		$out = [];
+		$push = function ($loc) use (&$seen, &$out) {
+			$loc = trim((string)$loc);
+			if ($loc === '') {
+				return;
+			}
+			$k = strtolower($loc);
+			if (isset($seen[$k])) {
+				return;
+			}
+			$seen[$k] = true;
+			$out[] = $loc;
+		};
+		if ($this->ragnar_stc_shop_has_column('branch')) {
+			$q = mysqli_query($this->stc_dbs, "SELECT DISTINCT TRIM(`branch`) AS loc FROM `stc_shop` WHERE `branch` IS NOT NULL AND TRIM(`branch`) <> ''");
+			if ($q) {
+				while ($row = mysqli_fetch_assoc($q)) {
+					$push($row['loc'] ?? '');
+				}
+			}
+		}
+		$q2 = mysqli_query($this->stc_dbs, "SELECT DISTINCT TRIM(`shopname`) AS loc FROM `stc_shop` WHERE `shopname` IS NOT NULL AND TRIM(`shopname`) <> ''");
+		if ($q2) {
+			while ($row = mysqli_fetch_assoc($q2)) {
+				$push($row['loc'] ?? '');
+			}
+		}
+		$q3 = mysqli_query($this->stc_dbs, "SELECT DISTINCT TRIM(`stc_trading_user_location`) AS loc FROM `stc_trading_user` WHERE `stc_trading_user_location` IS NOT NULL AND TRIM(`stc_trading_user_location`) <> ''");
+		if ($q3) {
+			while ($row = mysqli_fetch_assoc($q3)) {
+				$push($row['loc'] ?? '');
+			}
+		}
+		natcasesort($out);
+		return array_values($out);
+	}
+
+	/** JSON payload for branch-qty modal (aligned with superadmin POAdhocController::shopsByAdhoc). */
+	public function stc_poadhoc_shops_by_adhoc($adhoc_id)
+	{
+		$adhoc_id = (int)$adhoc_id;
+		if ($adhoc_id < 1) {
+			return ['success' => false, 'message' => 'Invalid adhoc id'];
+		}
+		$esc = mysqli_real_escape_string($this->stc_dbs, (string)$adhoc_id);
+		$adhocQ = mysqli_query($this->stc_dbs, "
+			SELECT spa.stc_purchase_product_adhoc_id, spa.stc_purchase_product_adhoc_itemdesc, spa.stc_purchase_product_adhoc_qty, spa.stc_purchase_product_adhoc_unit, p.stc_product_name
+			FROM stc_purchase_product_adhoc spa
+			LEFT JOIN stc_product p ON spa.stc_purchase_product_adhoc_productid = p.stc_product_id
+			WHERE spa.stc_purchase_product_adhoc_id = '".$esc."'
+			LIMIT 1
+		");
+		if (!$adhocQ || mysqli_num_rows($adhocQ) === 0) {
+			return ['success' => false, 'message' => 'PO adhoc line not found'];
+		}
+		$adhoc = mysqli_fetch_assoc($adhocQ);
+		$purchasedQty = (float)($adhoc['stc_purchase_product_adhoc_qty'] ?? 0);
+		$productLabel = trim((string)($adhoc['stc_product_name'] ?? ''));
+		if ($productLabel === '') {
+			$productLabel = (string)($adhoc['stc_purchase_product_adhoc_itemdesc'] ?? '');
+		}
+
+		$sumQ = mysqli_query($this->stc_dbs, "SELECT COALESCE(SUM(`qty`),0) AS s FROM `stc_shop` WHERE `adhoc_id`='".$esc."'");
+		$allocatedQty = 0.0;
+		if ($sumQ && $sr = mysqli_fetch_assoc($sumQ)) {
+			$allocatedQty = (float)($sr['s'] ?? 0);
+		}
+		$balancedQty = $purchasedQty - $allocatedQty;
+
+		$joinRack = '';
+		$selExtra = '';
+		if ($this->ragnar_stc_shop_has_column('rack_id')) {
+			$joinRack = ' LEFT JOIN `stc_rack` r ON r.stc_rack_id = s.rack_id ';
+			$selExtra .= ', s.rack_id, r.stc_rack_name';
+		}
+		if ($this->ragnar_stc_shop_has_column('remarks')) {
+			$selExtra .= ', s.remarks';
+		}
+		$orderBranch = $this->ragnar_stc_shop_has_column('branch') ? 's.branch, ' : '';
+		$selBranch = $this->ragnar_stc_shop_has_column('branch') ? 's.branch, ' : '';
+		$rowsQ = mysqli_query($this->stc_dbs, "
+			SELECT s.id, {$selBranch} s.shopname, s.adhoc_id, s.qty{$selExtra}
+			FROM stc_shop s
+			{$joinRack}
+			WHERE s.adhoc_id = '".$esc."'
+			ORDER BY {$orderBranch} s.shopname ASC, s.id ASC
+		");
+		$data = [];
+		if ($rowsQ) {
+			while ($rw = mysqli_fetch_assoc($rowsQ)) {
+				$rackId = $this->ragnar_stc_shop_has_column('rack_id') ? (int)($rw['rack_id'] ?? 0) : 0;
+				$item = [
+					'id' => (int)($rw['id'] ?? 0),
+					'shopname' => (string)($rw['shopname'] ?? ''),
+					'adhoc_id' => (int)($rw['adhoc_id'] ?? 0),
+					'qty' => (float)($rw['qty'] ?? 0),
+					'stc_rack_name' => (string)($rw['stc_rack_name'] ?? ''),
+					'rack_id' => $rackId,
+					'branch' => $this->ragnar_stc_shop_has_column('branch') ? (string)($rw['branch'] ?? '') : null,
+					'remarks' => $this->ragnar_stc_shop_has_column('remarks') ? (string)($rw['remarks'] ?? '') : '',
+				];
+				$data[] = $item;
+			}
+		}
+
+		return [
+			'success' => true,
+			'adhoc' => [
+				'id' => (int)($adhoc['stc_purchase_product_adhoc_id'] ?? 0),
+				'product_name' => $productLabel,
+				'purchased_qty' => $purchasedQty,
+				'unit' => (string)($adhoc['stc_purchase_product_adhoc_unit'] ?? ''),
+				'allocated_qty' => $allocatedQty,
+				'balanced_qty' => $balancedQty,
+			],
+			'shop_names' => $this->stc_poadhoc_collect_shop_name_options(),
+			'data' => $data,
+		];
+	}
+
+	private function stc_poadhoc_adhoc_purchased_qty($adhoc_id)
+	{
+		$adhoc_id = (int)$adhoc_id;
+		$esc = mysqli_real_escape_string($this->stc_dbs, (string)$adhoc_id);
+		$q = mysqli_query($this->stc_dbs, "SELECT stc_purchase_product_adhoc_qty FROM stc_purchase_product_adhoc WHERE stc_purchase_product_adhoc_id='".$esc."' LIMIT 1");
+		if ($q && $r = mysqli_fetch_assoc($q)) {
+			return (float)($r['stc_purchase_product_adhoc_qty'] ?? 0);
+		}
+		return 0.0;
+	}
+
+	private function stc_poadhoc_allocated_sum($adhoc_id, $exclude_shop_id = null)
+	{
+		$adhoc_id = (int)$adhoc_id;
+		$esc = mysqli_real_escape_string($this->stc_dbs, (string)$adhoc_id);
+		$sql = "SELECT COALESCE(SUM(qty),0) AS s FROM stc_shop WHERE adhoc_id='".$esc."'";
+		if ($exclude_shop_id !== null && (int)$exclude_shop_id > 0) {
+			$ex = mysqli_real_escape_string($this->stc_dbs, (string)(int)$exclude_shop_id);
+			$sql .= " AND id <> '".$ex."'";
+		}
+		$q = mysqli_query($this->stc_dbs, $sql);
+		if ($q && $r = mysqli_fetch_assoc($q)) {
+			return (float)($r['s'] ?? 0);
+		}
+		return 0.0;
+	}
+
+	public function stc_poadhoc_shop_modal_insert($adhoc_id, $branch, $qty, $rack_id, $remarks)
+	{
+		$adhoc_id = (int)$adhoc_id;
+		$branch = trim((string)$branch);
+		$qty = is_numeric($qty) ? (float)$qty : 0.0;
+		$rack_id = (int)$rack_id;
+		$remarks = trim((string)$remarks);
+		if ($adhoc_id < 1) {
+			return ['success' => false, 'message' => 'Invalid PO adhoc id'];
+		}
+		if ($branch === '') {
+			return ['success' => false, 'message' => 'Branch is required'];
+		}
+		$escA = mysqli_real_escape_string($this->stc_dbs, (string)$adhoc_id);
+		$exQ = mysqli_query($this->stc_dbs, "SELECT 1 FROM stc_purchase_product_adhoc WHERE stc_purchase_product_adhoc_id='".$escA."' LIMIT 1");
+		if (!$exQ || mysqli_num_rows($exQ) === 0) {
+			return ['success' => false, 'message' => 'PO adhoc line not found'];
+		}
+		$purchased = $this->stc_poadhoc_adhoc_purchased_qty($adhoc_id);
+		$allocated = $this->stc_poadhoc_allocated_sum($adhoc_id);
+		$remaining = $purchased - $allocated;
+		if ($qty > $remaining + 1e-6) {
+			return [
+				'success' => false,
+				'message' => 'Quantity exceeds available balance. Purchased: '.number_format($purchased, 2, '.', '')
+					.', allocated: '.number_format($allocated, 2, '.', '')
+					.', remaining: '.number_format(max(0, $remaining), 2, '.', '').'.',
+			];
+		}
+		$date = date('Y-m-d H:i:s');
+		$uid = mysqli_real_escape_string($this->stc_dbs, (string)($_SESSION['stc_empl_id'] ?? 0));
+		$b = mysqli_real_escape_string($this->stc_dbs, $branch);
+		$qtys = mysqli_real_escape_string($this->stc_dbs, number_format($qty, 4, '.', ''));
+		$rems = mysqli_real_escape_string($this->stc_dbs, $remarks);
+		$racks = mysqli_real_escape_string($this->stc_dbs, (string)$rack_id);
+
+		$cols = '`adhoc_id`, `shopname`, `qty`, `created_date`, `created_by`';
+		$vals = "'".$escA."', '".$b."', '".$qtys."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".$uid."'";
+		if ($this->ragnar_stc_shop_has_column('branch')) {
+			$cols = '`adhoc_id`, `branch`, `shopname`, `qty`, `created_date`, `created_by`';
+			$vals = "'".$escA."', '".$b."', '".$b."', '".$qtys."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".$uid."'";
+		}
+		if ($this->ragnar_stc_shop_has_column('rack_id')) {
+			$cols .= ', `rack_id`';
+			$vals .= ", '".$racks."'";
+		}
+		if ($this->ragnar_stc_shop_has_column('remarks')) {
+			$cols .= ', `remarks`';
+			$vals .= ", '".$rems."'";
+		}
+		$ok = mysqli_query($this->stc_dbs, "INSERT INTO `stc_shop`(".$cols.") VALUES(".$vals.")");
+		if ($ok) {
+			return ['success' => true, 'message' => 'Branch quantity saved'];
+		}
+		return ['success' => false, 'message' => 'Save failed'];
+	}
+
+	public function stc_poadhoc_shop_modal_update($id, $adhoc_id, $branch, $qty, $rack_id, $remarks)
+	{
+		$id = (int)$id;
+		$adhoc_id = (int)$adhoc_id;
+		$branch = trim((string)$branch);
+		$qty = is_numeric($qty) ? (float)$qty : 0.0;
+		$rack_id = (int)$rack_id;
+		$remarks = trim((string)$remarks);
+		if ($id < 1 || $adhoc_id < 1) {
+			return ['success' => false, 'message' => 'Invalid request'];
+		}
+		if ($branch === '') {
+			return ['success' => false, 'message' => 'Branch is required'];
+		}
+		$escI = mysqli_real_escape_string($this->stc_dbs, (string)$id);
+		$escA = mysqli_real_escape_string($this->stc_dbs, (string)$adhoc_id);
+		$exQ = mysqli_query($this->stc_dbs, "SELECT 1 FROM stc_shop WHERE id='".$escI."' AND adhoc_id='".$escA."' LIMIT 1");
+		if (!$exQ || mysqli_num_rows($exQ) === 0) {
+			return ['success' => false, 'message' => 'Row not found'];
+		}
+		$purchased = $this->stc_poadhoc_adhoc_purchased_qty($adhoc_id);
+		$sumOthers = $this->stc_poadhoc_allocated_sum($adhoc_id, $id);
+		if ($sumOthers + $qty > $purchased + 1e-6) {
+			return [
+				'success' => false,
+				'message' => 'Updated quantity would exceed purchased quantity ('.number_format($purchased, 2, '.', '').'). '
+					.'Other shops total '.number_format($sumOthers, 2, '.', '').'; max for this row is '
+					.number_format(max(0, $purchased - $sumOthers), 2, '.', '').'.',
+			];
+		}
+		$b = mysqli_real_escape_string($this->stc_dbs, $branch);
+		$qtys = mysqli_real_escape_string($this->stc_dbs, number_format($qty, 4, '.', ''));
+		$rems = mysqli_real_escape_string($this->stc_dbs, $remarks);
+		$racks = mysqli_real_escape_string($this->stc_dbs, (string)$rack_id);
+
+		$set = "`shopname`='".$b."', `qty`='".$qtys."'";
+		if ($this->ragnar_stc_shop_has_column('branch')) {
+			$set = "`branch`='".$b."', `shopname`='".$b."', `qty`='".$qtys."'";
+		}
+		if ($this->ragnar_stc_shop_has_column('rack_id')) {
+			$set .= ", `rack_id`='".$racks."'";
+		}
+		if ($this->ragnar_stc_shop_has_column('remarks')) {
+			$set .= ", `remarks`='".$rems."'";
+		}
+		$ok = mysqli_query($this->stc_dbs, "UPDATE `stc_shop` SET ".$set." WHERE id='".$escI."' AND adhoc_id='".$escA."'");
+		if ($ok) {
+			return ['success' => true, 'message' => 'Branch row updated'];
+		}
+		return ['success' => false, 'message' => 'Update failed'];
+	}
+
+	public function stc_poadhoc_shop_modal_delete($id, $adhoc_id)
+	{
+		$id = (int)$id;
+		$adhoc_id = (int)$adhoc_id;
+		if ($id < 1 || $adhoc_id < 1) {
+			return ['success' => false, 'message' => 'Invalid request'];
+		}
+		$escI = mysqli_real_escape_string($this->stc_dbs, (string)$id);
+		$escA = mysqli_real_escape_string($this->stc_dbs, (string)$adhoc_id);
+		$ok = mysqli_query($this->stc_dbs, "DELETE FROM `stc_shop` WHERE id='".$escI."' AND adhoc_id='".$escA."'");
+		if ($ok && mysqli_affected_rows($this->stc_dbs) > 0) {
+			return ['success' => true, 'message' => 'Shop row deleted'];
+		}
+		return ['success' => false, 'message' => 'Row not found'];
+	}
+
 	// save po adhoc trigger
 	public function stc_po_adhoc_save($itemcode, $itemname, $quantity, $prate, $rate, $unit, $rack, $condition, $source, $destination, $receivedby, $remarks){	
 		$odin='';
@@ -2327,17 +2637,44 @@ class ragnarPurchaseAdhoc extends tesseract{
 					}
 				}
 
-				$sql_qry=mysqli_query($this->stc_dbs, "
-					SELECT * FROM `stc_shop` WHERE `adhoc_id`='".$odinrow['stc_purchase_product_adhoc_id']."'
+				$adhocEscShop = mysqli_real_escape_string($this->stc_dbs, (string)$odinrow['stc_purchase_product_adhoc_id']);
+				$joinRackShop = '';
+				$selRackShop = '';
+				if ($this->ragnar_stc_shop_has_column('rack_id')) {
+					$joinRackShop = ' LEFT JOIN `stc_rack` R ON R.`stc_rack_id` = S.`rack_id` ';
+					$selRackShop = ', R.`stc_rack_name`';
+				}
+				$sql_qry = mysqli_query($this->stc_dbs, "
+					SELECT S.*{$selRackShop}
+					FROM `stc_shop` S
+					{$joinRackShop}
+					WHERE S.`adhoc_id`='".$adhocEscShop."'
+					ORDER BY S.`id` ASC
 				");
-				$shop_details='';
-				$shop_qty=0;
-				if(mysqli_num_rows($sql_qry)>0){
-					foreach($sql_qry as $sql_row){
-						$shop_qty+=$sql_row['qty'];
-						$shop_details.='<span><a href="stc-print-preview-transferchallan.php?transfer_id='.$sql_row['id'].'" id="'.$sql_row['id'].'" target="_blank" title="Print Challan"><i class="fa fa-print"></i></a>'.$sql_row['shopname'].'_'.number_format($sql_row['qty'], 2).'/'.$odinrow['stc_purchase_product_adhoc_unit'].'</span><a href="javascript:void(0)" title="Remove Item" id="'.$sql_row['id'].'" class="remove-shop-item"><i class="fa fa-trash"></i></a></span><br> ';
+				$shop_breakdown_html = '';
+				$shop_qty = 0;
+				if ($sql_qry && mysqli_num_rows($sql_qry) > 0) {
+					foreach ($sql_qry as $sql_row) {
+						$shop_qty += (float)($sql_row['qty'] ?? 0);
+						$label = htmlspecialchars($this->ragnar_stc_shop_branch_label_row($sql_row), ENT_QUOTES, 'UTF-8');
+						$qtyFmt = number_format((float)($sql_row['qty'] ?? 0), 2, '.', '');
+						$rackName = isset($sql_row['stc_rack_name']) ? trim((string)$sql_row['stc_rack_name']) : '';
+						$rackId = $this->ragnar_stc_shop_has_column('rack_id') ? (int)($sql_row['rack_id'] ?? 0) : 0;
+						$rackDisp = ($rackName !== '') ? htmlspecialchars($rackName, ENT_QUOTES, 'UTF-8') : ('#'.(int)$rackId);
+						$remH = '';
+						if ($this->ragnar_stc_shop_has_column('remarks')) {
+							$rem = trim((string)($sql_row['remarks'] ?? ''));
+							if ($rem !== '') {
+								$remH = '<br><span class="text-secondary" style="font-size:0.9em">'.htmlspecialchars($rem, ENT_QUOTES, 'UTF-8').'</span>';
+							}
+						}
+						$shop_breakdown_html .= '<div class="mb-1 text-left small shop-qty-summary-line"><strong>'.$label.'</strong>: <span class="text-nowrap">'.$qtyFmt.'</span> <span class="text-muted">('.$rackDisp.')</span>'.$remH.'</div>';
 					}
 				}
+				$shop_breakdown_inner = ($shop_breakdown_html === '') ? '<span class="text-muted small">—</span>' : $shop_breakdown_html;
+				$adhoc_id_shop_cell = (int)$odinrow['stc_purchase_product_adhoc_id'];
+				$shop_td = "<td class=\"text-center shop-qty-cell-clickable\" style=\"width: 220px; max-width: 280px; vertical-align: middle;\" data-adhoc-id=\"".$adhoc_id_shop_cell."\" title=\"Click to manage branch quantities\">"
+					."<div class=\"shop-qty-summary-inner border rounded bg-light\" style=\"text-align:left;\"><div class=\"p-2\">".$shop_breakdown_inner."</div></div></td>";
 				$stock=$stock-$shop_qty;
 				$rateforpieces=($odinrow['stc_purchase_product_adhoc_prate'] * $odinrow['stc_purchase_product_adhoc_qty'])/$odinrow['stc_purchase_product_adhoc_qty'];
 				$cherrypick="<a href='javascript:void(0)' class='btn btn-warning cherry-pick-btn' data-toggle='modal' data-target='#cherryPickModal' data-adhoc-id=".$odinrow['stc_purchase_product_adhoc_id']." data-current-qty=".$odinrow['stc_purchase_product_adhoc_qty']." data-rate=".$rateforpieces." data-unit=".$odinrow['stc_purchase_product_adhoc_unit']." title='Cherry Pick'><i class='fa fa-cut'></i></a>
@@ -2438,10 +2775,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
 						<td class='text-right' style='width: 125px;'><a href='javascript:void(0)' class='img-inputbtnshow'>".number_format($odinrow['stc_purchase_product_adhoc_prate'], 2)."</br>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."</a>".$pro_prate.$pro_percentage.$pro_rate."</td>
 						<td class='text-right'>".number_format($stock, 2)."</td>
-						<td class='text-center' style='width: 180px;'>
-							".$shop_details."
-							<a href='javascript:void(0)' class='btn btn-primary input-shop-item' data-toggle='modal' data-target='.bd-showadhocshop-modal-lg' title='Add Item to Shop' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-plus'></i></a>
-						</td>
+						".$shop_td."
 						<td class='text-center' style='width: 180px;'>
 							<a href='javascript:void(0)' class='btn btn-primary get-dispatch-details' data-toggle='modal' data-target='.bd-showadhocdetails-modal-lg' title='Dispatch details' id='".$odinrow['stc_purchase_product_adhoc_id']."'><i class='fa fa-file'></i></a>
 						</td>
@@ -2891,15 +3225,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}
 	
 	public function stc_poadhoc_itemtoshop($id, $name, $quantity) {
-		$odin="no";
-		$date=date("Y-m-d H:i:s");		
-		$query=mysqli_query($this->stc_dbs, "INSERT INTO `stc_shop`(`adhoc_id`, `shopname`, `qty`, created_date, created_by) VALUES('".mysqli_real_escape_string($this->stc_dbs, $id)."', '".mysqli_real_escape_string($this->stc_dbs, $name)."', '".mysqli_real_escape_string($this->stc_dbs, $quantity)."', '".mysqli_real_escape_string($this->stc_dbs, $date)."', '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."')"); 
-		
-		if($query){
-			$odin="yes";
-		}
-	
-		return $odin;
+		$res = $this->stc_poadhoc_shop_modal_insert((int)$id, trim((string)$name), $quantity, 0, '');
+		return !empty($res['success']) ? 'yes' : 'no';
 	}	
 	
 	public function stc_poadhoc_itemtoshopremove($id) {
@@ -3058,6 +3385,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 					<th class="text-center">Total</th>
 				</tr>
 		';
+		$sumTotalAmount = 0.0;
 		if(mysqli_num_rows($result) > 0) {
 			while ($row = mysqli_fetch_assoc($result)) {
 				$product_id = $row['stc_product_id'];
@@ -3098,7 +3426,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 
 				// Prepare product name
 				$row['stc_product_name'] = $row['stc_sub_cat_name'] != "OTHERS" ? $row['stc_sub_cat_name'] . " " . $row['stc_product_name'] : $row['stc_product_name'];
-				$total = $remainingqty * $rate_gst;
+				$total = (float)$remainingqty * (float)$rate_gst;
+				$sumTotalAmount += $total;
 
 				$html .= "<tr>
 							<td>{$row['stc_product_id']}</td>
@@ -3111,6 +3440,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 							<td class='text-right'>".number_format($total, 2)."</td>
 						</tr>";
 			}
+			$html .= "<tr class='inventory-amount-total-row'><td colspan='7' class='text-right'><strong>Total</strong></td><td class='text-right'><strong>".number_format($sumTotalAmount, 2)."</strong></td></tr>";
 		} else {
 			$html .= "<tr><td colspan='8' class='text-center'>No records found.</td></tr>";
 		}
@@ -3123,7 +3453,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		}
 		$pagination .= '</div>';
 
-		return ['html' => $html, 'pagination' => $pagination];
+		return ['html' => $html, 'pagination' => $pagination, 'total_amount_page' => $sumTotalAmount];
 	}
 
 	public function getPaginatedProducts2($page, $search, $inv_type){
@@ -3173,6 +3503,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 					<th class="text-center">Total</th>
 				</tr>
 		';
+		$sumTotalAmount = 0.0;
 		if ($result && mysqli_num_rows($result) > 0) {	
 			while ($row = mysqli_fetch_assoc($result)) {
 				$product_id = $row['stc_product_id'];
@@ -3218,7 +3549,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 
 				// Prepare product name
 				$row['stc_product_name'] = $row['stc_sub_cat_name'] != "OTHERS" ? $row['stc_sub_cat_name'] . " " . $row['stc_product_name'] : $row['stc_product_name'];
-				$total = $remainingqty * $rate_gst;
+				$total = (float)$remainingqty * (float)$rate_gst;
+				$sumTotalAmount += $total;
 
 				$html .= "<tr>
 							<td>{$row['stc_product_id']}</td>
@@ -3231,6 +3563,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 							<td class='text-right'>".number_format($total, 2)."</td>
 						</tr>";
 			}
+			$html .= "<tr class='inventory-amount-total-row'><td colspan='7' class='text-right'><strong>Total</strong></td><td class='text-right'><strong>".number_format($sumTotalAmount, 2)."</strong></td></tr>";
 		} else {
 			$html .= "<tr><td colspan='8' class='text-center'>No records found.</td></tr>";
 		}
@@ -3243,7 +3576,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		}
 		$pagination .= '</div>';
 
-		return ['html' => $html, 'query' => $query, 'pagination' => $pagination];
+		return ['html' => $html, 'query' => $query, 'pagination' => $pagination, 'total_amount_page' => $sumTotalAmount];
 	}
 
 	/** Tool rows for this ad-hoc line vs quantity (floor). */
@@ -4342,6 +4675,40 @@ if(isset($_POST['stc_removeItemshop'])){
 	$outbjornestocking=$bjornestocking->stc_poadhoc_itemtoshopremove($id);
 	// echo $outbjornestocking;
 	echo json_encode($outbjornestocking);
+}
+
+if(isset($_POST['stc_poadhoc_shops_get'])){
+	$adhoc_id = (int)($_POST['adhoc_id'] ?? 0);
+	$bjornestocking = new ragnarPurchaseAdhoc();
+	echo json_encode($bjornestocking->stc_poadhoc_shops_by_adhoc($adhoc_id));
+}
+
+if(isset($_POST['stc_poadhoc_shop_modal_save'])){
+	$adhoc_id = (int)($_POST['adhoc_id'] ?? 0);
+	$branch = $_POST['branch'] ?? $_POST['shopname'] ?? '';
+	$qty = $_POST['qty'] ?? 0;
+	$rack_id = (int)($_POST['rack_id'] ?? 0);
+	$remarks = $_POST['remarks'] ?? '';
+	$bjornestocking = new ragnarPurchaseAdhoc();
+	echo json_encode($bjornestocking->stc_poadhoc_shop_modal_insert($adhoc_id, $branch, $qty, $rack_id, $remarks));
+}
+
+if(isset($_POST['stc_poadhoc_shop_modal_update'])){
+	$id = (int)($_POST['id'] ?? 0);
+	$adhoc_id = (int)($_POST['adhoc_id'] ?? 0);
+	$branch = $_POST['branch'] ?? $_POST['shopname'] ?? '';
+	$qty = $_POST['qty'] ?? 0;
+	$rack_id = (int)($_POST['rack_id'] ?? 0);
+	$remarks = $_POST['remarks'] ?? '';
+	$bjornestocking = new ragnarPurchaseAdhoc();
+	echo json_encode($bjornestocking->stc_poadhoc_shop_modal_update($id, $adhoc_id, $branch, $qty, $rack_id, $remarks));
+}
+
+if(isset($_POST['stc_poadhoc_shop_modal_delete'])){
+	$id = (int)($_POST['id'] ?? 0);
+	$adhoc_id = (int)($_POST['adhoc_id'] ?? 0);
+	$bjornestocking = new ragnarPurchaseAdhoc();
+	echo json_encode($bjornestocking->stc_poadhoc_shop_modal_delete($id, $adhoc_id));
 }
 
 if(isset($_POST['stc_changestatus'])){
