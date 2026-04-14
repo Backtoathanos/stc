@@ -2243,8 +2243,10 @@ include("kattegat/role_check.php");
                   success: function(response) {
                       var response=response.data;
                       var data='';
+                      var totalQuantity = 0;
                       for(var i=0;i<=response.length-1;i++){
                         var statusbtn='';
+                        totalQuantity += parseFloat(response[i].stc_cust_super_requisition_list_items_rec_recqty || 0) || 0;
                         data+='<tr>';
                         data+='<td>'+(i+1)+'</td>';
                         data+='<td class="text-center">'+response[i].stc_requisition_combiner_req_comb_id+'<br>'+response[i].stc_cust_super_requisition_list_id+'</td>';
@@ -2258,7 +2260,7 @@ include("kattegat/role_check.php");
                         data+='</tr>';
                       }
                       data+='<tr>';
-                      data+='<td colspan="8">Total Quantity: '+totalQuantity+'</td>';
+                      data+='<td colspan="8"><b>Total Quantity:</b> '+totalQuantity.toFixed(2)+'</td>';
                       data+='</tr>';
                       $('.stc-call-view-poadhocpending-row').html(data);
                   }
