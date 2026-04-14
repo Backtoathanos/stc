@@ -587,6 +587,16 @@ include("kattegat/role_check.php");
     <script type="text/javascript" src="./assets/scripts/jarvis.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
+        function escapeHtml(str) {
+          str = (str === undefined || str === null) ? '' : String(str);
+          return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+        }
+
         $(document).ready(function(){
           const urlParams = new URLSearchParams(window.location.search);
           // Handle input/focus for each search input
@@ -2298,6 +2308,56 @@ include("kattegat/role_check.php");
             var psrc = $(this).attr('data-purchase-source') || '';
             $('.itt-itemdescription').val(pname);
             $('.itt-purdetails').val(psrc);
+
+            // Load existing tool rows for this Adhoc ID
+            $('.itt-existing-tools-wrap').show();
+            $('.itt-existing-tools-body').html('<tr><td colspan="10" class="text-center text-muted">Loading...</td></tr>');
+            $('.itt-existing-count').text('0');
+            $.ajax({
+              url: "kattegat/ragnar_purchase.php",
+              method: "POST",
+              dataType: "json",
+              data: { stc_get_tooldetails_by_poa: 1, poa_id: repid },
+              success: function (res) {
+                if (res && res.reload) {
+                  window.location.reload();
+                  return;
+                }
+                if (!res || res.success !== true) {
+                  $('.itt-existing-tools-body').html('<tr><td colspan="10" class="text-center text-danger">Failed to load tools.</td></tr>');
+                  return;
+                }
+                var list = res.data || [];
+                $('.itt-existing-count').text(String(list.length));
+                if (!list.length) {
+                  $('.itt-existing-tools-body').html('<tr><td colspan="10" class="text-center text-muted">No existing tools found for this Adhoc ID.</td></tr>');
+                  return;
+                }
+                var rows = '';
+                for (var i = 0; i < list.length; i++) {
+                  var it = list[i] || {};
+                  var inv = (it.taxinvono ? String(it.taxinvono) : '-');
+                  var invDate = (it.taxinvodate ? String(it.taxinvodate) : '-');
+                  var created = it.created_date ? String(it.created_date) : '-';
+                  rows += '<tr>' +
+                    '<td class="text-center">' + (i + 1) + '</td>' +
+                    '<td><span class="badge badge-primary">' + escapeHtml(it.unique_id || '-') + '</span><div class="small text-muted">' + escapeHtml(it.itemdescription || '') + '</div></td>' +
+                    '<td>' + escapeHtml(it.machinesrno || '-') + '</td>' +
+                    '<td>' + escapeHtml(it.make || '-') + '</td>' +
+                    '<td>' + escapeHtml(it.tooltype || '-') + '</td>' +
+                    '<td>' + escapeHtml(it.warranty || '-') + '</td>' +
+                    '<td>' + escapeHtml(inv) + '</td>' +
+                    '<td class="text-center">' + escapeHtml(invDate) + '</td>' +
+                    '<td>' + escapeHtml(it.remarks || '-') + '</td>' +
+                    '<td class="text-center"><div class="small">' + escapeHtml(created) + '</div><div class="small text-muted">' + escapeHtml(it.created_by_name || '') + '</div></td>' +
+                  '</tr>';
+                }
+                $('.itt-existing-tools-body').html(rows);
+              },
+              error: function () {
+                $('.itt-existing-tools-body').html('<tr><td colspan="10" class="text-center text-danger">Failed to load tools.</td></tr>');
+              }
+            });
           });
 
           // save dispatch
@@ -3637,6 +3697,40 @@ include("kattegat/role_check.php");
       <div class="modal-body">
         <div class="row">
           <div class="col-md-12 col-sm-12 col-xl-12">
+            <div class="main-card mb-3 card itt-existing-tools-wrap" style="display:none;">
+              <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                  <b>Existing Tools Track</b>
+                  <div class="small text-muted">Already saved tool rows for this Adhoc ID.</div>
+                </div>
+                <div>
+                  <span class="badge badge-secondary">Total: <span class="itt-existing-count">0</span></span>
+                </div>
+              </div>
+              <div class="card-body" style="padding:0;">
+                <div class="table-responsive" style="max-height:260px;overflow:auto;">
+                  <table class="table table-sm table-hover table-bordered mb-0">
+                    <thead class="thead-light" style="position:sticky;top:0;z-index:1;">
+                      <tr>
+                        <th class="text-center" style="width:60px;">#</th>
+                        <th>Unique ID</th>
+                        <th>Machine SR No</th>
+                        <th>Make</th>
+                        <th>Type</th>
+                        <th>Warranty</th>
+                        <th>Invoice</th>
+                        <th class="text-center">Inv Date</th>
+                        <th>Remarks</th>
+                        <th class="text-center">Created</th>
+                      </tr>
+                    </thead>
+                    <tbody class="itt-existing-tools-body">
+                      <tr><td colspan="10" class="text-center text-muted">Loading...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
             <div class="main-card mb-3 card">
               <div class="card-body">
                 <div class="row formcontrol">

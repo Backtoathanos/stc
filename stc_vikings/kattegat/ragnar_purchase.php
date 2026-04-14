@@ -2750,7 +2750,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$product_name_attr = htmlspecialchars($product_name, ENT_QUOTES, 'UTF-8');
 				$source_attr = htmlspecialchars((string)$odinrow['stc_purchase_product_adhoc_source'], ENT_QUOTES, 'UTF-8');
 				if($remaining_tools <= 0){
-					$addtoollist='<span class="text-muted" style="cursor:help;" title="Tool Tracker already has '.$tool_cnt.' record(s); matches ad-hoc quantity ('.$adhoc_qty_floor.')."><i class="fa fa-tools"></i></span>';
+					// Still allow opening modal to view existing tool rows
+					$addtoollist='<a href="javascript:void(0)" class="btn btn-light itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-adhoc-qty="'.$adhoc_qty_attr.'" data-remaining="0" data-product-name="'.$product_name_attr.'" data-purchase-source="'.$source_attr.'" title="View Tools Track ('.$tool_cnt.' record(s))"><i class="fa fa-tools"></i></a>';
 				}else{
 					$rem_attr = (string)$remaining_tools;
 					$addtoollist='<a href="javascript:void(0)" class="btn btn-success itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-adhoc-qty="'.$adhoc_qty_attr.'" data-remaining="'.$rem_attr.'" data-product-name="'.$product_name_attr.'" data-purchase-source="'.$source_attr.'" title="Add to Toollist (up to '.$remaining_tools.' more)"><i class="fa fa-tools"></i></a>';
@@ -3602,6 +3603,55 @@ class ragnarPurchaseAdhoc extends tesseract{
 		}
 		$remaining = max(0, $adhoc_qty - $existing);
 		return ['adhoc_qty' => $adhoc_qty, 'existing' => $existing, 'remaining' => $remaining];
+	}
+
+	/** List tool details for a given ad-hoc id (poa_id). */
+	public function stc_get_tooldetails_by_poa($poa_id = 0){
+		$poa_id = (int)$poa_id;
+		if($poa_id <= 0){
+			return ['success' => false, 'data' => [], 'message' => 'Invalid adhoc id.'];
+		}
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT
+				T.`id`,
+				T.`unique_id`,
+				T.`itemdescription`,
+				T.`machinesrno`,
+				T.`make`,
+				T.`tooltype`,
+				T.`warranty`,
+				T.`purchase_details`,
+				T.`taxinvono`,
+				T.`taxinvodate`,
+				T.`remarks`,
+				T.`created_date`,
+				U.`stc_user_name` AS created_by_name
+			FROM `stc_tooldetails` T
+			LEFT JOIN `stc_user` U ON U.`stc_user_id` = T.`created_by`
+			WHERE T.`poa_id`='".mysqli_real_escape_string($this->stc_dbs, (string)$poa_id)."'
+			ORDER BY T.`id` DESC
+		");
+		$data = [];
+		if($q && mysqli_num_rows($q) > 0){
+			while($row = mysqli_fetch_assoc($q)){
+				$data[] = [
+					'id' => (int)($row['id'] ?? 0),
+					'unique_id' => (string)($row['unique_id'] ?? ''),
+					'itemdescription' => (string)($row['itemdescription'] ?? ''),
+					'machinesrno' => (string)($row['machinesrno'] ?? ''),
+					'make' => (string)($row['make'] ?? ''),
+					'tooltype' => (string)($row['tooltype'] ?? ''),
+					'warranty' => (string)($row['warranty'] ?? ''),
+					'purchase_details' => (string)($row['purchase_details'] ?? ''),
+					'taxinvono' => (string)($row['taxinvono'] ?? ''),
+					'taxinvodate' => (string)($row['taxinvodate'] ?? ''),
+					'remarks' => (string)($row['remarks'] ?? ''),
+					'created_date' => (string)($row['created_date'] ?? ''),
+					'created_by_name' => (string)($row['created_by_name'] ?? '')
+				];
+			}
+		}
+		return ['success' => true, 'data' => $data];
 	}
 
 	/** Next numeric GTT id: max(GTT/n) + 1, or 1 if none */
@@ -4765,6 +4815,16 @@ if(isset($_POST['save_tool_tracker'])){
 		$out=$odin_req->stc_tool_tracker_save($repid, $unique, $itemdescription, $machineslno, $make, $type, $warranty, $purdetails, $tinnumber, $tindate, $remarks, $qty);
 	}
 	echo $out;
+}
+
+if(isset($_POST['stc_get_tooldetails_by_poa'])){
+	$poa_id = isset($_POST['poa_id']) ? (int)$_POST['poa_id'] : 0;
+	if(empty($_SESSION['stc_empl_id'])){
+		echo json_encode(['reload' => true]);
+	}else{
+		$odin_req = new ragnarPurchaseAdhoc();
+		echo json_encode($odin_req->stc_get_tooldetails_by_poa($poa_id));
+	}
 }
 
 if(isset($_POST['reset_items'])){
