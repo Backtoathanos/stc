@@ -6393,7 +6393,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 	public function stc_dispatch_daily_requisition_balance($item_id = 0, $product_id = 0, $dispatch_qty = 0){
 		$item_id = (int)$item_id;
 		$product_id = (int)$product_id;
-		$dispatch_qty = (float)$dispatch_qty;
+		$dispatch_qty = (float)$dispatch_qty; // requested qty (optional cap)
 		if($item_id <= 0 || $product_id <= 0){
 			return ['success' => false, 'message' => 'Invalid parameters.'];
 		}
@@ -6492,8 +6492,8 @@ class ragnarCallDailyRequisitions extends tesseract{
 			}
 			if($effective_remaining <= 0){ continue; }
 
-			$dispatch_qty = $effective_remaining > $remaining_to_dispatch ? $remaining_to_dispatch : $effective_remaining;
-			if($dispatch_qty <= 0){ continue; }
+			$qty_to_dispatch = $effective_remaining > $remaining_to_dispatch ? $remaining_to_dispatch : $effective_remaining;
+			if($qty_to_dispatch <= 0){ continue; }
 
 			$ins = mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_cust_super_requisition_list_items_rec`(
@@ -6508,7 +6508,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 					'".mysqli_real_escape_string($this->stc_dbs, $item_id)."',
 					'0',
 					'".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."',
-					'".mysqli_real_escape_string($this->stc_dbs, $dispatch_qty)."',
+					'".mysqli_real_escape_string($this->stc_dbs, $qty_to_dispatch)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $now)."'
 				)
 			");
@@ -6516,20 +6516,11 @@ class ragnarCallDailyRequisitions extends tesseract{
 				continue;
 			}
 
-			$total_dispatched_now += (float)$dispatch_qty;
-			$remaining_to_dispatch -= (float)$dispatch_qty;
+			$total_dispatched_now += (float)$qty_to_dispatch;
+			$remaining_to_dispatch -= (float)$qty_to_dispatch;
 
-			// Update adhoc status if fully used
-			mysqli_query($this->stc_dbs, "
-				UPDATE `stc_purchase_product_adhoc`
-				SET `stc_purchase_product_adhoc_status` = '2'
-				WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
-				AND `stc_purchase_product_adhoc_qty`<=(
-					SELECT SUM(`stc_cust_super_requisition_list_items_rec_recqty`)
-					FROM `stc_cust_super_requisition_list_items_rec`
-					WHERE `stc_cust_super_requisition_list_items_rec_list_poaid`=`stc_purchase_product_adhoc_id`
-				)
-			");
+			// Refresh adhoc status (1 = active, 2 = fully used)
+			$this->stc_dr_refresh_adhoc_status($adhoc_id);
 
 		}
 
@@ -6537,10 +6528,20 @@ class ragnarCallDailyRequisitions extends tesseract{
 			return ['success' => false, 'message' => 'No Adhoc balance available to dispatch.'];
 		}
 
-		// Update item status to dispatched (4)
+		// If this item was already verified earlier, new dispatch must re-appear in Verify Dispatch list.
+		// Verify listing hides accepted items via VA.id IS NULL, and accept table is UNIQUE per item_id.
+		@mysqli_query($this->stc_dbs, "
+			DELETE FROM `stc_verify_dispatch_accept`
+			WHERE `item_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+			LIMIT 1
+		");
+
+		// Update item status: set to 4 only when fully dispatched for this product; otherwise keep at 3 (Accepted).
+		$new_total_dispatched = $dispatchedForItemProduct + $total_dispatched_now;
+		$new_status = ($required_qty > 0 && $new_total_dispatched >= ($required_qty - 0.0001)) ? 4 : 3;
 		mysqli_query($this->stc_dbs, "
 			UPDATE `stc_cust_super_requisition_list_items`
-			SET `stc_cust_super_requisition_list_items_status` = 4
+			SET `stc_cust_super_requisition_list_items_status` = '".mysqli_real_escape_string($this->stc_dbs, $new_status)."'
 			WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
 				AND `stc_cust_super_requisition_list_items_req_id` = '".mysqli_real_escape_string($this->stc_dbs, $list_id)."'
 				AND `stc_cust_super_requisition_list_items_product_id` = '".$product_id."'

@@ -2128,10 +2128,18 @@ include("kattegat/role_check.php");
             }
           });
           var inv_type='warehouse';
+          function parseInventoryResponse(response) {
+              if (response == null) { return null; }
+              if (typeof response === 'object') { return response; }
+              try { return JSON.parse(response); } catch (e) { return null; }
+          }
           function loadInventories(page = 1, search = '', inv_type = 'warehouse') {
+              page = parseInt(page, 10);
+              if (isNaN(page) || page < 1) { page = 1; }
               $.ajax({
                    url: "kattegat/ragnar_purchase.php", // Replace with your API endpoint
                   method: 'POST',
+                  dataType: 'json',
                   data: {
                       stc_getinventory: 1,
                       page: page,
@@ -2139,7 +2147,8 @@ include("kattegat/role_check.php");
                       inv_type: inv_type
                   },
                   success: function(response) {
-                      const res = JSON.parse(response);
+                      var res = parseInventoryResponse(response);
+                      if (!res) { return; }
                       if(inv_type=="warehouse"){
                         $('#dataContainer').html(res.html);
                         $('#paginations').html(res.pagination);
@@ -2165,24 +2174,47 @@ include("kattegat/role_check.php");
           $(document).on('keyup', '.searchKey', function () {
               const search = $(this).val();
               $('.searchKey').val(search);
-              inv_type = $('.InvTypeBtns.active').attr('type');
-              if(search.length >= 3 || search.length === 0) {
+              inv_type = $('.InvTypeBtns.active').attr('type') || 'warehouse';
+              if (search.length >= 3 || search.length === 0) {
                   loadInventories(1, search, inv_type);
-              } else {
-                  loadInventories(1);
               }
           });
 
-          // Pagination Click
-          $(document).on('click', '.pagination_link', function () {
-              const page = $(this).data('page');
-              const search = $('.searchKey').val();
-              inv_type = $('.InvTypeBtns.active').attr('type');
-              loadInventories(1, search, inv_type);
+          // Pagination: pass the clicked page (previously always used 1). Resolve search + inv_type from the tab pane that contains this pagination.
+          $(document).on('click', '.pagination_link', function (e) {
+              e.preventDefault();
+              var page = $(this).data('page');
+              if (page === undefined || page === null || page === '') {
+                  page = parseInt($(this).attr('data-page'), 10);
+              }
+              var $pane = $(this).closest('.tab-pane');
+              var search = '';
+              var inv_for_load = 'warehouse';
+              if ($pane.length) {
+                  search = $pane.find('.searchKey').first().val() || '';
+                  var pid = $pane.attr('id');
+                  if (pid) {
+                      var $btn = $('.InvTypeBtns[href="#' + pid + '"]');
+                      if ($btn.length) {
+                          inv_for_load = $btn.attr('type') || 'warehouse';
+                      }
+                  }
+              } else {
+                  search = $('.searchKey').first().val() || '';
+                  inv_for_load = $('.InvTypeBtns.active').attr('type') || 'warehouse';
+              }
+              inv_type = inv_for_load;
+              loadInventories(page, search, inv_for_load);
           });
           $(document).on('click', '.InvTypeBtns', function () {
-              inv_type = $(this).attr('type');
-              var search = $('.searchKey').val();
+              inv_type = $(this).attr('type') || 'warehouse';
+              var href = $(this).attr('href');
+              var search = '';
+              if (href && $(href).length) {
+                  search = $(href).find('.searchKey').first().val() || '';
+              } else {
+                  search = $('.searchKey').first().val() || '';
+              }
               loadInventories(1, search, inv_type);
           });
           

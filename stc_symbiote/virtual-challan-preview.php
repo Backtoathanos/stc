@@ -499,15 +499,30 @@ if(isset($_GET['vcid'])){
                     $total=0;
                     $totalgst=0;
                     $mtye='';
+                      // If the same product is inserted multiple times in VC items (e.g. multiple dispatch runs),
+                      // show a single line with total qty.
                       $checkpurchaseorderitems=mysqli_query($con, "
-                        SELECT * FROM `stc_sale_product_vc`
-                        LEFT JOIN `stc_product`
-                        ON `stc_product_id`=`stc_sale_product_vc_items_product_id`
-                        LEFT JOIN `stc_sub_category`
-                        ON `stc_product_sub_cat_id`=`stc_sub_cat_id`
-                        LEFT JOIN `stc_rack`
-                        ON `stc_product_rack_id`=`stc_rack_id`
-                        WHERE `stc_sale_product_vc_items_sale_product_id`='".$_GET['vcid']."'
+                        SELECT
+                          VC.`stc_sale_product_vc_items_sale_product_id`,
+                          VC.`stc_sale_product_vc_items_product_id`,
+                          SUM(VC.`stc_sale_product_vc_items_product_qty`) AS `stc_sale_product_vc_items_product_qty`,
+                          MAX(VC.`stc_sale_product_vc_items_product_rate`) AS `stc_sale_product_vc_items_product_rate`,
+                          MAX(VC.`stc_sale_product_vc_items_product_sale_rate`) AS `stc_sale_product_vc_items_product_sale_rate`,
+                          P.*,
+                          SC.`stc_sub_cat_name`,
+                          RK.`stc_rack_name`
+                        FROM `stc_sale_product_vc` VC
+                        LEFT JOIN `stc_product` P
+                          ON P.`stc_product_id`=VC.`stc_sale_product_vc_items_product_id`
+                        LEFT JOIN `stc_sub_category` SC
+                          ON P.`stc_product_sub_cat_id`=SC.`stc_sub_cat_id`
+                        LEFT JOIN `stc_rack` RK
+                          ON P.`stc_product_rack_id`=RK.`stc_rack_id`
+                        WHERE VC.`stc_sale_product_vc_items_sale_product_id`='".$_GET['vcid']."'
+                        GROUP BY
+                          VC.`stc_sale_product_vc_items_sale_product_id`,
+                          VC.`stc_sale_product_vc_items_product_id`
+                        ORDER BY VC.`stc_sale_product_vc_items_product_id` ASC
                       ");
                       while ($row=mysqli_fetch_assoc($checkpurchaseorderitems)) {
                         $sl++;
