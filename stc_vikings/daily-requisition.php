@@ -813,7 +813,8 @@ include("kattegat/role_check.php");
                   'data-product-id=\"' + escapeHtml(row.product_id) + '\" ' +
                   'data-qty=\"' + escapeHtml(row.req_balance_qty) + '\" ' +
                   'data-item-unit=\"' + escapeHtml(row.item_unit) + '\" ' +
-                  'data-product-unit=\"' + escapeHtml(row.product_unit) + '\">' +
+                  'data-product-unit=\"' + escapeHtml(row.product_unit) + '\" ' +
+                  'data-item-type=\"' + escapeHtml(row.item_type || '') + '\">' +
                   '<b>' + escapeHtml(row.req_balance_qty) + '/' + escapeHtml(row.item_unit) + '</b></a>';
 
                 var balQtyNum = parseNumber(row.balance_qty);
@@ -1216,6 +1217,7 @@ include("kattegat/role_check.php");
         var qty = String($a.data('qty') || '').trim();
         var itemUnit = String($a.data('item-unit') || '').trim();
         var productUnit = String($a.data('product-unit') || '').trim();
+        var itemType = String($a.data('item-type') || '').trim();
         if (itemId <= 0 || productId <= 0) return;
 
         // Close any other open editor in modal
@@ -1240,12 +1242,22 @@ include("kattegat/role_check.php");
           options += '<option value="' + escapeHtml(u) + '"' + sel + '>' + escapeHtml(u) + '</option>';
         });
 
+        var typeArr = ['Consumable', 'PPE', 'Supply', 'Tools & Tackles'];
+        var typeOptions = '';
+        typeArr.forEach(function (t) {
+          var sel = (itemType && String(t).toLowerCase() === itemType.toLowerCase()) ? ' selected' : '';
+          typeOptions += '<option value="' + escapeHtml(t) + '"' + sel + '>' + escapeHtml(t) + '</option>';
+        });
+
         var editor =
           '<span class="dr-qtyunit-editor">' +
           '<input type="number" step="0.01" min="0" class="form-control input-sm dr-qtyunit-input" ' +
           'style="width:110px;display:inline-block;" value="' + escapeHtml(qty) + '">' +
           '<select class="form-control input-sm dr-qtyunit-unit" style="width:90px;display:inline-block;margin-left:6px;">' +
           options +
+          '</select>' +
+          '<select class="form-control input-sm dr-itemtype-unit" style="width:140px;display:inline-block;margin-left:6px;">' +
+          typeOptions +
           '</select>' +
           '<button type="button" class="btn btn-success btn-sm dr-qtyunit-update" ' +
           'style="margin-left:6px;" data-item-id="' + escapeHtml(itemId) + '" data-product-id="' + escapeHtml(productId) + '">Update</button>' +
@@ -1269,6 +1281,7 @@ include("kattegat/role_check.php");
         var $td = $btn.closest('td');
         var qtyVal = String($td.find('.dr-qtyunit-input').val() || '').trim();
         var unitVal = String($td.find('.dr-qtyunit-unit').val() || '').trim();
+        var typeVal = String($td.find('.dr-itemtype-unit').val() || '').trim();
         if (itemId <= 0 || productId <= 0) {
           showSwal('error', 'Invalid', 'Invalid item or product.');
           return;
@@ -1281,6 +1294,10 @@ include("kattegat/role_check.php");
           showSwal('warning', 'Invalid', 'Please select unit.');
           return;
         }
+        if (typeVal === '') {
+          showSwal('warning', 'Invalid', 'Please select item type.');
+          return;
+        }
 
         $btn.prop('disabled', true).text('Updating...');
         $.ajax({
@@ -1291,7 +1308,8 @@ include("kattegat/role_check.php");
             item_id: itemId,
             product_id: productId,
             pending_qty: Number(qtyVal),
-            unit: unitVal
+            unit: unitVal,
+            item_type: typeVal
           },
           dataType: 'json',
           success: function (response) {

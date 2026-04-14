@@ -6721,11 +6721,12 @@ class ragnarCallDailyRequisitions extends tesseract{
 		return ['success' => true, 'message' => 'Item code updated successfully.'];
 	}
 
-	public function stc_update_daily_requisition_qty_unit($item_id = 0, $product_id = 0, $pending_qty = 0, $unit = ''){
+	public function stc_update_daily_requisition_qty_unit($item_id = 0, $product_id = 0, $pending_qty = 0, $unit = '', $item_type = ''){
 		$item_id = (int)$item_id;
 		$product_id = (int)$product_id;
 		$pending_qty = (float)$pending_qty;
 		$unit = trim((string)$unit);
+		$item_type = trim((string)$item_type);
 		// item_id is stc_cust_super_requisition_list_items.stc_cust_super_requisition_list_id (line PK), not parent list id
 		if($item_id <= 0){
 			return ['success' => false, 'message' => 'Invalid parameters.'];
@@ -6739,11 +6740,18 @@ class ragnarCallDailyRequisitions extends tesseract{
 		if(strlen($unit) > 50){
 			return ['success' => false, 'message' => 'Unit too long.'];
 		}
+		if($item_type !== ''){
+			$allowed_types = ['Consumable', 'PPE', 'Supply', 'Tools & Tackles'];
+			if(!in_array($item_type, $allowed_types, true)){
+				return ['success' => false, 'message' => 'Invalid item type.'];
+			}
+		}
 
 		// Load line by primary key only (do not scope by product_id — item code may have changed)
 		$item_q = mysqli_query($this->stc_dbs, "
 			SELECT
 				`stc_cust_super_requisition_list_items_unit` AS old_unit,
+				`stc_cust_super_requisition_items_type` AS old_type,
 				IFNULL(`stc_cust_super_requisition_list_items_product_id`, 0) AS line_product_id
 			FROM `stc_cust_super_requisition_list_items`
 			WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
@@ -6754,6 +6762,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 		}
 		$item_row = mysqli_fetch_assoc($item_q);
 		$old_unit = (string)($item_row['old_unit'] ?? '');
+		$old_type = (string)($item_row['old_type'] ?? '');
 		$db_product_id = (int)($item_row['line_product_id'] ?? 0);
 		if($product_id > 0 && $db_product_id > 0 && $product_id !== $db_product_id){
 			return ['success' => false, 'message' => 'Product does not match this line (refresh and try again).'];
@@ -6780,13 +6789,18 @@ class ragnarCallDailyRequisitions extends tesseract{
 			$new_finalqty = $dispatchedForItemProduct;
 		}
 
+		$type_set_sql = '';
+		if($item_type !== ''){
+			$type_set_sql = ", `stc_cust_super_requisition_items_type`='".mysqli_real_escape_string($this->stc_dbs, $item_type)."'";
+		}
 		$up = mysqli_query($this->stc_dbs, "
 			UPDATE `stc_cust_super_requisition_list_items`
 			SET
 				`stc_cust_super_requisition_list_items_unit`='".mysqli_real_escape_string($this->stc_dbs, $unit)."',
 				`stc_cust_super_requisition_list_items_reqqty`='".mysqli_real_escape_string($this->stc_dbs, $new_finalqty)."',
 				`stc_cust_super_requisition_list_items_approved_qty`='".mysqli_real_escape_string($this->stc_dbs, $new_finalqty)."',
-				`stc_cust_super_requisition_items_finalqty`='".mysqli_real_escape_string($this->stc_dbs, $new_finalqty)."'
+				`stc_cust_super_requisition_items_finalqty`='".mysqli_real_escape_string($this->stc_dbs, $new_finalqty)."' 
+				".$type_set_sql."
 			WHERE `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
 			LIMIT 1
 		");
@@ -6798,7 +6812,11 @@ class ragnarCallDailyRequisitions extends tesseract{
 		}
 
 		$logMsg = 'Qty/Unit updated by '.$_SESSION['stc_empl_name'].' on '.date('d-m-Y h:i A').
-			' <br> Unit: '.htmlspecialchars($old_unit).' -> '.htmlspecialchars($unit).
+			' <br> Unit: '.htmlspecialchars($old_unit).' -> '.htmlspecialchars($unit);
+		if($item_type !== '' && strcasecmp($old_type, $item_type) !== 0){
+			$logMsg .= ' <br> Item Type: '.htmlspecialchars($old_type).' -> '.htmlspecialchars($item_type);
+		}
+		$logMsg .=
 			' <br> Pending Qty set to: '.number_format((float)$pending_qty, 2).' '.$unit.
 			' <br> Total Required Qty: '.number_format((float)$new_finalqty, 2).' '.$unit.
 			' <br> Dispatched Qty already: '.number_format((float)$dispatchedForItemProduct, 2).' '.$unit;
@@ -7489,11 +7507,12 @@ if(isset($_POST['stc_update_daily_requisition_qty_unit'])){
 	$product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
 	$pending_qty = isset($_POST['pending_qty']) ? (float)$_POST['pending_qty'] : 0;
 	$unit = isset($_POST['unit']) ? (string)$_POST['unit'] : '';
+	$item_type = isset($_POST['item_type']) ? (string)$_POST['item_type'] : '';
 	if(empty($_SESSION['stc_empl_id'])){
 		echo json_encode(['reload' => true]);
 	}else{
 		$odin_req = new ragnarCallDailyRequisitions();
-		$odin_req_out = $odin_req->stc_update_daily_requisition_qty_unit($item_id, $product_id, $pending_qty, $unit);
+		$odin_req_out = $odin_req->stc_update_daily_requisition_qty_unit($item_id, $product_id, $pending_qty, $unit, $item_type);
 		echo json_encode($odin_req_out);
 	}
 }
