@@ -6262,7 +6262,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 					FROM `stc_purchase_product_adhoc` A
 					LEFT JOIN `stc_rack` RK
 						ON RK.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid`
-					WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+					WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."' AND A.`stc_purchase_product_adhoc_status` = '1'
 					ORDER BY A.`stc_purchase_product_adhoc_id` DESC
 					LIMIT 1
 				");
