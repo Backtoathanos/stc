@@ -6389,7 +6389,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 					FROM `stc_purchase_product_adhoc` A
 					LEFT JOIN `stc_rack` RK
 						ON RK.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid`
-					WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."' AND A.`stc_purchase_product_adhoc_status` = '1'
+					WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
 				");
 				if($rk_q && $rk_row = mysqli_fetch_assoc($rk_q)){
 					$rackNames = trim((string)($rk_row['racks'] ?? ''));
