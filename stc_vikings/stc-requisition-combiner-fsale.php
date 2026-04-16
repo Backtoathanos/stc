@@ -406,9 +406,49 @@ STCAuthHelper::checkAuth();?>
         });
 
         $('body').delegate('.updaterecadhoc', 'click', function(e){
+          e.preventDefault();
           var repid=$(this).attr("id");
-          var adhoc_id=$(this).prev().val();
-          repitemid=repitemid;
+          var $cell = $(this).closest('td');
+          var action = ($cell.find('.stc-rec-multi-action').length ? $cell.find('.stc-rec-multi-action').val() : 'set');
+          var adhoc_id = $cell.find('.set-adhoc-id').val();
+
+          function reloadDispatchRows(){
+            $.ajax({
+              url       : "kattegat/ragnar_order.php",
+              method    : 'POST',
+              data      : {
+                call_requistdispatch_sub:1,
+                repid:repid,
+                repitemid:repitemid
+              },
+              dataType  : 'JSON',
+              success:function(res){
+                $('.show-requisitiondispatched-items').html(res);
+              }
+            });
+          }
+
+          if(action === 'split'){
+            $.ajax({
+              url       : "kattegat/ragnar_order.php",
+              method    : 'POST',
+              data      : {
+                split_dispatch_rec:1,
+                repid:repid
+              },
+              dataType  : 'JSON',
+              success:function(req){
+                if(req=="Success"){
+                  alert("Split successfully. Now set Adhoc ID for each row.");
+                  reloadDispatchRows();
+                }else{
+                  alert(req);
+                }
+              }
+            });
+            return;
+          }
+
           $.ajax({
             url       : "kattegat/ragnar_order.php",
             method    : 'POST',
@@ -419,9 +459,9 @@ STCAuthHelper::checkAuth();?>
             },
             dataType  : 'JSON',
             success:function(req){
-              // console.log(req);
               if(req=="Success"){
                 alert("Updated successfully!! Please reload modal to see changes.");
+                reloadDispatchRows();
               }else{
                 alert(req);
               }

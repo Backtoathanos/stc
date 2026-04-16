@@ -1395,6 +1395,20 @@ class ragnarRequisitionView extends tesseract{
 
 	public function stc_call_ag_requisition_items_merchandise_generate_activate($adhoc_id, $listid, $listitemid, $qty){
 		$date = date("Y-m-d H:i:s");
+		$pd_id = 0;
+		$adhoc_id = (int)$adhoc_id;
+		if($adhoc_id > 0){
+			$pdq = mysqli_query($this->stc_dbs, "
+				SELECT `stc_purchase_product_adhoc_productid`
+				FROM `stc_purchase_product_adhoc`
+				WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+				LIMIT 1
+			");
+			if($pdq && mysqli_num_rows($pdq) > 0){
+				$pdr = mysqli_fetch_assoc($pdq);
+				$pd_id = (int)($pdr['stc_purchase_product_adhoc_productid'] ?? 0);
+			}
+		}
 		$insert_qry = mysqli_query($this->stc_dbs, "
 			INSERT INTO `stc_cust_super_requisition_list_items_rec`(
 				`stc_cust_super_requisition_list_items_rec_list_id`, 
@@ -1407,7 +1421,7 @@ class ragnarRequisitionView extends tesseract{
 			) VALUES (
 				'".mysqli_real_escape_string($this->stc_dbs, $listid)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $listitemid)."',
-				'0',
+				'".mysqli_real_escape_string($this->stc_dbs, $pd_id)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $qty)."',
 				'1',
@@ -2745,17 +2759,121 @@ class ragnarRequisitionPertView extends tesseract{
 				if($sqlrow['stc_cust_super_requisition_list_items_rec_list_poaid']==0){
 					$result="-";
 				}
-				$desc=$sqlrow['stc_purchase_product_adhoc_itemdesc'].'<input type="number" class="form-control set-adhoc-id" placeholder="Enter Adhoc ID"><a href="javascript:void(0)" id='.$sqlrow['stc_cust_super_requisition_list_items_rec_id'].' title="Remove" class="updaterecadhoc btn btn-primary">Save</a>';
+				$recQty = (float)($sqlrow['stc_cust_super_requisition_list_items_rec_recqty'] ?? 0);
+				$recId = (int)$sqlrow['stc_cust_super_requisition_list_items_rec_id'];
+				$itemDescText = (string)($sqlrow['stc_purchase_product_adhoc_itemdesc'] ?? '');
+				if($sqlrow['stc_cust_super_requisition_list_items_rec_list_poaid']==0){
+					$itemDescText = '—';
+				}
+				$actionMode = '';
+				if($recQty > 1.0001 && (int)$sqlrow['stc_cust_super_requisition_list_items_rec_list_poaid'] === 0){
+					$actionMode = '
+						<select class="form-control stc-rec-multi-action" style="margin-bottom:6px;">
+							<option value="set">Set Adhoc ID (single)</option>
+							<option value="split">Dispatch individually (split qty)</option>
+						</select>
+					';
+				}
+				$desc = '
+					<div class="small text-muted" style="margin-bottom:6px;">'.$itemDescText.'</div>
+					'.$actionMode.'
+					<input type="number" class="form-control set-adhoc-id" placeholder="Enter Adhoc ID">
+					<a href="javascript:void(0)" id="'.$recId.'" class="updaterecadhoc btn btn-primary" style="margin-top:6px;">Save</a>
+				';
          	  $lokiout.='<tr>';
          	  $lokiout.='<td class="text-center">'.date('d-m-Y h:i A', strtotime($sqlrow['stc_cust_super_requisition_list_items_rec_date'])).'</td>';
          	  $lokiout.='<td>'.$desc.'</td>';
          	  $lokiout.='<td class="text-right">'.$result.number_format($sqlrow['stc_cust_super_requisition_list_items_rec_recqty'], 2).'</td>';
          	  $lokiout.='<td class="text-center">'.$sqlrow['stc_purchase_product_adhoc_unit'].'</td>';
-         	  $lokiout.='<td><a href="javascript:void(0)" id='.$sqlrow['stc_cust_super_requisition_list_items_rec_id'].' title="Remove" class="removeitemsfromdispatch" style="font-size:25px;color:black;"><i class="fas fa-trash"></i></a></td>';
+         	  $lokiout.='<td><a href="javascript:void(0)" id='.$recId.' title="Remove" class="removeitemsfromdispatch" style="font-size:25px;color:black;"><i class="fas fa-trash"></i></a></td>';
          	  $lokiout.='</tr>';
          	}
 		}
 		return $lokiout;
+	}
+
+	/**
+	 * Split a multi-qty dispatch row into qty=1 rows (so adhoc id can be set per unit).
+	 */
+	public function stc_split_req_rec_row($stc_repid){
+		$stc_repid = (int)$stc_repid;
+		if($stc_repid <= 0){
+			return 'Invalid record.';
+		}
+		$get = mysqli_query($this->stc_dbs, "
+			SELECT
+				`stc_cust_super_requisition_list_items_rec_id` AS id,
+				`stc_cust_super_requisition_list_items_rec_list_id` AS list_id,
+				`stc_cust_super_requisition_list_items_rec_list_item_id` AS list_item_id,
+				`stc_cust_super_requisition_list_items_rec_list_pd_id` AS pd_id,
+				`stc_cust_super_requisition_list_items_rec_list_poaid` AS poaid,
+				`stc_cust_super_requisition_list_items_rec_recqty` AS qty,
+				`stc_cust_super_requisition_list_items_rec_status` AS status
+			FROM `stc_cust_super_requisition_list_items_rec`
+			WHERE `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_repid)."'
+			LIMIT 1
+		");
+		if(!$get || mysqli_num_rows($get) === 0){
+			return 'Record not found.';
+		}
+		$row = mysqli_fetch_assoc($get);
+		$qty = (float)($row['qty'] ?? 0);
+		if($qty <= 1.0001){
+			return 'Nothing to split.';
+		}
+		if((int)($row['poaid'] ?? 0) !== 0){
+			return 'Already has Adhoc ID.';
+		}
+		$list_id = (int)($row['list_id'] ?? 0);
+		$list_item_id = (int)($row['list_item_id'] ?? 0);
+		$pd_id = (int)($row['pd_id'] ?? 0);
+		$status = (int)($row['status'] ?? 1);
+		$splitCount = (int)floor($qty);
+		if($splitCount < 2){
+			return 'Nothing to split.';
+		}
+		mysqli_begin_transaction($this->stc_dbs);
+		try{
+			$u = mysqli_query($this->stc_dbs, "
+				UPDATE `stc_cust_super_requisition_list_items_rec`
+				SET `stc_cust_super_requisition_list_items_rec_recqty`='1'
+				WHERE `stc_cust_super_requisition_list_items_rec_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_repid)."'
+				LIMIT 1
+			");
+			if(!$u){
+				throw new Exception('Update failed.');
+			}
+			$date = date("Y-m-d H:i:s");
+			for($i=1; $i<$splitCount; $i++){
+				$ins = mysqli_query($this->stc_dbs, "
+					INSERT INTO `stc_cust_super_requisition_list_items_rec`(
+						`stc_cust_super_requisition_list_items_rec_list_id`,
+						`stc_cust_super_requisition_list_items_rec_list_item_id`,
+						`stc_cust_super_requisition_list_items_rec_list_pd_id`,
+						`stc_cust_super_requisition_list_items_rec_list_poaid`,
+						`stc_cust_super_requisition_list_items_rec_recqty`,
+						`stc_cust_super_requisition_list_items_rec_status`,
+						`stc_cust_super_requisition_list_items_rec_date`
+					) VALUES (
+						'".mysqli_real_escape_string($this->stc_dbs, $list_id)."',
+						'".mysqli_real_escape_string($this->stc_dbs, $list_item_id)."',
+						'".mysqli_real_escape_string($this->stc_dbs, $pd_id)."',
+						'0',
+						'1',
+						'".mysqli_real_escape_string($this->stc_dbs, $status)."',
+						'".mysqli_real_escape_string($this->stc_dbs, $date)."'
+					)
+				");
+				if(!$ins){
+					throw new Exception('Insert failed.');
+				}
+			}
+			mysqli_commit($this->stc_dbs);
+			return 'Success';
+		}catch(Exception $e){
+			mysqli_rollback($this->stc_dbs);
+			return 'Hmmm!!! Something went wrong while splitting.';
+		}
 	}
 	public function stc_update_req_rec_adhoc_id($stc_repid, $stc_adhoc_id){
 		$lokiout='';
@@ -5492,6 +5610,14 @@ if(isset($_POST['update_adhoc_id_rec'])){
 	// echo $objlokiout;
 }
 
+// split multi-qty dispatch row into qty=1 rows
+if(isset($_POST['split_dispatch_rec'])){
+	$stc_repid = $_POST['repid'];
+	$objloki = new ragnarRequisitionPertView();
+	$objlokiout = $objloki->stc_split_req_rec_row($stc_repid);
+	echo json_encode($objlokiout);
+}
+
 // add challan items to sale product_id
 if(isset($_POST['stceditsaleaction'])){
 	$bjornefiltercatout=$_POST['phpfiltercatout'];
@@ -6249,6 +6375,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 				$directQty = 0.0;
 				$dispatchedForItemProduct = 0.0;
 				$rackNames = '-';
+				$adhocOptions = [];
 
 				$q1 = mysqli_query($this->stc_dbs, "SELECT SUM(`stc_purchase_product_adhoc_qty`) AS total_qty FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid` = '".$product_id."'");
 				if($q1){
@@ -6256,19 +6383,41 @@ class ragnarCallDailyRequisitions extends tesseract{
 					$adhocQty = (float)($r1['total_qty'] ?? 0);
 				}
 
-				// Racks for this product (for display) - single rack, order by adhoc id desc
+				// Racks for this product (for display) - show all racks across adhoc lines
 				$rk_q = mysqli_query($this->stc_dbs, "
-					SELECT RK.`stc_rack_name` AS racks
+					SELECT GROUP_CONCAT(DISTINCT RK.`stc_rack_name` ORDER BY RK.`stc_rack_name` SEPARATOR ', ') AS racks
 					FROM `stc_purchase_product_adhoc` A
 					LEFT JOIN `stc_rack` RK
 						ON RK.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid`
 					WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."' AND A.`stc_purchase_product_adhoc_status` = '1'
-					ORDER BY A.`stc_purchase_product_adhoc_id` DESC
-					LIMIT 1
 				");
 				if($rk_q && $rk_row = mysqli_fetch_assoc($rk_q)){
 					$rackNames = trim((string)($rk_row['racks'] ?? ''));
 					if($rackNames === ''){ $rackNames = '-'; }
+				}
+
+				// Adhoc options for this product (for dropdown UI)
+				$ao_q = mysqli_query($this->stc_dbs, "
+					SELECT
+						A.`stc_purchase_product_adhoc_id` AS adhoc_id,
+						IFNULL(RK.`stc_rack_name`, '-') AS rack_name
+					FROM `stc_purchase_product_adhoc` A
+					LEFT JOIN `stc_rack` RK
+						ON RK.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid`
+					WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+						AND A.`stc_purchase_product_adhoc_status` = '1'
+					ORDER BY A.`stc_purchase_product_adhoc_id` DESC
+				");
+				if($ao_q && mysqli_num_rows($ao_q) > 0){
+					while($ao = mysqli_fetch_assoc($ao_q)){
+						$adh = (int)($ao['adhoc_id'] ?? 0);
+						if($adh <= 0){ continue; }
+						$adhocOptions[] = [
+							'adhoc_id' => $adh,
+							'rack_name' => (string)($ao['rack_name'] ?? '-'),
+							'label' => 'PPO '.$adh.' — Rack '.(string)($ao['rack_name'] ?? '-')
+						];
+					}
 				}
 
 				$q2 = mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = '".$product_id."'");
@@ -6325,6 +6474,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 					'item_type' => $item_type_row,
 					'tools_track_options' => $tools_track_options,
 					'racks' => $rackNames,
+					'adhoc_options' => $adhocOptions,
 					'connected_qty' => number_format((float)($row['connected_qty'] ?? 0), 2),
 					'dispatched_qty' => number_format((float)$dispatchedForItemProduct, 2),
 					'req_balance_qty' => number_format((float)$reqBalanceQty, 2),
@@ -6390,10 +6540,11 @@ class ragnarCallDailyRequisitions extends tesseract{
 		");
 	}
 
-	public function stc_dispatch_daily_requisition_balance($item_id = 0, $product_id = 0, $dispatch_qty = 0){
+	public function stc_dispatch_daily_requisition_balance($item_id = 0, $product_id = 0, $dispatch_qty = 0, $only_adhoc_id = 0){
 		$item_id = (int)$item_id;
 		$product_id = (int)$product_id;
 		$dispatch_qty = (float)$dispatch_qty; // requested qty (optional cap)
+		$only_adhoc_id = (int)$only_adhoc_id;
 		if($item_id <= 0 || $product_id <= 0){
 			return ['success' => false, 'message' => 'Invalid parameters.'];
 		}
@@ -6443,6 +6594,10 @@ class ragnarCallDailyRequisitions extends tesseract{
 
 		// Build adhoc rows with remaining per adhoc_id (ignoring GLD for now, we subtract it from effective stock)
 		$adhoc_rows = [];
+		$adhoc_where = "A.`stc_purchase_product_adhoc_productid` = '".$product_id."'";
+		if($only_adhoc_id > 0){
+			$adhoc_where .= " AND A.`stc_purchase_product_adhoc_id` = '".mysqli_real_escape_string($this->stc_dbs, $only_adhoc_id)."'";
+		}
 		$adhoc_q = mysqli_query($this->stc_dbs, "
 			SELECT 
 				A.`stc_purchase_product_adhoc_id` AS adhoc_id,
@@ -6451,7 +6606,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 			FROM `stc_purchase_product_adhoc` A
 			LEFT JOIN `stc_cust_super_requisition_list_items_rec` R
 				ON R.`stc_cust_super_requisition_list_items_rec_list_poaid` = A.`stc_purchase_product_adhoc_id`
-			WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+			WHERE ".$adhoc_where."
 			GROUP BY A.`stc_purchase_product_adhoc_id`
 			HAVING (A.`stc_purchase_product_adhoc_qty` - IFNULL(SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`),0)) > 0
 			ORDER BY A.`stc_purchase_product_adhoc_id` ASC
@@ -6465,7 +6620,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 			}
 		}
 		if(count($adhoc_rows) === 0){
-			return ['success' => false, 'message' => 'No Adhoc stock available for this product.'];
+			return ['success' => false, 'message' => ($only_adhoc_id > 0) ? 'Selected Adhoc has no balance.' : 'No Adhoc stock available for this product.'];
 		}
 
 		// Subtract GLD consumption from effective remaining
@@ -6506,7 +6661,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 				) VALUES (
 					'".mysqli_real_escape_string($this->stc_dbs, $list_id)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $item_id)."',
-					'0',
+					'".mysqli_real_escape_string($this->stc_dbs, $product_id)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $qty_to_dispatch)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $now)."'
@@ -7433,11 +7588,12 @@ if(isset($_POST['stc_dispatch_daily_requisition_balance'])){
 	$item_id = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
 	$product_id = isset($_POST['product_id']) ? (int)$_POST['product_id'] : 0;
 	$dispatch_qty = isset($_POST['dispatch_qty']) ? (float)$_POST['dispatch_qty'] : 0;
+	$adhoc_id = isset($_POST['adhoc_id']) ? (int)$_POST['adhoc_id'] : 0;
 	if(empty($_SESSION['stc_empl_id'])){
 		echo json_encode(['reload' => true]);
 	}else{
 		$odin_req = new ragnarCallDailyRequisitions();
-		$odin_req_out = $odin_req->stc_dispatch_daily_requisition_balance($item_id, $product_id, $dispatch_qty);
+		$odin_req_out = $odin_req->stc_dispatch_daily_requisition_balance($item_id, $product_id, $dispatch_qty, $adhoc_id);
 		echo json_encode($odin_req_out);
 	}
 }

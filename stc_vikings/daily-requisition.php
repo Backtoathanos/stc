@@ -841,12 +841,22 @@ include("kattegat/role_check.php");
                     toolsCell = '<span class="text-warning" title="Add tool on purchase (PPO) first"><i class="fa fa-exclamation-triangle"></i> No tool rows</span>';
                   }
                 }
+                var adhocCell = '<span class="text-muted">—</span>';
+                if (row.adhoc_options && row.adhoc_options.length > 0) {
+                  var adhocOpts = '';
+                  row.adhoc_options.forEach(function (o) {
+                    adhocOpts += '<option value="' + escapeHtml(o.adhoc_id) + '">' + escapeHtml(o.label || ('PPO ' + o.adhoc_id)) + '</option>';
+                  });
+                  adhocCell = '<select class="form-control input-sm dr-adhoc-select" style="max-width:240px;">' + adhocOpts + '</select>';
+                } else {
+                  adhocCell = escapeHtml(row.racks || '-');
+                }
                 html += '<tr class="dr-balance-row" data-product-id="' + escapeHtml(row.product_id) + '" data-balance="' + escapeHtml(row.balance_qty) + '" data-unit="' + escapeHtml(row.product_unit) + '">' +
                   '<td class="text-center"><b>' + escapeHtml(row.product_id) + '</b></td>' +
                   '<td>' + escapeHtml(row.product_name) + '<span style="display:' + HideSHow + ';font-size: 12px; color: Red;">* Units not matching please change product or update unit of requisition</span></td>' +
                   '<td class="text-right dr-qtyunit-cell">' + reqQtyLink + '</td>' +
                   '<td class="text-right dr-balance-cell"><b>' + escapeHtml(row.balance_qty) + '/' + escapeHtml(row.product_unit) + '</b>' + pendingBtn + '</td>' +
-                  '<td>' + escapeHtml(row.racks || '-') + '</td>' +
+                  '<td>' + adhocCell + '</td>' +
                   '<td><input type="number" class="form-control input-sm dr-rack-input" value="' + escapeHtml(row.req_balance_qty) + '"></td>' +
                   '<td class="text-center" style="white-space:normal;">' + toolsCell + '</td>' +
                   '<td class="text-center"><div class="dr-action-btns" style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;">' + btn + changeBtn + '</div></td>' +
@@ -1338,8 +1348,12 @@ include("kattegat/role_check.php");
         var productId = $btn.data('product-id');
         var $row = $btn.closest('tr');
         var dispatchQty = parseFloat($row.find('.dr-rack-input').val(), 10) || 0;
+        var adhocId = 0;
+        if ($row.find('.dr-adhoc-select').length) {
+          adhocId = parseInt(String($row.find('.dr-adhoc-select').val() || '0'), 10) || 0;
+        }
         if (typeof Swal === 'undefined' || !Swal.fire) {
-          if (!confirm('Dispatch ' + dispatchQty + ' from Adhoc?')) return;
+          if (!confirm('Dispatch ' + dispatchQty + ' from Adhoc' + (adhocId ? (' PPO ' + adhocId) : '') + '?')) return;
           $btn.prop('disabled', true).text('Dispatching...');
           doDispatch();
           return;
@@ -1348,7 +1362,7 @@ include("kattegat/role_check.php");
         Swal.fire({
           icon: 'warning',
           title: 'Confirm dispatch',
-          text: 'Dispatch ' + dispatchQty + ' from Adhoc?',
+          text: 'Dispatch ' + dispatchQty + ' from Adhoc' + (adhocId ? (' PPO ' + adhocId) : '') + '?',
           position: 'top',
           showCancelButton: true,
           confirmButtonText: 'Yes, dispatch',
@@ -1367,7 +1381,8 @@ include("kattegat/role_check.php");
             stc_dispatch_daily_requisition_balance: 1,
             item_id: itemId,
             product_id: productId,
-            dispatch_qty: dispatchQty
+            dispatch_qty: dispatchQty,
+            adhoc_id: adhocId
           },
           dataType: 'json',
           success: function (response) {
