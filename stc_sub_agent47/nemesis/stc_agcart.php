@@ -197,12 +197,6 @@ class witcher_supervisor extends tesseract{
 		");
 		if($optimusprimequery){
 			$last_id = mysqli_insert_id($this->stc_dbs);
-			echo "
-				SELECT A.stc_cust_super_requisition_list_items_product_id, C.stc_purchase_product_adhoc_productid 
-				FROM `stc_cust_super_requisition_list_items` A 
-				LEFT JOIN `stc_cust_super_requisition_list_items_rec` B ON A.stc_cust_super_requisition_list_id=B.stc_cust_super_requisition_list_items_rec_list_item_id 
-				LEFT JOIN `stc_purchase_product_adhoc` C ON B.stc_cust_super_requisition_list_items_rec_list_poaid=C.stc_purchase_product_adhoc_id 
-				WHERE (A.stc_cust_super_requisition_list_items_product_id<>0 OR A.stc_cust_super_requisition_list_items_product_id<>NULL) AND (A.stc_cust_super_requisition_list_items_title LIKE '".mysqli_real_escape_string($this->stc_dbs, $desct)."' OR A.stc_cust_super_requisition_list_items_title='".mysqli_real_escape_string($this->stc_dbs, $desct)."')";
 			$qry=mysqli_query($this->stc_dbs, "
 				SELECT A.stc_cust_super_requisition_list_items_product_id, C.stc_purchase_product_adhoc_productid 
 				FROM `stc_cust_super_requisition_list_items` A 
