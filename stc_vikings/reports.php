@@ -1431,6 +1431,58 @@ STCAuthHelper::checkAuth();?>
                                 </div>
                             </div>
                             <!-- stc trading -->
+                            <?php
+                            if (!isset($con)) {
+                                include_once __DIR__ . '/../MCU/db.php';
+                            }
+                            $gld_sale_gradients = [
+                                'linear-gradient(135deg, #6e8efb, #a777e3)',
+                                'linear-gradient(135deg, #0cebeb, #20e3b2, #29ffc6)',
+                                'linear-gradient(135deg, #ff4e50, #f9d423)',
+                                'linear-gradient(135deg, #4776E6, #8E54E9, #d585ff)',
+                                'linear-gradient(135deg, #f093fb, #f5576c)',
+                                'linear-gradient(135deg, #4facfe, #00f2fe)',
+                            ];
+                            $gld_trading_locations = [];
+                            $gld_location_challan_counts = [];
+                            if (!empty($con)) {
+                                $locRes = mysqli_query($con, "
+                                    SELECT DISTINCT TRIM(`stc_trading_user_location`) AS loc
+                                    FROM `stc_trading_user`
+                                    WHERE `stc_trading_user_location` IS NOT NULL
+                                      AND TRIM(`stc_trading_user_location`) <> ''
+                                      AND LOWER(TRIM(`stc_trading_user_location`)) NOT IN ('root', 'roto')
+                                    ORDER BY loc ASC
+                                ");
+                                if ($locRes) {
+                                    while ($lr = mysqli_fetch_assoc($locRes)) {
+                                        $loc = trim((string) ($lr['loc'] ?? ''));
+                                        if ($loc !== '') {
+                                            $gld_trading_locations[] = $loc;
+                                        }
+                                    }
+                                }
+                                $cntRes = mysqli_query($con, "
+                                    SELECT TRIM(TU.`stc_trading_user_location`) AS loc, COUNT(G.`id`) AS cnt
+                                    FROM `gld_challan` G
+                                    INNER JOIN `stc_trading_user` TU ON TU.`stc_trading_user_id` = G.`created_by`
+                                    WHERE G.`status` <> 0
+                                    GROUP BY TRIM(TU.`stc_trading_user_location`)
+                                ");
+                                if ($cntRes) {
+                                    while ($cr = mysqli_fetch_assoc($cntRes)) {
+                                        $lk = trim((string) ($cr['loc'] ?? ''));
+                                        if ($lk !== '') {
+                                            $gld_location_challan_counts[$lk] = (int) ($cr['cnt'] ?? 0);
+                                        }
+                                    }
+                                }
+                                $allCntRes = mysqli_query($con, "SELECT COUNT(*) AS c FROM `gld_challan` WHERE `status` <> 0");
+                                $gld_all_challan_count = ($allCntRes && ($acr = mysqli_fetch_assoc($allCntRes))) ? (int) ($acr['c'] ?? 0) : 0;
+                            } else {
+                                $gld_all_challan_count = 0;
+                            }
+                            ?>
                             <div class="tab-pane tabs-animation fade" id="tab-content-14" role="tabpanel">
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12">
@@ -1443,33 +1495,33 @@ STCAuthHelper::checkAuth();?>
                                     </div>
                                 </div>
                                 <div class="row">
-                                    <div class="col-xl-12 col-lg-12 col-md-6">
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
                                         <div class="card-border mb-3 card card-body border-success">
                                             <div class="row">
-                                                <div class="col-md-2 col-xl-2 col-sm-2" style="background: linear-gradient(135deg, #6e8efb, #a777e3);" >
+                                                <div class="col-md-2 col-xl-2 col-sm-6 mb-2" style="background: <?php echo $gld_sale_gradients[0]; ?>;" >
                                                     <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="all" name="stc-gld-sale" checked value="0">
-                                                        <label for="all" style="position:relative;font-size: 30px;top: 15px;">All</label>
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="stc-gld-sale-all" name="stc-gld-sale" checked value="0">
+                                                        <label for="stc-gld-sale-all" style="position:relative;font-size: 22px;top: 12px;">All
+                                                            <span class="label label-default" style="font-size:11px;"><?php echo (int) $gld_all_challan_count; ?></span>
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-2 col-xl-2 col-sm-2" style="background: linear-gradient(135deg, #0cebeb, #20e3b2, #29ffc6);" >
+                                                <?php
+                                                foreach ($gld_trading_locations as $gi => $gld_loc) {
+                                                    $grad = $gld_sale_gradients[($gi + 1) % count($gld_sale_gradients)];
+                                                    $cnt = isset($gld_location_challan_counts[$gld_loc]) ? $gld_location_challan_counts[$gld_loc] : 0;
+                                                    $rid = 'stc-gld-sale-loc-' . (int) $gi;
+                                                    ?>
+                                                <div class="col-md-2 col-xl-2 col-sm-6 mb-2" style="background: <?php echo htmlspecialchars($grad, ENT_QUOTES, 'UTF-8'); ?>;" >
                                                     <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="dhatkidih" name="stc-gld-sale" value="1">
-                                                        <label for="dhatkidih" style="position:relative;font-size: 30px;top: 15px;">Dhatkidih</label>
+                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="<?php echo htmlspecialchars($rid, ENT_QUOTES, 'UTF-8'); ?>" name="stc-gld-sale" value="<?php echo htmlspecialchars($gld_loc, ENT_QUOTES, 'UTF-8'); ?>">
+                                                        <label for="<?php echo htmlspecialchars($rid, ENT_QUOTES, 'UTF-8'); ?>" style="position:relative;font-size: 22px;top: 12px;">
+                                                            <?php echo htmlspecialchars($gld_loc, ENT_QUOTES, 'UTF-8'); ?>
+                                                            <span class="label label-default" style="font-size:11px;"><?php echo (int) $cnt; ?></span>
+                                                        </label>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-2 col-xl-2 col-sm-2" style="background: linear-gradient(135deg, #ff4e50, #f9d423);" >
-                                                    <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="sehrabazar" name="stc-gld-sale" value="2">
-                                                        <label for="sehrabazar" style="position:relative;font-size: 30px;top: 15px;">Sehrabazar</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-2 col-xl-2 col-sm-2" style="background: linear-gradient(135deg, #4776E6, #8E54E9, #d585ff);" >
-                                                    <div class="card-border mb-3 card-body border-success">
-                                                        <input type="radio" class="material-icons form-control stc-gld-sale" id="kolkata" name="stc-gld-sale" value="3">
-                                                        <label for="kolkata" style="position:relative;font-size: 30px;top: 15px;">Kolkata</label>
-                                                    </div>
-                                                </div>
+                                                <?php } ?>
                                             </div>
                                         </div>
                                     </div>
@@ -1521,32 +1573,23 @@ STCAuthHelper::checkAuth();?>
                                           <table class="mb-0 table table-bordered ">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">Party Name</th>
-                                                    <th scope="col">Challan No</th>
-                                                    <th scope="col">Challan Date</th>
-                                                    <th scope="col">Material Details</th>
-                                                    <th scope="col">Material Quantity</th>
-                                                    <th scope="col">Material Rate</th>
-                                                    <th scope="col">Amount</th>
-                                                    <th scope="col">Due Amount</th> 
-                                                    <th scope="col">Remarks</th> 
-                                                    <th scope="col">Order By</th> 
+                                                    <th class="text-center" scope="col">Party Name</th>
+                                                    <th class="text-center" scope="col">Challan No</th>
+                                                    <th class="text-center" scope="col">Challan Date</th>
+                                                    <th class="text-center" scope="col">Material Details</th>
+                                                    <th class="text-center" scope="col">Material Quantity</th>
+                                                    <th class="text-center" scope="col">Unit</th>
+                                                    <th class="text-center" scope="col">Material Rate</th>
+                                                    <th class="text-center" scope="col">Amount</th>
+                                                    <th class="text-center" scope="col">Discount</th>
+                                                    <th class="text-center" scope="col">Total Amount</th>
+                                                    <th class="text-center" scope="col">Due Amount</th>
+                                                    <th class="text-center" scope="col">Order By</th>
                                                 </tr>
                                             </thead>
                                             <tbody class="">
                                               <tr>
-                                                <td colspan="2">
-                                                  <button type="button" class="btn btn-primary stcsndpbegbuttoninvsearch" style="float:right;">
-                                                    <i class="fas fa-arrow-left"></i>
-                                                  </button>
-                                                  <input type="hidden" class="stcsndpbegvalueinputsearch" value="0">
-                                                </td>
-                                                <td colspan="11">
-                                                  <button type="button" class="btn btn-primary stcsndpendbuttoninvsearch">
-                                                    <i class="fas fa-arrow-right"></i>
-                                                  </button>
-                                                  <input type="hidden" class="stcsndpendvalueinputsearch" value="30">
-                                                </td>
+                                                <td colspan="12" class="text-center text-muted">Select dates and location, then click Find.</td>
                                               </tr>
                                             </tbody>
                                           </table>

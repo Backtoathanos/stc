@@ -2867,15 +2867,12 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
       $totaldiscountedamt=0;
       
       $filter='';
-      if($branch>0){
-         if($branch==1){
-            $branch='Dhatkidih';
-         }elseif($branch==2){
-            $branch='Sehrabazar';
-         }elseif($branch==3){
-            $branch='Kolkata';
+      $branch_raw = isset($branch) ? $branch : '';
+      if ($branch_raw !== '' && $branch_raw !== '0' && $branch_raw !== 0) {
+         $locEsc = mysqli_real_escape_string($this->stc_dbs, trim((string) $branch_raw));
+         if ($locEsc !== '') {
+            $filter = "`stc_trading_user_location`='".$locEsc."' AND ";
          }
-         $filter="`stc_trading_user_location`='".$branch."' AND ";
       }
       $query="
          SELECT `id`, `stc_product_name`, `stc_sub_cat_name`, `stc_product_unit`, `gld_customer_title`, `challan_number`, `bill_number`, `qty`, `rate`, `paid_amount`, `discount`, `payment_status`, `agent_id`, `status`, `created_date`, `stc_trading_user_name` 
@@ -2900,14 +2897,14 @@ class ragnarReportsViewTradingPurchaseSaleReports extends tesseract{
                <th class="text-center" scope="col">Challan No</th>
                <th class="text-center" scope="col">Challan Date</th>
                <th class="text-center" scope="col">Material Details</th>
-               <th class="text-center" scope="col">Quantity</th>
+               <th class="text-center" scope="col">Material Quantity</th>
                <th class="text-center" scope="col">Unit</th>
-               <th class="text-center" scope="col">Rate</th>
+               <th class="text-center" scope="col">Material Rate</th>
                <th class="text-center" scope="col">Amount</th>
                <th class="text-center" scope="col">Discount</th>
                <th class="text-center" scope="col">Total Amount</th>
                <th class="text-center" scope="col">Due Amount</th> 
-               <th class="text-center" scope="col">Created By</th> 
+               <th class="text-center" scope="col">Order By</th> 
               </tr>
             </thead>
             <tbody>  
