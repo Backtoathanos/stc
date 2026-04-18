@@ -30,6 +30,7 @@ use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\POAdhocController;
 use App\Http\Controllers\PPETrackerController;
 use App\Http\Controllers\ToolTrackerController;
+use App\Http\Controllers\GldChallanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -245,4 +246,12 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::post('/branch/stc/tooltracker/edit-track', [ToolTrackerController::class, 'updateTrack']);
     Route::get('/branch/stc/tooltracker/delete-track', [ToolTrackerController::class, 'deleteTrack']);
     Route::post('/branch/stc/tooltracker/delete-track-bulk', [ToolTrackerController::class, 'deleteTrackBulk']);
+
+    // GLD challan
+    Route::get('/branch/stc/gld', [GldChallanController::class, 'show']);
+    Route::post('/branch/stc/gld/list', [GldChallanController::class, 'list']);
+    Route::get('/branch/stc/gld/get', [GldChallanController::class, 'get']);
+    Route::post('/branch/stc/gld/store', [GldChallanController::class, 'store']);
+    Route::post('/branch/stc/gld/edit', [GldChallanController::class, 'update']);
+    Route::get('/branch/stc/gld/delete', [GldChallanController::class, 'delete']);
 });

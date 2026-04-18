@@ -2177,14 +2177,6 @@ class ragnarPurchaseAdhoc extends tesseract{
 			$seen[$k] = true;
 			$out[] = $loc;
 		};
-		if ($this->ragnar_stc_shop_has_column('branch')) {
-			$q = mysqli_query($this->stc_dbs, "SELECT DISTINCT TRIM(`branch`) AS loc FROM `stc_shop` WHERE `branch` IS NOT NULL AND TRIM(`branch`) <> ''");
-			if ($q) {
-				while ($row = mysqli_fetch_assoc($q)) {
-					$push($row['loc'] ?? '');
-				}
-			}
-		}
 		$q2 = mysqli_query($this->stc_dbs, "SELECT DISTINCT TRIM(`shopname`) AS loc FROM `stc_shop` WHERE `shopname` IS NOT NULL AND TRIM(`shopname`) <> ''");
 		if ($q2) {
 			while ($row = mysqli_fetch_assoc($q2)) {

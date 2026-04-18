@@ -196,6 +196,12 @@
                       <p>Tool Tracker</p>
                     </a>
                   </li>
+                  <li class="nav-item">
+                    <a href="{{ url('/branch/stc/gld') }}" class="nav-link @if(Request::segment(3) == 'gld') active @endif">
+                      <i class="far fa-arrow-alt-circle-right nav-icon"></i>
+                      <p>GLD</p>
+                    </a>
+                  </li>
                 </ul>
               </li>
             </ul>
