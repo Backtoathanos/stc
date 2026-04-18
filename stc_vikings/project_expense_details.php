@@ -63,7 +63,7 @@ if(isset($_GET['pro_id'])){
         .invoice table td,
         .invoice table th {
             padding: 5px;
-            background: #7d6161;
+            /* background: #7d6161; */
             border-bottom: 1px solid #fff;
         }
 
@@ -76,7 +76,7 @@ if(isset($_GET['pro_id'])){
         .invoice table td h3 {
             margin: 0;
             font-weight: 400;
-            color: #7d6161;
+            /* color: #7d6161; */
             font-size: 1.2em;
         }
 
