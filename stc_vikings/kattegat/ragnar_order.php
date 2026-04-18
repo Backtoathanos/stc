@@ -6388,7 +6388,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 					SELECT GROUP_CONCAT(DISTINCT RK.`stc_rack_name` ORDER BY RK.`stc_rack_name` SEPARATOR ', ') AS racks
 					FROM `stc_purchase_product_adhoc` A
 					LEFT JOIN `stc_rack` RK
-						ON RK.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid`
+						ON RK.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid` AND RK.`stc_rack_status` <> '2'
 					WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
 				");
 				if($rk_q && $rk_row = mysqli_fetch_assoc($rk_q)){
