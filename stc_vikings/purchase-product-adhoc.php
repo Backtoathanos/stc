@@ -3237,12 +3237,6 @@ include("kattegat/role_check.php");
                                 $pushPoadhocShopLoc($row['loc']);
                             }
                         }
-                        $qBranch = mysqli_query($con, "SELECT DISTINCT TRIM(`branch`) AS loc FROM `stc_shop` WHERE `branch` IS NOT NULL AND TRIM(`branch`) <> ''");
-                        if ($qBranch) {
-                            while ($row = mysqli_fetch_assoc($qBranch)) {
-                                $pushPoadhocShopLoc($row['loc']);
-                            }
-                        }
                         $qTu = mysqli_query($con, "SELECT DISTINCT TRIM(`stc_trading_user_location`) AS loc FROM `stc_trading_user` WHERE `stc_trading_user_location` IS NOT NULL AND TRIM(`stc_trading_user_location`) <> ''");
                         if ($qTu) {
                             while ($row = mysqli_fetch_assoc($qTu)) {
