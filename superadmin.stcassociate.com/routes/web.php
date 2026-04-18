@@ -249,6 +249,7 @@ Route::group(['middleware' => 'superadmin'], function(){
 
     // GLD challan
     Route::get('/branch/stc/gld', [GldChallanController::class, 'show']);
+    Route::get('/branch/stc/gld/filter-racks', [GldChallanController::class, 'filterRacks']);
     Route::post('/branch/stc/gld/list', [GldChallanController::class, 'list']);
     Route::get('/branch/stc/gld/get', [GldChallanController::class, 'get']);
     Route::post('/branch/stc/gld/store', [GldChallanController::class, 'store']);

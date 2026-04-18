@@ -380,13 +380,53 @@ $(function () {
     }
   });
 
-  $('#gld-filter-created-by, #gld-filter-rack').on('change', function () {
+  function gldLoadRackOptions(createdBy, after) {
+    $.get("{{ url('/branch/stc/gld/filter-racks') }}", { created_by: createdBy == null ? '' : createdBy }, function (res) {
+      if (!res || !res.success) {
+        if (after) {
+          after();
+        }
+        return;
+      }
+      var $rack = $('#gld-filter-rack');
+      var keep = $rack.val();
+      $rack.empty();
+      $rack.append($('<option></option>').val('').text('All racks'));
+      $.each(res.data || [], function (_, rk) {
+        $rack.append(
+          $('<option></option>').val(rk.stc_rack_id).text(rk.stc_rack_name)
+        );
+      });
+      if (keep && $rack.find('option[value="' + String(keep) + '"]').length) {
+        $rack.val(keep);
+      } else {
+        $rack.val('');
+      }
+      if (after) {
+        after();
+      }
+    }).fail(function () {
+      if (after) {
+        after();
+      }
+    });
+  }
+
+  $('#gld-filter-rack').on('change', function () {
     table.ajax.reload();
   });
+
+  $('#gld-filter-created-by').on('change', function () {
+    gldLoadRackOptions($(this).val(), function () {
+      table.ajax.reload();
+    });
+  });
+
   $('#gld-filter-clear').on('click', function () {
     $('#gld-filter-created-by').val('');
-    $('#gld-filter-rack').val('');
-    table.ajax.reload();
+    gldLoadRackOptions('', function () {
+      table.ajax.reload();
+    });
   });
 
   function lookupProductLabel(idNum) {

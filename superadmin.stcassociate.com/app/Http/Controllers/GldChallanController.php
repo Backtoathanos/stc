@@ -89,6 +89,29 @@ class GldChallanController extends Controller
         return view('pages.gld', $data);
     }
 
+    /**
+     * Racks that appear on challan → adhoc lines, optionally limited to a creator.
+     */
+    public function filterRacks(Request $request)
+    {
+        $createdBy = $request->get('created_by');
+
+        $q = DB::table('gld_challan as GC')
+            ->join('stc_purchase_product_adhoc as PA', 'GC.adhoc_id', '=', 'PA.stc_purchase_product_adhoc_id')
+            ->join('stc_rack as RK', 'PA.stc_purchase_product_adhoc_rackid', '=', 'RK.stc_rack_id')
+            ->where('PA.stc_purchase_product_adhoc_rackid', '>', 0)
+            ->select('RK.stc_rack_id', 'RK.stc_rack_name')
+            ->distinct();
+
+        if ($createdBy !== null && $createdBy !== '') {
+            $q->where('GC.created_by', (int) $createdBy);
+        }
+
+        $rows = $q->orderBy('RK.stc_rack_name')->get();
+
+        return response()->json(['success' => true, 'data' => $rows]);
+    }
+
     public function list(Request $request)
     {
         $draw = (int) $request->get('draw', 1);
