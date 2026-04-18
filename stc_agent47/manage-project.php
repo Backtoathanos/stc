@@ -159,6 +159,127 @@ include_once("../MCU/db.php");
           color:#fff;
           text-decoration:none;
         }
+        /* Project requisitions tab — single autocomplete combo */
+        .stc-req-project-combo {
+            position: relative;
+            margin-bottom: 8px;
+        }
+        .stc-req-project-list-wrap {
+            display: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 100%;
+            margin-top: 2px;
+            z-index: 1060;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            max-height: 240px;
+            overflow-y: auto;
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,.12);
+        }
+        .stc-req-project-list-wrap.is-open {
+            display: block;
+        }
+        .stc-req-project-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            list-style: none;
+        }
+        .stc-req-project-item:last-child {
+            border-bottom: none;
+        }
+        .stc-req-project-item:hover {
+            background: #f8f9fa;
+        }
+        .stc-req-project-item.active {
+            background: #e8f4fc;
+            font-weight: 600;
+        }
+        .stc-req-project-item.hidden {
+            display: none;
+        }
+        /* Project requisitions — table & toolbar */
+        .stc-req-details-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 12px 14px;
+            background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        .stc-req-details-toolbar .stc-req-details-summary {
+            flex: 1 1 200px;
+            margin: 0;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .stc-req-details-toolbar-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+        .stc-req-details-toolbar-actions label {
+            margin: 0;
+            font-weight: 600;
+            font-size: 12px;
+            color: #475569;
+        }
+        .stc-req-details-wrap {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0,0,0,.06);
+            background: #fff;
+        }
+        .stc-req-details-table {
+            margin-bottom: 0;
+        }
+        .stc-req-details-table thead th {
+            background: linear-gradient(180deg, #4a5568 0%, #2d3748 100%);
+            color: #fff;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            border: none !important;
+            padding: 12px 10px;
+            vertical-align: middle;
+            white-space: nowrap;
+        }
+        .stc-req-details-table tbody td {
+            vertical-align: middle !important;
+            padding: 10px;
+            border-color: #edf2f7;
+            font-size: 13px;
+        }
+        .stc-req-details-table tbody tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+        .stc-req-details-table tbody tr:hover {
+            background-color: #f0f7ff !important;
+        }
+        .stc-req-details-table .label {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        #stc-req-details-pagination-wrap {
+            margin-top: 16px;
+            text-align: center;
+        }
+        #stc-req-details-pagination-wrap .stc-req-det-pag .btn {
+            min-width: 34px;
+        }
     </style>
 </head>
 <body>
@@ -190,8 +311,13 @@ include_once("../MCU/db.php");
                                 </a>
                             </li> -->
                             <li class="nav-item">
-                                <a role="tab" class="nav-link active" id="tab-1" data-toggle="tab" href="#show-project">
+                                <a role="tab" class="nav-link active" id="tab-show-project" data-toggle="tab" href="#show-project">
                                     <span>Show Project <b>O</b></span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-project-req-details" data-toggle="tab" href="#project-req-details">
+                                    <span>Project Requisitions Details</span>
                                 </a>
                             </li>
                             <!-- <li class="nav-item">
@@ -363,6 +489,129 @@ include_once("../MCU/db.php");
                                                     }
                                                     ?>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane tabs-animation fade" id="project-req-details" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Project requisitions</h5>
+                                                <p class="text-muted small">Set date range, type a project name, pick from the list, then Search.</p>
+                                                <?php
+                                                $stc_reqdet_beg = date('Y-m-01');
+                                                $stc_reqdet_end = date('Y-m-d');
+                                                ?>
+                                                <div class="row mb-2">
+                                                    <div class="col-md-4 col-sm-6 mb-2">
+                                                        <label for="stc-req-det-beg-date" class="small text-muted">From date</label>
+                                                        <input type="date" class="form-control stc-req-det-beg-date" id="stc-req-det-beg-date" value="<?php echo htmlspecialchars($stc_reqdet_beg, ENT_QUOTES, 'UTF-8'); ?>">
+                                                    </div>
+                                                    <div class="col-md-4 col-sm-6 mb-2">
+                                                        <label for="stc-req-det-end-date" class="small text-muted">To date</label>
+                                                        <input type="date" class="form-control stc-req-det-end-date" id="stc-req-det-end-date" value="<?php echo htmlspecialchars($stc_reqdet_end, ENT_QUOTES, 'UTF-8'); ?>">
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-md-8">
+                                                        <div class="stc-req-project-combo">
+                                                            <input type="hidden" id="stc-req-project-id" value="">
+                                                            <input type="text" class="form-control" id="stc-req-project-filter" placeholder="Type to search project..." autocomplete="off">
+                                                            <ul id="stc-req-project-list" class="list-unstyled stc-req-project-list-wrap">
+                                                            <?php
+                                                            if ($_SESSION['stc_agent_role'] == 3) {
+                                                                $reqdd_qry = mysqli_query($con, "
+                                                                    SELECT DISTINCT
+                                                                        `stc_cust_project_id`,
+                                                                        `stc_cust_project_title`
+                                                                    FROM `stc_cust_project`
+                                                                    INNER JOIN `stc_agent_requested_customer`
+                                                                        ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
+                                                                    INNER JOIN `stc_agents`
+                                                                        ON `stc_agent_requested_customer_agent_id`=`stc_agents_id`
+                                                                    WHERE `stc_agents_id`='" . mysqli_real_escape_string($con, (string) $_SESSION['stc_agent_id']) . "'
+                                                                    ORDER BY `stc_cust_project_title` ASC
+                                                                ");
+                                                            } else {
+                                                                $reqdd_qry = mysqli_query($con, "
+                                                                    SELECT DISTINCT
+                                                                        `stc_cust_project_id`,
+                                                                        `stc_cust_project_title`
+                                                                    FROM `stc_cust_project`
+                                                                    LEFT JOIN `stc_cust_project_collaborate`
+                                                                        ON `stc_cust_project_collaborate_projectid`=`stc_cust_project_id`
+                                                                    WHERE `stc_cust_project_createdby`='" . mysqli_real_escape_string($con, (string) $_SESSION['stc_agent_id']) . "'
+                                                                    OR `stc_cust_project_collaborate_teamid`='" . mysqli_real_escape_string($con, (string) $_SESSION['stc_agent_id']) . "'
+                                                                    ORDER BY `stc_cust_project_title` ASC
+                                                                ");
+                                                            }
+                                                            if ($reqdd_qry && mysqli_num_rows($reqdd_qry) > 0) {
+                                                                foreach ($reqdd_qry as $rp) {
+                                                                    echo '<li class="stc-req-project-item" data-project-id="' . htmlspecialchars((string) $rp['stc_cust_project_id'], ENT_QUOTES, 'UTF-8') . '">' . htmlspecialchars((string) $rp['stc_cust_project_title'], ENT_QUOTES, 'UTF-8') . '</li>';
+                                                                }
+                                                            } else {
+                                                                echo '<li class="stc-req-project-item text-muted" style="cursor:default;">No projects available.</li>';
+                                                            }
+                                                            ?>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <button type="button" class="btn btn-success btn-block stc-req-details-search">
+                                                            <i class="fa fa-search"></i> Search
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="stc-req-details-toolbar">
+                                                    <p class="stc-req-details-summary" id="stc-req-details-summary">Select a project and click Search.</p>
+                                                    <div class="stc-req-details-toolbar-actions">
+                                                        <div class="form-inline">
+                                                            <label for="stc-req-details-per-page">Rows</label>
+                                                            <select class="form-control input-sm" id="stc-req-details-per-page" style="width:auto;min-width:72px;display:inline-block;margin-left:6px;">
+                                                                <option value="10">10</option>
+                                                                <option value="25" selected>25</option>
+                                                                <option value="50">50</option>
+                                                                <option value="100">100</option>
+                                                            </select>
+                                                        </div>
+                                                        <button type="button" class="btn btn-default btn-sm" id="stc-req-details-export" title="Download all matching rows as CSV (opens in Excel)">
+                                                            <i class="fa fa-file-excel-o"></i> Export Excel
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="table-responsive stc-req-details-wrap" style="overflow-x:auto;">
+                                                    <table class="table table-hover stc-req-details-table mb-0">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center">Sl No</th>
+                                                                <th class="text-center">Req Date</th>
+                                                                <th class="text-center">Requisition number</th>
+                                                                <th class="text-center">Item name</th>
+                                                                <th class="text-center">Unit</th>
+                                                                <th class="text-center">Req qty</th>
+                                                                <th class="text-center">GM passed qty</th>
+                                                                <th class="text-center">Dispatched qty</th>
+                                                                <th class="text-center">Received qty</th>
+                                                                <th class="text-center">Item type</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody id="stc-req-details-tbody">
+                                                            <tr>
+                                                                <td colspan="10" class="text-center text-muted">Select a project and click Search.</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div id="stc-req-details-pagination-wrap"></div>
+                                                <form id="stc-req-export-form" action="nemesis/stc_project.php" method="post" target="_blank" style="display:none;">
+                                                    <input type="hidden" name="stc_agent_project_req_export" value="1">
+                                                    <input type="hidden" name="project_id" id="stc-req-export-project-id" value="">
+                                                    <input type="hidden" name="beg_date" id="stc-req-export-beg-date" value="">
+                                                    <input type="hidden" name="end_date" id="stc-req-export-end-date" value="">
+                                                </form>
                                             </div>
                                         </div>
                                     </div>
@@ -828,6 +1077,139 @@ include_once("../MCU/db.php");
             }
           }
         }
+
+        function stcReqProjectApplyFilter() {
+          var q = $('#stc-req-project-filter').val().toLowerCase();
+          $('#stc-req-project-list .stc-req-project-item[data-project-id]').each(function () {
+            var $li = $(this);
+            var t = $li.text().toLowerCase();
+            var show = !q || t.indexOf(q) >= 0;
+            $li.toggleClass('hidden', !show);
+          });
+        }
+        function stcReqProjectOpenList() {
+          $('#stc-req-project-list').addClass('is-open');
+        }
+        function stcReqProjectCloseList() {
+          $('#stc-req-project-list').removeClass('is-open');
+        }
+
+        $(document).on('focus', '#stc-req-project-filter', function () {
+          stcReqProjectApplyFilter();
+          stcReqProjectOpenList();
+        });
+
+        $(document).on('input', '#stc-req-project-filter', function () {
+          var picked = $(this).data('picked-title') || '';
+          if ($(this).val() !== picked) {
+            $('#stc-req-project-id').val('');
+            $(this).removeData('picked-title');
+          }
+          stcReqProjectApplyFilter();
+          stcReqProjectOpenList();
+        });
+
+        $(document).on('click', '#stc-req-project-list .stc-req-project-item[data-project-id]', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var title = $(this).text().trim();
+          var id = $(this).attr('data-project-id');
+          $('#stc-req-project-filter').val(title).data('picked-title', title);
+          $('#stc-req-project-id').val(id);
+          $('#stc-req-project-list .stc-req-project-item').removeClass('active');
+          $(this).addClass('active');
+          stcReqProjectCloseList();
+        });
+
+        $(document).on('click', function (e) {
+          if (!$(e.target).closest('.stc-req-project-combo').length) {
+            stcReqProjectCloseList();
+          }
+        });
+
+        function stcReqDetailsValidate() {
+          var pid = $('#stc-req-project-id').val();
+          if (!pid) {
+            alert('Please select a project.');
+            return null;
+          }
+          var beg = $('.stc-req-det-beg-date').val();
+          var end = $('.stc-req-det-end-date').val();
+          if (!beg || !end) {
+            alert('Please select From date and To date.');
+            return null;
+          }
+          if (beg > end) {
+            alert('From date cannot be after To date.');
+            return null;
+          }
+          return { project_id: pid, beg_date: beg, end_date: end };
+        }
+
+        function stcReqDetailsLoad(page) {
+          var v = stcReqDetailsValidate();
+          if (!v) return;
+          page = parseInt(page, 10) || 1;
+          var perPage = parseInt($('#stc-req-details-per-page').val(), 10) || 25;
+          $('#stc-req-details-tbody').html('<tr><td colspan="10" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</td></tr>');
+          $('#stc-req-details-pagination-wrap').empty();
+          $('#stc-req-details-summary').text('Loading…');
+          $.ajax({
+            url: 'nemesis/stc_project.php',
+            method: 'POST',
+            dataType: 'json',
+            data: {
+              stc_agent_project_req_details: 1,
+              project_id: v.project_id,
+              beg_date: v.beg_date,
+              end_date: v.end_date,
+              page: page,
+              per_page: perPage
+            },
+            success: function (res) {
+              if (!res || !res.ok) {
+                var msg = (res && res.message) ? res.message : 'Could not load data.';
+                $('#stc-req-details-tbody').html('<tr><td colspan="10" class="text-center text-danger">' + $('<div/>').text(msg).html() + '</td></tr>');
+                $('#stc-req-details-summary').text('');
+                return;
+              }
+              $('#stc-req-details-tbody').html(res.tbody || '');
+              $('#stc-req-details-pagination-wrap').html(res.pagination || '');
+              $('#stc-req-details-summary').text(res.summary || '');
+            },
+            error: function () {
+              $('#stc-req-details-tbody').html('<tr><td colspan="10" class="text-center text-danger">Could not load data.</td></tr>');
+              $('#stc-req-details-summary').text('');
+            }
+          });
+        }
+
+        $(document).on('click', '.stc-req-details-search', function (e) {
+          e.preventDefault();
+          stcReqDetailsLoad(1);
+        });
+
+        $(document).on('click', '.stc-req-details-page', function (e) {
+          e.preventDefault();
+          var p = $(this).data('page');
+          if (p) stcReqDetailsLoad(p);
+        });
+
+        $(document).on('change', '#stc-req-details-per-page', function () {
+          if ($('#stc-req-project-id').val()) {
+            stcReqDetailsLoad(1);
+          }
+        });
+
+        $(document).on('click', '#stc-req-details-export', function (e) {
+          e.preventDefault();
+          var v = stcReqDetailsValidate();
+          if (!v) return;
+          $('#stc-req-export-project-id').val(v.project_id);
+          $('#stc-req-export-beg-date').val(v.beg_date);
+          $('#stc-req-export-end-date').val(v.end_date);
+          $('#stc-req-export-form')[0].submit();
+        });
 
         $(document).ready(function(e){
             // create project

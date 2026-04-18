@@ -2008,6 +2008,316 @@ class pirates_project extends tesseract{
 		return '<table class="table table-bordered">'.$thead.'<tbody>'.$rowsHtml.'</tbody></table>';
 	}
 
+	/** Agent manage-project: paginated requisition lines as JSON (tbody + pagination). */
+	public function stc_agent_project_requisitions_details_json($project_id, $beg_date = '', $end_date = '', $page = 1, $per_page = 25){
+		$project_id = (int) $project_id;
+		$page = max(1, (int) $page);
+		$per_page = max(5, min(100, (int) $per_page));
+		$agent = isset($_SESSION['stc_agent_id']) ? (int) $_SESSION['stc_agent_id'] : 0;
+		$role = isset($_SESSION['stc_agent_role']) ? (int) $_SESSION['stc_agent_role'] : 0;
+		if ($project_id <= 0 || $agent <= 0) {
+			return json_encode(['ok' => false, 'message' => 'Invalid request.']);
+		}
+		$ok = false;
+		if ($role === 3) {
+			$chk = mysqli_query($this->stc_dbs, "
+				SELECT 1
+				FROM `stc_cust_project`
+				INNER JOIN `stc_agent_requested_customer` ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
+				INNER JOIN `stc_agents` ON `stc_agent_requested_customer_agent_id`=`stc_agents_id`
+				WHERE `stc_cust_project_id`='".$project_id."' AND `stc_agents_id`='".$agent."'
+				LIMIT 1
+			");
+			$ok = ($chk && mysqli_num_rows($chk) > 0);
+		} else {
+			$chk = mysqli_query($this->stc_dbs, "
+				SELECT 1 FROM `stc_cust_project` P
+				LEFT JOIN `stc_cust_project_collaborate` C
+					ON C.`stc_cust_project_collaborate_projectid`=P.`stc_cust_project_id`
+				WHERE P.`stc_cust_project_id`='".$project_id."'
+				AND (
+					P.`stc_cust_project_createdby`='".$agent."'
+					OR C.`stc_cust_project_collaborate_teamid`='".$agent."'
+				)
+				LIMIT 1
+			");
+			$ok = ($chk && mysqli_num_rows($chk) > 0);
+		}
+		if (!$ok) {
+			return json_encode(['ok' => false, 'message' => 'Project not found or access denied.']);
+		}
+
+		$date_filter = '';
+		$beg_ts = strtotime(trim((string) $beg_date));
+		$end_ts = strtotime(trim((string) $end_date));
+		if ($beg_ts !== false && $end_ts !== false) {
+			if ($beg_ts > $end_ts) {
+				$t = $beg_ts;
+				$beg_ts = $end_ts;
+				$end_ts = $t;
+			}
+			$bd = mysqli_real_escape_string($this->stc_dbs, date('Y-m-d', $beg_ts));
+			$ed = mysqli_real_escape_string($this->stc_dbs, date('Y-m-d', $end_ts));
+			$date_filter = " AND DATE(L.`stc_cust_super_requisition_list_date`) BETWEEN '".$bd."' AND '".$ed."' ";
+		}
+
+		$base_from = "
+			FROM `stc_cust_super_requisition_list_items` I
+			INNER JOIN `stc_cust_super_requisition_list` L
+				ON I.`stc_cust_super_requisition_list_items_req_id`=L.`stc_cust_super_requisition_list_id`
+			WHERE L.`stc_cust_super_requisition_list_project_id`='".$project_id."'
+			".$date_filter."
+		";
+
+		$count_q = mysqli_query($this->stc_dbs, "SELECT COUNT(*) AS c ".$base_from);
+		$total = 0;
+		if ($count_q && ($crow = mysqli_fetch_assoc($count_q))) {
+			$total = (int) ($crow['c'] ?? 0);
+		}
+
+		if ($total === 0) {
+			return json_encode([
+				'ok' => true,
+				'tbody' => '<tr><td colspan="10" class="text-center text-muted">No requisitions for this filter.</td></tr>',
+				'pagination' => '',
+				'summary' => '0 records',
+				'total' => 0,
+				'page' => 1,
+				'pages' => 0,
+				'from' => 0,
+				'to' => 0,
+				'per_page' => $per_page,
+			]);
+		}
+
+		$pages = (int) ceil($total / $per_page);
+		$page = min($page, max(1, $pages));
+		$offset = ($page - 1) * $per_page;
+
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT
+				I.`stc_cust_super_requisition_list_id` AS reqlistid,
+				L.`stc_cust_super_requisition_list_id` AS list_id,
+				DATE(L.`stc_cust_super_requisition_list_date`) AS req_date,
+				I.`stc_cust_super_requisition_list_items_title`,
+				I.`stc_cust_super_requisition_list_items_unit`,
+				I.`stc_cust_super_requisition_list_items_reqqty`,
+				I.`stc_cust_super_requisition_items_finalqty`,
+				IFNULL(I.`stc_cust_super_requisition_items_type`,'') AS item_type
+			".$base_from."
+			ORDER BY L.`stc_cust_super_requisition_list_date` DESC, L.`stc_cust_super_requisition_list_id` DESC
+			LIMIT ".(int) $offset.", ".(int) $per_page."
+		");
+
+		$html = '';
+		$sl = $offset;
+		if ($q && mysqli_num_rows($q) > 0) {
+			foreach ($q as $row) {
+				$sl++;
+				$stcdispatchedqty = 0;
+				$stcrecievedqty = 0;
+				$list_id = (int) $row['list_id'];
+				$reqlistid = (int) $row['reqlistid'];
+
+				$stcdecqtyqry = mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_list_items_rec_recqty`
+					FROM `stc_cust_super_requisition_list_items_rec`
+					WHERE `stc_cust_super_requisition_list_items_rec_list_id`='".$list_id."'
+					AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$reqlistid."'
+				");
+				if ($stcdecqtyqry) {
+					foreach ($stcdecqtyqry as $dispatchedrow) {
+						$stcdispatchedqty += (float) ($dispatchedrow['stc_cust_super_requisition_list_items_rec_recqty'] ?? 0);
+					}
+				}
+
+				$stcrecqtyqry = mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+					FROM `stc_cust_super_requisition_rec_items_fr_supervisor`
+					WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$reqlistid."'
+				");
+				if ($stcrecqtyqry) {
+					foreach ($stcrecqtyqry as $recievedrow) {
+						$stcrecievedqty += (float) ($recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'] ?? 0);
+					}
+				}
+
+				$gm = (float) ($row['stc_cust_super_requisition_items_finalqty'] ?? 0);
+				$html .= '<tr class="stc-req-det-tr">
+					<td class="text-center text-muted"><small>'.$sl.'</small></td>
+					<td class="text-center">'.htmlspecialchars(date('d-m-Y', strtotime($row['req_date'])), ENT_QUOTES, 'UTF-8').'</td>
+					<td class="text-center"><span class="label label-info">'.$list_id.'</span></td>
+					<td>'.htmlspecialchars((string) $row['stc_cust_super_requisition_list_items_title'], ENT_QUOTES, 'UTF-8').'</td>
+					<td class="text-center">'.htmlspecialchars((string) $row['stc_cust_super_requisition_list_items_unit'], ENT_QUOTES, 'UTF-8').'</td>
+					<td class="text-right">'.number_format((float) ($row['stc_cust_super_requisition_list_items_reqqty'] ?? 0), 2).'</td>
+					<td class="text-right">'.number_format($gm, 2).'</td>
+					<td class="text-right">'.number_format($stcdispatchedqty, 2).'</td>
+					<td class="text-right">'.number_format($stcrecievedqty, 2).'</td>
+					<td class="text-center"><span class="label label-default">'.htmlspecialchars((string) $row['item_type'], ENT_QUOTES, 'UTF-8').'</span></td>
+				</tr>';
+			}
+		}
+
+		$from = $offset + 1;
+		$to = min($offset + $per_page, $total);
+		$summary = 'Showing '.$from.'–'.$to.' of '.$total.' records';
+
+		$pagination = '<div class="stc-req-det-pag btn-group text-center" role="group" style="display:inline-block;">';
+		if ($page > 1) {
+			$pagination .= '<button type="button" class="btn btn-default btn-sm stc-req-details-page" data-page="'.($page - 1).'" title="Previous"><i class="fa fa-chevron-left"></i></button>';
+		}
+		$win_start = max(1, $page - 2);
+		$win_end = min($pages, $page + 2);
+		for ($i = $win_start; $i <= $win_end; $i++) {
+			if ((int) $i === (int) $page) {
+				$pagination .= '<button type="button" class="btn btn-primary btn-sm" disabled>'.$i.'</button>';
+			} else {
+				$pagination .= '<button type="button" class="btn btn-default btn-sm stc-req-details-page" data-page="'.$i.'">'.$i.'</button>';
+			}
+		}
+		if ($page < $pages) {
+			$pagination .= '<button type="button" class="btn btn-default btn-sm stc-req-details-page" data-page="'.($page + 1).'" title="Next"><i class="fa fa-chevron-right"></i></button>';
+		}
+		$pagination .= '</div>';
+
+		return json_encode([
+			'ok' => true,
+			'tbody' => $html,
+			'pagination' => $pagination,
+			'summary' => $summary,
+			'total' => $total,
+			'page' => $page,
+			'pages' => $pages,
+			'from' => $from,
+			'to' => $to,
+			'per_page' => $per_page,
+		]);
+	}
+
+	/** Full export UTF-8 CSV (opens in Excel). Same filters as details. */
+	public function stc_agent_project_requisitions_export_csv($project_id, $beg_date = '', $end_date = ''){
+		$project_id = (int) $project_id;
+		$agent = isset($_SESSION['stc_agent_id']) ? (int) $_SESSION['stc_agent_id'] : 0;
+		$role = isset($_SESSION['stc_agent_role']) ? (int) $_SESSION['stc_agent_role'] : 0;
+		if ($project_id <= 0 || $agent <= 0) {
+			header('HTTP/1.1 400 Bad Request');
+			echo 'Invalid request.';
+			return;
+		}
+		$ok = false;
+		if ($role === 3) {
+			$chk = mysqli_query($this->stc_dbs, "
+				SELECT 1 FROM `stc_cust_project`
+				INNER JOIN `stc_agent_requested_customer` ON `stc_agent_requested_customer_cust_id`=`stc_cust_project_cust_id`
+				INNER JOIN `stc_agents` ON `stc_agent_requested_customer_agent_id`=`stc_agents_id`
+				WHERE `stc_cust_project_id`='".$project_id."' AND `stc_agents_id`='".$agent."' LIMIT 1
+			");
+			$ok = ($chk && mysqli_num_rows($chk) > 0);
+		} else {
+			$chk = mysqli_query($this->stc_dbs, "
+				SELECT 1 FROM `stc_cust_project` P
+				LEFT JOIN `stc_cust_project_collaborate` C ON C.`stc_cust_project_collaborate_projectid`=P.`stc_cust_project_id`
+				WHERE P.`stc_cust_project_id`='".$project_id."'
+				AND (P.`stc_cust_project_createdby`='".$agent."' OR C.`stc_cust_project_collaborate_teamid`='".$agent."')
+				LIMIT 1
+			");
+			$ok = ($chk && mysqli_num_rows($chk) > 0);
+		}
+		if (!$ok) {
+			header('HTTP/1.1 403 Forbidden');
+			echo 'Access denied.';
+			return;
+		}
+
+		$date_filter = '';
+		$beg_ts = strtotime(trim((string) $beg_date));
+		$end_ts = strtotime(trim((string) $end_date));
+		if ($beg_ts !== false && $end_ts !== false) {
+			if ($beg_ts > $end_ts) {
+				$t = $beg_ts;
+				$beg_ts = $end_ts;
+				$end_ts = $t;
+			}
+			$bd = mysqli_real_escape_string($this->stc_dbs, date('Y-m-d', $beg_ts));
+			$ed = mysqli_real_escape_string($this->stc_dbs, date('Y-m-d', $end_ts));
+			$date_filter = " AND DATE(L.`stc_cust_super_requisition_list_date`) BETWEEN '".$bd."' AND '".$ed."' ";
+		}
+
+		$fname = 'project-requisitions-'.$project_id.'-'.date('Y-m-d_His').'.csv';
+		header('Content-Type: text/csv; charset=UTF-8');
+		header('Content-Disposition: attachment; filename="'.$fname.'"');
+		header('Cache-Control: max-age=0');
+		echo "\xEF\xBB\xBF";
+		$out = fopen('php://output', 'w');
+		fputcsv($out, ['Sl No', 'Req Date', 'Requisition number', 'Item name', 'Unit', 'Req qty', 'GM passed qty', 'Dispatched qty', 'Received qty', 'Item type']);
+
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT
+				I.`stc_cust_super_requisition_list_id` AS reqlistid,
+				L.`stc_cust_super_requisition_list_id` AS list_id,
+				DATE(L.`stc_cust_super_requisition_list_date`) AS req_date,
+				I.`stc_cust_super_requisition_list_items_title`,
+				I.`stc_cust_super_requisition_list_items_unit`,
+				I.`stc_cust_super_requisition_list_items_reqqty`,
+				I.`stc_cust_super_requisition_items_finalqty`,
+				IFNULL(I.`stc_cust_super_requisition_items_type`,'') AS item_type
+			FROM `stc_cust_super_requisition_list_items` I
+			INNER JOIN `stc_cust_super_requisition_list` L
+				ON I.`stc_cust_super_requisition_list_items_req_id`=L.`stc_cust_super_requisition_list_id`
+			WHERE L.`stc_cust_super_requisition_list_project_id`='".$project_id."'
+			".$date_filter."
+			ORDER BY L.`stc_cust_super_requisition_list_date` DESC, L.`stc_cust_super_requisition_list_id` DESC
+		");
+
+		$sl = 0;
+		if ($q && mysqli_num_rows($q) > 0) {
+			foreach ($q as $row) {
+				$sl++;
+				$stcdispatchedqty = 0;
+				$stcrecievedqty = 0;
+				$list_id = (int) $row['list_id'];
+				$reqlistid = (int) $row['reqlistid'];
+
+				$stcdecqtyqry = mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_list_items_rec_recqty`
+					FROM `stc_cust_super_requisition_list_items_rec`
+					WHERE `stc_cust_super_requisition_list_items_rec_list_id`='".$list_id."'
+					AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$reqlistid."'
+				");
+				if ($stcdecqtyqry) {
+					foreach ($stcdecqtyqry as $dispatchedrow) {
+						$stcdispatchedqty += (float) ($dispatchedrow['stc_cust_super_requisition_list_items_rec_recqty'] ?? 0);
+					}
+				}
+
+				$stcrecqtyqry = mysqli_query($this->stc_dbs, "
+					SELECT `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
+					FROM `stc_cust_super_requisition_rec_items_fr_supervisor`
+					WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$reqlistid."'
+				");
+				if ($stcrecqtyqry) {
+					foreach ($stcrecqtyqry as $recievedrow) {
+						$stcrecievedqty += (float) ($recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'] ?? 0);
+					}
+				}
+
+				$gm = (float) ($row['stc_cust_super_requisition_items_finalqty'] ?? 0);
+				fputcsv($out, [
+					$sl,
+					date('d-m-Y', strtotime($row['req_date'])),
+					$list_id,
+					(string) $row['stc_cust_super_requisition_list_items_title'],
+					(string) $row['stc_cust_super_requisition_list_items_unit'],
+					number_format((float) ($row['stc_cust_super_requisition_list_items_reqqty'] ?? 0), 2, '.', ''),
+					number_format($gm, 2, '.', ''),
+					number_format($stcdispatchedqty, 2, '.', ''),
+					number_format($stcrecievedqty, 2, '.', ''),
+					(string) $row['item_type'],
+				]);
+			}
+		}
+		fclose($out);
+	}
 
 }
 
@@ -4426,6 +4736,27 @@ if(isset($_POST['stc_ag_pro_hit'])){
 	$objcrproj=new pirates_project();
 	$opobjcrproj=$objcrproj->stc_project_details_save($stc_pg_id, $stc_cust_name, $stc_cust_emailid, $stc_cust_cont_no, $stc_purpose, $stc_ref_cont, $stc_job_details, $stc_quote_number, $stc_quote_date, $stc_basic_val, $stc_gst_val, $stc_quoted_by, $stc_mode_of_quotation, $stc_target_price, $stc_status, $stc_remarks, $stc_po_number, $stc_po_value);
 	echo $opobjcrproj;
+}
+
+if (isset($_POST['stc_agent_project_req_details'])) {
+	$project_id = isset($_POST['project_id']) ? (int) $_POST['project_id'] : 0;
+	$beg_date = isset($_POST['beg_date']) ? (string) $_POST['beg_date'] : '';
+	$end_date = isset($_POST['end_date']) ? (string) $_POST['end_date'] : '';
+	$page = isset($_POST['page']) ? (int) $_POST['page'] : 1;
+	$per_page = isset($_POST['per_page']) ? (int) $_POST['per_page'] : 25;
+	$objcrproj = new pirates_project();
+	header('Content-Type: application/json; charset=UTF-8');
+	echo $objcrproj->stc_agent_project_requisitions_details_json($project_id, $beg_date, $end_date, $page, $per_page);
+	exit;
+}
+
+if (isset($_POST['stc_agent_project_req_export'])) {
+	$project_id = isset($_POST['project_id']) ? (int) $_POST['project_id'] : 0;
+	$beg_date = isset($_POST['beg_date']) ? (string) $_POST['beg_date'] : '';
+	$end_date = isset($_POST['end_date']) ? (string) $_POST['end_date'] : '';
+	$objcrproj = new pirates_project();
+	$objcrproj->stc_agent_project_requisitions_export_csv($project_id, $beg_date, $end_date);
+	exit;
 }
 
 // retrieve project details
