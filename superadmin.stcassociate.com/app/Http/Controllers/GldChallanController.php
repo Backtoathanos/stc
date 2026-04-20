@@ -134,6 +134,7 @@ class GldChallanController extends Controller
         $sortMap = [
             'id' => 'GC.id',
             'product_label' => 'SP.stc_product_name',
+            'pdetails' => 'GC.pdetails',
             'adhoc_label' => 'PA.stc_purchase_product_adhoc_itemdesc',
             'customer_label' => 'GCU.gld_customer_title',
             'requisition_label' => 'GC.requisition_id',
@@ -227,6 +228,7 @@ class GldChallanController extends Controller
             $data_arr[] = [
                 'id' => $id,
                 'product_label' => $productLabel,
+                'pdetails' => e($r->pdetails ?? ''),
                 'adhoc_label' => $adhocLabel,
                 'customer_label' => $customerLabel,
                 'requisition_label' => $requisitionLabel,
@@ -278,6 +280,7 @@ class GldChallanController extends Controller
             'requisition_id' => 'nullable|integer',
             'challan_number' => 'nullable|string|max:190',
             'bill_number' => 'nullable|string|max:190',
+            'pdetails' => 'nullable|string|max:255',
             'qty' => 'required|numeric',
             'rate' => 'nullable|numeric',
             'discount' => 'nullable|numeric',
@@ -295,6 +298,7 @@ class GldChallanController extends Controller
             'requisition_id' => (int) ($request->requisition_id ?? 0),
             'challan_number' => $request->challan_number ?? '',
             'bill_number' => $request->bill_number ?? '',
+            'pdetails' => $request->pdetails ?? '',
             'qty' => $request->qty,
             'rate' => $request->rate ?? 0,
             'discount' => $request->discount ?? 0,
@@ -319,6 +323,7 @@ class GldChallanController extends Controller
             'requisition_id' => 'nullable|integer',
             'challan_number' => 'nullable|string|max:190',
             'bill_number' => 'nullable|string|max:190',
+            'pdetails' => 'nullable|string|max:255',
             'qty' => 'required|numeric',
             'rate' => 'nullable|numeric',
             'discount' => 'nullable|numeric',
@@ -340,6 +345,7 @@ class GldChallanController extends Controller
             'requisition_id' => (int) ($request->requisition_id ?? 0),
             'challan_number' => $request->challan_number ?? '',
             'bill_number' => $request->bill_number ?? '',
+            'pdetails' => $request->pdetails ?? '',
             'qty' => $request->qty,
             'rate' => $request->rate ?? 0,
             'discount' => $request->discount ?? 0,
@@ -386,6 +392,7 @@ class GldChallanController extends Controller
                 ->orWhere('GC.requisition_id', 'like', $term)
                 ->orWhere('GC.challan_number', 'like', $term)
                 ->orWhere('GC.bill_number', 'like', $term)
+                ->orWhere('GC.pdetails', 'like', $term)
                 ->orWhere('GC.qty', 'like', $term)
                 ->orWhere('GC.rate', 'like', $term)
                 ->orWhere('GC.discount', 'like', $term)

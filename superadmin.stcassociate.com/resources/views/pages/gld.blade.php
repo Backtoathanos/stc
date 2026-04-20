@@ -133,6 +133,7 @@
                     <tr>
                       <th>ID</th>
                       <th>Product</th>
+                      <th>P details</th>
                       <th>PO Adhoc</th>
                       <th>Customer</th>
                       <th>Requisition</th>
@@ -207,6 +208,12 @@
                 <span id="gld-span-adhoc-label" class="d-block text-truncate border rounded px-2 py-1 bg-light small" title="">—</span>
               </div>
               <input type="number" min="0" step="1" class="form-control" id="gld-f-adhoc_id" name="adhoc_id" inputmode="numeric" placeholder="Adhoc ID (0 = none)" value="0">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group col-md-12">
+              <label class="modal-label" for="gld-f-pdetails">P details</label>
+              <input type="text" class="form-control" id="gld-f-pdetails" name="pdetails" maxlength="255" autocomplete="off" placeholder="e.g. IDU - 123456 & ODU - 123456 / Sl No - 123456">
             </div>
           </div>
           <div class="form-row">
@@ -349,6 +356,7 @@ $(function () {
     columns: [
       { data: 'id', width: '52px' },
       { data: 'product_label', orderable: true, searchable: false },
+      { data: 'pdetails', orderable: true, searchable: true },
       { data: 'adhoc_label', orderable: true, searchable: false },
       { data: 'customer_label', orderable: true, searchable: false },
       { data: 'requisition_label', orderable: true, searchable: false },
@@ -367,9 +375,9 @@ $(function () {
       { data: 'actionData', orderable: false, searchable: false, className: 'text-center' }
     ],
     columnDefs: [
-      { targets: [0, 5, 6, 8, 9, 10, 11, 15], className: 'align-middle text-center' },
-      { targets: [1, 2, 3, 4, 7, 13, 14, 16, 17], className: 'align-middle text-center', render: function (d) { return d; } },
-      { targets: [12], className: 'align-middle' }
+      { targets: [0, 6, 7, 9, 10, 11, 12, 16], className: 'align-middle text-center' },
+      { targets: [1, 2, 3, 4, 5, 8, 14, 15, 17, 18], className: 'align-middle text-center', render: function (d) { return d; } },
+      { targets: [13], className: 'align-middle' }
     ],
     dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
       "<'row'<'col-sm-12'tr>>" +
@@ -482,6 +490,7 @@ $(function () {
     $('#gld-f-id').val('');
     $('#gld-f-product_id').val('');
     $('#gld-f-adhoc_id').val('0');
+    $('#gld-f-pdetails').val('');
     $('#gld-span-product-name').text('—').attr('title', '');
     $('#gld-span-adhoc-label').text('—').attr('title', '');
     $('#gld-modal-form-title').html('<i class="fas fa-plus-circle mr-2"></i> New challan');
@@ -496,6 +505,7 @@ $(function () {
     $('#gld-f-id').val(d.id);
     $('#gld-f-product_id').val(d.product_id != null && d.product_id !== '' ? String(d.product_id) : '');
     $('#gld-f-adhoc_id').val(d.adhoc_id != null && d.adhoc_id !== '' ? String(d.adhoc_id) : '0');
+    $('#gld-f-pdetails').val(d.pdetails || '');
     if (d.stc_product_name) {
       $('#gld-span-product-name').text(d.stc_product_name).attr('title', d.stc_product_name);
     } else {
@@ -539,6 +549,7 @@ $(function () {
     var rows = [
       ['ID', d.id],
       ['Product', (d.stc_product_name || '—') + ' <span class="text-muted">(product_id: ' + d.product_id + ')</span>'],
+      ['P details', d.pdetails ? $('<div/>').text(d.pdetails).html() : '—'],
       ['PO Adhoc', (d.adhoc_itemdesc || '—') + ' <span class="text-muted">(adhoc_id: ' + d.adhoc_id + ')</span>'],
       ['Customer', (d.gld_customer_title || '—') + ' <span class="text-muted">(cust_id: ' + d.cust_id + ')</span>'],
       ['Requisition', 'ID: ' + (d.requisition_id || '0') + sdlHtml + projHtml],
