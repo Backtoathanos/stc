@@ -72,6 +72,8 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true); // Loading state
     const [modalShow, setModalShow] = useState(false); // State for modal visibility
     const [selectedProductId, setSelectedProductId] = useState(null);
+    const [selectedProductName, setSelectedProductName] = useState('');
+    const [selectedProductCategory, setSelectedProductCategory] = useState('');
     const [selectedProductRate, setSelectedProductRate] = useState(null);
     const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "inventory";
@@ -282,6 +284,8 @@ export default function Dashboard() {
                                 className="btn btn-primary"
                                 onClick={() => {
                                     setSelectedProductId(row.stc_product_id);
+                                        setSelectedProductName(row.stc_product_name || '');
+                                        setSelectedProductCategory(row.stc_cat_name || '');
                                     setSelectedProductRate(row.rate_including_gst);
                                     setSelectedProductQuantity(Number(row.stc_item_inventory_pd_qty));
                                     setModalShow(true);
@@ -563,6 +567,8 @@ export default function Dashboard() {
                 show={modalShow}
                 handleClose={() => setModalShow(false)}
                 productId={selectedProductId}
+                productName={selectedProductName}
+                productCategory={selectedProductCategory}
                 productRate={selectedProductRate}
                 productQuantity={selectedProductQuantity}
             />

@@ -260,7 +260,7 @@ export default function Order() {
                 <Footer />
             </div>
             <Modal show={showModal} onHide={handleCloseModal}>
-                <Modal.Header>
+                <Modal.Header closeButton>
                     <Modal.Title>Add Product</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

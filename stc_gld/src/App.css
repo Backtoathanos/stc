@@ -22,6 +22,32 @@ button {
   width: 100%;
 }
 
+/* Bootstrap modal close (X) should not inherit global button styles */
+.modal-header .btn-close,
+.modal-header button.btn-close {
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  background-color: transparent;
+  color: inherit;
+}
+
+/* Ensure the X icon renders even if variables are missing */
+.modal-header .btn-close {
+  background-image: var(--bs-btn-close-bg, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath d='M2.146 2.146a.5.5 0 0 1 .708 0L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854a.5.5 0 0 1 0-.708z' fill='%23000'/%3e%3c/svg%3e"));
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 0.9rem 0.9rem;
+  opacity: 0.65;
+}
+
+.modal-header .btn-close:hover {
+  opacity: 0.9;
+}
+
 /* Add a hover effect for buttons */
 button:hover {
   opacity: 0.8;

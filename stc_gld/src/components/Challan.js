@@ -11,6 +11,7 @@ import { debounce } from 'lodash';
 import Swal from 'sweetalert2';
 import { Modal, Button } from 'react-bootstrap';
 import Select from 'react-select';
+import { FaEye, FaMoneyBillWave, FaTrashAlt } from 'react-icons/fa';
 
 export default function ChallanDashboard() {
     const location = useLocation();
@@ -36,6 +37,8 @@ export default function ChallanDashboard() {
 
     const [selectedChallanForPayment, setSelectedChallanForPayment] = useState(null); // Selected row for payment
     const [paymentAmount, setPaymentAmount] = useState(''); // Payment input
+    const [showViewModal, setShowViewModal] = useState(false);
+    const [selectedChallanForView, setSelectedChallanForView] = useState(null);
 
 
     const fetchData = debounce((query = '') => {
@@ -78,6 +81,11 @@ export default function ChallanDashboard() {
         setSelectedChallanForPayment(row); // Set the selected challan
         setShowModal(true); // Show the modal
     };    
+
+    const handleView = (row) => {
+        setSelectedChallanForView(row);
+        setShowViewModal(true);
+    };
     const handleDelete = (id) => {
         Swal.fire({
             title: 'Are you sure?',
@@ -124,6 +132,23 @@ export default function ChallanDashboard() {
         });
     };
 
+    const formatMoney = (v) => {
+        const n = Number(v);
+        return Number.isFinite(n) ? n.toFixed(2) : '0.00';
+    };
+
+    const formatDateDMY = (value) => {
+        if (!value) return '';
+        const s = String(value);
+        const isoLike = s.includes(' ') ? s.replace(' ', 'T') : s;
+        const d = new Date(isoLike);
+        if (Number.isNaN(d.getTime())) return s;
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = String(d.getFullYear());
+        return `${dd}-${mm}-${yyyy}`;
+    };
+
     // Define columns for DataTable
     const columns = [
         {
@@ -140,163 +165,124 @@ export default function ChallanDashboard() {
             allowOverflow: true,
             button: true,
             width: '50px'
-        },
+        },        
         {
-            name: 'Action',
-            selector: row => row.created_by,
+            name: 'Actions',
             cell: row => {
-                const duesValue = (((row.rate * row.qty) - row.discount) - row.paid_amount).toFixed(2);
-                
-                // Conditionally render button if dues are greater than 0
-                return duesValue > 0 ? (
-                    <button onClick={() => handleAddPayment(row)}>Add Payment</button>
-                ) : "Paid";
+                const duesValue = ((row.rate * row.qty) - row.discount) - row.paid_amount;
+                return (
+                    <div className="challan-actions">
+                        <button
+                            type="button"
+                            className="btn btn-light btn-sm challan-icon-btn"
+                            title="View details"
+                            onClick={() => handleView(row)}
+                        >
+                            <FaEye />
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-light btn-sm challan-icon-btn"
+                            title={duesValue > 0 ? 'Add payment' : 'Paid'}
+                            onClick={() => duesValue > 0 && handleAddPayment(row)}
+                            disabled={!(duesValue > 0)}
+                        >
+                            <FaMoneyBillWave />
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-danger btn-sm challan-icon-btn challan-icon-btn--danger"
+                            title="Delete"
+                            onClick={() => handleDelete(row.id)}
+                        >
+                            <FaTrashAlt />
+                        </button>
+                    </div>
+                );
             },
-            button: true,
-            sortable: true,
-            center: true,
-            width: '100px'
-        },
-        {
-            name: 'Delete',  // New column for Delete button
-            cell: row => (
-                <button 
-                    onClick={() => handleDelete(row.id)} 
-                    style={{ 
-                        backgroundColor: 'red', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '5px', 
-                        cursor: 'pointer' 
-                    }}>
-                    Delete
-                </button>
-            ),
             ignoreRowClick: true,
             allowOverflow: true,
             button: true,
-            width: '100px'
+            width: '160px'
         },
         {
-            name: 'Product Name',
-            selector: row => row.stc_product_name,
+            name: 'Challan No',
+            selector: row => row.challan_number,
             sortable: true,
-            cell: (row) => (
-                <div style={{ textAlign: 'center' }}>
-                    <span>
-                        {row.stc_product_name.length > 20 
-                            ? `${row.stc_product_name.substring(0, 20)}...` 
-                            : row.stc_product_name}
-                    </span>
-                    {row.stc_product_name.length > 20 && (
-                        <button 
-                            onClick={() => alert(row.stc_product_name)} 
-                            style={{ 
-                                marginTop: '5px', // Add some spacing above the button
-                                background: 'none', 
-                                color: 'blue', 
-                                cursor: 'pointer', 
-                                border: 'none' 
-                            }}>
-                            View More
-                        </button>
-                    )}
-                </div>
-            ),
-            width: '250px'
-        },  
+            wrap: true,
+            width: '120px'
+        },
         {
-            name: 'Customer Name',
+            name: 'Customer',
             selector: row => row.gld_customer_title,
             sortable: true,
-            center: true,
-            width: '150px'
+            wrap: true,
+            grow: 1.2,
+            cell: row => <span title={row.gld_customer_title}>{row.gld_customer_title}</span>
         },
         {
-            name: 'Quantity',
+            name: 'Product',
+            selector: row => row.stc_product_name,
+            sortable: true,
+            wrap: true,
+            grow: 2,
+            cell: row => (
+                <span title={row.stc_product_name} style={{ textAlign: 'left', display: 'inline-block' }}>
+                    {row.stc_product_name}
+                </span>
+            )
+        },
+        {
+            name: 'Qty',
             selector: row => row.qty,
             sortable: true,
             right: true,
-            width: '100px'
+            width: '90px'
         },
         {
-            name: 'Rate',
-            selector: row => row.rate,
+            name: 'Grand',
+            selector: row => formatMoney((row.rate * row.qty) - row.discount),
             sortable: true,
-            right: true
+            right: true,
+            width: '110px'
         },
         {
-            name: 'Total',
-            selector: row => {
-                const total = row.rate * row.qty;
-                return total ? total.toFixed(2) : '0.00';  // Round to 2 decimal places
-            },
-            sortable: false,
-            right: true
-        },
-        {
-            name: 'Discount',
-            selector: row => row.discount,
+            name: 'Paid',
+            selector: row => formatMoney(row.paid_amount),
             sortable: true,
-            right: true
-        },
-        {
-            name: 'Grand Total',
-            selector: row => {
-                const total = (row.rate * row.qty) - row.discount;
-                return total ? total.toFixed(2) : '0.00';  // Round to 2 decimal places
-            },
-            sortable: false,
-            right: true
-        },
-        {
-            name: 'Paid Amount',
-            selector: row => row.paid_amount,
-            sortable: true,
-            right: true
+            right: true,
+            width: '110px'
         },
         {
             name: 'Dues',
-            selector: row => (((row.rate * row.qty) - row.discount) - row.paid_amount).toFixed(2),
-            sortable: false,
+            selector: row => formatMoney(((row.rate * row.qty) - row.discount) - row.paid_amount),
+            sortable: true,
             right: true,
+            width: '110px',
             cell: row => {
-                const duesValue = (((row.rate * row.qty) - row.discount) - row.paid_amount).toFixed(2);
+                const duesValue = ((row.rate * row.qty) - row.discount) - row.paid_amount;
                 return (
-                    <span style={{ color: duesValue > 0 ? 'red' : 'black' }}>
-                        {duesValue}
+                    <span style={{ color: duesValue > 0 ? '#b02a37' : '#198754', fontWeight: 700 }}>
+                        {formatMoney(duesValue)}
                     </span>
                 );
             }
         },
         {
-            name: 'Payment Status',
-            selector: row => parseInt(row.payment_status) === 0 ? 'Credit' : parseInt(row.payment_status) === 1 ? 'Cash' : 'A/C',
-            sortable: true,
-            center: true
-        },
-        {
-            name: 'Status',
-            selector: row => {
-                return parseInt(row.status) === 0 ? 'Unchallaned' :
-                    parseInt(row.status) === 1 ? 'Challaned' :
-                        parseInt(row.status) === 2 ? 'Billed' : 'Unknown';
-            },
-            sortable: true,
-            center: true
-        },
-        {
-            name: 'Created Date',
+            name: 'Created',
             selector: row => row.created_date,
             sortable: true,
-            center: true,
-            width: '200px'
+            wrap: true,
+            width: '120px',
+            cell: row => <span title={String(row.created_date || '')}>{formatDateDMY(row.created_date)}</span>,
         },
         {
             name: 'Created By',
             selector: row => row.stc_trading_user_name,
             sortable: true,
-            center: true
+            wrap: true,
+            width: '160px',
+            cell: row => <span title={row.stc_trading_user_name}>{row.stc_trading_user_name}</span>
         }
     ];
 
@@ -307,6 +293,7 @@ export default function ChallanDashboard() {
     const handleCloseModal = () => {
         setShowModal(false); // Close modal when the close button is clicked
         setShowModal1(false);
+        setShowViewModal(false);
     };
 
     const handleChallanUpdate = () => {
@@ -459,6 +446,7 @@ export default function ChallanDashboard() {
                                                 columns={columns}
                                                 data={data}
                                                 pagination
+                                                dense
                                                 highlightOnHover
                                                 striped
                                                 className="data-table"
@@ -471,7 +459,7 @@ export default function ChallanDashboard() {
                                         )}
                                         {/* Modal */}
                                         <Modal show={showModal1} onHide={handleCloseModal}>
-                                            <Modal.Header>
+                                            <Modal.Header closeButton>
                                                 <Modal.Title>Print Challan</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
@@ -501,7 +489,7 @@ export default function ChallanDashboard() {
                                             </Modal.Footer>
                                         </Modal>
                                         <Modal show={showModal} onHide={handleCloseModal}>
-                                            <Modal.Header>
+                                            <Modal.Header closeButton>
                                                 <Modal.Title>Add Payment</Modal.Title>
                                             </Modal.Header>
                                             <Modal.Body>
@@ -525,6 +513,71 @@ export default function ChallanDashboard() {
                                                 </Button>
                                                 <Button variant="primary" onClick={handleSavePayment}>
                                                     Save Payment
+                                                </Button>
+                                            </Modal.Footer>
+                                        </Modal>
+
+                                        <Modal show={showViewModal} onHide={handleCloseModal} centered size="lg">
+                                            <Modal.Header closeButton>
+                                                <Modal.Title>Challan Details</Modal.Title>
+                                            </Modal.Header>
+                                            <Modal.Body>
+                                                {selectedChallanForView && (
+                                                    <div className="table-responsive">
+                                                        <table className="table table-sm table-bordered">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th style={{ width: 180 }}>Challan No</th>
+                                                                    <td>{selectedChallanForView.challan_number}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Customer</th>
+                                                                    <td>{selectedChallanForView.gld_customer_title}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Product</th>
+                                                                    <td>{selectedChallanForView.stc_product_name}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Qty</th>
+                                                                    <td>{selectedChallanForView.qty}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Rate</th>
+                                                                    <td>{formatMoney(selectedChallanForView.rate)}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Discount</th>
+                                                                    <td>{formatMoney(selectedChallanForView.discount)}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Grand Total</th>
+                                                                    <td>{formatMoney((selectedChallanForView.rate * selectedChallanForView.qty) - selectedChallanForView.discount)}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Paid</th>
+                                                                    <td>{formatMoney(selectedChallanForView.paid_amount)}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Dues</th>
+                                                                    <td>{formatMoney(((selectedChallanForView.rate * selectedChallanForView.qty) - selectedChallanForView.discount) - selectedChallanForView.paid_amount)}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Created</th>
+                                                                    <td>{formatDateDMY(selectedChallanForView.created_date)}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th>Created By</th>
+                                                                    <td>{selectedChallanForView.stc_trading_user_name}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                )}
+                                            </Modal.Body>
+                                            <Modal.Footer>
+                                                <Button variant="secondary" onClick={handleCloseModal}>
+                                                    Close
                                                 </Button>
                                             </Modal.Footer>
                                         </Modal>

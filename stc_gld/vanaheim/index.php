@@ -123,7 +123,7 @@ function getCustomers($conn) {
 
 // Function to fetch customers from the database
 function getAgents($conn) {
-    $query = "SELECT `stc_own_agents_id`, `stc_own_agents_name` FROM `stc_own_agents` ORDER BY `stc_own_agents_name` ASC";
+    $query = "SELECT `stc_trading_user_id`, `stc_trading_user_name` FROM `stc_trading_user` ORDER BY `stc_trading_user_name` ASC";
     $result = $conn->query($query);
 
     $agents = [];
@@ -149,6 +149,7 @@ function addCustomer($conn) {
     $quantity = $data['quantity'];
     $rate = $data['rate'];
     $discount = $data['discount'];
+    $pdetails = isset($data['pdetails']) ? $data['pdetails'] : '';
     $userId=$data['userId'];
     $agentId=$data['agentId'];
     if($productId){
@@ -191,7 +192,7 @@ function addCustomer($conn) {
             }
         }
         if($adhoc_id>0){
-            $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, adhoc_id, product_id, qty, rate, discount, agent_id, created_date, created_by) VALUES ('$customerId', '$requisition', '$adhoc_id', '$productId', '$quantity', '$rate', '$discount', '$agentId', '$date', '$userId')";
+            $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, adhoc_id, product_id, qty, rate, discount, agent_id, pdetails, created_date, created_by) VALUES ('$customerId', '$requisition', '$adhoc_id', '$productId', '$quantity', '$rate', '$discount', '$agentId', '$pdetails', '$date', '$userId')";
             if ($conn->query($productQuery)) {
                 echo json_encode(['success' => true, 'message' => 'Challan created successfully']);
             } else {
@@ -208,7 +209,7 @@ function addCustomer($conn) {
 // Function to fetch customers from the database
 function getChallan($conn) {
     $search = isset($_GET['search']) ? $_GET['search'] : '';
-    $query = "SELECT GC.id, COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name) AS stc_product_name, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, ROUND(rate, 2) AS rate, ROUND(discount, 2) AS discount, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%') AND status=0 ORDER BY TIMESTAMP(`created_date`) DESC";
+    $query = "SELECT GC.id, CONCAT(COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name), IF(GC.pdetails IS NULL OR GC.pdetails = '', '', CONCAT(' - ', GC.pdetails))) AS stc_product_name, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, ROUND(rate, 2) AS rate, ROUND(discount, 2) AS discount, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%') AND status=0 ORDER BY TIMESTAMP(`created_date`) DESC";
 
     $result = $conn->query($query);
 
@@ -225,7 +226,7 @@ function getChallan($conn) {
 // Function to fetch customers from the database
 function getChallaned($conn) {
     $search = isset($_GET['search']) ? $_GET['search'] : '';
-    $query = "SELECT GC.id, COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name) AS stc_product_name, bill_number, challan_number, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, stc_product_unit, ROUND(rate, 2) AS rate, ROUND(discount, 2) AS discount, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%') AND (status=1 OR status=2 OR status=3) ORDER BY TIMESTAMP(`created_date`) DESC";
+    $query = "SELECT GC.id, CONCAT(COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name), IF(GC.pdetails IS NULL OR GC.pdetails = '', '', CONCAT(' - ', GC.pdetails))) AS stc_product_name, bill_number, challan_number, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, stc_product_unit, ROUND(rate, 2) AS rate, ROUND(discount, 2) AS discount, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%') AND (status=1 OR status=2 OR status=3) ORDER BY TIMESTAMP(`created_date`) DESC";
 
     $result = $conn->query($query);
 
@@ -358,7 +359,7 @@ function getChallanDetails($conn) {
     if($status=="billed"){
         $query="gld_challan.bill_number = '$challan_number'";
     }
-    $query = "SELECT gld_challan.challan_number, gld_customer.gld_customer_title AS customer_name, gld_customer.gld_customer_cont_no AS customer_phone, stc_product.stc_product_name AS product_name, stc_product.stc_product_rack_id AS Rackid, stc_product.stc_product_unit AS unit, stc_product.stc_product_gst AS gst, gld_challan.qty, gld_challan.rate, gld_challan.discount, gld_challan.paid_amount, gld_challan.payment_status, gld_customer.gld_customer_address, gld_challan.created_date  
+    $query = "SELECT gld_challan.challan_number, gld_customer.gld_customer_title AS customer_name, gld_customer.gld_customer_cont_no AS customer_phone, CONCAT(stc_product.stc_product_name, IF(gld_challan.pdetails IS NULL OR gld_challan.pdetails = '', '', CONCAT(' - ', gld_challan.pdetails))) AS product_name, stc_product.stc_product_rack_id AS Rackid, stc_product.stc_product_unit AS unit, stc_product.stc_product_gst AS gst, gld_challan.qty, gld_challan.rate, gld_challan.discount, gld_challan.paid_amount, gld_challan.payment_status, gld_customer.gld_customer_address, gld_challan.created_date  
               FROM gld_challan
               JOIN gld_customer ON gld_challan.cust_id = gld_customer.gld_customer_id
               JOIN stc_product ON gld_challan.product_id = stc_product.stc_product_id
@@ -741,7 +742,7 @@ function setChallanRequisition($conn) {
         }
         if($adhoc_id>0){
             // Link customer to the product and set the quantity
-            $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, adhoc_id, product_id, qty, rate, agent_id, created_date, created_by) VALUES ('$customerId', '$requisition', '$adhoc_id', '$productId', '$quantity', '$rate', '0', '$date', '$userId')";
+            $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, adhoc_id, product_id, qty, rate, agent_id, pdetails, created_date, created_by) VALUES ('$customerId', '$requisition', '$adhoc_id', '$productId', '$quantity', '$rate', '0', '', '$date', '$userId')";
             if ($conn->query($productQuery)) {
                 $conn->query("UPDATE `stc_requisition_gld` SET `status`=2 WHERE `id`='$ListId'");
                 echo json_encode(['success' => true, 'message' => 'Challan created successfully']);

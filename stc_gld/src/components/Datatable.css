@@ -26,7 +26,8 @@
 .data-table .rdt_TableCell {
     border-right: 1px solid #ddd;  /* Add a border between columns */
 }
-.data-table .rdt_TableCell:nth-child(2)  {
+/* Only constrain cell sizing for inventory tables, not globally */
+.inventory-page .data-table .rdt_TableCell:nth-child(2)  {
     width: 10px;
     height: 75px;
 }
@@ -110,4 +111,35 @@
 .inventory-page .inventory-datatable .rdt_TableCol,
 .inventory-page .inventory-datatable .rdt_TableCell {
     vertical-align: middle;
+}
+
+/* Challan table: clean action icons + allow full text */
+.challan-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.challan-icon-btn {
+    /* Override global App.css button styles */
+    width: 2rem !important;
+    height: 2rem !important;
+    min-width: 2rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 1 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    color: #1f2937 !important;
+}
+
+.challan-icon-btn--danger {
+    color: #fff !important;
+}
+
+.challan-icon-btn svg {
+    font-size: 1rem;
+    display: block;
 }

@@ -53,6 +53,175 @@ input[type=text], input[type=number], textarea{
 .modal-content {
     max-width: 500px;
 }
+
+/* CustomerModal: expand starting at md breakpoint */
+.modal-dialog.customer-modal-dialog {
+    max-width: 500px;
+}
+
+@media (min-width: 768px) {
+    .modal-dialog.customer-modal-dialog {
+        max-width: min(900px, 96vw);
+        width: 96vw;
+        margin-left: auto;
+        margin-right: auto;
+    }
+}
+
+.modal-content.customer-modal-content {
+    max-width: none;
+    width: 100%;
+}
+
+/* CustomerModal: modern professional look */
+.modal-content.customer-modal-content {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid rgba(117, 33, 128, 0.15);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+}
+
+.customer-modal-header {
+    background: linear-gradient(180deg, rgba(117, 33, 128, 0.07) 0%, rgba(255, 255, 255, 1) 75%);
+    border-bottom: 1px solid rgba(117, 33, 128, 0.12);
+    position: relative;
+    padding-right: 3.25rem; /* room for close button */
+}
+
+.customer-modal-header .btn-close {
+    position: absolute;
+    top: 0.85rem;
+    right: 0.9rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    padding: 0;
+    border-radius: 8px;
+    opacity: 0.65;
+    background-color: transparent;
+    background-image: var(--bs-btn-close-bg, url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath d='M2.146 2.146a.5.5 0 0 1 .708 0L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854a.5.5 0 0 1 0-.708z' fill='%23000'/%3e%3c/svg%3e"));
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 0.75rem 0.75rem;
+    box-shadow: none;
+}
+
+.customer-modal-header .btn-close:hover {
+    opacity: 0.9;
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.customer-modal-header .btn-close:focus-visible {
+    outline: 2px solid rgba(117, 33, 128, 0.45);
+    outline-offset: 2px;
+}
+
+.customer-modal-header-title {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.customer-modal-title {
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    color: #1f1f1f;
+}
+
+.customer-modal-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #5f6368;
+}
+
+.customer-modal-pill {
+    font-weight: 600;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.customer-modal-body {
+    background: #fbfbfd;
+    padding: 1.1rem 1.25rem 0.75rem;
+}
+
+.customer-modal-section {
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 12px;
+    padding: 1rem 1rem 1.05rem;
+    margin-bottom: 0.9rem;
+}
+
+.customer-modal-section-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #202124;
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid rgba(117, 33, 128, 0.12);
+}
+
+.customer-modal-form .form-label {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.customer-modal-form .form-text {
+    margin-top: 0.35rem;
+}
+
+.customer-modal-static-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.customer-modal-static-label {
+    font-weight: 600;
+    color: #343a40;
+}
+
+.customer-modal-static-value {
+    background: #f8f9fa;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+    padding: 0.65rem 0.85rem;
+    color: #202124;
+    /* font-weight: 600; */
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+.customer-modal-help-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.customer-modal-error {
+    margin-top: 0.35rem;
+    color: #b02a37;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.customer-modal-footer {
+    border-top: 1px solid rgba(117, 33, 128, 0.12);
+    background: #fff;
+    padding: 0.9rem 1.25rem;
+}
+
+@media (max-width: 575.98px) {
+    .customer-modal-body {
+        padding: 0.9rem 0.9rem 0.65rem;
+    }
+
+    .customer-modal-section {
+        padding: 0.9rem 0.85rem 0.95rem;
+    }
+}
 .product-image {
     max-width: 100%; /* Make the image responsive */
     height: auto; /* Maintain aspect ratio */
