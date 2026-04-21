@@ -763,12 +763,12 @@ class sceptor extends tesseract{
         // $year = date('Y');
 		$queryFilter="WHERE MONTH(stc_purchase_product_adhoc_created_date) = '$month' AND YEAR(stc_purchase_product_adhoc_created_date) = '$year'";
 		$queryFilter1="WHERE stc_purchase_product_adhoc_cherrypickby=0 AND MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
-		$queryFilter2="WHERE MONTH(created_date)='$month' AND YEAR(created_date)='$year'";
+		$queryFilter2="WHERE MONTH(A.created_date)='$month' AND YEAR(A.created_date)='$year'";
 		$queryFilter3="WHERE MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
 		if($type == 'Y') {
 			$queryFilter = "WHERE YEAR(stc_purchase_product_adhoc_created_date) = '$year'";
 			$queryFilter1="WHERE stc_purchase_product_adhoc_cherrypickby=0 AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
-			$queryFilter2="WHERE YEAR(created_date)='$year'";
+			$queryFilter2="WHERE YEAR(A.created_date)='$year'";
 		}
         // Total Purchased
         $purchase_q = mysqli_query($this->stc_dbs, "
@@ -789,7 +789,7 @@ class sceptor extends tesseract{
         $total_sale = $sold['sold'] ? floatval($sold['sold']) : 0;
 
         $sale_locations = [];
-        $sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, SUM(qty * rate) as amount FROM gld_challan INNER JOIN stc_trading_user ON created_by=stc_trading_user_id $queryFilter2 GROUP BY stc_trading_user_location");
+        $sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, SUM(A.qty * A.rate) as amount FROM gld_challan A INNER JOIN stc_trading_user ON A.created_by=stc_trading_user_id $queryFilter2 GROUP BY stc_trading_user_location");
 		if(mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
 				$sale_locations[] = [
@@ -799,7 +799,17 @@ class sceptor extends tesseract{
 			}
 		}
         $purchase_locations = [];
-        $sql = mysqli_query($this->stc_dbs, "SELECT S.shopname, SUM(S.qty * A.stc_purchase_product_adhoc_prate) AS amount  FROM `stc_shop` S INNER JOIN `stc_purchase_product_adhoc` A ON S.adhoc_id=A.stc_purchase_product_adhoc_id $queryFilter2 GROUP BY S.shopname");
+        // $sql = mysqli_query($this->stc_dbs, "SELECT S.shopname, SUM(S.qty * A.stc_purchase_product_adhoc_prate) AS amount  FROM `stc_shop` S INNER JOIN `stc_purchase_product_adhoc` A ON S.adhoc_id=A.stc_purchase_product_adhoc_id $queryFilter2 GROUP BY S.shopname");
+		$sql = mysqli_query($this->stc_dbs, "
+			SELECT
+				A.shopname,
+				SUM(A.qty * (B.stc_purchase_product_adhoc_prate * (1 + (COALESCE(P.stc_product_gst, 0) / 100)))) AS amount
+			FROM `stc_shop` A
+			INNER JOIN `stc_purchase_product_adhoc` B ON A.adhoc_id = B.stc_purchase_product_adhoc_id
+			INNER JOIN `stc_product` P ON P.stc_product_id = B.stc_purchase_product_adhoc_productid
+			$queryFilter2
+			GROUP BY A.shopname
+		");
 		if(mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
 				$purchase_locations[] = [
@@ -812,65 +822,64 @@ class sceptor extends tesseract{
         return array('total_purchase' => $total_purchase, 'total_sale' => $total_sale, 'sub_locations_purchase' => $purchase_locations, 'sub_locations_sale' => $sale_locations);
     }
 
-	// public function stc_gldprofit_analyzer($month, $year, $type){
-	// 	$ragnar = '';
-	// 	$yearFilter = "YEAR(created_date) = '$year'";
-	// 	$monthFilter = $type != 'Y' ? "AND MONTH(created_date) = '$month'" : '';
+	// GLD purchase breakup for a specific shop location (product-wise)
+	public function stc_gld_purchase_breakdown($month, $year, $type, $location){
+		$locationEsc = mysqli_real_escape_string($this->stc_dbs, (string)$location);
+		$month = (int)$month;
+		$year = (int)$year;
 
-	// 	// Main query with JOIN to avoid N+1 queries
-	// 	$query = mysqli_query($this->stc_dbs, "
-	// 		SELECT 
-	// 			a.stc_purchase_product_adhoc_id,
-	// 			a.stc_purchase_product_adhoc_itemdesc,
-	// 			a.stc_purchase_product_adhoc_qty,
-	// 			a.stc_purchase_product_adhoc_rate as salerate,
-	// 			a.stc_purchase_product_adhoc_prate,
-	// 			COALESCE(SUM(r.stc_cust_super_requisition_list_items_rec_recqty), 0) as sold_qty,
-	// 			COALESCE(SUM(g.qty), 0) as gld_qty,
-	// 			COALESCE(AVG(g.rate), 0) as gld_rate
-	// 		FROM stc_purchase_product_adhoc a
-	// 		LEFT JOIN stc_product p ON p.stc_product_id = a.stc_purchase_product_adhoc_productid
-	// 		LEFT JOIN stc_cust_super_requisition_list_items_rec r 
-	// 			ON r.stc_cust_super_requisition_list_items_rec_list_poaid = a.stc_purchase_product_adhoc_id
-	// 			AND YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'
-	// 			" . ($type != 'Y' ? "AND MONTH(r.stc_cust_super_requisition_list_items_rec_date) = '$month'" : "") . "
-	// 		LEFT JOIN gld_challan g 
-	// 			ON g.adhoc_id = a.stc_purchase_product_adhoc_id
-	// 			AND YEAR(g.created_date) = '$year'
-	// 			" . ($type != 'Y' ? "AND MONTH(g.created_date) = '$month'" : "") . "
-	// 		WHERE a.stc_purchase_product_adhoc_cherrypickby = 0
-	// 			AND YEAR(a.stc_purchase_product_adhoc_created_date) = '$year'
-	// 			" . ($type != 'Y' ? "AND MONTH(a.stc_purchase_product_adhoc_created_date) = '$month'" : "") . "
-	// 		GROUP BY a.stc_purchase_product_adhoc_id
-	// 		ORDER BY a.stc_purchase_product_adhoc_itemdesc ASC
-	// 	");
+		// Keep date filtering consistent with dashboard purchase_locations query (stc_shop alias A)
+		$dateFilter = "YEAR(A.created_date) = '".$year."'";
+		if($type !== 'Y'){
+			$dateFilter .= " AND MONTH(A.created_date) = '".$month."'";
+		}
 
-	// 	$totals = ['purchase' => 0, 'sold' => 0, 'profit' => 0];
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT
+				P.stc_product_id AS product_id,
+				CASE
+					WHEN S.stc_sub_cat_name != 'OTHERS' THEN CONCAT(S.stc_sub_cat_name, ' ', P.stc_product_name)
+					ELSE P.stc_product_name
+				END AS product_name,
+				C.stc_cat_name AS category,
+				COALESCE(SUM(A.qty), 0) AS purchase_qty,
+				ROUND(
+					COALESCE(SUM(A.qty * (B.stc_purchase_product_adhoc_prate * (1 + (COALESCE(P.stc_product_gst, 0) / 100)))), 0)
+					/ NULLIF(SUM(A.qty), 0),
+				2) AS rate,
+				COALESCE(SUM(A.qty * (B.stc_purchase_product_adhoc_prate * (1 + (COALESCE(P.stc_product_gst, 0) / 100)))), 0) AS total
+			FROM stc_shop A
+			INNER JOIN stc_purchase_product_adhoc B ON A.adhoc_id = B.stc_purchase_product_adhoc_id
+			INNER JOIN stc_product P ON P.stc_product_id = B.stc_purchase_product_adhoc_productid
+			INNER JOIN stc_sub_category S ON S.stc_sub_cat_id = P.stc_product_sub_cat_id
+			INNER JOIN stc_category C ON C.stc_cat_id = P.stc_product_cat_id
+			WHERE A.shopname = '".$locationEsc."'
+				AND ".$dateFilter."
+			GROUP BY P.stc_product_id, product_name, category
+			ORDER BY stc_cat_name, stc_product_name ASC
+		");
 
-	// 	foreach ($query as $row) {
-	// 		$totalSoldQty = $row['sold_qty'] + $row['gld_qty'];
-	// 		$purchaseAmount = $row['stc_purchase_product_adhoc_qty'] * $row['stc_purchase_product_adhoc_prate'];
-	// 		$soldAmount = $totalSoldQty * $row['salerate'];
-	// 		$profitAmount = ($row['salerate'] - $row['stc_purchase_product_adhoc_prate']) * $totalSoldQty;
-
-	// 		$totals['purchase'] += $purchaseAmount;
-	// 		$totals['sold'] += $soldAmount;
-	// 		$totals['profit'] += $profitAmount;
-	// 	}
-
-	// 	$profitClass = $totals['profit'] >= 0 ? 'text-success' : 'text-danger';
-	// 	$profitDisplay = ($totals['profit'] >= 0 ? '+' : '') . number_format($totals['profit'], 2);
-
-	// 	$ragnar .= "
-	// 		<tr>
-	// 			<td class='text-right'>" . number_format($totals['purchase'], 2) . "</td>
-	// 			<td class='text-right'>" . number_format($totals['sold'], 2) . "</td>
-	// 			<td class='text-right'><span class='$profitClass'>$profitDisplay</span></td>
-	// 		</tr>
-	// 	";
-
-	// 	return $ragnar;
-	// }
+		$rows = [];
+		$grand = 0.0;
+		if($q && mysqli_num_rows($q) > 0){
+			while($r = mysqli_fetch_assoc($q)){
+				$qty = (float)($r['purchase_qty'] ?? 0);
+				$rate = (float)($r['rate'] ?? 0);
+				$total = (float)($r['total'] ?? 0);
+				$grand += $total;
+				$rows[] = [
+					'product_id' => (int)($r['product_id'] ?? 0),
+					'product_name' => (string)($r['product_name'] ?? ''),
+					'category' => (string)($r['category'] ?? ''),
+					'purchase_qty' => $qty,
+					'rate' => $rate,
+					'total' => $total
+				];
+			}
+		}
+		return ['success' => true, 'rows' => $rows, 'total' => $grand];
+	}
+	
 	public function stc_gldprofit_analyzer($month, $year, $type){
 		$ragnar = '';
 		$yearFilter = "YEAR(created_date) = '$year'";
@@ -1054,6 +1063,25 @@ if(isset($_POST["dashboard"])){
 
 	echo json_encode($cursedyouout);
 	// echo $cursedyouout;
+}
+
+// GLD purchase breakup (product-wise) for a clicked location on dashboard
+if(isset($_POST["gld_purchase_breakdown"])){
+	$Omonth = $month = isset($_POST['month']) ? $_POST['month'] : date('Y-m');
+	$type = isset($_POST['type']) ? $_POST['type'] : 'NA';
+	$location = isset($_POST['location']) ? $_POST['location'] : '';
+
+	$year = date('Y');
+	$month = date('m', strtotime($month));
+	if($type=="Y"){
+		$year = date('Y', strtotime($Omonth));
+	}
+
+	$obj = new sceptor();
+	$out = $obj->stc_gld_purchase_breakdown((int)$month, (int)$year, $type, $location);
+	header('Content-Type: application/json');
+	echo json_encode($out);
+	exit;
 }
 
 // if(isset($_POST["dashboardpurchasedcharts"])){

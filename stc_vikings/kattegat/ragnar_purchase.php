@@ -3480,7 +3480,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		}
 
 		// Main data query with LIMIT
-		$query = "SELECT DISTINCT P.stc_product_id, P.stc_product_name, P.stc_product_unit, P.stc_product_sale_percentage, S.stc_sub_cat_name, C.stc_cat_name, B.stc_brand_title " . $baseQuery . " ORDER BY C.stc_cat_name, P.stc_product_name ASC LIMIT $offset, $limit";
+		$query = "SELECT DISTINCT P.stc_product_id, P.stc_product_name, P.stc_product_unit, P.stc_product_sale_percentage, P.stc_product_gst, S.stc_sub_cat_name, C.stc_cat_name, B.stc_brand_title " . $baseQuery . " ORDER BY C.stc_cat_name, P.stc_product_name ASC LIMIT $offset, $limit";
 
 		$result = mysqli_query($this->stc_dbs, $query);
 		$html = '
@@ -3574,7 +3574,10 @@ class ragnarPurchaseAdhoc extends tesseract{
 					}
 				}
 
-				$stockBalanceVal = $balanceQty * $rate_gst;
+				$gstPct = (float)($row['stc_product_gst'] ?? 0);
+				$gstMultiplier = 1 + ($gstPct / 100);
+				$rateWithGst = $rate_gst * $gstMultiplier;
+				$stockBalanceVal = $balanceQty * $rateWithGst;
 				$sumTotalStockBalance += $stockBalanceVal;
 				$sumSoldAmount += $soldAmount;
 
@@ -3586,7 +3589,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$stockQtyCell = $stockQtyZero
 					? "<td class='text-right font-weight-bold' style=\"color:#9b2226;background-color:#ffe4e6;border-radius:4px;\">".number_format($balanceQty, 2)."</td>"
 					: "<td class='text-right'>".number_format($balanceQty, 2)."</td>";
-				$tpurchase = $buyQty * $rate_gst;
+				$tpurchase = $buyQty * $rateWithGst;
 				$sumTotalPurchase += $tpurchase;
 				$html .= "<tr>
 							<td class='text-center'>{$sl}</td>
@@ -3597,7 +3600,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 							".$stockQtyCell."
 							<td class='text-right'>".number_format($soldQty, 2)."</td>
 							<td class='text-right'>{$unitEsc}</td>
-							<td class='text-right'>".number_format($rate_gst, 2)."</td>
+							<td class='text-right'>".number_format($rateWithGst, 2)."</td>
 							<td class='text-right'>".number_format($tpurchase, 2)."</td>
 							<td class='text-right'>".number_format($stockBalanceVal, 2)."</td>
 							<td class='text-right'>".number_format($soldAmount, 2)."</td>

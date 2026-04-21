@@ -790,6 +790,8 @@ STCAuthHelper::checkAuth();
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="assets/vendor/bootstrap/js/popper.js"></script>
+    <script src="assets/vendor/bootstrap/js/bootstrap.js"></script>
     <script type="text/javascript" src="./assets/scripts/fusioncharts.js"></script>
     <script type="text/javascript" src="./assets/scripts/fusioncharts.charts.js"></script>
     <script type="text/javascript" src="./assets/scripts/themes/fusioncharts.theme.zune.js"></script>
@@ -885,7 +887,7 @@ STCAuthHelper::checkAuth();
                                 total += parseFloat(item.purchase_amount);
                                 gldRows2 += '<tr>' +
                                 '<td>' + item.purchase_location + '</td>' +
-                                '<td class="text-right"><span class="badge badge-pill badge-info" style="font-size:14px;">₹ ' + parseFloat(item.purchase_amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
+                                '<td class="text-right"><span class="badge badge-pill badge-info js-gld-purchase-breakdown" style="font-size:14px;cursor:pointer;" data-location="'+ String(item.purchase_location).replace(/"/g,'&quot;') +'" data-month="'+ String(month).replace(/"/g,'&quot;') +'" data-type="'+ String(type).replace(/"/g,'&quot;') +'">₹ ' + parseFloat(item.purchase_amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td>' +
                                 '</tr>';
                           });
                           gldRows2 += '<tr><td><b>Total:</b></td><td class="text-right"><span class="badge badge-pill badge-success" style="font-size:14px;">₹ ' + parseFloat(total).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td></tr>';
@@ -1165,6 +1167,106 @@ STCAuthHelper::checkAuth();
                 }
             });
         });
+
+		// GLD purchase location -> product breakup modal
+		$(document).on('click', '.js-gld-purchase-breakdown', function(){
+			var $el = $(this);
+			var location = $el.data('location') || '';
+			var month = $el.data('month') || '';
+			var type = $el.data('type') || 'NA';
+
+			$('#gldPurchaseBreakupModalLabel').text('GLD Purchase Breakup - ' + location);
+			$('#gld-purchase-breakup-tbody').html('<tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>');
+			$('#gld-purchase-breakup-total').text('₹ --');
+			$('#gldPurchaseBreakupModal').modal('show');
+
+			$.ajax({
+				url: 'kattegat/ragnar_lothbrok.php',
+				method: 'POST',
+				dataType: 'json',
+				data: {
+					gld_purchase_breakdown: 1,
+					location: location,
+					month: month,
+					type: type
+				},
+				success: function(resp){
+					if(!resp || resp.success !== true){
+						$('#gld-purchase-breakup-tbody').html('<tr><td colspan="7" class="text-center text-danger">Failed to load data.</td></tr>');
+						return;
+					}
+					var rows = resp.rows || [];
+					if(!Array.isArray(rows) || rows.length === 0){
+						$('#gld-purchase-breakup-tbody').html('<tr><td colspan="7" class="text-center text-muted">No data found.</td></tr>');
+						$('#gld-purchase-breakup-total').text('₹ 0.00');
+						return;
+					}
+					var html = '';
+					var sl = 0;
+					$.each(rows, function(i, r){
+						sl++;
+						var pid = (r && r.product_id !== undefined && r.product_id !== null) ? r.product_id : '';
+						var pname = (r && r.product_name !== undefined && r.product_name !== null) ? r.product_name : '';
+						var cat = (r && r.category !== undefined && r.category !== null) ? r.category : '';
+						var qty = (r && r.purchase_qty !== undefined && r.purchase_qty !== null) ? r.purchase_qty : 0;
+						var rate = (r && r.rate !== undefined && r.rate !== null) ? r.rate : 0;
+						var total = (r && r.total !== undefined && r.total !== null) ? r.total : 0;
+						html += '<tr>' +
+							'<td class="text-center">'+ sl +'</td>' +
+							'<td>'+ pid +'</td>' +
+							'<td>'+ pname +'</td>' +
+							'<td>'+ cat +'</td>' +
+							'<td class="text-right">'+ parseFloat(qty).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+							'<td class="text-right">₹ '+ parseFloat(rate).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+							'<td class="text-right">₹ '+ parseFloat(total).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+						'</tr>';
+					});
+					$('#gld-purchase-breakup-tbody').html(html);
+					var gtotal = (resp && resp.total !== undefined && resp.total !== null) ? resp.total : 0;
+					$('#gld-purchase-breakup-total').text('₹ ' + parseFloat(gtotal).toLocaleString('en-IN', {minimumFractionDigits:2}));
+				},
+				error: function(){
+					$('#gld-purchase-breakup-tbody').html('<tr><td colspan="7" class="text-center text-danger">Error loading data.</td></tr>');
+				}
+			});
+		});
     </script>
+
+	<!-- GLD Purchase Breakup Modal -->
+	<div class="modal fade" id="gldPurchaseBreakupModal" tabindex="-1" role="dialog" aria-labelledby="gldPurchaseBreakupModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-xl" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="gldPurchaseBreakupModalLabel">GLD Purchase Breakup</h5>
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="table-responsive">
+						<table class="table table-bordered table-hover mb-0">
+							<thead>
+								<tr>
+									<th class="text-center">Sl No</th>
+									<th class="text-center">Product ID</th>
+									<th class="text-center">Product Name</th>
+									<th class="text-center">Category</th>
+									<th class="text-center">Purchase Qty</th>
+									<th class="text-center">Rate</th>
+									<th class="text-center">Total</th>
+								</tr>
+							</thead>
+							<tbody id="gld-purchase-breakup-tbody">
+								<tr><td colspan="7" class="text-center text-muted">Click an amount to load breakup.</td></tr>
+							</tbody>
+						</table>
+					</div>
+					<div class="d-flex justify-content-end mt-3">
+						<span class="badge badge-pill badge-success" style="font-size:14px;">Grand Total: <span id="gld-purchase-breakup-total">₹ --</span></span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>

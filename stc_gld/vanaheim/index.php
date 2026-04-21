@@ -156,9 +156,28 @@ function addCustomer($conn) {
 
         // Insert new customer if no existing customer is selected
         if (!$customerId) {
-            $query = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_email, gld_customer_city_id, gld_customer_state_id, gld_customer_address) VALUES ('$customerName', '$customerContact', '$customerEmail', '65', '16', '$customerAddress')";
-            $conn->query($query);
-            $customerId = $conn->insert_id;
+            // Check if a customer already exists with the given contact number or email
+            $checkQuery = "SELECT gld_customer_id FROM gld_customer WHERE gld_customer_cont_no = '$customerContact'";
+            if (!empty($customerEmailEsc)) {
+                $checkQuery .= " OR gld_customer_email = '$customerEmail'";
+            }
+            $result = $conn->query($checkQuery);
+
+            if ($result && $result->num_rows > 0) {
+                // If customer exists, fetch the customer ID
+                $row = $result->fetch_assoc();
+                $customerId = $row['gld_customer_id'];
+            } else {
+                // Insert a new customer if not found
+                $insertQuery = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_email, gld_customer_city_id, gld_customer_state_id, gld_customer_address) 
+                                VALUES ('$customerName', '$customerContact', '$customerEmail', '65', '16', '$customerAddress')";
+                if ($conn->query($insertQuery)) {
+                    $customerId = $conn->insert_id;
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Failed to add customer', 'query' => $insertQuery]);
+                    return;
+                }
+            }
         }
         $date = date('Y-m-d H:i:s');
         $adhoc_id=0;
@@ -674,6 +693,7 @@ function setChallanRequisition($conn) {
     $ListId = $data['ListId'] ?? '';
     $customerName = $data['userName'] ?? '';
     $customerContact = $data['contact'] ?? '';
+    $customerEmail = $data['email'] ?? '';
     $customerAddress = $data['address'] ?? '';
     $productId = $data['productId'] ?? null;
     $requisition = $data['requisition'] ?? '';
@@ -682,8 +702,16 @@ function setChallanRequisition($conn) {
     $userId=$data['userId'] ?? 0;
 
     if ($productId) {
-        // Check if a customer already exists with the given contact number
-        $checkQuery = "SELECT gld_customer_id FROM gld_customer WHERE gld_customer_cont_no = '$customerContact'";
+        $customerNameEsc = $conn->real_escape_string($customerName);
+        $customerContactEsc = $conn->real_escape_string($customerContact);
+        $customerEmailEsc = $conn->real_escape_string($customerEmail);
+        $customerAddressEsc = $conn->real_escape_string($customerAddress);
+
+        // Check if a customer already exists with the given contact number or email
+        $checkQuery = "SELECT gld_customer_id FROM gld_customer WHERE gld_customer_cont_no = '$customerContactEsc'";
+        if (!empty($customerEmailEsc)) {
+            $checkQuery .= " OR gld_customer_email = '$customerEmailEsc'";
+        }
         $result = $conn->query($checkQuery);
 
         if ($result && $result->num_rows > 0) {
@@ -692,8 +720,8 @@ function setChallanRequisition($conn) {
             $customerId = $row['gld_customer_id'];
         } else {
             // Insert a new customer if not found
-            $insertQuery = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_city_id, gld_customer_state_id, gld_customer_address) 
-                            VALUES ('$customerName', '$customerContact', '65', '16', '$customerAddress')";
+            $insertQuery = "INSERT INTO gld_customer (gld_customer_title, gld_customer_cont_no, gld_customer_email, gld_customer_city_id, gld_customer_state_id, gld_customer_address) 
+                            VALUES ('$customerNameEsc', '$customerContactEsc', '$customerEmailEsc', '65', '16', '$customerAddressEsc')";
             if ($conn->query($insertQuery)) {
                 $customerId = $conn->insert_id;
             } else {
