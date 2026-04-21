@@ -3495,6 +3495,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 					<th class="text-center">Sold Qty</th>
 					<th class="text-center">Unit</th>
 					<th class="text-center">Rate</th>
+					<th class="text-center">Total Purchase</th>
 					<th class="text-center">Total Stock balance</th>
 					<th class="text-center">Total Sold Amount</th>
 				</tr>
@@ -3502,6 +3503,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$sl = $offset;
 		$sumTotalStockBalance = 0.0;
 		$sumSoldAmount = 0.0;
+		$sumTotalPurchase = 0.0;
 		if ($result && mysqli_num_rows($result) > 0) {
 			while ($row = mysqli_fetch_assoc($result)) {
 				$sl++;
@@ -3584,7 +3586,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$stockQtyCell = $stockQtyZero
 					? "<td class='text-right font-weight-bold' style=\"color:#9b2226;background-color:#ffe4e6;border-radius:4px;\">".number_format($balanceQty, 2)."</td>"
 					: "<td class='text-right'>".number_format($balanceQty, 2)."</td>";
-
+				$tpurchase = $buyQty * $rate_gst;
+				$sumTotalPurchase += $tpurchase;
 				$html .= "<tr>
 							<td class='text-center'>{$sl}</td>
 							<td>{$row['stc_product_id']}</td>
@@ -3595,12 +3598,14 @@ class ragnarPurchaseAdhoc extends tesseract{
 							<td class='text-right'>".number_format($soldQty, 2)."</td>
 							<td class='text-right'>{$unitEsc}</td>
 							<td class='text-right'>".number_format($rate_gst, 2)."</td>
+							<td class='text-right'>".number_format($tpurchase, 2)."</td>
 							<td class='text-right'>".number_format($stockBalanceVal, 2)."</td>
 							<td class='text-right'>".number_format($soldAmount, 2)."</td>
 						</tr>";
 			}
 			$html .= "<tr class='inventory-amount-total-row'>
 						<td colspan='9' class='text-right'><strong>Total</strong></td>
+						<td class='text-right'><strong>".number_format($sumTotalPurchase, 2)."</strong></td>
 						<td class='text-right'><strong>".number_format($sumTotalStockBalance, 2)."</strong></td>
 						<td class='text-right'><strong>".number_format($sumSoldAmount, 2)."</strong></td>
 					</tr>";

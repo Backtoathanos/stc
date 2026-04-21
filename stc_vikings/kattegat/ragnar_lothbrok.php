@@ -799,7 +799,7 @@ class sceptor extends tesseract{
 			}
 		}
         $purchase_locations = [];
-        $sql = mysqli_query($this->stc_dbs, "SELECT S.shopname, SUM(S.qty * A.stc_purchase_product_adhoc_rate) AS amount  FROM `stc_shop` S INNER JOIN `stc_purchase_product_adhoc` A ON S.adhoc_id=A.stc_purchase_product_adhoc_id $queryFilter2 GROUP BY S.shopname");
+        $sql = mysqli_query($this->stc_dbs, "SELECT S.shopname, SUM(S.qty * A.stc_purchase_product_adhoc_prate) AS amount  FROM `stc_shop` S INNER JOIN `stc_purchase_product_adhoc` A ON S.adhoc_id=A.stc_purchase_product_adhoc_id $queryFilter2 GROUP BY S.shopname");
 		if(mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
 				$purchase_locations[] = [
