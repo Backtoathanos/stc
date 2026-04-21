@@ -879,6 +879,63 @@ class sceptor extends tesseract{
 		}
 		return ['success' => true, 'rows' => $rows, 'total' => $grand];
 	}
+
+	// GLD sale breakup for a specific trading user location (product-wise)
+	public function stc_gld_sale_breakdown($month, $year, $type, $location){
+		$locationEsc = mysqli_real_escape_string($this->stc_dbs, (string)$location);
+		$month = (int)$month;
+		$year = (int)$year;
+
+		// Keep date filtering consistent with dashboard sale_locations query (gld_challan alias A)
+		$dateFilter = "YEAR(A.created_date) = '".$year."'";
+		if($type !== 'Y'){
+			$dateFilter .= " AND MONTH(A.created_date) = '".$month."'";
+		}
+
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT
+				P.stc_product_id AS product_id,
+				CASE
+					WHEN S.stc_sub_cat_name != 'OTHERS' THEN CONCAT(S.stc_sub_cat_name, ' ', P.stc_product_name)
+					ELSE P.stc_product_name
+				END AS product_name,
+				C.stc_cat_name AS category,
+				COALESCE(SUM(A.qty), 0) AS sold_qty,
+				ROUND(
+					COALESCE(SUM(A.qty * A.rate), 0) / NULLIF(SUM(A.qty), 0),
+				2) AS rate,
+				COALESCE(SUM(A.qty * A.rate), 0) AS total
+			FROM gld_challan A
+			INNER JOIN stc_trading_user TU ON A.created_by = TU.stc_trading_user_id
+			INNER JOIN stc_product P ON P.stc_product_id = A.product_id
+			INNER JOIN stc_sub_category S ON S.stc_sub_cat_id = P.stc_product_sub_cat_id
+			INNER JOIN stc_category C ON C.stc_cat_id = P.stc_product_cat_id
+			WHERE TRIM(TU.stc_trading_user_location) = TRIM('".$locationEsc."')
+				AND ".$dateFilter."
+			GROUP BY P.stc_product_id, product_name, category
+			ORDER BY total DESC
+		");
+
+		$rows = [];
+		$grand = 0.0;
+		if($q && mysqli_num_rows($q) > 0){
+			while($r = mysqli_fetch_assoc($q)){
+				$qty = (float)($r['sold_qty'] ?? 0);
+				$rate = (float)($r['rate'] ?? 0);
+				$total = (float)($r['total'] ?? 0);
+				$grand += $total;
+				$rows[] = [
+					'product_id' => (int)($r['product_id'] ?? 0),
+					'product_name' => (string)($r['product_name'] ?? ''),
+					'category' => (string)($r['category'] ?? ''),
+					'sold_qty' => $qty,
+					'rate' => $rate,
+					'total' => $total
+				];
+			}
+		}
+		return ['success' => true, 'rows' => $rows, 'total' => $grand];
+	}
 	
 	public function stc_gldprofit_analyzer($month, $year, $type){
 		$ragnar = '';
@@ -1079,6 +1136,25 @@ if(isset($_POST["gld_purchase_breakdown"])){
 
 	$obj = new sceptor();
 	$out = $obj->stc_gld_purchase_breakdown((int)$month, (int)$year, $type, $location);
+	header('Content-Type: application/json');
+	echo json_encode($out);
+	exit;
+}
+
+// GLD sale breakup (product-wise) for a clicked location on dashboard
+if(isset($_POST["gld_sale_breakdown"])){
+	$Omonth = $month = isset($_POST['month']) ? $_POST['month'] : date('Y-m');
+	$type = isset($_POST['type']) ? $_POST['type'] : 'NA';
+	$location = isset($_POST['location']) ? $_POST['location'] : '';
+
+	$year = date('Y');
+	$month = date('m', strtotime($month));
+	if($type=="Y"){
+		$year = date('Y', strtotime($Omonth));
+	}
+
+	$obj = new sceptor();
+	$out = $obj->stc_gld_sale_breakdown((int)$month, (int)$year, $type, $location);
 	header('Content-Type: application/json');
 	echo json_encode($out);
 	exit;
