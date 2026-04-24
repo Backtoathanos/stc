@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>STC Sale Architecture – GLD / Mustak</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #f0f4f8;
+    font-family: 'IBM Plex Sans', sans-serif;
+    padding: 32px 24px 48px;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .page-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a2540;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .page-header p {
+    font-size: 12px;
+    color: #667;
+    margin-top: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  /* ── Shared box style ── */
+  .box {
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.35;
+    position: relative;
+  }
+  .box-blue   { background: #dbeafe; border: 2px solid #3b82f6; color: #1e3a8a; }
+  .box-green  { background: #dcfce7; border: 2px solid #22c55e; color: #14532d; }
+  .box-orange { background: #ffedd5; border: 2px solid #f97316; color: #7c2d12; }
+  .box-purple { background: #ede9fe; border: 2px solid #8b5cf6; color: #4c1d95; }
+  .box-gray   { background: #f1f5f9; border: 2px solid #94a3b8; color: #334155; }
+  .box-red    { background: #fee2e2; border: 2px solid #ef4444; color: #7f1d1d; }
+  .box-teal   { background: #ccfbf1; border: 2px solid #14b8a6; color: #134e4a; }
+  .box-yellow { background: #fef9c3; border: 2px solid #eab308; color: #713f12; }
+
+  .box .sub { font-size: 10px; font-weight: 400; margin-top: 2px; opacity: 0.75; }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #94a3b8;
+    margin-bottom: 8px;
+  }
+
+  /* ── Main layout grid ── */
+  .diagram {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  /* ── Two sections combined in one panel ── */
+  .diagram-row {
+    background: white;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    padding: 20px 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    grid-column: span 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+  .diagram-row > .lane {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    box-shadow: none;
+    padding: 16px 14px;
+  }
+
+  /* ── Lane panels ── */
+  .lane {
+    background: white;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    padding: 20px 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .lane-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1e293b;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .lane-header span {
+    font-size: 10px;
+    font-weight: 400;
+    color: #94a3b8;
+    margin-left: 6px;
+  }
+
+  /* ── Arrow ── */
+  .arrow-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: #64748b;
+    padding: 4px 0;
+  }
+  .arrow-row .lbl { flex: 1; font-size: 10.5px; color: #475569; }
+  .arr { font-size: 16px; color: #3b82f6; flex-shrink: 0; }
+  .arr-right::after { content: '→'; }
+  .arr-down::after  { content: '↓'; }
+
+  /* ── Step list ── */
+  .step-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .step-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 11.5px;
+    color: #334155;
+    line-height: 1.4;
+  }
+  .step-num {
+    min-width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Flow chain ── */
+  .flow-chain {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+  .flow-step .node {
+    border-radius: 5px;
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 56px;
+    text-align: center;
+  }
+  .flow-step .connector {
+    flex: 1;
+    height: 2px;
+    background: #3b82f6;
+    position: relative;
+  }
+  .flow-step .connector::after {
+    content: '';
+    position: absolute;
+    right: -1px; top: -4px;
+    border: 5px solid transparent;
+    border-left: 7px solid #3b82f6;
+  }
+  .flow-step .label {
+    font-size: 9.5px;
+    color: #64748b;
+    position: absolute;
+    top: -13px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+  .v-connector {
+    width: 2px;
+    height: 14px;
+    background: #3b82f6;
+    margin-left: 28px;
+    position: relative;
+  }
+  .v-connector::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; left: -4px;
+    border: 5px solid transparent;
+    border-top: 7px solid #3b82f6;
+  }
+
+  /* ── Document tag ── */
+  .doc-tag {
+    display: inline-block;
+    background: #fef3c7;
+    border: 1.5px solid #f59e0b;
+    color: #92400e;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  /* ── Full-width bottom row ── */
+  .full-row {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 12px;
+    border: 1.5px solid #e2e8f0;
+    padding: 20px 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin-top: 24px;
+  }
+  .full-row .lane-header { margin-bottom: 16px; }
+
+  /* ── Connector between rows ── */
+  .row-connector {
+    max-width: 1100px;
+    margin: 14px auto 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: start;
+    color: #3b82f6;
+  }
+  .row-connector .from-third {
+    grid-column: 3;
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .row-connector .from-first {
+    grid-column: 1;
+    justify-self: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .row-connector .line {
+    width: 2px;
+    height: 18px;
+    background: #3b82f6;
+    border-radius: 2px;
+    opacity: 0.9;
+  }
+  .row-connector .arrow {
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  /* ── Outlet flow connectivity (return arrows) ── */
+  .outlet-row .flow-col { position: relative; }
+  .outlet-row .flow-col:not(:last-child)::after {
+    content: '↔';
+    position: absolute;
+    top: 46px;
+    right: -20px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #3b82f6;
+    opacity: 0.9;
+    pointer-events: none;
+  }
+  .outlet-row .flow-col:not(:last-child)::before {
+    content: 'Transfer';
+    position: absolute;
+    top: 40px;
+    right: -30px;
+    font-size: 9.5px;
+    color: #64748b;
+    letter-spacing: 0.3px;
+    pointer-events: none;
+  }
+  .outlet-row .transfer-label {
+    font-size: 9.5px;
+    color: #64748b;
+    letter-spacing: 0.3px;
+    margin-top: 2px;
+  }
+
+  .flow-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    align-items: start;
+  }
+  .flow-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    position: relative;
+  }
+  .flow-col .arrow-down {
+    font-size: 18px;
+    color: #3b82f6;
+    line-height: 1;
+  }
+  .flow-col .side-note {
+    font-size: 9.5px;
+    color: #64748b;
+    text-align: center;
+  }
+
+  /* connector between columns */
+  .h-line {
+    height: 2px;
+    background: #3b82f6;
+    width: 100%;
+    position: absolute;
+    top: 26px;
+    left: 50%;
+  }
+
+  /* ── Legend ── */
+  .legend {
+    max-width: 1100px;
+    margin: 20px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 11px;
+    color: #475569;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>STC Sale Architecture &mdash; GLD</h1>
+  <p>System Flow Diagram &nbsp;|&nbsp; Globalate EPQ / GLD &nbsp;→&nbsp; Warehouse &nbsp;→&nbsp; STC Outlet</p>
+</div>
+
+<!-- ═══════════════ ROW 1: Three Lane Panels ═══════════════ -->
+<div class="diagram">
+  <div class="diagram-row">
+    <!-- LANE 1: Globalate / EPC GLD -->
+    <div class="lane">
+      <div class="lane-header">Global AC &nbsp;<span>EPQ / GLD</span></div>
+
+      <div class="section-title">Entry Methods</div>
+      <ul class="step-list">
+        <li><span class="step-num">1</span><span>LPO (Local Purchase Order)</span></li>
+        <li><span class="step-num">2</span><span>GRN (Goods Receipt Note)</span></li>
+        <li><span class="step-num">3</span><span>STC (Stock Transfer Challan)</span></li>
+      </ul>
+
+      <div style="height:1px;background:#e2e8f0;margin:4px 0;"></div>
+
+      <div class="section-title">System Entry</div>
+      <div class="box box-blue" style="margin-bottom:4px;">
+        Throw System Entry
+      </div>
+
+      <div style="text-align:center;font-size:18px;color:#3b82f6;">↓</div>
+
+      <div class="section-title">Payment Deduction</div>
+      <div class="box box-orange">
+        Payment Deduction from GTO / As per DC
+        <div class="sub">Attributed / Distributed</div>
+      </div>
+
+      <div style="height:1px;background:#e2e8f0;margin:4px 0;"></div>
+      <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#475569;">
+        <span style="color:#3b82f6;font-size:14px;">→</span>
+        <span>Direct Hit</span>
+        <span class="doc-tag" style="background: #dbeafe;border: 2px solid #3b82f6;color: #1e3a8a;">GD-1</span>
+        <span class="doc-tag" style="background: #ccfbf1;border: 2px solid #14b8a6;color: #14b8a6;">GD-2</span>
+        <span class="doc-tag" style="background: #ede9fe;border: 2px solid #8b5cf6;color: #4c1d95;">GM-3</span>
+        <span class="doc-tag" style="background: #dcfce7;border: 2px solid #22c55e;color: #14532d;">GS-4</span>
+        <span class="doc-tag" style="background: #fef9c3;border: 2px solid #eab308;color: #713f12;">GK-5</span>
+      </div>
+      <div style="font-size:10.5px;color:#64748b;margin-left:20px;">
+        1. DC &nbsp;&nbsp; 2. RMC
+      </div>
+    </div>
+
+    <!-- LANE 2: GLD Warehouse -->
+    <div class="lane">
+      <div class="lane-header">GLD &nbsp;<span>Warehouse / MBS</span></div>
+
+      <div class="section-title">Stock Transfer Challan</div>
+      <div class="box box-purple" style="margin-bottom:6px;">
+        Stock Transfer Challan
+        <div class="sub">① &nbsp;&nbsp; ② &nbsp;&nbsp; ③</div>
+      </div>
+
+      <div style="text-align:center;font-size:18px;color:#3b82f6;">↓</div>
+
+      <div class="section-title">MBS Processing</div>
+      <div class="box box-teal">
+        MBS
+        <div class="sub">Warehouse Management</div>
+      </div>
+      <div style="height:1px;background:#e2e8f0;margin:4px 0;"></div>
+
+      <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#475569;margin-bottom:4px;">
+        <span style="color:#3b82f6;font-size:14px;">→</span>
+        <span>Direct Hit</span>
+        <span class="doc-tag" style="background: #dbeafe;border: 2px solid #3b82f6;color: #1e3a8a;">GD-1</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#14b8a6;margin-bottom:4px;">
+        <span style="color:#3b82f6;font-size:14px;">→</span>
+        <span>Direct Hit</span>
+        <span class="doc-tag" style="background: #ccfbf1;border: 2px solid #14b8a6;color: #14b8a6;">GD-2</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#134e4a;margin-bottom:4px;">
+        <span style="color:#3b82f6;font-size:14px;">→</span>
+        <span>Direct Hit</span>
+        <span class="doc-tag" style="background: #ede9fe;border: 2px solid #8b5cf6;color: #4c1d95;">GM-3</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#22c55e;">
+        <span style="color:#3b82f6;font-size:14px;">→</span>
+        <span>Direct Hit</span>
+        <span class="doc-tag" style="background: #dcfce7;border: 2px solid #22c55e;color: #14532d;">GS-4</span>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#eab308;margin-bottom:4px;">
+        <span style="color:#3b82f6;font-size:14px;">→</span>
+        <span>Direct Hit</span>
+        <span class="doc-tag" style="background: #fef9c3;border: 2px solid #eab308;color: #713f12;">GK-5</span>
+      </div>
+    </div>
+  </div>
+  <!-- LANE 3: STC Sale -->
+  <div class="lane">
+    <div class="lane-header">STC Sale &nbsp;<span>Mustak</span></div>
+
+    <div class="section-title">Process Steps</div>
+    <ul class="step-list">
+      <li><span class="step-num">1</span><span>Requisition – STC Through</span></li>
+      <li><span class="step-num">2</span><span>Delivery Challan – as per Requisition</span></li>
+      <li><span class="step-num">3</span><span>Payment – Deduct from GTO / As per<br><span style="font-size:10.5px;color:#64748b;">Delivery Challan Amount</span></span></li>
+    </ul>
+
+    <div style="height:1px;background:#e2e8f0;margin:4px 0;"></div>
+
+    <div class="section-title">Recipient</div>
+    <div class="box box-green">
+      Persons
+      <div class="sub">Outlet Management</div>
+    </div>
+
+    <div style="height:1px;background:#e2e8f0;margin:4px 0;"></div>
+
+    <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#475569;margin-bottom:4px;">
+      <span style="color:#3b82f6;font-size:14px;">→</span>
+      <span>Direct Hit</span>
+      <span class="doc-tag" style="background: #dbeafe;border: 2px solid #3b82f6;color: #1e3a8a;">GD-1</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#14b8a6;margin-bottom:4px;">
+      <span style="color:#3b82f6;font-size:14px;">→</span>
+      <span>Direct Hit</span>
+      <span class="doc-tag" style="background: #ccfbf1;border: 2px solid #14b8a6;color: #14b8a6;">GD-2</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#134e4a;margin-bottom:4px;">
+      <span style="color:#3b82f6;font-size:14px;">→</span>
+      <span>Direct Hit</span>
+      <span class="doc-tag" style="background: #ede9fe;border: 2px solid #8b5cf6;color: #4c1d95;">GM-3</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#22c55e;">
+      <span style="color:#3b82f6;font-size:14px;">→</span>
+      <span>Direct Hit</span>
+      <span class="doc-tag" style="background: #dcfce7;border: 2px solid #22c55e;color: #14532d;">GS-4</span>
+    </div>
+    <div style="display:flex;gap:6px;align-items:center;font-size:11px;color:#eab308;margin-bottom:4px;">
+      <span style="color:#3b82f6;font-size:14px;">→</span>
+      <span>Direct Hit</span>
+      <span class="doc-tag" style="background: #fef9c3;border: 2px solid #eab308;color: #713f12;">GK-5</span>
+    </div>
+  </div>
+</div>
+
+<div class="row-connector" aria-hidden="true">
+  <div class="from-first">
+    <div class="arrow">↑</div>
+    <div class="line"></div>
+  </div>
+  <div class="from-third">
+    <div class="line"></div>
+    <div class="arrow">↓</div>
+  </div>
+</div>
+
+<!-- ═══════════════ ROW 2: Outlet Flow Chain ═══════════════ -->
+<div class="full-row outlet-row">
+  <div class="lane-header">Outlet Flow Chain &nbsp;<span>GD-1 → GD-2 → GM-3 → GS-4 → GK-5</span></div>
+
+  <div class="flow-grid">
+
+    <div class="flow-col">
+      <div class="side-note">Direct Hit</div>
+      <div class="arrow-down">↕</div>
+      <div class="box box-blue node" style="width:90px;">GD-1</div>
+      <div class="side-note">DC / RMC</div>
+    </div>
+
+    <div class="flow-col">
+      <div class="side-note">Direct Hit</div>
+      <div class="arrow-down">↕</div>
+      <div class="box box-teal node" style="width:90px;">GD-2</div>
+      <div class="side-note">DC / RMC</div>
+    </div>
+
+    <div class="flow-col">
+      <div class="side-note">Direct Hit</div>
+      <div class="arrow-down">↕</div>
+      <div class="box box-purple node" style="width:90px;">GM-3</div>
+      <div class="side-note">DC / RMC</div>
+    </div>
+
+    <div class="flow-col">
+      <div class="side-note">Direct Hit</div>
+      <div class="arrow-down">↕</div>
+      <div class="box box-green node" style="width:90px;">GS-4</div>
+      <div class="side-note">DC / RMC</div>
+    </div>
+
+    <div class="flow-col">
+      <div class="side-note">Direct Hit</div>
+      <div class="arrow-down">↕</div>
+      <div class="box box-yellow node" style="width:90px;">GK-5</div>
+      <div class="side-note">DC / RMC</div>
+    </div>
+
+  </div>
+
+  <!-- horizontal arrow connecting all -->
+  <div style="display:flex;align-items:center;gap:0;margin-top:16px;padding:0 16px;">
+    <div style="flex:1;height:2.5px;background:linear-gradient(90deg,#3b82f6,#8b5cf6,#14b8a6,#22c55e,#eab308);border-radius:2px;"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;padding:4px 16px 0;font-size:9.5px;color:#94a3b8;">
+    <span>Start</span><span>→</span><span>→</span><span>→</span><span>End</span>
+  </div>
+</div>
+
+<!-- ═══════════════ Legend ═══════════════ -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div> GD (Global Dhatkidih / Monitor Business System)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;"></div> GM (Global Mango / Monitor Business System)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#22c55e;"></div> GS (Global Sehrabazar / Monitor Business System)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#eab308;"></div> GK (Global Kolkata / Monitor Business System)</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f97316;"></div> Payment / Deduction Flow</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#14b8a6;"></div> Warehouse / Monitor Business System Processing</div>
+</div>
+
+</body>
+</html>
