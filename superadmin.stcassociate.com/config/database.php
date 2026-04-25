@@ -63,6 +63,28 @@ return [
             ]) : [],
         ],
 
+        // Remote/server database connection (used for DB sync).
+        // Configure in .env as SERVER_DB_HOST/PORT/DATABASE/USERNAME/PASSWORD.
+        'server' => [
+            'driver' => 'mysql',
+            'url' => env('SERVER_DATABASE_URL'),
+            'host' => env('SERVER_DB_HOST', '127.0.0.1'),
+            'port' => env('SERVER_DB_PORT', '3306'),
+            'database' => env('SERVER_DB_DATABASE', 'forge'),
+            'username' => env('SERVER_DB_USERNAME', 'forge'),
+            'password' => env('SERVER_DB_PASSWORD', ''),
+            'unix_socket' => env('SERVER_DB_SOCKET', ''),
+            'charset' => env('SERVER_DB_CHARSET', 'utf8mb4'),
+            'collation' => env('SERVER_DB_COLLATION', 'utf8mb4_unicode_ci'),
+            'prefix' => env('SERVER_DB_PREFIX', ''),
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('SERVER_MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),

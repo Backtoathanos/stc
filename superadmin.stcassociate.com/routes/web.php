@@ -31,6 +31,7 @@ use App\Http\Controllers\POAdhocController;
 use App\Http\Controllers\PPETrackerController;
 use App\Http\Controllers\ToolTrackerController;
 use App\Http\Controllers\GldChallanController;
+use App\Http\Controllers\DbSyncController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,6 +52,11 @@ Route::get('/logout', [AuthController::class, 'logout_admin']);
 Route::group(['middleware' => 'superadmin'], function(){
 
     Route::get('/dashboard', [DashboardController::class, 'show']);
+
+    // DB sync (server -> local)
+    Route::get('/db-sync', [DbSyncController::class, 'index']);
+    Route::post('/db-sync/sync', [DbSyncController::class, 'sync']);
+    Route::post('/db-sync/run-server-query', [DbSyncController::class, 'runServerQuery']);
     
     // user admin route
     Route::get('/users/admin', [SuperAdminUsersController::class, 'show']);
