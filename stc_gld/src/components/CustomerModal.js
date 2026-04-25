@@ -143,7 +143,12 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
         }
         const userId = userIdCookie.split('=')[1];
         const finalcost=parseFloat(parsedRate) + parseFloat(pmargin);
-
+        const locationcookie = document.cookie.split('; ').find(row => row.startsWith('location_stc='));
+        if (!locationcookie) {
+            setIsSubmitting(false);  // Reset the submit state to allow future submissions
+            return;  // Stop the function execution if no location_stc cookie is found
+        }
+        const location = locationcookie.split('=')[1];
         const isAirConditioner = /air\s*conditioner/i.test(String(productCategory || '')) || /air\s*conditioner/i.test(String(productName || ''));
         const pdetails = isAirConditioner
             ? [idu ? `IDU - ${idu}` : null, odu ? `ODU - ${odu}` : null].filter(Boolean).join(' & ')
@@ -162,7 +167,8 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
             email: customerEmail,
             address: customerAddress,
             userId: userId,
-            agentId: agentId
+            agentId: agentId,
+            location: locationcookie
         };
 
         axios.post(`${API_BASE_URL}/index.php?action=addCustomer`, customerData)

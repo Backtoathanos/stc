@@ -152,6 +152,11 @@ function addCustomer($conn) {
     $pdetails = isset($data['pdetails']) ? $data['pdetails'] : '';
     $userId=$data['userId'];
     $agentId=$data['agentId'];
+    $locationcookie=$data['location'];
+    if($locationcookie==""){
+        echo json_encode(['success' => false, 'message' => 'Location not found']);
+        return;
+    }
     if($productId){
 
         // Insert new customer if no existing customer is selected
@@ -182,8 +187,35 @@ function addCustomer($conn) {
         $date = date('Y-m-d H:i:s');
         $adhoc_id=0;
         // Link customer to the product and set the quantity
-        $query = $conn->query("SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty` FROM `stc_purchase_product_adhoc` INNER JOIN `stc_shop` ON `stc_purchase_product_adhoc_id`=`adhoc_id` WHERE `stc_purchase_product_adhoc_productid`='$productId' AND `stc_purchase_product_adhoc_status`=1 ORDER BY `stc_purchase_product_adhoc_id` ASC");
-        while ($row = $query->fetch_assoc()) {
+        $shopName = (string)$locationcookie;
+        if (strpos($shopName, 'location_stc=') !== false) {
+            $parts = [];
+            parse_str($shopName, $parts);
+            if (isset($parts['location_stc']) && $parts['location_stc'] !== '') {
+                $shopName = $parts['location_stc'];
+            }
+        }
+        $shopName = trim(urldecode($shopName));
+
+        $stmt = $conn->prepare(
+            "SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty`
+             FROM `stc_purchase_product_adhoc`
+             INNER JOIN `stc_shop` ON `stc_purchase_product_adhoc_id`=`adhoc_id`
+             WHERE `stc_purchase_product_adhoc_productid`=?
+               AND `stc_purchase_product_adhoc_status`=1
+               AND `shopname`=?
+             ORDER BY `stc_purchase_product_adhoc_id` ASC"
+        );
+        if (!$stmt) {
+            echo json_encode(['success' => false, 'message' => 'Failed to prepare stock query']);
+            return;
+        }
+        $productIdStr = (string)$productId;
+        $stmt->bind_param("ss", $productIdStr, $shopName);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
             $delivered=0;
             $sql_qry=$conn->query("
                 SELECT `stc_cust_super_requisition_list_items_rec_recqty` 
@@ -210,6 +242,7 @@ function addCustomer($conn) {
                 break;
             }
         }
+        $stmt->close();
         if($adhoc_id>0){
             $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, adhoc_id, product_id, qty, rate, discount, agent_id, pdetails, created_date, created_by) VALUES ('$customerId', '$requisition', '$adhoc_id', '$productId', '$quantity', '$rate', '$discount', '$agentId', '$pdetails', '$date', '$userId')";
             if ($conn->query($productQuery)) {
