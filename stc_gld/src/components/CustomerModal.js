@@ -78,7 +78,32 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
                 .catch(error => console.error('Error fetching customer options:', error));
         }
     }, [show]);
-
+    function getCookie(name) {
+        // 1. Encode the cookie name to handle special characters
+        const encodedName = encodeURIComponent(name) + "=";
+        
+        // 2. Split all cookies into an array
+        const cookies = document.cookie.split(';');
+        
+        // 3. Loop through cookies to find the matching one
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i];
+            
+            // 4. Remove leading whitespace
+            while (cookie.charAt(0) === ' ') {
+            cookie = cookie.substring(1);
+            }
+            
+            // 5. Check if this cookie starts with our encoded name
+            if (cookie.indexOf(encodedName) === 0) {
+            // 6. Return the decoded value
+            return decodeURIComponent(cookie.substring(encodedName.length, cookie.length));
+            }
+        }
+        
+        // 7. Return null if not found
+        return null;
+    }
     // Handle adding customer and product
     const handleAddCustomer = () => {
         // Reset error messages

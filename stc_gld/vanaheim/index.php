@@ -186,13 +186,13 @@ function addCustomer($conn) {
         }
         $date = date('Y-m-d H:i:s');
         $adhoc_id=0;
-        $shopName = $shopName;
+        $shopName = $locationcookie;
 
         $result = $conn->query(
             "SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty`
              FROM `stc_purchase_product_adhoc`
              INNER JOIN `stc_shop` ON `stc_purchase_product_adhoc_id`=`adhoc_id`
-             WHERE `stc_purchase_product_adhoc_productid`=$productId
+             WHERE `stc_purchase_product_adhoc_productid`='$productId'
                AND `stc_purchase_product_adhoc_status`=1
                AND `shopname`='$shopName'
              ORDER BY `stc_purchase_product_adhoc_id` ASC"
