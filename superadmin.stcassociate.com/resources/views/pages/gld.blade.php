@@ -302,7 +302,6 @@
                   <option value="{{ $u->stc_trading_user_id }}">{{ $u->stc_trading_user_name }}</option>
                 @endforeach
               </select>
-              <small class="text-muted">Shown only when creating a new challan.</small>
             </div>
           </div>
           <div class="form-group mb-0" id="gld-wrap-created-date" style="display:none;">
@@ -535,6 +534,9 @@ $(function () {
     }
     $('#gld-f-status').val(String(d.status != null ? d.status : 0));
     $('#gld-f-agent_id').val(String(d.agent_id || 0));
+    if (d.created_by != null && d.created_by !== '') {
+      $('#gld-f-created_by').val(String(d.created_by));
+    }
     if (d.created_date) {
       $('#gld-f-created_date_ro').val(d.created_date);
       $('#gld-wrap-created-date').show();
@@ -605,7 +607,7 @@ $(function () {
     $.get("{{ url('/branch/stc/gld/get') }}", { id: id }, function (res) {
       if (res.success && res.data) {
         $('#gld-modal-form-title').html('<i class="fas fa-edit mr-2"></i> Edit challan #' + id);
-        $('#gld-wrap-created').hide();
+        $('#gld-wrap-created').show();
         $('#gld-f-created_by').prop('required', false);
         fillForm(res.data);
         $('#gld-modal-form').modal('show');

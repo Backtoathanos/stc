@@ -386,6 +386,7 @@ class GldChallanController extends Controller
             'payment_status' => 'nullable|integer',
             'agent_id' => 'nullable|integer',
             'status' => 'nullable|integer',
+            'created_by' => 'nullable|integer',
         ]);
 
         $id = (int) $request->id;
@@ -395,7 +396,7 @@ class GldChallanController extends Controller
 
         $paymentStatus = $this->normalizePaymentStatus($request->payment_status);
 
-        DB::table('gld_challan')->where('id', $id)->update([
+        $payload = [
             'product_id' => (int) $request->product_id,
             'adhoc_id' => (int) ($request->adhoc_id ?? 0),
             'cust_id' => (int) $request->cust_id,
@@ -410,7 +411,13 @@ class GldChallanController extends Controller
             'payment_status' => $paymentStatus,
             'agent_id' => (int) ($request->agent_id ?? 0),
             'status' => (int) ($request->status ?? 0),
-        ]);
+        ];
+
+        if ($request->filled('created_by')) {
+            $payload['created_by'] = (int) $request->created_by;
+        }
+
+        DB::table('gld_challan')->where('id', $id)->update($payload);
 
         return response()->json(['success' => true, 'message' => 'GLD challan updated successfully.']);
     }
