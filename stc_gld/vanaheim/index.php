@@ -186,15 +186,6 @@ function addCustomer($conn) {
         }
         $date = date('Y-m-d H:i:s');
         $adhoc_id=0;
-        // Link customer to the product and set the quantity
-        $shopName = (string)$locationcookie;
-        if (strpos($shopName, 'location_stc=') !== false) {
-            $parts = [];
-            parse_str($shopName, $parts);
-            if (isset($parts['location_stc']) && $parts['location_stc'] !== '') {
-                $shopName = $parts['location_stc'];
-            }
-        }
         $shopName = trim(urldecode($shopName));
 
         $stmt = $conn->prepare(
