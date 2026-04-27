@@ -163,7 +163,7 @@ function addCustomer($conn) {
         if (!$customerId) {
             // Check if a customer already exists with the given contact number or email
             $checkQuery = "SELECT gld_customer_id FROM gld_customer WHERE gld_customer_cont_no = '$customerContact'";
-            if (!empty($customerEmailEsc)) {
+            if (!empty($customerEmail)) {
                 $checkQuery .= " OR gld_customer_email = '$customerEmail'";
             }
             $result = $conn->query($checkQuery);

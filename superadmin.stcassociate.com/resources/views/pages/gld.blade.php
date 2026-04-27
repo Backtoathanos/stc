@@ -269,10 +269,10 @@
               <label class="modal-label" for="gld-f-payment_status">Payment status</label>
               <select class="form-control" id="gld-f-payment_status" name="payment_status">
                 <option value="">— Select —</option>
-                <option value="credit">Credit</option>
-                <option value="cash">Cash</option>
-                <option value="bank transfer">Bank transfer</option>
-                <option value="UPI">UPI</option>
+                <option value="1">Credit</option>
+                <option value="2">Cash</option>
+                <option value="3">Bank transfer</option>
+                <option value="4">UPI</option>
               </select>
             </div>
             <div class="form-group col-md-4">
@@ -367,7 +367,7 @@ $(function () {
       { data: 'rate' },
       { data: 'discount' },
       { data: 'paid_amount' },
-      { data: 'payment_status' },
+      { data: 'payment_status_label' },
       { data: 'agent_label', orderable: true, searchable: false },
       { data: 'status_badge', orderable: true, searchable: false },
       { data: 'created_date_fmt' },
@@ -567,7 +567,7 @@ $(function () {
       ['Rate', d.rate],
       ['Discount', d.discount],
       ['Paid amount', d.paid_amount],
-      ['Payment status', d.payment_status || '—'],
+      ['Payment status', d.payment_status_label || '—'],
       ['Agent', (d.agent_name || '—') + (d.agent_id ? ' <span class="text-muted">(id: ' + d.agent_id + ')</span>' : '')],
       ['Status code', d.status],
       ['Created date', d.created_date || '—'],

@@ -8,6 +8,53 @@ use Illuminate\Support\Str;
 
 class GldChallanController extends Controller
 {
+    private const PAYMENT_STATUS_MAP = [
+        0 => '',
+        1 => 'Credit',
+        2 => 'Cash',
+        3 => 'Bank transfer',
+        4 => 'UPI',
+    ];
+
+    private function normalizePaymentStatus($raw): int
+    {
+        if ($raw === null) {
+            return 0;
+        }
+
+        if (is_int($raw)) {
+            return $raw;
+        }
+
+        $s = trim((string) $raw);
+        if ($s === '') {
+            return 0;
+        }
+
+        if (is_numeric($s)) {
+            return (int) $s;
+        }
+
+        $key = strtolower($s);
+        $key = str_replace(['_', '-'], ' ', $key);
+        $key = preg_replace('/\s+/', ' ', $key);
+
+        $stringMap = [
+            'credit' => 1,
+            'cash' => 2,
+            'bank transfer' => 3,
+            'banktransfer' => 3,
+            'upi' => 4,
+        ];
+
+        return $stringMap[$key] ?? 0;
+    }
+
+    private function paymentStatusLabel(int $code): string
+    {
+        return self::PAYMENT_STATUS_MAP[$code] ?? ('Code ' . $code);
+    }
+
     private function baseQuery()
     {
         return DB::table('gld_challan as GC')
@@ -217,6 +264,8 @@ class GldChallanController extends Controller
             $agentLabel = $r->agent_name ? e($r->agent_name) : ($r->agent_id ? '<span class="text-muted">#' . (int) $r->agent_id . '</span>' : '—');
 
             $statusBadge = $this->statusBadgeHtml((int) $r->status);
+            $paymentCode = (int) ($r->payment_status ?? 0);
+            $paymentLabel = $this->paymentStatusLabel($paymentCode);
 
             $actionData = '
                 <div class="btn-group btn-group-sm">
@@ -239,7 +288,8 @@ class GldChallanController extends Controller
                 'rate' => $r->rate !== null ? number_format((float) $r->rate, 2) : '',
                 'discount' => $r->discount !== null ? number_format((float) $r->discount, 2) : '',
                 'paid_amount' => $r->paid_amount !== null ? number_format((float) $r->paid_amount, 2) : '',
-                'payment_status' => e($r->payment_status ?? ''),
+                'payment_status' => $paymentCode,
+                'payment_status_label' => e($paymentLabel),
                 'agent_label' => $agentLabel,
                 'status_badge' => $statusBadge,
                 'created_date_fmt' => $createdFmt,
@@ -268,6 +318,9 @@ class GldChallanController extends Controller
             return response()->json(['success' => false, 'message' => 'Record not found']);
         }
 
+        $row->payment_status = (int) ($row->payment_status ?? 0);
+        $row->payment_status_label = $this->paymentStatusLabel((int) $row->payment_status);
+
         return response()->json(['success' => true, 'data' => $row]);
     }
 
@@ -285,25 +338,27 @@ class GldChallanController extends Controller
             'rate' => 'nullable|numeric',
             'discount' => 'nullable|numeric',
             'paid_amount' => 'nullable|numeric',
-            'payment_status' => 'nullable|string|max:190',
+            'payment_status' => 'nullable',
             'agent_id' => 'nullable|integer',
             'status' => 'nullable|integer',
             'created_by' => 'required|integer',
         ]);
+
+        $paymentStatus = $this->normalizePaymentStatus($request->payment_status);
 
         DB::table('gld_challan')->insert([
             'product_id' => (int) $request->product_id,
             'adhoc_id' => (int) ($request->adhoc_id ?? 0),
             'cust_id' => (int) $request->cust_id,
             'requisition_id' => (int) ($request->requisition_id ?? 0),
-            'challan_number' => $request->challan_number ?? '',
-            'bill_number' => $request->bill_number ?? '',
-            'pdetails' => $request->pdetails ?? '',
+            'challan_number' => $request->filled('challan_number') ? (string) $request->challan_number : '',
+            'bill_number' => $request->filled('bill_number') ? (string) $request->bill_number : '',
+            'pdetails' => $request->filled('pdetails') ? (string) $request->pdetails : '',
             'qty' => $request->qty,
             'rate' => $request->rate ?? 0,
             'discount' => $request->discount ?? 0,
             'paid_amount' => $request->paid_amount ?? 0,
-            'payment_status' => $request->payment_status ?? '',
+            'payment_status' => $paymentStatus,
             'agent_id' => (int) ($request->agent_id ?? 0),
             'status' => (int) ($request->status ?? 0),
             'created_date' => now(),
@@ -328,7 +383,7 @@ class GldChallanController extends Controller
             'rate' => 'nullable|numeric',
             'discount' => 'nullable|numeric',
             'paid_amount' => 'nullable|numeric',
-            'payment_status' => 'nullable|string|max:190',
+            'payment_status' => 'nullable|integer',
             'agent_id' => 'nullable|integer',
             'status' => 'nullable|integer',
         ]);
@@ -338,19 +393,21 @@ class GldChallanController extends Controller
             return response()->json(['success' => false, 'message' => 'Record not found.']);
         }
 
+        $paymentStatus = $this->normalizePaymentStatus($request->payment_status);
+
         DB::table('gld_challan')->where('id', $id)->update([
             'product_id' => (int) $request->product_id,
             'adhoc_id' => (int) ($request->adhoc_id ?? 0),
             'cust_id' => (int) $request->cust_id,
             'requisition_id' => (int) ($request->requisition_id ?? 0),
-            'challan_number' => $request->challan_number ?? '',
-            'bill_number' => $request->bill_number ?? '',
-            'pdetails' => $request->pdetails ?? '',
+            'challan_number' => $request->filled('challan_number') ? (string) $request->challan_number : '',
+            'bill_number' => $request->filled('bill_number') ? (string) $request->bill_number : '',
+            'pdetails' => $request->filled('pdetails') ? (string) $request->pdetails : '',
             'qty' => $request->qty,
             'rate' => $request->rate ?? 0,
             'discount' => $request->discount ?? 0,
             'paid_amount' => $request->paid_amount ?? 0,
-            'payment_status' => $request->payment_status ?? '',
+            'payment_status' => $paymentStatus,
             'agent_id' => (int) ($request->agent_id ?? 0),
             'status' => (int) ($request->status ?? 0),
         ]);
