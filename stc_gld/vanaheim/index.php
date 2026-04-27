@@ -186,26 +186,21 @@ function addCustomer($conn) {
         }
         $date = date('Y-m-d H:i:s');
         $adhoc_id=0;
-        $shopName = trim(urldecode($shopName));
+        $shopName = $shopName;
 
-        $stmt = $conn->prepare(
+        $result = $conn->query(
             "SELECT `stc_purchase_product_adhoc_id`, `stc_purchase_product_adhoc_qty`
              FROM `stc_purchase_product_adhoc`
              INNER JOIN `stc_shop` ON `stc_purchase_product_adhoc_id`=`adhoc_id`
-             WHERE `stc_purchase_product_adhoc_productid`=?
+             WHERE `stc_purchase_product_adhoc_productid`=$productId
                AND `stc_purchase_product_adhoc_status`=1
-               AND `shopname`=?
+               AND `shopname`='$shopName'
              ORDER BY `stc_purchase_product_adhoc_id` ASC"
         );
-        if (!$stmt) {
+        if (!$result) {
             echo json_encode(['success' => false, 'message' => 'Failed to prepare stock query']);
             return;
         }
-        $productIdStr = (string)$productId;
-        $stmt->bind_param("ss", $productIdStr, $shopName);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
         while ($row = $result->fetch_assoc()) {
             $delivered=0;
             $sql_qry=$conn->query("
@@ -233,7 +228,7 @@ function addCustomer($conn) {
                 break;
             }
         }
-        $stmt->close();
+        $result->close();
         if($adhoc_id>0){
             $productQuery = "INSERT INTO gld_challan (cust_id, requisition_id, adhoc_id, product_id, qty, rate, discount, agent_id, pdetails, created_date, created_by) VALUES ('$customerId', '$requisition', '$adhoc_id', '$productId', '$quantity', '$rate', '$discount', '$agentId', '$pdetails', '$date', '$userId')";
             if ($conn->query($productQuery)) {
