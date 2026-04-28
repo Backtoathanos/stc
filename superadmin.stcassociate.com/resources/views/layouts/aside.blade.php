@@ -212,12 +212,12 @@
               <p>Users</p>
             </a>
           </li>
-          <li class="nav-item">
+          <!-- <li class="nav-item">
             <a href="{{ url('/db-sync') }}" class="nav-link @if(request()->path() === 'db-sync') active @endif">
               <i class="nav-icon fas fa-sync"></i>
               <p>DB Sync</p>
             </a>
-          </li>
+          </li> -->
           <li class="nav-item">
             <a href="{{ url('/users/admin') }}" class="nav-link @if(\Illuminate\Support\Str::startsWith(request()->path(), 'users/admin')) active @endif">
               <i class="nav-icon far fa-user-circle"></i>

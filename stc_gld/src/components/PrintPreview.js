@@ -73,8 +73,8 @@ const PrintPreview = () => {
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
                     {/* Left 50% for Challan No */}
                     <div style={{ width: '50%', textAlign: 'left' }}>
-                        <p>{queryParams.get('status') === 'billed' ? 'Invoice' : 'Challan'} No: {challanDetails?.challan_number}</p>
-                        <p>{queryParams.get('status') === 'billed' ? 'Invoice' : 'Challan'} Date: {challanDetails?.challan_date ? formatDate(challanDetails.challan_date) : ''}</p>
+                        <p>{queryParams.get('status') === 'billed' ? 'Invoice' : 'Delivery Challan'} No: {challanDetails?.challan_number}</p>
+                        <p>{queryParams.get('status') === 'billed' ? 'Invoice' : 'Delivery Challan'} Date: {challanDetails?.challan_date ? formatDate(challanDetails.challan_date) : ''}</p>
                     </div>
 
                     {/* Right 50% for Customer Info */}

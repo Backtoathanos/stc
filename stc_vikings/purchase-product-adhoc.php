@@ -179,6 +179,222 @@ include("kattegat/role_check.php");
           color: #007bff;
       }
 
+      /* Purchase adhoc search bar: merged input + icon button */
+      .stc-poa-searchbar {
+          width: 100%;
+      }
+      .stc-poa-searchbar > .form-control {
+          height: 38px;
+          line-height: 38px;
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+      }
+      .stc-poa-searchbar > .input-group-btn > .btn.stc-poa-search-btn {
+          height: 38px;
+          line-height: 38px;
+          padding: 0 14px;
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+      }
+      .stc-poa-searchbar > .input-group-btn > .btn.stc-poa-search-btn i {
+          font-size: 16px;
+      }
+
+      /* Advanced search modal layout fixes */
+      .bd-modal-adhoc-advanced-search .stc-adv-header {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-header-icon {
+          width: 38px;
+          height: 38px;
+          border-radius: 10px;
+          background: rgba(63,106,216,0.10);
+          color: #3f6ad8;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: 0 0 auto;
+          margin-top: 2px;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-header-title {
+          margin: 0;
+          font-size: 18px;
+          font-weight: 700;
+          color: #1f2d3d;
+          line-height: 1.2;
+      }
+      .bd-modal-adhoc-advanced-search .modal-content {
+          border-radius: 10px;
+          overflow: hidden;
+          border: 0;
+          box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+      }
+      .bd-modal-adhoc-advanced-search .modal-header {
+          background: linear-gradient(90deg, #f7fbff, #ffffff);
+          border-bottom: 1px solid #eef2f6;
+          padding: 14px 16px;
+          display: flex;
+          align-items: flex-start;
+      }
+      .bd-modal-adhoc-advanced-search .modal-header .close {
+          font-size: 26px;
+          opacity: 0.6;
+          margin-left: auto;
+      }
+      .bd-modal-adhoc-advanced-search .modal-header .close:hover {
+          opacity: 0.9;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-subtitle {
+          margin-top: 4px;
+          color: #6c757d;
+          font-size: 12px;
+      }
+      .bd-modal-adhoc-advanced-search .modal-body .form-group {
+          margin-bottom: 14px;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-field-label {
+          display: block;
+          margin: 0;
+          font-weight: 600;
+          line-height: 1.2;
+      }
+      .bd-modal-adhoc-advanced-search .modal-body .form-control {
+          height: 38px;
+      }
+      .bd-modal-adhoc-advanced-search .modal-body {
+          background: #fbfcfe;
+          padding: 16px;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-grid {
+          display: flex;
+          flex-wrap: wrap;
+          margin: -8px;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-col {
+          padding: 8px;
+          width: 50%;
+      }
+      @media (max-width: 767px) {
+          .bd-modal-adhoc-advanced-search .stc-adv-col { width: 100%; }
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-field {
+          background: #fff;
+          border: 1px solid #eef2f6;
+          border-radius: 10px;
+          padding: 12px;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-label {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 8px;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-label i {
+          color: #3f6ad8;
+          width: 16px;
+          text-align: center;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-actions {
+          display: flex;
+          gap: 10px;
+          justify-content: flex-end;
+          padding: 12px 16px;
+          border-top: 1px solid #eef2f6;
+          background: #fff;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-actions .btn {
+          border-radius: 8px;
+          padding: 9px 14px;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-clear-inline {
+          margin-right: auto;
+      }
+      .bd-modal-adhoc-advanced-search .stc-adv-clear-inline.btn {
+          background: #f5f7fb;
+          border-color: #e6ebf3;
+      }
+
+      /* Horizontal scroll for wide result tables */
+      .stc-table-scroll {
+          display: block;
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+          overflow-x: auto;
+          overflow-y: hidden;
+          -webkit-overflow-scrolling: touch;
+          box-sizing: border-box;
+      }
+      .stc-table-scroll table {
+          min-width: 1200px;
+          width: auto;
+          table-layout: auto;
+      }
+      .stc-table-scroll th,
+      /* .stc-table-scroll td {
+          white-space: nowrap;
+      } */
+      .stc-view-purchase-order-form {
+          max-width: 100%;
+          overflow: visible;
+      }
+
+      /* Columns dropdown: clean ul/li list */
+      #stc-poa-columns-menu {
+          min-width: 420px !important;
+          max-width: 520px;
+          padding: 10px 12px !important;
+      }
+      #stc-poa-columns-menu-items .stc-poa-col-ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+          max-height: 260px;
+          overflow: auto;
+          position: static !important;
+      }
+      #stc-poa-columns-menu-items .stc-poa-col-li {
+          padding: 0;
+          margin: 0;
+          position: static !important;
+          float: none !important;
+          clear: both;
+          width: 100%;
+      }
+      #stc-poa-columns-menu-items .stc-poa-col-li:first-child {
+          margin-top: 5px;
+      }
+      #stc-poa-columns-menu-items .stc-poa-col-item {
+          display: flex;
+          gap: 10px;
+          align-items: flex-start;
+          padding: 6px 6px;
+          margin: 0;
+          font-weight: normal;
+          cursor: pointer;
+          user-select: none;
+          position: static !important;
+          float: none !important;
+          width: 100%;
+      }
+      #stc-poa-columns-menu-items .stc-poa-col-item:hover {
+          background: #f7f7f7;
+      }
+      #stc-poa-columns-menu-items .stc-poa-col-item input[type="checkbox"] {
+          margin: 2px 0 0 0;
+          flex: 0 0 auto;
+      }
+      #stc-poa-columns-menu-items .stc-poa-col-label {
+          flex: 1 1 auto;
+          min-width: 0;
+          white-space: normal;
+          word-break: break-word;
+          overflow-wrap: anywhere;
+          line-height: 1.25;
+      }
+
       .autocomplete-item-name {
           font-weight: 600;
           color: #333;
@@ -188,6 +404,38 @@ include("kattegat/role_check.php");
           font-size: 12px;
           color: #666;
           margin-top: 3px;
+      }
+
+      /* Typeahead dropdown (ul/li) */
+      .stc-typeahead-wrap {
+          position: relative;
+      }
+      .stc-typeahead-list {
+          position: absolute;
+          top: calc(100% + 2px);
+          left: 0;
+          right: 0;
+          z-index: 2000;
+          background: #fff;
+          border: 1px solid #e6ebf3;
+          border-radius: 10px;
+          box-shadow: 0 10px 22px rgba(0,0,0,0.12);
+          max-height: 240px;
+          overflow: auto;
+          padding: 6px 0;
+          margin: 0;
+          list-style: none;
+          display: none;
+      }
+      .stc-typeahead-item {
+          padding: 8px 12px;
+          cursor: pointer;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+      }
+      .stc-typeahead-item:hover {
+          background: #f5f7fb;
       }
     </style>
 </head>
@@ -217,17 +465,7 @@ include("kattegat/role_check.php");
                             ?>
                         </ul>
                         <div class="tab-content">
-                            <div class="tab-pane tabs-animation fade" id="tab-content-1" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <div class="card-border mb-3 card card-body border-success">
-                                            <h5
-                                              for="description" align="center"
-                                              >Purchase Order Adhoc
-                                            </h5>
-                                        </div>
-                                    </div>
-                                </div>                                
+                            <div class="tab-pane tabs-animation fade" id="tab-content-1" role="tabpanel">                            
                                 <div class="row">
                                     <div class="col-xl-12 col-md-12 col-sm-12">
                                         <form action="" class="stc-add-poadhoc-product-form">
@@ -450,97 +688,112 @@ include("kattegat/role_check.php");
                                 </div>
                             </div>
                             <div class="tab-pane tabs-animation fade show active" id="tab-content-2" role="tabpanel">
-                                <div class="row">
-                                    <div class="col-xl-12 col-lg-12 col-md-12">
-                                        <div class="card-border mb-3 card card-body border-success">
-                                            <h5
-                                              for="description" align="center"
-                                              >View Purchase Order Adhoc
-                                            </h5>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="row stc-view-product-row">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
                                       <div class="row mb-3">
-                                        <div class="col-md-3 text-right">
-                                          <a class="btn btn-secondary form-control" data-toggle="modal" data-target=".bd-modal-inventoryshow" href="javascript:void(0)">View Inventory</a>
+                                        <div class="col-4 col-sm-12 text-left">
+                                          <div class="btn-group" role="group" aria-label="Quick actions">
+                                            <a
+                                              class="btn btn-sm btn-outline-secondary"
+                                              data-toggle="modal"
+                                              data-target=".bd-modal-inventoryshow"
+                                              href="javascript:void(0)"
+                                              title="View Inventory"
+                                              aria-label="View Inventory"
+                                              style="font-size: 25px;"
+                                            ><i class="fa fa-cubes" aria-hidden="true"></i></a>
+                                            <a
+                                              class="btn btn-sm btn-outline-success"
+                                              data-toggle="modal"
+                                              data-target=".bd-modal-ledgershow"
+                                              href="javascript:void(0)"
+                                              title="View Ledger"
+                                              aria-label="View Ledger"
+                                              style="font-size: 25px;"
+                                            ><i class="fa fa-book" aria-hidden="true"></i></a>
+                                            <a
+                                              class="btn btn-sm btn-outline-danger"
+                                              data-toggle="modal"
+                                              data-target=".bd-modal-pendingshow"
+                                              href="javascript:void(0)"
+                                              title="View Adjustments"
+                                              aria-label="View Adjustments"
+                                              style="font-size: 25px;"
+                                            ><i class="fa fa-sliders" aria-hidden="true"></i></a>
+                                            <a
+                                              class="btn btn-sm btn-outline-primary reset-items"
+                                              href="javascript:void(0)"
+                                              title="Reset Items"
+                                              aria-label="Reset Items"
+                                              style="font-size: 25px;"
+                                            ><i class="fa fa-refresh" aria-hidden="true"></i></a>
+                                          </div>
                                         </div>
-                                        <div class="col-md-3 text-right">
-                                          <a class="btn btn-success form-control" data-toggle="modal" data-target=".bd-modal-ledgershow" href="javascript:void(0)">View Ledger</a>
+
+                                        <div class="col-md-3 col-sm-6 mb-2">
+                                          <button
+                                            type="button"
+                                            class="btn btn-primary btn-block"
+                                            data-toggle="modal"
+                                            data-target=".bd-modal-adhoc-advanced-search"
+                                          >
+                                            <i class="fa fa-filter" aria-hidden="true"></i> Advanced search
+                                          </button>
                                         </div>
-                                        <div class="col-md-3 text-right">
-                                          <a class="btn btn-danger form-control" data-toggle="modal" data-target=".bd-modal-pendingshow" href="javascript:void(0)">View Adjustments</a>
-                                        </div>
-                                        <div class="col-md-3 text-right">
-                                          <a class="btn btn-primary form-control reset-items" href="javascript:void(0)">Reset Items</a>
+
+                                        <div class="col-md-3 col-sm-6 mb-2">
+                                          <div class="dropdown">
+                                            <button
+                                              class="btn btn-success btn-block dropdown-toggle"
+                                              type="button"
+                                              id="stc-poa-columns-btn"
+                                              data-toggle="dropdown"
+                                              aria-haspopup="true"
+                                              aria-expanded="false"
+                                            >
+                                              <i class="fa fa-columns" aria-hidden="true"></i> Columns <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="stc-poa-columns-btn" id="stc-poa-columns-menu">
+                                              <li style="padding: 2px 0;"><strong>Show / hide columns</strong></li>
+                                              <li role="separator" class="divider"></li>
+                                              <li style="padding: 0;">
+                                                <div id="stc-poa-columns-menu-items"></div>
+                                              </li>
+                                            </ul>
+                                          </div>
                                         </div>
                                       </div>
-                                      <form action="" class="stc-view-product-form">
-                                          <table class="table table-hover table-bordered">
-                                            <thead>
-                                              <tr>
-                                                <th scope="col" class="text-center">By Item Desc</th>
-                                                <th scope="col" class="text-center">By Source/Destination (Location) </th>
-                                                <th scope="col" class="text-center">By Rack</th>
-                                                <th scope="col" class="text-center">By Status</th>
-                                                <th scope="col" class="text-center">Action</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              <tr>
-                                                <td>
-                                                  <input 
-                                                    type="text"
-                                                    class="form-control stc-poa-searchbyitem"
-                                                    id="stc-poa-searchbyitem"
-                                                    placeholder="Item name" 
-                                                  >
-                                                </td>
-                                                <td>
-                                                  <input 
-                                                    type="text" 
-                                                    id="tc-poa-searchbydourcedestination" 
-                                                    class="form-control"
-                                                    placeholder="Source/destination (Location)" 
-                                                  >
-                                                </td>
-                                                <td>
-                                                  <input 
-                                                    type="text" 
-                                                    class="form-control tc-poa-searchbyrack"
-                                                    placeholder="Rack" 
-                                                  >
-                                                </td>
-                                                <td>
-                                                  <select 
-                                                    class="custom-select form-control stc-po-status-in"
-                                                    >
-                                                    <option value="NA">Select Status</option>
-                                                    <option value="1">Stock</option>
-                                                    <option value="2">Dispatched</option>
-                                                    <option value="3">Pending</option>
-                                                    <option value="4">Approved</option>
-                                                    <option value="5">Rejected</option>
-                                                  </select>
-                                                </td>
-                                                <td>
-                                                  <a class="btn btn-success stc-adhocpo-find" href="javascript:void(0)">Find</a>
-                                                </td>
-                                              </tr>
-                                            </tbody>
-                                          </table>
-                                      </form>
+                                      <div class="row" style="align-items: center;">
+                                        <div class="col-md-6 col-sm-12 mb-2">
+                                          <div class="input-group stc-poa-searchbar">
+                                            <input
+                                              type="text"
+                                              class="form-control stc-poa-searchbyitem"
+                                              id="stc-poa-searchbyitem"
+                                              placeholder="Search item name…"
+                                            >
+                                            <span class="input-group-btn">
+                                              <button type="button" class="btn btn-success stc-adhocpo-find stc-poa-search-btn" title="Search" aria-label="Search">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                              </button>
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <!-- Advanced search modal lives near page bottom -->
                                     </div>
                                   </div>
                                 </div>
-                                <div class="row stc-view-purchase-row">
+                                <div class="row stc-view-purchase-row" style="overflow-x: auto;">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
-                                      <form action="" class="stc-view-purchase-order-form" style="overflow-x: auto; width: 100%;">
-                                          <table class="table table-hover table-bordered stc-purchase-view-table">
+                                      <form action="" class="stc-view-purchase-order-form">
+                                        <div class="stc-table-scroll">
+                                          <table class="table table-hover table-bordered stc-purchase-view-table" id="stc-poadhoc-results-table">
                                             <thead>
+                                              <tr>
                                               <th>
                                                 <input type="checkbox" id="selectAllCheckbox" class="form-control" style="width: 20px; height: 20px; margin: 0 auto; display: block;">
                                                 <br>Sl No.
@@ -564,12 +817,14 @@ include("kattegat/role_check.php");
                                               <th>Status</th>
                                               <th>Remarks</th>
                                               <th>Action</th>
+                                              </tr>
                                             </thead>
                                             <tbody class="stc-call-view-poadhoc-row">
                                               <tr><td colspan="8">Search</td></tr>
                                             </tbody>
                                           </table>
-                                          <div id="pagination"></div>
+                                        </div>
+                                        <div id="pagination"></div>
                                       </form>
                                     </div>
                                   </div>
@@ -599,6 +854,52 @@ include("kattegat/role_check.php");
 
         $(document).ready(function(){
           const urlParams = new URLSearchParams(window.location.search);
+
+          function stcSyncPurchaseRowWidthPx() {
+            var $row = $('.stc-view-purchase-row');
+            if (!$row.length) return;
+
+            // Prefer the inner content container width (responsive to sidebar toggle).
+            var $container = $row.closest('.app-main__inner');
+            var w = ($container.length ? $container.innerWidth() : $(window).width());
+            if (!w || isNaN(w)) return;
+
+            // Keep a tiny safety padding so it never pushes beyond viewport.
+            w = Math.max(320, Math.floor(w - 2));
+
+            // Match sidebar-persist.js persistence (localStorage key).
+            // If sidebar is closed, we can safely show a bit more table width.
+            var sidebarClosed = false;
+            try { sidebarClosed = (localStorage.getItem('stc_sidebar_closed') === '1'); } catch (e) {}
+            // Fallback: class on the container (what sidebar-persist.js toggles)
+            if (!sidebarClosed) {
+              sidebarClosed = $('.app-container').hasClass('closed-sidebar');
+            }
+            if (sidebarClosed) {
+              w = w + 200;
+            }
+            $row.css('width', w + 'px');
+          }
+
+          // Run now + on resize
+          stcSyncPurchaseRowWidthPx();
+          $(window).on('resize', function() {
+            stcSyncPurchaseRowWidthPx();
+          });
+
+          // Sidebar toggle often changes body classes; observe and resync.
+          try {
+            var target = document.body;
+            var obs = new MutationObserver(function(mutations) {
+              for (var i = 0; i < mutations.length; i++) {
+                if (mutations[i].attributeName === 'class') {
+                  stcSyncPurchaseRowWidthPx();
+                  break;
+                }
+              }
+            });
+            obs.observe(target, { attributes: true });
+          } catch (e) {}
           // Handle input/focus for each search input
           $(document).on('input focus', '.search-input', function () {
               var $container = $(this).closest('.searchable-dropdown');
@@ -749,9 +1050,15 @@ include("kattegat/role_check.php");
                           data: {
                               stc_call_poadhoc: 1,
                               itemname: $('#stc-poa-searchbyitem').val(),
+                              adhoc_id: $('#stc-adv-adhoc-id').val(),
+                              product_id: $('#stc-adv-product-id').val(),
+                              product_name: $('#stc-adv-product-name').val(),
+                              adhoc_name: $('#stc-adv-adhoc-name').val(),
                               sourcedestination: $('#tc-poa-searchbydourcedestination').val(),
                               byrack: $('.tc-poa-searchbyrack').val(),
                               status: $('.stc-po-status-in').val(),
+                              received_by: $('#stc-adv-received-by').val(),
+                              remarks: $('#stc-adv-remarks').val(),
                               page: page,
                               pageSize: config.pageSize
                           },
@@ -879,6 +1186,339 @@ include("kattegat/role_check.php");
             Pagination.loadData(currentPage);
           });
 
+          // Trigger search on Enter in the main search box
+          $('body').delegate('#stc-poa-searchbyitem', 'keydown', function(e) {
+            if (e.keyCode === 13) {
+              e.preventDefault();
+              $('.stc-adhocpo-find').trigger('click');
+            }
+          });
+
+          // Advanced search apply / clear
+          $('body').delegate('.stc-adhocpo-adv-apply', 'click', function(e) {
+            e.preventDefault();
+            var $advModal = $('.bd-modal-adhoc-advanced-search');
+            // Sometimes backdrop gets "stuck" if an Ajax refresh happens mid-hide.
+            $advModal.one('hidden.bs.modal', function() {
+              $('body').removeClass('modal-open').css('padding-right', '');
+              $('.modal-backdrop').remove();
+            });
+            $advModal.modal('hide');
+            currentPage = 1;
+            Pagination.loadData(currentPage);
+          });
+          $('body').delegate('.stc-adhocpo-adv-clear', 'click', function(e) {
+            e.preventDefault();
+            $('#stc-adv-adhoc-id').val('');
+            $('#stc-adv-product-id').val('');
+            $('#stc-adv-product-name').val('');
+            $('#stc-adv-adhoc-name').val('');
+            $('#stc-adv-received-by').val('');
+            $('#stc-adv-remarks').val('');
+            $('#tc-poa-searchbydourcedestination').val('');
+            $('.tc-poa-searchbyrack').val('');
+            $('.stc-po-status-in').val('NA');
+          });
+
+          // Safety net: if any modal leaves a stray backdrop, clean it.
+          $(document).on('hidden.bs.modal', function() {
+            if ($('.modal.in').length === 0) {
+              $('body').removeClass('modal-open').css('padding-right', '');
+              $('.modal-backdrop').remove();
+            }
+          });
+
+          // Columns show/hide dropdown
+          function stcSetCookie(name, value, days) {
+            var expires = '';
+            if (days) {
+              var date = new Date();
+              date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+              expires = '; expires=' + date.toUTCString();
+            }
+            document.cookie = name + '=' + encodeURIComponent(value || '') + expires + '; path=/';
+          }
+          function stcGetCookie(name) {
+            var nameEQ = name + '=';
+            var ca = document.cookie.split(';');
+            for (var i = 0; i < ca.length; i++) {
+              var c = ca[i];
+              while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+              if (c.indexOf(nameEQ) === 0) return decodeURIComponent(c.substring(nameEQ.length, c.length));
+            }
+            return null;
+          }
+
+          function initPoaColumnChooser() {
+            var $table = $('#stc-poadhoc-results-table');
+            var $itemsHost = $('#stc-poa-columns-menu-items');
+            if (!$table.length || !$itemsHost.length) return;
+
+            // Build only once
+            if ($itemsHost.data('built') === 1) return;
+            $itemsHost.data('built', 1);
+
+            var cookieKey = 'stc_poadhoc_cols_v1';
+            var storedRaw = stcGetCookie(cookieKey);
+            var stored = null;
+            try { stored = storedRaw ? JSON.parse(storedRaw) : null; } catch (e) { stored = null; }
+
+            function normalizeLabel(s) {
+              return $.trim(String(s || '').replace(/\s+/g, ' ').toLowerCase());
+            }
+
+            // Default hidden columns (applied only when there is no cookie yet)
+            var defaultHidden = {};
+            [
+              'purchase rate profit % / sale rate',
+              'shop',
+              'dispatch details',
+              'from source (supplier/location) to destination (location)',
+              'condition',
+              'remarks'
+            ].forEach(function(lbl) { defaultHidden[normalizeLabel(lbl)] = true; });
+
+            // Employee-specific column restrictions (hide + remove from chooser)
+            var stcEmpId = <?php echo isset($_SESSION['stc_empl_id']) ? (int)$_SESSION['stc_empl_id'] : 0; ?>;
+            var stcRestrictRateCol = (stcEmpId === 19 || stcEmpId === 20);
+
+            var $ths = $table.find('thead th');
+            var html = '<ul class="stc-poa-col-ul" role="menu">';
+            $ths.each(function(i) {
+              var idx = i + 1; // nth-child is 1-based
+
+              // Remove Sl No (first column) from chooser
+              if (idx === 1) return;
+
+              var $thClone = $(this).clone();
+              $thClone.find('input, br').remove();
+              var label = $.trim($thClone.text().replace(/\s+/g, ' '));
+              if (!label) label = 'Column ' + idx;
+
+              var norm = normalizeLabel(label);
+              // For employees 19 & 20, completely skip the rate column in chooser and force-hide it.
+              if (stcRestrictRateCol && idx === 9) {
+                setPoaColumnVisible(idx, false);
+                return;
+              }
+
+              var isVisible;
+              if (stored && typeof stored[idx] !== 'undefined') {
+                isVisible = !!stored[idx];
+              } else {
+                isVisible = !defaultHidden[norm];
+              }
+              html += '' +
+                '<li class="stc-poa-col-li" role="none">' +
+                  '<label class="stc-poa-col-item" role="menuitemcheckbox" aria-checked="' + (isVisible ? 'true' : 'false') + '">' +
+                    '<input type="checkbox" class="stc-poa-col-toggle" data-col="' + idx + '" ' + (isVisible ? 'checked' : '') + '>' +
+                    '<span class="stc-poa-col-label">' + escapeHtml(label) + '</span>' +
+                  '</label>' +
+                '</li>';
+            });
+            html += '</ul>';
+            $itemsHost.html(html);
+
+            // Apply initial visibility state (cookie or defaults)
+            $itemsHost.find('.stc-poa-col-toggle').each(function() {
+              var colIdx = parseInt($(this).data('col'), 10);
+              setPoaColumnVisible(colIdx, $(this).is(':checked'));
+            });
+
+            // If no cookie existed yet, persist the defaults now
+            if (!stored) {
+              var toStore = {};
+              $itemsHost.find('.stc-poa-col-toggle').each(function() {
+                var colIdx = parseInt($(this).data('col'), 10);
+                toStore[colIdx] = $(this).is(':checked');
+              });
+              stcSetCookie(cookieKey, JSON.stringify(toStore), 365);
+            }
+
+            // Prevent dropdown close on checkbox click
+            $('#stc-poa-columns-menu').on('click', function(ev) {
+              ev.stopPropagation();
+            });
+          }
+
+          function setPoaColumnVisible(colIdx, isVisible) {
+            var $table = $('#stc-poadhoc-results-table');
+            if (!$table.length) return;
+            var displayValue = isVisible ? '' : 'none';
+            $table.find('thead th:nth-child(' + colIdx + ')').css('display', displayValue);
+            $table.find('tbody tr').each(function() {
+              $(this).find('td:nth-child(' + colIdx + ')').css('display', displayValue);
+            });
+          }
+
+          function applyPoaColumnVisibilityToTable() {
+            var $table = $('#stc-poadhoc-results-table');
+            if (!$table.length) return;
+
+            var stcEmpId = <?php echo isset($_SESSION['stc_empl_id']) ? (int)$_SESSION['stc_empl_id'] : 0; ?>;
+            var stcRestrictRateCol = (stcEmpId === 19 || stcEmpId === 20);
+
+            // Prefer current UI state if chooser exists; fallback to cookie.
+            var $toggles = $('#stc-poa-columns-menu-items .stc-poa-col-toggle');
+            if ($toggles.length) {
+              $toggles.each(function() {
+                var colIdx = parseInt($(this).data('col'), 10);
+                setPoaColumnVisible(colIdx, $(this).is(':checked'));
+              });
+
+              // Employee-specific: even though column is not in chooser, force-hide its TDs too.
+              if (stcRestrictRateCol) {
+                setPoaColumnVisible(9, false);
+              }
+              return;
+            }
+
+            // Employee-specific: force-hide rate column for 19 & 20.
+            if (stcRestrictRateCol) {
+              // Rate column is 9th in current table layout (Purchase Rate / Profit % / Sale Rate)
+              setPoaColumnVisible(9, false);
+            }
+
+            var cookieKey = 'stc_poadhoc_cols_v1';
+            var storedRaw = stcGetCookie(cookieKey);
+            var stored = null;
+            try { stored = storedRaw ? JSON.parse(storedRaw) : null; } catch (e) { stored = null; }
+            if (!stored) return;
+
+            Object.keys(stored).forEach(function(k) {
+              var colIdx = parseInt(k, 10);
+              if (!isNaN(colIdx)) setPoaColumnVisible(colIdx, !!stored[k]);
+            });
+          }
+
+          function stcUnique(arr) {
+            var out = [];
+            var seen = {};
+            for (var i = 0; i < arr.length; i++) {
+              var v = String(arr[i] || '').trim();
+              if (!v) continue;
+              var key = v.toLowerCase();
+              if (seen[key]) continue;
+              seen[key] = 1;
+              out.push(v);
+            }
+            return out;
+          }
+
+          function stcGetColumnTextValues(colIdx, splitLines) {
+            var $table = $('#stc-poadhoc-results-table');
+            if (!$table.length) return [];
+            var values = [];
+            $table.find('tbody tr').each(function() {
+              var $td = $(this).find('td:nth-child(' + colIdx + ')');
+              if (!$td.length) return;
+              var raw = $td.text().replace(/\s+/g, ' ').trim();
+              if (!raw) return;
+              if (splitLines) {
+                // Try to split source/destination cell into parts (source + destination)
+                // Keep meaningful chunks by splitting on arrows/bullets and collapsing.
+                var parts = raw
+                  .replace(/➤/g, '|')
+                  .replace(/►/g, '|')
+                  .split('|')
+                  .map(function(s){ return s.replace(/\s+/g, ' ').trim(); })
+                  .filter(Boolean);
+                if (parts.length) values = values.concat(parts);
+                else values.push(raw);
+              } else {
+                values.push(raw);
+              }
+            });
+            return stcUnique(values);
+          }
+
+          function stcRenderTypeahead($input, $list, allValues) {
+            var term = String($input.val() || '').trim().toLowerCase();
+            var filtered = allValues.filter(function(v) {
+              return !term || v.toLowerCase().indexOf(term) !== -1;
+            }).slice(0, 25);
+
+            if (!filtered.length) {
+              $list.hide().empty();
+              return;
+            }
+
+            var html = '';
+            filtered.forEach(function(v) {
+              html += '<li class="stc-typeahead-item" data-value="' + escapeHtml(v) + '">' + escapeHtml(v) + '</li>';
+            });
+            $list.html(html).show();
+          }
+
+          function stcInitTypeaheads() {
+            var $rackInput = $('#stc-poa-by-rack');
+            var $rackList = $('#stc-typeahead-rack');
+            var $locInput = $('#tc-poa-searchbydourcedestination');
+            var $locList = $('#stc-typeahead-location');
+
+            if ($rackInput.length && $rackList.length) {
+              var rackValues = stcGetColumnTextValues(6, false); // Rack column
+              $rackInput.off('.stcTypeahead').on('focus.stcTypeahead input.stcTypeahead', function() {
+                rackValues = stcGetColumnTextValues(6, false);
+                stcRenderTypeahead($rackInput, $rackList, rackValues);
+              });
+              $rackList.off('.stcTypeahead').on('click.stcTypeahead', '.stc-typeahead-item', function() {
+                $rackInput.val($(this).data('value'));
+                $rackList.hide().empty();
+              });
+            }
+
+            if ($locInput.length && $locList.length) {
+              var locValues = stcGetColumnTextValues(13, true); // Source/Destination column
+              $locInput.off('.stcTypeahead').on('focus.stcTypeahead input.stcTypeahead', function() {
+                locValues = stcGetColumnTextValues(13, true);
+                stcRenderTypeahead($locInput, $locList, locValues);
+              });
+              $locList.off('.stcTypeahead').on('click.stcTypeahead', '.stc-typeahead-item', function() {
+                $locInput.val($(this).data('value'));
+                $locList.hide().empty();
+              });
+            }
+          }
+
+          // Build chooser after initial table exists and after each data reload
+          initPoaColumnChooser();
+          applyPoaColumnVisibilityToTable();
+          stcInitTypeaheads();
+          var originalLoadData = Pagination.loadData.bind(Pagination);
+          Pagination.loadData = function(page) {
+            return originalLoadData(page);
+          };
+          // Rebuild chooser after Ajax updates table body (once headers exist)
+          $(document).ajaxComplete(function() {
+            initPoaColumnChooser();
+            // Re-apply column visibility to newly loaded dynamic <td> cells.
+            applyPoaColumnVisibilityToTable();
+            // Refresh typeahead sources after table updates.
+            stcInitTypeaheads();
+          });
+
+          // Hide typeahead lists when clicking outside
+          $(document).on('click', function(e) {
+            if (!$(e.target).closest('.stc-typeahead-wrap').length) {
+              $('.stc-typeahead-list').hide().empty();
+            }
+          });
+
+          $('body').delegate('.stc-poa-col-toggle', 'change', function() {
+            var colIdx = parseInt($(this).data('col'), 10);
+            setPoaColumnVisible(colIdx, $(this).is(':checked'));
+            $(this).closest('.stc-poa-col-item').attr('aria-checked', $(this).is(':checked') ? 'true' : 'false');
+
+            // Persist to cookie
+            var cookieKey = 'stc_poadhoc_cols_v1';
+            var storedRaw = stcGetCookie(cookieKey);
+            var stored = {};
+            try { stored = storedRaw ? JSON.parse(storedRaw) : {}; } catch (e) { stored = {}; }
+            stored[colIdx] = $(this).is(':checked');
+            stcSetCookie(cookieKey, JSON.stringify(stored), 365);
+          });
+
           
           $('body').delegate('.get-dispatch-details', 'click', function(e){
             var poaid=$(this).attr('id');
@@ -946,12 +1586,13 @@ include("kattegat/role_check.php");
                           $.each(response.data, function(index, item) {
                               var li = $('<li></li>');
                               var itemName = item.itemname || 'N/A';
+                              var productid = item.productid || 'N/A';
                               var unit = item.unit || 'N/A';
                               var rate = item.rate || '0';
                               
                               li.html(
                                   '<div class="autocomplete-item-name">' + itemName + '</div>' +
-                                  '<div class="autocomplete-item-details">' + unit + ' / ' + rate + '</div>'
+                                  '<div class="autocomplete-item-details">' + productid + ' / ' + unit + ' / ' + rate + '</div>'
                               );
                               li.data('item', item);
                               li.on('click', function() {
@@ -959,6 +1600,7 @@ include("kattegat/role_check.php");
                                   var itemData = $(this).data('item');
                                   
                                   // Populate fields
+                                  row.find('[name="itemcode[]"]').val(itemData.productid || '');
                                   row.find('[name="itemname[]"]').val(itemData.itemname || '');
                                   row.find('[name="unit[]"]').val(itemData.unit || 'NOS');
                                   row.find('[name="rate[]"]').val(itemData.rate || '0');
@@ -3041,6 +3683,142 @@ include("kattegat/role_check.php");
         </div>
     </div>
 </div>
+
+<!-- Advanced search modal (moved here to avoid overflow/stacking issues) -->
+<div class="modal fade bd-modal-adhoc-advanced-search" tabindex="-1" role="dialog" aria-labelledby="stcAdvSearchTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="stc-adv-header">
+          <div class="stc-adv-header-icon" aria-hidden="true">
+            <i class="fa fa-filter"></i>
+          </div>
+          <div>
+            <p class="stc-adv-header-title" id="stcAdvSearchTitle">Advanced search</p>
+            <div class="stc-adv-subtitle">Narrow results using more filters, then apply search.</div>
+          </div>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        <div class="stc-adv-grid">
+          <div class="stc-adv-col">
+            <div class="stc-adv-field">
+              <div class="stc-adv-label">
+                <i class="fa fa-hashtag" aria-hidden="true"></i>
+                <p class="stc-adv-field-label" id="stc-adv-lbl-adhocid">Adhoc ID</p>
+              </div>
+              <input type="text" id="stc-adv-adhoc-id" class="form-control" placeholder="Type adhoc id…" aria-labelledby="stc-adv-lbl-adhocid">
+            </div>
+          </div>
+
+          <div class="stc-adv-col">
+            <div class="stc-adv-field">
+              <div class="stc-adv-label">
+                <i class="fa fa-barcode" aria-hidden="true"></i>
+                <p class="stc-adv-field-label" id="stc-adv-lbl-productid">Product ID</p>
+              </div>
+              <input type="text" id="stc-adv-product-id" class="form-control" placeholder="Type product id…" aria-labelledby="stc-adv-lbl-productid">
+            </div>
+          </div>
+
+          <div class="stc-adv-col">
+            <div class="stc-adv-field">
+              <div class="stc-adv-label">
+                <i class="fa fa-tag" aria-hidden="true"></i>
+                <p class="stc-adv-field-label" id="stc-adv-lbl-productname">Product name</p>
+              </div>
+              <input type="text" id="stc-adv-product-name" class="form-control" placeholder="Type product name…" aria-labelledby="stc-adv-lbl-productname">
+            </div>
+          </div>
+
+          <div class="stc-adv-col">
+            <div class="stc-adv-field">
+              <div class="stc-adv-label">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+                <p class="stc-adv-field-label" id="stc-adv-lbl-adhocname">Adhoc name</p>
+              </div>
+              <input type="text" id="stc-adv-adhoc-name" class="form-control" placeholder="Type adhoc item name…" aria-labelledby="stc-adv-lbl-adhocname">
+            </div>
+          </div>
+
+          <div class="stc-adv-col">
+            <div class="stc-adv-field">
+              <div class="stc-adv-label">
+                <i class="fa fa-th-large" aria-hidden="true"></i>
+                <p class="stc-adv-field-label" id="stc-adv-lbl-rack">Rack</p>
+              </div>
+              <div class="stc-typeahead-wrap">
+                <input type="text" id="stc-poa-by-rack" class="form-control tc-poa-searchbyrack" placeholder="Type rack…" aria-labelledby="stc-adv-lbl-rack" autocomplete="off">
+                <ul class="stc-typeahead-list" id="stc-typeahead-rack"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="stc-adv-col">
+            <div class="stc-adv-field">
+              <div class="stc-adv-label">
+                <i class="fa fa-map-marker" aria-hidden="true"></i>
+                <p class="stc-adv-field-label" id="stc-adv-lbl-location">Source / destination (Location)</p>
+              </div>
+              <div class="stc-typeahead-wrap">
+                <input type="text" id="tc-poa-searchbydourcedestination" class="form-control" placeholder="Type location…" aria-labelledby="stc-adv-lbl-location" autocomplete="off">
+                <ul class="stc-typeahead-list" id="stc-typeahead-location"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="stc-adv-col">
+            <div class="stc-adv-field">
+              <div class="stc-adv-label">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                <p class="stc-adv-field-label" id="stc-adv-lbl-status">Status</p>
+              </div>
+              <select id="stc-poa-status" class="custom-select form-control stc-po-status-in" aria-labelledby="stc-adv-lbl-status">
+                <option value="NA">Select Status</option>
+                <option value="1">Stock</option>
+                <option value="2">Dispatched</option>
+                <option value="3">Pending</option>
+                <option value="4">Approved</option>
+                <option value="5">Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="stc-adv-col">
+            <div class="stc-adv-field">
+              <div class="stc-adv-label">
+                <i class="fa fa-user" aria-hidden="true"></i>
+                <p class="stc-adv-field-label" id="stc-adv-lbl-receivedby">Received by</p>
+              </div>
+              <input type="text" id="stc-adv-received-by" class="form-control" placeholder="Type received by…" aria-labelledby="stc-adv-lbl-receivedby">
+            </div>
+          </div>
+
+          <div class="stc-adv-col">
+            <div class="stc-adv-field">
+              <div class="stc-adv-label">
+                <i class="fa fa-comment" aria-hidden="true"></i>
+                <p class="stc-adv-field-label" id="stc-adv-lbl-remarks">Remarks</p>
+              </div>
+              <input type="text" id="stc-adv-remarks" class="form-control" placeholder="Type remarks…" aria-labelledby="stc-adv-lbl-remarks">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="stc-adv-actions">
+        <button type="button" class="btn btn-default stc-adv-clear-inline stc-adhocpo-adv-clear">
+          <i class="fa fa-eraser" aria-hidden="true"></i> Clear
+        </button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success stc-adhocpo-adv-apply">
+          <i class="fa fa-search" aria-hidden="true"></i> Apply & search
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal fade bd-modal-ledgershow" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">

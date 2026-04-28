@@ -2484,6 +2484,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		// Search in purchase product adhoc table for previous entries
 		$search_qry = mysqli_query($this->stc_dbs, "
 			SELECT DISTINCT
+				`stc_purchase_product_adhoc_productid` as productid,
 				`stc_purchase_product_adhoc_itemdesc` as itemname,
 				`stc_purchase_product_adhoc_unit` as unit,
 				`stc_purchase_product_adhoc_rate` as rate,
@@ -2491,7 +2492,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 			FROM `stc_purchase_product_adhoc`
 			WHERE `stc_purchase_product_adhoc_itemdesc` LIKE '%".$keyword."%'
 			AND `stc_purchase_product_adhoc_itemdesc` != ''
-			ORDER BY `stc_purchase_product_adhoc_created_date` DESC
+			ORDER BY DATE(`stc_purchase_product_adhoc_created_date`), `stc_purchase_product_adhoc_rate` DESC
 			LIMIT 10
 		");
 		
@@ -2499,6 +2500,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		if(mysqli_num_rows($search_qry) > 0){
 			foreach($search_qry as $row){
 				$data[] = array(
+					'productid' => $row['productid'],
 					'itemname' => $row['itemname'],
 					'unit' => $row['unit'],
 					'rate' => $row['rate'],
@@ -2524,11 +2526,29 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}
 
 	// call po adhoc
-	public function stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status, $page, $pageSize){
+	public function stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status, $page, $pageSize, $adhoc_id = '', $product_id = '', $product_name = '', $adhoc_name = '', $received_by = '', $remarks = ''){
 		$odin='';
 		$filter='';
 		if($itemname!=""){
 			$filter.="AND (`stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_desc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_cat_name`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."')";
+		}
+		if($adhoc_id!=""){
+			$filter.="AND `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'";
+		}
+		if($product_id!=""){
+			$filter.="AND `stc_product_id` regexp '".mysqli_real_escape_string($this->stc_dbs, $product_id)."'";
+		}
+		if($product_name!=""){
+			$filter.="AND `stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $product_name)."'";
+		}
+		if($adhoc_name!=""){
+			$filter.="AND `stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."'";
+		}
+		if($received_by!=""){
+			$filter.="AND `stc_purchase_product_adhoc_recievedby` regexp '".mysqli_real_escape_string($this->stc_dbs, $received_by)."'";
+		}
+		if($remarks!=""){
+			$filter.="AND `stc_purchase_product_adhoc_remarks` regexp '".mysqli_real_escape_string($this->stc_dbs, $remarks)."'";
 		}
 		if($sourcedestination!=""){
 			$filter.="
@@ -2750,7 +2770,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				}
 				$checkbox = '';
 				if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==6){
-					$checkbox="<div class='card-border mb-3 card-body border-success'><input type='checkbox' class='material-icons form-control common_selector' style='width:50px;' value='".$odinrow['stc_purchase_product_adhoc_id']."'></div>";
+					$checkbox="<div class='card-border mb-3 card-body border-success'><input type='checkbox' class='material-icons form-control common_selector' style='width:20px;' value='".$odinrow['stc_purchase_product_adhoc_id']."'></div>";
 				}
 				$odin.="
 					<tr>
@@ -4628,13 +4648,19 @@ if(isset($_POST['stc_po_adhoc_save'])) {
 // call po adhoc
 if(isset($_POST['stc_call_poadhoc'])){
 	$itemname=$_POST['itemname'];
-	$sourcedestination=$_POST['sourcedestination'];
+	$sourcedestination = isset($_POST['sourcedestination']) ? $_POST['sourcedestination'] : '';
 	$byrack=$_POST['byrack'];
-	$status=$_POST['status'];
+	$status = isset($_POST['status']) ? $_POST['status'] : 'NA';
 	$page=$_POST['page'];
 	$pageSize=$_POST['pageSize'];
+	$adhoc_id = isset($_POST['adhoc_id']) ? $_POST['adhoc_id'] : '';
+	$product_id = isset($_POST['product_id']) ? $_POST['product_id'] : '';
+	$product_name = isset($_POST['product_name']) ? $_POST['product_name'] : '';
+	$adhoc_name = isset($_POST['adhoc_name']) ? $_POST['adhoc_name'] : '';
+	$received_by = isset($_POST['received_by']) ? $_POST['received_by'] : '';
+	$remarks = isset($_POST['remarks']) ? $_POST['remarks'] : '';
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status, $page, $pageSize);
+	$outbjornestocking=$bjornestocking->stc_call_poadhoc($itemname, $sourcedestination, $byrack, $status, $page, $pageSize, $adhoc_id, $product_id, $product_name, $adhoc_name, $received_by, $remarks);
 	echo json_encode($outbjornestocking);
 }
 
