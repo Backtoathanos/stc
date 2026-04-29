@@ -765,7 +765,7 @@ include("kattegat/role_check.php");
                                         </div>
                                       </div>
                                       <div class="row" style="align-items: center;">
-                                        <div class="col-md-6 col-sm-12 mb-2">
+                                        <div class="col-md-4 col-sm-12 mb-2">
                                           <div class="input-group stc-poa-searchbar">
                                             <input
                                               type="text"
@@ -780,16 +780,21 @@ include("kattegat/role_check.php");
                                             </span>
                                           </div>
                                         </div>
+                                        <!-- <div class="col-md-4 col-sm-12 mb-2">
+                                          <div class="stc-adv-field">
+                                            <input type="text" id="stc-adv-adhoc-name" class="form-control" placeholder="Type adhoc item name…" aria-labelledby="stc-adv-lbl-adhocname">
+                                          </div>
+                                        </div> -->
                                       </div>
 
                                       <!-- Advanced search modal lives near page bottom -->
                                     </div>
                                   </div>
                                 </div>
-                                <div class="row">
+                                <div class="row stc-view-purchase-row" style="overflow-x: auto;">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
-                                      <form action="" class="stc-view-purchase-order-form stc-view-purchase-row" style="overflow-x: auto;>
+                                      <form action="" class="stc-view-purchase-order-form">
                                         <div class="stc-table-scroll">
                                           <table class="table table-hover table-bordered stc-purchase-view-table" id="stc-poadhoc-results-table">
                                             <thead>
@@ -880,6 +885,10 @@ include("kattegat/role_check.php");
               w = w - 200;
 
             }
+            // console.log(w);
+            // console.log(window.innerWidth);
+            w = window.innerWidth - 300;
+            // $row.css('width', w + 'px');
             $row.css('width', w + 'px');
           }
 

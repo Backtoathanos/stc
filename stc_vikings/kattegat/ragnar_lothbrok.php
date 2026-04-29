@@ -787,6 +787,26 @@ class sceptor extends tesseract{
 				$queryFilter2 = "WHERE 1=1";
 			}
 		}
+
+		// Location list (branches) should be complete even if there is no data for the selected period.
+		// We source locations from stc_trading_user and then fill missing values as 0.
+		$all_locations = [];
+		$locSql = mysqli_query(
+			$this->stc_dbs,
+			"SELECT DISTINCT TRIM(stc_trading_user_location) AS loc FROM stc_trading_user WHERE TRIM(stc_trading_user_location) <> ''"
+		);
+		if ($locSql && mysqli_num_rows($locSql) > 0) {
+			while ($locRow = mysqli_fetch_assoc($locSql)) {
+				$loc = trim((string)($locRow['loc'] ?? ''));
+				if ($loc !== '') {
+					$all_locations[] = $loc;
+				}
+			}
+		}
+		// Fallback: if stc_trading_user has no locations, keep old behavior.
+		if (count($all_locations) === 0) {
+			$all_locations = null;
+		}
         // Total Purchased
         $purchase_q = mysqli_query($this->stc_dbs, "
             SELECT SUM(stc_purchase_product_adhoc_qty * stc_purchase_product_adhoc_prate) as purchased
@@ -806,13 +826,32 @@ class sceptor extends tesseract{
         $total_sale = $sold['sold'] ? floatval($sold['sold']) : 0;
 
         $sale_locations = [];
-        $sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, SUM(A.qty * A.rate) as amount FROM gld_challan A INNER JOIN stc_trading_user ON A.created_by=stc_trading_user_id $queryFilter2 GROUP BY stc_trading_user_location");
+		$sale_amount_by_location = [];
+		$sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, SUM(A.qty * A.rate) as amount FROM gld_challan A INNER JOIN stc_trading_user ON A.created_by=stc_trading_user_id $queryFilter2 GROUP BY stc_trading_user_location");
 		if(mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
-				$total_sale += $row['amount'];
+				$loc = trim((string)($row['stc_trading_user_location'] ?? ''));
+				$amt = floatval($row['amount'] ?? 0);
+				$total_sale += $amt;
+				if ($loc !== '') {
+					$sale_amount_by_location[$loc] = $amt;
+				}
+			}
+		}
+
+		if ($all_locations !== null) {
+			foreach ($all_locations as $loc) {
 				$sale_locations[] = [
-					'sale_location' => $row['stc_trading_user_location'],
-					'sale_amount' => floatval($row['amount'])
+					'sale_location' => $loc,
+					'sale_amount' => isset($sale_amount_by_location[$loc]) ? (float)$sale_amount_by_location[$loc] : 0.0
+				];
+			}
+		} else {
+			// Old behavior (only locations present in the query result).
+			foreach ($sale_amount_by_location as $loc => $amt) {
+				$sale_locations[] = [
+					'sale_location' => $loc,
+					'sale_amount' => (float)$amt
 				];
 			}
 		}
@@ -828,11 +867,29 @@ class sceptor extends tesseract{
 			$queryFilter2
 			GROUP BY A.shopname
 		");
+		$purchase_amount_by_location = [];
 		if(mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
+				$loc = trim((string)($row['shopname'] ?? ''));
+				$amt = floatval($row['amount'] ?? 0);
+				if ($loc !== '') {
+					$purchase_amount_by_location[$loc] = $amt;
+				}
+			}
+		}
+
+		if ($all_locations !== null) {
+			foreach ($all_locations as $loc) {
 				$purchase_locations[] = [
-					'purchase_location' => $row['shopname'],
-					'purchase_amount' => floatval($row['amount'])
+					'purchase_location' => $loc,
+					'purchase_amount' => isset($purchase_amount_by_location[$loc]) ? (float)$purchase_amount_by_location[$loc] : 0.0
+				];
+			}
+		} else {
+			foreach ($purchase_amount_by_location as $loc => $amt) {
+				$purchase_locations[] = [
+					'purchase_location' => $loc,
+					'purchase_amount' => (float)$amt
 				];
 			}
 		}
@@ -840,6 +897,7 @@ class sceptor extends tesseract{
 		// Stock breakup (location-wise) using stc_shop quantities (value at purchase rate + gst)
 		$total_stock = 0.0;
 		$stock_locations = [];
+		$stock_amount_by_location = [];
 		$sql = mysqli_query($this->stc_dbs, "
 			SELECT
 				A.shopname,
@@ -854,9 +912,25 @@ class sceptor extends tesseract{
 			while($row = mysqli_fetch_assoc($sql)){
 				$amt = floatval($row['amount']);
 				$total_stock += $amt;
+				$loc = trim((string)($row['shopname'] ?? ''));
+				if ($loc !== '') {
+					$stock_amount_by_location[$loc] = $amt;
+				}
+			}
+		}
+
+		if ($all_locations !== null) {
+			foreach ($all_locations as $loc) {
 				$stock_locations[] = [
-					'stock_location' => $row['shopname'],
-					'stock_amount' => $amt
+					'stock_location' => $loc,
+					'stock_amount' => isset($stock_amount_by_location[$loc]) ? (float)$stock_amount_by_location[$loc] : 0.0
+				];
+			}
+		} else {
+			foreach ($stock_amount_by_location as $loc => $amt) {
+				$stock_locations[] = [
+					'stock_location' => $loc,
+					'stock_amount' => (float)$amt
 				];
 			}
 		}
