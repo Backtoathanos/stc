@@ -759,16 +759,33 @@ class sceptor extends tesseract{
     }
 
     // GLD summary for dashboard
-    public function stc_gld($month, $year, $type) {
+    // $type: 'NA' (monthly), 'Y' (yearly), 'A' (all time), 'R' (date range)
+    public function stc_gld($month, $year, $type, $date_from = '', $date_to = '') {
         // $year = date('Y');
 		$queryFilter="WHERE MONTH(stc_purchase_product_adhoc_created_date) = '$month' AND YEAR(stc_purchase_product_adhoc_created_date) = '$year'";
 		$queryFilter1="WHERE stc_purchase_product_adhoc_cherrypickby=0 AND MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
 		$queryFilter2="WHERE MONTH(A.created_date)='$month' AND YEAR(A.created_date)='$year'";
-		$queryFilter3="WHERE MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
 		if($type == 'Y') {
 			$queryFilter = "WHERE YEAR(stc_purchase_product_adhoc_created_date) = '$year'";
 			$queryFilter1="WHERE stc_purchase_product_adhoc_cherrypickby=0 AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
 			$queryFilter2="WHERE YEAR(A.created_date)='$year'";
+		} elseif($type == 'A') {
+			$queryFilter = "WHERE 1=1";
+			$queryFilter1 = "WHERE stc_purchase_product_adhoc_cherrypickby=0";
+			$queryFilter2 = "WHERE 1=1";
+		} elseif($type == 'R') {
+			$df = mysqli_real_escape_string($this->stc_dbs, (string)$date_from);
+			$dt = mysqli_real_escape_string($this->stc_dbs, (string)$date_to);
+			// Expect YYYY-MM-DD, use inclusive range; if missing, fall back to 1=1
+			if($df != '' && $dt != ''){
+				$queryFilter = "WHERE DATE(stc_purchase_product_adhoc_created_date) BETWEEN '".$df."' AND '".$dt."'";
+				$queryFilter1 = "WHERE stc_purchase_product_adhoc_cherrypickby=0 AND DATE(s.stc_cust_super_requisition_list_items_rec_date) BETWEEN '".$df."' AND '".$dt."'";
+				$queryFilter2 = "WHERE DATE(A.created_date) BETWEEN '".$df."' AND '".$dt."'";
+			} else {
+				$queryFilter = "WHERE 1=1";
+				$queryFilter1 = "WHERE stc_purchase_product_adhoc_cherrypickby=0";
+				$queryFilter2 = "WHERE 1=1";
+			}
 		}
         // Total Purchased
         $purchase_q = mysqli_query($this->stc_dbs, "
@@ -792,6 +809,7 @@ class sceptor extends tesseract{
         $sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, SUM(A.qty * A.rate) as amount FROM gld_challan A INNER JOIN stc_trading_user ON A.created_by=stc_trading_user_id $queryFilter2 GROUP BY stc_trading_user_location");
 		if(mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
+				$total_sale += $row['amount'];
 				$sale_locations[] = [
 					'sale_location' => $row['stc_trading_user_location'],
 					'sale_amount' => floatval($row['amount'])
@@ -819,7 +837,38 @@ class sceptor extends tesseract{
 			}
 		}
 
-        return array('total_purchase' => $total_purchase, 'total_sale' => $total_sale, 'sub_locations_purchase' => $purchase_locations, 'sub_locations_sale' => $sale_locations);
+		// Stock breakup (location-wise) using stc_shop quantities (value at purchase rate + gst)
+		$total_stock = 0.0;
+		$stock_locations = [];
+		$sql = mysqli_query($this->stc_dbs, "
+			SELECT
+				A.shopname,
+				SUM(A.qty * (B.stc_purchase_product_adhoc_prate * (1 + (COALESCE(P.stc_product_gst, 0) / 100)))) AS amount
+			FROM `stc_shop` A
+			INNER JOIN `stc_purchase_product_adhoc` B ON A.adhoc_id = B.stc_purchase_product_adhoc_id
+			INNER JOIN `stc_product` P ON P.stc_product_id = B.stc_purchase_product_adhoc_productid
+			$queryFilter2
+			GROUP BY A.shopname
+		");
+		if($sql && mysqli_num_rows($sql)>0){
+			while($row = mysqli_fetch_assoc($sql)){
+				$amt = floatval($row['amount']);
+				$total_stock += $amt;
+				$stock_locations[] = [
+					'stock_location' => $row['shopname'],
+					'stock_amount' => $amt
+				];
+			}
+		}
+
+        return array(
+			'total_purchase' => $total_purchase,
+			'total_sale' => $total_sale,
+			'total_stock' => $total_stock,
+			'sub_locations_purchase' => $purchase_locations,
+			'sub_locations_sale' => $sale_locations,
+			'sub_locations_stock' => $stock_locations
+		);
     }
 
 	// GLD purchase breakup for a specific shop location (product-wise)
@@ -937,10 +986,29 @@ class sceptor extends tesseract{
 		return ['success' => true, 'rows' => $rows, 'total' => $grand];
 	}
 	
-	public function stc_gldprofit_analyzer($month, $year, $type){
+	public function stc_gldprofit_analyzer($month, $year, $type, $date_from = '', $date_to = ''){
 		$ragnar = '';
-		$yearFilter = "YEAR(created_date) = '$year'";
-		$monthFilter = $type != 'Y' ? "AND MONTH(created_date) = '$month'" : '';
+		$dateFilterAdhoc = "YEAR(a.stc_purchase_product_adhoc_created_date) = '$year'".($type != 'Y' ? " AND MONTH(a.stc_purchase_product_adhoc_created_date) = '$month'" : "");
+		$dateFilterRec = "YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'".($type != 'Y' ? " AND MONTH(r.stc_cust_super_requisition_list_items_rec_date) = '$month'" : "");
+		$dateFilterGld = "YEAR(g.created_date) = '$year'".($type != 'Y' ? " AND MONTH(g.created_date) = '$month'" : "");
+
+		if($type == 'A'){
+			$dateFilterAdhoc = "1=1";
+			$dateFilterRec = "1=1";
+			$dateFilterGld = "1=1";
+		} elseif($type == 'R'){
+			$df = mysqli_real_escape_string($this->stc_dbs, (string)$date_from);
+			$dt = mysqli_real_escape_string($this->stc_dbs, (string)$date_to);
+			if($df != '' && $dt != ''){
+				$dateFilterAdhoc = "DATE(a.stc_purchase_product_adhoc_created_date) BETWEEN '".$df."' AND '".$dt."'";
+				$dateFilterRec = "DATE(r.stc_cust_super_requisition_list_items_rec_date) BETWEEN '".$df."' AND '".$dt."'";
+				$dateFilterGld = "DATE(g.created_date) BETWEEN '".$df."' AND '".$dt."'";
+			} else {
+				$dateFilterAdhoc = "1=1";
+				$dateFilterRec = "1=1";
+				$dateFilterGld = "1=1";
+			}
+		}
 
 		// Step 1: Get purchase data from adhoc table - get qty and rate, do sum in loop and add to purchase array
 		$purchaseQuery = mysqli_query($this->stc_dbs, "
@@ -950,8 +1018,7 @@ class sceptor extends tesseract{
 			FROM stc_purchase_product_adhoc a
 			LEFT JOIN stc_product p ON p.stc_product_id = a.stc_purchase_product_adhoc_productid
 			WHERE a.stc_purchase_product_adhoc_cherrypickby = 0
-				AND YEAR(a.stc_purchase_product_adhoc_created_date) = '$year'
-				" . ($type != 'Y' ? "AND MONTH(a.stc_purchase_product_adhoc_created_date) = '$month'" : "") . "
+				AND ".$dateFilterAdhoc."
 		");
 
 		$purchaseArray = 0;
@@ -968,8 +1035,7 @@ class sceptor extends tesseract{
 				a.stc_purchase_product_adhoc_prate
 			FROM stc_cust_super_requisition_list_items_rec r
 			LEFT JOIN stc_purchase_product_adhoc a ON a.stc_purchase_product_adhoc_id = r.stc_cust_super_requisition_list_items_rec_list_poaid
-			WHERE YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'
-				" . ($type != 'Y' ? "AND MONTH(r.stc_cust_super_requisition_list_items_rec_date) = '$month'" : "") . "
+			WHERE ".$dateFilterRec."
 		");
 
 		$soldArray = 0;
@@ -993,8 +1059,7 @@ class sceptor extends tesseract{
 				a.stc_purchase_product_adhoc_prate
 			FROM gld_challan g
 			LEFT JOIN stc_purchase_product_adhoc a ON a.stc_purchase_product_adhoc_id = g.adhoc_id
-			WHERE YEAR(g.created_date) = '$year'
-				" . ($type != 'Y' ? "AND MONTH(g.created_date) = '$month'" : "") . "
+			WHERE ".$dateFilterGld."
 		");
 
 		while ($row = mysqli_fetch_assoc($gldQuery)) {
@@ -1078,8 +1143,10 @@ if(isset($_POST["dashboard"])){
 	$Omonth=$month=isset($_POST['month']) ? $_POST['month'] : '01';
 	$preload=isset($_POST['preload']) ? $_POST['preload'] : '';
 	$type=isset($_POST['type']) ? $_POST['type'] : 'NA';
+	$date_from = isset($_POST['date_from']) ? $_POST['date_from'] : '';
+	$date_to = isset($_POST['date_to']) ? $_POST['date_to'] : '';
 	$year=date('Y');
-	$month=date('m', strtotime($month));
+	$month=date('m', strtotime($month ? $month : date('Y-m')));
 	if($type=="Y"){
 		$year=date('Y', strtotime($Omonth));
 	}
@@ -1109,8 +1176,10 @@ if(isset($_POST["dashboard"])){
 	$opobjstcelec=$objstcelecpaid->stc_electronics($month, $year);
 	$opobjstctra=$objstctrapaid->stc_trading($month, $year, $type);
 	$opobjstcgro=$objstcgropaid->stc_groceries($month, $year);
-	$opobjstcgld=$objstcgropaid->stc_gld($month, $year, $type);
-	$opobjstcgldanalyzer=$objstcgropaid->stc_gldprofit_analyzer($month, $year, $type);
+	$date_from = isset($_POST['date_from']) ? $_POST['date_from'] : '';
+	$date_to = isset($_POST['date_to']) ? $_POST['date_to'] : '';
+	$opobjstcgld=$objstcgropaid->stc_gld($month, $year, $type, $date_from, $date_to);
+	$opobjstcgldanalyzer=$objstcgropaid->stc_gldprofit_analyzer($month, $year, $type, $date_from, $date_to);
 	if($preload=='preload'){
 		$month=date('Y-m');
 	}else{

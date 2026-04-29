@@ -324,7 +324,7 @@ STCAuthHelper::checkAuth();
                                         <div class="card border-0 shadow-sm" style="background: linear-gradient(-20deg, #e0f7fa 0%, #80deea 100%);">
                                           <div class="card-body">
                                             <h5 class="card-title font-weight-bold mb-4 text-dark">
-                                              <i class="fa fa-cubes"></i> GLD Summary
+                                              <i class="fa fa-cubes"></i> GLD Summary <a href="gld_summary.php" target="_blank" class="btn btn-sm btn-primary" style="font-size: 12px;">Click here to view GLD Detailed Summary</a>
                                             </h5>
                                             <div class="row mb-3">
                                               <div class="col-md-4">
@@ -381,12 +381,12 @@ STCAuthHelper::checkAuth();
                                                         </table>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-4">
+                                                <div class="col-md-6">
                                                     <div class="mt-4">
                                                         <canvas id="gldDonutChart" width="400" height="220"></canvas>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-8">
+                                                <div class="col-md-6">
                                                     <div class="mt-4">
                                                         <canvas id="gldBarChart" width="400" height="220"></canvas>
                                                     </div>

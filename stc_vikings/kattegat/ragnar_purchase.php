@@ -2530,7 +2530,21 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$odin='';
 		$filter='';
 		if($itemname!=""){
-			$filter.="AND (`stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_desc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_product_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR `stc_cat_name`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."')";
+			$filter.="
+				AND (
+					`stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR 
+					`stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR 
+					`stc_product_desc` regexp '".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR 
+					`stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR 
+					`stc_product_id`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR 
+					`stc_cat_name`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR 
+					`stc_purchase_product_adhoc_source`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR 
+					`stc_purchase_product_adhoc_destination`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR 
+					`stc_purchase_product_adhoc_recievedby`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR 
+					`stc_purchase_product_adhoc_remarks`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."' OR 
+					`stc_rack_name`='".mysqli_real_escape_string($this->stc_dbs, $itemname)."'
+				)
+			";
 		}
 		if($adhoc_id!=""){
 			$filter.="AND `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'";
@@ -2539,7 +2553,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 			$filter.="AND `stc_product_id` regexp '".mysqli_real_escape_string($this->stc_dbs, $product_id)."'";
 		}
 		if($product_name!=""){
-			$filter.="AND `stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $product_name)."'";
+			$filter.="AND (`stc_product_name` regexp '".mysqli_real_escape_string($this->stc_dbs, $product_name)."' OR `stc_product_desc` regexp '".mysqli_real_escape_string($this->stc_dbs, $product_name)."')";
 		}
 		if($adhoc_name!=""){
 			$filter.="AND `stc_purchase_product_adhoc_itemdesc` regexp '".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."'";

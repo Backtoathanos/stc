@@ -771,7 +771,7 @@ include("kattegat/role_check.php");
                                               type="text"
                                               class="form-control stc-poa-searchbyitem"
                                               id="stc-poa-searchbyitem"
-                                              placeholder="Search item name…"
+                                              placeholder="Search here…"
                                             >
                                             <span class="input-group-btn">
                                               <button type="button" class="btn btn-success stc-adhocpo-find stc-poa-search-btn" title="Search" aria-label="Search">
@@ -786,10 +786,10 @@ include("kattegat/role_check.php");
                                     </div>
                                   </div>
                                 </div>
-                                <div class="row stc-view-purchase-row" style="overflow-x: auto;">
+                                <div class="row">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
-                                      <form action="" class="stc-view-purchase-order-form">
+                                      <form action="" class="stc-view-purchase-order-form stc-view-purchase-row" style="overflow-x: auto;>
                                         <div class="stc-table-scroll">
                                           <table class="table table-hover table-bordered stc-purchase-view-table" id="stc-poadhoc-results-table">
                                             <thead>
@@ -859,9 +859,8 @@ include("kattegat/role_check.php");
             var $row = $('.stc-view-purchase-row');
             if (!$row.length) return;
 
-            // Prefer the inner content container width (responsive to sidebar toggle).
-            var $container = $row.closest('.app-main__inner');
-            var w = ($container.length ? $container.innerWidth() : $(window).width());
+            // Use browser (viewport) width in px.
+            var w = window.innerWidth || document.documentElement.clientWidth || $(window).width();
             if (!w || isNaN(w)) return;
 
             // Keep a tiny safety padding so it never pushes beyond viewport.
@@ -877,6 +876,9 @@ include("kattegat/role_check.php");
             }
             if (sidebarClosed) {
               w = w + 200;
+            }else{
+              w = w - 200;
+
             }
             $row.css('width', w + 'px');
           }
