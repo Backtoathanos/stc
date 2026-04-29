@@ -765,7 +765,7 @@ include("kattegat/role_check.php");
                                         </div>
                                       </div>
                                       <div class="row" style="align-items: center;">
-                                        <div class="col-md-4 col-sm-12 mb-2">
+                                        <div class="col-md-3 col-sm-12 mb-2">
                                           <div class="input-group stc-poa-searchbar">
                                             <input
                                               type="text"
@@ -780,11 +780,35 @@ include("kattegat/role_check.php");
                                             </span>
                                           </div>
                                         </div>
-                                        <!-- <div class="col-md-4 col-sm-12 mb-2">
+                                        <div class="col-md-3 col-sm-12 mb-2">
                                           <div class="stc-adv-field">
-                                            <input type="text" id="stc-adv-adhoc-name" class="form-control" placeholder="Type adhoc item name…" aria-labelledby="stc-adv-lbl-adhocname">
+                                            <input type="text" id="stc-adv-adhoc-name" class="form-control" placeholder="Type source/location name…" aria-labelledby="stc-adv-lbl-adhocname">
                                           </div>
-                                        </div> -->
+                                        </div>
+                                        <div class="col-md-2 col-sm-12 mb-2">
+                                          <div class="stc-adv-field">
+                                            <input type="text" id="stc-adv-rack" class="form-control" placeholder="Type rack name…" aria-labelledby="stc-adv-lbl-adhocname">
+                                          </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-12 mb-2">
+                                          <div class="stc-adv-field">
+                                            <select id="stc-poa-status" class="custom-select form-control stc-po-status-in" aria-labelledby="stc-adv-lbl-status">
+                                              <option value="NA">Select Status</option>
+                                              <option value="1">Stock</option>
+                                              <option value="2">Dispatched</option>
+                                              <option value="3">Pending</option>
+                                              <option value="4">Approved</option>
+                                              <option value="5">Rejected</option>
+                                            </select>
+                                          </div>
+                                        </div>
+                                        <div class="col-md-2 col-sm-12 mb-2">
+                                          <div class="stc-adv-field">
+                                          <button type="button" class="form-control btn btn-success stc-adhocpo-find stc-poa-search-btn" title="Search" aria-label="Search">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                              </button>
+                                          </div>
+                                        </div>
                                       </div>
 
                                       <!-- Advanced search modal lives near page bottom -->
@@ -982,6 +1006,20 @@ include("kattegat/role_check.php");
             });
           });
 
+          // If a selector accidentally matches multiple inputs (duplicate IDs in legacy markup),
+          // pick the first non-empty value (fallback to the first element).
+          function stcPickInputValue(selector, defaultValue) {
+            var $els = $(selector);
+            var out = '';
+            $els.each(function() {
+              var v = $.trim($(this).val() || '');
+              if (v !== '') { out = v; return false; }
+            });
+            if (out === '') out = $.trim(($els.first().val() || ''));
+            if (out === '') out = (defaultValue === undefined ? '' : defaultValue);
+            return out;
+          }
+
           let pagenumber=0;
           // Pagination Module
           const Pagination = (function() {
@@ -1064,10 +1102,14 @@ include("kattegat/role_check.php");
                               adhoc_id: $('#stc-adv-adhoc-id').val(),
                               product_id: $('#stc-adv-product-id').val(),
                               product_name: $('#stc-adv-product-name').val(),
-                              adhoc_name: $('#stc-adv-adhoc-name').val(),
+                              // This field is for source/location (NOT itemdesc)
+                              sourcelocation: stcPickInputValue('#stc-adv-adhoc-name', ''),
+                              // Keep for backward compatibility (server uses source/destination filters instead)
+                              adhoc_name: '',
                               sourcedestination: $('#tc-poa-searchbydourcedestination').val(),
-                              byrack: $('.tc-poa-searchbyrack').val(),
-                              status: $('.stc-po-status-in').val(),
+                              // Support both inline (top row) and advanced modal inputs
+                              byrack: ($('#stc-adv-rack').val() || $('.tc-poa-searchbyrack').val() || ''),
+                              status: (stcPickInputValue('#stc-poa-status', 'NA') || $('.stc-po-status-in').val() || 'NA'),
                               received_by: $('#stc-adv-received-by').val(),
                               remarks: $('#stc-adv-remarks').val(),
                               page: page,
@@ -1223,7 +1265,9 @@ include("kattegat/role_check.php");
             $('#stc-adv-adhoc-id').val('');
             $('#stc-adv-product-id').val('');
             $('#stc-adv-product-name').val('');
-            $('#stc-adv-adhoc-name').val('');
+            $('[id="stc-adv-adhoc-name"]').val('');
+            $('#stc-adv-rack').val('');
+            $('[id="stc-poa-status"]').val('NA');
             $('#stc-adv-received-by').val('');
             $('#stc-adv-remarks').val('');
             $('#tc-poa-searchbydourcedestination').val('');

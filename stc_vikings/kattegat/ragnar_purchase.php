@@ -4662,7 +4662,12 @@ if(isset($_POST['stc_po_adhoc_save'])) {
 // call po adhoc
 if(isset($_POST['stc_call_poadhoc'])){
 	$itemname=$_POST['itemname'];
+	// Support explicit source/location filter (preferred) + legacy sourcedestination
+	$sourcelocation = isset($_POST['sourcelocation']) ? $_POST['sourcelocation'] : '';
 	$sourcedestination = isset($_POST['sourcedestination']) ? $_POST['sourcedestination'] : '';
+	if($sourcelocation !== ''){
+		$sourcedestination = $sourcelocation;
+	}
 	$byrack=$_POST['byrack'];
 	$status = isset($_POST['status']) ? $_POST['status'] : 'NA';
 	$page=$_POST['page'];

@@ -894,23 +894,44 @@ class sceptor extends tesseract{
 			}
 		}
 
-		// Stock breakup (location-wise) using stc_shop quantities (value at purchase rate + gst)
+		// Stock breakup (location-wise) using balance qty:
+		// stc_shop.qty (branch-wise) - delivered(stc_cust_super_requisition_list_items_rec) - sold(gld_challan)
+		// Value is computed at purchase rate (stc_purchase_product_adhoc_prate).
 		$total_stock = 0.0;
 		$stock_locations = [];
 		$stock_amount_by_location = [];
 		$sql = mysqli_query($this->stc_dbs, "
 			SELECT
-				A.shopname,
-				SUM(A.qty * (B.stc_purchase_product_adhoc_prate * (1 + (COALESCE(P.stc_product_gst, 0) / 100)))) AS amount
-			FROM `stc_shop` A
-			INNER JOIN `stc_purchase_product_adhoc` B ON A.adhoc_id = B.stc_purchase_product_adhoc_id
-			INNER JOIN `stc_product` P ON P.stc_product_id = B.stc_purchase_product_adhoc_productid
-			$queryFilter2
-			GROUP BY A.shopname
+				S.shopname,
+				SUM(
+					GREATEST(
+						COALESCE(S.qty, 0) - (COALESCE(D.delivered_qty, 0) + COALESCE(C.sold_qty, 0)),
+						0
+					) * COALESCE(A.stc_purchase_product_adhoc_prate, 0)
+				) AS amount
+			FROM stc_shop S
+			INNER JOIN stc_purchase_product_adhoc A
+				ON S.adhoc_id = A.stc_purchase_product_adhoc_id
+				AND A.stc_purchase_product_adhoc_status = 1
+			LEFT JOIN (
+				SELECT
+					stc_cust_super_requisition_list_items_rec_list_poaid AS poaid,
+					SUM(stc_cust_super_requisition_list_items_rec_recqty) AS delivered_qty
+				FROM stc_cust_super_requisition_list_items_rec
+				GROUP BY stc_cust_super_requisition_list_items_rec_list_poaid
+			) D ON D.poaid = S.adhoc_id
+			LEFT JOIN (
+				SELECT
+					adhoc_id,
+					SUM(qty) AS sold_qty
+				FROM gld_challan
+				GROUP BY adhoc_id
+			) C ON C.adhoc_id = S.adhoc_id
+			GROUP BY S.shopname
 		");
 		if($sql && mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
-				$amt = floatval($row['amount']);
+				$amt = floatval($row['amount'] ?? 0);
 				$total_stock += $amt;
 				$loc = trim((string)($row['shopname'] ?? ''));
 				if ($loc !== '') {
