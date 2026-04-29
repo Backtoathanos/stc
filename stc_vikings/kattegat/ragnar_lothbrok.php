@@ -793,7 +793,7 @@ class sceptor extends tesseract{
 		$all_locations = [];
 		$locSql = mysqli_query(
 			$this->stc_dbs,
-			"SELECT DISTINCT TRIM(stc_trading_user_location) AS loc FROM stc_trading_user WHERE TRIM(stc_trading_user_location) <> ''"
+			"SELECT DISTINCT TRIM(stc_trading_user_location) AS loc FROM stc_trading_user WHERE TRIM(stc_trading_user_location) <> '' AND stc_trading_user_location <> 'root'"
 		);
 		if ($locSql && mysqli_num_rows($locSql) > 0) {
 			while ($locRow = mysqli_fetch_assoc($locSql)) {
@@ -894,32 +894,78 @@ class sceptor extends tesseract{
 			}
 		}
 
-		// Stock breakup (location-wise) using balance qty:
-		// stc_shop.qty (branch-wise) - delivered(stc_cust_super_requisition_list_items_rec) - sold(gld_challan)
-		// Value is computed at purchase rate (stc_purchase_product_adhoc_prate).
+		// STOCK (overall + branch-wise) should reflect current balance qty.
+		//
+		// Concept you described:
+		// 1) Overall (central) remaining per adhoc:
+		//    adhoc.qty - (SUM(rec.qty by poaid) + SUM(shop.qty by adhoc_id))
+		//    then multiply by prate and include GST from product.
+		//
+		// 2) Branch-wise remaining:
+		//    shop.qty - SUM(gld_challan.qty by adhoc_id)
+		//    then multiply by prate and include GST from product.
+		//
+		// Note: Stock is "current", so we intentionally do NOT apply date filters here.
 		$total_stock = 0.0;
 		$stock_locations = [];
 		$stock_amount_by_location = [];
+
+		// (1) Overall / central remaining stock value from adhoc master qty
+		$overallStockSql = mysqli_query($this->stc_dbs, "
+			SELECT
+				SUM(
+					GREATEST(
+						COALESCE(A.stc_purchase_product_adhoc_qty, 0)
+						- (COALESCE(R.rec_qty, 0) + COALESCE(SH.shop_qty, 0)),
+						0
+					) * (
+						COALESCE(A.stc_purchase_product_adhoc_prate, 0)
+						* (1 + (COALESCE(P.stc_product_gst, 0) / 100))
+					)
+				) AS amount
+			FROM stc_purchase_product_adhoc A
+			INNER JOIN stc_product P
+				ON P.stc_product_id = A.stc_purchase_product_adhoc_productid
+			LEFT JOIN (
+				SELECT
+					stc_cust_super_requisition_list_items_rec_list_poaid AS poaid,
+					SUM(stc_cust_super_requisition_list_items_rec_recqty) AS rec_qty
+				FROM stc_cust_super_requisition_list_items_rec
+				GROUP BY stc_cust_super_requisition_list_items_rec_list_poaid
+			) R ON R.poaid = A.stc_purchase_product_adhoc_id
+			LEFT JOIN (
+				SELECT
+					adhoc_id,
+					SUM(qty) AS shop_qty
+				FROM stc_shop
+				GROUP BY adhoc_id
+			) SH ON SH.adhoc_id = A.stc_purchase_product_adhoc_id
+			WHERE A.stc_purchase_product_adhoc_status = 1
+		");
+		if ($overallStockSql && mysqli_num_rows($overallStockSql) > 0) {
+			$overallRow = mysqli_fetch_assoc($overallStockSql);
+			$total_stock = floatval($overallRow['amount'] ?? 0);
+		}
+
+		// (2) Branch-wise stock value from shop table (minus challan qty)
 		$sql = mysqli_query($this->stc_dbs, "
 			SELECT
 				S.shopname,
 				SUM(
 					GREATEST(
-						COALESCE(S.qty, 0) - (COALESCE(D.delivered_qty, 0) + COALESCE(C.sold_qty, 0)),
+						COALESCE(S.qty, 0) - COALESCE(C.sold_qty, 0),
 						0
-					) * COALESCE(A.stc_purchase_product_adhoc_prate, 0)
+					) * (
+						COALESCE(A.stc_purchase_product_adhoc_prate, 0)
+						* (1 + (COALESCE(P.stc_product_gst, 0) / 100))
+					)
 				) AS amount
 			FROM stc_shop S
 			INNER JOIN stc_purchase_product_adhoc A
 				ON S.adhoc_id = A.stc_purchase_product_adhoc_id
 				AND A.stc_purchase_product_adhoc_status = 1
-			LEFT JOIN (
-				SELECT
-					stc_cust_super_requisition_list_items_rec_list_poaid AS poaid,
-					SUM(stc_cust_super_requisition_list_items_rec_recqty) AS delivered_qty
-				FROM stc_cust_super_requisition_list_items_rec
-				GROUP BY stc_cust_super_requisition_list_items_rec_list_poaid
-			) D ON D.poaid = S.adhoc_id
+			INNER JOIN stc_product P
+				ON P.stc_product_id = A.stc_purchase_product_adhoc_productid
 			LEFT JOIN (
 				SELECT
 					adhoc_id,
@@ -932,7 +978,6 @@ class sceptor extends tesseract{
 		if($sql && mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
 				$amt = floatval($row['amount'] ?? 0);
-				$total_stock += $amt;
 				$loc = trim((string)($row['shopname'] ?? ''));
 				if ($loc !== '') {
 					$stock_amount_by_location[$loc] = $amt;
@@ -967,7 +1012,7 @@ class sceptor extends tesseract{
     }
 
 	// GLD purchase breakup for a specific shop location (product-wise)
-	public function stc_gld_purchase_breakdown($month, $year, $type, $location){
+	public function stc_gld_purchase_breakdown($month, $year, $type, $location, $date_from = '', $date_to = ''){
 		$locationEsc = mysqli_real_escape_string($this->stc_dbs, (string)$location);
 		$month = (int)$month;
 		$year = (int)$year;
@@ -976,6 +1021,17 @@ class sceptor extends tesseract{
 		$dateFilter = "YEAR(A.created_date) = '".$year."'";
 		if($type !== 'Y'){
 			$dateFilter .= " AND MONTH(A.created_date) = '".$month."'";
+		}
+		if($type == 'A'){
+			$dateFilter = "1=1";
+		} elseif($type == 'R'){
+			$df = mysqli_real_escape_string($this->stc_dbs, (string)$date_from);
+			$dt = mysqli_real_escape_string($this->stc_dbs, (string)$date_to);
+			if($df != '' && $dt != ''){
+				$dateFilter = "DATE(A.created_date) BETWEEN '".$df."' AND '".$dt."'";
+			} else {
+				$dateFilter = "1=1";
+			}
 		}
 
 		$q = mysqli_query($this->stc_dbs, "
@@ -1025,7 +1081,7 @@ class sceptor extends tesseract{
 	}
 
 	// GLD sale breakup for a specific trading user location (product-wise)
-	public function stc_gld_sale_breakdown($month, $year, $type, $location){
+	public function stc_gld_sale_breakdown($month, $year, $type, $location, $date_from = '', $date_to = ''){
 		$locationEsc = mysqli_real_escape_string($this->stc_dbs, (string)$location);
 		$month = (int)$month;
 		$year = (int)$year;
@@ -1034,6 +1090,17 @@ class sceptor extends tesseract{
 		$dateFilter = "YEAR(A.created_date) = '".$year."'";
 		if($type !== 'Y'){
 			$dateFilter .= " AND MONTH(A.created_date) = '".$month."'";
+		}
+		if($type == 'A'){
+			$dateFilter = "1=1";
+		} elseif($type == 'R'){
+			$df = mysqli_real_escape_string($this->stc_dbs, (string)$date_from);
+			$dt = mysqli_real_escape_string($this->stc_dbs, (string)$date_to);
+			if($df != '' && $dt != ''){
+				$dateFilter = "DATE(A.created_date) BETWEEN '".$df."' AND '".$dt."'";
+			} else {
+				$dateFilter = "1=1";
+			}
 		}
 
 		$q = mysqli_query($this->stc_dbs, "
@@ -1073,6 +1140,65 @@ class sceptor extends tesseract{
 					'product_name' => (string)($r['product_name'] ?? ''),
 					'category' => (string)($r['category'] ?? ''),
 					'sold_qty' => $qty,
+					'rate' => $rate,
+					'total' => $total
+				];
+			}
+		}
+		return ['success' => true, 'rows' => $rows, 'total' => $grand];
+	}
+
+	// GLD stock breakup for a specific shop location (product-wise)
+	// Stock is current; we don't apply period/date filters here.
+	public function stc_gld_stock_breakdown($location){
+		$locationEsc = mysqli_real_escape_string($this->stc_dbs, (string)$location);
+
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT
+				P.stc_product_id AS product_id,
+				CASE
+					WHEN S.stc_sub_cat_name != 'OTHERS' THEN CONCAT(S.stc_sub_cat_name, ' ', P.stc_product_name)
+					ELSE P.stc_product_name
+				END AS product_name,
+				C.stc_cat_name AS category,
+				COALESCE(SUM(GREATEST(COALESCE(SH.qty, 0) - COALESCE(GLD.sold_qty, 0), 0)), 0) AS stock_qty,
+				ROUND(
+					COALESCE(
+						SUM(GREATEST(COALESCE(SH.qty, 0) - COALESCE(GLD.sold_qty, 0), 0) * (A.stc_purchase_product_adhoc_prate * (1 + (COALESCE(P.stc_product_gst, 0) / 100)))),
+					0) / NULLIF(SUM(GREATEST(COALESCE(SH.qty, 0) - COALESCE(GLD.sold_qty, 0), 0)), 0),
+				2) AS rate,
+				COALESCE(
+					SUM(GREATEST(COALESCE(SH.qty, 0) - COALESCE(GLD.sold_qty, 0), 0) * (A.stc_purchase_product_adhoc_prate * (1 + (COALESCE(P.stc_product_gst, 0) / 100)))),
+				0) AS total
+			FROM stc_shop SH
+			INNER JOIN stc_purchase_product_adhoc A ON SH.adhoc_id = A.stc_purchase_product_adhoc_id
+			INNER JOIN stc_product P ON P.stc_product_id = A.stc_purchase_product_adhoc_productid
+			INNER JOIN stc_sub_category S ON S.stc_sub_cat_id = P.stc_product_sub_cat_id
+			INNER JOIN stc_category C ON C.stc_cat_id = P.stc_product_cat_id
+			LEFT JOIN (
+				SELECT adhoc_id, SUM(qty) AS sold_qty
+				FROM gld_challan
+				GROUP BY adhoc_id
+			) GLD ON GLD.adhoc_id = SH.adhoc_id
+			WHERE SH.shopname = '".$locationEsc."'
+				AND A.stc_purchase_product_adhoc_status = 1
+			GROUP BY P.stc_product_id, product_name, category
+			ORDER BY total DESC
+		");
+
+		$rows = [];
+		$grand = 0.0;
+		if($q && mysqli_num_rows($q) > 0){
+			while($r = mysqli_fetch_assoc($q)){
+				$qty = (float)($r['stock_qty'] ?? 0);
+				$rate = (float)($r['rate'] ?? 0);
+				$total = (float)($r['total'] ?? 0);
+				$grand += $total;
+				$rows[] = [
+					'product_id' => (int)($r['product_id'] ?? 0),
+					'product_name' => (string)($r['product_name'] ?? ''),
+					'category' => (string)($r['category'] ?? ''),
+					'stock_qty' => $qty,
 					'rate' => $rate,
 					'total' => $total
 				];
@@ -1291,6 +1417,8 @@ if(isset($_POST["gld_purchase_breakdown"])){
 	$Omonth = $month = isset($_POST['month']) ? $_POST['month'] : date('Y-m');
 	$type = isset($_POST['type']) ? $_POST['type'] : 'NA';
 	$location = isset($_POST['location']) ? $_POST['location'] : '';
+	$date_from = isset($_POST['date_from']) ? $_POST['date_from'] : '';
+	$date_to = isset($_POST['date_to']) ? $_POST['date_to'] : '';
 
 	$year = date('Y');
 	$month = date('m', strtotime($month));
@@ -1299,7 +1427,7 @@ if(isset($_POST["gld_purchase_breakdown"])){
 	}
 
 	$obj = new sceptor();
-	$out = $obj->stc_gld_purchase_breakdown((int)$month, (int)$year, $type, $location);
+	$out = $obj->stc_gld_purchase_breakdown((int)$month, (int)$year, $type, $location, $date_from, $date_to);
 	header('Content-Type: application/json');
 	echo json_encode($out);
 	exit;
@@ -1310,6 +1438,8 @@ if(isset($_POST["gld_sale_breakdown"])){
 	$Omonth = $month = isset($_POST['month']) ? $_POST['month'] : date('Y-m');
 	$type = isset($_POST['type']) ? $_POST['type'] : 'NA';
 	$location = isset($_POST['location']) ? $_POST['location'] : '';
+	$date_from = isset($_POST['date_from']) ? $_POST['date_from'] : '';
+	$date_to = isset($_POST['date_to']) ? $_POST['date_to'] : '';
 
 	$year = date('Y');
 	$month = date('m', strtotime($month));
@@ -1318,7 +1448,17 @@ if(isset($_POST["gld_sale_breakdown"])){
 	}
 
 	$obj = new sceptor();
-	$out = $obj->stc_gld_sale_breakdown((int)$month, (int)$year, $type, $location);
+	$out = $obj->stc_gld_sale_breakdown((int)$month, (int)$year, $type, $location, $date_from, $date_to);
+	header('Content-Type: application/json');
+	echo json_encode($out);
+	exit;
+}
+
+// GLD stock breakup (product-wise) for a clicked location on GLD summary/dashboard
+if(isset($_POST["gld_stock_breakdown"])){
+	$location = isset($_POST['location']) ? $_POST['location'] : '';
+	$obj = new sceptor();
+	$out = $obj->stc_gld_stock_breakdown($location);
 	header('Content-Type: application/json');
 	echo json_encode($out);
 	exit;

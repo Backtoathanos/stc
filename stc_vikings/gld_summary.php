@@ -206,7 +206,7 @@ $(document).ready(function(){
                     var totalSale=0;
                     $.each(gld.sub_locations_sale, function(i, item) {
                         totalSale += parseFloat(item.sale_amount);
-                        gldRowsSale += '<tr><td>' + item.sale_location + '</td><td class="text-right">₹ ' + parseFloat(item.sale_amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</td></tr>';
+                        gldRowsSale += '<tr><td>' + item.sale_location + '</td><td class="text-right"><span class="js-gld-sale-breakdown" style="cursor:pointer; text-decoration:underline;" data-location="'+ item.sale_location +'" data-month="'+ monthStr +'" data-type="'+ type +'" data-date-from="'+ dateFrom +'" data-date-to="'+ dateTo +'">₹ ' + parseFloat(item.sale_amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td></tr>';
                         donutLabels.push(item.sale_location);
                         donutData.push(item.sale_amount);
                     });
@@ -220,7 +220,7 @@ $(document).ready(function(){
                     var totalPurchase=0;
                     $.each(gld.sub_locations_purchase, function(i, item) {
                         totalPurchase += parseFloat(item.purchase_amount);
-                        gldRowsPurchase += '<tr><td>' + item.purchase_location + '</td><td class="text-right">₹ ' + parseFloat(item.purchase_amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</td></tr>';
+                        gldRowsPurchase += '<tr><td>' + item.purchase_location + '</td><td class="text-right"><span class="js-gld-purchase-breakdown" style="cursor:pointer; text-decoration:underline;" data-location="'+ item.purchase_location +'" data-month="'+ monthStr +'" data-type="'+ type +'" data-date-from="'+ dateFrom +'" data-date-to="'+ dateTo +'">₹ ' + parseFloat(item.purchase_amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td></tr>';
                     });
                     gldRowsPurchase += '<tr><td><b>Total:</b></td><td class="text-right"><b>₹ ' + parseFloat(totalPurchase).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</b></td></tr>';
                 } else {
@@ -235,7 +235,7 @@ $(document).ready(function(){
                     var totalStock=0;
                     $.each(gld.sub_locations_stock, function(i, item) {
                         totalStock += parseFloat(item.stock_amount);
-                        gldRowsStock += '<tr><td>' + item.stock_location + '</td><td class="text-right">₹ ' + parseFloat(item.stock_amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</td></tr>';
+                        gldRowsStock += '<tr><td>' + item.stock_location + '</td><td class="text-right"><span class="js-gld-stock-breakdown" style="cursor:pointer; text-decoration:underline;" data-location="'+ item.stock_location +'">₹ ' + parseFloat(item.stock_amount).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</span></td></tr>';
                     });
                     gldRowsStock += '<tr><td><b>Total:</b></td><td class="text-right"><b>₹ ' + parseFloat(totalStock).toLocaleString('en-IN', {minimumFractionDigits:2}) + '</b></td></tr>';
                 } else {
@@ -303,8 +303,312 @@ $(document).ready(function(){
     // Default: all time
     $('#stc-gld-range-hint').hide();
     stc_reload_gld(monthStr, 'preload');
+
+	// GLD purchase location -> product breakup modal
+	$(document).on('click', '.js-gld-purchase-breakdown', function(){
+		var $el = $(this);
+		var location = $el.data('location') || '';
+		var month = $el.data('month') || '';
+		var t = $el.data('type') || 'A';
+		var df = $el.data('date-from') || '';
+		var dt = $el.data('date-to') || '';
+
+		$('#gldPurchaseBreakupModalLabel').text('GLD Purchase Breakup - ' + location);
+		$('#gld-purchase-breakup-tbody').html('<tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>');
+		$('#gld-purchase-breakup-total').text('₹ --');
+		$('#gldPurchaseBreakupModal').modal('show');
+
+		$.ajax({
+			url: 'kattegat/ragnar_lothbrok.php',
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				gld_purchase_breakdown: 1,
+				location: location,
+				month: month,
+				type: t,
+				date_from: df,
+				date_to: dt
+			},
+			success: function(resp){
+				if(!resp || resp.success !== true){
+					$('#gld-purchase-breakup-tbody').html('<tr><td colspan="7" class="text-center text-danger">Failed to load data.</td></tr>');
+					return;
+				}
+				var rows = resp.rows || [];
+				if(!Array.isArray(rows) || rows.length === 0){
+					$('#gld-purchase-breakup-tbody').html('<tr><td colspan="7" class="text-center text-muted">No data found.</td></tr>');
+					$('#gld-purchase-breakup-total').text('₹ 0.00');
+					return;
+				}
+				var html = '';
+				var sl = 0;
+				$.each(rows, function(i, r){
+					sl++;
+					var pid = (r && r.product_id !== undefined && r.product_id !== null) ? r.product_id : '';
+					var pname = (r && r.product_name !== undefined && r.product_name !== null) ? r.product_name : '';
+					var cat = (r && r.category !== undefined && r.category !== null) ? r.category : '';
+					var qty = (r && r.purchase_qty !== undefined && r.purchase_qty !== null) ? r.purchase_qty : 0;
+					var rate = (r && r.rate !== undefined && r.rate !== null) ? r.rate : 0;
+					var total = (r && r.total !== undefined && r.total !== null) ? r.total : 0;
+					html += '<tr>' +
+						'<td class="text-center">'+ sl +'</td>' +
+						'<td>'+ pid +'</td>' +
+						'<td>'+ pname +'</td>' +
+						'<td>'+ cat +'</td>' +
+						'<td class="text-right">'+ parseFloat(qty).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+						'<td class="text-right">₹ '+ parseFloat(rate).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+						'<td class="text-right">₹ '+ parseFloat(total).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+					'</tr>';
+				});
+				$('#gld-purchase-breakup-tbody').html(html);
+				var gtotal = (resp && resp.total !== undefined && resp.total !== null) ? resp.total : 0;
+				$('#gld-purchase-breakup-total').text('₹ ' + parseFloat(gtotal).toLocaleString('en-IN', {minimumFractionDigits:2}));
+			},
+			error: function(){
+				$('#gld-purchase-breakup-tbody').html('<tr><td colspan="7" class="text-center text-danger">Error loading data.</td></tr>');
+			}
+		});
+	});
+
+	// GLD sale location -> product breakup modal
+	$(document).on('click', '.js-gld-sale-breakdown', function(){
+		var $el = $(this);
+		var location = $el.data('location') || '';
+		var month = $el.data('month') || '';
+		var t = $el.data('type') || 'A';
+		var df = $el.data('date-from') || '';
+		var dt = $el.data('date-to') || '';
+
+		$('#gldSaleBreakupModalLabel').text('GLD Sale Breakup - ' + location);
+		$('#gld-sale-breakup-tbody').html('<tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>');
+		$('#gld-sale-breakup-total').text('₹ --');
+		$('#gldSaleBreakupModal').modal('show');
+
+		$.ajax({
+			url: 'kattegat/ragnar_lothbrok.php',
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				gld_sale_breakdown: 1,
+				location: location,
+				month: month,
+				type: t,
+				date_from: df,
+				date_to: dt
+			},
+			success: function(resp){
+				if(!resp || resp.success !== true){
+					$('#gld-sale-breakup-tbody').html('<tr><td colspan="7" class="text-center text-danger">Failed to load data.</td></tr>');
+					return;
+				}
+				var rows = resp.rows || [];
+				if(!Array.isArray(rows) || rows.length === 0){
+					$('#gld-sale-breakup-tbody').html('<tr><td colspan="7" class="text-center text-muted">No data found.</td></tr>');
+					$('#gld-sale-breakup-total').text('₹ 0.00');
+					return;
+				}
+				var html = '';
+				var sl = 0;
+				$.each(rows, function(i, r){
+					sl++;
+					var pid = (r && r.product_id !== undefined && r.product_id !== null) ? r.product_id : '';
+					var pname = (r && r.product_name !== undefined && r.product_name !== null) ? r.product_name : '';
+					var cat = (r && r.category !== undefined && r.category !== null) ? r.category : '';
+					var qty = (r && r.sold_qty !== undefined && r.sold_qty !== null) ? r.sold_qty : 0;
+					var rate = (r && r.rate !== undefined && r.rate !== null) ? r.rate : 0;
+					var total = (r && r.total !== undefined && r.total !== null) ? r.total : 0;
+					html += '<tr>' +
+						'<td class="text-center">'+ sl +'</td>' +
+						'<td>'+ pid +'</td>' +
+						'<td>'+ pname +'</td>' +
+						'<td>'+ cat +'</td>' +
+						'<td class="text-right">'+ parseFloat(qty).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+						'<td class="text-right">₹ '+ parseFloat(rate).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+						'<td class="text-right">₹ '+ parseFloat(total).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+					'</tr>';
+				});
+				$('#gld-sale-breakup-tbody').html(html);
+				var gtotal = (resp && resp.total !== undefined && resp.total !== null) ? resp.total : 0;
+				$('#gld-sale-breakup-total').text('₹ ' + parseFloat(gtotal).toLocaleString('en-IN', {minimumFractionDigits:2}));
+			},
+			error: function(){
+				$('#gld-sale-breakup-tbody').html('<tr><td colspan="7" class="text-center text-danger">Error loading data.</td></tr>');
+			}
+		});
+	});
+
+	// GLD stock location -> product breakup modal
+	$(document).on('click', '.js-gld-stock-breakdown', function(){
+		var $el = $(this);
+		var location = $el.data('location') || '';
+
+		$('#gldStockBreakupModalLabel').text('GLD Stock Breakup - ' + location);
+		$('#gld-stock-breakup-tbody').html('<tr><td colspan="7" class="text-center text-muted">Loading...</td></tr>');
+		$('#gld-stock-breakup-total').text('₹ --');
+		$('#gldStockBreakupModal').modal('show');
+
+		$.ajax({
+			url: 'kattegat/ragnar_lothbrok.php',
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				gld_stock_breakdown: 1,
+				location: location
+			},
+			success: function(resp){
+				if(!resp || resp.success !== true){
+					$('#gld-stock-breakup-tbody').html('<tr><td colspan="7" class="text-center text-danger">Failed to load data.</td></tr>');
+					return;
+				}
+				var rows = resp.rows || [];
+				if(!Array.isArray(rows) || rows.length === 0){
+					$('#gld-stock-breakup-tbody').html('<tr><td colspan="7" class="text-center text-muted">No data found.</td></tr>');
+					$('#gld-stock-breakup-total').text('₹ 0.00');
+					return;
+				}
+				var html = '';
+				var sl = 0;
+				$.each(rows, function(i, r){
+					sl++;
+					var pid = (r && r.product_id !== undefined && r.product_id !== null) ? r.product_id : '';
+					var pname = (r && r.product_name !== undefined && r.product_name !== null) ? r.product_name : '';
+					var cat = (r && r.category !== undefined && r.category !== null) ? r.category : '';
+					var qty = (r && r.stock_qty !== undefined && r.stock_qty !== null) ? r.stock_qty : 0;
+					var rate = (r && r.rate !== undefined && r.rate !== null) ? r.rate : 0;
+					var total = (r && r.total !== undefined && r.total !== null) ? r.total : 0;
+					html += '<tr>' +
+						'<td class="text-center">'+ sl +'</td>' +
+						'<td>'+ pid +'</td>' +
+						'<td>'+ pname +'</td>' +
+						'<td>'+ cat +'</td>' +
+						'<td class="text-right">'+ parseFloat(qty).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+						'<td class="text-right">₹ '+ parseFloat(rate).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+						'<td class="text-right">₹ '+ parseFloat(total).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+					'</tr>';
+				});
+				$('#gld-stock-breakup-tbody').html(html);
+				var gtotal = (resp && resp.total !== undefined && resp.total !== null) ? resp.total : 0;
+				$('#gld-stock-breakup-total').text('₹ ' + parseFloat(gtotal).toLocaleString('en-IN', {minimumFractionDigits:2}));
+			},
+			error: function(){
+				$('#gld-stock-breakup-tbody').html('<tr><td colspan="7" class="text-center text-danger">Error loading data.</td></tr>');
+			}
+		});
+	});
 });
 </script>
+
+<!-- GLD Purchase Breakup Modal -->
+<div class="modal fade" id="gldPurchaseBreakupModal" tabindex="-1" role="dialog" aria-labelledby="gldPurchaseBreakupModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="gldPurchaseBreakupModalLabel">GLD Purchase Breakup</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover mb-0">
+						<thead>
+							<tr>
+								<th class="text-center">Sl No</th>
+								<th class="text-center">Product ID</th>
+								<th class="text-center">Product Name</th>
+								<th class="text-center">Category</th>
+								<th class="text-center">Purchase Qty</th>
+								<th class="text-center">Rate</th>
+								<th class="text-center">Total</th>
+							</tr>
+						</thead>
+						<tbody id="gld-purchase-breakup-tbody">
+							<tr><td colspan="7" class="text-center text-muted">Click an amount to load breakup.</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="d-flex justify-content-end mt-3">
+					<span class="badge badge-pill badge-success" style="font-size:14px;">Grand Total: <span id="gld-purchase-breakup-total">₹ --</span></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- GLD Sale Breakup Modal -->
+<div class="modal fade" id="gldSaleBreakupModal" tabindex="-1" role="dialog" aria-labelledby="gldSaleBreakupModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="gldSaleBreakupModalLabel">GLD Sale Breakup</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover mb-0">
+						<thead>
+							<tr>
+								<th class="text-center">Sl No</th>
+								<th class="text-center">Product ID</th>
+								<th class="text-center">Product Name</th>
+								<th class="text-center">Category</th>
+								<th class="text-center">Sold Qty</th>
+								<th class="text-center">Rate</th>
+								<th class="text-center">Total</th>
+							</tr>
+						</thead>
+						<tbody id="gld-sale-breakup-tbody">
+							<tr><td colspan="7" class="text-center text-muted">Click an amount to load breakup.</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="d-flex justify-content-end mt-3">
+					<span class="badge badge-pill badge-success" style="font-size:14px;">Grand Total: <span id="gld-sale-breakup-total">₹ --</span></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- GLD Stock Breakup Modal -->
+<div class="modal fade" id="gldStockBreakupModal" tabindex="-1" role="dialog" aria-labelledby="gldStockBreakupModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="gldStockBreakupModalLabel">GLD Stock Breakup</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover mb-0">
+						<thead>
+							<tr>
+								<th class="text-center">Sl No</th>
+								<th class="text-center">Product ID</th>
+								<th class="text-center">Product Name</th>
+								<th class="text-center">Category</th>
+								<th class="text-center">Stock Qty</th>
+								<th class="text-center">Rate</th>
+								<th class="text-center">Total</th>
+							</tr>
+						</thead>
+						<tbody id="gld-stock-breakup-tbody">
+							<tr><td colspan="7" class="text-center text-muted">Click an amount to load breakup.</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="d-flex justify-content-end mt-3">
+					<span class="badge badge-pill badge-success" style="font-size:14px;">Grand Total: <span id="gld-stock-breakup-total">₹ --</span></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 </body>
 </html>
 
