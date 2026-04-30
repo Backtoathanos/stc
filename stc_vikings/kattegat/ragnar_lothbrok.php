@@ -827,7 +827,7 @@ class sceptor extends tesseract{
 
         $sale_locations = [];
 		$sale_amount_by_location = [];
-		$sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, SUM(A.qty * A.rate) as amount FROM gld_challan A INNER JOIN stc_trading_user ON A.created_by=stc_trading_user_id $queryFilter2 GROUP BY stc_trading_user_location");
+		$sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, COALESCE(SUM(A.qty * COALESCE(A.rate, 0) - COALESCE(A.discount, 0)), 0) AS amount FROM gld_challan A INNER JOIN stc_trading_user ON A.created_by=stc_trading_user_id $queryFilter2 GROUP BY stc_trading_user_location");
 		if(mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
 				$loc = trim((string)($row['stc_trading_user_location'] ?? ''));
@@ -1115,7 +1115,7 @@ class sceptor extends tesseract{
 				ROUND(
 					COALESCE(SUM(A.qty * A.rate), 0) / NULLIF(SUM(A.qty), 0),
 				2) AS rate,
-				COALESCE(SUM(A.qty * A.rate), 0) AS total
+				COALESCE(SUM(A.qty * COALESCE(A.rate, 0) - COALESCE(A.discount, 0)), 0) AS total
 			FROM gld_challan A
 			INNER JOIN stc_trading_user TU ON A.created_by = TU.stc_trading_user_id
 			INNER JOIN stc_product P ON P.stc_product_id = A.product_id
@@ -1205,6 +1205,194 @@ class sceptor extends tesseract{
 			}
 		}
 		return ['success' => true, 'rows' => $rows, 'total' => $grand];
+	}
+
+	// Item audit by Product ID (Item Code) for GLD summary page
+	public function stc_gld_item_audit($item_code){
+		$item_code = (int)$item_code;
+		if($item_code <= 0){
+			return ['success' => false, 'message' => 'Invalid item code'];
+		}
+
+		// Product info
+		$product_name = '';
+		$pq = mysqli_query($this->stc_dbs, "
+			SELECT
+				P.stc_product_id,
+				CASE
+					WHEN S.stc_sub_cat_name != 'OTHERS' THEN CONCAT(S.stc_sub_cat_name, ' ', P.stc_product_name)
+					ELSE P.stc_product_name
+				END AS product_name
+			FROM stc_product P
+			LEFT JOIN stc_sub_category S ON S.stc_sub_cat_id = P.stc_product_sub_cat_id
+			WHERE P.stc_product_id = '".$item_code."'
+			LIMIT 1
+		");
+		if($pq && mysqli_num_rows($pq) > 0){
+			$pr = mysqli_fetch_assoc($pq);
+			$product_name = (string)($pr['product_name'] ?? '');
+		}
+
+		// Purchase rows from adhoc (by product id)
+		$purchase_rows = [];
+		$purchase_total_qty = 0.0;
+		$adhoc_ids = [];
+		$qPurchase = mysqli_query($this->stc_dbs, "
+			SELECT
+				stc_purchase_product_adhoc_id AS adhoc_id,
+				stc_purchase_product_adhoc_source AS source_loc,
+				stc_purchase_product_adhoc_destination AS dest_loc,
+				stc_purchase_product_adhoc_qty AS qty,
+				stc_purchase_product_adhoc_prate AS prate,
+				stc_purchase_product_adhoc_created_date AS created_date
+			FROM stc_purchase_product_adhoc
+			WHERE stc_purchase_product_adhoc_productid = '".$item_code."'
+				AND stc_purchase_product_adhoc_cherrypickby = 0
+			ORDER BY stc_purchase_product_adhoc_id DESC
+			LIMIT 80
+		");
+		if($qPurchase && mysqli_num_rows($qPurchase) > 0){
+			while($r = mysqli_fetch_assoc($qPurchase)){
+				$aid = (int)($r['adhoc_id'] ?? 0);
+				$qty = (float)($r['qty'] ?? 0);
+				$purchase_total_qty += $qty;
+				if($aid > 0){
+					$adhoc_ids[$aid] = true;
+				}
+				$purchase_rows[] = [
+					'adhoc_id' => $aid,
+					'source' => (string)($r['source_loc'] ?? ''),
+					'destination' => (string)($r['dest_loc'] ?? ''),
+					'qty' => $qty,
+					'prate' => (float)($r['prate'] ?? 0),
+					'date' => isset($r['created_date']) ? date('d-m-Y', strtotime((string)$r['created_date'])) : ''
+				];
+			}
+		}
+
+		$adhoc_id_list_sql = '0';
+		if(!empty($adhoc_ids)){
+			$adhoc_id_list_sql = implode(',', array_map('intval', array_keys($adhoc_ids)));
+		}
+
+		// Dispatch with requisition (rec table) for those adhoc ids
+		$requisition_rows = [];
+		$requisition_total_qty = 0.0;
+		$qReq = mysqli_query($this->stc_dbs, "
+			SELECT
+				R.stc_cust_super_requisition_list_items_rec_list_id AS requisition_no,
+				R.stc_cust_super_requisition_list_items_rec_list_poaid AS adhoc_id,
+				R.stc_cust_super_requisition_list_items_rec_recqty AS qty,
+				RI.stc_cust_super_requisition_list_items_unit AS unit,
+				R.stc_cust_super_requisition_list_items_rec_date AS rec_date,
+				PRJ.stc_cust_project_title AS project_name,
+				SUP.stc_cust_pro_supervisor_fullname AS supervisor_name
+			FROM stc_cust_super_requisition_list_items_rec R
+			LEFT JOIN stc_cust_super_requisition_list L ON L.stc_cust_super_requisition_list_id = R.stc_cust_super_requisition_list_items_rec_list_id
+			LEFT JOIN stc_cust_project PRJ ON PRJ.stc_cust_project_id = L.stc_cust_super_requisition_list_project_id
+			LEFT JOIN stc_cust_pro_supervisor SUP ON SUP.stc_cust_pro_supervisor_id = L.stc_cust_super_requisition_list_super_id
+			LEFT JOIN stc_purchase_product_adhoc A ON A.stc_purchase_product_adhoc_id = R.stc_cust_super_requisition_list_items_rec_list_poaid
+			LEFT JOIN stc_cust_super_requisition_list_items RI ON RI.stc_cust_super_requisition_list_id = R.stc_cust_super_requisition_list_items_rec_list_item_id
+			WHERE A.stc_purchase_product_adhoc_productid = '".$item_code."'
+				AND R.stc_cust_super_requisition_list_items_rec_list_poaid IN (".$adhoc_id_list_sql.")
+			ORDER BY TIMESTAMP(R.stc_cust_super_requisition_list_items_rec_date) DESC
+			LIMIT 200
+		");
+		if($qReq && mysqli_num_rows($qReq) > 0){
+			while($r = mysqli_fetch_assoc($qReq)){
+				$qty = (float)($r['qty'] ?? 0);
+				$requisition_total_qty += $qty;
+				$requisition_rows[] = [
+					'requisition_no' => (string)($r['requisition_no'] ?? ''),
+					'adhoc_id' => (int)($r['adhoc_id'] ?? 0),
+					'qty' => $qty,
+					'unit' => (string)($r['unit'] ?? ''),
+					'project_name' => (string)($r['project_name'] ?? ''),
+					'supervisor_name' => (string)($r['supervisor_name'] ?? ''),
+					'date' => isset($r['rec_date']) ? date('d-m-Y', strtotime((string)$r['rec_date'])) : ''
+				];
+			}
+		}
+
+		// Transfer to shop (stc_shop) by those adhoc ids
+		$shop_rows = [];
+		$shop_total_qty = 0.0;
+		$qShop = mysqli_query($this->stc_dbs, "
+			SELECT
+				TRIM(COALESCE(SH.shopname, '')) AS shop,
+				COALESCE(SUM(SH.qty), 0) AS qty
+			FROM stc_shop SH
+			LEFT JOIN stc_purchase_product_adhoc A ON A.stc_purchase_product_adhoc_id = SH.adhoc_id
+			WHERE A.stc_purchase_product_adhoc_productid = '".$item_code."'
+				AND SH.adhoc_id IN (".$adhoc_id_list_sql.")
+			GROUP BY shop
+			ORDER BY qty DESC
+		");
+		if($qShop && mysqli_num_rows($qShop) > 0){
+			while($r = mysqli_fetch_assoc($qShop)){
+				$qty = (float)($r['qty'] ?? 0);
+				$shop_total_qty += $qty;
+				$shop_rows[] = [
+					'shop' => (string)($r['shop'] ?? ''),
+					'qty' => $qty
+				];
+			}
+		}
+
+		// Challan dispatch (gld_challan) by product id
+		$challan_rows = [];
+		$challan_total_qty = 0.0;
+		$qCh = mysqli_query($this->stc_dbs, "
+			SELECT
+				G.bill_number AS bill_no,
+				C.gld_customer_title AS customer,
+				G.qty AS qty,
+				G.rate AS rate,
+				G.created_date AS created_date
+			FROM gld_challan G
+			LEFT JOIN gld_customer C ON C.gld_customer_id = G.cust_id
+			WHERE G.product_id = '".$item_code."'
+			ORDER BY TIMESTAMP(G.created_date) DESC
+			LIMIT 200
+		");
+		if($qCh && mysqli_num_rows($qCh) > 0){
+			while($r = mysqli_fetch_assoc($qCh)){
+				$qty = (float)($r['qty'] ?? 0);
+				$challan_total_qty += $qty;
+				$challan_rows[] = [
+					'bill_no' => (string)($r['bill_no'] ?? ''),
+					'customer' => (string)($r['customer'] ?? ''),
+					'qty' => $qty,
+					'rate' => (float)($r['rate'] ?? 0),
+					'date' => isset($r['created_date']) ? date('d-m-Y', strtotime((string)$r['created_date'])) : ''
+				];
+			}
+		}
+
+		// Stock math
+		$adhoc_qty = $purchase_total_qty;
+		$req_qty = $requisition_total_qty;
+		$challan_qty = $challan_total_qty;
+		$balance_qty = $adhoc_qty - ($req_qty + $challan_qty);
+
+		return [
+			'success' => true,
+			'item_code' => (string)$item_code,
+			'product_name' => $product_name,
+			'purchase_rows' => $purchase_rows,
+			'purchase_total_qty' => $purchase_total_qty,
+			'stock' => [
+				'adhoc_qty' => $adhoc_qty,
+				'requisition_qty' => $req_qty,
+				'challan_qty' => $challan_qty,
+				'balance_qty' => $balance_qty
+			],
+			'requisition_rows' => $requisition_rows,
+			'shop_rows' => $shop_rows,
+			'shop_total_qty' => $shop_total_qty,
+			'challan_rows' => $challan_rows,
+			'challan_total_qty' => $challan_total_qty
+		];
 	}
 	
 	public function stc_gldprofit_analyzer($month, $year, $type, $date_from = '', $date_to = ''){
@@ -1459,6 +1647,16 @@ if(isset($_POST["gld_stock_breakdown"])){
 	$location = isset($_POST['location']) ? $_POST['location'] : '';
 	$obj = new sceptor();
 	$out = $obj->stc_gld_stock_breakdown($location);
+	header('Content-Type: application/json');
+	echo json_encode($out);
+	exit;
+}
+
+// GLD item audit (Purchase/Stock/Dispatch/Shop/Challan) by item code (product id)
+if(isset($_POST["gld_item_audit"])){
+	$item_code = isset($_POST['item_code']) ? $_POST['item_code'] : '';
+	$obj = new sceptor();
+	$out = $obj->stc_gld_item_audit($item_code);
 	header('Content-Type: application/json');
 	echo json_encode($out);
 	exit;

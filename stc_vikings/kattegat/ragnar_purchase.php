@@ -3565,6 +3565,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				");
 				$shopQtyRow = $shopQtyQuery ? mysqli_fetch_assoc($shopQtyQuery) : null;
 				$stockQty = (float)($shopQtyRow['total_qty'] ?? 0);
+				$shopBuyQty = (float)($shopQtyRow['total_qty'] ?? 0);
 
 				// Sold qty & amount: challans created by trading users whose branch location matches this shop tab (shopname)
 				$challanAggQuery = mysqli_query($this->stc_dbs, "
@@ -3623,7 +3624,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 				$stockQtyCell = $stockQtyZero
 					? "<td class='text-right font-weight-bold' style=\"color:#9b2226;background-color:#ffe4e6;border-radius:4px;\">".number_format($balanceQty, 2)."</td>"
 					: "<td class='text-right'>".number_format($balanceQty, 2)."</td>";
-				$tpurchase = $buyQty * $rateWithGst;
+				$tpurchase = $shopBuyQty * $rateWithGst;
 				$sumTotalPurchase += $tpurchase;
 				$html .= "<tr>
 							<td class='text-center'>{$sl}</td>

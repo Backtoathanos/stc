@@ -25,6 +25,36 @@ STCAuthHelper::checkAuth();
         .stc-dash-month { transition: all 0.3s ease; }
         .stc-dash-month:focus { box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important; }
         .h-200 { height: 200px !important; }
+		/* Item audit scrolling */
+		:root{
+			/* Approx row heights so we show ~4 rows + header */
+			--gld-audit-row-h: 30px;
+			--gld-audit-head-h: 34px;
+		}
+		.gld-audit-table-scroll {
+			max-height: calc(var(--gld-audit-head-h) + (4 * var(--gld-audit-row-h)));
+			overflow-y: auto;
+		}
+		/* For non-table panels (Stock balance) keep same height */
+		.gld-audit-body-scroll {
+			height: calc(var(--gld-audit-head-h) + (4 * var(--gld-audit-row-h)));
+			overflow-y: auto;
+		}
+		/* Keep header visible while scrolling */
+		.gld-audit-table-scroll thead th {
+			position: sticky;
+			top: 0;
+			z-index: 2;
+			background: #f8f9fa;
+		}
+		/* Make paired audit cards equal height */
+		.gld-audit-card-eq{
+			display: flex;
+			flex-direction: column;
+		}
+		.gld-audit-footer-eq{
+			min-height: 44px;
+		}
     </style>
 </head>
 <body>
@@ -131,6 +161,8 @@ STCAuthHelper::checkAuth();
                                                             </table>
                                                         </div>
                                                     </div>
+												</div>
+                                                <div class="row mb-3 mt-3">
 
                                                     <div class="col-md-6">
                                                         <div class="mt-4">
@@ -143,6 +175,210 @@ STCAuthHelper::checkAuth();
                                                         </div>
                                                     </div>
                                                 </div>
+												<!-- Item Audit -->
+												<div class="row mb-3 mt-4">
+													<div class="col-md-12">
+														<div class="card border-0 shadow-sm" style="background: linear-gradient(-20deg, #f5f7ff 0%, #e9fff3 100%); border-radius: 12px;">
+															<div class="card-body">
+																<div class="d-flex align-items-center justify-content-between flex-wrap" style="gap: 10px;">
+																	<h5 class="mb-0 font-weight-bold text-dark">
+																		<i class="fa fa-search"></i> Item Audit
+																	</h5>
+																	<div class="text-muted small">Search by Item Code (Product ID)</div>
+																</div>
+
+																<div class="row mt-3" style="align-items:center;">
+																	<div class="col-lg-5 col-md-6 mb-2">
+																		<div class="input-group">
+																			<div class="input-group-prepend">
+																				<span class="input-group-text"><i class="fa fa-barcode"></i></span>
+																			</div>
+																			<input type="text" class="form-control" id="gld-audit-itemcode" placeholder="Enter item code…">
+																		</div>
+																	</div>
+																	<div class="col-lg-3 col-md-4 mb-2">
+																		<button class="btn btn-success btn-block" id="gld-audit-search-btn">
+																			<i class="fa fa-search"></i> Search
+																		</button>
+																	</div>
+																	<div class="col-lg-4 col-md-12 mb-2">
+																		<div class="alert alert-light border mb-0 py-2" id="gld-audit-status" style="display:none;"></div>
+																	</div>
+																</div>
+
+																<div class="row mt-3" id="gld-audit-meta" style="display:none;">
+																	<div class="col-md-12">
+																		<div class="d-flex align-items-center justify-content-between flex-wrap" style="gap: 10px;">
+																			<div>
+																				<span class="badge badge-pill badge-primary" style="font-size: 13px;">Item: <span id="gld-audit-meta-item">--</span></span>
+																				<span class="badge badge-pill badge-secondary" style="font-size: 13px;">Name: <span id="gld-audit-meta-name">--</span></span>
+																			</div>
+																			<div class="text-muted small">Tip: press Enter after typing item code.</div>
+																		</div>
+																	</div>
+																</div>
+
+																<div class="row mt-3" id="gld-audit-results" style="display:none;">
+																	<!-- Purchase -->
+																	<div class="col-xl-6 col-lg-6 mb-3">
+																		<div class="card border-success shadow-sm gld-audit-card-eq">
+																			<div class="card-header bg-success text-white py-2">
+																				<strong>Purchase</strong>
+																			</div>
+																			<div class="card-body p-0">
+																				<div class="table-responsive gld-audit-table-scroll">
+																					<table class="table table-sm table-bordered mb-0">
+																						<thead class="thead-light">
+																							<tr>
+																								<th class="text-center">Adhoc ID</th>
+																								<th>Source → Destination</th>
+																								<th class="text-center">Qty</th>
+																								<th class="text-center">P.Rate</th>
+																								<th class="text-center">Date</th>
+																							</tr>
+																						</thead>
+																						<tbody id="gld-audit-purchase-tbody">
+																							<tr><td colspan="5" class="text-center text-muted">Search an item code to load data.</td></tr>
+																						</tbody>
+																					</table>
+																				</div>
+																			</div>
+																			<div class="card-footer bg-white gld-audit-footer-eq">
+																				<div class="d-flex justify-content-between">
+																					<span class="text-muted">Total Purchase Qty - </span>
+																					<strong id="gld-audit-purchase-totalqty">--</strong>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+
+																	<!-- Stock balance -->
+																	<div class="col-xl-6 col-lg-6 mb-3">
+																		<div class="card border-primary shadow-sm gld-audit-card-eq">
+																			<div class="card-header bg-primary text-white py-2">
+																				<strong>Stock balance</strong>
+																				<span class="float-right small">Adhoc - (Requisition + Challan)</span>
+																			</div>
+																			<div class="card-body gld-audit-body-scroll">
+																				<div class="row">
+																					<div class="col-md-4 mb-2">
+																						<div class="alert alert-light border mb-0"><b>Adhoc Qty</b><br><span id="gld-audit-stock-adhoc">--</span></div>
+																					</div>
+																					<div class="col-md-4 mb-2">
+																						<div class="alert alert-light border mb-0"><b>Requisition Dispatch</b><br><span id="gld-audit-stock-req">--</span></div>
+																					</div>
+																					<div class="col-md-4 mb-2">
+																						<div class="alert alert-light border mb-0"><b>Shop Challan Dispatch</b><br><span id="gld-audit-stock-challan">--</span></div>
+																					</div>
+																				</div>
+																			</div>
+																			<div class="card-footer bg-white gld-audit-footer-eq">
+																				<div class="d-flex justify-content-between">
+																					<span class="text-muted">Balance Qty - </span>
+																					<strong id="gld-audit-stock-balance">--</strong>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+
+																	<!-- Dispatch with requisition -->
+																	<div class="col-xl-12 mb-3">
+																		<div class="card border-warning shadow-sm">
+																			<div class="card-header bg-warning text-dark py-2">
+																				<strong>Dispatch with requisition</strong>
+																			</div>
+																			<div class="card-body p-0">
+																				<div class="table-responsive gld-audit-table-scroll">
+																					<table class="table table-sm table-bordered mb-0">
+																						<thead class="thead-light">
+																							<tr>
+																								<th class="text-center">Sl</th>
+																								<th class="text-center">Requisition No</th>
+																								<th>Project</th>
+																								<th>Supervisor</th>
+																								<th class="text-center">Adhoc ID</th>
+																								<th class="text-center">Qty</th>
+																								<th class="text-center">Unit</th>
+																								<th class="text-center">Date</th>
+																							</tr>
+																						</thead>
+																						<tbody id="gld-audit-req-tbody">
+																							<tr><td colspan="8" class="text-center text-muted">—</td></tr>
+																						</tbody>
+																					</table>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+
+																	<!-- Transfer to Shop -->
+																	<div class="col-xl-6 col-lg-6 mb-3">
+																		<div class="card border-info shadow-sm">
+																			<div class="card-header bg-info text-white py-2">
+																				<strong>Transfer to Shop</strong>
+																			</div>
+																			<div class="card-body p-0">
+																				<div class="table-responsive gld-audit-table-scroll">
+																					<table class="table table-sm table-bordered mb-0">
+																						<thead class="thead-light">
+																							<tr>
+																								<th class="text-center">Shop</th>
+																								<th class="text-center">Qty</th>
+																							</tr>
+																						</thead>
+																						<tbody id="gld-audit-shop-tbody">
+																							<tr><td colspan="2" class="text-center text-muted">—</td></tr>
+																						</tbody>
+																					</table>
+																				</div>
+																			</div>
+																			<div class="card-footer bg-white">
+																				<div class="d-flex justify-content-between">
+																					<span class="text-muted">Total Transfer Qty - </span>
+																					<strong id="gld-audit-shop-totalqty">--</strong>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+
+																	<!-- Shop Challan Dispatch -->
+																	<div class="col-xl-6 col-lg-6 mb-3">
+																		<div class="card border-dark shadow-sm">
+																			<div class="card-header bg-dark text-white py-2">
+																				<strong>Shop Challan Dispatch</strong>
+																			</div>
+																			<div class="card-body p-0">
+																				<div class="table-responsive gld-audit-table-scroll">
+																					<table class="table table-sm table-bordered mb-0">
+																						<thead class="thead-light">
+																							<tr>
+																								<th class="text-center">Bill No</th>
+																								<th>Customer</th>
+																								<th class="text-center">Qty</th>
+																								<th class="text-center">Rate</th>
+																								<th class="text-center">Total</th>
+																								<th class="text-center">Date</th>
+																							</tr>
+																						</thead>
+																						<tbody id="gld-audit-challan-tbody">
+																							<tr><td colspan="6" class="text-center text-muted">—</td></tr>
+																						</tbody>
+																					</table>
+																				</div>
+																			</div>
+																			<div class="card-footer bg-white">
+																				<div class="d-flex justify-content-between">
+																					<span class="text-muted">Total Challan Qty - </span>
+																					<strong id="gld-audit-challan-totalqty">--</strong>
+																				</div>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
                                             </div>
                                         </div>
                                     </div>
@@ -303,6 +539,169 @@ $(document).ready(function(){
     // Default: all time
     $('#stc-gld-range-hint').hide();
     stc_reload_gld(monthStr, 'preload');
+
+	// ----------------- Item Audit -----------------
+	function fmtNum(n){
+		var x = parseFloat(n || 0);
+		if(isNaN(x)) x = 0;
+		return x.toLocaleString('en-IN', {minimumFractionDigits:2});
+	}
+
+	function showAuditStatus(html, kind){
+		var $box = $('#gld-audit-status');
+		$box.removeClass('alert-danger alert-success alert-info alert-warning');
+		if(kind) $box.addClass('alert-' + kind);
+		$box.html(html).show();
+	}
+
+	function hideAuditStatus(){
+		$('#gld-audit-status').hide().html('');
+	}
+
+	function renderEmpty(){
+		$('#gld-audit-meta').hide();
+		$('#gld-audit-results').hide();
+		$('#gld-audit-purchase-tbody').html('<tr><td colspan="5" class="text-center text-muted">No purchase records found.</td></tr>');
+		$('#gld-audit-req-tbody').html('<tr><td colspan="8" class="text-center text-muted">No requisition dispatch found.</td></tr>');
+		$('#gld-audit-shop-tbody').html('<tr><td colspan="2" class="text-center text-muted">No shop transfer found.</td></tr>');
+		$('#gld-audit-challan-tbody').html('<tr><td colspan="6" class="text-center text-muted">No challan dispatch found.</td></tr>');
+		$('#gld-audit-purchase-totalqty, #gld-audit-shop-totalqty, #gld-audit-challan-totalqty').text('--');
+		$('#gld-audit-stock-adhoc, #gld-audit-stock-req, #gld-audit-stock-challan, #gld-audit-stock-balance').text('--');
+	}
+
+	function loadItemAudit(){
+		hideAuditStatus();
+		var code = $.trim($('#gld-audit-itemcode').val() || '');
+		if(code === ''){
+			showAuditStatus('<b>Please enter an item code.</b>', 'warning');
+			renderEmpty();
+			return;
+		}
+
+		showAuditStatus('Loading audit…', 'info');
+		$('#gld-audit-results').hide();
+
+		$.ajax({
+			url: 'kattegat/ragnar_lothbrok.php',
+			method: 'POST',
+			dataType: 'json',
+			data: { gld_item_audit: 1, item_code: code },
+			success: function(resp){
+				if(!resp || resp.success !== true){
+					showAuditStatus('<b>Failed to load audit.</b> ' + (resp && resp.message ? resp.message : ''), 'danger');
+					renderEmpty();
+					return;
+				}
+
+				$('#gld-audit-meta-item').text(resp.item_code || code);
+				$('#gld-audit-meta-name').text(resp.product_name || '--');
+				$('#gld-audit-meta').show();
+				$('#gld-audit-results').show();
+
+				// Purchase
+				var pRows = resp.purchase_rows || [];
+				var pHtml = '';
+				if(Array.isArray(pRows) && pRows.length > 0){
+					$.each(pRows, function(i, r){
+						pHtml += '<tr>' +
+							'<td class="text-center">'+ (r.adhoc_id || '') +'</td>' +
+							'<td>'+ (r.source || '') +' <span class="text-muted">→</span> '+ (r.destination || '') +'</td>' +
+							'<td class="text-right">'+ fmtNum(r.qty) +'</td>' +
+							'<td class="text-right">'+ fmtNum(r.prate) +'</td>' +
+							'<td class="text-center">'+ (r.date || '') +'</td>' +
+						'</tr>';
+					});
+				}else{
+					pHtml = '<tr><td colspan="5" class="text-center text-muted">No purchase records found.</td></tr>';
+				}
+				$('#gld-audit-purchase-tbody').html(pHtml);
+				$('#gld-audit-purchase-totalqty').text(fmtNum(resp.purchase_total_qty || 0));
+
+				// Stock summary
+				$('#gld-audit-stock-adhoc').text(fmtNum(resp.stock && resp.stock.adhoc_qty ? resp.stock.adhoc_qty : 0));
+				$('#gld-audit-stock-req').text(fmtNum(resp.stock && resp.stock.requisition_qty ? resp.stock.requisition_qty : 0));
+				$('#gld-audit-stock-challan').text(fmtNum(resp.stock && resp.stock.challan_qty ? resp.stock.challan_qty : 0));
+				$('#gld-audit-stock-balance').text(fmtNum(resp.stock && resp.stock.balance_qty ? resp.stock.balance_qty : 0));
+
+				// Requisitions
+				var rRows = resp.requisition_rows || [];
+				var rHtml = '';
+				if(Array.isArray(rRows) && rRows.length > 0){
+					var sl = 0;
+					$.each(rRows, function(i, r){
+						sl++;
+						rHtml += '<tr>' +
+							'<td class="text-center">'+ sl +'</td>' +
+							'<td class="text-center">'+ (r.requisition_no || '') +'</td>' +
+							'<td>'+ (r.project_name || '') +'</td>' +
+							'<td>'+ (r.supervisor_name || '') +'</td>' +
+							'<td class="text-center">'+ (r.adhoc_id || '') +'</td>' +
+							'<td class="text-right">'+ fmtNum(r.qty) +'</td>' +
+							'<td class="text-center">'+ (r.unit || '') +'</td>' +
+							'<td class="text-center">'+ (r.date || '') +'</td>' +
+						'</tr>';
+					});
+				}else{
+					rHtml = '<tr><td colspan="8" class="text-center text-muted">No requisition dispatch found.</td></tr>';
+				}
+				$('#gld-audit-req-tbody').html(rHtml);
+
+				// Shop transfer
+				var sRows = resp.shop_rows || [];
+				var sHtml = '';
+				if(Array.isArray(sRows) && sRows.length > 0){
+					$.each(sRows, function(i, r){
+						sHtml += '<tr>' +
+							'<td>'+ (r.shop || '') +'</td>' +
+							'<td class="text-right">'+ fmtNum(r.qty) +'</td>' +
+						'</tr>';
+					});
+				}else{
+					sHtml = '<tr><td colspan="2" class="text-center text-muted">No shop transfer found.</td></tr>';
+				}
+				$('#gld-audit-shop-tbody').html(sHtml);
+				$('#gld-audit-shop-totalqty').text(fmtNum(resp.shop_total_qty || 0));
+
+				// Challan dispatch
+				var cRows = resp.challan_rows || [];
+				var cHtml = '';
+				if(Array.isArray(cRows) && cRows.length > 0){
+					$.each(cRows, function(i, r){
+						var total = (parseFloat(r.qty||0) * parseFloat(r.rate||0));
+						cHtml += '<tr>' +
+							'<td class="text-center">'+ (r.bill_no || '') +'</td>' +
+							'<td>'+ (r.customer || '') +'</td>' +
+							'<td class="text-right">'+ fmtNum(r.qty) +'</td>' +
+							'<td class="text-right">'+ fmtNum(r.rate) +'</td>' +
+							'<td class="text-right">'+ fmtNum(total) +'</td>' +
+							'<td class="text-center">'+ (r.date || '') +'</td>' +
+						'</tr>';
+					});
+				}else{
+					cHtml = '<tr><td colspan="6" class="text-center text-muted">No challan dispatch found.</td></tr>';
+				}
+				$('#gld-audit-challan-tbody').html(cHtml);
+				$('#gld-audit-challan-totalqty').text(fmtNum(resp.challan_total_qty || 0));
+
+				showAuditStatus('<b>Audit loaded.</b>', 'success');
+			},
+			error: function(){
+				showAuditStatus('<b>Error loading audit.</b>', 'danger');
+				renderEmpty();
+			}
+		});
+	}
+
+	$('#gld-audit-search-btn').on('click', function(e){
+		e.preventDefault();
+		loadItemAudit();
+	});
+	$('#gld-audit-itemcode').on('keydown', function(e){
+		if(e.keyCode === 13){
+			e.preventDefault();
+			loadItemAudit();
+		}
+	});
 
 	// GLD purchase location -> product breakup modal
 	$(document).on('click', '.js-gld-purchase-breakdown', function(){
