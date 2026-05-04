@@ -1395,8 +1395,16 @@ class sceptor extends tesseract{
 		];
 	}
 	
-	public function stc_gldprofit_analyzer($month, $year, $type, $date_from = '', $date_to = ''){
+	public function stc_gldprofit_analyzer($month, $year, $type, $date_from = '', $date_to = '', $dash_month_str = ''){
 		$ragnar = '';
+		if($dash_month_str === '' || $dash_month_str === null){
+			$dash_month_str = $year.'-'.str_pad((string)(int)$month, 2, '0', STR_PAD_LEFT);
+		}
+		$dash_month_str_esc = htmlspecialchars((string)$dash_month_str, ENT_QUOTES, 'UTF-8');
+		$type_esc = htmlspecialchars((string)$type, ENT_QUOTES, 'UTF-8');
+		$df_esc = htmlspecialchars((string)$date_from, ENT_QUOTES, 'UTF-8');
+		$dt_esc = htmlspecialchars((string)$date_to, ENT_QUOTES, 'UTF-8');
+
 		$dateFilterAdhoc = "YEAR(a.stc_purchase_product_adhoc_created_date) = '$year'".($type != 'Y' ? " AND MONTH(a.stc_purchase_product_adhoc_created_date) = '$month'" : "");
 		$dateFilterRec = "YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'".($type != 'Y' ? " AND MONTH(r.stc_cust_super_requisition_list_items_rec_date) = '$month'" : "");
 		$dateFilterGld = "YEAR(g.created_date) = '$year'".($type != 'Y' ? " AND MONTH(g.created_date) = '$month'" : "");
@@ -1441,9 +1449,11 @@ class sceptor extends tesseract{
 			SELECT 
 				r.stc_cust_super_requisition_list_items_rec_recqty,
 				a.stc_purchase_product_adhoc_rate,
-				a.stc_purchase_product_adhoc_prate
+				a.stc_purchase_product_adhoc_prate,
+				COALESCE(p.stc_product_sale_percentage, 0) AS sale_pct
 			FROM stc_cust_super_requisition_list_items_rec r
 			LEFT JOIN stc_purchase_product_adhoc a ON a.stc_purchase_product_adhoc_id = r.stc_cust_super_requisition_list_items_rec_list_poaid
+			LEFT JOIN stc_product p ON p.stc_product_id = a.stc_purchase_product_adhoc_productid
 			WHERE ".$dateFilterRec."
 		");
 
@@ -1454,8 +1464,10 @@ class sceptor extends tesseract{
 			$soldAmount = $row['stc_purchase_product_adhoc_rate'] * $row['stc_cust_super_requisition_list_items_rec_recqty'];
 			$soldArray += $soldAmount;
 			
-			// Calculate profit: (rate from adhoc - prate from adhoc) * qty from rec table
-			$profitAmount = ($row['stc_purchase_product_adhoc_rate'] - $row['stc_purchase_product_adhoc_prate']) * $row['stc_cust_super_requisition_list_items_rec_recqty'];
+			// Profit = Sale ₹ × qty (sale margin on basic, times qty again)
+			$basicRec = (float)$row['stc_purchase_product_adhoc_prate'] * (float)$row['stc_cust_super_requisition_list_items_rec_recqty'];
+			$saleRupeeLine = $basicRec * ((float)$row['sale_pct'] / 100.0);
+			$profitAmount = $saleRupeeLine * (float)$row['stc_cust_super_requisition_list_items_rec_recqty'];
 			$profitArray += $profitAmount;
 		}
 
@@ -1465,9 +1477,11 @@ class sceptor extends tesseract{
 				g.qty,
 				g.rate,
 				a.stc_purchase_product_adhoc_rate,
-				a.stc_purchase_product_adhoc_prate
+				a.stc_purchase_product_adhoc_prate,
+				COALESCE(p.stc_product_sale_percentage, 0) AS sale_pct
 			FROM gld_challan g
 			LEFT JOIN stc_purchase_product_adhoc a ON a.stc_purchase_product_adhoc_id = g.adhoc_id
+			LEFT JOIN stc_product p ON p.stc_product_id = a.stc_purchase_product_adhoc_productid
 			WHERE ".$dateFilterGld."
 		");
 
@@ -1476,23 +1490,239 @@ class sceptor extends tesseract{
 			$gldSoldAmount = $row['stc_purchase_product_adhoc_rate'] * $row['qty'];
 			$soldArray += $gldSoldAmount;
 			
-			// Calculate profit: (rate from adhoc - prate from adhoc) * qty from gld table
-			$gldProfitAmount = ($row['stc_purchase_product_adhoc_rate'] - $row['stc_purchase_product_adhoc_prate']) * $row['qty'];
+			$basicGld = (float)$row['stc_purchase_product_adhoc_prate'] * (float)$row['qty'];
+			$saleRupeeLineGld = $basicGld * ((float)$row['sale_pct'] / 100.0);
+			$gldProfitAmount = $saleRupeeLineGld * (float)$row['qty'];
 			$profitArray += $gldProfitAmount;
 		}
 
-		$profitClass = $profitArray >= 0 ? 'text-success' : 'text-danger';
 		$profitDisplay = ($profitArray >= 0 ? '+' : '') . number_format($profitArray, 2);
+		$profitBadgeClass = $profitArray >= 0 ? 'badge-success' : 'badge-danger';
 
 		$ragnar .= "
 			<tr>
 				<td class='text-right'>" . number_format($purchaseArray, 2) . "</td>
 				<td class='text-right'>" . number_format($soldArray, 2) . "</td>
-				<td class='text-right'><span class='$profitClass'>$profitDisplay</span></td>
+				<td class='text-right'><span class='badge badge-pill ".$profitBadgeClass." js-gld-profit-breakdown' style='font-size:14px;cursor:pointer;' data-month=\"".$dash_month_str_esc."\" data-type=\"".$type_esc."\" data-date-from=\"".$df_esc."\" data-date-to=\"".$dt_esc."\">".$profitDisplay."</span></td>
 			</tr>
 		";
 
 		return $ragnar;
+	}
+
+	// Line-wise profit breakup (requisition rec + GLD challan); merged list paginated (default 25 per page)
+	public function stc_gld_profit_breakdown($month, $year, $type, $date_from = '', $date_to = '', $page = 1, $per_page = 25){
+		$month = (int)$month;
+		$year = (int)$year;
+		$page = max(1, (int)$page);
+		$per_page = max(1, min(100, (int)$per_page));
+		$offset = ($page - 1) * $per_page;
+
+		$dateFilterRec = "YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'".($type != 'Y' ? " AND MONTH(r.stc_cust_super_requisition_list_items_rec_date) = '$month'" : "");
+		$dateFilterGld = "YEAR(g.created_date) = '$year'".($type != 'Y' ? " AND MONTH(g.created_date) = '$month'" : "");
+
+		if($type == 'A'){
+			$dateFilterRec = "1=1";
+			$dateFilterGld = "1=1";
+		} elseif($type == 'R'){
+			$df = mysqli_real_escape_string($this->stc_dbs, (string)$date_from);
+			$dt = mysqli_real_escape_string($this->stc_dbs, (string)$date_to);
+			if($df != '' && $dt != ''){
+				$dateFilterRec = "DATE(r.stc_cust_super_requisition_list_items_rec_date) BETWEEN '".$df."' AND '".$dt."'";
+				$dateFilterGld = "DATE(g.created_date) BETWEEN '".$df."' AND '".$dt."'";
+			} else {
+				$dateFilterRec = "1=1";
+				$dateFilterGld = "1=1";
+			}
+		}
+
+		/* Line total = Basic + Sale ₹ + GST ₹. Profit = Sale ₹ × Qty (sale margin amount multiplied by quantity again). */
+		$sqlRec = "
+			SELECT
+				source,
+				adhoc_id,
+				product_id,
+				product_name,
+				product_unit,
+				qty,
+				prate,
+				rate,
+				gst_pct,
+				sale_pct,
+				basic,
+				sale_amount,
+				gst_amount,
+				CAST(basic + sale_amount + gst_amount AS DECIMAL(18,4)) AS total,
+				profit,
+				sort_ts
+			FROM (
+				SELECT
+					'REQ' AS source,
+					r.stc_cust_super_requisition_list_items_rec_list_poaid AS adhoc_id,
+					COALESCE(p.stc_product_id, 0) AS product_id,
+					CASE
+						WHEN S.stc_sub_cat_name IS NOT NULL AND S.stc_sub_cat_name != 'OTHERS' THEN CONCAT(S.stc_sub_cat_name, ' ', COALESCE(p.stc_product_name, ''))
+						ELSE COALESCE(p.stc_product_name, '')
+					END AS product_name,
+					COALESCE(NULLIF(TRIM(p.stc_product_unit), ''), '—') AS product_unit,
+					CAST(COALESCE(r.stc_cust_super_requisition_list_items_rec_recqty, 0) AS DECIMAL(18,4)) AS qty,
+					CAST(COALESCE(a.stc_purchase_product_adhoc_prate, 0) AS DECIMAL(18,4)) AS prate,
+					CAST(COALESCE(a.stc_purchase_product_adhoc_rate, 0) AS DECIMAL(18,4)) AS rate,
+					CAST(COALESCE(p.stc_product_gst, 0) AS DECIMAL(18,4)) AS gst_pct,
+					CAST(COALESCE(p.stc_product_sale_percentage, 0) AS DECIMAL(18,4)) AS sale_pct,
+					CAST(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(r.stc_cust_super_requisition_list_items_rec_recqty, 0) AS DECIMAL(18,4)) AS basic,
+					CAST(
+						(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(r.stc_cust_super_requisition_list_items_rec_recqty, 0))
+						* (COALESCE(p.stc_product_sale_percentage, 0) / 100)
+					AS DECIMAL(18,4)) AS sale_amount,
+					CAST(
+						(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(r.stc_cust_super_requisition_list_items_rec_recqty, 0))
+						* (1 + (COALESCE(p.stc_product_sale_percentage, 0) / 100))
+						* (COALESCE(p.stc_product_gst, 0) / 100)
+					AS DECIMAL(18,4)) AS gst_amount,
+					CAST(
+						(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(r.stc_cust_super_requisition_list_items_rec_recqty, 0))
+						* (COALESCE(p.stc_product_sale_percentage, 0) / 100)
+						* COALESCE(r.stc_cust_super_requisition_list_items_rec_recqty, 0)
+					AS DECIMAL(18,4)) AS profit,
+					TIMESTAMP(r.stc_cust_super_requisition_list_items_rec_date) AS sort_ts
+				FROM stc_cust_super_requisition_list_items_rec r
+				LEFT JOIN stc_purchase_product_adhoc a ON a.stc_purchase_product_adhoc_id = r.stc_cust_super_requisition_list_items_rec_list_poaid
+				LEFT JOIN stc_product p ON p.stc_product_id = a.stc_purchase_product_adhoc_productid
+				LEFT JOIN stc_sub_category S ON S.stc_sub_cat_id = p.stc_product_sub_cat_id
+				WHERE ".$dateFilterRec."
+			) AS rec_line
+		";
+
+		$sqlGld = "
+			SELECT
+				source,
+				adhoc_id,
+				product_id,
+				product_name,
+				product_unit,
+				qty,
+				prate,
+				rate,
+				gst_pct,
+				sale_pct,
+				basic,
+				sale_amount,
+				gst_amount,
+				CAST(basic + sale_amount + gst_amount AS DECIMAL(18,4)) AS total,
+				profit,
+				sort_ts
+			FROM (
+				SELECT
+					'GLD' AS source,
+					COALESCE(g.adhoc_id, 0) AS adhoc_id,
+					COALESCE(g.product_id, a.stc_purchase_product_adhoc_productid, 0) AS product_id,
+					CASE
+						WHEN S.stc_sub_cat_name IS NOT NULL AND S.stc_sub_cat_name != 'OTHERS' THEN CONCAT(S.stc_sub_cat_name, ' ', COALESCE(p.stc_product_name, ''))
+						ELSE COALESCE(p.stc_product_name, '')
+					END AS product_name,
+					COALESCE(NULLIF(TRIM(p.stc_product_unit), ''), '—') AS product_unit,
+					CAST(COALESCE(g.qty, 0) AS DECIMAL(18,4)) AS qty,
+					CAST(COALESCE(a.stc_purchase_product_adhoc_prate, 0) AS DECIMAL(18,4)) AS prate,
+					CAST(COALESCE(a.stc_purchase_product_adhoc_rate, 0) AS DECIMAL(18,4)) AS rate,
+					CAST(COALESCE(p.stc_product_gst, 0) AS DECIMAL(18,4)) AS gst_pct,
+					CAST(COALESCE(p.stc_product_sale_percentage, 0) AS DECIMAL(18,4)) AS sale_pct,
+					CAST(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(g.qty, 0) AS DECIMAL(18,4)) AS basic,
+					CAST(
+						(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(g.qty, 0))
+						* (COALESCE(p.stc_product_sale_percentage, 0) / 100)
+					AS DECIMAL(18,4)) AS sale_amount,
+					CAST(
+						(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(g.qty, 0))
+						* (1 + (COALESCE(p.stc_product_sale_percentage, 0) / 100))
+						* (COALESCE(p.stc_product_gst, 0) / 100)
+					AS DECIMAL(18,4)) AS gst_amount,
+					CAST(
+						(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(g.qty, 0))
+						* (COALESCE(p.stc_product_sale_percentage, 0) / 100)
+						* COALESCE(g.qty, 0)
+					AS DECIMAL(18,4)) AS profit,
+					TIMESTAMP(g.created_date) AS sort_ts
+				FROM gld_challan g
+				LEFT JOIN stc_purchase_product_adhoc a ON a.stc_purchase_product_adhoc_id = g.adhoc_id
+				LEFT JOIN stc_product p ON p.stc_product_id = COALESCE(g.product_id, a.stc_purchase_product_adhoc_productid)
+				LEFT JOIN stc_sub_category S ON S.stc_sub_cat_id = p.stc_product_sub_cat_id
+				WHERE ".$dateFilterGld."
+			) AS gld_line
+		";
+
+		$unionWrapped = '('.$sqlRec.') UNION ALL ('.$sqlGld.')';
+
+		$totalRows = 0;
+		$qCnt = mysqli_query($this->stc_dbs, 'SELECT COUNT(*) AS cnt FROM ('.$unionWrapped.') AS merged_cnt');
+		if($qCnt){
+			$cRow = mysqli_fetch_assoc($qCnt);
+			$totalRows = (int)($cRow['cnt'] ?? 0);
+		}
+
+		$sumTotal = 0.0;
+		$sumProfit = 0.0;
+		$qSum = mysqli_query($this->stc_dbs, '
+			SELECT
+				COALESCE(SUM(merged.total), 0) AS sum_total,
+				COALESCE(SUM(merged.profit), 0) AS sum_profit
+			FROM ('.$unionWrapped.') AS merged
+		');
+		if($qSum){
+			$sRow = mysqli_fetch_assoc($qSum);
+			$sumTotal = (float)($sRow['sum_total'] ?? 0);
+			$sumProfit = (float)($sRow['sum_profit'] ?? 0);
+		}
+
+		$totalPages = $totalRows > 0 ? (int)ceil($totalRows / $per_page) : 0;
+		if($totalPages > 0 && $page > $totalPages){
+			$page = $totalPages;
+			$offset = ($page - 1) * $per_page;
+		}
+
+		$rows = [];
+		$qPage = mysqli_query($this->stc_dbs, '
+			SELECT merged.source, merged.adhoc_id, merged.product_id, merged.product_name, merged.product_unit, merged.qty, merged.prate, merged.rate, merged.gst_pct, merged.sale_pct, merged.basic, merged.sale_amount, merged.gst_amount, merged.total, merged.profit
+			FROM ('.$unionWrapped.') AS merged
+			ORDER BY merged.sort_ts DESC, merged.adhoc_id DESC
+			LIMIT '.(int)$per_page.' OFFSET '.(int)$offset.'
+		');
+
+		if($qPage){
+			while($r = mysqli_fetch_assoc($qPage)){
+				$t = (float)($r['total'] ?? 0);
+				$pr = (float)($r['profit'] ?? 0);
+				$rows[] = [
+					'source' => (string)($r['source'] ?? ''),
+					'adhoc_id' => (int)($r['adhoc_id'] ?? 0),
+					'product_id' => (int)($r['product_id'] ?? 0),
+					'product_name' => (string)($r['product_name'] ?? ''),
+					'product_unit' => (string)($r['product_unit'] ?? ''),
+					'qty' => (float)($r['qty'] ?? 0),
+					'prate' => (float)($r['prate'] ?? 0),
+					'rate' => (float)($r['rate'] ?? 0),
+					'gst_pct' => (float)($r['gst_pct'] ?? 0),
+					'sale_pct' => (float)($r['sale_pct'] ?? 0),
+					'basic' => (float)($r['basic'] ?? 0),
+					'sale_amount' => (float)($r['sale_amount'] ?? 0),
+					'gst_amount' => (float)($r['gst_amount'] ?? 0),
+					'total' => $t,
+					'profit' => $pr
+				];
+			}
+		}
+
+		return [
+			'success' => true,
+			'rows' => $rows,
+			'total_sale' => $sumTotal,
+			'total_profit' => $sumProfit,
+			'total_formula' => 'Sale ₹ = Basic × (Sale % ÷ 100). Profit = Sale ₹ × Qty (Prate × Qty² × Sale % ÷ 100). Line total = Basic + Sale ₹ + GST ₹.',
+			'page' => $page,
+			'per_page' => $per_page,
+			'total_rows' => $totalRows,
+			'total_pages' => $totalPages,
+		];
 	}
 
 	// Update requisition item status with logging
@@ -1588,7 +1818,8 @@ if(isset($_POST["dashboard"])){
 	$date_from = isset($_POST['date_from']) ? $_POST['date_from'] : '';
 	$date_to = isset($_POST['date_to']) ? $_POST['date_to'] : '';
 	$opobjstcgld=$objstcgropaid->stc_gld($month, $year, $type, $date_from, $date_to);
-	$opobjstcgldanalyzer=$objstcgropaid->stc_gldprofit_analyzer($month, $year, $type, $date_from, $date_to);
+	$dash_month_str = ($preload=='preload') ? date('Y-m') : date('Y-m', strtotime($Omonth));
+	$opobjstcgldanalyzer=$objstcgropaid->stc_gldprofit_analyzer($month, $year, $type, $date_from, $date_to, $dash_month_str);
 	if($preload=='preload'){
 		$month=date('Y-m');
 	}else{
@@ -1647,6 +1878,28 @@ if(isset($_POST["gld_stock_breakdown"])){
 	$location = isset($_POST['location']) ? $_POST['location'] : '';
 	$obj = new sceptor();
 	$out = $obj->stc_gld_stock_breakdown($location);
+	header('Content-Type: application/json');
+	echo json_encode($out);
+	exit;
+}
+
+// GLD profit line-item breakup (requisition + challan) for GLD profit summary cell
+if(isset($_POST["gld_profit_breakdown"])){
+	$Omonth = $month = isset($_POST['month']) ? $_POST['month'] : date('Y-m');
+	$type = isset($_POST['type']) ? $_POST['type'] : 'NA';
+	$date_from = isset($_POST['date_from']) ? $_POST['date_from'] : '';
+	$date_to = isset($_POST['date_to']) ? $_POST['date_to'] : '';
+	$p_page = isset($_POST['page']) ? max(1, (int)$_POST['page']) : 1;
+	$p_per = isset($_POST['per_page']) ? max(1, min(100, (int)$_POST['per_page'])) : 25;
+
+	$year = date('Y');
+	$month = date('m', strtotime($month));
+	if($type=="Y"){
+		$year = date('Y', strtotime($Omonth));
+	}
+
+	$obj = new sceptor();
+	$out = $obj->stc_gld_profit_breakdown((int)$month, (int)$year, $type, $date_from, $date_to, $p_page, $p_per);
 	header('Content-Type: application/json');
 	echo json_encode($out);
 	exit;

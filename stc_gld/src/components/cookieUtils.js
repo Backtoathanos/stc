@@ -69,8 +69,10 @@ export const validateAuthCookies = () => {
         allCookies: document.cookie
     });
     
+    // Cookies alone are enough (e.g. superadmin GLD opens print-preview on another path/subdomain;
+    // localStorage does not carry over). Login flow still sets cookies + localStorage.
     return {
-        isValid: !!(userId && location && login),
+        isValid: !!(userId && location),
         userId,
         location,
         login

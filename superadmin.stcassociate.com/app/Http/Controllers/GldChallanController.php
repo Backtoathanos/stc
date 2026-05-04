@@ -72,6 +72,7 @@ class GldChallanController extends Controller
                 'SP.stc_product_name',
                 'GCU.gld_customer_title',
                 'TU.stc_trading_user_name as creator_name',
+                'TU.stc_trading_user_location as creator_location',
                 'AG.stc_trading_user_name as agent_name',
                 'PA.stc_purchase_product_adhoc_itemdesc as adhoc_itemdesc',
                 'PA.stc_purchase_product_adhoc_productid as adhoc_line_product_id',
@@ -267,8 +268,23 @@ class GldChallanController extends Controller
             $paymentCode = (int) ($r->payment_status ?? 0);
             $paymentLabel = $this->paymentStatusLabel($paymentCode);
 
+            $challanNoRaw = isset($r->challan_number) ? trim((string) $r->challan_number) : '';
+            $printPreviewHref = $challanNoRaw !== ''
+                ? 'https://stcassociate.com/stc_gld/print-preview?challan_no=' . rawurlencode($challanNoRaw) . '&status=challan'
+                : '';
+            $creatorUid = (int) ($r->created_by ?? 0);
+            $creatorLoc = isset($r->creator_location) ? trim((string) $r->creator_location) : '';
+            $printPreviewBtn = $printPreviewHref !== ''
+                ? '<button type="button" class="btn btn-outline-info gld-open-print-preview" '
+                . 'data-url="' . e($printPreviewHref) . '" '
+                . 'data-user-id="' . $creatorUid . '" '
+                . 'data-location="' . e($creatorLoc) . '" '
+                . 'title="Print preview (sets GLD cookies for this creator)"><i class="fas fa-print"></i></button>'
+                : '<button type="button" class="btn btn-outline-info" disabled title="No challan number"><i class="fas fa-print"></i></button>';
+
             $actionData = '
                 <div class="btn-group btn-group-sm">
+                  ' . $printPreviewBtn . '
                   <button type="button" class="btn btn-outline-secondary gld-view-btn" data-id="' . $id . '" title="View"><i class="fas fa-eye"></i></button>
                   <button type="button" class="btn btn-outline-primary gld-edit-btn" data-id="' . $id . '" title="Edit"><i class="fas fa-edit"></i></button>
                   <button type="button" class="btn btn-outline-danger gld-delete-btn" data-id="' . $id . '" title="Delete"><i class="fas fa-trash"></i></button>

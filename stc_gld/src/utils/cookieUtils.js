@@ -70,7 +70,7 @@ export const validateAuthCookies = () => {
     });
     
     return {
-        isValid: !!(userId && location && login),
+        isValid: !!(userId && location),
         userId,
         location,
         login

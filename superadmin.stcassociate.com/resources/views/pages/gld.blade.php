@@ -323,6 +323,33 @@
     products: @json($gld_product_names ?? []),
     adhocs: @json($gld_adhoc_labels ?? [])
   };
+  /** Match stc_gld src/components/cookieUtils.js so React Protected routes see the same cookies. */
+  window.GLD_setTradingAuthCookies = function (userId, locationStr, days) {
+    days = days == null ? 7 : days;
+    var uid = userId != null && userId !== '' ? String(userId) : '';
+    var loc = locationStr != null && locationStr !== '' ? String(locationStr) : '';
+    if (!uid || !loc) {
+      return false;
+    }
+    var expires = new Date(Date.now() + days * 864e5).toUTCString();
+    var host = window.location.hostname || '';
+    var isLocalhost = host === 'localhost' || host === '127.0.0.1';
+    var isHttps = window.location.protocol === 'https:';
+    function writeCookie(name, value) {
+      var s = name + '=' + encodeURIComponent(value) + '; expires=' + expires + '; path=/';
+      if (isHttps) {
+        s += '; Secure';
+      }
+      if (isHttps && !isLocalhost) {
+        s += '; domain=.stcassociate.com';
+      }
+      s += '; SameSite=Lax';
+      document.cookie = s;
+    }
+    writeCookie('user_id', uid);
+    writeCookie('location_stc', loc);
+    return true;
+  };
 </script>
 <script>
 $(function () {
@@ -385,6 +412,24 @@ $(function () {
       search: '_INPUT_',
       searchPlaceholder: 'Search records…'
     }
+  });
+
+  $('#gld-table').on('click', '.gld-open-print-preview', function (e) {
+    e.preventDefault();
+    var $btn = $(this);
+    var url = $btn.attr('data-url');
+    var uid = $btn.attr('data-user-id');
+    var loc = $btn.attr('data-location');
+    if (!url) {
+      return;
+    }
+    if (typeof window.GLD_setTradingAuthCookies === 'function') {
+      var ok = window.GLD_setTradingAuthCookies(uid, loc, 7);
+      if (!ok) {
+        swalToast('warning', 'This row has no creator / branch location; GLD print preview may ask you to log in.');
+      }
+    }
+    window.open(url, '_blank', 'noopener,noreferrer');
   });
 
   function gldLoadRackOptions(createdBy, after) {

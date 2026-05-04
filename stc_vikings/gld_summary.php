@@ -895,6 +895,176 @@ $(document).ready(function(){
 			}
 		});
 	});
+
+	function renderGldProfitBreakup(resp){
+		if(!resp || resp.success !== true){
+			$('#gld-profit-breakup-tbody').html('<tr><td colspan="16" class="text-center text-danger">Failed to load data.</td></tr>');
+			$('#gld-profit-breakup-pager-wrap').hide();
+			return;
+		}
+		var rows = resp.rows || [];
+		var totalRows = (resp.total_rows !== undefined && resp.total_rows !== null) ? parseInt(resp.total_rows, 10) : 0;
+		var page = (resp.page !== undefined && resp.page !== null) ? parseInt(resp.page, 10) : 1;
+		var perPage = (resp.per_page !== undefined && resp.per_page !== null) ? parseInt(resp.per_page, 10) : 25;
+		var totalPages = (resp.total_pages !== undefined && resp.total_pages !== null) ? parseInt(resp.total_pages, 10) : 0;
+
+		var $modal = $('#gldProfitBreakupModal');
+		var ctx = $modal.data('profitCtx') || {};
+		ctx.page = page;
+		$modal.data('profitCtx', ctx);
+
+		var tSale = (resp.total_sale !== undefined && resp.total_sale !== null) ? resp.total_sale : 0;
+		var tProf = (resp.total_profit !== undefined && resp.total_profit !== null) ? resp.total_profit : 0;
+		$('#gld-profit-breakup-total').text('₹ ' + parseFloat(tSale).toLocaleString('en-IN', {minimumFractionDigits:2}));
+		var tProfN = parseFloat(tProf);
+		var tProfSign = tProfN > 0 ? '+' : (tProfN < 0 ? '-' : '');
+		var tProfAmt = Math.abs(tProfN).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+		$('#gld-profit-breakup-profit').text(tProfSign + '₹ ' + tProfAmt);
+		var $profBadge = $('#gld-profit-breakup-profit').parent('.badge');
+		$profBadge.removeClass('badge-success badge-danger badge-secondary').addClass(tProfN > 0 ? 'badge-success' : 'badge-danger');
+
+		if(!Array.isArray(rows) || rows.length === 0){
+			$('#gld-profit-breakup-tbody').html('<tr><td colspan="16" class="text-center text-muted">No data found.</td></tr>');
+			$('#gld-profit-breakup-pager-wrap').hide();
+			return;
+		}
+
+		var slBase = (page - 1) * perPage;
+		var html = '';
+		var gldTT = {
+			sl: 'Serial number on this page only (pagination offset). Not calculated from other columns.',
+			src: 'Line origin: REQ = requisition dispatch, GLD = GLD sale row. Reference only.',
+			adhoc: 'Purchase adhoc / PO line ID this row is tied to. Reference only.',
+			pid: 'Product master ID from stc_product. Reference only.',
+			pname: 'Display name from product (and subcategory when used). Not a formula column.',
+			unit: 'Unit of measure from product master (stc_product_unit). Reference only; does not change maths.',
+			qty: 'Quantity on this line. Profit = Sale ₹ × Qty (API Sale ₹ margin multiplied by quantity again).',
+			prate: 'Purchase rate per unit from adhoc (stc_purchase_product_adhoc_prate). Basic = Prate × Qty.',
+			basic: 'Basic = Prate × Qty. Purchase/stock value for the line before sale margin and GST.',
+			gst: 'GST % from product (stc_product_gst). Applied on taxable base (Basic + Sale ₹), not on Prate alone.',
+			gstAmt: 'GST ₹ = (Basic + Sale ₹) × (GST % ÷ 100). Tax is on Basic plus the sale-margin amount.',
+			salepct: 'Sale margin % from product (stc_product_sale_percentage). Sale ₹ = Basic × (Sale % ÷ 100); Profit column shows Sale ₹ × Qty.',
+			saleAmt: 'Sale ₹ = Basic × (Sale % ÷ 100). Profit cell = this Sale ₹ × Qty.',
+			total: 'Line total = Basic + Sale ₹ + GST ₹. Sum of purchase subtotal, margin rupees, and GST rupees.',
+			listRate: 'List/sell rate per unit from adhoc (stc_purchase_product_adhoc_rate). Reference only; Profit = Sale ₹ × Qty.',
+			profit: 'Profit = Sale ₹ × Qty (same as API profit/Sale ₹ figure multiplied by quantity again). Equals Prate × Qty² × (Sale % ÷ 100).'
+		};
+		var gldTTe = {};
+		$.each(gldTT, function(k, v){ gldTTe[k] = $('<div/>').text(v).html(); });
+		$.each(rows, function(i, r){
+			var sl = slBase + i + 1;
+			var src = (r && r.source !== undefined && r.source !== null) ? r.source : '';
+			var aid = (r && r.adhoc_id !== undefined && r.adhoc_id !== null) ? r.adhoc_id : '';
+			var pid = (r && r.product_id !== undefined && r.product_id !== null) ? r.product_id : '';
+			var pname = (r && r.product_name !== undefined && r.product_name !== null) ? $('<div/>').text(r.product_name).html() : '';
+			var unit = (r && r.product_unit !== undefined && r.product_unit !== null) ? $('<div/>').text(r.product_unit).html() : '—';
+			var qty = (r && r.qty !== undefined && r.qty !== null) ? r.qty : 0;
+			var prate = (r && r.prate !== undefined && r.prate !== null) ? r.prate : 0;
+			var basic = (r && r.basic !== undefined && r.basic !== null) ? r.basic : 0;
+			var gst = (r && r.gst_pct !== undefined && r.gst_pct !== null) ? r.gst_pct : 0;
+			var gstAmt = (r && r.gst_amount !== undefined && r.gst_amount !== null) ? r.gst_amount : 0;
+			var salepct = (r && r.sale_pct !== undefined && r.sale_pct !== null) ? r.sale_pct : 0;
+			var saleAmt = (r && r.sale_amount !== undefined && r.sale_amount !== null) ? r.sale_amount : 0;
+			var total = (r && r.total !== undefined && r.total !== null) ? r.total : 0;
+			var listRate = (r && r.rate !== undefined && r.rate !== null) ? r.rate : 0;
+			var saleRupeeLine = parseFloat(saleAmt);
+			var qtyNum = parseFloat(qty);
+			var pVal = saleRupeeLine * qtyNum;
+			var profitClr = pVal > 0 ? 'text-success' : 'text-danger';
+			var profitSign = pVal > 0 ? '+' : (pVal < 0 ? '-' : '');
+			var profitAmt = Math.abs(pVal).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+			html += '<tr>' +
+				'<td class="text-center text-muted" style="cursor:help" title="'+ gldTTe.sl +'">'+ sl +'</td>' +
+				'<td class="text-center" style="cursor:help" title="'+ gldTTe.src +'"><span class="badge badge-secondary">'+ $('<div/>').text(src).html() +'</span></td>' +
+				'<td class="text-center" style="cursor:help" title="'+ gldTTe.adhoc +'">'+ aid +'</td>' +
+				'<td class="text-center" style="cursor:help" title="'+ gldTTe.pid +'">'+ pid +'</td>' +
+				'<td class="text-left" style="cursor:help" title="'+ gldTTe.pname +'">'+ pname +'</td>' +
+				'<td class="text-center" style="cursor:help" title="'+ gldTTe.unit +'">'+ unit +'</td>' +
+				'<td class="text-right" style="cursor:help" title="'+ gldTTe.qty +'">'+ parseFloat(qty).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+				'<td class="text-right text-info" style="cursor:help" title="'+ gldTTe.prate +'">₹ '+ parseFloat(prate).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+				'<td class="text-right" style="cursor:help" title="'+ gldTTe.basic +'">₹ '+ parseFloat(basic).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+				'<td class="text-right" style="cursor:help" title="'+ gldTTe.gst +'">'+ parseFloat(gst).toLocaleString('en-IN', {minimumFractionDigits:2}) +'%</td>' +
+				'<td class="text-right" style="cursor:help" title="'+ gldTTe.gstAmt +'">₹ '+ parseFloat(gstAmt).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+				'<td class="text-right" style="cursor:help" title="'+ gldTTe.salepct +'">'+ parseFloat(salepct).toLocaleString('en-IN', {minimumFractionDigits:2}) +'%</td>' +
+				'<td class="text-right" style="cursor:help" title="'+ gldTTe.saleAmt +'">₹ '+ parseFloat(saleAmt).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+				'<td class="text-right font-weight-bold text-primary" style="cursor:help" title="'+ gldTTe.total +'">₹ '+ parseFloat(total).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+				'<td class="text-right text-success" style="cursor:help" title="'+ gldTTe.listRate +'">₹ '+ parseFloat(listRate).toLocaleString('en-IN', {minimumFractionDigits:2}) +'</td>' +
+				'<td class="text-right font-weight-bold '+ profitClr +'" style="cursor:help" title="'+ gldTTe.profit +'">'+ profitSign +'₹ '+ profitAmt +'</td>' +
+			'</tr>';
+		});
+		$('#gld-profit-breakup-tbody').html(html);
+
+		if(totalPages > 1){
+			$('#gld-profit-breakup-pager-wrap').show();
+			$('#gld-profit-breakup-pageinfo').text('Page ' + page + ' of ' + totalPages + ' · ' + totalRows + ' rows');
+			$('#gld-profit-breakup-prev').prop('disabled', page <= 1);
+			$('#gld-profit-breakup-next').prop('disabled', page >= totalPages);
+		} else {
+			$('#gld-profit-breakup-pager-wrap').hide();
+		}
+	}
+
+	function loadGldProfitBreakup(page){
+		var ctx = $('#gldProfitBreakupModal').data('profitCtx');
+		if(!ctx){
+			return;
+		}
+		page = page || 1;
+		ctx.page = page;
+		$('#gldProfitBreakupModal').data('profitCtx', ctx);
+		$('#gld-profit-breakup-tbody').html('<tr><td colspan="16" class="text-center text-muted">Loading...</td></tr>');
+		$.ajax({
+			url: 'kattegat/ragnar_lothbrok.php',
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				gld_profit_breakdown: 1,
+				month: ctx.month,
+				type: ctx.type,
+				date_from: ctx.df,
+				date_to: ctx.dt,
+				page: page,
+				per_page: 25
+			},
+			success: renderGldProfitBreakup,
+			error: function(){
+				$('#gld-profit-breakup-tbody').html('<tr><td colspan="16" class="text-center text-danger">Error loading data.</td></tr>');
+				$('#gld-profit-breakup-pager-wrap').hide();
+			}
+		});
+	}
+
+	$(document).on('click', '.js-gld-profit-breakdown', function(){
+		var $el = $(this);
+		var month = $el.data('month') || '';
+		var t = $el.data('type') || 'A';
+		var df = $el.data('date-from') || '';
+		var dt = $el.data('date-to') || '';
+
+		$('#gldProfitBreakupModal').data('profitCtx', { month: month, type: t, df: df, dt: dt, page: 1 });
+		$('#gldProfitBreakupModalLabel').text('GLD Profit Breakup');
+		$('#gld-profit-breakup-total').text('₹ --');
+		$('#gld-profit-breakup-profit').text('₹ --');
+		$('#gld-profit-breakup-profit').parent('.badge').removeClass('badge-success badge-danger').addClass('badge-secondary');
+		$('#gldProfitBreakupModal').modal('show');
+		loadGldProfitBreakup(1);
+	});
+
+	$(document).on('click', '#gld-profit-breakup-prev', function(){
+		var ctx = $('#gldProfitBreakupModal').data('profitCtx');
+		if(!ctx || ctx.page <= 1){
+			return;
+		}
+		loadGldProfitBreakup(ctx.page - 1);
+	});
+
+	$(document).on('click', '#gld-profit-breakup-next', function(){
+		var ctx = $('#gldProfitBreakupModal').data('profitCtx');
+		if(!ctx){
+			return;
+		}
+		loadGldProfitBreakup(ctx.page + 1);
+	});
 });
 </script>
 
@@ -1003,6 +1173,59 @@ $(document).ready(function(){
 				</div>
 				<div class="d-flex justify-content-end mt-3">
 					<span class="badge badge-pill badge-success" style="font-size:14px;">Grand Total: <span id="gld-stock-breakup-total">₹ --</span></span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- GLD Profit Breakup Modal -->
+<div class="modal fade" id="gldProfitBreakupModal" tabindex="-1" role="dialog" aria-labelledby="gldProfitBreakupModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="gldProfitBreakupModalLabel">GLD Profit Breakup</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p class="small text-muted mb-2">Read each row left → right: product, unit &amp; qty, then <strong class="text-info">Prate</strong> and <strong>Basic</strong> (= Prate×Qty). Then GST % &amp; GST ₹, Sale % &amp; Sale ₹ (= Basic × Sale % ÷ 100). <strong class="text-primary">Line total</strong> (= Basic + Sale ₹ + GST ₹). <strong class="text-success">List rate</strong> is quoted sell ₹/unit. <strong>Profit</strong> = <strong>Sale ₹ × Qty</strong>.</p>
+				<div class="table-responsive">
+					<table class="table table-bordered table-hover table-sm mb-0">
+						<thead class="thead-light">
+							<tr>
+								<th class="text-center" style="cursor:help" title="Serial number on this page only (pagination offset). Not calculated from other columns.">#</th>
+								<th class="text-center" style="cursor:help" title="Line origin: REQ = requisition dispatch, GLD = GLD sale row. Reference only.">Src</th>
+								<th class="text-center" style="cursor:help" title="Purchase adhoc / PO line ID this row is tied to. Reference only.">Adhoc</th>
+								<th class="text-center" style="cursor:help" title="Product master ID from stc_product. Reference only.">PID</th>
+								<th class="text-center" style="cursor:help" title="Display name from product (and subcategory when used). Not a formula column.">Product</th>
+								<th class="text-center" style="cursor:help" title="Unit of measure from product master (stc_product_unit). Reference only; does not change maths.">Unit</th>
+								<th class="text-center" style="cursor:help" title="Quantity on this line. Profit shown = Sale ₹ × Qty.">Qty</th>
+								<th class="text-center" style="cursor:help" title="Purchase rate per unit from adhoc (stc_purchase_product_adhoc_prate). Basic = Prate × Qty.">Prate</th>
+								<th class="text-center" style="cursor:help" title="Basic = Prate × Qty. Purchase/stock value for the line before sale margin and GST.">Basic</th>
+								<th class="text-center" style="cursor:help" title="GST % from product (stc_product_gst). Applied on taxable base (Basic + Sale ₹), not on Prate alone.">GST %</th>
+								<th class="text-center" style="cursor:help" title="GST ₹ = (Basic + Sale ₹) × (GST % ÷ 100). Tax is on Basic plus the sale-margin amount.">GST ₹</th>
+								<th class="text-center" style="cursor:help" title="Sale margin % from product (stc_product_sale_percentage). Sale ₹ on Basic; Profit = Sale ₹ × Qty.">Sale %</th>
+								<th class="text-center" style="cursor:help" title="Sale ₹ = Basic × (Sale % ÷ 100). Profit column multiplies this by Qty again.">Sale ₹</th>
+								<th class="text-center" style="cursor:help" title="Line total = Basic + Sale ₹ + GST ₹. Sum of purchase subtotal, margin rupees, and GST rupees.">Line total</th>
+								<th class="text-center" style="cursor:help" title="List/sell rate per unit from adhoc (stc_purchase_product_adhoc_rate). Reference only; Profit = Sale ₹ × Qty.">List ₹</th>
+								<th class="text-center" style="cursor:help" title="Profit = Sale ₹ × Qty (= API profit margin × Qty).">Profit</th>
+							</tr>
+						</thead>
+						<tbody id="gld-profit-breakup-tbody">
+							<tr><td colspan="16" class="text-center text-muted">Click total profit to load breakup.</td></tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="d-flex justify-content-between align-items-center flex-wrap mt-2 mb-1" id="gld-profit-breakup-pager-wrap" style="display:none;">
+					<button type="button" class="btn btn-sm btn-outline-secondary" id="gld-profit-breakup-prev">&laquo; Prev</button>
+					<span class="small text-muted" id="gld-profit-breakup-pageinfo"></span>
+					<button type="button" class="btn btn-sm btn-outline-secondary" id="gld-profit-breakup-next">Next &raquo;</button>
+				</div>
+				<div class="d-flex justify-content-end flex-wrap mt-3">
+					<span class="badge badge-pill badge-info mr-2 mb-1" style="font-size:14px;">Sale total: <span id="gld-profit-breakup-total">₹ --</span></span>
+					<span class="badge badge-pill badge-secondary mb-1" style="font-size:14px;">Profit total: <span id="gld-profit-breakup-profit">₹ --</span></span>
 				</div>
 			</div>
 		</div>
