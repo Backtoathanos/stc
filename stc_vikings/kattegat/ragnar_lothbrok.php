@@ -1640,7 +1640,6 @@ class sceptor extends tesseract{
 					CAST(
 						(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(g.qty, 0))
 						* (COALESCE(p.stc_product_sale_percentage, 0) / 100)
-						* COALESCE(g.qty, 0)
 					AS DECIMAL(18,4)) AS profit,
 					TIMESTAMP(g.created_date) AS sort_ts
 				FROM gld_challan g
