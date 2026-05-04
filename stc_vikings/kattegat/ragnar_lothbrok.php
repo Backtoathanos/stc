@@ -1572,7 +1572,7 @@ class sceptor extends tesseract{
 					CAST(COALESCE(p.stc_product_sale_percentage, 0) AS DECIMAL(18,4)) AS sale_pct,
 					CAST(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(r.stc_cust_super_requisition_list_items_rec_recqty, 0) AS DECIMAL(18,4)) AS basic,
 					CAST(
-						(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(r.stc_cust_super_requisition_list_items_rec_recqty, 0))
+						a.stc_purchase_product_adhoc_prate
 						* (COALESCE(p.stc_product_sale_percentage, 0) / 100)
 					AS DECIMAL(18,4)) AS sale_amount,
 					CAST(
@@ -1629,7 +1629,7 @@ class sceptor extends tesseract{
 					CAST(COALESCE(p.stc_product_sale_percentage, 0) AS DECIMAL(18,4)) AS sale_pct,
 					CAST(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(g.qty, 0) AS DECIMAL(18,4)) AS basic,
 					CAST(
-						(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(g.qty, 0))
+						a.stc_purchase_product_adhoc_prate
 						* (COALESCE(p.stc_product_sale_percentage, 0) / 100)
 					AS DECIMAL(18,4)) AS sale_amount,
 					CAST(
