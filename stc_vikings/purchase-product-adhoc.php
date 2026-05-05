@@ -200,6 +200,43 @@ include("kattegat/role_check.php");
           font-size: 16px;
       }
 
+      .stc-view-purchase-row-wrap {
+          position: relative;
+          margin-bottom: 8px;
+      }
+      .stc-view-purchase-row-width-handle {
+          position: absolute;
+          right: 10px;
+          top: 10px;
+          z-index: 6;
+          padding: 5px 10px;
+          cursor: ew-resize;
+          border: 1px solid #c8d4e0;
+          border-radius: 4px;
+          background: #fff;
+          box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+          line-height: 1;
+          color: #3f6ad8;
+      }
+      .stc-view-purchase-row-width-handle:hover {
+          background: #f7fbff;
+          border-color: #3f6ad8;
+      }
+      .stc-view-purchase-row-width-handle:focus {
+          outline: 2px solid rgba(63,106,216,0.35);
+          outline-offset: 2px;
+      }
+      .stc-view-purchase-row-width-handle .fa {
+          pointer-events: none;
+      }
+      body.stc-poa-width-dragging {
+          cursor: ew-resize !important;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+      }
+
       /* Advanced search modal layout fixes */
       .bd-modal-adhoc-advanced-search .stc-adv-header {
           display: flex;
@@ -815,7 +852,11 @@ include("kattegat/role_check.php");
                                     </div>
                                   </div>
                                 </div>
-                                <div class="row stc-view-purchase-row" style="overflow-x: auto;">
+                                <div class="stc-view-purchase-row-wrap">
+                                  <button type="button" class="stc-view-purchase-row-width-handle" title="Drag left or right to change width. Double-click to restore automatic width." aria-label="Adjust results table width">
+                                    <i class="fa fa-arrows-h" aria-hidden="true"></i>
+                                  </button>
+                                  <div class="row stc-view-purchase-row" style="overflow-x: auto;">
                                   <div class="col-xl-12 col-lg-12 col-md-12">
                                     <div class="card-border mb-3 card card-body border-success">
                                       <form action="" class="stc-view-purchase-order-form">
@@ -857,6 +898,7 @@ include("kattegat/role_check.php");
                                       </form>
                                     </div>
                                   </div>
+                                  </div>
                                 </div>
                             </div>
                         </div>
@@ -884,7 +926,19 @@ include("kattegat/role_check.php");
         $(document).ready(function(){
           const urlParams = new URLSearchParams(window.location.search);
 
+          var purchaseRowWidthManual = false;
+          var stcPoaRowWidthDrag = { active: false, startX: 0, startW: 0 };
+          try {
+            var savedRowW = localStorage.getItem('stc_poa_purchase_row_width_px');
+            var parsedRowW = parseInt(savedRowW, 10);
+            if (savedRowW !== null && !isNaN(parsedRowW) && parsedRowW >= 280) {
+              purchaseRowWidthManual = true;
+              $('.stc-view-purchase-row').css('width', parsedRowW + 'px');
+            }
+          } catch (eRowInit) {}
+
           function stcSyncPurchaseRowWidthPx() {
+            if (purchaseRowWidthManual) return;
             var $row = $('.stc-view-purchase-row');
             if (!$row.length) return;
 
@@ -935,6 +989,53 @@ include("kattegat/role_check.php");
             });
             obs.observe(target, { attributes: true });
           } catch (e) {}
+
+          $(document).on('mousedown', '.stc-view-purchase-row-width-handle', function (e) {
+            if (e.which !== 1) return;
+            e.preventDefault();
+            var $row = $('.stc-view-purchase-row');
+            if (!$row.length) return;
+            stcPoaRowWidthDrag.active = true;
+            stcPoaRowWidthDrag.startX = e.pageX;
+            stcPoaRowWidthDrag.startW = $row.outerWidth();
+            $('body').addClass('stc-poa-width-dragging');
+          });
+
+          $(document).on('mousemove', function (e) {
+            if (!stcPoaRowWidthDrag.active) return;
+            e.preventDefault();
+            var $row = $('.stc-view-purchase-row');
+            var dx = e.pageX - stcPoaRowWidthDrag.startX;
+            var nw = Math.round(stcPoaRowWidthDrag.startW + dx);
+            var vw = window.innerWidth || document.documentElement.clientWidth || 1200;
+            var maxW = Math.max(vw * 5, stcPoaRowWidthDrag.startW + 2400);
+            nw = Math.max(280, Math.min(nw, maxW));
+            $row.css('width', nw + 'px');
+          });
+
+          $(document).on('mouseup', function () {
+            if (!stcPoaRowWidthDrag.active) return;
+            stcPoaRowWidthDrag.active = false;
+            $('body').removeClass('stc-poa-width-dragging');
+            var $row = $('.stc-view-purchase-row');
+            if ($row.length) {
+              try {
+                localStorage.setItem('stc_poa_purchase_row_width_px', String(Math.round($row.outerWidth())));
+              } catch (eSaveW) {}
+              purchaseRowWidthManual = true;
+            }
+          });
+
+          $(document).on('dblclick', '.stc-view-purchase-row-width-handle', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            try {
+              localStorage.removeItem('stc_poa_purchase_row_width_px');
+            } catch (eRmW) {}
+            purchaseRowWidthManual = false;
+            stcSyncPurchaseRowWidthPx();
+          });
+
           // Handle input/focus for each search input
           $(document).on('input focus', '.search-input', function () {
               var $container = $(this).closest('.searchable-dropdown');
