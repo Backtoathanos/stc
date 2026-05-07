@@ -299,7 +299,7 @@ include("kattegat/role_check.php");
                   <th class="text-center">Adhoc Balance</th>
                   <th class="text-center">Rack</th>
                   <th class="text-center">Adjust Quantity</th>
-                  <th class="text-center">Tools track <span class="text-muted" style="font-weight:normal;font-size:11px;">(PPO)</span></th>
+                  <th class="text-center">Tools track <span class="text-muted" style="font-weight:normal;font-size:11px;">(PPA)</span></th>
                   <th class="text-center">Action</th>
                 </tr>
               </thead>
@@ -773,7 +773,7 @@ include("kattegat/role_check.php");
                   $('#dr-balance-req-summary .row').last().after(
                     '<div class="col-sm-12" id="dr-balance-tools-tackles-hint" style="margin-top:8px;">' +
                     '<span class="label label-default">Tools &amp; Tackles</span> ' +
-                    '<span class="text-muted">After dispatch, pick the PPO tool below and click <strong>Copy</strong> to record it in Tools Track with this requisition.</span>' +
+                    '<span class="text-muted">After dispatch, pick the PPA tool below and click <strong>Send</strong> to record it in Tools Track with this requisition.</span>' +
                     '</div>'
                   );
                 } else {
@@ -829,23 +829,23 @@ include("kattegat/role_check.php");
                 var toolsCell = '<span class="text-muted">—</span>';
                 if (String(row.item_type || '') === 'Tools & Tackles') {
                   if (row.tools_track_options && row.tools_track_options.length > 0) {
-                    var opts = '<option value="">— PPO / unique id —</option>';
+                    var opts = '<option value="">— PPA / unique id —</option>';
                     row.tools_track_options.forEach(function (o) {
                       opts += '<option value="' + escapeHtml(o.toolsdetails_id) + '">' + escapeHtml(o.label) + '</option>';
                     });
                     toolsCell =
                       '<select class="form-control input-sm dr-tools-track-select" style="max-width:240px;display:inline-block;vertical-align:middle;">' + opts + '</select> ' +
-                      '<button type="button" class="btn btn-primary btn-xs dr-copy-tool-track-btn" data-item-id="' + escapeHtml(itemId) + '" data-product-id="' + escapeHtml(row.product_id) + '" title="Copy to stc_tooldetails_track">' +
-                      '<i class="fa fa-copy"></i> Copy</button>';
+                      '<button type="button" class="btn btn-primary btn-xs dr-copy-tool-track-btn" data-item-id="' + escapeHtml(itemId) + '" data-product-id="' + escapeHtml(row.product_id) + '" title="Send to stc_tooldetails_track">' +
+                      '<i class="fa fa-copy"></i> Send</button>';
                   } else {
-                    toolsCell = '<span class="text-warning" title="Add tool on purchase (PPO) first"><i class="fa fa-exclamation-triangle"></i> No tool rows</span>';
+                    toolsCell = '<span class="text-warning" title="Add tool on purchase (PPA) first"><i class="fa fa-exclamation-triangle"></i> No tool rows</span>';
                   }
                 }
                 var adhocCell = '<span class="text-muted">—</span>';
                 if (row.adhoc_options && row.adhoc_options.length > 0) {
                   var adhocOpts = '';
                   row.adhoc_options.forEach(function (o) {
-                    adhocOpts += '<option value="' + escapeHtml(o.adhoc_id) + '">' + escapeHtml(o.label || ('PPO ' + o.adhoc_id)) + '</option>';
+                    adhocOpts += '<option value="' + escapeHtml(o.adhoc_id) + '">' + escapeHtml(o.label || ('PPA ' + o.adhoc_id)) + '</option>';
                   });
                   adhocCell = '<select class="form-control input-sm dr-adhoc-select" style="max-width:240px;">' + adhocOpts + '</select>';
                 } else {
@@ -1353,7 +1353,7 @@ include("kattegat/role_check.php");
           adhocId = parseInt(String($row.find('.dr-adhoc-select').val() || '0'), 10) || 0;
         }
         if (typeof Swal === 'undefined' || !Swal.fire) {
-          if (!confirm('Dispatch ' + dispatchQty + ' from Adhoc' + (adhocId ? (' PPO ' + adhocId) : '') + '?')) return;
+          if (!confirm('Dispatch ' + dispatchQty + ' from Adhoc' + (adhocId ? (' PPA ' + adhocId) : '') + '?')) return;
           $btn.prop('disabled', true).text('Dispatching...');
           doDispatch();
           return;
@@ -1362,7 +1362,7 @@ include("kattegat/role_check.php");
         Swal.fire({
           icon: 'warning',
           title: 'Confirm dispatch',
-          text: 'Dispatch ' + dispatchQty + ' from Adhoc' + (adhocId ? (' PPO ' + adhocId) : '') + '?',
+          text: 'Dispatch ' + dispatchQty + ' from Adhoc' + (adhocId ? (' PPA ' + adhocId) : '') + '?',
           position: 'top',
           showCancelButton: true,
           confirmButtonText: 'Yes, dispatch',
@@ -1424,7 +1424,7 @@ include("kattegat/role_check.php");
         var $tr = $btn.closest('tr');
         var toolsdetailsId = parseInt(String($tr.find('.dr-tools-track-select').val() || '0'), 10) || 0;
         if (toolsdetailsId <= 0) {
-          showSwal('warning', 'Select tool', 'Choose a PPO line / tool from the dropdown first.');
+          showSwal('warning', 'Select tool', 'Choose a PPA line / tool from the dropdown first.');
           return;
         }
         $btn.prop('disabled', true);
@@ -1446,12 +1446,12 @@ include("kattegat/role_check.php");
             if (response && response.success) {
               showSwal('success', 'Tools Track', response.message || 'Saved.');
             } else {
-              showSwal('error', 'Failed', (response && response.message) ? response.message : 'Could not copy to Tools Track.');
+              showSwal('error', 'Failed', (response && response.message) ? response.message : 'Could not send to Tools Track.');
             }
             $btn.prop('disabled', false);
           },
           error: function () {
-            showSwal('error', 'Failed', 'Could not copy to Tools Track.');
+            showSwal('error', 'Failed', 'Could not send to Tools Track.');
             $btn.prop('disabled', false);
           }
         });

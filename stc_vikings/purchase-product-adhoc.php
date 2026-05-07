@@ -224,6 +224,8 @@ include("kattegat/role_check.php");
           box-shadow: 0 1px 4px rgba(0,0,0,0.08);
           line-height: 1;
           color: #3f6ad8;
+          touch-action: none;
+          -ms-touch-action: none;
       }
       .stc-view-purchase-row-width-handle:hover {
           background: #f7fbff;
@@ -689,6 +691,7 @@ include("kattegat/role_check.php");
                                                                     name="receivedby[]"
                                                                     class="form-control validate"
                                                                   >
+                                                                    <option>RAFIQUE</option>
                                                                     <option>HASIBUL MONDAL</option>
                                                                     <option>GAUTAM</option>
                                                                     <option>JOYDEEP</option>
@@ -697,11 +700,10 @@ include("kattegat/role_check.php");
                                                                     <option>MANSOOR</option>
                                                                     <option>MUSHTAK</option>
                                                                     <option>PAL DA</option>
-                                                                    <option>RAFIQUE</option>
                                                                     <option>RAJESH MUNSHI</option>
                                                                     <option>RAVI</option>
                                                                     <option>RAZA</option>
-                                                                    <option>RAZi</option>
+                                                                    <option>RAZI</option>
                                                                     <option>SUBHDIP</option>
                                                                     <option>ZUBER</option>
                                                                 </select>
@@ -860,7 +862,7 @@ include("kattegat/role_check.php");
                                   </div>
                                 </div>
                                 <div class="stc-view-purchase-row-wrap">
-                                  <button type="button" class="stc-view-purchase-row-width-handle" title="Drag left or right to change width. Double-click to restore automatic width." aria-label="Adjust results table width">
+                                  <button type="button" class="stc-view-purchase-row-width-handle" title="Drag left or right to change width. Double-click (or double-tap on a touch screen) to restore automatic width." aria-label="Adjust results table width">
                                     <i class="fa fa-arrows-h" aria-hidden="true"></i>
                                   </button>
                                   <div class="row stc-view-purchase-row">
@@ -934,7 +936,9 @@ include("kattegat/role_check.php");
           const urlParams = new URLSearchParams(window.location.search);
 
           var purchaseRowWidthManual = false;
-          var stcPoaRowWidthDrag = { active: false, startX: 0, startW: 0 };
+          var stcPoaRowWidthDrag = { active: false, startX: 0, startW: 0, touchId: null, lastX: 0 };
+          var stcPoaWidthHandleLastTapMs = 0;
+          var stcPoaWidthIgnoreMouseUntil = 0;
           try {
             var savedRowW = localStorage.getItem('stc_poa_purchase_row_width_px');
             var parsedRowW = parseInt(savedRowW, 10);
@@ -997,18 +1001,50 @@ include("kattegat/role_check.php");
           } catch (e) {}
 
           $(document).on('mousedown', '.stc-view-purchase-row-width-handle', function (e) {
+            if (Date.now() < stcPoaWidthIgnoreMouseUntil) {
+              e.preventDefault();
+              return;
+            }
             if (e.which !== 1) return;
             e.preventDefault();
             var $wrap = $('.stc-view-purchase-row-wrap');
             if (!$wrap.length) return;
             stcPoaRowWidthDrag.active = true;
+            stcPoaRowWidthDrag.touchId = null;
             stcPoaRowWidthDrag.startX = e.pageX;
+            stcPoaRowWidthDrag.lastX = e.pageX;
             stcPoaRowWidthDrag.startW = $wrap.outerWidth();
             $('body').addClass('stc-poa-width-dragging');
           });
 
+          $(document).on('touchstart', '.stc-view-purchase-row-width-handle', function (e) {
+            var oe = e.originalEvent;
+            if (!oe || !oe.touches || oe.touches.length !== 1) return;
+            e.preventDefault();
+            stcPoaWidthIgnoreMouseUntil = Date.now() + 800;
+            var touch = oe.touches[0];
+            var $wrap = $('.stc-view-purchase-row-wrap');
+            if (!$wrap.length) return;
+            stcPoaRowWidthDrag.active = true;
+            stcPoaRowWidthDrag.touchId = touch.identifier;
+            stcPoaRowWidthDrag.startX = touch.pageX;
+            stcPoaRowWidthDrag.lastX = touch.pageX;
+            stcPoaRowWidthDrag.startW = $wrap.outerWidth();
+            $('body').addClass('stc-poa-width-dragging');
+          });
+
+          function stcPoaRowWidthDragFinishTouch(e) {
+            var oe = e.originalEvent;
+            if (!oe || !oe.changedTouches || stcPoaRowWidthDrag.touchId === null) return false;
+            var i;
+            for (i = 0; i < oe.changedTouches.length; i++) {
+              if (oe.changedTouches[i].identifier === stcPoaRowWidthDrag.touchId) return true;
+            }
+            return false;
+          }
+
           $(document).on('mousemove', function (e) {
-            if (!stcPoaRowWidthDrag.active) return;
+            if (!stcPoaRowWidthDrag.active || stcPoaRowWidthDrag.touchId !== null) return;
             e.preventDefault();
             var $wrap = $('.stc-view-purchase-row-wrap');
             var dx = e.pageX - stcPoaRowWidthDrag.startX;
@@ -1019,9 +1055,33 @@ include("kattegat/role_check.php");
             $wrap.css('width', nw + 'px');
           });
 
-          $(document).on('mouseup', function () {
-            if (!stcPoaRowWidthDrag.active) return;
+          $(document).on('touchmove', function (e) {
+            if (!stcPoaRowWidthDrag.active || stcPoaRowWidthDrag.touchId === null) return;
+            var oe = e.originalEvent;
+            if (!oe || !oe.touches || !oe.touches.length) return;
+            var pageX = null;
+            var i;
+            for (i = 0; i < oe.touches.length; i++) {
+              if (oe.touches[i].identifier === stcPoaRowWidthDrag.touchId) {
+                pageX = oe.touches[i].pageX;
+                break;
+              }
+            }
+            if (pageX === null) return;
+            e.preventDefault();
+            stcPoaRowWidthDrag.lastX = pageX;
+            var $wrap = $('.stc-view-purchase-row-wrap');
+            var dx = pageX - stcPoaRowWidthDrag.startX;
+            var nw = Math.round(stcPoaRowWidthDrag.startW + dx);
+            var vw = window.innerWidth || document.documentElement.clientWidth || 1200;
+            var maxW = Math.max(vw * 5, stcPoaRowWidthDrag.startW + 2400);
+            nw = Math.max(280, Math.min(nw, maxW));
+            $wrap.css('width', nw + 'px');
+          });
+
+          function stcPoaRowWidthDragEndPersist() {
             stcPoaRowWidthDrag.active = false;
+            stcPoaRowWidthDrag.touchId = null;
             $('body').removeClass('stc-poa-width-dragging');
             var $wrap = $('.stc-view-purchase-row-wrap');
             if ($wrap.length) {
@@ -1029,6 +1089,33 @@ include("kattegat/role_check.php");
                 localStorage.setItem('stc_poa_purchase_row_width_px', String(Math.round($wrap.outerWidth())));
               } catch (eSaveW) {}
               purchaseRowWidthManual = true;
+            }
+          }
+
+          $(document).on('mouseup', function () {
+            if (!stcPoaRowWidthDrag.active || stcPoaRowWidthDrag.touchId !== null) return;
+            stcPoaRowWidthDragEndPersist();
+          });
+
+          $(document).on('touchend touchcancel', function (e) {
+            if (!stcPoaRowWidthDrag.active || stcPoaRowWidthDrag.touchId === null) return;
+            if (!stcPoaRowWidthDragFinishTouch(e)) return;
+            var moved = Math.abs(stcPoaRowWidthDrag.lastX - stcPoaRowWidthDrag.startX) > 12;
+            stcPoaRowWidthDragEndPersist();
+            if (!moved) {
+              var now = Date.now();
+              if (now - stcPoaWidthHandleLastTapMs < 380) {
+                stcPoaWidthHandleLastTapMs = 0;
+                try {
+                  localStorage.removeItem('stc_poa_purchase_row_width_px');
+                } catch (eRmW) {}
+                purchaseRowWidthManual = false;
+                stcSyncPurchaseRowWidthPx();
+              } else {
+                stcPoaWidthHandleLastTapMs = now;
+              }
+            } else {
+              stcPoaWidthHandleLastTapMs = 0;
             }
           });
 

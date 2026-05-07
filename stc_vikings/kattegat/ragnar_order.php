@@ -6423,7 +6423,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 						$adhocOptions[] = [
 							'adhoc_id' => $adh,
 							'rack_name' => (string)($ao['rack_name'] ?? '-'),
-							'label' => 'PPO '.$adh.' — Rack '.(string)($ao['rack_name'] ?? '-')
+							'label' => 'PPA '.$adh.' — Rack '.(string)($ao['rack_name'] ?? '-')
 						];
 					}
 				}
@@ -6496,7 +6496,8 @@ class ragnarCallDailyRequisitions extends tesseract{
 	}
 
 	/**
-	 * Tools registered under PPO adhoc lines for this product (for Tools & Tackles copy-to-track UI).
+	 * Tools registered under PPA adhoc for this product (Tools & Tackles copy-to-track UI).
+	 * Only rows that are available to issue: no track row yet, or latest stc_tooldetails_track status is 2 (returned).
 	 */
 	private function stc_dr_tools_track_options_for_product($product_id = 0){
 		$product_id = (int)$product_id;
@@ -6509,13 +6510,23 @@ class ragnarCallDailyRequisitions extends tesseract{
 			FROM `stc_tooldetails` td
 			INNER JOIN `stc_purchase_product_adhoc` A
 				ON A.`stc_purchase_product_adhoc_id` = td.`poa_id`
+			LEFT JOIN (
+				SELECT tt.`toolsdetails_id`, tt.`status`
+				FROM `stc_tooldetails_track` tt
+				INNER JOIN (
+					SELECT `toolsdetails_id`, MAX(`id`) AS mid
+					FROM `stc_tooldetails_track`
+					GROUP BY `toolsdetails_id`
+				) z ON z.`mid` = tt.`id` AND z.`toolsdetails_id` = tt.`toolsdetails_id`
+			) last_tr ON last_tr.`toolsdetails_id` = td.`id`
 			WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
+			AND (last_tr.`toolsdetails_id` IS NULL OR last_tr.`status` = '2')
 			ORDER BY td.`id` DESC
 		");
 		if($tq && mysqli_num_rows($tq) > 0){
 			while($tr = mysqli_fetch_assoc($tq)){
 				$adh = (int)$tr['adhoc_id'];
-				$label = 'PPO '.$adh.' — '.(string)($tr['unique_id'] ?? '').' — '.(string)($tr['itemdescription'] ?? '');
+				$label = 'PPA '.$adh.' — '.(string)($tr['unique_id'] ?? '').' — '.(string)($tr['itemdescription'] ?? '');
 				$out[] = [
 					'toolsdetails_id' => (int)$tr['toolsdetails_id'],
 					'adhoc_id' => $adh,
@@ -6719,7 +6730,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 	}
 
 	/**
-	 * Insert stc_tooldetails_track for Tools & Tackles with requisition + PPO adhoc binding (explicit copy from Daily Requisition).
+	 * Insert stc_tooldetails_track for Tools & Tackles with requisition + PPA adhoc binding (explicit copy from Daily Requisition).
 	 */
 	public function stc_dr_copy_tool_track($item_id = 0, $product_id = 0, $toolsdetails_id = 0){
 		$item_id = (int)$item_id;
@@ -6757,7 +6768,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 			LIMIT 1
 		");
 		if(!$tq || mysqli_num_rows($tq) === 0){
-			return ['success' => false, 'message' => 'Selected tool does not belong to this product/PPO line.'];
+			return ['success' => false, 'message' => 'Selected tool does not belong to this product/PPA line.'];
 		}
 		$tool_row = mysqli_fetch_assoc($tq);
 		$poa_adhoc_id = (int)$tool_row['poa_id'];
@@ -6820,7 +6831,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 		if(!$ins){
 			return ['success' => false, 'message' => 'Could not save Tools Track row. Run DB migration: stc_vikings/migrations/20250324_stc_tooldetails_track_requisition.sql'];
 		}
-		$this->stc_daily_req_log($item_id, 'Tools Track', 'Copied to Tools Track for PPO '.$poa_adhoc_id.' (tool #'.$toolsdetails_id.') by '.$_SESSION['stc_empl_name'].' on '.date('d-m-Y h:i A'));
+		$this->stc_daily_req_log($item_id, 'Tools Track', 'Copied to Tools Track for PPA '.$poa_adhoc_id.' (tool #'.$toolsdetails_id.') by '.$_SESSION['stc_empl_name'].' on '.date('d-m-Y h:i A'));
 		return ['success' => true, 'message' => 'Saved to Tools Track (details) with requisition link.'];
 	}
 

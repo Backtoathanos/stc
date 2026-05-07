@@ -2153,8 +2153,14 @@ include("kattegat/role_check.php");
 
       $('body').delegate('#searchInputppebtn', 'click', function (e) {
         var searchTerm = $('#searchInputppe').val().toLowerCase();
-        if (searchTerm != '') {
+        if ((searchTerm.trim().length >= 3) || (searchTerm.trim().length == 0)) {
+          $('.text-danger').remove();
           item_tracker_call(searchTerm);
+        }else{
+          $("#searchInputppe").after("<span class='text-danger'>Please enter at least 3 characters to search.</span>");
+          setTimeout(function() {
+            $('.text-danger').remove();
+          }, 5000);
         }
       });
 
@@ -2244,8 +2250,14 @@ include("kattegat/role_check.php");
       // Search button click event
       $('body').delegate('#itt-toolssearchInputbtn', 'click', function (e) {
         var searchTerm = $('#itt-toolssearchInput').val().toLowerCase();
-        if (searchTerm != '') {
+        if ((searchTerm.trim().length >= 3) || (searchTerm.trim().length == 0)) {
+          $('.text-danger').remove();
           call_tools_tracker(searchTerm);
+        }else{
+          $("#itt-toolssearchInput").after("<span class='text-danger'>Please enter at least 3 characters to search.</span>");
+          setTimeout(function() {
+            $('.text-danger').remove();
+          }, 5000);
         }
       });
 
