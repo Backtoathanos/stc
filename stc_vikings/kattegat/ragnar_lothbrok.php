@@ -1464,10 +1464,9 @@ class sceptor extends tesseract{
 			$soldAmount = $row['stc_purchase_product_adhoc_rate'] * $row['stc_cust_super_requisition_list_items_rec_recqty'];
 			$soldArray += $soldAmount;
 			
-			// Profit = Sale ₹ × qty (sale margin on basic, times qty again)
+			// Line margin ₹ = (basic for line) × sale % = prate × qty × sale_pct/100
 			$basicRec = (float)$row['stc_purchase_product_adhoc_prate'] * (float)$row['stc_cust_super_requisition_list_items_rec_recqty'];
-			$saleRupeeLine = $basicRec * ((float)$row['sale_pct'] / 100.0);
-			$profitAmount = $saleRupeeLine * (float)$row['stc_cust_super_requisition_list_items_rec_recqty'];
+			$profitAmount = $basicRec * ((float)$row['sale_pct'] / 100.0);
 			$profitArray += $profitAmount;
 		}
 
@@ -1491,8 +1490,7 @@ class sceptor extends tesseract{
 			$soldArray += $gldSoldAmount;
 			
 			$basicGld = (float)$row['stc_purchase_product_adhoc_prate'] * (float)$row['qty'];
-			$saleRupeeLineGld = $basicGld * ((float)$row['sale_pct'] / 100.0);
-			$gldProfitAmount = $saleRupeeLineGld * (float)$row['qty'];
+			$gldProfitAmount = $basicGld * ((float)$row['sale_pct'] / 100.0);
 			$profitArray += $gldProfitAmount;
 		}
 
@@ -1536,7 +1534,7 @@ class sceptor extends tesseract{
 			}
 		}
 
-		/* Line total = Basic + Sale ₹ + GST ₹. Profit = Sale ₹ × Qty (sale margin amount multiplied by quantity again). */
+		/* Line total = Basic + Sale ₹ + GST ₹. Profit (margin) = prate × qty × sale_pct/100 (same units as REC/GLD analyzers). */
 		$sqlRec = "
 			SELECT
 				source,
@@ -1583,7 +1581,6 @@ class sceptor extends tesseract{
 					CAST(
 						(COALESCE(a.stc_purchase_product_adhoc_prate, 0) * COALESCE(r.stc_cust_super_requisition_list_items_rec_recqty, 0))
 						* (COALESCE(p.stc_product_sale_percentage, 0) / 100)
-						* COALESCE(r.stc_cust_super_requisition_list_items_rec_recqty, 0)
 					AS DECIMAL(18,4)) AS profit,
 					TIMESTAMP(r.stc_cust_super_requisition_list_items_rec_date) AS sort_ts
 				FROM stc_cust_super_requisition_list_items_rec r

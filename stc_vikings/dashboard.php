@@ -799,6 +799,7 @@ STCAuthHelper::checkAuth();
     <script type="text/javascript" src="./assets/scripts/sidebar-persist.js"></script>
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
     <script type="text/javascript" src="./assets/scripts/jarvis.js"></script>
+    <script src="./assets/scripts/jquery.table2excel.js"></script>
     <script>
         $(document).ready(function(){
             var d = new Date($.now());
@@ -1294,40 +1295,7 @@ STCAuthHelper::checkAuth();
 			});
 		});
 
-		function renderGldProfitBreakup(resp){
-			if(!resp || resp.success !== true){
-				$('#gld-profit-breakup-tbody').html('<tr><td colspan="16" class="text-center text-danger">Failed to load data.</td></tr>');
-				$('#gld-profit-breakup-pager-wrap').hide();
-				return;
-			}
-			var rows = resp.rows || [];
-			var totalRows = (resp.total_rows !== undefined && resp.total_rows !== null) ? parseInt(resp.total_rows, 10) : 0;
-			var page = (resp.page !== undefined && resp.page !== null) ? parseInt(resp.page, 10) : 1;
-			var perPage = (resp.per_page !== undefined && resp.per_page !== null) ? parseInt(resp.per_page, 10) : 25;
-			var totalPages = (resp.total_pages !== undefined && resp.total_pages !== null) ? parseInt(resp.total_pages, 10) : 0;
-
-			var $modal = $('#gldProfitBreakupModal');
-			var ctx = $modal.data('profitCtx') || {};
-			ctx.page = page;
-			$modal.data('profitCtx', ctx);
-
-			var tSale = (resp.total_sale !== undefined && resp.total_sale !== null) ? resp.total_sale : 0;
-			var tProf = (resp.total_profit !== undefined && resp.total_profit !== null) ? resp.total_profit : 0;
-			$('#gld-profit-breakup-total').text('₹ ' + parseFloat(tSale).toLocaleString('en-IN', {minimumFractionDigits:2}));
-			var tProfN = parseFloat(tProf);
-			var tProfSign = tProfN > 0 ? '+' : (tProfN < 0 ? '-' : '');
-			var tProfAmt = Math.abs(tProfN).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
-			$('#gld-profit-breakup-profit').text(tProfSign + '₹ ' + tProfAmt);
-			var $profBadge = $('#gld-profit-breakup-profit').parent('.badge');
-			$profBadge.removeClass('badge-success badge-danger badge-secondary').addClass(tProfN > 0 ? 'badge-success' : 'badge-danger');
-
-			if(!Array.isArray(rows) || rows.length === 0){
-				$('#gld-profit-breakup-tbody').html('<tr><td colspan="16" class="text-center text-muted">No data found.</td></tr>');
-				$('#gld-profit-breakup-pager-wrap').hide();
-				return;
-			}
-
-			var slBase = (page - 1) * perPage;
+		function buildGldProfitBreakupRowsHtml(rows, slBase){
 			var html = '';
 			var gldTT = {
 				sl: 'Serial number on this page only (pagination offset). Not calculated from other columns.',
@@ -1390,6 +1358,44 @@ STCAuthHelper::checkAuth();
 					'<td class="text-right font-weight-bold '+ profitClr +'" style="cursor:help" title="'+ gldTTe.profit +'">'+ profitSign +'₹ '+ profitAmt +'</td>' +
 				'</tr>';
 			});
+			return html;
+		}
+
+		function renderGldProfitBreakup(resp){
+			if(!resp || resp.success !== true){
+				$('#gld-profit-breakup-tbody').html('<tr><td colspan="16" class="text-center text-danger">Failed to load data.</td></tr>');
+				$('#gld-profit-breakup-pager-wrap').hide();
+				return;
+			}
+			var rows = resp.rows || [];
+			var totalRows = (resp.total_rows !== undefined && resp.total_rows !== null) ? parseInt(resp.total_rows, 10) : 0;
+			var page = (resp.page !== undefined && resp.page !== null) ? parseInt(resp.page, 10) : 1;
+			var perPage = (resp.per_page !== undefined && resp.per_page !== null) ? parseInt(resp.per_page, 10) : 25;
+			var totalPages = (resp.total_pages !== undefined && resp.total_pages !== null) ? parseInt(resp.total_pages, 10) : 0;
+
+			var $modal = $('#gldProfitBreakupModal');
+			var ctx = $modal.data('profitCtx') || {};
+			ctx.page = page;
+			$modal.data('profitCtx', ctx);
+
+			var tSale = (resp.total_sale !== undefined && resp.total_sale !== null) ? resp.total_sale : 0;
+			var tProf = (resp.total_profit !== undefined && resp.total_profit !== null) ? resp.total_profit : 0;
+			$('#gld-profit-breakup-total').text('₹ ' + parseFloat(tSale).toLocaleString('en-IN', {minimumFractionDigits:2}));
+			var tProfN = parseFloat(tProf);
+			var tProfSign = tProfN > 0 ? '+' : (tProfN < 0 ? '-' : '');
+			var tProfAmt = Math.abs(tProfN).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+			$('#gld-profit-breakup-profit').text(tProfSign + '₹ ' + tProfAmt);
+			var $profBadge = $('#gld-profit-breakup-profit').parent('.badge');
+			$profBadge.removeClass('badge-success badge-danger badge-secondary').addClass(tProfN > 0 ? 'badge-success' : 'badge-danger');
+
+			if(!Array.isArray(rows) || rows.length === 0){
+				$('#gld-profit-breakup-tbody').html('<tr><td colspan="16" class="text-center text-muted">No data found.</td></tr>');
+				$('#gld-profit-breakup-pager-wrap').hide();
+				return;
+			}
+
+			var slBase = (page - 1) * perPage;
+			var html = buildGldProfitBreakupRowsHtml(rows, slBase);
 			$('#gld-profit-breakup-tbody').html(html);
 
 			if(totalPages > 1){
@@ -1462,6 +1468,77 @@ STCAuthHelper::checkAuth();
 				return;
 			}
 			loadGldProfitBreakup(ctx.page + 1);
+		});
+
+		function fetchAllGldProfitBreakupRows(ctx, onDone){
+			var perPage = 100;
+			var acc = [];
+			function loadPage(p){
+				$.ajax({
+					url: 'kattegat/ragnar_lothbrok.php',
+					method: 'POST',
+					dataType: 'json',
+					data: {
+						gld_profit_breakdown: 1,
+						month: ctx.month,
+						type: ctx.type,
+						date_from: ctx.df,
+						date_to: ctx.dt,
+						page: p,
+						per_page: perPage
+					},
+					success: function(resp){
+						if(!resp || resp.success !== true){
+							onDone(null);
+							return;
+						}
+						var chunk = resp.rows || [];
+						$.each(chunk, function(i, r){ acc.push(r); });
+						var totalPages = parseInt(resp.total_pages, 10) || 1;
+						if(p >= totalPages){
+							onDone(acc);
+						} else {
+							loadPage(p + 1);
+						}
+					},
+					error: function(){ onDone(null); }
+				});
+			}
+			loadPage(1);
+		}
+
+		$(document).on('click', '#gld-profit-breakup-export-excel', function(){
+			var ctx = $('#gldProfitBreakupModal').data('profitCtx');
+			if(!ctx){
+				return;
+			}
+			var $tbody = $('#gld-profit-breakup-tbody');
+			if($tbody.find('td[colspan]').length){
+				alert('Load profit breakup data before exporting.');
+				return;
+			}
+			var $btn = $(this);
+			var prevHtml = $btn.html();
+			$btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Exporting…');
+			fetchAllGldProfitBreakupRows(ctx, function(allRows){
+				$btn.prop('disabled', false).html(prevHtml);
+				if(allRows === null){
+					alert('Could not load data for export.');
+					return;
+				}
+				if(!allRows.length){
+					alert('No rows to export.');
+					return;
+				}
+				var safeMonth = (ctx.month || 'export').toString().replace(/[^\w\-]/g, '_');
+				var fname = 'gld-profit-breakup-' + safeMonth + '.xls';
+				var rowHtml = buildGldProfitBreakupRowsHtml(allRows, 0);
+				var $orig = $('#gld-profit-breakup-table');
+				var $clone = $('<table/>').append($orig.find('thead').first().clone()).append($('<tbody/>').html(rowHtml));
+				$clone.hide().appendTo('body');
+				$clone.table2excel({ filename: fname });
+				$clone.remove();
+			});
 		});
     </script>
 
@@ -1551,8 +1628,11 @@ STCAuthHelper::checkAuth();
 				</div>
 				<div class="modal-body">
 					<p class="small text-muted mb-2">Read each row left → right: product, unit &amp; qty, then <strong class="text-info">Prate</strong> and <strong>Basic</strong> (= Prate×Qty). Then GST % &amp; GST ₹, Sale % &amp; Sale ₹ (= Basic × Sale % ÷ 100). <strong class="text-primary">Line total</strong> (= Basic + Sale ₹ + GST ₹). <strong class="text-success">List rate</strong> is quoted sell ₹/unit. <strong>Profit</strong> = <strong>Sale ₹ × Qty</strong>.</p>
+					<div class="d-flex justify-content-end mb-2">
+						<button type="button" class="btn btn-sm btn-success" id="gld-profit-breakup-export-excel"><i class="fa fa-file-excel-o"></i> Export Excel</button>
+					</div>
 					<div class="table-responsive">
-						<table class="table table-bordered table-hover table-sm mb-0">
+						<table id="gld-profit-breakup-table" class="table table-bordered table-hover table-sm mb-0">
 							<thead class="thead-light">
 								<tr>
 									<th class="text-center" style="cursor:help" title="Serial number on this page only (pagination offset). Not calculated from other columns.">#</th>
