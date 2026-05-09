@@ -207,6 +207,12 @@
             </ul>
           </li>
           <li class="nav-item">
+            <a href="{{ url('/images') }}" class="nav-link @if(request()->path() === 'images') active @endif">
+              <i class="nav-icon fas fa-images"></i>
+              <p>Images</p>
+            </a>
+          </li>
+          <li class="nav-item">
             <a href="{{ url('/users') }}" class="nav-link @if(request()->path() === 'users') active @endif">
               <i class="nav-icon fas fa-user"></i>
               <p>Users</p>

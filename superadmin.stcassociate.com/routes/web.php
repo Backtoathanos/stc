@@ -32,6 +32,7 @@ use App\Http\Controllers\PPETrackerController;
 use App\Http\Controllers\ToolTrackerController;
 use App\Http\Controllers\GldChallanController;
 use App\Http\Controllers\DbSyncController;
+use App\Http\Controllers\MediaImagesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -65,6 +66,12 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/users/admin/edit/{id}', [SuperAdminUsersController::class, 'edit']);
     Route::post('/users/admin/edit/{id}', [SuperAdminUsersController::class, 'update']);    
     Route::get('/users/admin/delete/{id}', [SuperAdminUsersController::class, 'delete']);
+
+    Route::get('/images', [MediaImagesController::class, 'show']);
+    Route::get('/images/products/list', [MediaImagesController::class, 'productsList']);
+    Route::get('/images/tbm/list', [MediaImagesController::class, 'tbmList']);
+    Route::post('/images/products/migrate-cloud', [MediaImagesController::class, 'migrateProductToCloud']);
+    Route::post('/images/tbm/migrate-cloud', [MediaImagesController::class, 'migrateTbmImageToCloud']);
 
     Route::get('/users', [UsersHubController::class, 'index']);
     Route::get('/users/hub/record/{type}/{id}', [UsersHubController::class, 'recordJson']);

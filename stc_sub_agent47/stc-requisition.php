@@ -26,6 +26,32 @@ if(isset($_SESSION["stc_agent_sub_id"])){
       .fade:not(.show) {
         opacity: 10;
       }
+      .stc-req-filter-panel {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px 18px;
+        margin-bottom: 8px;
+      }
+      .stc-req-filter-panel .filter-label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: .04em;
+        color: #6c757d;
+        margin-bottom: 6px;
+      }
+      .stc-req-filter-actions {
+        display: flex;
+        align-items: flex-end;
+        gap: 10px;
+      }
+      .stc-req-filter-actions .btn-primary {
+        min-width: 120px;
+      }
+      .stc-req-pagination-wrap .pagination {
+        margin: 0 !important;
+      }
     </style>
 </head>
 <body>
@@ -82,30 +108,57 @@ if(isset($_SESSION["stc_agent_sub_id"])){
                                                   $date = date("d-m-Y");
                                                   $newDate = date('Y-m-d', strtotime($date)); 
                                                   $effectiveDate = date('Y-m-d', strtotime("-7 days", strtotime($date)));
-                                                ?>   
-                                                <div class="form-row">
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom01">From</label>
-                                                        <input type="date" class="form-control" id="stc-sup-req-beg-date" value="<?php echo $effectiveDate;?>" required>
-                                                        <div class="valid-feedback">
-                                                            Looks good!
+                                                ?>
+                                                <div class="stc-req-filter-panel">
+                                                    <div class="row">
+                                                        <div class="col-md-3 col-sm-6 col-xs-12 mb-3">
+                                                            <div class="filter-label"><i class="fa fa-calendar"></i> From date</div>
+                                                            <input type="date" class="form-control" id="stc-sup-req-beg-date" value="<?php echo $effectiveDate;?>" required>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6 col-xs-12 mb-3">
+                                                            <div class="filter-label"><i class="fa fa-calendar"></i> To date</div>
+                                                            <input type="date" class="form-control" id="stc-sup-req-end-date" value="<?php echo $newDate;?>" required>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6 col-xs-12 mb-3">
+                                                            <div class="filter-label"><i class="fa fa-building"></i> Project / site</div>
+                                                            <select class="form-control" id="stc-sup-req-project-filter" title="Filter by project">
+                                                                <option value="">Loading projects…</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6 col-xs-12 mb-3">
+                                                            <div class="filter-label"><i class="fa fa-flag"></i> Status</div>
+                                                            <select class="form-control" id="stc-sup-req-status-filter" title="Filter by line-item status">
+                                                                <option value="">All statuses</option>
+                                                                <option value="1">Ordered</option>
+                                                                <option value="2">Approved</option>
+                                                                <option value="3">Accepted</option>
+                                                                <option value="4">Dispatched</option>
+                                                                <option value="5">Received</option>
+                                                                <option value="6">Rejected</option>
+                                                                <option value="7">Canceled</option>
+                                                                <option value="8">Returned</option>
+                                                                <option value="9">Pending</option>
+                                                            </select>
                                                         </div>
                                                     </div>
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustom01">To</label>
-                                                        <input type="date" class="form-control" id="stc-sup-req-end-date" value="<?php echo $newDate;?>" required>
-                                                        <div class="valid-feedback">
-                                                            Looks good!
-                                                        </div>
-                                                    </div>
-                                                    <div class="col-md-4 mb-3">
-                                                        <label for="validationCustomUsername">Search</label>
-                                                        <div class="input-group">
-                                                            <a class="btn btn-primary stc-sup-req-search"><i class="fa fa-search"></i> Search</a>
+                                                    <div class="row">
+                                                        <div class="col-xs-12">
+                                                            <div class="stc-req-filter-actions" style="flex-wrap: wrap;">
+                                                                <div style="margin-right: auto; margin-bottom: 8px;">
+                                                                    <div class="filter-label" style="margin-bottom: 4px;"><i class="fa fa-list"></i> Rows per page</div>
+                                                                    <select class="form-control input-sm" id="stc-sup-req-per-page" style="max-width: 100px; display: inline-block;">
+                                                                        <option value="25" selected>25</option>
+                                                                        <option value="50">50</option>
+                                                                        <option value="100">100</option>
+                                                                    </select>
+                                                                </div>
+                                                                <a href="#" class="btn btn-default btn-sm stc-sup-req-reset-filters" style="border: 1px solid #ccc;"><i class="fa fa-undo"></i> Reset filters</a>
+                                                                <a class="btn btn-primary stc-sup-req-search"><i class="fa fa-search"></i> Apply filters</a>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </form> 
+                                            </form>
                                         </div>
                                         <div class="card-body stc-requisition-search-result" style="overflow-x: auto;">
                                         </div>
@@ -157,25 +210,74 @@ if(isset($_SESSION["stc_agent_sub_id"])){
             
             sdlno=result.sdl==undefined ? "0" : result.sdl;
             $('.stc-sup-sdlnumber').val(sdlno);
-            // search requistion by date
-            $('body').delegate('.stc-sup-req-search', 'click', function(e){
+            function loadReqProjectFilter(){
+                $.ajax({
+                    url     : "nemesis/stc_agcart.php",
+                    method  : "POST",
+                    data    : { load_cust_req_filter: 1 },
+                    success : function(html){
+                        $('#stc-sup-req-project-filter').html(html);
+                    },
+                    error   : function(){
+                        $('#stc-sup-req-project-filter').html('<option value="">All projects</option>');
+                    }
+                });
+            }
+            loadReqProjectFilter();
+
+            $('body').delegate('.stc-sup-req-reset-filters', 'click', function(e){
                 e.preventDefault();
+                $('#stc-sup-req-beg-date').val('<?php echo $effectiveDate; ?>');
+                $('#stc-sup-req-end-date').val('<?php echo $newDate; ?>');
+                $('#stc-sup-req-status-filter').val('');
+                $('#stc-sup-req-per-page').val('25');
+                loadReqProjectFilter();
+            });
+
+            function loadRequisitionSearchResults(reqPage){
+                reqPage = parseInt(reqPage, 10) || 1;
                 $('.stc-requisition-search-result').html("Loading...");
                 var supreqfromdate=$('#stc-sup-req-beg-date').val();
                 var supreqtodate=$('#stc-sup-req-end-date').val();
+                var supreq_project_id=$('#stc-sup-req-project-filter').val();
+                var supreq_status=$('#stc-sup-req-status-filter').val();
+                var supreq_per_page=parseInt($('#stc-sup-req-per-page').val(), 10) || 25;
                 $.ajax({
                     url     : "nemesis/stc_agcart.php",
                     method  : "POST",
                     data    : {
                             call_searched_requisition:1,
                             supreqfromdate:supreqfromdate,
-                            supreqtodate:supreqtodate
+                            supreqtodate:supreqtodate,
+                            supreq_project_id:supreq_project_id,
+                            supreq_status:supreq_status,
+                            supreq_page:reqPage,
+                            supreq_per_page:supreq_per_page
                     },
                     success : function(reequisitionresult){
-                        // console.log(response);
-                        $('.stc-requisition-search-result').html('<input type="text" class="form-control stc-requisition-search" placeholder="Search here...">'+reequisitionresult);
+                        $('.stc-requisition-search-result').html('<div class="mb-2"><input type="text" class="form-control stc-requisition-search" placeholder="Quick search in results…"></div>'+reequisitionresult);
                     }
                 });
+            }
+
+            $('body').delegate('.stc-sup-req-search', 'click', function(e){
+                e.preventDefault();
+                loadRequisitionSearchResults(1);
+            });
+
+            $('body').delegate('.stc-req-page-btn', 'click', function(e){
+                e.preventDefault();
+                var $li = $(this).closest('li');
+                if($li.hasClass('disabled') || $li.hasClass('active')){ return; }
+                var p = parseInt($(this).attr('data-page'), 10);
+                if(isNaN(p) || p < 1){ return; }
+                loadRequisitionSearchResults(p);
+            });
+
+            $('body').delegate('#stc-sup-req-per-page', 'change', function(){
+                if($('.stc-requisition-search-result table').length){
+                    loadRequisitionSearchResults(1);
+                }
             });
 
             $('body').delegate('.stc-requisition-search', 'keyup', function(e){

@@ -84,7 +84,7 @@ class transformers extends tesseract{
 		return $odin=$order_table;
 	}
 
-	public function stc_call_cust_for_agent(){
+	public function stc_call_cust_for_agent($for_filter=false){
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
 			SELECT DISTINCT
 				`stc_cust_project_id`, 
@@ -97,9 +97,22 @@ class transformers extends tesseract{
 				`stc_cust_project_id`=`stc_cust_pro_attend_supervise_pro_id` 
 			WHERE 
 				`stc_cust_pro_attend_supervise_super_id`='".$_SESSION['stc_agent_sub_id']."'
+			ORDER BY `stc_cust_project_title` ASC
 		");
 		$optimusprime='';
 		$do_action=mysqli_num_rows($optimusprimequery);
+		if($for_filter){
+			$optimusprime='<option value="">All projects</option>';
+			if($do_action == 0){
+				return $optimusprime;
+			}
+			foreach ($optimusprimequery as $row) {
+				$optimusprime.='
+							<option value="'.$row["stc_cust_project_id"].'">'.htmlspecialchars($row["stc_cust_project_title"], ENT_QUOTES, 'UTF-8').'</option>
+		            	';
+			}
+			return $optimusprime;
+		}
 		if($do_action == 0){
 			$optimusprime = "<option value='NA' selected>No Site Found !!</option>";
 		}elseif($do_action == 1){
@@ -338,7 +351,43 @@ class witcher_supervisor extends tesseract{
 		return $optimusprime;
 	}
 
-	public function stc_search_requisitions($supreqfromdate, $supreqtodate){ 
+	public function stc_search_requisitions($supreqfromdate, $supreqtodate, $project_id='', $status_filter='', $page=1, $per_page=25){ 
+		$project_sql='';
+		if($project_id!=='' && $project_id!=='NA' && ctype_digit((string)$project_id)){
+			$project_sql=" AND L.`stc_cust_super_requisition_list_project_id`='".mysqli_real_escape_string($this->stc_dbs, $project_id)."' ";
+		}
+		$status_sql='';
+		if($status_filter!=='' && ctype_digit((string)$status_filter)){
+			$sf=(int)$status_filter;
+			if($sf>=1 && $sf<=9){
+				$status_sql=" AND I.`stc_cust_super_requisition_list_items_status`='".$sf."' ";
+			}
+		}
+		$super_esc=mysqli_real_escape_string($this->stc_dbs, (string)$_SESSION['stc_agent_sub_id']);
+		$from_where="
+			FROM `stc_cust_super_requisition_list_items` I
+			LEFT JOIN `stc_cust_super_requisition_list` L
+			ON L.`stc_cust_super_requisition_list_id`= I.`stc_cust_super_requisition_list_items_req_id`
+			LEFT JOIN `stc_cust_project` P
+			ON P.`stc_cust_project_id`= L.`stc_cust_super_requisition_list_project_id`
+			WHERE (
+				DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $supreqfromdate)."'
+				AND '".mysqli_real_escape_string($this->stc_dbs, $supreqtodate)."'
+			) AND `stc_cust_super_requisition_list_super_id`='".$super_esc."'
+			".$project_sql.$status_sql."
+		";
+		$cnt_res=mysqli_query($this->stc_dbs, "SELECT COUNT(*) AS cnt ".$from_where);
+		$cnt_row=$cnt_res ? mysqli_fetch_assoc($cnt_res) : array('cnt'=>0);
+		$total_rows=(int)$cnt_row['cnt'];
+		$per_page=(int)$per_page;
+		if($per_page<10){ $per_page=10; }
+		if($per_page>100){ $per_page=100; }
+		$page=(int)$page;
+		if($page<1){ $page=1; }
+		$total_pages=$total_rows>0 ? (int)ceil($total_rows/$per_page) : 1;
+		if($page>$total_pages){ $page=$total_pages; }
+		$offset=($page-1)*$per_page;
+
 		$requisition_table='
 			<table class="mb-0 table table-hover table-bordered">
 				<thead>
@@ -378,18 +427,12 @@ class witcher_supervisor extends tesseract{
 				`stc_cust_super_requisition_items_priority`,
 				`stc_cust_super_requisition_items_type`,
 				I.`stc_cust_super_requisition_list_id` as list_item_id
-			FROM `stc_cust_super_requisition_list_items` I
-			LEFT JOIN `stc_cust_super_requisition_list` L
-			ON L.`stc_cust_super_requisition_list_id`= I.`stc_cust_super_requisition_list_items_req_id`
-			LEFT JOIN `stc_cust_project` P
-			ON P.`stc_cust_project_id`= L.`stc_cust_super_requisition_list_project_id`
-			WHERE (
-				DATE(`stc_cust_super_requisition_list_date`) BETWEEN '".mysqli_real_escape_string($this->stc_dbs, $supreqfromdate)."'
-				AND '".mysqli_real_escape_string($this->stc_dbs, $supreqtodate)."'
-			) AND `stc_cust_super_requisition_list_super_id`='".$_SESSION['stc_agent_sub_id']."'
+			".$from_where."
 			ORDER BY `stc_cust_super_requisition_items_priority` DESC, TIMESTAMP(`stc_cust_super_requisition_list_date`) DESC
+			LIMIT ".(int)$offset.", ".(int)$per_page."
 		");
-		if(mysqli_num_rows($requisitioni_qry)>0){
+		$rows_on_page=($requisitioni_qry ? mysqli_num_rows($requisitioni_qry) : 0);
+		if($rows_on_page>0){
 			foreach($requisitioni_qry as $requisitioni_row){
 				$reqstaus='';
 				if($requisitioni_row['stc_cust_super_requisition_list_items_status']==1){
@@ -559,7 +602,7 @@ class witcher_supervisor extends tesseract{
 		}else{
 			$requisition_table.='
 				<tr>
-					<td colspan="8">No record found.</td>
+					<td colspan="17" class="text-center">No record found.</td>
 				</tr>
 			';
 		}
@@ -567,7 +610,44 @@ class witcher_supervisor extends tesseract{
 				</tbody>
 			</table>
 		';
-		return $requisition_table;
+		$pagination_bar='';
+		if($total_rows>0){
+			$show_from=$offset+1;
+			$show_to=$offset+$rows_on_page;
+			$p_win=array();
+			if($total_pages<=7){
+				for($i=1;$i<=$total_pages;$i++){ $p_win[]=$i; }
+			}else{
+				$p_win[]=1;
+				$start=max(2,$page-2);
+				$end=min($total_pages-1,$page+2);
+				if($start>2){ $p_win[]=0; }
+				for($i=$start;$i<=$end;$i++){ $p_win[]=$i; }
+				if($end<$total_pages-1){ $p_win[]=0; }
+				$p_win[]=$total_pages;
+			}
+			$pagination_bar.='
+				<div class="stc-req-pagination-wrap clearfix" style="margin-top:12px;">
+					<div class="pull-left text-muted" style="padding-top:6px;">
+						Showing '.$show_from.'–'.$show_to.' of '.$total_rows.' (page '.$page.' of '.$total_pages.')
+					</div>
+					<ul class="pagination pagination-sm pull-right" style="margin:0;">
+						<li class="'.($page<=1?'disabled':'').'"><a href="#" class="stc-req-page-btn" data-page="'.max(1,$page-1).'">&laquo; Prev</a></li>
+			';
+			foreach($p_win as $pn){
+				if($pn===0){
+					$pagination_bar.='<li class="disabled"><a href="#">…</a></li>';
+				}else{
+					$pagination_bar.='<li class="'.($pn==$page?'active':'').'"><a href="#" class="stc-req-page-btn" data-page="'.$pn.'">'.$pn.'</a></li>';
+				}
+			}
+			$pagination_bar.='
+						<li class="'.($page>=$total_pages?'disabled':'').'"><a href="#" class="stc-req-page-btn" data-page="'.min($total_pages,$page+1).'">Next &raquo;</a></li>
+					</ul>
+				</div>
+			';
+		}
+		return $requisition_table.$pagination_bar;
 	}
 
 	public function stc_ag_requisition_items_call($odid){
@@ -1127,6 +1207,15 @@ if(isset($_POST['load_cust'])){
 	echo $outbumblebee;
 }
 
+if(isset($_POST['load_cust_req_filter'])){
+	if(empty($_SESSION["stc_agent_sub_id"])){
+		echo '<option value="">All projects</option>';
+	}else{
+		$bumblebee=new transformers();
+		echo $bumblebee->stc_call_cust_for_agent(true);
+	}
+}
+
 if(isset($_POST['order_add'])){
 	$out='';
 	$site_id=$_POST['site_id'];
@@ -1378,8 +1467,12 @@ if(isset($_POST['save_Dailylist'])){
 if(isset($_POST['call_searched_requisition'])){
 	$supreqfromdate=date("Y-m-d", strtotime($_POST['supreqfromdate']));
 	$supreqtodate=date("Y-m-d", strtotime($_POST['supreqtodate']));
+	$supreq_project_id=isset($_POST['supreq_project_id']) ? $_POST['supreq_project_id'] : '';
+	$supreq_status=isset($_POST['supreq_status']) ? $_POST['supreq_status'] : '';
+	$supreq_page=isset($_POST['supreq_page']) ? (int)$_POST['supreq_page'] : 1;
+	$supreq_per_page=isset($_POST['supreq_per_page']) ? (int)$_POST['supreq_per_page'] : 25;
 	$objsearchreq=new witcher_supervisor();
-	$opobjsearchreq=$objsearchreq->stc_search_requisitions($supreqfromdate, $supreqtodate);
+	$opobjsearchreq=$objsearchreq->stc_search_requisitions($supreqfromdate, $supreqtodate, $supreq_project_id, $supreq_status, $supreq_page, $supreq_per_page);
 	echo $opobjsearchreq;
 }
 
