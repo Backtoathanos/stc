@@ -90,6 +90,8 @@ if ($result) {
 
         $row = applyRackAndRatesFromMaps($row, $product_id, $location_stc, $maps);
 
+        $row['stc_product_image'] = stc_product_image_url($row['stc_product_image'] ?? '');
+
         if ($qtyNum > 0) {
             $inStockRows[] = $row;
         }

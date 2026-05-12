@@ -1055,7 +1055,7 @@ class thanos extends tesseract{
 		             	  	<div class="row">
 		             			<div class="el-wrapper">
 			            		    <div class="box-up">
-			            		        <img class="img" style="height: 100%; width:100%;" src="stc_product_image/'.$row["stc_product_image"].'" alt="">
+			            		        <img class="img" style="height: 100%; width:100%;" src="'.stc_product_image_url($row["stc_product_image"]).'" alt="">
 			            		        <div class="img-info">
 				             	        <div class="info-inner">
 				             	            <span class="p-name">'.htmlentities($row["stc_product_name"]).'</span>

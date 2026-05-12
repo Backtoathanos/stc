@@ -136,7 +136,7 @@ if(empty(@$_SESSION['stc_admin_info_id'])){
               </div>
               <div class="col-xl-6 col-lg-6 col-md-12 mx-auto mb-4">
                 <div class="stc-product-img-dummy mx-auto stc-edit-page" style="height: 25%">
-                  <img src="stc_product_image/<?php echo $stcretresult['stc_product_image'];?>">
+                  <img src="<?php echo htmlspecialchars(stc_product_image_url($stcretresult['stc_product_image']));?>">
                 </div>
                 <div class="form-group mb-3">
                   <label

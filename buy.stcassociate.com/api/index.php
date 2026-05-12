@@ -61,6 +61,7 @@ class prime extends tesseract {
                 $row['rate']=$result2['stc_purchase_product_adhoc_rate'];
             }
             if($row['stc_product_image']!=''){
+                $row['stc_product_image'] = stc_product_image_url($row['stc_product_image']);
                 $results[] = $row;
             }
         }
@@ -129,6 +130,7 @@ class prime extends tesseract {
                 $row['rate']=$result2['stc_purchase_product_adhoc_rate'];
             }
             if($row['stc_product_image']!=''){
+                $row['stc_product_image'] = stc_product_image_url($row['stc_product_image']);
                 $results[] = $row;
             }
         }
@@ -215,7 +217,7 @@ class prime extends tesseract {
                         'name' => $row['stc_product_name'],
                         'sub_category' => $row['stc_sub_cat_name'],
                         'category' => $row['stc_cat_name'],
-                        'image' => $row['stc_product_image'],
+                        'image' => stc_product_image_url($row['stc_product_image']),
                         'rate' => $row['rate'],
                         'quantity' => $quantity // Use the quantity from the cart
                     ];
@@ -394,7 +396,7 @@ class prime extends tesseract {
                     'product_price' => $row['rate'], // Use the fetched rate as the price
                     'stock_status' => 'In Stock', // Assuming stock status is always available
                     'product_description' => 'Product description', // Add description if available
-                    'images' => [$row['stc_product_image']] // Add more images if available
+                    'images' => [stc_product_image_url($row['stc_product_image'])] // Add more images if available
                 ]
             ];
 

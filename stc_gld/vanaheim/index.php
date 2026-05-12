@@ -554,6 +554,9 @@ function getProductDetails($conn) {
 
     if ($result->num_rows > 0) {
         $productDetails = $result->fetch_assoc();
+        if (! empty($productDetails['productImage'])) {
+            $productDetails['productImage'] = stc_product_image_url($productDetails['productImage']);
+        }
         enrichProductCommerceFields($conn, $productId, $productDetails);
         $jsonOpts = JSON_UNESCAPED_UNICODE;
         if (defined('JSON_INVALID_UTF8_SUBSTITUTE')) {

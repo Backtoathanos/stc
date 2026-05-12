@@ -1531,7 +1531,7 @@ class ragnarRequisitionView extends tesseract{
 						<div class="row">
 							<div class="el-wrapper">
 								<div class="box-up">
-									<img class="img" style="height: 100%; width:100%;" src="../stc_symbiote/stc_product_image/'.$filterrow["stc_product_image"].'" alt="">
+									<img class="img" style="height: 100%; width:100%;" src="'.stc_product_image_url($filterrow["stc_product_image"]).'" alt="">
 									<div class="img-info">
 										<div class="info-inner">
 											<span class="p-name">'.htmlentities($filterrow["stc_product_name"]).'</span>
@@ -3310,7 +3310,7 @@ class ragnarRequisitionPertView extends tesseract{
 						  	<div class="row">
 								<div class="el-wrapper">
 								    <div class="box-up">
-								        <img class="img" style="height: 100%; width:100%;" src="../stc_symbiote/stc_product_image/'.$filterrow["stc_product_image"].'" alt="">
+								        <img class="img" style="height: 100%; width:100%;" src="'.stc_product_image_url($filterrow["stc_product_image"]).'" alt="">
 								        <div class="img-info">
 						     	        <div class="info-inner">
 						     	            <span class="p-name">'.htmlentities($filterrow["stc_product_name"]).'</span>
@@ -6288,7 +6288,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 				if($adhocRack === ''){ $adhocRack = '-'; }
 				$out .= '<div class="col-xl-4 col-lg-4 col-md-4 col-sm-12 col-12 mb-3">
 					<div class="card">
-						<img class="card-img-top" style="height:100px;object-fit:contain;" src="../stc_symbiote/stc_product_image/'.$img.'" alt="">
+						<img class="card-img-top" style="height:100px;object-fit:contain;" src="'.stc_product_image_url($img).'" alt="">
 						<div class="card-body p-2">
 							<div class="small text-muted text-center">'.$row['stc_product_id'].' / '.htmlspecialchars($subBrand).' / '.htmlspecialchars(($row['stc_cat_name']??'').' / '.($row['stc_product_hsncode']??'')).'</div>
 							<div class="small font-weight-bold dr-product-name" style="font-size:14px;" title="'.htmlspecialchars($fullName).'">'.htmlspecialchars($displayName).'</div>

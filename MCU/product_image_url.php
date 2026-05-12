@@ -1,0 +1,31 @@
+<?php
+
+/**
+ * Resolve `stc_product_image` column for HTML/JSON: full https URL (e.g. R2) unchanged;
+ * legacy filenames get STC_PRODUCT_IMAGE_LOCAL_BASE_URL prefix.
+ *
+ * Override base: set env STC_PRODUCT_IMAGE_URL (same as Laravel STC_PRODUCT_IMAGE_URL).
+ */
+if (!defined('STC_PRODUCT_IMAGE_LOCAL_BASE_URL')) {
+    $MCU_product_image_base = getenv('STC_PRODUCT_IMAGE_URL');
+    define(
+        'STC_PRODUCT_IMAGE_LOCAL_BASE_URL',
+        ($MCU_product_image_base !== false && $MCU_product_image_base !== '')
+            ? rtrim($MCU_product_image_base, '/')
+            : 'https://stcassociate.com/stc_symbiote/stc_product_image'
+    );
+}
+
+if (!function_exists('stc_product_image_url')) {
+    function stc_product_image_url($stored)
+    {
+        $stored = trim((string) $stored);
+        if ($stored === '') {
+            return '';
+        }
+
+        return preg_match('#^https?://#i', $stored)
+            ? $stored
+            : STC_PRODUCT_IMAGE_LOCAL_BASE_URL . '/' . str_replace('\\', '/', $stored);
+    }
+}

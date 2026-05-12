@@ -8,4 +8,6 @@ $db = getenv('DB_NAME') ?: 'stc_associate_go';
 $con=mysqli_connect($server,$user,$password,$db) or die("could not connect");
 mysqli_set_charset($con,'utf8');
 
+require_once __DIR__ . '/product_image_url.php';
+
 ?>

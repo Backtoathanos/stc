@@ -325,7 +325,7 @@
 								<div class="col-md-4 agileinfo_new_products_grid agileinfo_new_products_grid_mobiles">
 									<div class="agile_ecommerce_tab_left mobiles_grid">
 										<div class="hs-wrapper hs-wrapper2">
-											<img src="../stc_symbiote/stc_product_image/'.$getproductrow['stc_product_image'].'" alt=" " class="img-responsive" />
+											<img src="'.stc_product_image_url($getproductrow['stc_product_image']).'" alt=" " class="img-responsive" />
 											<div class="w3_hs_bottom w3_hs_bottom_sub1">
 												<ul>
 													<li>
@@ -348,7 +348,7 @@
 												<section>
 													<div class="modal-body">
 														<div class="col-md-5 modal_body_left">
-															<img src="../stc_symbiote/stc_product_image/'.$getproductrow['stc_product_image'].'" alt=" " class="img-responsive" />
+															<img src="'.stc_product_image_url($getproductrow['stc_product_image']).'" alt=" " class="img-responsive" />
 														</div>
 														<div class="col-md-7 modal_body_right">
 															<h4>'.$subcat.' '.$getproductrow['stc_product_name'].'</h4>

@@ -57,11 +57,7 @@ const ProductModal = ({ show, handleClose, productId }) => {
                             ? `${product.gst}%`
                             : '—'
                     );
-                    setImage(
-                        product.productImage
-                            ? 'https://stcassociate.com/stc_symbiote/stc_product_image/' + product.productImage
-                            : ''
-                    );
+                    setImage(product.productImage ? String(product.productImage).trim() : '');
                     setCostPrice(product.costPrice ?? null);
                     setMrp(product.mrp ?? null);
                     setSellingPrice(product.sellingPrice ?? null);

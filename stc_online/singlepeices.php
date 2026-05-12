@@ -318,7 +318,7 @@
 							<div class="flexslider">
 								<ul class="slides">
 									<li data-thumb="images/a.jpg">
-										<div class="thumb-image"> <img src="../stc_symbiote/stc_product_image/'.$callonlinepro['stc_product_image'].'" data-imagezoom="true" class="img-responsive" alt=""> </div>
+										<div class="thumb-image"> <img src="'.stc_product_image_url($callonlinepro['stc_product_image']).'" data-imagezoom="true" class="img-responsive" alt=""> </div>
 									</li>
 									<!-- <li data-thumb="images/b.jpg">
 										 <div class="thumb-image"> <img src="images/b.jpg" data-imagezoom="true" class="img-responsive" alt=""> </div>
@@ -509,7 +509,7 @@
 						<div class="w3l_related_products_grid">
 							<div class="agile_ecommerce_tab_left mobiles_grid">
 								<div class="hs-wrapper hs-wrapper3">
-									<img src="../stc_symbiote/stc_product_image/'.$getrelatpro['stc_product_image'].'" alt=" " class="img-responsive" />
+									<img src="'.stc_product_image_url($getrelatpro['stc_product_image']).'" alt=" " class="img-responsive" />
 									<div class="w3_hs_bottom">
 										<div class="flex_ecommerce">
 											<a href="singlepeices.php?productname='.$getrelatpro['stc_product_name'].'&&pdid='.$getrelatpro['stc_product_id'].'""><span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span></a>
@@ -580,7 +580,7 @@
 							<section>
 								<div class="modal-body">
 									<div class="col-md-5 modal_body_left">
-										<img src="../stc_symbiote/stc_product_image/'.$getrelatproa['stc_product_image'].'" alt=" " class="img-responsive" />
+										<img src="'.stc_product_image_url($getrelatproa['stc_product_image']).'" alt=" " class="img-responsive" />
 									</div>
 									<div class="col-md-7 modal_body_right">
 										<h4>'.$subcat.' '.$getrelatproa['stc_product_name'].'</h4>

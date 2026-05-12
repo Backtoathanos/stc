@@ -257,7 +257,7 @@ class aether extends tesseract{
 		             	  <div class="row">
 		             	    <div class="el-wrapper">
 		             	      <div class="box-up">
-		             	        <img class="img" style="height: 100%; width:100%;" src="stc_product_image/'.$row["stc_product_image"].'" alt="">
+		             	        <img class="img" style="height: 100%; width:100%;" src="'.stc_product_image_url($row["stc_product_image"]).'" alt="">
 		             	        <div class="img-info">
 		             	          <div class="info-inner">
 		             	            <span class="p-name">'.$row["stc_product_name"].'</span>
@@ -332,7 +332,7 @@ class aether extends tesseract{
 		             	  <div class="row">
 		             	    <div class="el-wrapper">
 		             	      <div class="box-up">
-		             	        <img class="img" style="height: 100%; width:100%;" src="stc_product_image/'.$row["stc_product_image"].'" alt="">
+		             	        <img class="img" style="height: 100%; width:100%;" src="'.stc_product_image_url($row["stc_product_image"]).'" alt="">
 		             	        <div class="img-info">
 		             	          <div class="info-inner">
 		             	            <span class="p-name">'.$row["stc_product_name"].'</span>
@@ -411,7 +411,7 @@ class aether extends tesseract{
 		             	  <div class="row">
 		             	    <div class="el-wrapper">
 		             	      <div class="box-up">
-		             	        <img class="img" style="height: 100%; width:100%;" src="stc_product_image/'.$row["stc_product_image"].'" alt="">
+		             	        <img class="img" style="height: 100%; width:100%;" src="'.stc_product_image_url($row["stc_product_image"]).'" alt="">
 		             	        <div class="img-info">
 		             	          <div class="info-inner">
 		             	            <span class="p-name">'.$row["stc_product_name"].'</span>
@@ -489,7 +489,7 @@ class aether extends tesseract{
 		             	  <div class="row">
 		             	    <div class="el-wrapper">
 		             	      <div class="box-up">
-		             	        <img class="img" style="height: 100%; width:100%;" src="stc_product_image/'.$row["stc_product_image"].'" alt="">
+		             	        <img class="img" style="height: 100%; width:100%;" src="'.stc_product_image_url($row["stc_product_image"]).'" alt="">
 		             	        <div class="img-info">
 		             	          <div class="info-inner">
 		             	            <span class="p-name">'.$row["stc_product_name"].'</span>
@@ -566,7 +566,7 @@ class aether extends tesseract{
 		             	  <div class="row">
 		             	    <div class="el-wrapper">
 		             	      <div class="box-up">
-		             	        <img class="img" style="height: 100%; width:100%;" src="stc_product_image/'.$row["stc_product_image"].'" alt="">
+		             	        <img class="img" style="height: 100%; width:100%;" src="'.stc_product_image_url($row["stc_product_image"]).'" alt="">
 		             	        <div class="img-info">
 		             	          <div class="info-inner">
 		             	            <span class="p-name">'.$row["stc_product_name"].'</span>
@@ -1049,7 +1049,7 @@ class aether extends tesseract{
 					<tr>
 						<td>'.$subcat.' '.$row["stc_product_name"].'</td>
 						<td>
-							<img src="stc_product_image/'.$row["stc_product_image"].'" height="60" width="75" class="img-thumbnail" />
+							<img src="'.stc_product_image_url($row["stc_product_image"]).'" height="60" width="75" class="img-thumbnail" />
 						</td>
 						<td><button type="button" name="update" class="btn btn-warning bt-xs update" id="'.$row["stc_product_id"].'">Change</button></td>
 						
@@ -1123,7 +1123,7 @@ class aether extends tesseract{
 						<tr>
 							<td>'.$subcat.' '.$row["stc_product_name"].'</td>
 							<td>
-								<img src="stc_product_image/'.$row["stc_product_image"].'" height="60" width="75" class="img-thumbnail" />
+								<img src="'.stc_product_image_url($row["stc_product_image"]).'" height="60" width="75" class="img-thumbnail" />
 							</td>
 							<td><button type="button" name="update" class="btn btn-warning bt-xs update" id="'.$row["stc_product_id"].'">Change</button></td>
 							

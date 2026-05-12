@@ -151,6 +151,10 @@ export default function Dashboard() {
         setLimit(newLimit);
         setPage(newPage || 1); // Reset to page 1 if not specified
     };
+
+    const defaultImageUrl =
+        'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996';
+
     // Define columns for DataTable
     const columns = [
         {
@@ -160,14 +164,14 @@ export default function Dashboard() {
             minWidth: '240px',
             grow: 2,
             cell: row => {
-                const imageUrl = `https://stcassociate.com/stc_symbiote/stc_product_image/${row.stc_product_image}`;
-                const defaultImageUrl = 'https://img.freepik.com/premium-vector/default-image-icon-vector-missing-picture-page-website-design-mobile-app-no-photo-available_87543-11093.jpg?w=996';
+                const raw = row.stc_product_image ? String(row.stc_product_image).trim() : '';
+                const imageUrl = raw ? raw : defaultImageUrl;
 
                 return (
                     <div className="inventory-product-cell">
                         <div className="inventory-product-thumb">
                             <img
-                                src={row.stc_product_image ? imageUrl : defaultImageUrl}
+                                src={imageUrl}
                                 alt=""
                                 onError={(e) => {
                                     e.target.src = defaultImageUrl;
