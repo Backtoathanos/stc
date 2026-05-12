@@ -36,12 +36,12 @@
             <p>@include('layouts._message')</p>
             @if (empty($cloud_upload_ready))
             <div class="alert alert-warning border-0 shadow-sm">
-              <strong>Cloud upload:</strong> add R2 or S3 credentials to <code>.env</code>
-              (<code>AWS_ACCESS_KEY_ID</code>, <code>AWS_SECRET_ACCESS_KEY</code>, <code>AWS_BUCKET</code>,
-              <code>AWS_ENDPOINT</code> for R2, <code>AWS_URL</code> as your <em>public</em> base URL,
-              <code>AWS_DEFAULT_REGION=auto</code>, <code>AWS_USE_PATH_STYLE_ENDPOINT=true</code> for Cloudflare R2).
-              Free tier: <a href="https://developers.cloudflare.com/r2/pricing/" target="_blank" rel="noopener">Cloudflare R2</a>
-              (S3-compatible, generous free storage).
+              <strong>Cloud upload (Cloudflare R2):</strong> add credentials to <code>.env</code>:
+              <code>R2_ACCESS_KEY_ID</code>, <code>R2_SECRET_ACCESS_KEY</code>, <code>R2_BUCKET</code>,
+              <code>R2_ENDPOINT</code> (e.g. <code>https://&lt;account&gt;.r2.cloudflarestorage.com</code> — no bucket path),
+              <code>R2_PUBLIC_URL</code> as your <em>public</em> reader base URL (custom domain or R2.dev),
+              plus <code>R2_REGION=auto</code> and <code>R2_USE_PATH_STYLE_ENDPOINT=true</code>.
+              Pricing: <a href="https://developers.cloudflare.com/r2/pricing/" target="_blank" rel="noopener">Cloudflare R2</a>.
             </div>
             @endif
           </div>
@@ -134,7 +134,7 @@
       var id = btn.data('product-id');
       Swal.fire({
         title: 'Upload to cloud?',
-        text: 'The file is sent to your R2/S3 bucket and stc_product_image is replaced with the public URL. Optional: local file can be deleted after upload (see CLOUD_DELETE_LOCAL_AFTER_UPLOAD).',
+        text: 'The file is sent to your R2 bucket and stc_product_image is replaced with the public URL. Optional: local file can be deleted after upload (see CLOUD_DELETE_LOCAL_AFTER_UPLOAD).',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Upload',
@@ -169,7 +169,7 @@
       var loc = btn.attr('data-img-location');
       Swal.fire({
         title: 'Upload to cloud?',
-        text: 'The file is sent to your R2/S3 bucket and this stc_safetytbm_img row is updated to the public URL.',
+        text: 'The file is sent to your R2 bucket and this stc_safetytbm_img row is updated to the public URL.',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Upload',

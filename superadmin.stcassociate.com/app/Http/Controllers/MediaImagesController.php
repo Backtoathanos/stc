@@ -203,12 +203,12 @@ class MediaImagesController extends Controller
     public function migrateProductToCloud(Request $request)
     {
         if (! $this->cloudUploadConfigured()) {
-            return response()->json(['success' => false, 'message' => 'Cloud storage is not configured. Set AWS_* / R2 variables in .env.']);
+            return response()->json(['success' => false, 'message' => 'Cloud storage is not configured. Set R2_* variables in .env (see Images page help text).']);
         }
 
         $pub = $this->publicBaseUrlForDisk();
         if (! $pub) {
-            return response()->json(['success' => false, 'message' => 'Set AWS_URL in .env to your public bucket URL (required to store full image address in the database).']);
+            return response()->json(['success' => false, 'message' => 'Set R2_PUBLIC_URL in .env to your public bucket URL (required to store full image address in the database).']);
         }
 
         $request->validate([
@@ -237,7 +237,7 @@ class MediaImagesController extends Controller
 
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         $safeExt = preg_match('/^[a-z0-9]{1,8}$/', $ext) ? $ext : 'bin';
-        $objectKey = 'products/' . $id . '/' . $id . '_' . date('YmdHis') . '.' . $safeExt;
+        $objectKey = 'products/' . $id . '_' . date('YmdHis') . '.' . $safeExt;
 
         try {
             $disk = $this->cloudDisk();
@@ -246,14 +246,15 @@ class MediaImagesController extends Controller
                 return response()->json(['success' => false, 'message' => 'Could not read image bytes.']);
             }
 
-            $put = Storage::disk($disk)->put($objectKey, $bytes, 'public');
+            // R2 rejects PutObject with bucket-owner ACL headers; use private objects — bucket public URL still serves them.
+            $put = Storage::disk($disk)->put($objectKey, $bytes, 'private');
             if (! $put) {
                 return response()->json(['success' => false, 'message' => 'Upload to cloud failed.']);
             }
 
             $publicUrl = $this->remoteObjectPublicUrl($objectKey);
             if (! $publicUrl) {
-                return response()->json(['success' => false, 'message' => 'Could not build public URL. Set AWS_URL.']);
+                return response()->json(['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.']);
             }
 
             DB::table('stc_product')->where('stc_product_id', $id)->update(['stc_product_image' => $publicUrl]);
@@ -278,12 +279,12 @@ class MediaImagesController extends Controller
     public function migrateTbmImageToCloud(Request $request)
     {
         if (! $this->cloudUploadConfigured()) {
-            return response()->json(['success' => false, 'message' => 'Cloud storage is not configured. Set AWS_* / R2 variables in .env.']);
+            return response()->json(['success' => false, 'message' => 'Cloud storage is not configured. Set R2_* variables in .env (see Images page help text).']);
         }
 
         $pub = $this->publicBaseUrlForDisk();
         if (! $pub) {
-            return response()->json(['success' => false, 'message' => 'Set AWS_URL in .env to your public bucket URL (required to store full image address in the database).']);
+            return response()->json(['success' => false, 'message' => 'Set R2_PUBLIC_URL in .env to your public bucket URL (required to store full image address in the database).']);
         }
 
         $request->validate([
@@ -323,14 +324,14 @@ class MediaImagesController extends Controller
                 return response()->json(['success' => false, 'message' => 'Could not read image bytes.']);
             }
 
-            $put = Storage::disk($disk)->put($objectKey, $bytes, 'public');
+            $put = Storage::disk($disk)->put($objectKey, $bytes, 'private');
             if (! $put) {
                 return response()->json(['success' => false, 'message' => 'Upload to cloud failed.']);
             }
 
             $publicUrl = $this->remoteObjectPublicUrl($objectKey);
             if (! $publicUrl) {
-                return response()->json(['success' => false, 'message' => 'Could not build public URL. Set AWS_URL.']);
+                return response()->json(['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.']);
             }
 
             DB::table('stc_safetytbm_img')
@@ -414,7 +415,7 @@ class MediaImagesController extends Controller
                 $href = $this->isRemoteUrl($img) ? $img : ($base . '/' . rawurlencode(basename(str_replace('\\', '/', $img))));
                 $action = '<a href="' . e($href) . '" target="_blank" rel="noopener" class="btn btn-sm btn-info" title="Open image"><i class="fas fa-external-link-alt"></i></a>';
                 if ($cloudReady && ! $this->isRemoteUrl($img)) {
-                    $action .= ' <button type="button" class="btn btn-sm btn-warning js-migrate-product-cloud" data-product-id="' . $id . '" title="Move to cloud (R2/S3)"><i class="fas fa-cloud-upload-alt"></i></button>';
+                    $action .= ' <button type="button" class="btn btn-sm btn-warning js-migrate-product-cloud" data-product-id="' . $id . '" title="Upload to Cloudflare R2"><i class="fas fa-cloud-upload-alt"></i></button>';
                 }
             } else {
                 $action = '<span class="text-muted">—</span>';
@@ -513,7 +514,7 @@ class MediaImagesController extends Controller
                     : ($imgBase . '/' . rawurlencode(basename(str_replace('\\', '/', $imgFile))));
                 $btns .= '<a href="' . e($href) . '" target="_blank" rel="noopener" class="btn btn-sm btn-info mr-1" title="Open image"><i class="fas fa-image"></i></a>';
                 if ($cloudReady && ! $this->isRemoteUrl($imgFile)) {
-                    $btns .= '<button type="button" class="btn btn-sm btn-warning js-migrate-tbm-cloud" data-tbm-id="' . $id . '" data-img-location="' . e($imgFile) . '" title="Move to cloud (R2/S3)"><i class="fas fa-cloud-upload-alt"></i></button>';
+                    $btns .= '<button type="button" class="btn btn-sm btn-warning js-migrate-tbm-cloud" data-tbm-id="' . $id . '" data-img-location="' . e($imgFile) . '" title="Upload to Cloudflare R2"><i class="fas fa-cloud-upload-alt"></i></button>';
                 }
             }
 
