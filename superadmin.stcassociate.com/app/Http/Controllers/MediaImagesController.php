@@ -203,9 +203,16 @@ class MediaImagesController extends Controller
         return $base . '/' . implode('/', $segments);
     }
 
-    private function cloudMigrateBatchMax(): int
+    /** Max items per request for product image uploads (shared-hosting friendly). */
+    private function cloudMigrateProductBatchMax(): int
     {
         return max(1, min(100, (int) env('CLOUD_MIGRATE_BATCH_MAX', 100)));
+    }
+
+    /** Max items per request for TBM image uploads. */
+    private function cloudMigrateTbmBatchMax(): int
+    {
+        return max(1, min(500, (int) env('CLOUD_MIGRATE_BATCH_MAX_TBM', 500)));
     }
 
     /** When local/TBM file is missing, clear DB reference instead of leaving a broken filename. */
@@ -420,7 +427,7 @@ class MediaImagesController extends Controller
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         $safeExt = preg_match('/^[a-z0-9]{1,8}$/', $ext) ? $ext : 'bin';
         $uniq = str_replace('.', '', uniqid('', true));
-        $objectKey = 'tbm/' . $tbmId . '/' . $tbmId . '_' . date('YmdHis') . '_' . $uniq . '.' . $safeExt;
+        $objectKey = 'tbm/' . $tbmId . '_' . date('YmdHis') . '_' . $uniq . '.' . $safeExt;
 
         try {
             $disk = $this->cloudDisk();
@@ -463,7 +470,8 @@ class MediaImagesController extends Controller
         $data['page_title'] = 'Images';
         $data['cloud_upload_ready'] = $this->cloudMigrateReady();
         $data['cloud_s3_adapter_missing'] = $this->cloudUploadConfigured() && ! $this->flysystemS3AdapterAvailable();
-        $data['cloud_migrate_batch_max'] = $this->cloudMigrateBatchMax();
+        $data['cloud_migrate_batch_max'] = $this->cloudMigrateProductBatchMax();
+        $data['cloud_migrate_tbm_batch_max'] = $this->cloudMigrateTbmBatchMax();
 
         return view('pages.images', $data);
     }
@@ -491,7 +499,7 @@ class MediaImagesController extends Controller
             return response()->json($reject);
         }
 
-        $max = $this->cloudMigrateBatchMax();
+        $max = $this->cloudMigrateProductBatchMax();
         $request->validate([
             'product_ids' => 'required|array|min:1|max:' . $max,
             'product_ids.*' => 'integer|min:1',
@@ -551,7 +559,7 @@ class MediaImagesController extends Controller
             return response()->json($reject);
         }
 
-        $max = $this->cloudMigrateBatchMax();
+        $max = $this->cloudMigrateProductBatchMax();
         $request->validate([
             'product_ids' => 'required|array|min:1|max:' . $max,
             'product_ids.*' => 'integer|min:1',
@@ -678,7 +686,7 @@ class MediaImagesController extends Controller
             return response()->json($reject);
         }
 
-        $max = $this->cloudMigrateBatchMax();
+        $max = $this->cloudMigrateTbmBatchMax();
         $request->validate([
             'tbm_items' => 'required|array|min:1|max:' . $max,
             'tbm_items.*.tbm_id' => 'required|integer|min:1',
@@ -689,7 +697,7 @@ class MediaImagesController extends Controller
         if (count($items) > $max) {
             return response()->json([
                 'success' => false,
-                'message' => 'Too many TBM rows (maximum ' . $max . ' per request).',
+                'message' => 'Too many TBM rows (maximum ' . $max . ' per request). Increase CLOUD_MIGRATE_BATCH_MAX_TBM in .env (max 500).',
             ]);
         }
 

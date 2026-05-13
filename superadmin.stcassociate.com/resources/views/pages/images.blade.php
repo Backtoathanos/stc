@@ -135,7 +135,7 @@
                     <div class="d-none mb-2 js-tbm-bulk-toolbar clearfix">
                       <div class="float-right border rounded px-3 py-2 bg-light shadow-sm">
                         <span class="text-muted small mr-2 js-tbm-bulk-count">0 selected</span>
-                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_batch_max ?? 100) }} per request)</span>
+                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_tbm_batch_max ?? 500) }} per request)</span>
                         <button type="button" class="btn btn-warning btn-sm js-bulk-migrate-tbm">
                           <i class="fas fa-cloud-upload-alt"></i> Upload selected to cloud
                         </button>
@@ -177,6 +177,7 @@
 <script>
   $(function () {
     var BATCH_MAX = {{ (int) ($cloud_migrate_batch_max ?? 100) }};
+    var TBM_BATCH_MAX = {{ (int) ($cloud_migrate_tbm_batch_max ?? 500) }};
 
     function swalToast(icon, title) {
       var Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3800 });
@@ -258,7 +259,7 @@
       var loc = btn.attr('data-img-location');
       Swal.fire({
         title: 'Upload to cloud?',
-        text: 'The file is sent to your R2 bucket and this stc_safetytbm_img row is updated to the public URL.',
+        html: 'The file is sent to your R2 bucket under <code>tbm/</code> (not <code>products/</code>) and this <code>stc_safetytbm_img</code> row is updated to the public URL.',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Upload',
@@ -400,11 +401,11 @@
         });
       });
       if (!rows.length) return;
-      if (rows.length > BATCH_MAX) {
+      if (rows.length > TBM_BATCH_MAX) {
         Swal.fire({
           icon: 'warning',
           title: 'Too many selected',
-          text: 'Upload at most ' + BATCH_MAX + ' TBM images per request. Deselect some and run again.'
+          text: 'Upload at most ' + TBM_BATCH_MAX + ' TBM images per request. Deselect some and run again. (CLOUD_MIGRATE_BATCH_MAX_TBM in .env, max 500.)'
         });
         return;
       }
@@ -526,6 +527,7 @@
       serverSide: true,
       responsive: true,
       pageLength: 25,
+      lengthMenu: [[10, 25, 50, 100, 500], [10, 25, 50, 100, 500]],
       ajax: {
         url: "{{ url('/images/products/list') }}",
         data: function (d) {
@@ -556,6 +558,7 @@
         serverSide: true,
         responsive: true,
         pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100, 500], [10, 25, 50, 100, 500]],
         ajax: {
           url: "{{ url('/images/tbm/list') }}",
           data: function (d) {
