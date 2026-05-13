@@ -205,7 +205,104 @@ class MediaImagesController extends Controller
 
     private function cloudMigrateBatchMax(): int
     {
-        return max(1, min(100, (int) env('CLOUD_MIGRATE_BATCH_MAX', 50)));
+        return max(1, min(100, (int) env('CLOUD_MIGRATE_BATCH_MAX', 100)));
+    }
+
+    /** When local/TBM file is missing, clear DB reference instead of leaving a broken filename. */
+    private function clearImageColumnWhenFileMissing(): bool
+    {
+        return filter_var(env('CLOUD_CLEAR_IMAGE_ON_MISSING_FILE', true), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * Upload raw bytes to cloud and set stc_product_image to the public URL.
+     *
+     * @return array{success:bool, message:string, url?:string}
+     */
+    private function pushProductBytesToCloudAndSaveUrl(int $productId, string $bytes, string $safeExt): array
+    {
+        $uniq = str_replace('.', '', uniqid('', true));
+        $objectKey = 'products/' . $productId . '_' . date('YmdHis') . '_' . $uniq . '.' . $safeExt;
+
+        try {
+            $disk = $this->cloudDisk();
+            $put = Storage::disk($disk)->put($objectKey, $bytes, 'private');
+            if (! $put) {
+                return ['success' => false, 'message' => 'Upload to cloud failed.'];
+            }
+
+            $publicUrl = $this->remoteObjectPublicUrl($objectKey);
+            if (! $publicUrl) {
+                return ['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.'];
+            }
+
+            DB::table('stc_product')->where('stc_product_id', $productId)->update(['stc_product_image' => $publicUrl]);
+
+            return ['success' => true, 'message' => 'Uploaded and database updated.', 'url' => $publicUrl];
+        } catch (\Throwable $e) {
+            report($e);
+
+            return ['success' => false, 'message' => 'Cloud error: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Apply Images page filters (Products): image_kind all|local|cloud|empty_only, hide_empty 0|1.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     */
+    private function applyProductImageListFilters($query, Request $request): void
+    {
+        $kind = (string) $request->get('image_kind', 'all');
+        if (! in_array($kind, ['all', 'local', 'cloud', 'empty_only'], true)) {
+            $kind = 'all';
+        }
+        $hideEmpty = $request->get('hide_empty', '0') === '1';
+
+        if ($kind === 'empty_only') {
+            $query->whereRaw("(TRIM(COALESCE(stc_product_image, '')) = '')");
+
+            return;
+        }
+
+        if ($kind === 'local') {
+            $query->whereRaw("(TRIM(COALESCE(stc_product_image, '')) <> '' AND LOWER(TRIM(stc_product_image)) NOT LIKE 'http://%' AND LOWER(TRIM(stc_product_image)) NOT LIKE 'https://%')");
+        } elseif ($kind === 'cloud') {
+            $query->whereRaw("(LOWER(TRIM(stc_product_image)) LIKE 'http://%' OR LOWER(TRIM(stc_product_image)) LIKE 'https://%')");
+        }
+
+        if ($hideEmpty) {
+            $query->whereRaw("(TRIM(COALESCE(stc_product_image, '')) <> '')");
+        }
+    }
+
+    /**
+     * @param  \Illuminate\Database\Query\Builder  $query
+     */
+    private function applyTbmImageListFilters($query, Request $request): void
+    {
+        $kind = (string) $request->get('image_kind', 'all');
+        if (! in_array($kind, ['all', 'local', 'cloud', 'empty_only'], true)) {
+            $kind = 'all';
+        }
+        $hideEmpty = $request->get('hide_empty', '0') === '1';
+        $col = 'IMG.stc_safetytbm_img_location';
+
+        if ($kind === 'empty_only') {
+            $query->whereRaw("(TRIM(COALESCE({$col}, '')) = '')");
+
+            return;
+        }
+
+        if ($kind === 'local') {
+            $query->whereRaw("(TRIM(COALESCE({$col}, '')) <> '' AND LOWER(TRIM({$col})) NOT LIKE 'http://%' AND LOWER(TRIM({$col})) NOT LIKE 'https://%')");
+        } elseif ($kind === 'cloud') {
+            $query->whereRaw("(LOWER(TRIM({$col})) LIKE 'http://%' OR LOWER(TRIM({$col})) LIKE 'https://%')");
+        }
+
+        if ($hideEmpty) {
+            $query->whereRaw("(TRIM(COALESCE({$col}, '')) <> '')");
+        }
     }
 
     /** Microseconds to sleep between items in a batch (shared hosting I/O friendly). 0 = no delay. */
@@ -257,45 +354,34 @@ class MediaImagesController extends Controller
 
         [$path, $isTmp] = $this->resolveReadableProductFile($current);
         if (! $path) {
-            return ['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_PRODUCT_IMAGE_DIR or enable CLOUD_FETCH_IF_LOCAL_MISSING.'];
+            if ($this->clearImageColumnWhenFileMissing()) {
+                DB::table('stc_product')->where('stc_product_id', $id)->update(['stc_product_image' => '']);
+
+                return ['success' => true, 'message' => 'Image missing from disk (and fetch disabled or failed). Cleared stc_product_image. Re-upload a file from the Images page if needed.'];
+            }
+
+            return ['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_PRODUCT_IMAGE_DIR or enable CLOUD_FETCH_IF_LOCAL_MISSING. Set CLOUD_CLEAR_IMAGE_ON_MISSING_FILE=true (default) to clear the column automatically.'];
+        }
+
+        $bytes = file_get_contents($path);
+        if ($bytes === false) {
+            return ['success' => false, 'message' => 'Could not read image bytes.'];
         }
 
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         $safeExt = preg_match('/^[a-z0-9]{1,8}$/', $ext) ? $ext : 'bin';
-        $uniq = str_replace('.', '', uniqid('', true));
-        $objectKey = 'products/' . $id . '_' . date('YmdHis') . '_' . $uniq . '.' . $safeExt;
 
-        try {
-            $disk = $this->cloudDisk();
-            $bytes = file_get_contents($path);
-            if ($bytes === false) {
-                return ['success' => false, 'message' => 'Could not read image bytes.'];
-            }
+        $payload = $this->pushProductBytesToCloudAndSaveUrl($id, $bytes, $safeExt);
 
-            $put = Storage::disk($disk)->put($objectKey, $bytes, 'private');
-            if (! $put) {
-                return ['success' => false, 'message' => 'Upload to cloud failed.'];
-            }
-
-            $publicUrl = $this->remoteObjectPublicUrl($objectKey);
-            if (! $publicUrl) {
-                return ['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.'];
-            }
-
-            DB::table('stc_product')->where('stc_product_id', $id)->update(['stc_product_image' => $publicUrl]);
-
+        if ($payload['success']) {
             if ($isTmp) {
                 @unlink($path);
             } else {
                 $this->deleteLocalUnderRoot($path, $this->defaultLocalProductImageDir());
             }
-
-            return ['success' => true, 'message' => 'Uploaded and database updated.', 'url' => $publicUrl];
-        } catch (\Throwable $e) {
-            report($e);
-
-            return ['success' => false, 'message' => 'Cloud error: ' . $e->getMessage()];
         }
+
+        return $payload;
     }
 
     /**
@@ -319,6 +405,15 @@ class MediaImagesController extends Controller
 
         [$path, $isTmp] = $this->resolveReadableTbmFile($stored);
         if (! $path) {
+            if ($this->clearImageColumnWhenFileMissing()) {
+                DB::table('stc_safetytbm_img')
+                    ->where('stc_safetytbm_img_tbmid', $tbmId)
+                    ->where('stc_safetytbm_img_location', $stored)
+                    ->update(['stc_safetytbm_img_location' => '']);
+
+                return ['success' => true, 'message' => 'Image missing from disk (and fetch disabled or failed). Cleared this TBM image reference.'];
+            }
+
             return ['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_TBM_IMAGE_DIR or enable CLOUD_FETCH_IF_LOCAL_MISSING.'];
         }
 
@@ -430,6 +525,119 @@ class MediaImagesController extends Controller
             } else {
                 $fail++;
             }
+            if ($i < $n - 1 && $usleep > 0) {
+                usleep($usleep);
+            }
+        }
+
+        return response()->json([
+            'success' => $fail === 0,
+            'batch_complete' => true,
+            'total' => $n,
+            'ok' => $ok,
+            'failed' => $fail,
+            'results' => $results,
+            'message' => $ok . ' uploaded, ' . $fail . ' failed.',
+        ]);
+    }
+
+    /**
+     * Multipart upload: pair each checked product ID with one chosen image file (sorted IDs × files sorted by name).
+     */
+    public function uploadProductsDirectCloud(Request $request)
+    {
+        $reject = $this->cloudMigrateRejectIfNotReady();
+        if ($reject !== null) {
+            return response()->json($reject);
+        }
+
+        $max = $this->cloudMigrateBatchMax();
+        $request->validate([
+            'product_ids' => 'required|array|min:1|max:' . $max,
+            'product_ids.*' => 'integer|min:1',
+            'files' => 'required|array|min:1|max:' . $max,
+            'files.*' => 'required|image|max:15360',
+        ]);
+
+        $ids = array_map('intval', $request->input('product_ids'));
+        $files = $request->file('files');
+        if (! is_array($files)) {
+            return response()->json(['success' => false, 'message' => 'No files received.']);
+        }
+
+        if (count($ids) !== count($files)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Product count and file count must match (got ' . count($ids) . ' products and ' . count($files) . ' files).',
+            ]);
+        }
+
+        if (count($ids) !== count(array_unique($ids))) {
+            return response()->json(['success' => false, 'message' => 'Duplicate product IDs are not allowed.']);
+        }
+
+        @ini_set('max_execution_time', (string) max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
+        @set_time_limit(max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
+
+        $usleep = $this->cloudMigrateBatchUsleep();
+        $results = [];
+        $ok = 0;
+        $fail = 0;
+        $n = count($ids);
+
+        foreach ($ids as $i => $pid) {
+            /** @var \Illuminate\Http\UploadedFile|null $file */
+            $file = $files[$i];
+            if (! $file || ! $file->isValid()) {
+                $results[] = ['product_id' => $pid, 'success' => false, 'message' => 'Invalid upload for this row.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            if (! DB::table('stc_product')->where('stc_product_id', $pid)->exists()) {
+                $results[] = ['product_id' => $pid, 'success' => false, 'message' => 'Product not found.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            $real = $file->getRealPath();
+            $bytes = $real ? @file_get_contents($real) : false;
+            if ($bytes === false || $bytes === '') {
+                $results[] = ['product_id' => $pid, 'success' => false, 'message' => 'Could not read uploaded file.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            $ext = strtolower((string) $file->getClientOriginalExtension());
+            if ($ext === '' && method_exists($file, 'guessExtension')) {
+                $ext = strtolower((string) $file->guessExtension());
+            }
+            $safeExt = preg_match('/^[a-z0-9]{1,8}$/', $ext) ? $ext : 'jpg';
+
+            $r = $this->pushProductBytesToCloudAndSaveUrl($pid, $bytes, $safeExt);
+            $results[] = [
+                'product_id' => $pid,
+                'success' => $r['success'],
+                'message' => $r['message'],
+            ];
+            if ($r['success']) {
+                $ok++;
+            } else {
+                $fail++;
+            }
+
             if ($i < $n - 1 && $usleep > 0) {
                 usleep($usleep);
             }
@@ -564,6 +772,8 @@ class MediaImagesController extends Controller
             });
         }
 
+        $this->applyProductImageListFilters($query, $request);
+
         $totalRecordswithFilter = (clone $query)->count();
 
         $records = $query
@@ -578,13 +788,23 @@ class MediaImagesController extends Controller
         foreach ($records as $row) {
             $id = (int) $row->stc_product_id;
             $img = trim((string) ($row->stc_product_image ?? ''));
-            $action = '';
+            $canBulkPick = $cloudReady;
+            $canMigrateRow = $cloudReady && $img !== '' && ! $this->isRemoteUrl($img);
+
             $bulkSelect = '<span class="text-muted">—</span>';
+            if ($canBulkPick) {
+                $attrs = 'data-product-id="' . $id . '"';
+                if ($img !== '' && $this->isRemoteUrl($img)) {
+                    $attrs .= ' data-image-remote="1"';
+                }
+                $bulkSelect = '<input type="checkbox" class="js-product-row-select align-middle" ' . $attrs . ' title="Select for bulk upload">';
+            }
+
+            $action = '';
             if ($img !== '') {
                 $href = $this->isRemoteUrl($img) ? $img : ($base . '/' . rawurlencode(basename(str_replace('\\', '/', $img))));
                 $action = '<a href="' . e($href) . '" target="_blank" rel="noopener" class="btn btn-sm btn-info" title="Open image"><i class="fas fa-external-link-alt"></i></a>';
-                if ($cloudReady && ! $this->isRemoteUrl($img)) {
-                    $bulkSelect = '<input type="checkbox" class="js-product-row-select align-middle" data-product-id="' . $id . '" title="Select for bulk upload">';
+                if ($canMigrateRow) {
                     $action .= ' <button type="button" class="btn btn-sm btn-warning js-migrate-product-cloud" data-product-id="' . $id . '" title="Upload to Cloudflare R2"><i class="fas fa-cloud-upload-alt"></i></button>';
                 }
             } else {
@@ -659,6 +879,8 @@ class MediaImagesController extends Controller
                     ->orWhere('IMG.stc_safetytbm_img_location', 'like', $like);
             });
         }
+
+        $this->applyTbmImageListFilters($query, $request);
 
         $totalRecordswithFilter = (clone $query)->count();
 

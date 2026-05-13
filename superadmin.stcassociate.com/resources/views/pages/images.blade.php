@@ -68,12 +68,34 @@
               <div class="card-body">
                 <div class="tab-content" id="images-tab-content">
                   <div class="tab-pane fade show active" id="tab-products" role="tabpanel" aria-labelledby="tab-products-link">
+                    <div class="d-flex flex-wrap align-items-center mb-2 pb-2 border-bottom">
+                      <label for="js-products-image-kind" class="mb-1 mr-2 small font-weight-bold text-muted">Show</label>
+                      <select id="js-products-image-kind" class="form-control form-control-sm mb-1 mr-3" style="width:auto;min-width:11rem">
+                        <option value="all">All rows</option>
+                        <option value="local">Local filename only</option>
+                        <option value="cloud">Cloud URL only</option>
+                        <option value="empty_only">No image only</option>
+                      </select>
+                      <div class="custom-control custom-checkbox mb-1 mr-3">
+                        <input type="checkbox" class="custom-control-input" id="js-hide-empty-products">
+                        <label class="custom-control-label small" for="js-hide-empty-products">Hide rows with no image</label>
+                      </div>
+                      @if (!empty($cloud_upload_ready))
+                      <span class="small text-muted mb-1"><i class="fas fa-info-circle"></i> Bulk pairs direct uploads by <strong>sorted product ID</strong> × files sorted by filename.</span>
+                      @endif
+                    </div>
                     <div class="d-none mb-2 js-products-bulk-toolbar clearfix">
                       <div class="float-right border rounded px-3 py-2 bg-light shadow-sm">
                         <span class="text-muted small mr-2 js-products-bulk-count">0 selected</span>
-                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_batch_max ?? 50) }} per request)</span>
+                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_batch_max ?? 100) }} per request)</span>
+                        @if (!empty($cloud_upload_ready))
+                        <button type="button" class="btn btn-secondary btn-sm js-products-direct-upload mr-1" title="Pick image files from your computer (same count as selection)">
+                          <i class="fas fa-folder-open"></i> Upload files → cloud
+                        </button>
+                        <input type="file" id="js-products-direct-files" class="d-none" accept="image/*" multiple>
+                        @endif
                         <button type="button" class="btn btn-warning btn-sm js-bulk-migrate-products">
-                          <i class="fas fa-cloud-upload-alt"></i> Upload selected to cloud
+                          <i class="fas fa-cloud-upload-alt"></i> Upload from server/disk path
                         </button>
                       </div>
                     </div>
@@ -97,10 +119,23 @@
                     </div>
                   </div>
                   <div class="tab-pane fade" id="tab-tbm" role="tabpanel" aria-labelledby="tab-tbm-link">
+                    <div class="d-flex flex-wrap align-items-center mb-2 pb-2 border-bottom">
+                      <label for="js-tbm-image-kind" class="mb-1 mr-2 small font-weight-bold text-muted">Show</label>
+                      <select id="js-tbm-image-kind" class="form-control form-control-sm mb-1 mr-3" style="width:auto;min-width:11rem">
+                        <option value="all">All rows</option>
+                        <option value="local">Local filename only</option>
+                        <option value="cloud">Cloud URL only</option>
+                        <option value="empty_only">No image only</option>
+                      </select>
+                      <div class="custom-control custom-checkbox mb-1 mr-3">
+                        <input type="checkbox" class="custom-control-input" id="js-hide-empty-tbm">
+                        <label class="custom-control-label small" for="js-hide-empty-tbm">Hide rows with no image</label>
+                      </div>
+                    </div>
                     <div class="d-none mb-2 js-tbm-bulk-toolbar clearfix">
                       <div class="float-right border rounded px-3 py-2 bg-light shadow-sm">
                         <span class="text-muted small mr-2 js-tbm-bulk-count">0 selected</span>
-                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_batch_max ?? 50) }} per request)</span>
+                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_batch_max ?? 100) }} per request)</span>
                         <button type="button" class="btn btn-warning btn-sm js-bulk-migrate-tbm">
                           <i class="fas fa-cloud-upload-alt"></i> Upload selected to cloud
                         </button>
@@ -141,7 +176,7 @@
 
 <script>
   $(function () {
-    var BATCH_MAX = {{ (int) ($cloud_migrate_batch_max ?? 50) }};
+    var BATCH_MAX = {{ (int) ($cloud_migrate_batch_max ?? 100) }};
 
     function swalToast(icon, title) {
       var Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3800 });
@@ -305,8 +340,13 @@
     $('.js-bulk-migrate-products').on('click', function () {
       var ids = [];
       $('#images-products-table tbody .js-product-row-select:checked').each(function () {
+        if ($(this).attr('data-image-remote') === '1') return;
         ids.push($(this).data('product-id'));
       });
+      if (!ids.length) {
+        Swal.fire({ icon: 'info', title: 'Nothing to migrate', text: 'Choose rows that still have a local filename (not already a cloud URL), or use “Upload files → cloud” for computer files.' });
+        return;
+      }
       if (!ids.length) return;
       if (ids.length > BATCH_MAX) {
         Swal.fire({
@@ -405,12 +445,94 @@
       });
     });
 
+    $('.js-products-direct-upload').on('click', function () {
+      var ids = [];
+      $('#images-products-table tbody .js-product-row-select:checked').each(function () {
+        ids.push(parseInt($(this).data('product-id'), 10));
+      });
+      if (!ids.length) {
+        Swal.fire({ icon: 'warning', title: 'Select products first', text: 'Check one or more rows (empty image, local filename, or cloud URL you want to replace).' });
+        return;
+      }
+      ids.sort(function (a, b) { return a - b; });
+      if (ids.length > BATCH_MAX) {
+        Swal.fire({ icon: 'warning', title: 'Too many selected', text: 'At most ' + BATCH_MAX + ' images per request.' });
+        return;
+      }
+      $('#js-products-direct-files').data('pending-ids', ids).trigger('click');
+    });
+
+    $('#js-products-direct-files').on('change', function () {
+      var input = this;
+      var ids = $(input).data('pending-ids') || [];
+      $(input).removeData('pending-ids');
+      var fileList = input.files ? Array.prototype.slice.call(input.files, 0) : [];
+      input.value = '';
+      if (!ids.length || !fileList.length) return;
+
+      fileList.sort(function (a, b) { return String(a.name).localeCompare(String(b.name), undefined, { sensitivity: 'base', numeric: true }); });
+
+      if (fileList.length !== ids.length) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Count mismatch',
+          html: 'Selected <strong>' + ids.length + '</strong> products but chose <strong>' + fileList.length + '</strong> files. They must match.'
+        });
+        return;
+      }
+
+      var fd = new FormData();
+      fd.append('_token', "{{ csrf_token() }}");
+      ids.forEach(function (id) { fd.append('product_ids[]', id); });
+      fileList.forEach(function (f) { fd.append('files[]', f); });
+
+      Swal.fire({
+        title: 'Upload ' + ids.length + ' images?',
+        text: 'Files are paired with products using ascending product ID and ascending filename.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Upload',
+        cancelButtonText: 'Cancel'
+      }).then(function (result) {
+        if (!result.value) return;
+        var btn = $('.js-products-direct-upload');
+        btn.prop('disabled', true);
+        $.ajax({
+          url: "{{ url('/images/products/upload-cloud-files') }}",
+          method: 'POST',
+          data: fd,
+          processData: false,
+          contentType: false,
+          dataType: 'json',
+          headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" }
+        }).done(function (res) {
+          $('#images-products-table').DataTable().ajax.reload(null, false);
+          var detail = summarizeBatchFails(res.results, 'product_id');
+          Swal.fire({
+            icon: res.success ? 'success' : 'warning',
+            title: res.success ? 'Upload complete' : 'Finished with errors',
+            html: '<p>' + (res.message || '') + '</p>' + (detail ? '<pre style="text-align:left;font-size:12px;max-height:220px;overflow:auto">' + detail.replace(/</g, '&lt;') + '</pre>' : '')
+          });
+        }).fail(function (xhr) {
+          Swal.fire({ icon: 'error', title: 'Request failed', text: ajaxErrMessage(xhr) });
+        }).always(function () {
+          btn.prop('disabled', false);
+        });
+      });
+    });
+
     $('#images-products-table').DataTable({
       processing: true,
       serverSide: true,
       responsive: true,
       pageLength: 25,
-      ajax: "{{ url('/images/products/list') }}",
+      ajax: {
+        url: "{{ url('/images/products/list') }}",
+        data: function (d) {
+          d.image_kind = $('#js-products-image-kind').val();
+          d.hide_empty = $('#js-hide-empty-products').is(':checked') ? '1' : '0';
+        }
+      },
       order: [[1, 'desc']],
       columns: [
         { data: 'bulk_select', orderable: false, searchable: false, className: 'text-center align-middle', responsivePriority: 1 },
@@ -434,7 +556,13 @@
         serverSide: true,
         responsive: true,
         pageLength: 25,
-        ajax: "{{ url('/images/tbm/list') }}",
+        ajax: {
+          url: "{{ url('/images/tbm/list') }}",
+          data: function (d) {
+            d.image_kind = $('#js-tbm-image-kind').val();
+            d.hide_empty = $('#js-hide-empty-tbm').is(':checked') ? '1' : '0';
+          }
+        },
         order: [[1, 'desc']],
         columns: [
           { data: 'bulk_select', orderable: false, searchable: false, className: 'text-center align-middle', responsivePriority: 1 },
@@ -452,6 +580,17 @@
 
     $('a[data-toggle="pill"][href="#tab-tbm"]').on('shown.bs.tab', function () {
       initTbmTable();
+    });
+
+    $('#js-products-image-kind, #js-hide-empty-products').on('change', function () {
+      if ($.fn.DataTable.isDataTable('#images-products-table')) {
+        $('#images-products-table').DataTable().ajax.reload();
+      }
+    });
+    $('#js-tbm-image-kind, #js-hide-empty-tbm').on('change', function () {
+      if ($.fn.DataTable.isDataTable('#images-tbm-table')) {
+        $('#images-tbm-table').DataTable().ajax.reload();
+      }
     });
   });
 </script>

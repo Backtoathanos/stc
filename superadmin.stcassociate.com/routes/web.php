@@ -72,6 +72,7 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/images/tbm/list', [MediaImagesController::class, 'tbmList']);
     Route::post('/images/products/migrate-cloud', [MediaImagesController::class, 'migrateProductToCloud']);
     Route::post('/images/products/migrate-cloud-batch', [MediaImagesController::class, 'migrateProductsToCloudBatch']);
+    Route::post('/images/products/upload-cloud-files', [MediaImagesController::class, 'uploadProductsDirectCloud']);
     Route::post('/images/tbm/migrate-cloud', [MediaImagesController::class, 'migrateTbmImageToCloud']);
     Route::post('/images/tbm/migrate-cloud-batch', [MediaImagesController::class, 'migrateTbmImagesToCloudBatch']);
 
