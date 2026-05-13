@@ -203,77 +203,83 @@ class MediaImagesController extends Controller
         return $base . '/' . implode('/', $segments);
     }
 
-    public function show()
+    private function cloudMigrateBatchMax(): int
     {
-        $data['page_title'] = 'Images';
-        $data['cloud_upload_ready'] = $this->cloudMigrateReady();
-        $data['cloud_s3_adapter_missing'] = $this->cloudUploadConfigured() && ! $this->flysystemS3AdapterAvailable();
-
-        return view('pages.images', $data);
+        return max(1, min(100, (int) env('CLOUD_MIGRATE_BATCH_MAX', 50)));
     }
 
-    public function migrateProductToCloud(Request $request)
+    /** Microseconds to sleep between items in a batch (shared hosting I/O friendly). 0 = no delay. */
+    private function cloudMigrateBatchUsleep(): int
+    {
+        return max(0, (int) env('CLOUD_MIGRATE_BATCH_USLEEP_MICROSECONDS', 50000));
+    }
+
+    /**
+     * JSON error payload or null if cloud migrate may proceed.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function cloudMigrateRejectIfNotReady(): ?array
     {
         if (! $this->cloudUploadConfigured()) {
-            return response()->json(['success' => false, 'message' => 'Cloud storage is not configured. Set R2_* variables in .env (see Images page help text).']);
+            return ['success' => false, 'message' => 'Cloud storage is not configured. Set R2_* variables in .env (see Images page help text).'];
         }
 
         if (! $this->flysystemS3AdapterAvailable()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'S3/R2 PHP libraries are missing on this server. From the project root run: composer install --no-dev (installs league/flysystem-aws-s3-v3 and aws/aws-sdk-php). Deploy the full vendor folder if Composer is not available on the host.',
-            ]);
+            return ['success' => false, 'message' => 'S3/R2 PHP libraries are missing on this server. From the project root run: composer install --no-dev (installs league/flysystem-aws-s3-v3 and aws/aws-sdk-php). Deploy the full vendor folder if Composer is not available on the host.'];
         }
 
-        $pub = $this->publicBaseUrlForDisk();
-        if (! $pub) {
-            return response()->json(['success' => false, 'message' => 'Set R2_PUBLIC_URL in .env to your public bucket URL (required to store full image address in the database).']);
+        if (! $this->publicBaseUrlForDisk()) {
+            return ['success' => false, 'message' => 'Set R2_PUBLIC_URL in .env to your public bucket URL (required to store full image address in the database).'];
         }
 
-        $request->validate([
-            'product_id' => 'required|integer|min:1',
-        ]);
+        return null;
+    }
 
-        $id = (int) $request->input('product_id');
+    /**
+     * @return array{success:bool, message:string, url?:string}
+     */
+    private function migrateSingleProductInternal(int $id): array
+    {
         $row = DB::table('stc_product')->where('stc_product_id', $id)->first(['stc_product_id', 'stc_product_image']);
         if (! $row) {
-            return response()->json(['success' => false, 'message' => 'Product not found.']);
+            return ['success' => false, 'message' => 'Product not found.'];
         }
 
         $current = trim((string) ($row->stc_product_image ?? ''));
         if ($current === '') {
-            return response()->json(['success' => false, 'message' => 'No image filename stored for this product.']);
+            return ['success' => false, 'message' => 'No image filename stored for this product.'];
         }
 
         if ($this->isRemoteUrl($current)) {
-            return response()->json(['success' => false, 'message' => 'This row already points to a cloud URL.', 'url' => $current]);
+            return ['success' => false, 'message' => 'This row already points to a cloud URL.', 'url' => $current];
         }
 
         [$path, $isTmp] = $this->resolveReadableProductFile($current);
         if (! $path) {
-            return response()->json(['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_PRODUCT_IMAGE_DIR or enable CLOUD_FETCH_IF_LOCAL_MISSING.']);
+            return ['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_PRODUCT_IMAGE_DIR or enable CLOUD_FETCH_IF_LOCAL_MISSING.'];
         }
 
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         $safeExt = preg_match('/^[a-z0-9]{1,8}$/', $ext) ? $ext : 'bin';
-        $objectKey = 'products/' . $id . '_' . date('YmdHis') . '.' . $safeExt;
+        $uniq = str_replace('.', '', uniqid('', true));
+        $objectKey = 'products/' . $id . '_' . date('YmdHis') . '_' . $uniq . '.' . $safeExt;
 
         try {
             $disk = $this->cloudDisk();
             $bytes = file_get_contents($path);
             if ($bytes === false) {
-                return response()->json(['success' => false, 'message' => 'Could not read image bytes.']);
+                return ['success' => false, 'message' => 'Could not read image bytes.'];
             }
 
-            // R2 rejects PutObject with bucket-owner ACL headers; use private objects — bucket public URL still serves them.
             $put = Storage::disk($disk)->put($objectKey, $bytes, 'private');
             if (! $put) {
-                return response()->json(['success' => false, 'message' => 'Upload to cloud failed.']);
+                return ['success' => false, 'message' => 'Upload to cloud failed.'];
             }
 
             $publicUrl = $this->remoteObjectPublicUrl($objectKey);
             if (! $publicUrl) {
-                return response()->json(['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.']);
+                return ['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.'];
             }
 
             DB::table('stc_product')->where('stc_product_id', $id)->update(['stc_product_image' => $publicUrl]);
@@ -284,45 +290,22 @@ class MediaImagesController extends Controller
                 $this->deleteLocalUnderRoot($path, $this->defaultLocalProductImageDir());
             }
 
-            return response()->json(['success' => true, 'message' => 'Uploaded and database updated.', 'url' => $publicUrl]);
+            return ['success' => true, 'message' => 'Uploaded and database updated.', 'url' => $publicUrl];
         } catch (\Throwable $e) {
             report($e);
 
-            return response()->json([
-                'success' => false,
-                'message' => 'Cloud error: ' . $e->getMessage(),
-            ]);
+            return ['success' => false, 'message' => 'Cloud error: ' . $e->getMessage()];
         }
     }
 
-    public function migrateTbmImageToCloud(Request $request)
+    /**
+     * @return array{success:bool, message:string, url?:string}
+     */
+    private function migrateSingleTbmInternal(int $tbmId, string $stored): array
     {
-        if (! $this->cloudUploadConfigured()) {
-            return response()->json(['success' => false, 'message' => 'Cloud storage is not configured. Set R2_* variables in .env (see Images page help text).']);
-        }
-
-        if (! $this->flysystemS3AdapterAvailable()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'S3/R2 PHP libraries are missing on this server. From the project root run: composer install --no-dev (installs league/flysystem-aws-s3-v3 and aws/aws-sdk-php). Deploy the full vendor folder if Composer is not available on the host.',
-            ]);
-        }
-
-        $pub = $this->publicBaseUrlForDisk();
-        if (! $pub) {
-            return response()->json(['success' => false, 'message' => 'Set R2_PUBLIC_URL in .env to your public bucket URL (required to store full image address in the database).']);
-        }
-
-        $request->validate([
-            'tbm_id' => 'required|integer|min:1',
-            'img_location' => 'required|string|max:512',
-        ]);
-
-        $tbmId = (int) $request->input('tbm_id');
-        $stored = trim((string) $request->input('img_location'));
-
+        $stored = trim($stored);
         if ($this->isRemoteUrl($stored)) {
-            return response()->json(['success' => false, 'message' => 'This row already points to a cloud URL.', 'url' => $stored]);
+            return ['success' => false, 'message' => 'This row already points to a cloud URL.', 'url' => $stored];
         }
 
         $imgRow = DB::table('stc_safetytbm_img')
@@ -331,33 +314,34 @@ class MediaImagesController extends Controller
             ->first(['stc_safetytbm_img_tbmid', 'stc_safetytbm_img_location']);
 
         if (! $imgRow) {
-            return response()->json(['success' => false, 'message' => 'TBM image record not found. Refresh the table and try again.']);
+            return ['success' => false, 'message' => 'TBM image record not found. Refresh the table and try again.'];
         }
 
         [$path, $isTmp] = $this->resolveReadableTbmFile($stored);
         if (! $path) {
-            return response()->json(['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_TBM_IMAGE_DIR or enable CLOUD_FETCH_IF_LOCAL_MISSING.']);
+            return ['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_TBM_IMAGE_DIR or enable CLOUD_FETCH_IF_LOCAL_MISSING.'];
         }
 
         $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
         $safeExt = preg_match('/^[a-z0-9]{1,8}$/', $ext) ? $ext : 'bin';
-        $objectKey = 'tbm/' . $tbmId . '/' . $tbmId . '_' . date('YmdHis') . '.' . $safeExt;
+        $uniq = str_replace('.', '', uniqid('', true));
+        $objectKey = 'tbm/' . $tbmId . '/' . $tbmId . '_' . date('YmdHis') . '_' . $uniq . '.' . $safeExt;
 
         try {
             $disk = $this->cloudDisk();
             $bytes = file_get_contents($path);
             if ($bytes === false) {
-                return response()->json(['success' => false, 'message' => 'Could not read image bytes.']);
+                return ['success' => false, 'message' => 'Could not read image bytes.'];
             }
 
             $put = Storage::disk($disk)->put($objectKey, $bytes, 'private');
             if (! $put) {
-                return response()->json(['success' => false, 'message' => 'Upload to cloud failed.']);
+                return ['success' => false, 'message' => 'Upload to cloud failed.'];
             }
 
             $publicUrl = $this->remoteObjectPublicUrl($objectKey);
             if (! $publicUrl) {
-                return response()->json(['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.']);
+                return ['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.'];
             }
 
             DB::table('stc_safetytbm_img')
@@ -371,15 +355,172 @@ class MediaImagesController extends Controller
                 $this->deleteLocalUnderRoot($path, $this->defaultLocalTbmImageDir());
             }
 
-            return response()->json(['success' => true, 'message' => 'Uploaded and database updated.', 'url' => $publicUrl]);
+            return ['success' => true, 'message' => 'Uploaded and database updated.', 'url' => $publicUrl];
         } catch (\Throwable $e) {
             report($e);
 
+            return ['success' => false, 'message' => 'Cloud error: ' . $e->getMessage()];
+        }
+    }
+
+    public function show()
+    {
+        $data['page_title'] = 'Images';
+        $data['cloud_upload_ready'] = $this->cloudMigrateReady();
+        $data['cloud_s3_adapter_missing'] = $this->cloudUploadConfigured() && ! $this->flysystemS3AdapterAvailable();
+        $data['cloud_migrate_batch_max'] = $this->cloudMigrateBatchMax();
+
+        return view('pages.images', $data);
+    }
+
+    public function migrateProductToCloud(Request $request)
+    {
+        $reject = $this->cloudMigrateRejectIfNotReady();
+        if ($reject !== null) {
+            return response()->json($reject);
+        }
+
+        $request->validate([
+            'product_id' => 'required|integer|min:1',
+        ]);
+
+        $payload = $this->migrateSingleProductInternal((int) $request->input('product_id'));
+
+        return response()->json($payload);
+    }
+
+    public function migrateProductsToCloudBatch(Request $request)
+    {
+        $reject = $this->cloudMigrateRejectIfNotReady();
+        if ($reject !== null) {
+            return response()->json($reject);
+        }
+
+        $max = $this->cloudMigrateBatchMax();
+        $request->validate([
+            'product_ids' => 'required|array|min:1|max:' . $max,
+            'product_ids.*' => 'integer|min:1',
+        ]);
+
+        $ids = array_values(array_unique(array_map('intval', $request->input('product_ids'))));
+        if (count($ids) > $max) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cloud error: ' . $e->getMessage(),
+                'message' => 'Too many product IDs (maximum ' . $max . ' per request). Select fewer rows or increase CLOUD_MIGRATE_BATCH_MAX.',
             ]);
         }
+
+        @ini_set('max_execution_time', (string) max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
+        @set_time_limit(max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
+
+        $usleep = $this->cloudMigrateBatchUsleep();
+        $results = [];
+        $ok = 0;
+        $fail = 0;
+        $n = count($ids);
+        foreach ($ids as $i => $id) {
+            $r = $this->migrateSingleProductInternal($id);
+            $results[] = [
+                'product_id' => $id,
+                'success' => $r['success'],
+                'message' => $r['message'],
+            ];
+            if ($r['success']) {
+                $ok++;
+            } else {
+                $fail++;
+            }
+            if ($i < $n - 1 && $usleep > 0) {
+                usleep($usleep);
+            }
+        }
+
+        return response()->json([
+            'success' => $fail === 0,
+            'batch_complete' => true,
+            'total' => $n,
+            'ok' => $ok,
+            'failed' => $fail,
+            'results' => $results,
+            'message' => $ok . ' uploaded, ' . $fail . ' failed.',
+        ]);
+    }
+
+    public function migrateTbmImageToCloud(Request $request)
+    {
+        $reject = $this->cloudMigrateRejectIfNotReady();
+        if ($reject !== null) {
+            return response()->json($reject);
+        }
+
+        $request->validate([
+            'tbm_id' => 'required|integer|min:1',
+            'img_location' => 'required|string|max:512',
+        ]);
+
+        $payload = $this->migrateSingleTbmInternal((int) $request->input('tbm_id'), (string) $request->input('img_location'));
+
+        return response()->json($payload);
+    }
+
+    public function migrateTbmImagesToCloudBatch(Request $request)
+    {
+        $reject = $this->cloudMigrateRejectIfNotReady();
+        if ($reject !== null) {
+            return response()->json($reject);
+        }
+
+        $max = $this->cloudMigrateBatchMax();
+        $request->validate([
+            'tbm_items' => 'required|array|min:1|max:' . $max,
+            'tbm_items.*.tbm_id' => 'required|integer|min:1',
+            'tbm_items.*.img_location' => 'required|string|max:512',
+        ]);
+
+        $items = $request->input('tbm_items');
+        if (count($items) > $max) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Too many TBM rows (maximum ' . $max . ' per request).',
+            ]);
+        }
+
+        @ini_set('max_execution_time', (string) max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
+        @set_time_limit(max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
+
+        $usleep = $this->cloudMigrateBatchUsleep();
+        $results = [];
+        $ok = 0;
+        $fail = 0;
+        $n = count($items);
+        foreach ($items as $i => $row) {
+            $tid = (int) ($row['tbm_id'] ?? 0);
+            $loc = trim((string) ($row['img_location'] ?? ''));
+            $r = $this->migrateSingleTbmInternal($tid, $loc);
+            $results[] = [
+                'tbm_id' => $tid,
+                'success' => $r['success'],
+                'message' => $r['message'],
+            ];
+            if ($r['success']) {
+                $ok++;
+            } else {
+                $fail++;
+            }
+            if ($i < $n - 1 && $usleep > 0) {
+                usleep($usleep);
+            }
+        }
+
+        return response()->json([
+            'success' => $fail === 0,
+            'batch_complete' => true,
+            'total' => $n,
+            'ok' => $ok,
+            'failed' => $fail,
+            'results' => $results,
+            'message' => $ok . ' uploaded, ' . $fail . ' failed.',
+        ]);
     }
 
     public function productsList(Request $request)

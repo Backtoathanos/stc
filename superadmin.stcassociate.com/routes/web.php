@@ -71,7 +71,9 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/images/products/list', [MediaImagesController::class, 'productsList']);
     Route::get('/images/tbm/list', [MediaImagesController::class, 'tbmList']);
     Route::post('/images/products/migrate-cloud', [MediaImagesController::class, 'migrateProductToCloud']);
+    Route::post('/images/products/migrate-cloud-batch', [MediaImagesController::class, 'migrateProductsToCloudBatch']);
     Route::post('/images/tbm/migrate-cloud', [MediaImagesController::class, 'migrateTbmImageToCloud']);
+    Route::post('/images/tbm/migrate-cloud-batch', [MediaImagesController::class, 'migrateTbmImagesToCloudBatch']);
 
     Route::get('/users', [UsersHubController::class, 'index']);
     Route::get('/users/hub/record/{type}/{id}', [UsersHubController::class, 'recordJson']);

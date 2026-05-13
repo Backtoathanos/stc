@@ -71,6 +71,7 @@
                     <div class="d-none mb-2 js-products-bulk-toolbar clearfix">
                       <div class="float-right border rounded px-3 py-2 bg-light shadow-sm">
                         <span class="text-muted small mr-2 js-products-bulk-count">0 selected</span>
+                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_batch_max ?? 50) }} per request)</span>
                         <button type="button" class="btn btn-warning btn-sm js-bulk-migrate-products">
                           <i class="fas fa-cloud-upload-alt"></i> Upload selected to cloud
                         </button>
@@ -99,6 +100,7 @@
                     <div class="d-none mb-2 js-tbm-bulk-toolbar clearfix">
                       <div class="float-right border rounded px-3 py-2 bg-light shadow-sm">
                         <span class="text-muted small mr-2 js-tbm-bulk-count">0 selected</span>
+                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_batch_max ?? 50) }} per request)</span>
                         <button type="button" class="btn btn-warning btn-sm js-bulk-migrate-tbm">
                           <i class="fas fa-cloud-upload-alt"></i> Upload selected to cloud
                         </button>
@@ -139,6 +141,8 @@
 
 <script>
   $(function () {
+    var BATCH_MAX = {{ (int) ($cloud_migrate_batch_max ?? 50) }};
+
     function swalToast(icon, title) {
       var Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3800 });
       Toast.fire({ icon: icon, title: title });
@@ -159,6 +163,24 @@
         return parts.join(' ') || 'Validation error';
       }
       return 'Request failed';
+    }
+
+    function summarizeBatchFails(results, idField) {
+      if (!results || !results.length) return '';
+      var fails = [];
+      for (var i = 0; i < results.length; i++) {
+        if (!results[i].success) fails.push(results[i]);
+      }
+      if (!fails.length) return '';
+      var lines = [];
+      var cap = 10;
+      for (var j = 0; j < fails.length && j < cap; j++) {
+        var r = fails[j];
+        var id = r[idField] != null ? r[idField] : '?';
+        lines.push('#' + id + ': ' + (r.message || 'Failed'));
+      }
+      if (fails.length > cap) lines.push('… +' + (fails.length - cap) + ' more');
+      return lines.join('\n');
     }
 
     $(document).on('click', '.js-migrate-product-cloud', function () {
@@ -286,9 +308,17 @@
         ids.push($(this).data('product-id'));
       });
       if (!ids.length) return;
+      if (ids.length > BATCH_MAX) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Too many selected',
+          text: 'Shared hosting: upload at most ' + BATCH_MAX + ' images per request. Deselect some rows, upload, then select the next batch. (Adjust CLOUD_MIGRATE_BATCH_MAX in .env if your host allows.)'
+        });
+        return;
+      }
       Swal.fire({
         title: 'Upload ' + ids.length + ' to cloud?',
-        text: 'Each selected image is uploaded to R2 and the database row is updated.',
+        text: 'One server request uploads all selected images to R2 (easier on shared hosting than many separate requests).',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Upload',
@@ -297,48 +327,50 @@
         if (!result.value) return;
         var btn = $('.js-bulk-migrate-products');
         btn.prop('disabled', true);
-        var ok = 0;
-        var fail = 0;
-        var i = 0;
-        function step() {
-          if (i >= ids.length) {
-            btn.prop('disabled', false);
-            $('#images-products-table').DataTable().ajax.reload(null, false);
-            Swal.fire({
-              icon: fail ? 'warning' : 'success',
-              title: 'Bulk upload finished',
-              text: ok + ' succeeded, ' + fail + ' failed.'
-            });
-            return;
-          }
-          var id = ids[i++];
-          $.ajax({
-            url: "{{ url('/images/products/migrate-cloud') }}",
-            method: 'POST',
-            dataType: 'json',
-            headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
-            data: { _token: "{{ csrf_token() }}", product_id: id }
-          }).done(function (res) {
-            if (res.success) ok++; else fail++;
-          }).fail(function () {
-            fail++;
-          }).always(function () {
-            step();
+        $.ajax({
+          url: "{{ url('/images/products/migrate-cloud-batch') }}",
+          method: 'POST',
+          dataType: 'json',
+          contentType: 'application/json',
+          processData: false,
+          headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" },
+          data: JSON.stringify({ _token: "{{ csrf_token() }}", product_ids: ids })
+        }).done(function (res) {
+          $('#images-products-table').DataTable().ajax.reload(null, false);
+          var detail = summarizeBatchFails(res.results, 'product_id');
+          Swal.fire({
+            icon: res.success ? 'success' : 'warning',
+            title: res.success ? 'Bulk upload complete' : 'Bulk upload finished with errors',
+            html: '<p>' + (res.message || '') + '</p>' + (detail ? '<pre style="text-align:left;font-size:12px;max-height:220px;overflow:auto">' + detail.replace(/</g, '&lt;') + '</pre>' : '')
           });
-        }
-        step();
+        }).fail(function (xhr) {
+          Swal.fire({ icon: 'error', title: 'Request failed', text: ajaxErrMessage(xhr) });
+        }).always(function () {
+          btn.prop('disabled', false);
+        });
       });
     });
 
     $('.js-bulk-migrate-tbm').on('click', function () {
       var rows = [];
       $('#images-tbm-table tbody .js-tbm-row-select:checked').each(function () {
-        rows.push({ tbmId: $(this).data('tbm-id'), loc: $(this).attr('data-img-location') });
+        rows.push({
+          tbm_id: $(this).data('tbm-id'),
+          img_location: $(this).attr('data-img-location')
+        });
       });
       if (!rows.length) return;
+      if (rows.length > BATCH_MAX) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Too many selected',
+          text: 'Upload at most ' + BATCH_MAX + ' TBM images per request. Deselect some and run again.'
+        });
+        return;
+      }
       Swal.fire({
         title: 'Upload ' + rows.length + ' to cloud?',
-        text: 'Each selected TBM image is uploaded to R2 and the row is updated.',
+        text: 'One server request uploads all selected TBM images.',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Upload',
@@ -347,38 +379,29 @@
         if (!result.value) return;
         var btn = $('.js-bulk-migrate-tbm');
         btn.prop('disabled', true);
-        var ok = 0;
-        var fail = 0;
-        var i = 0;
-        function step() {
-          if (i >= rows.length) {
-            btn.prop('disabled', false);
-            if ($.fn.DataTable.isDataTable('#images-tbm-table')) {
-              $('#images-tbm-table').DataTable().ajax.reload(null, false);
-            }
-            Swal.fire({
-              icon: fail ? 'warning' : 'success',
-              title: 'Bulk upload finished',
-              text: ok + ' succeeded, ' + fail + ' failed.'
-            });
-            return;
+        $.ajax({
+          url: "{{ url('/images/tbm/migrate-cloud-batch') }}",
+          method: 'POST',
+          dataType: 'json',
+          contentType: 'application/json',
+          processData: false,
+          headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" },
+          data: JSON.stringify({ _token: "{{ csrf_token() }}", tbm_items: rows })
+        }).done(function (res) {
+          if ($.fn.DataTable.isDataTable('#images-tbm-table')) {
+            $('#images-tbm-table').DataTable().ajax.reload(null, false);
           }
-          var r = rows[i++];
-          $.ajax({
-            url: "{{ url('/images/tbm/migrate-cloud') }}",
-            method: 'POST',
-            dataType: 'json',
-            headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
-            data: { _token: "{{ csrf_token() }}", tbm_id: r.tbmId, img_location: r.loc }
-          }).done(function (res) {
-            if (res.success) ok++; else fail++;
-          }).fail(function () {
-            fail++;
-          }).always(function () {
-            step();
+          var detail = summarizeBatchFails(res.results, 'tbm_id');
+          Swal.fire({
+            icon: res.success ? 'success' : 'warning',
+            title: res.success ? 'Bulk upload complete' : 'Bulk upload finished with errors',
+            html: '<p>' + (res.message || '') + '</p>' + (detail ? '<pre style="text-align:left;font-size:12px;max-height:220px;overflow:auto">' + detail.replace(/</g, '&lt;') + '</pre>' : '')
           });
-        }
-        step();
+        }).fail(function (xhr) {
+          Swal.fire({ icon: 'error', title: 'Request failed', text: ajaxErrMessage(xhr) });
+        }).always(function () {
+          btn.prop('disabled', false);
+        });
       });
     });
 
