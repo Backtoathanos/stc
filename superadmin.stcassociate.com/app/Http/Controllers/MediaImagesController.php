@@ -30,6 +30,17 @@ class MediaImagesController extends Controller
             && ! empty($cfg['bucket']);
     }
 
+    private function flysystemS3AdapterAvailable(): bool
+    {
+        return class_exists(\League\Flysystem\AwsS3v3\AwsS3Adapter::class);
+    }
+
+    /** Credentials set + Composer packages present (league/flysystem-aws-s3-v3). */
+    private function cloudMigrateReady(): bool
+    {
+        return $this->cloudUploadConfigured() && $this->flysystemS3AdapterAvailable();
+    }
+
     private function publicBaseUrlForDisk(): ?string
     {
         $disk = $this->cloudDisk();
@@ -195,7 +206,8 @@ class MediaImagesController extends Controller
     public function show()
     {
         $data['page_title'] = 'Images';
-        $data['cloud_upload_ready'] = $this->cloudUploadConfigured();
+        $data['cloud_upload_ready'] = $this->cloudMigrateReady();
+        $data['cloud_s3_adapter_missing'] = $this->cloudUploadConfigured() && ! $this->flysystemS3AdapterAvailable();
 
         return view('pages.images', $data);
     }
@@ -204,6 +216,13 @@ class MediaImagesController extends Controller
     {
         if (! $this->cloudUploadConfigured()) {
             return response()->json(['success' => false, 'message' => 'Cloud storage is not configured. Set R2_* variables in .env (see Images page help text).']);
+        }
+
+        if (! $this->flysystemS3AdapterAvailable()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'S3/R2 PHP libraries are missing on this server. From the project root run: composer install --no-dev (installs league/flysystem-aws-s3-v3 and aws/aws-sdk-php). Deploy the full vendor folder if Composer is not available on the host.',
+            ]);
         }
 
         $pub = $this->publicBaseUrlForDisk();
@@ -280,6 +299,13 @@ class MediaImagesController extends Controller
     {
         if (! $this->cloudUploadConfigured()) {
             return response()->json(['success' => false, 'message' => 'Cloud storage is not configured. Set R2_* variables in .env (see Images page help text).']);
+        }
+
+        if (! $this->flysystemS3AdapterAvailable()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'S3/R2 PHP libraries are missing on this server. From the project root run: composer install --no-dev (installs league/flysystem-aws-s3-v3 and aws/aws-sdk-php). Deploy the full vendor folder if Composer is not available on the host.',
+            ]);
         }
 
         $pub = $this->publicBaseUrlForDisk();
@@ -373,6 +399,7 @@ class MediaImagesController extends Controller
         $searchValue = $search_arr['value'] ?? '';
 
         $columnMap = [
+            'bulk_select' => 'stc_product_id',
             'product_id' => 'stc_product_id',
             'product_name' => 'stc_product_name',
             'image_name' => 'stc_product_image',
@@ -405,16 +432,18 @@ class MediaImagesController extends Controller
             ->get();
 
         $base = $this->productImageBaseUrl();
-        $cloudReady = $this->cloudUploadConfigured();
+        $cloudReady = $this->cloudMigrateReady();
         $data_arr = [];
         foreach ($records as $row) {
             $id = (int) $row->stc_product_id;
             $img = trim((string) ($row->stc_product_image ?? ''));
             $action = '';
+            $bulkSelect = '<span class="text-muted">—</span>';
             if ($img !== '') {
                 $href = $this->isRemoteUrl($img) ? $img : ($base . '/' . rawurlencode(basename(str_replace('\\', '/', $img))));
                 $action = '<a href="' . e($href) . '" target="_blank" rel="noopener" class="btn btn-sm btn-info" title="Open image"><i class="fas fa-external-link-alt"></i></a>';
                 if ($cloudReady && ! $this->isRemoteUrl($img)) {
+                    $bulkSelect = '<input type="checkbox" class="js-product-row-select align-middle" data-product-id="' . $id . '" title="Select for bulk upload">';
                     $action .= ' <button type="button" class="btn btn-sm btn-warning js-migrate-product-cloud" data-product-id="' . $id . '" title="Upload to Cloudflare R2"><i class="fas fa-cloud-upload-alt"></i></button>';
                 }
             } else {
@@ -422,6 +451,7 @@ class MediaImagesController extends Controller
             }
 
             $data_arr[] = [
+                'bulk_select' => $bulkSelect,
                 'product_id' => '<span class="text-center d-block">' . $id . '</span>',
                 'product_name' => e((string) $row->stc_product_name),
                 'image_name' => $img !== '' ? e($img) : '<span class="text-muted">—</span>',
@@ -454,6 +484,7 @@ class MediaImagesController extends Controller
         $searchValue = $search_arr['value'] ?? '';
 
         $columnMap = [
+            'bulk_select' => 'T.stc_safetytbm_id',
             'tbm_id' => 'T.stc_safetytbm_id',
             'tbm_location' => 'tbm_location_sort',
             'img_name' => 'img_file',
@@ -497,7 +528,7 @@ class MediaImagesController extends Controller
             ->get();
 
         $imgBase = $this->tbmImageBaseUrl();
-        $cloudReady = $this->cloudUploadConfigured();
+        $cloudReady = $this->cloudMigrateReady();
         $data_arr = [];
         foreach ($records as $row) {
             $id = (int) $row->stc_safetytbm_id;
@@ -507,6 +538,7 @@ class MediaImagesController extends Controller
             $imgCell = $imgFile !== '' ? e($imgFile) : '<span class="text-muted">—</span>';
 
             $btns = '';
+            $bulkSelect = '<span class="text-muted">—</span>';
             $btns .= '<a href="' . e($this->tbmPrintUrl($id)) . '" target="_blank" rel="noopener" class="btn btn-sm btn-success mr-1" title="TBM print preview"><i class="fas fa-file-alt"></i></a>';
             if ($imgFile !== '') {
                 $href = $this->isRemoteUrl($imgFile)
@@ -514,11 +546,13 @@ class MediaImagesController extends Controller
                     : ($imgBase . '/' . rawurlencode(basename(str_replace('\\', '/', $imgFile))));
                 $btns .= '<a href="' . e($href) . '" target="_blank" rel="noopener" class="btn btn-sm btn-info mr-1" title="Open image"><i class="fas fa-image"></i></a>';
                 if ($cloudReady && ! $this->isRemoteUrl($imgFile)) {
+                    $bulkSelect = '<input type="checkbox" class="js-tbm-row-select align-middle" data-tbm-id="' . $id . '" data-img-location="' . e($imgFile) . '" title="Select for bulk upload">';
                     $btns .= '<button type="button" class="btn btn-sm btn-warning js-migrate-tbm-cloud" data-tbm-id="' . $id . '" data-img-location="' . e($imgFile) . '" title="Upload to Cloudflare R2"><i class="fas fa-cloud-upload-alt"></i></button>';
                 }
             }
 
             $data_arr[] = [
+                'bulk_select' => $bulkSelect,
                 'tbm_id' => '<span class="text-center d-block">' . $id . '</span>',
                 'tbm_location' => $loc !== '' ? e($loc) : '<span class="text-muted">—</span>',
                 'img_name' => $imgCell,

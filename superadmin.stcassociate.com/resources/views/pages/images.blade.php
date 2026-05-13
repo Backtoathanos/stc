@@ -34,7 +34,13 @@
         <div class="row">
           <div class="col-12">
             <p>@include('layouts._message')</p>
-            @if (empty($cloud_upload_ready))
+            @if (!empty($cloud_s3_adapter_missing))
+            <div class="alert alert-danger border-0 shadow-sm">
+              <strong>PHP packages missing:</strong> this server does not have the S3/R2 Composer libraries (e.g. <code>League\Flysystem\AwsS3v3\AwsS3Adapter</code>).
+              SSH into the server, <code>cd</code> to this Laravel project, then run <code>composer install --no-dev</code>.
+              If Composer is not installed on the host, upload the full <code>vendor/</code> folder from a machine where <code>composer install</code> already ran.
+            </div>
+            @elseif (empty($cloud_upload_ready))
             <div class="alert alert-warning border-0 shadow-sm">
               <strong>Cloud upload (Cloudflare R2):</strong> add credentials to <code>.env</code>:
               <code>R2_ACCESS_KEY_ID</code>, <code>R2_SECRET_ACCESS_KEY</code>, <code>R2_BUCKET</code>,
@@ -62,10 +68,23 @@
               <div class="card-body">
                 <div class="tab-content" id="images-tab-content">
                   <div class="tab-pane fade show active" id="tab-products" role="tabpanel" aria-labelledby="tab-products-link">
+                    <div class="d-none mb-2 js-products-bulk-toolbar clearfix">
+                      <div class="float-right border rounded px-3 py-2 bg-light shadow-sm">
+                        <span class="text-muted small mr-2 js-products-bulk-count">0 selected</span>
+                        <button type="button" class="btn btn-warning btn-sm js-bulk-migrate-products">
+                          <i class="fas fa-cloud-upload-alt"></i> Upload selected to cloud
+                        </button>
+                      </div>
+                    </div>
                     <div class="table-responsive">
                       <table id="images-products-table" class="table table-bordered table-striped table-hover mb-0" style="width:100%">
                         <thead>
                           <tr>
+                            <th class="text-center align-middle" style="width:40px" data-orderable="false">
+                              @if (!empty($cloud_upload_ready))
+                              <input type="checkbox" id="images-products-select-all" class="js-products-select-all" title="Select all on this page" aria-label="Select all on page">
+                              @endif
+                            </th>
                             <th class="text-center">Product ID</th>
                             <th>Product name</th>
                             <th>Image name</th>
@@ -77,10 +96,23 @@
                     </div>
                   </div>
                   <div class="tab-pane fade" id="tab-tbm" role="tabpanel" aria-labelledby="tab-tbm-link">
+                    <div class="d-none mb-2 js-tbm-bulk-toolbar clearfix">
+                      <div class="float-right border rounded px-3 py-2 bg-light shadow-sm">
+                        <span class="text-muted small mr-2 js-tbm-bulk-count">0 selected</span>
+                        <button type="button" class="btn btn-warning btn-sm js-bulk-migrate-tbm">
+                          <i class="fas fa-cloud-upload-alt"></i> Upload selected to cloud
+                        </button>
+                      </div>
+                    </div>
                     <div class="table-responsive">
                       <table id="images-tbm-table" class="table table-bordered table-striped table-hover mb-0" style="width:100%">
                         <thead>
                           <tr>
+                            <th class="text-center align-middle" style="width:40px" data-orderable="false">
+                              @if (!empty($cloud_upload_ready))
+                              <input type="checkbox" id="images-tbm-select-all" class="js-tbm-select-all" title="Select all on this page" aria-label="Select all on page">
+                              @endif
+                            </th>
                             <th class="text-center">TBM ID</th>
                             <th>TBM location</th>
                             <th>TBM image name</th>
@@ -200,19 +232,174 @@
       });
     });
 
+    function updateProductsBulkUi() {
+      var n = $('#images-products-table tbody .js-product-row-select:checked').length;
+      var $bar = $('.js-products-bulk-toolbar');
+      var $all = $('#images-products-select-all');
+      if (n > 0) {
+        $bar.removeClass('d-none');
+        $('.js-products-bulk-count').text(n + ' selected');
+      } else {
+        $bar.addClass('d-none');
+        $('.js-products-bulk-count').text('0 selected');
+      }
+      if ($all.length) {
+        var total = $('#images-products-table tbody .js-product-row-select').length;
+        $all.prop('checked', total > 0 && n === total);
+      }
+    }
+
+    function updateTbmBulkUi() {
+      var n = $('#images-tbm-table tbody .js-tbm-row-select:checked').length;
+      var $bar = $('.js-tbm-bulk-toolbar');
+      var $all = $('#images-tbm-select-all');
+      if (n > 0) {
+        $bar.removeClass('d-none');
+        $('.js-tbm-bulk-count').text(n + ' selected');
+      } else {
+        $bar.addClass('d-none');
+        $('.js-tbm-bulk-count').text('0 selected');
+      }
+      if ($all.length) {
+        var total = $('#images-tbm-table tbody .js-tbm-row-select').length;
+        $all.prop('checked', total > 0 && n === total);
+      }
+    }
+
+    $('#images-products-table').on('change', '.js-product-row-select', updateProductsBulkUi);
+    $('#images-products-table').on('change', '.js-products-select-all', function () {
+      var on = $(this).prop('checked');
+      $('#images-products-table tbody .js-product-row-select').prop('checked', on);
+      updateProductsBulkUi();
+    });
+
+    $('#images-tbm-table').on('change', '.js-tbm-row-select', updateTbmBulkUi);
+    $('#images-tbm-table').on('change', '.js-tbm-select-all', function () {
+      var on = $(this).prop('checked');
+      $('#images-tbm-table tbody .js-tbm-row-select').prop('checked', on);
+      updateTbmBulkUi();
+    });
+
+    $('.js-bulk-migrate-products').on('click', function () {
+      var ids = [];
+      $('#images-products-table tbody .js-product-row-select:checked').each(function () {
+        ids.push($(this).data('product-id'));
+      });
+      if (!ids.length) return;
+      Swal.fire({
+        title: 'Upload ' + ids.length + ' to cloud?',
+        text: 'Each selected image is uploaded to R2 and the database row is updated.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Upload',
+        cancelButtonText: 'Cancel'
+      }).then(function (result) {
+        if (!result.value) return;
+        var btn = $('.js-bulk-migrate-products');
+        btn.prop('disabled', true);
+        var ok = 0;
+        var fail = 0;
+        var i = 0;
+        function step() {
+          if (i >= ids.length) {
+            btn.prop('disabled', false);
+            $('#images-products-table').DataTable().ajax.reload(null, false);
+            Swal.fire({
+              icon: fail ? 'warning' : 'success',
+              title: 'Bulk upload finished',
+              text: ok + ' succeeded, ' + fail + ' failed.'
+            });
+            return;
+          }
+          var id = ids[i++];
+          $.ajax({
+            url: "{{ url('/images/products/migrate-cloud') }}",
+            method: 'POST',
+            dataType: 'json',
+            headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+            data: { _token: "{{ csrf_token() }}", product_id: id }
+          }).done(function (res) {
+            if (res.success) ok++; else fail++;
+          }).fail(function () {
+            fail++;
+          }).always(function () {
+            step();
+          });
+        }
+        step();
+      });
+    });
+
+    $('.js-bulk-migrate-tbm').on('click', function () {
+      var rows = [];
+      $('#images-tbm-table tbody .js-tbm-row-select:checked').each(function () {
+        rows.push({ tbmId: $(this).data('tbm-id'), loc: $(this).attr('data-img-location') });
+      });
+      if (!rows.length) return;
+      Swal.fire({
+        title: 'Upload ' + rows.length + ' to cloud?',
+        text: 'Each selected TBM image is uploaded to R2 and the row is updated.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Upload',
+        cancelButtonText: 'Cancel'
+      }).then(function (result) {
+        if (!result.value) return;
+        var btn = $('.js-bulk-migrate-tbm');
+        btn.prop('disabled', true);
+        var ok = 0;
+        var fail = 0;
+        var i = 0;
+        function step() {
+          if (i >= rows.length) {
+            btn.prop('disabled', false);
+            if ($.fn.DataTable.isDataTable('#images-tbm-table')) {
+              $('#images-tbm-table').DataTable().ajax.reload(null, false);
+            }
+            Swal.fire({
+              icon: fail ? 'warning' : 'success',
+              title: 'Bulk upload finished',
+              text: ok + ' succeeded, ' + fail + ' failed.'
+            });
+            return;
+          }
+          var r = rows[i++];
+          $.ajax({
+            url: "{{ url('/images/tbm/migrate-cloud') }}",
+            method: 'POST',
+            dataType: 'json',
+            headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+            data: { _token: "{{ csrf_token() }}", tbm_id: r.tbmId, img_location: r.loc }
+          }).done(function (res) {
+            if (res.success) ok++; else fail++;
+          }).fail(function () {
+            fail++;
+          }).always(function () {
+            step();
+          });
+        }
+        step();
+      });
+    });
+
     $('#images-products-table').DataTable({
       processing: true,
       serverSide: true,
       responsive: true,
       pageLength: 25,
       ajax: "{{ url('/images/products/list') }}",
-      order: [[0, 'desc']],
+      order: [[1, 'desc']],
       columns: [
+        { data: 'bulk_select', orderable: false, searchable: false, className: 'text-center align-middle', responsivePriority: 1 },
         { data: 'product_id', className: 'text-center align-middle' },
         { data: 'product_name', className: 'align-middle' },
         { data: 'image_name', className: 'align-middle' },
         { data: 'actionData', orderable: false, searchable: false, className: 'text-center align-middle' }
       ]
+    }).on('draw.dt', function () {
+      $('.js-products-bulk-toolbar').addClass('d-none');
+      $('.js-products-bulk-count').text('0 selected');
+      $('#images-products-select-all').prop('checked', false);
     });
 
     var tbmTableInitialized = false;
@@ -225,13 +412,18 @@
         responsive: true,
         pageLength: 25,
         ajax: "{{ url('/images/tbm/list') }}",
-        order: [[0, 'desc']],
+        order: [[1, 'desc']],
         columns: [
+          { data: 'bulk_select', orderable: false, searchable: false, className: 'text-center align-middle', responsivePriority: 1 },
           { data: 'tbm_id', className: 'text-center align-middle' },
           { data: 'tbm_location', className: 'align-middle' },
           { data: 'img_name', className: 'align-middle' },
           { data: 'actionData', orderable: false, searchable: false, className: 'text-center align-middle' }
         ]
+      }).on('draw.dt', function () {
+        $('.js-tbm-bulk-toolbar').addClass('d-none');
+        $('.js-tbm-bulk-count').text('0 selected');
+        $('#images-tbm-select-all').prop('checked', false);
       });
     }
 
