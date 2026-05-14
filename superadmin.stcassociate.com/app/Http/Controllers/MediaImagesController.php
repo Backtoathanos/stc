@@ -215,6 +215,24 @@ class MediaImagesController extends Controller
         return max(1, min(500, (int) env('CLOUD_MIGRATE_BATCH_MAX_TBM', 500)));
     }
 
+    /**
+     * Split bulk uploads into smaller HTTP requests (avoids 503/timeouts on shared hosting).
+     * Env CLOUD_MIGRATE_HTTP_CHUNK_SIZE (default 40); cannot exceed per-tab batch max.
+     */
+    private function cloudMigrateHttpChunkSizeProducts(): int
+    {
+        $chunk = (int) env('CLOUD_MIGRATE_HTTP_CHUNK_SIZE', 40);
+
+        return max(1, min($chunk, $this->cloudMigrateProductBatchMax()));
+    }
+
+    private function cloudMigrateHttpChunkSizeTbm(): int
+    {
+        $chunk = (int) env('CLOUD_MIGRATE_HTTP_CHUNK_SIZE', 40);
+
+        return max(1, min($chunk, $this->cloudMigrateTbmBatchMax()));
+    }
+
     /** When local/TBM file is missing, clear DB reference instead of leaving a broken filename. */
     private function clearImageColumnWhenFileMissing(): bool
     {
@@ -472,6 +490,8 @@ class MediaImagesController extends Controller
         $data['cloud_s3_adapter_missing'] = $this->cloudUploadConfigured() && ! $this->flysystemS3AdapterAvailable();
         $data['cloud_migrate_batch_max'] = $this->cloudMigrateProductBatchMax();
         $data['cloud_migrate_tbm_batch_max'] = $this->cloudMigrateTbmBatchMax();
+        $data['cloud_migrate_http_chunk_products'] = $this->cloudMigrateHttpChunkSizeProducts();
+        $data['cloud_migrate_http_chunk_tbm'] = $this->cloudMigrateHttpChunkSizeTbm();
 
         return view('pages.images', $data);
     }

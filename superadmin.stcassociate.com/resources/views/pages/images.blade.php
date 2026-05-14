@@ -87,7 +87,7 @@
                     <div class="d-none mb-2 js-products-bulk-toolbar clearfix">
                       <div class="float-right border rounded px-3 py-2 bg-light shadow-sm">
                         <span class="text-muted small mr-2 js-products-bulk-count">0 selected</span>
-                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_batch_max ?? 100) }} per request)</span>
+                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_batch_max ?? 100) }} selected; {{ (int) ($cloud_migrate_http_chunk_products ?? 40) }} per HTTP request)</span>
                         @if (!empty($cloud_upload_ready))
                         <button type="button" class="btn btn-secondary btn-sm js-products-direct-upload mr-1" title="Pick image files from your computer (same count as selection)">
                           <i class="fas fa-folder-open"></i> Upload files → cloud
@@ -135,7 +135,7 @@
                     <div class="d-none mb-2 js-tbm-bulk-toolbar clearfix">
                       <div class="float-right border rounded px-3 py-2 bg-light shadow-sm">
                         <span class="text-muted small mr-2 js-tbm-bulk-count">0 selected</span>
-                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_tbm_batch_max ?? 500) }} per request)</span>
+                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_tbm_batch_max ?? 500) }} selected; {{ (int) ($cloud_migrate_http_chunk_tbm ?? 40) }} per HTTP request)</span>
                         <button type="button" class="btn btn-warning btn-sm js-bulk-migrate-tbm">
                           <i class="fas fa-cloud-upload-alt"></i> Upload selected to cloud
                         </button>
@@ -178,6 +178,8 @@
   $(function () {
     var BATCH_MAX = {{ (int) ($cloud_migrate_batch_max ?? 100) }};
     var TBM_BATCH_MAX = {{ (int) ($cloud_migrate_tbm_batch_max ?? 500) }};
+    var HTTP_CHUNK_PRODUCTS = {{ (int) ($cloud_migrate_http_chunk_products ?? 40) }};
+    var HTTP_CHUNK_TBM = {{ (int) ($cloud_migrate_http_chunk_tbm ?? 40) }};
 
     function swalToast(icon, title) {
       var Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3800 });
@@ -185,6 +187,9 @@
     }
 
     function ajaxErrMessage(xhr) {
+      if (xhr && xhr.status === 503) {
+        return '503 Service Unavailable — the host ended this request (timeout or capacity limits). Lower CLOUD_MIGRATE_HTTP_CHUNK_SIZE in .env (try 25 or 20) or select fewer rows.';
+      }
       if (!xhr || !xhr.responseJSON) return 'Request failed';
       var j = xhr.responseJSON;
       if (j.message) return j.message;
@@ -217,6 +222,14 @@
       }
       if (fails.length > cap) lines.push('… +' + (fails.length - cap) + ' more');
       return lines.join('\n');
+    }
+
+    function mergeBatchResults(accum, res) {
+      if (!accum.results) accum.results = [];
+      if (res && Array.isArray(res.results)) accum.results = accum.results.concat(res.results);
+      accum.ok = (accum.ok || 0) + (parseInt(res.ok, 10) || 0);
+      accum.failed = (accum.failed || 0) + (parseInt(res.failed, 10) || 0);
+      return accum;
     }
 
     $(document).on('click', '.js-migrate-product-cloud', function () {
@@ -348,18 +361,19 @@
         Swal.fire({ icon: 'info', title: 'Nothing to migrate', text: 'Choose rows that still have a local filename (not already a cloud URL), or use “Upload files → cloud” for computer files.' });
         return;
       }
-      if (!ids.length) return;
       if (ids.length > BATCH_MAX) {
         Swal.fire({
           icon: 'warning',
           title: 'Too many selected',
-          text: 'This page allows up to ' + BATCH_MAX + ' images per request (set CLOUD_MIGRATE_BATCH_MAX in .env, maximum 500). Deselect some rows and run another batch, or increase the limit if your host can handle it.'
+          text: 'This page allows up to ' + BATCH_MAX + ' images in one run (set CLOUD_MIGRATE_BATCH_MAX in .env, maximum 500). Deselect some rows or raise the limit if your host can handle it.'
         });
         return;
       }
+      var chunk = HTTP_CHUNK_PRODUCTS;
+      var batchTotal = Math.max(1, Math.ceil(ids.length / chunk));
       Swal.fire({
         title: 'Upload ' + ids.length + ' to cloud?',
-        text: 'One server request uploads all selected images to R2 (easier on shared hosting than many separate requests).',
+        html: 'Large runs are split into <strong>' + batchTotal + '</strong> request(s) of up to <strong>' + chunk + '</strong> images each (<code>CLOUD_MIGRATE_HTTP_CHUNK_SIZE</code> in <code>.env</code>) to avoid 503 timeouts on shared hosting.',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Upload',
@@ -368,27 +382,56 @@
         if (!result.value) return;
         var btn = $('.js-bulk-migrate-products');
         btn.prop('disabled', true);
-        $.ajax({
-          url: "{{ url('/images/products/migrate-cloud-batch') }}",
-          method: 'POST',
-          dataType: 'json',
-          contentType: 'application/json',
-          processData: false,
-          headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" },
-          data: JSON.stringify({ _token: "{{ csrf_token() }}", product_ids: ids })
-        }).done(function (res) {
-          $('#images-products-table').DataTable().ajax.reload(null, false);
-          var detail = summarizeBatchFails(res.results, 'product_id');
-          Swal.fire({
-            icon: res.success ? 'success' : 'warning',
-            title: res.success ? 'Bulk upload complete' : 'Bulk upload finished with errors',
-            html: '<p>' + (res.message || '') + '</p>' + (detail ? '<pre style="text-align:left;font-size:12px;max-height:220px;overflow:auto">' + detail.replace(/</g, '&lt;') + '</pre>' : '')
-          });
-        }).fail(function (xhr) {
-          Swal.fire({ icon: 'error', title: 'Request failed', text: ajaxErrMessage(xhr) });
-        }).always(function () {
-          btn.prop('disabled', false);
+
+        Swal.fire({
+          title: 'Uploading to cloud',
+          html: 'Starting…',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: function () { Swal.showLoading(); }
         });
+
+        var accum = { ok: 0, failed: 0, results: [] };
+        var offset = 0;
+        var batchIndex = 0;
+
+        function runNextProductBatch() {
+          if (offset >= ids.length) {
+            Swal.close();
+            $('#images-products-table').DataTable().ajax.reload(null, false);
+            var detail = summarizeBatchFails(accum.results, 'product_id');
+            var overallOk = accum.failed === 0;
+            Swal.fire({
+              icon: overallOk ? 'success' : 'warning',
+              title: overallOk ? 'Bulk upload complete' : 'Bulk upload finished with errors',
+              html: '<p>' + accum.ok + ' uploaded, ' + accum.failed + ' failed.</p>' + (detail ? '<pre style="text-align:left;font-size:12px;max-height:220px;overflow:auto">' + detail.replace(/</g, '&lt;') + '</pre>' : '')
+            });
+            btn.prop('disabled', false);
+            return;
+          }
+          var slice = ids.slice(offset, offset + chunk);
+          batchIndex++;
+          Swal.update({ html: 'Request <strong>' + batchIndex + '</strong> of <strong>' + batchTotal + '</strong> (' + slice.length + ' items)…' });
+          $.ajax({
+            url: "{{ url('/images/products/migrate-cloud-batch') }}",
+            method: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            processData: false,
+            headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" },
+            data: JSON.stringify({ _token: "{{ csrf_token() }}", product_ids: slice })
+          }).done(function (res) {
+            mergeBatchResults(accum, res);
+            offset += chunk;
+            runNextProductBatch();
+          }).fail(function (xhr) {
+            Swal.close();
+            Swal.fire({ icon: 'error', title: 'Request failed', text: ajaxErrMessage(xhr) });
+            btn.prop('disabled', false);
+          });
+        }
+        runNextProductBatch();
       });
     });
 
@@ -405,13 +448,15 @@
         Swal.fire({
           icon: 'warning',
           title: 'Too many selected',
-          text: 'Upload at most ' + TBM_BATCH_MAX + ' TBM images per request. Deselect some and run again. (CLOUD_MIGRATE_BATCH_MAX_TBM in .env, max 500.)'
+          text: 'Upload at most ' + TBM_BATCH_MAX + ' TBM images in one run. Deselect some and run again. (CLOUD_MIGRATE_BATCH_MAX_TBM in .env, max 500.)'
         });
         return;
       }
+      var chunk = HTTP_CHUNK_TBM;
+      var batchTotal = Math.max(1, Math.ceil(rows.length / chunk));
       Swal.fire({
         title: 'Upload ' + rows.length + ' to cloud?',
-        text: 'One server request uploads all selected TBM images.',
+        html: 'Sent in <strong>' + batchTotal + '</strong> request(s) of up to <strong>' + chunk + '</strong> rows (<code>CLOUD_MIGRATE_HTTP_CHUNK_SIZE</code> in <code>.env</code>).',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Upload',
@@ -420,29 +465,58 @@
         if (!result.value) return;
         var btn = $('.js-bulk-migrate-tbm');
         btn.prop('disabled', true);
-        $.ajax({
-          url: "{{ url('/images/tbm/migrate-cloud-batch') }}",
-          method: 'POST',
-          dataType: 'json',
-          contentType: 'application/json',
-          processData: false,
-          headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" },
-          data: JSON.stringify({ _token: "{{ csrf_token() }}", tbm_items: rows })
-        }).done(function (res) {
-          if ($.fn.DataTable.isDataTable('#images-tbm-table')) {
-            $('#images-tbm-table').DataTable().ajax.reload(null, false);
-          }
-          var detail = summarizeBatchFails(res.results, 'tbm_id');
-          Swal.fire({
-            icon: res.success ? 'success' : 'warning',
-            title: res.success ? 'Bulk upload complete' : 'Bulk upload finished with errors',
-            html: '<p>' + (res.message || '') + '</p>' + (detail ? '<pre style="text-align:left;font-size:12px;max-height:220px;overflow:auto">' + detail.replace(/</g, '&lt;') + '</pre>' : '')
-          });
-        }).fail(function (xhr) {
-          Swal.fire({ icon: 'error', title: 'Request failed', text: ajaxErrMessage(xhr) });
-        }).always(function () {
-          btn.prop('disabled', false);
+
+        Swal.fire({
+          title: 'Uploading TBM images',
+          html: 'Starting…',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: function () { Swal.showLoading(); }
         });
+
+        var accum = { ok: 0, failed: 0, results: [] };
+        var offset = 0;
+        var batchIndex = 0;
+
+        function runNextTbmBatch() {
+          if (offset >= rows.length) {
+            Swal.close();
+            if ($.fn.DataTable.isDataTable('#images-tbm-table')) {
+              $('#images-tbm-table').DataTable().ajax.reload(null, false);
+            }
+            var detail = summarizeBatchFails(accum.results, 'tbm_id');
+            var overallOk = accum.failed === 0;
+            Swal.fire({
+              icon: overallOk ? 'success' : 'warning',
+              title: overallOk ? 'Bulk upload complete' : 'Bulk upload finished with errors',
+              html: '<p>' + accum.ok + ' uploaded, ' + accum.failed + ' failed.</p>' + (detail ? '<pre style="text-align:left;font-size:12px;max-height:220px;overflow:auto">' + detail.replace(/</g, '&lt;') + '</pre>' : '')
+            });
+            btn.prop('disabled', false);
+            return;
+          }
+          var slice = rows.slice(offset, offset + chunk);
+          batchIndex++;
+          Swal.update({ html: 'Request <strong>' + batchIndex + '</strong> of <strong>' + batchTotal + '</strong> (' + slice.length + ' items)…' });
+          $.ajax({
+            url: "{{ url('/images/tbm/migrate-cloud-batch') }}",
+            method: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            processData: false,
+            headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" },
+            data: JSON.stringify({ _token: "{{ csrf_token() }}", tbm_items: slice })
+          }).done(function (res) {
+            mergeBatchResults(accum, res);
+            offset += chunk;
+            runNextTbmBatch();
+          }).fail(function (xhr) {
+            Swal.close();
+            Swal.fire({ icon: 'error', title: 'Request failed', text: ajaxErrMessage(xhr) });
+            btn.prop('disabled', false);
+          });
+        }
+        runNextTbmBatch();
       });
     });
 
@@ -457,7 +531,7 @@
       }
       ids.sort(function (a, b) { return a - b; });
       if (ids.length > BATCH_MAX) {
-        Swal.fire({ icon: 'warning', title: 'Too many selected', text: 'At most ' + BATCH_MAX + ' images per request (CLOUD_MIGRATE_BATCH_MAX in .env, max 500).' });
+        Swal.fire({ icon: 'warning', title: 'Too many selected', text: 'At most ' + BATCH_MAX + ' images per run (CLOUD_MIGRATE_BATCH_MAX in .env, max 500).' });
         return;
       }
       $('#js-products-direct-files').data('pending-ids', ids).trigger('click');
@@ -482,14 +556,12 @@
         return;
       }
 
-      var fd = new FormData();
-      fd.append('_token', "{{ csrf_token() }}");
-      ids.forEach(function (id) { fd.append('product_ids[]', id); });
-      fileList.forEach(function (f) { fd.append('files[]', f); });
+      var chunk = HTTP_CHUNK_PRODUCTS;
+      var batchTotal = Math.max(1, Math.ceil(ids.length / chunk));
 
       Swal.fire({
         title: 'Upload ' + ids.length + ' images?',
-        text: 'Files are paired with products using ascending product ID and ascending filename.',
+        html: 'Paired by sorted product ID × sorted filename. Sent in <strong>' + batchTotal + '</strong> request(s) of up to <strong>' + chunk + '</strong> files each (<code>CLOUD_MIGRATE_HTTP_CHUNK_SIZE</code>).',
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Upload',
@@ -498,27 +570,63 @@
         if (!result.value) return;
         var btn = $('.js-products-direct-upload');
         btn.prop('disabled', true);
-        $.ajax({
-          url: "{{ url('/images/products/upload-cloud-files') }}",
-          method: 'POST',
-          data: fd,
-          processData: false,
-          contentType: false,
-          dataType: 'json',
-          headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" }
-        }).done(function (res) {
-          $('#images-products-table').DataTable().ajax.reload(null, false);
-          var detail = summarizeBatchFails(res.results, 'product_id');
-          Swal.fire({
-            icon: res.success ? 'success' : 'warning',
-            title: res.success ? 'Upload complete' : 'Finished with errors',
-            html: '<p>' + (res.message || '') + '</p>' + (detail ? '<pre style="text-align:left;font-size:12px;max-height:220px;overflow:auto">' + detail.replace(/</g, '&lt;') + '</pre>' : '')
-          });
-        }).fail(function (xhr) {
-          Swal.fire({ icon: 'error', title: 'Request failed', text: ajaxErrMessage(xhr) });
-        }).always(function () {
-          btn.prop('disabled', false);
+
+        Swal.fire({
+          title: 'Uploading files',
+          html: 'Starting…',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: function () { Swal.showLoading(); }
         });
+
+        var accum = { ok: 0, failed: 0, results: [] };
+        var offset = 0;
+        var batchIndex = 0;
+
+        function runNextFileChunk() {
+          if (offset >= ids.length) {
+            Swal.close();
+            $('#images-products-table').DataTable().ajax.reload(null, false);
+            var detail = summarizeBatchFails(accum.results, 'product_id');
+            var overallOk = accum.failed === 0;
+            Swal.fire({
+              icon: overallOk ? 'success' : 'warning',
+              title: overallOk ? 'Upload complete' : 'Finished with errors',
+              html: '<p>' + accum.ok + ' uploaded, ' + accum.failed + ' failed.</p>' + (detail ? '<pre style="text-align:left;font-size:12px;max-height:220px;overflow:auto">' + detail.replace(/</g, '&lt;') + '</pre>' : '')
+            });
+            btn.prop('disabled', false);
+            return;
+          }
+          var idSlice = ids.slice(offset, offset + chunk);
+          var fileSlice = fileList.slice(offset, offset + chunk);
+          batchIndex++;
+          Swal.update({ html: 'Part <strong>' + batchIndex + '</strong> of <strong>' + batchTotal + '</strong> (' + idSlice.length + ' files)…' });
+
+          var fd = new FormData();
+          fd.append('_token', "{{ csrf_token() }}");
+          idSlice.forEach(function (id) { fd.append('product_ids[]', id); });
+          fileSlice.forEach(function (f) { fd.append('files[]', f); });
+
+          $.ajax({
+            url: "{{ url('/images/products/upload-cloud-files') }}",
+            method: 'POST',
+            data: fd,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" }
+          }).done(function (res) {
+            mergeBatchResults(accum, res);
+            offset += chunk;
+            runNextFileChunk();
+          }).fail(function (xhr) {
+            Swal.close();
+            Swal.fire({ icon: 'error', title: 'Request failed', text: ajaxErrMessage(xhr) });
+            btn.prop('disabled', false);
+          });
+        }
+        runNextFileChunk();
       });
     });
 
