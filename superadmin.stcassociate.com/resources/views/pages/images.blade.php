@@ -353,7 +353,7 @@
         Swal.fire({
           icon: 'warning',
           title: 'Too many selected',
-          text: 'Shared hosting: upload at most ' + BATCH_MAX + ' images per request. Deselect some rows, upload, then select the next batch. (Adjust CLOUD_MIGRATE_BATCH_MAX in .env if your host allows.)'
+          text: 'This page allows up to ' + BATCH_MAX + ' images per request (set CLOUD_MIGRATE_BATCH_MAX in .env, maximum 500). Deselect some rows and run another batch, or increase the limit if your host can handle it.'
         });
         return;
       }
@@ -457,7 +457,7 @@
       }
       ids.sort(function (a, b) { return a - b; });
       if (ids.length > BATCH_MAX) {
-        Swal.fire({ icon: 'warning', title: 'Too many selected', text: 'At most ' + BATCH_MAX + ' images per request.' });
+        Swal.fire({ icon: 'warning', title: 'Too many selected', text: 'At most ' + BATCH_MAX + ' images per request (CLOUD_MIGRATE_BATCH_MAX in .env, max 500).' });
         return;
       }
       $('#js-products-direct-files').data('pending-ids', ids).trigger('click');

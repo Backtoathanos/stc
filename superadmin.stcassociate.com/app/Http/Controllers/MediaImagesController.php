@@ -203,10 +203,10 @@ class MediaImagesController extends Controller
         return $base . '/' . implode('/', $segments);
     }
 
-    /** Max items per request for product image uploads (shared-hosting friendly). */
+    /** Max items per request for product image uploads. Env CLOUD_MIGRATE_BATCH_MAX (default 100, max 500). */
     private function cloudMigrateProductBatchMax(): int
     {
-        return max(1, min(100, (int) env('CLOUD_MIGRATE_BATCH_MAX', 100)));
+        return max(1, min(500, (int) env('CLOUD_MIGRATE_BATCH_MAX', 100)));
     }
 
     /** Max items per request for TBM image uploads. */
@@ -509,7 +509,7 @@ class MediaImagesController extends Controller
         if (count($ids) > $max) {
             return response()->json([
                 'success' => false,
-                'message' => 'Too many product IDs (maximum ' . $max . ' per request). Select fewer rows or increase CLOUD_MIGRATE_BATCH_MAX.',
+                'message' => 'Too many product IDs (maximum ' . $max . ' per request). Select fewer rows or set CLOUD_MIGRATE_BATCH_MAX in .env (up to 500).',
             ]);
         }
 
