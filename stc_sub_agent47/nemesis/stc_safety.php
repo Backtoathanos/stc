@@ -914,7 +914,7 @@ class witcher_nearmiss extends tesseract{
 					$img_path=$optimusprimeimgrow['stc_safetynearmiss_img_location'];
 
 					$safety_image.='
-							<img src="safety_img/'.$img_path.'" style="width: 190px;position: relative;padding: 0;margin: 0;">
+							<img src="'.htmlspecialchars(stc_nearmiss_image_url($img_path), ENT_QUOTES, 'UTF-8').'" style="width: 190px;position: relative;padding: 0;margin: 0;">
 					';
 				}
 				if($imgcounter<=2){
@@ -2068,7 +2068,29 @@ if(isset($_POST['stc-safety-tbm-id'])){
 	$objsearchreq=new witcher_supervisor();
 	$opobjsearchreq=$objsearchreq->stc_save_tbm_image($tbm_id, $stcsafetyimages);
 	if($opobjsearchreq=="success"){
-		move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+		$cloudOk = false;
+		if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
+			&& function_exists('stc_r2_upload_safety_image_from_path')
+			&& is_uploaded_file($stcsafetytmpname)) {
+			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'tbm', (int) $tbm_id, '');
+			if (!empty($r2['ok']) && !empty($r2['public_url'])) {
+				$db = $objsearchreq->stc_dbs;
+				$fn = mysqli_real_escape_string($db, $stcsafetyimages);
+				$url = mysqli_real_escape_string($db, $r2['public_url']);
+				$tid = mysqli_real_escape_string($db, (string) (int) $tbm_id);
+				if (mysqli_query($db, "
+					UPDATE `stc_safetytbm_img`
+					SET `stc_safetytbm_img_location`='".$url."'
+					WHERE `stc_safetytbm_img_tbmid`='".$tid."' AND `stc_safetytbm_img_location`='".$fn."'
+					LIMIT 1
+				") !== false && mysqli_affected_rows($db) > 0) {
+					$cloudOk = true;
+				}
+			}
+		}
+		if (!$cloudOk) {
+			move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+		}
 	}
 	echo $opobjsearchreq;
 }
@@ -2283,7 +2305,29 @@ if(isset($_POST['stc-safety-nearmiss-id'])){
 	$objsearchreq=new witcher_nearmiss();
 	$opobjsearchreq=$objsearchreq->stc_save_nearmiss_image($nearmiss_id, $stcsafetyimages);
 	if($opobjsearchreq=="success"){
-		move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+		$cloudOk = false;
+		if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
+			&& function_exists('stc_r2_upload_safety_image_from_path')
+			&& is_uploaded_file($stcsafetytmpname)) {
+			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'nearmiss', (int) $nearmiss_id, '');
+			if (!empty($r2['ok']) && !empty($r2['public_url'])) {
+				$db = $objsearchreq->stc_dbs;
+				$fn = mysqli_real_escape_string($db, $stcsafetyimages);
+				$url = mysqli_real_escape_string($db, $r2['public_url']);
+				$nid = mysqli_real_escape_string($db, (string) (int) $nearmiss_id);
+				if (mysqli_query($db, "
+					UPDATE `stc_safetynearmiss_img`
+					SET `stc_safetynearmiss_img_location`='".$url."'
+					WHERE `stc_safetynearmiss_img_nearmissid`='".$nid."' AND `stc_safetynearmiss_img_location`='".$fn."'
+					LIMIT 1
+				") !== false && mysqli_affected_rows($db) > 0) {
+					$cloudOk = true;
+				}
+			}
+		}
+		if (!$cloudOk) {
+			move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+		}
 	}
 	echo $opobjsearchreq;
 }
@@ -2646,19 +2690,6 @@ if(isset($_POST['stc_safety_updatecapa'])){
 }
 
 // save image
-if(isset($_POST['stc-safety-nearmiss-id'])){
-	$nearmiss_id=$_POST['stc-safety-nearmiss-id'];
-	$stcsafetyimages=$_FILES['stc-safety-nearmissimage-path']['name'];
-	$stcsafetytmpname=$_FILES['stc-safety-nearmissimage-path']['tmp_name'];
-	$objsearchreq=new witcher_nearmiss();
-	$opobjsearchreq=$objsearchreq->stc_save_nearmiss_image($nearmiss_id, $stcsafetyimages);
-	if($opobjsearchreq=="success"){
-		move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
-	}
-	echo $opobjsearchreq;
-}
-
-// save image
 if(isset($_POST['stc-capabefore-no'])){
 	$capa_id=$_POST['stc-capabefore-no'];
 	$stcsafetyimages=$_FILES['before-image']['name'];
@@ -2666,7 +2697,25 @@ if(isset($_POST['stc-capabefore-no'])){
 	$objsearchreq=new witcher_capa();
 	$opobjsearchreq=$objsearchreq->stc_save_capabefore_image($capa_id, $stcsafetyimages);
 	if($opobjsearchreq=="success"){
-		move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+		$cloudOk = false;
+		if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
+			&& function_exists('stc_r2_upload_safety_image_from_path')
+			&& is_uploaded_file($stcsafetytmpname)) {
+			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'capa', (int) $capa_id, 'before');
+			if (!empty($r2['ok']) && !empty($r2['public_url'])) {
+				$db = $objsearchreq->stc_dbs;
+				$url = mysqli_real_escape_string($db, $r2['public_url']);
+				$cid = mysqli_real_escape_string($db, (string) (int) $capa_id);
+				if (mysqli_query($db, "
+					UPDATE `capa` SET `beforeimage`='".$url."' WHERE `id`='".$cid."'
+				") !== false) {
+					$cloudOk = true;
+				}
+			}
+		}
+		if (!$cloudOk) {
+			move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+		}
 	}
 	echo $opobjsearchreq;
 }
@@ -2679,7 +2728,25 @@ if(isset($_POST['stc-capaafter-no'])){
 	$objsearchreq=new witcher_capa();
 	$opobjsearchreq=$objsearchreq->stc_save_capaafter_image($capa_id, $stcsafetyimages);
 	if($opobjsearchreq=="success"){
-		move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+		$cloudOk = false;
+		if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
+			&& function_exists('stc_r2_upload_safety_image_from_path')
+			&& is_uploaded_file($stcsafetytmpname)) {
+			$r2 = stc_r2_upload_safety_image_from_path($stcsafetytmpname, 'capa', (int) $capa_id, 'after');
+			if (!empty($r2['ok']) && !empty($r2['public_url'])) {
+				$db = $objsearchreq->stc_dbs;
+				$url = mysqli_real_escape_string($db, $r2['public_url']);
+				$cid = mysqli_real_escape_string($db, (string) (int) $capa_id);
+				if (mysqli_query($db, "
+					UPDATE `capa` SET `afterimage`='".$url."' WHERE `id`='".$cid."'
+				") !== false) {
+					$cloudOk = true;
+				}
+			}
+		}
+		if (!$cloudOk) {
+			move_uploaded_file($stcsafetytmpname, "../safety_img/".$stcsafetyimages);
+		}
 	}
 	echo $opobjsearchreq;
 }

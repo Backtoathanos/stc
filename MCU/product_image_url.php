@@ -29,3 +29,37 @@ if (!function_exists('stc_product_image_url')) {
             : STC_PRODUCT_IMAGE_LOCAL_BASE_URL . '/' . str_replace('\\', '/', $stored);
     }
 }
+
+if (!defined('STC_NEARMISS_IMAGE_LOCAL_BASE_URL')) {
+    $MCU_nearmiss_base = getenv('STC_NEARMISS_IMAGE_URL');
+    if ($MCU_nearmiss_base === false || $MCU_nearmiss_base === '') {
+        $MCU_nearmiss_base = getenv('STC_TBM_IMAGE_URL');
+    }
+    define(
+        'STC_NEARMISS_IMAGE_LOCAL_BASE_URL',
+        ($MCU_nearmiss_base !== false && $MCU_nearmiss_base !== '')
+            ? rtrim($MCU_nearmiss_base, '/')
+            : 'https://stcassociate.com/stc_sub_agent47/safety_img'
+    );
+}
+
+if (!function_exists('stc_nearmiss_image_url')) {
+    /**
+     * `stc_safetynearmiss_img_location`: full https URL (R2) unchanged; legacy filenames use safety_img base.
+     */
+    function stc_nearmiss_image_url($stored)
+    {
+        $stored = trim((string) $stored);
+        if ($stored === '') {
+            return '';
+        }
+
+        if (preg_match('#^https?://#i', $stored)) {
+            return $stored;
+        }
+
+        $base = basename(str_replace('\\', '/', $stored));
+
+        return STC_NEARMISS_IMAGE_LOCAL_BASE_URL . '/' . rawurlencode($base);
+    }
+}

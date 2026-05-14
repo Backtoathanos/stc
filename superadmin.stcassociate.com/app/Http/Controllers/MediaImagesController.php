@@ -86,6 +86,30 @@ class MediaImagesController extends Controller
         return $base . '?tbm_no=' . $tbmId;
     }
 
+    /** Legacy folder same as TBM; optional override STC_NEARMISS_IMAGE_URL. */
+    private function nearmissImageBaseUrl(): string
+    {
+        $explicit = env('STC_NEARMISS_IMAGE_URL');
+        if (is_string($explicit) && $explicit !== '') {
+            return rtrim($explicit, '/');
+        }
+
+        return $this->tbmImageBaseUrl();
+    }
+
+    private function nearMissPrintUrl(int $nearmissId): string
+    {
+        $base = rtrim((string) env('STC_NEARMISS_PRINT_BASE', 'https://stcassociate.com/stc_agent47/safety-nearmiss-print-preview.php'), '/');
+
+        return $base . '?nearmiss_no=' . $nearmissId;
+    }
+
+    /** Near-miss files historically live beside TBM under safety_img. */
+    private function resolveReadableNearmissFile(string $filename): array
+    {
+        return $this->resolveReadableTbmFile($filename);
+    }
+
     /**
      * @return array{0: string|null, 1: bool} [path, isTemporary]
      */
@@ -215,6 +239,17 @@ class MediaImagesController extends Controller
         return max(1, min(500, (int) env('CLOUD_MIGRATE_BATCH_MAX_TBM', 500)));
     }
 
+    /** Max Near Miss image rows per batch (defaults to TBM limit). */
+    private function cloudMigrateNearmissBatchMax(): int
+    {
+        $env = env('CLOUD_MIGRATE_BATCH_MAX_NEARMISS');
+        if ($env !== null && $env !== '') {
+            return max(1, min(500, (int) $env));
+        }
+
+        return $this->cloudMigrateTbmBatchMax();
+    }
+
     /**
      * Split bulk uploads into smaller HTTP requests (avoids 503/timeouts on shared hosting).
      * Env CLOUD_MIGRATE_HTTP_CHUNK_SIZE (default 40); cannot exceed per-tab batch max.
@@ -233,6 +268,13 @@ class MediaImagesController extends Controller
         return max(1, min($chunk, $this->cloudMigrateTbmBatchMax()));
     }
 
+    private function cloudMigrateHttpChunkSizeNearmiss(): int
+    {
+        $chunk = (int) env('CLOUD_MIGRATE_HTTP_CHUNK_SIZE', 40);
+
+        return max(1, min($chunk, $this->cloudMigrateNearmissBatchMax()));
+    }
+
     /** When local/TBM file is missing, clear DB reference instead of leaving a broken filename. */
     private function clearImageColumnWhenFileMissing(): bool
     {
@@ -240,14 +282,15 @@ class MediaImagesController extends Controller
     }
 
     /**
-     * Upload raw bytes to cloud and set stc_product_image to the public URL.
+     * Upload product image bytes to cloud. If $matchStoredExactly is set, every row with that exact
+     * stc_product_image value is updated to the same URL (duplicate filenames). Otherwise only $representativeProductId is updated (direct file upload).
      *
      * @return array{success:bool, message:string, url?:string}
      */
-    private function pushProductBytesToCloudAndSaveUrl(int $productId, string $bytes, string $safeExt): array
+    private function pushProductBytesToCloudAndSaveUrl(int $representativeProductId, string $bytes, string $safeExt, ?string $matchStoredExactly = null): array
     {
         $uniq = str_replace('.', '', uniqid('', true));
-        $objectKey = 'products/' . $productId . '_' . date('YmdHis') . '_' . $uniq . '.' . $safeExt;
+        $objectKey = 'products/' . $representativeProductId . '_' . date('YmdHis') . '_' . $uniq . '.' . $safeExt;
 
         try {
             $disk = $this->cloudDisk();
@@ -261,7 +304,19 @@ class MediaImagesController extends Controller
                 return ['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.'];
             }
 
-            DB::table('stc_product')->where('stc_product_id', $productId)->update(['stc_product_image' => $publicUrl]);
+            if ($matchStoredExactly !== null && $matchStoredExactly !== '') {
+                $affected = DB::table('stc_product')->where('stc_product_image', $matchStoredExactly)->update(['stc_product_image' => $publicUrl]);
+
+                return [
+                    'success' => true,
+                    'message' => $affected > 1
+                        ? ('Uploaded and updated ' . $affected . ' product rows sharing the same image reference.')
+                        : 'Uploaded and database updated.',
+                    'url' => $publicUrl,
+                ];
+            }
+
+            DB::table('stc_product')->where('stc_product_id', $representativeProductId)->update(['stc_product_image' => $publicUrl]);
 
             return ['success' => true, 'message' => 'Uploaded and database updated.', 'url' => $publicUrl];
         } catch (\Throwable $e) {
@@ -330,6 +385,35 @@ class MediaImagesController extends Controller
         }
     }
 
+    /**
+     * @param  \Illuminate\Database\Query\Builder  $query
+     */
+    private function applyNearmissImageListFilters($query, Request $request): void
+    {
+        $kind = (string) $request->get('image_kind', 'all');
+        if (! in_array($kind, ['all', 'local', 'cloud', 'empty_only'], true)) {
+            $kind = 'all';
+        }
+        $hideEmpty = $request->get('hide_empty', '0') === '1';
+        $col = 'IMG.stc_safetynearmiss_img_location';
+
+        if ($kind === 'empty_only') {
+            $query->whereRaw("(TRIM(COALESCE({$col}, '')) = '')");
+
+            return;
+        }
+
+        if ($kind === 'local') {
+            $query->whereRaw("(TRIM(COALESCE({$col}, '')) <> '' AND LOWER(TRIM({$col})) NOT LIKE 'http://%' AND LOWER(TRIM({$col})) NOT LIKE 'https://%')");
+        } elseif ($kind === 'cloud') {
+            $query->whereRaw("(LOWER(TRIM({$col})) LIKE 'http://%' OR LOWER(TRIM({$col})) LIKE 'https://%')");
+        }
+
+        if ($hideEmpty) {
+            $query->whereRaw("(TRIM(COALESCE({$col}, '')) <> '')");
+        }
+    }
+
     /** Microseconds to sleep between items in a batch (shared hosting I/O friendly). 0 = no delay. */
     private function cloudMigrateBatchUsleep(): int
     {
@@ -359,6 +443,48 @@ class MediaImagesController extends Controller
     }
 
     /**
+     * Migrate every product row whose stc_product_image equals $stored (exact string).
+     * Uses $representativeProductId only for the cloud object key suffix.
+     *
+     * @return array{success:bool, message:string, url?:string}
+     */
+    private function migrateProductByStoredReference(string $stored, int $representativeProductId): array
+    {
+        $stored = trim($stored);
+
+        [$path, $isTmp] = $this->resolveReadableProductFile($stored);
+        if (! $path) {
+            if ($this->clearImageColumnWhenFileMissing()) {
+                $affected = DB::table('stc_product')->where('stc_product_image', $stored)->update(['stc_product_image' => '']);
+
+                return ['success' => true, 'message' => 'Image missing from disk (and fetch disabled or failed). Cleared stc_product_image for ' . $affected . ' row(s) sharing this reference. Re-upload from the Images page if needed.'];
+            }
+
+            return ['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_PRODUCT_IMAGE_DIR or enable CLOUD_FETCH_IF_LOCAL_MISSING. Set CLOUD_CLEAR_IMAGE_ON_MISSING_FILE=true (default) to clear the column automatically.'];
+        }
+
+        $bytes = file_get_contents($path);
+        if ($bytes === false) {
+            return ['success' => false, 'message' => 'Could not read image bytes.'];
+        }
+
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $safeExt = preg_match('/^[a-z0-9]{1,8}$/', $ext) ? $ext : 'bin';
+
+        $payload = $this->pushProductBytesToCloudAndSaveUrl($representativeProductId, $bytes, $safeExt, $stored);
+
+        if ($payload['success']) {
+            if ($isTmp) {
+                @unlink($path);
+            } else {
+                $this->deleteLocalUnderRoot($path, $this->defaultLocalProductImageDir());
+            }
+        }
+
+        return $payload;
+    }
+
+    /**
      * @return array{success:bool, message:string, url?:string}
      */
     private function migrateSingleProductInternal(int $id): array
@@ -377,36 +503,7 @@ class MediaImagesController extends Controller
             return ['success' => false, 'message' => 'This row already points to a cloud URL.', 'url' => $current];
         }
 
-        [$path, $isTmp] = $this->resolveReadableProductFile($current);
-        if (! $path) {
-            if ($this->clearImageColumnWhenFileMissing()) {
-                DB::table('stc_product')->where('stc_product_id', $id)->update(['stc_product_image' => '']);
-
-                return ['success' => true, 'message' => 'Image missing from disk (and fetch disabled or failed). Cleared stc_product_image. Re-upload a file from the Images page if needed.'];
-            }
-
-            return ['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_PRODUCT_IMAGE_DIR or enable CLOUD_FETCH_IF_LOCAL_MISSING. Set CLOUD_CLEAR_IMAGE_ON_MISSING_FILE=true (default) to clear the column automatically.'];
-        }
-
-        $bytes = file_get_contents($path);
-        if ($bytes === false) {
-            return ['success' => false, 'message' => 'Could not read image bytes.'];
-        }
-
-        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-        $safeExt = preg_match('/^[a-z0-9]{1,8}$/', $ext) ? $ext : 'bin';
-
-        $payload = $this->pushProductBytesToCloudAndSaveUrl($id, $bytes, $safeExt);
-
-        if ($payload['success']) {
-            if ($isTmp) {
-                @unlink($path);
-            } else {
-                $this->deleteLocalUnderRoot($path, $this->defaultLocalProductImageDir());
-            }
-        }
-
-        return $payload;
+        return $this->migrateProductByStoredReference($current, $id);
     }
 
     /**
@@ -431,12 +528,11 @@ class MediaImagesController extends Controller
         [$path, $isTmp] = $this->resolveReadableTbmFile($stored);
         if (! $path) {
             if ($this->clearImageColumnWhenFileMissing()) {
-                DB::table('stc_safetytbm_img')
-                    ->where('stc_safetytbm_img_tbmid', $tbmId)
+                $affected = DB::table('stc_safetytbm_img')
                     ->where('stc_safetytbm_img_location', $stored)
                     ->update(['stc_safetytbm_img_location' => '']);
 
-                return ['success' => true, 'message' => 'Image missing from disk (and fetch disabled or failed). Cleared this TBM image reference.'];
+                return ['success' => true, 'message' => 'Image missing from disk (and fetch disabled or failed). Cleared ' . $affected . ' TBM image row(s) sharing this reference.'];
             }
 
             return ['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_TBM_IMAGE_DIR or enable CLOUD_FETCH_IF_LOCAL_MISSING.'];
@@ -464,8 +560,7 @@ class MediaImagesController extends Controller
                 return ['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.'];
             }
 
-            DB::table('stc_safetytbm_img')
-                ->where('stc_safetytbm_img_tbmid', $tbmId)
+            $affected = DB::table('stc_safetytbm_img')
                 ->where('stc_safetytbm_img_location', $stored)
                 ->update(['stc_safetytbm_img_location' => $publicUrl]);
 
@@ -475,7 +570,93 @@ class MediaImagesController extends Controller
                 $this->deleteLocalUnderRoot($path, $this->defaultLocalTbmImageDir());
             }
 
-            return ['success' => true, 'message' => 'Uploaded and database updated.', 'url' => $publicUrl];
+            return [
+                'success' => true,
+                'message' => $affected > 1
+                    ? ('Uploaded and updated ' . $affected . ' TBM rows sharing this image reference.')
+                    : 'Uploaded and database updated.',
+                'url' => $publicUrl,
+            ];
+        } catch (\Throwable $e) {
+            report($e);
+
+            return ['success' => false, 'message' => 'Cloud error: ' . $e->getMessage()];
+        }
+    }
+
+    /**
+     * Near Miss images → R2 prefix nearmiss/ (not tbm/).
+     *
+     * @return array{success:bool, message:string, url?:string}
+     */
+    private function migrateSingleNearmissInternal(int $nearmissId, string $stored): array
+    {
+        $stored = trim($stored);
+        if ($this->isRemoteUrl($stored)) {
+            return ['success' => false, 'message' => 'This row already points to a cloud URL.', 'url' => $stored];
+        }
+
+        $imgRow = DB::table('stc_safetynearmiss_img')
+            ->where('stc_safetynearmiss_img_nearmissid', $nearmissId)
+            ->where('stc_safetynearmiss_img_location', $stored)
+            ->first(['stc_safetynearmiss_img_nearmissid', 'stc_safetynearmiss_img_location']);
+
+        if (! $imgRow) {
+            return ['success' => false, 'message' => 'Near miss image record not found. Refresh the table and try again.'];
+        }
+
+        [$path, $isTmp] = $this->resolveReadableNearmissFile($stored);
+        if (! $path) {
+            if ($this->clearImageColumnWhenFileMissing()) {
+                $affected = DB::table('stc_safetynearmiss_img')
+                    ->where('stc_safetynearmiss_img_location', $stored)
+                    ->update(['stc_safetynearmiss_img_location' => '']);
+
+                return ['success' => true, 'message' => 'Image missing from disk (and fetch disabled or failed). Cleared ' . $affected . ' Near Miss image row(s) sharing this reference.'];
+            }
+
+            return ['success' => false, 'message' => 'Image file not found on disk and could not be downloaded. Check LOCAL_TBM_IMAGE_DIR / safety_img or enable CLOUD_FETCH_IF_LOCAL_MISSING.'];
+        }
+
+        $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+        $safeExt = preg_match('/^[a-z0-9]{1,8}$/', $ext) ? $ext : 'bin';
+        $uniq = str_replace('.', '', uniqid('', true));
+        $objectKey = 'nearmiss/' . $nearmissId . '_' . date('YmdHis') . '_' . $uniq . '.' . $safeExt;
+
+        try {
+            $disk = $this->cloudDisk();
+            $bytes = file_get_contents($path);
+            if ($bytes === false) {
+                return ['success' => false, 'message' => 'Could not read image bytes.'];
+            }
+
+            $put = Storage::disk($disk)->put($objectKey, $bytes, 'private');
+            if (! $put) {
+                return ['success' => false, 'message' => 'Upload to cloud failed.'];
+            }
+
+            $publicUrl = $this->remoteObjectPublicUrl($objectKey);
+            if (! $publicUrl) {
+                return ['success' => false, 'message' => 'Could not build public URL. Set R2_PUBLIC_URL.'];
+            }
+
+            $affected = DB::table('stc_safetynearmiss_img')
+                ->where('stc_safetynearmiss_img_location', $stored)
+                ->update(['stc_safetynearmiss_img_location' => $publicUrl]);
+
+            if ($isTmp) {
+                @unlink($path);
+            } else {
+                $this->deleteLocalUnderRoot($path, $this->defaultLocalTbmImageDir());
+            }
+
+            return [
+                'success' => true,
+                'message' => $affected > 1
+                    ? ('Uploaded and updated ' . $affected . ' Near Miss rows sharing this image reference.')
+                    : 'Uploaded and database updated.',
+                'url' => $publicUrl,
+            ];
         } catch (\Throwable $e) {
             report($e);
 
@@ -492,6 +673,8 @@ class MediaImagesController extends Controller
         $data['cloud_migrate_tbm_batch_max'] = $this->cloudMigrateTbmBatchMax();
         $data['cloud_migrate_http_chunk_products'] = $this->cloudMigrateHttpChunkSizeProducts();
         $data['cloud_migrate_http_chunk_tbm'] = $this->cloudMigrateHttpChunkSizeTbm();
+        $data['cloud_migrate_nearmiss_batch_max'] = $this->cloudMigrateNearmissBatchMax();
+        $data['cloud_migrate_http_chunk_nearmiss'] = $this->cloudMigrateHttpChunkSizeNearmiss();
 
         return view('pages.images', $data);
     }
@@ -536,13 +719,84 @@ class MediaImagesController extends Controller
         @ini_set('max_execution_time', (string) max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
         @set_time_limit(max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
 
+        $rows = DB::table('stc_product')->whereIn('stc_product_id', $ids)->get(['stc_product_id', 'stc_product_image']);
+        $rowMap = [];
+        foreach ($rows as $row) {
+            $rowMap[(int) $row->stc_product_id] = trim((string) ($row->stc_product_image ?? ''));
+        }
+
+        $repPerStored = [];
+        foreach ($ids as $id) {
+            if (! isset($rowMap[$id])) {
+                continue;
+            }
+            $c = $rowMap[$id];
+            if ($c === '' || $this->isRemoteUrl($c)) {
+                continue;
+            }
+            $repPerStored[$c] = isset($repPerStored[$c]) ? min($repPerStored[$c], $id) : $id;
+        }
+
         $usleep = $this->cloudMigrateBatchUsleep();
         $results = [];
         $ok = 0;
         $fail = 0;
         $n = count($ids);
+        $memoStored = [];
+
         foreach ($ids as $i => $id) {
-            $r = $this->migrateSingleProductInternal($id);
+            if (! isset($rowMap[$id])) {
+                $results[] = ['product_id' => $id, 'success' => false, 'message' => 'Product not found.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            $current = $rowMap[$id];
+            if ($current === '') {
+                $results[] = ['product_id' => $id, 'success' => false, 'message' => 'No image filename stored for this product.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            if ($this->isRemoteUrl($current)) {
+                $results[] = ['product_id' => $id, 'success' => false, 'message' => 'This row already points to a cloud URL.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            if (isset($memoStored[$current])) {
+                $prev = $memoStored[$current];
+                $msg = $prev['success']
+                    ? ('Same image reference as another selected row. ' . $prev['message'])
+                    : $prev['message'];
+                $results[] = ['product_id' => $id, 'success' => $prev['success'], 'message' => $msg];
+                if ($prev['success']) {
+                    $ok++;
+                } else {
+                    $fail++;
+                }
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            $repId = $repPerStored[$current] ?? $id;
+            $r = $this->migrateProductByStoredReference($current, $repId);
+            $memoStored[$current] = $r;
             $results[] = [
                 'product_id' => $id,
                 'success' => $r['success'],
@@ -724,17 +978,250 @@ class MediaImagesController extends Controller
         @ini_set('max_execution_time', (string) max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
         @set_time_limit(max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
 
+        $repTbmPerLoc = [];
+        foreach ($items as $row) {
+            $tid = (int) ($row['tbm_id'] ?? 0);
+            $loc = trim((string) ($row['img_location'] ?? ''));
+            if ($tid < 1 || $loc === '' || $this->isRemoteUrl($loc)) {
+                continue;
+            }
+            $repTbmPerLoc[$loc] = isset($repTbmPerLoc[$loc]) ? min($repTbmPerLoc[$loc], $tid) : $tid;
+        }
+
         $usleep = $this->cloudMigrateBatchUsleep();
         $results = [];
         $ok = 0;
         $fail = 0;
         $n = count($items);
+        $memoLoc = [];
+
         foreach ($items as $i => $row) {
             $tid = (int) ($row['tbm_id'] ?? 0);
             $loc = trim((string) ($row['img_location'] ?? ''));
-            $r = $this->migrateSingleTbmInternal($tid, $loc);
+
+            if ($tid < 1) {
+                $results[] = ['tbm_id' => $tid, 'success' => false, 'message' => 'Invalid TBM id.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            if ($loc === '') {
+                $results[] = ['tbm_id' => $tid, 'success' => false, 'message' => 'Missing image location.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            if ($this->isRemoteUrl($loc)) {
+                $results[] = ['tbm_id' => $tid, 'success' => false, 'message' => 'This row already points to a cloud URL.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            $pairExists = DB::table('stc_safetytbm_img')
+                ->where('stc_safetytbm_img_tbmid', $tid)
+                ->where('stc_safetytbm_img_location', $loc)
+                ->exists();
+
+            if (! $pairExists) {
+                $results[] = ['tbm_id' => $tid, 'success' => false, 'message' => 'TBM image record not found. Refresh the table and try again.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            if (isset($memoLoc[$loc])) {
+                $prev = $memoLoc[$loc];
+                $msg = $prev['success']
+                    ? ('Same image reference as another selected row. ' . $prev['message'])
+                    : $prev['message'];
+                $results[] = ['tbm_id' => $tid, 'success' => $prev['success'], 'message' => $msg];
+                if ($prev['success']) {
+                    $ok++;
+                } else {
+                    $fail++;
+                }
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            $repId = $repTbmPerLoc[$loc] ?? $tid;
+            $r = $this->migrateSingleTbmInternal($repId, $loc);
+            $memoLoc[$loc] = $r;
             $results[] = [
                 'tbm_id' => $tid,
+                'success' => $r['success'],
+                'message' => $r['message'],
+            ];
+            if ($r['success']) {
+                $ok++;
+            } else {
+                $fail++;
+            }
+            if ($i < $n - 1 && $usleep > 0) {
+                usleep($usleep);
+            }
+        }
+
+        return response()->json([
+            'success' => $fail === 0,
+            'batch_complete' => true,
+            'total' => $n,
+            'ok' => $ok,
+            'failed' => $fail,
+            'results' => $results,
+            'message' => $ok . ' uploaded, ' . $fail . ' failed.',
+        ]);
+    }
+
+    public function migrateNearmissImageToCloud(Request $request)
+    {
+        $reject = $this->cloudMigrateRejectIfNotReady();
+        if ($reject !== null) {
+            return response()->json($reject);
+        }
+
+        $request->validate([
+            'nearmiss_id' => 'required|integer|min:1',
+            'img_location' => 'required|string|max:512',
+        ]);
+
+        $payload = $this->migrateSingleNearmissInternal((int) $request->input('nearmiss_id'), (string) $request->input('img_location'));
+
+        return response()->json($payload);
+    }
+
+    public function migrateNearmissImagesToCloudBatch(Request $request)
+    {
+        $reject = $this->cloudMigrateRejectIfNotReady();
+        if ($reject !== null) {
+            return response()->json($reject);
+        }
+
+        $max = $this->cloudMigrateNearmissBatchMax();
+        $request->validate([
+            'nearmiss_items' => 'required|array|min:1|max:' . $max,
+            'nearmiss_items.*.nearmiss_id' => 'required|integer|min:1',
+            'nearmiss_items.*.img_location' => 'required|string|max:512',
+        ]);
+
+        $items = $request->input('nearmiss_items');
+        if (count($items) > $max) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Too many Near Miss rows (maximum ' . $max . ' per request). Increase CLOUD_MIGRATE_BATCH_MAX_NEARMISS in .env.',
+            ]);
+        }
+
+        @ini_set('max_execution_time', (string) max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
+        @set_time_limit(max(120, (int) env('CLOUD_MIGRATE_BATCH_TIME_LIMIT', 300)));
+
+        $repNearmissPerLoc = [];
+        foreach ($items as $row) {
+            $nid = (int) ($row['nearmiss_id'] ?? 0);
+            $loc = trim((string) ($row['img_location'] ?? ''));
+            if ($nid < 1 || $loc === '' || $this->isRemoteUrl($loc)) {
+                continue;
+            }
+            $repNearmissPerLoc[$loc] = isset($repNearmissPerLoc[$loc]) ? min($repNearmissPerLoc[$loc], $nid) : $nid;
+        }
+
+        $usleep = $this->cloudMigrateBatchUsleep();
+        $results = [];
+        $ok = 0;
+        $fail = 0;
+        $n = count($items);
+        $memoLoc = [];
+
+        foreach ($items as $i => $row) {
+            $nid = (int) ($row['nearmiss_id'] ?? 0);
+            $loc = trim((string) ($row['img_location'] ?? ''));
+
+            if ($nid < 1) {
+                $results[] = ['nearmiss_id' => $nid, 'success' => false, 'message' => 'Invalid Near Miss id.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            if ($loc === '') {
+                $results[] = ['nearmiss_id' => $nid, 'success' => false, 'message' => 'Missing image location.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            if ($this->isRemoteUrl($loc)) {
+                $results[] = ['nearmiss_id' => $nid, 'success' => false, 'message' => 'This row already points to a cloud URL.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            $pairExists = DB::table('stc_safetynearmiss_img')
+                ->where('stc_safetynearmiss_img_nearmissid', $nid)
+                ->where('stc_safetynearmiss_img_location', $loc)
+                ->exists();
+
+            if (! $pairExists) {
+                $results[] = ['nearmiss_id' => $nid, 'success' => false, 'message' => 'Near miss image record not found. Refresh the table and try again.'];
+                $fail++;
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            if (isset($memoLoc[$loc])) {
+                $prev = $memoLoc[$loc];
+                $msg = $prev['success']
+                    ? ('Same image reference as another selected row. ' . $prev['message'])
+                    : $prev['message'];
+                $results[] = ['nearmiss_id' => $nid, 'success' => $prev['success'], 'message' => $msg];
+                if ($prev['success']) {
+                    $ok++;
+                } else {
+                    $fail++;
+                }
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            $repId = $repNearmissPerLoc[$loc] ?? $nid;
+            $r = $this->migrateSingleNearmissInternal($repId, $loc);
+            $memoLoc[$loc] = $r;
+            $results[] = [
+                'nearmiss_id' => $nid,
                 'success' => $r['success'],
                 'message' => $r['message'],
             ];
@@ -946,6 +1433,117 @@ class MediaImagesController extends Controller
                 'bulk_select' => $bulkSelect,
                 'tbm_id' => '<span class="text-center d-block">' . $id . '</span>',
                 'tbm_location' => $loc !== '' ? e($loc) : '<span class="text-muted">—</span>',
+                'img_name' => $imgCell,
+                'actionData' => $btns !== '' ? $btns : '<span class="text-muted">—</span>',
+            ];
+        }
+
+        return response()->json([
+            'draw' => $draw,
+            'iTotalRecords' => $totalRecords,
+            'iTotalDisplayRecords' => $totalRecordswithFilter,
+            'aaData' => $data_arr,
+        ]);
+    }
+
+    public function nearMissList(Request $request)
+    {
+        $draw = (int) $request->get('draw');
+        $start = (int) $request->get('start');
+        $rowperpage = (int) $request->get('length');
+
+        $columnIndex_arr = $request->get('order');
+        $columnName_arr = $request->get('columns');
+        $order_arr = $request->get('order');
+        $search_arr = $request->get('search');
+
+        $columnIndex = $columnIndex_arr[0]['column'] ?? 0;
+        $columnDataKey = $columnName_arr[$columnIndex]['data'] ?? 'nearmiss_id';
+        $columnSortOrder = $order_arr[0]['dir'] ?? 'desc';
+        $searchValue = $search_arr['value'] ?? '';
+
+        $columnMap = [
+            'bulk_select' => 'N.stc_safetynearmiss_id',
+            'nearmiss_id' => 'N.stc_safetynearmiss_id',
+            'report_date' => 'N.stc_safetynearmiss_date',
+            'nearmiss_location' => 'N.stc_safetynearmiss_location',
+            'img_name' => 'img_file',
+        ];
+        $orderColumn = $columnMap[$columnDataKey] ?? 'N.stc_safetynearmiss_id';
+        if (! in_array($columnSortOrder, ['asc', 'desc'], true)) {
+            $columnSortOrder = 'desc';
+        }
+
+        $baseQuery = DB::table('stc_safetynearmiss_img as IMG')
+            ->join('stc_safetynearmiss as N', 'IMG.stc_safetynearmiss_img_nearmissid', '=', 'N.stc_safetynearmiss_id')
+            ->select(
+                'N.stc_safetynearmiss_id',
+                'N.stc_safetynearmiss_date',
+                'N.stc_safetynearmiss_location',
+                'IMG.stc_safetynearmiss_img_location as img_file'
+            );
+
+        $totalRecords = DB::table('stc_safetynearmiss_img')->count();
+
+        $query = clone $baseQuery;
+        if ($searchValue !== '') {
+            $like = '%' . $searchValue . '%';
+            $query->where(function ($q) use ($like) {
+                $q->where('N.stc_safetynearmiss_id', 'like', $like)
+                    ->orWhere('N.stc_safetynearmiss_location', 'like', $like)
+                    ->orWhere('N.stc_safetynearmiss_placeofincident', 'like', $like)
+                    ->orWhere('N.stc_safetynearmiss_incidenetdesc', 'like', $like)
+                    ->orWhere('IMG.stc_safetynearmiss_img_location', 'like', $like);
+            });
+        }
+
+        $this->applyNearmissImageListFilters($query, $request);
+
+        $totalRecordswithFilter = (clone $query)->count();
+
+        $records = $query
+            ->orderBy($orderColumn, $columnSortOrder)
+            ->skip($start)
+            ->take($rowperpage)
+            ->get();
+
+        $imgBase = $this->nearmissImageBaseUrl();
+        $cloudReady = $this->cloudMigrateReady();
+        $data_arr = [];
+        foreach ($records as $row) {
+            $nmId = (int) $row->stc_safetynearmiss_id;
+            $dtRaw = $row->stc_safetynearmiss_date ?? '';
+            $reportCell = '';
+            if ($dtRaw !== '' && $dtRaw !== null) {
+                $ts = strtotime((string) $dtRaw);
+                $reportCell = $ts ? e(date('d-m-Y', $ts)) : e((string) $dtRaw);
+            } else {
+                $reportCell = '<span class="text-muted">—</span>';
+            }
+            $locNm = trim((string) ($row->stc_safetynearmiss_location ?? ''));
+            $imgFile = trim((string) ($row->img_file ?? ''));
+
+            $imgCell = $imgFile !== '' ? e($imgFile) : '<span class="text-muted">—</span>';
+
+            $btns = '';
+            $bulkSelect = '<span class="text-muted">—</span>';
+            $btns .= '<a href="' . e($this->nearMissPrintUrl($nmId)) . '" target="_blank" rel="noopener" class="btn btn-sm btn-success mr-1" title="Near miss print preview"><i class="fas fa-file-alt"></i></a>';
+            if ($imgFile !== '') {
+                $href = $this->isRemoteUrl($imgFile)
+                    ? $imgFile
+                    : ($imgBase . '/' . rawurlencode(basename(str_replace('\\', '/', $imgFile))));
+                $btns .= '<a href="' . e($href) . '" target="_blank" rel="noopener" class="btn btn-sm btn-info mr-1" title="Open image"><i class="fas fa-image"></i></a>';
+                if ($cloudReady && ! $this->isRemoteUrl($imgFile)) {
+                    $bulkSelect = '<input type="checkbox" class="js-nearmiss-row-select align-middle" data-nearmiss-id="' . $nmId . '" data-img-location="' . e($imgFile) . '" title="Select for bulk upload">';
+                    $btns .= '<button type="button" class="btn btn-sm btn-warning js-migrate-nearmiss-cloud" data-nearmiss-id="' . $nmId . '" data-img-location="' . e($imgFile) . '" title="Upload to Cloudflare R2 (nearmiss/)"><i class="fas fa-cloud-upload-alt"></i></button>';
+                }
+            }
+
+            $data_arr[] = [
+                'bulk_select' => $bulkSelect,
+                'nearmiss_id' => '<span class="text-center d-block">' . $nmId . '</span>',
+                'report_date' => $reportCell,
+                'nearmiss_location' => $locNm !== '' ? e($locNm) : '<span class="text-muted">—</span>',
                 'img_name' => $imgCell,
                 'actionData' => $btns !== '' ? $btns : '<span class="text-muted">—</span>',
             ];

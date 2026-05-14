@@ -63,6 +63,9 @@
                   <li class="nav-item">
                     <a class="nav-link" id="tab-tbm-link" data-toggle="pill" href="#tab-tbm" role="tab" aria-controls="tab-tbm" aria-selected="false">TBM</a>
                   </li>
+                  <li class="nav-item">
+                    <a class="nav-link" id="tab-nearmiss-link" data-toggle="pill" href="#tab-nearmiss" role="tab" aria-controls="tab-nearmiss" aria-selected="false">Near Miss</a>
+                  </li>
                 </ul>
               </div>
               <div class="card-body">
@@ -160,6 +163,52 @@
                       </table>
                     </div>
                   </div>
+                  <div class="tab-pane fade" id="tab-nearmiss" role="tabpanel" aria-labelledby="tab-nearmiss-link">
+                    <div class="d-flex flex-wrap align-items-center mb-2 pb-2 border-bottom">
+                      <label for="js-nearmiss-image-kind" class="mb-1 mr-2 small font-weight-bold text-muted">Show</label>
+                      <select id="js-nearmiss-image-kind" class="form-control form-control-sm mb-1 mr-3" style="width:auto;min-width:11rem">
+                        <option value="all">All rows</option>
+                        <option value="local">Local filename only</option>
+                        <option value="cloud">Cloud URL only</option>
+                        <option value="empty_only">No image only</option>
+                      </select>
+                      <div class="custom-control custom-checkbox mb-1 mr-3">
+                        <input type="checkbox" class="custom-control-input" id="js-hide-empty-nearmiss">
+                        <label class="custom-control-label small" for="js-hide-empty-nearmiss">Hide rows with no image</label>
+                      </div>
+                      @if (!empty($cloud_upload_ready))
+                      <span class="small text-muted mb-1"><i class="fas fa-info-circle"></i> R2 prefix <code>nearmiss/</code> (separate from <code>tbm/</code>).</span>
+                      @endif
+                    </div>
+                    <div class="d-none mb-2 js-nearmiss-bulk-toolbar clearfix">
+                      <div class="float-right border rounded px-3 py-2 bg-light shadow-sm">
+                        <span class="text-muted small mr-2 js-nearmiss-bulk-count">0 selected</span>
+                        <span class="text-muted small mr-2">(max {{ (int) ($cloud_migrate_nearmiss_batch_max ?? 500) }} selected; {{ (int) ($cloud_migrate_http_chunk_nearmiss ?? 40) }} per HTTP request)</span>
+                        <button type="button" class="btn btn-warning btn-sm js-bulk-migrate-nearmiss">
+                          <i class="fas fa-cloud-upload-alt"></i> Upload selected to cloud
+                        </button>
+                      </div>
+                    </div>
+                    <div class="table-responsive">
+                      <table id="images-nearmiss-table" class="table table-bordered table-striped table-hover mb-0" style="width:100%">
+                        <thead>
+                          <tr>
+                            <th class="text-center align-middle" style="width:40px" data-orderable="false">
+                              @if (!empty($cloud_upload_ready))
+                              <input type="checkbox" id="images-nearmiss-select-all" class="js-nearmiss-select-all" title="Select all on this page" aria-label="Select all on page">
+                              @endif
+                            </th>
+                            <th class="text-center">Near miss ID</th>
+                            <th class="text-center">Report date</th>
+                            <th>Incident location</th>
+                            <th>Image name</th>
+                            <th class="text-center">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody></tbody>
+                      </table>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -178,8 +227,10 @@
   $(function () {
     var BATCH_MAX = {{ (int) ($cloud_migrate_batch_max ?? 100) }};
     var TBM_BATCH_MAX = {{ (int) ($cloud_migrate_tbm_batch_max ?? 500) }};
+    var NEARMISS_BATCH_MAX = {{ (int) ($cloud_migrate_nearmiss_batch_max ?? 500) }};
     var HTTP_CHUNK_PRODUCTS = {{ (int) ($cloud_migrate_http_chunk_products ?? 40) }};
     var HTTP_CHUNK_TBM = {{ (int) ($cloud_migrate_http_chunk_tbm ?? 40) }};
+    var HTTP_CHUNK_NEARMISS = {{ (int) ($cloud_migrate_http_chunk_nearmiss ?? 40) }};
 
     function swalToast(icon, title) {
       var Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 3800 });
@@ -303,6 +354,43 @@
       });
     });
 
+    $(document).on('click', '.js-migrate-nearmiss-cloud', function () {
+      var btn = $(this);
+      var nmId = btn.data('nearmiss-id');
+      var loc = btn.attr('data-img-location');
+      Swal.fire({
+        title: 'Upload to cloud?',
+        html: 'The file is stored under <code>nearmiss/</code> on R2 (not <code>tbm/</code>) and this <code>stc_safetynearmiss_img</code> row is updated.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Upload',
+        cancelButtonText: 'Cancel'
+      }).then(function (result) {
+        if (!result.value) return;
+        btn.prop('disabled', true);
+        $.ajax({
+          url: "{{ url('/images/nearmiss/migrate-cloud') }}",
+          method: 'POST',
+          dataType: 'json',
+          headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json' },
+          data: { _token: "{{ csrf_token() }}", nearmiss_id: nmId, img_location: loc }
+        }).done(function (res) {
+          if (res.success) {
+            swalToast('success', res.message || 'Uploaded');
+            if ($.fn.DataTable.isDataTable('#images-nearmiss-table')) {
+              $('#images-nearmiss-table').DataTable().ajax.reload(null, false);
+            }
+          } else {
+            swalToast('error', res.message || 'Failed');
+            btn.prop('disabled', false);
+          }
+        }).fail(function (xhr) {
+          swalToast('error', ajaxErrMessage(xhr));
+          btn.prop('disabled', false);
+        });
+      });
+    });
+
     function updateProductsBulkUi() {
       var n = $('#images-products-table tbody .js-product-row-select:checked').length;
       var $bar = $('.js-products-bulk-toolbar');
@@ -337,6 +425,23 @@
       }
     }
 
+    function updateNearmissBulkUi() {
+      var n = $('#images-nearmiss-table tbody .js-nearmiss-row-select:checked').length;
+      var $bar = $('.js-nearmiss-bulk-toolbar');
+      var $all = $('#images-nearmiss-select-all');
+      if (n > 0) {
+        $bar.removeClass('d-none');
+        $('.js-nearmiss-bulk-count').text(n + ' selected');
+      } else {
+        $bar.addClass('d-none');
+        $('.js-nearmiss-bulk-count').text('0 selected');
+      }
+      if ($all.length) {
+        var total = $('#images-nearmiss-table tbody .js-nearmiss-row-select').length;
+        $all.prop('checked', total > 0 && n === total);
+      }
+    }
+
     $('#images-products-table').on('change', '.js-product-row-select', updateProductsBulkUi);
     $('#images-products-table').on('change', '.js-products-select-all', function () {
       var on = $(this).prop('checked');
@@ -349,6 +454,13 @@
       var on = $(this).prop('checked');
       $('#images-tbm-table tbody .js-tbm-row-select').prop('checked', on);
       updateTbmBulkUi();
+    });
+
+    $('#images-nearmiss-table').on('change', '.js-nearmiss-row-select', updateNearmissBulkUi);
+    $('#images-nearmiss-table').on('change', '.js-nearmiss-select-all', function () {
+      var on = $(this).prop('checked');
+      $('#images-nearmiss-table tbody .js-nearmiss-row-select').prop('checked', on);
+      updateNearmissBulkUi();
     });
 
     $('.js-bulk-migrate-products').on('click', function () {
@@ -517,6 +629,91 @@
           });
         }
         runNextTbmBatch();
+      });
+    });
+
+    $('.js-bulk-migrate-nearmiss').on('click', function () {
+      var rows = [];
+      $('#images-nearmiss-table tbody .js-nearmiss-row-select:checked').each(function () {
+        rows.push({
+          nearmiss_id: $(this).data('nearmiss-id'),
+          img_location: $(this).attr('data-img-location')
+        });
+      });
+      if (!rows.length) return;
+      if (rows.length > NEARMISS_BATCH_MAX) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Too many selected',
+          text: 'Upload at most ' + NEARMISS_BATCH_MAX + ' Near Miss images in one run. (CLOUD_MIGRATE_BATCH_MAX_NEARMISS or CLOUD_MIGRATE_BATCH_MAX_TBM in .env.)'
+        });
+        return;
+      }
+      var chunk = HTTP_CHUNK_NEARMISS;
+      var batchTotal = Math.max(1, Math.ceil(rows.length / chunk));
+      Swal.fire({
+        title: 'Upload ' + rows.length + ' Near Miss images?',
+        html: 'Sent in <strong>' + batchTotal + '</strong> request(s) of up to <strong>' + chunk + '</strong> rows. Objects use prefix <code>nearmiss/</code>.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Upload',
+        cancelButtonText: 'Cancel'
+      }).then(function (result) {
+        if (!result.value) return;
+        var btn = $('.js-bulk-migrate-nearmiss');
+        btn.prop('disabled', true);
+
+        Swal.fire({
+          title: 'Uploading Near Miss images',
+          html: 'Starting…',
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+          showConfirmButton: false,
+          didOpen: function () { Swal.showLoading(); }
+        });
+
+        var accum = { ok: 0, failed: 0, results: [] };
+        var offset = 0;
+        var batchIndex = 0;
+
+        function runNextNearmissBatch() {
+          if (offset >= rows.length) {
+            Swal.close();
+            if ($.fn.DataTable.isDataTable('#images-nearmiss-table')) {
+              $('#images-nearmiss-table').DataTable().ajax.reload(null, false);
+            }
+            var detail = summarizeBatchFails(accum.results, 'nearmiss_id');
+            var overallOk = accum.failed === 0;
+            Swal.fire({
+              icon: overallOk ? 'success' : 'warning',
+              title: overallOk ? 'Bulk upload complete' : 'Bulk upload finished with errors',
+              html: '<p>' + accum.ok + ' uploaded, ' + accum.failed + ' failed.</p>' + (detail ? '<pre style="text-align:left;font-size:12px;max-height:220px;overflow:auto">' + detail.replace(/</g, '&lt;') + '</pre>' : '')
+            });
+            btn.prop('disabled', false);
+            return;
+          }
+          var slice = rows.slice(offset, offset + chunk);
+          batchIndex++;
+          Swal.update({ html: 'Request <strong>' + batchIndex + '</strong> of <strong>' + batchTotal + '</strong> (' + slice.length + ' items)…' });
+          $.ajax({
+            url: "{{ url('/images/nearmiss/migrate-cloud-batch') }}",
+            method: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            processData: false,
+            headers: { 'X-Requested-With': 'XMLHttpRequest', Accept: 'application/json', 'X-CSRF-TOKEN': "{{ csrf_token() }}" },
+            data: JSON.stringify({ _token: "{{ csrf_token() }}", nearmiss_items: slice })
+          }).done(function (res) {
+            mergeBatchResults(accum, res);
+            offset += chunk;
+            runNextNearmissBatch();
+          }).fail(function (xhr) {
+            Swal.close();
+            Swal.fire({ icon: 'error', title: 'Request failed', text: ajaxErrMessage(xhr) });
+            btn.prop('disabled', false);
+          });
+        }
+        runNextNearmissBatch();
       });
     });
 
@@ -689,8 +886,45 @@
       });
     }
 
+    var nearmissTableInitialized = false;
+    function initNearmissTable() {
+      if (nearmissTableInitialized) return;
+      nearmissTableInitialized = true;
+      $('#images-nearmiss-table').DataTable({
+        processing: true,
+        serverSide: true,
+        responsive: true,
+        pageLength: 25,
+        lengthMenu: [[10, 25, 50, 100, 500], [10, 25, 50, 100, 500]],
+        ajax: {
+          url: "{{ url('/images/nearmiss/list') }}",
+          data: function (d) {
+            d.image_kind = $('#js-nearmiss-image-kind').val();
+            d.hide_empty = $('#js-hide-empty-nearmiss').is(':checked') ? '1' : '0';
+          }
+        },
+        order: [[1, 'desc']],
+        columns: [
+          { data: 'bulk_select', orderable: false, searchable: false, className: 'text-center align-middle', responsivePriority: 1 },
+          { data: 'nearmiss_id', className: 'text-center align-middle' },
+          { data: 'report_date', className: 'text-center align-middle' },
+          { data: 'nearmiss_location', className: 'align-middle' },
+          { data: 'img_name', className: 'align-middle' },
+          { data: 'actionData', orderable: false, searchable: false, className: 'text-center align-middle' }
+        ]
+      }).on('draw.dt', function () {
+        $('.js-nearmiss-bulk-toolbar').addClass('d-none');
+        $('.js-nearmiss-bulk-count').text('0 selected');
+        $('#images-nearmiss-select-all').prop('checked', false);
+      });
+    }
+
     $('a[data-toggle="pill"][href="#tab-tbm"]').on('shown.bs.tab', function () {
       initTbmTable();
+    });
+
+    $('a[data-toggle="pill"][href="#tab-nearmiss"]').on('shown.bs.tab', function () {
+      initNearmissTable();
     });
 
     $('#js-products-image-kind, #js-hide-empty-products').on('change', function () {
@@ -701,6 +935,11 @@
     $('#js-tbm-image-kind, #js-hide-empty-tbm').on('change', function () {
       if ($.fn.DataTable.isDataTable('#images-tbm-table')) {
         $('#images-tbm-table').DataTable().ajax.reload();
+      }
+    });
+    $('#js-nearmiss-image-kind, #js-hide-empty-nearmiss').on('change', function () {
+      if ($.fn.DataTable.isDataTable('#images-nearmiss-table')) {
+        $('#images-nearmiss-table').DataTable().ajax.reload();
       }
     });
   });

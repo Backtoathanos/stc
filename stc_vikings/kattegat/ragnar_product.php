@@ -1,6 +1,9 @@
 <?php
 include "../../MCU/obdb.php";
 class ragnarProduct extends tesseract{
+	/** Set after successful `stc_product_hit` INSERT (for cloud upload / follow-up updates). */
+	public $last_inserted_product_id = 0;
+
 	// data show in product section
 	// call category
 	public function call_category(){
@@ -76,6 +79,7 @@ class ragnarProduct extends tesseract{
 
 	// add product to the database
 	public function stc_product_hit($stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsn, $stcpdpercentage, $stcpdunit, $stcpdstatus, $stcpdgst, $stcpdimages, $stcpdbrand){
+		$this->last_inserted_product_id = 0;
 		$stc_filter_add_product=$stcpdname;
 		$check_loki=mysqli_query($this->stc_dbs, "
 			SELECT * FROM `stc_product` 
@@ -116,6 +120,7 @@ class ragnarProduct extends tesseract{
 				)
 			");
 			if($loki_query){
+				$this->last_inserted_product_id = (int) mysqli_insert_id($this->stc_dbs);
 				$odin = "success";
 			}else{
 				$odin = "You Need To Try Again!!";
@@ -732,8 +737,10 @@ class ragnarProduct extends tesseract{
 	// alter & update product image 
 	public function stc_alter_pdimage($pd_id, $pdname){
 		$odin='';
+		$safe_img=mysqli_real_escape_string($this->stc_dbs, (string) $pdname);
+		$safe_id=mysqli_real_escape_string($this->stc_dbs, (string) (int) $pd_id);
 		$lokiupdatepd=mysqli_query($this->stc_dbs, "
-			UPDATE `stc_product` SET `stc_product_image`='".$pdname."' WHERE `stc_product_id`='".$pd_id."'
+			UPDATE `stc_product` SET `stc_product_image`='".$safe_img."' WHERE `stc_product_id`='".$safe_id."'
 		");
 		if($lokiupdatepd){
 			$odin="success";
@@ -889,12 +896,27 @@ if(isset($_POST['stc_add_product_hit'])){
 	}else{
 		$objadago=$adago->stc_product_hit($stcpdname, $stcpddsc, $stcpdcat, $stcpdsubcat, $stcpdhsn, $stcpdpercentage, $stcpdunit, $stcpdstatus, $stcpdgst, $stcpdimages, $stcpdbrand);
 
-		if($objadago == "success"){	
-			$stcassemble=move_uploaded_file($stcpdtmpname, "../../stc_symbiote/stc_product_image/".$stcpdimages);
-			if($stcassemble){
-				echo "Product's added!!";
-			}else{
-				echo "Product Uploaded Successfully but Except Images!!!";
+		if($objadago == "success"){
+			$newPid = (int) $adago->last_inserted_product_id;
+			$cloudOk = false;
+			if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
+				&& is_uploaded_file($stcpdtmpname) && function_exists('stc_r2_upload_product_image_from_path')) {
+				$r2 = stc_r2_upload_product_image_from_path($stcpdtmpname, $newPid);
+				if (!empty($r2['ok']) && !empty($r2['public_url'])) {
+					$updUrl = $adago->stc_alter_pdimage($newPid, $r2['public_url']);
+					if ($updUrl == "success") {
+						$cloudOk = true;
+						echo "Product's added!!";
+					}
+				}
+			}
+			if (!$cloudOk) {
+				$stcassemble=move_uploaded_file($stcpdtmpname, "../../stc_symbiote/stc_product_image/".$stcpdimages);
+				if($stcassemble){
+					echo "Product's added!!";
+				}else{
+					echo "Product Uploaded Successfully but Except Images!!!";
+				}
 			}
 		}else{
 			echo $objadago;
@@ -1045,17 +1067,31 @@ if(isset($_POST['image_id'])){
 	$pdname=$_FILES['image']['name'];
 	$pdtmp_name=$_FILES['image']['tmp_name'];
 	$adago=new ragnarProduct();
-	$objadago=$adago->stc_alter_pdimage($pd_id, $pdname);
-
-	if($objadago == "success"){	
-		$stcassemble=move_uploaded_file($pdtmp_name, "../../stc_symbiote/stc_product_image/".$pdname);
-		if($stcassemble){
-			echo "Product image updated!!!";
-		}else{
-			echo "Please check and try again!!!";
+	$cloudOk = false;
+	if (function_exists('stc_r2_product_upload_configured') && stc_r2_product_upload_configured()
+		&& is_uploaded_file($pdtmp_name) && function_exists('stc_r2_upload_product_image_from_path')) {
+		$r2 = stc_r2_upload_product_image_from_path($pdtmp_name, (int) $pd_id);
+		if (!empty($r2['ok']) && !empty($r2['public_url'])) {
+			$objadago = $adago->stc_alter_pdimage($pd_id, $r2['public_url']);
+			if ($objadago == "success") {
+				$cloudOk = true;
+				echo "Product image updated!!!";
+			}
 		}
-	}else{
-		echo $objadago;
+	}
+	if (!$cloudOk) {
+		$objadago=$adago->stc_alter_pdimage($pd_id, $pdname);
+
+		if($objadago == "success"){
+			$stcassemble=move_uploaded_file($pdtmp_name, "../../stc_symbiote/stc_product_image/".$pdname);
+			if($stcassemble){
+				echo "Product image updated!!!";
+			}else{
+				echo "Please check and try again!!!";
+			}
+		}else{
+			echo $objadago;
+		}
 	}
 }
 

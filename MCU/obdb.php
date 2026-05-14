@@ -18,6 +18,7 @@ class tesseract {
 }
 
 require_once __DIR__ . '/product_image_url.php';
+require_once __DIR__ . '/product_r2_upload.php';
 
 ?>
 

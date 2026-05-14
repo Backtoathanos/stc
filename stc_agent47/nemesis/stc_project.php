@@ -4399,7 +4399,7 @@ class pirates_supervisor extends tesseract{
 					$img_path=$optimusprimeimgrow['stc_safetynearmiss_img_location'];
 
 					$safety_image.='
-							<img src="../stc_sub_agent47/safety_img/'.$img_path.'" style="width: 190px;position: relative;padding: 0;margin: 0;">
+							<img src="'.htmlspecialchars(stc_nearmiss_image_url($img_path), ENT_QUOTES, 'UTF-8').'" style="width: 190px;position: relative;padding: 0;margin: 0;">
 					';
 				}
 				if($imgcounter<=2){

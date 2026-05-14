@@ -70,11 +70,14 @@ Route::group(['middleware' => 'superadmin'], function(){
     Route::get('/images', [MediaImagesController::class, 'show']);
     Route::get('/images/products/list', [MediaImagesController::class, 'productsList']);
     Route::get('/images/tbm/list', [MediaImagesController::class, 'tbmList']);
+    Route::get('/images/nearmiss/list', [MediaImagesController::class, 'nearMissList']);
     Route::post('/images/products/migrate-cloud', [MediaImagesController::class, 'migrateProductToCloud']);
     Route::post('/images/products/migrate-cloud-batch', [MediaImagesController::class, 'migrateProductsToCloudBatch']);
     Route::post('/images/products/upload-cloud-files', [MediaImagesController::class, 'uploadProductsDirectCloud']);
     Route::post('/images/tbm/migrate-cloud', [MediaImagesController::class, 'migrateTbmImageToCloud']);
     Route::post('/images/tbm/migrate-cloud-batch', [MediaImagesController::class, 'migrateTbmImagesToCloudBatch']);
+    Route::post('/images/nearmiss/migrate-cloud', [MediaImagesController::class, 'migrateNearmissImageToCloud']);
+    Route::post('/images/nearmiss/migrate-cloud-batch', [MediaImagesController::class, 'migrateNearmissImagesToCloudBatch']);
 
     Route::get('/users', [UsersHubController::class, 'index']);
     Route::get('/users/hub/record/{type}/{id}', [UsersHubController::class, 'recordJson']);
