@@ -43,6 +43,79 @@ include("kattegat/role_check.php");
       .fade:not(.show) {
         opacity: 10;
       }
+
+      /* Toolbar under filters — avoid inline label + select overlap */
+      .stc-pdimg-toolbar {
+        margin-top: 14px;
+        padding-top: 14px;
+        border-top: 1px solid #e8e8e8;
+      }
+      /*
+       * style.css sets ALL labels to position:absolute (signup forms). That stacks
+       * "Page size" on top of the <select>. Reset labels inside this form only.
+       */
+      .stc-view-product-form .stc-pdimg-toolbar label {
+        position: static !important;
+        left: auto !important;
+        top: auto !important;
+        right: auto !important;
+        transform: none !important;
+        -webkit-transform: none !important;
+        -moz-transform: none !important;
+        -ms-transform: none !important;
+        -o-transform: none !important;
+        width: auto !important;
+        height: auto !important;
+        margin-top: 0 !important;
+      }
+      .stc-view-product-form .stc-pdimg-toolbar .form-group {
+        overflow: visible !important;
+        position: static;
+      }
+      .stc-pdimg-toolbar .checkbox {
+        margin: 10px 0 0;
+      }
+      .stc-pdimg-toolbar .checkbox label {
+        font-weight: normal;
+        font-size: 13px;
+        cursor: pointer;
+        display: inline-block;
+      }
+      .stc-pdimg-toolbar .form-group {
+        margin-bottom: 0;
+      }
+      .stc-pdimg-toolbar .control-label.stc-pdimg-compact-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 6px;
+      }
+      .stc-pdimg-toolbar select#pdimg_per_page {
+        display: block;
+        width: 100%;
+        max-width: 110px;
+        height: 34px;
+        line-height: 1.42857143;
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #fff;
+        box-sizing: border-box;
+      }
+      .stc-pdimg-toolbar .stc-pdimg-search-wrap {
+        padding-top: 22px;
+        text-align: right;
+      }
+      @media (max-width: 767px) {
+        .stc-pdimg-toolbar .stc-pdimg-search-wrap {
+          padding-top: 12px;
+          text-align: left;
+        }
+        .stc-pdimg-toolbar select#pdimg_per_page {
+          max-width: none;
+        }
+      }
     </style>
 </head>
 <body>
@@ -92,7 +165,6 @@ include("kattegat/role_check.php");
                                                       type="text"
                                                       placeholder="Product Name"
                                                       class="form-control validate stcprosearchsame"
-                                                      required
                                                     />
                                                     <input type="hidden" name="search_alo_in">
                                                   </div>
@@ -110,6 +182,31 @@ include("kattegat/role_check.php");
                                           </tr>
                                       </tbody>
                                   </table>
+                                  <div class="row stc-pdimg-toolbar">
+                                      <div class="col-sm-12 col-md-5">
+                                          <div class="checkbox">
+                                              <label for="pdimg_only_no_image" title="Limit results to products that have no image file stored">
+                                                  <input type="checkbox" id="pdimg_only_no_image" name="pdimg_only_no_image" value="1" />
+                                                  Products without image only
+                                              </label>
+                                          </div>
+                                      </div>
+                                      <div class="col-sm-6 col-md-3">
+                                          <div class="form-group">
+                                              <label class="control-label stc-pdimg-compact-label" for="pdimg_per_page">Page size</label>
+                                              <select id="pdimg_per_page" name="pdimg_per_page" class="form-control">
+                                                  <option value="10" selected>10</option>
+                                                  <option value="25">25</option>
+                                                  <option value="50">50</option>
+                                              </select>
+                                          </div>
+                                      </div>
+                                      <div class="col-sm-6 col-md-4 stc-pdimg-search-wrap">
+                                          <button type="button" id="pdimg_search_btn" class="btn btn-primary">
+                                              <i class="fa fa-search"></i> Search
+                                          </button>
+                                      </div>
+                                  </div>
                               </form>
                           </div>
                       </div>
@@ -122,6 +219,7 @@ include("kattegat/role_check.php");
                             </div>
                             <br />
                             <div id="image_data">
+                              <p class="text-muted text-center">Choose filters and click <strong>Search</strong>.</p>
                             </div>
                           </div>   
                       </div>             
@@ -203,63 +301,65 @@ include("kattegat/role_check.php");
           });
 
 
-          var jsfiltercat;
-          var jsfiltersubcat;
-          var jsfiltername;
-          // filter function
-          // filter by cat
-          $("#filterbycat").change(function(e){
-            e.preventDefault();
-            $('#image_data').html("Loading...");
-            jsfiltercat = $(this).val();
-            jsfiltersubcat = $('#filterbysubcat').val();
-            jsfiltername = $('#searchbystcname').val();
-            stc_filter_pro(jsfiltercat, jsfiltersubcat ,jsfiltername);
-          });
+          var jsfiltercat = 'NA';
+          var jsfiltersubcat = 'NA';
+          var jsfiltername = '';
 
-          // filter by sub cat
-          $("#filterbysubcat").change(function(e){
-            e.preventDefault();
-            $('#image_data').html("Loading...");
-            jsfiltercat = $('#filterbycat').val();
-            jsfiltersubcat = $(this).val();
-            jsfiltername = $('#searchbystcname').val();
-            stc_filter_pro(jsfiltercat, jsfiltersubcat ,jsfiltername);
-          });
-
-          // filter by name
-          $("#searchbystcname").on('keyup', function(e){
-            e.preventDefault();
-            jsfiltercat = $('#filterbycat').val();
-            jsfiltersubcat = $('#filterbysubcat').val();
-            jsfiltername = $(this).val();
-            var responset='<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12"><a href="#" class="btn btn-primary btn-block mb-3">Please type a product name to search or by category/sub category!!!</a></div>';
-            var countlen=jsfiltername.length;
-            if((+jsfiltername!='') && countlen>=3){
-              stc_filter_pro(jsfiltercat, jsfiltersubcat ,jsfiltername);
-            }else{
-              $('#image_data').html(responset);
+          function stc_pdimg_validateSearch() {
+            var cat = $('#filterbycat').val();
+            var sub = $('#filterbysubcat').val();
+            var name = $('#searchbystcname').val().trim();
+            var onlyNo = $('#pdimg_only_no_image').is(':checked');
+            if (!onlyNo && name.length < 3 && cat === 'NA' && sub === 'NA') {
+              alert('Select a category or sub-category, enter at least 3 characters in product name, or enable "Products without image only".');
+              return false;
             }
-          });
+            return true;
+          }
 
-          // filter function
-          function stc_filter_pro(jsfiltercat, jsfiltersubcat ,jsfiltername){
+          function stc_filter_pro(jsfiltercat, jsfiltersubcat, jsfiltername, page) {
+            page = page || 1;
+            var perPage = $('#pdimg_per_page').val() || 10;
+            var onlyNo = $('#pdimg_only_no_image').is(':checked') ? 1 : 0;
             $.ajax({
               url     : "kattegat/ragnar_product.php",
               method  : "post",
               data    : {
-                pdimg_sear:1,
-                phpfiltercatout:jsfiltercat,
-                phpfiltersubcatout:jsfiltersubcat,
-                phpfilternameout:jsfiltername
+                pdimg_sear: 1,
+                phpfiltercatout: jsfiltercat,
+                phpfiltersubcatout: jsfiltersubcat,
+                phpfilternameout: jsfiltername,
+                pdimg_page: page,
+                pdimg_per_page: perPage,
+                pdimg_only_no_image: onlyNo
               },
-              // dataType : 'JSON',
               success : function(data){
-                // console.log(data);
                 $('#image_data').html(data);
+              },
+              error   : function(){
+                $('#image_data').html('<p class="text-danger text-center">Request failed. Try again.</p>');
               }
             });
           }
+
+          $('#pdimg_search_btn').on('click', function(e){
+            e.preventDefault();
+            if (!stc_pdimg_validateSearch()) return;
+            jsfiltercat = $('#filterbycat').val();
+            jsfiltersubcat = $('#filterbysubcat').val();
+            jsfiltername = $('#searchbystcname').val().trim();
+            $('#image_data').html('<p class="text-center text-muted">Loading…</p>');
+            stc_filter_pro(jsfiltercat, jsfiltersubcat, jsfiltername, 1);
+          });
+
+          $(document).on('click', '.stc-pdimg-page-link', function(e){
+            e.preventDefault();
+            if ($(this).prop('disabled')) return;
+            var p = parseInt($(this).data('page'), 10);
+            if (!p || p < 1) return;
+            $('#image_data').html('<p class="text-center text-muted">Loading…</p>');
+            stc_filter_pro(jsfiltercat, jsfiltersubcat, jsfiltername, p);
+          });
 
           // $('body').delegate('.prodimgsearch', 'click', function (e) {
           //   e.preventDefault();

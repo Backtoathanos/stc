@@ -750,9 +750,80 @@ class ragnarProduct extends tesseract{
 		return $odin;
 	}
 
-	// filter product by all
-	public function search_pd_with_img($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout){
-		$ivar='
+	// filter product by all (pagination + optional “no image only” for update-product-image page)
+	public function search_pd_with_img($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout, $page = 1, $per_page = 10, $only_no_image = false){
+		$page = max(1, (int) $page);
+		if (! in_array((int) $per_page, [10, 25, 50], true)) {
+			$per_page = 10;
+		} else {
+			$per_page = (int) $per_page;
+		}
+
+		$array = array(
+			'bycat' => $bjornefiltercatout,
+			'bysubcat' => $bjornefiltersubcatout,
+			'byname' => $bjornefilternameout,
+		);
+		$category = '';
+		$subcategory = '';
+		$productname = '';
+		foreach ($array as $key => $value) {
+			if ($array['bycat'] != 'NA') {
+				$category = "
+					AND `stc_product_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $array['bycat'])."'
+				";
+			}
+
+			if ($array['bysubcat'] != 'NA') {
+				$subcategory = "
+					AND `stc_product_sub_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $array['bysubcat'])."'
+				";
+			}
+
+			if (! empty($array['byname'])) {
+				$productname = "
+					AND (`stc_product_name` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byname'])."'
+					OR 
+					`stc_product_desc` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byname'])."')
+				";
+			}
+		}
+
+		$no_image_sql = '';
+		if ($only_no_image) {
+			$no_image_sql = " AND TRIM(IFNULL(`stc_product`.`stc_product_image`,'')) = '' ";
+		}
+
+		$joins = "
+			FROM `stc_product` 
+			LEFT JOIN `stc_category` ON `stc_cat_id`=`stc_product_cat_id` 
+			LEFT JOIN `stc_sub_category` ON `stc_sub_cat_id`=`stc_product_sub_cat_id` 
+			LEFT JOIN `stc_rack` ON `stc_rack_id`=`stc_product_rack_id` 
+			LEFT JOIN `stc_item_inventory` ON `stc_item_inventory_pd_id`=`stc_product_id`
+			LEFT JOIN `stc_brand` ON `stc_brand_id`=`stc_product_brand_id`
+		";
+
+		$where = "
+			WHERE `stc_product_avail`='1' 
+			".$category.$subcategory.$productname.$no_image_sql;
+
+		$count_sql = "
+			SELECT COUNT(DISTINCT `stc_product`.`stc_product_id`) AS `stc_pdimg_cnt`
+			".$joins.$where;
+		$count_res = mysqli_query($this->stc_dbs, $count_sql);
+		$total = 0;
+		if ($count_res && ($count_row = mysqli_fetch_assoc($count_res))) {
+			$total = (int) $count_row['stc_pdimg_cnt'];
+		}
+
+		$total_pages = max(1, (int) ceil($total / $per_page));
+		if ($page > $total_pages) {
+			$page = $total_pages;
+		}
+		$offset = ($page - 1) * $per_page;
+
+		$ivar = '
+			<div class="stc-pdimg-results-wrap">
 			<table class="table table-hover" align="centre">
 				<thead>
 				  	<tr>
@@ -763,80 +834,77 @@ class ragnarProduct extends tesseract{
 				</thead>
 				<tbody>
 		';
-		$array = array(
-			"bycat" => $bjornefiltercatout,
-			"bysubcat" => $bjornefiltersubcatout,
-			"byname" => $bjornefilternameout
-		);
-		$category='';
-		$subcategory='';
-		$productname='';
-		foreach($array as $key => $value){
-			if($array['bycat']!="NA"){
-				$category="
-					AND `stc_product_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $array['bycat'])."'
-				";
-			}
 
-			if($array['bysubcat']!="NA"){
-				$subcategory="
-					AND `stc_product_sub_cat_id`='".mysqli_real_escape_string($this->stc_dbs, $array['bysubcat'])."'
-				";
-			}
-
-			if(!empty($array['byname'])){
-				$productname="
-					AND (`stc_product_name` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byname'])."'
-					OR 
-					`stc_product_desc` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $array['byname'])."')
-				";
-			}
-		}
-		$endfilterqry='ORDER BY `stc_product_name` ASC';
-
-		$ivarfilterquery=mysqli_query($this->stc_dbs, "
+		$data_sql = "
 			SELECT DISTINCT 				
 				`stc_product_name`, 
 				`stc_sub_cat_name`, 
 				`stc_product_image`, 
 				`stc_product_id` 
-			FROM `stc_product` 
-			LEFT JOIN `stc_category` ON `stc_cat_id`=`stc_product_cat_id` 
-			LEFT JOIN `stc_sub_category` ON `stc_sub_cat_id`=`stc_product_sub_cat_id` 
-			LEFT JOIN `stc_rack` ON `stc_rack_id`=`stc_product_rack_id` 
-			LEFT JOIN `stc_item_inventory` ON `stc_item_inventory_pd_id`=`stc_product_id`
-			LEFT JOIN `stc_brand` ON `stc_brand_id`=`stc_product_brand_id`
-			WHERE `stc_product_avail`='1' 
-			".$category.$subcategory.$productname.$endfilterqry
-		);
+			".$joins.$where.'
+			ORDER BY `stc_product_name` ASC
+			LIMIT '.(int) $offset.', '.(int) $per_page;
 
-		if(mysqli_num_rows($ivarfilterquery)>0){
-			$brandname='';
-			$subcat='';
-			foreach($ivarfilterquery as $filterrow){
-				$correct_stcpdname=strlen($filterrow["stc_product_name"]);
-				$ivar.='
+		$ivarfilterquery = mysqli_query($this->stc_dbs, $data_sql);
+
+		if (! $ivarfilterquery) {
+			return '<div class="alert alert-danger">Unable to load products. Please try again.</div>';
+		}
+
+		if (mysqli_num_rows($ivarfilterquery) > 0) {
+			$brandname = '';
+			$subcat = '';
+			foreach ($ivarfilterquery as $filterrow) {
+				$pid = (int) $filterrow['stc_product_id'];
+				$stored = trim((string) ($filterrow['stc_product_image'] ?? ''));
+				$img_cell = '';
+				if ($stored === '') {
+					$img_cell = '<span class="text-muted">No image</span>';
+				} else {
+					$img_cell = '<img src="'.htmlspecialchars(stc_product_image_url($stored), ENT_QUOTES, 'UTF-8').'" height="60" width="75" class="img-thumbnail" alt="" />';
+				}
+				$ivar .= '
 					<tr>
-						<td>'.$subcat.' '.$filterrow["stc_product_name"].' '.$brandname.' </td>
-						<td>
-							<img src="'.stc_product_image_url($filterrow["stc_product_image"]).'" height="60" width="75" class="img-thumbnail" />
-						</td>
-						<td><button type="button" name="update" class="btn btn-warning bt-xs update" id="'.$filterrow["stc_product_id"].'">Change</button></td>
-						
+						<td>'.htmlspecialchars($subcat.' '.$filterrow['stc_product_name'].' '.$brandname, ENT_QUOTES, 'UTF-8').'</td>
+						<td>'.$img_cell.'</td>
+						<td><button type="button" name="update" class="btn btn-warning btn-xs update" id="'.$pid.'">Change</button></td>
 					</tr>
 				';
 			}
-		}else{
+		} else {
 			$ivar .= '
 				<tr>
-					<td>No Records Found!!!</td>					
+					<td colspan="3" class="text-center">No Records Found!!!</td>					
 				</tr>
 			';
 		}
 
-		$ivar.='
+		$ivar .= '
+				</tbody>
 			</table>
 		';
+
+		$from_row = $total > 0 ? $offset + 1 : 0;
+		$to_row = $total > 0 ? min($offset + $per_page, $total) : 0;
+		$prev_page = max(1, $page - 1);
+		$next_page = min($total_pages, $page + 1);
+		$prev_dis = ($page <= 1) ? ' disabled="disabled"' : '';
+		$next_dis = ($page >= $total_pages || $total === 0) ? ' disabled="disabled"' : '';
+
+		$ivar .= '
+			<div class="stc-pdimg-pagination-bar clearfix" style="margin-top:12px;">
+				<div class="pull-left">
+					<span class="stc-pdimg-showing text-muted">Showing '.(int) $from_row.'–'.(int) $to_row.' of '.(int) $total.'</span>
+				</div>
+				<div class="pull-right">
+					<button type="button" class="btn btn-default btn-sm stc-pdimg-page-link" data-page="'.(int) $prev_page.'"'.$prev_dis.'>&laquo; Prev</button>
+					<span style="margin:0 8px;">Page '.(int) $page.' / '.(int) $total_pages.'</span>
+					<button type="button" class="btn btn-default btn-sm stc-pdimg-page-link" data-page="'.(int) $next_page.'"'.$next_dis.'>Next &raquo;</button>
+				</div>
+			</div>
+			</div>
+		';
+
 		return $ivar;
 	}
 }
@@ -1097,13 +1165,14 @@ if(isset($_POST['image_id'])){
 
 // search by same
 if(isset($_POST['pdimg_sear'])){
-	$bjornefiltercatout=$_POST['phpfiltercatout'];
-	$bjornefiltersubcatout=$_POST['phpfiltersubcatout'];
-	$bjornefilternameout=$_POST['phpfilternameout'];
-	$out='';
-	$objpdres=new ragnarProduct();	
-	$opobjpdres=$objpdres->search_pd_with_img($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout);
-	$out=$opobjpdres;
-	echo $out;
+	$bjornefiltercatout = isset($_POST['phpfiltercatout']) ? $_POST['phpfiltercatout'] : 'NA';
+	$bjornefiltersubcatout = isset($_POST['phpfiltersubcatout']) ? $_POST['phpfiltersubcatout'] : 'NA';
+	$bjornefilternameout = isset($_POST['phpfilternameout']) ? $_POST['phpfilternameout'] : '';
+	$pdimg_page = isset($_POST['pdimg_page']) ? max(1, (int) $_POST['pdimg_page']) : 1;
+	$pdimg_per_page = isset($_POST['pdimg_per_page']) ? (int) $_POST['pdimg_per_page'] : 10;
+	$pdimg_only_no_image = ! empty($_POST['pdimg_only_no_image']);
+	$objpdres = new ragnarProduct();
+	$opobjpdres = $objpdres->search_pd_with_img($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout, $pdimg_page, $pdimg_per_page, $pdimg_only_no_image);
+	echo $opobjpdres;
 }
 ?>
