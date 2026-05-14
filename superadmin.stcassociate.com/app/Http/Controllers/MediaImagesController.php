@@ -988,6 +988,23 @@ class MediaImagesController extends Controller
             $repTbmPerLoc[$loc] = isset($repTbmPerLoc[$loc]) ? min($repTbmPerLoc[$loc], $tid) : $tid;
         }
 
+        /** @var array<string, bool> Snapshot (tbm_id, img_location) → row existed before any migrate in this batch (duplicate filenames update all rows). */
+        $snapshotTbmImgPair = [];
+        foreach ($items as $row) {
+            $tid = (int) ($row['tbm_id'] ?? 0);
+            $loc = trim((string) ($row['img_location'] ?? ''));
+            if ($tid < 1 || $loc === '' || $this->isRemoteUrl($loc)) {
+                continue;
+            }
+            $pairKey = $tid . "\x1e" . $loc;
+            if (! array_key_exists($pairKey, $snapshotTbmImgPair)) {
+                $snapshotTbmImgPair[$pairKey] = DB::table('stc_safetytbm_img')
+                    ->where('stc_safetytbm_img_tbmid', $tid)
+                    ->where('stc_safetytbm_img_location', $loc)
+                    ->exists();
+            }
+        }
+
         $usleep = $this->cloudMigrateBatchUsleep();
         $results = [];
         $ok = 0;
@@ -1029,21 +1046,6 @@ class MediaImagesController extends Controller
                 continue;
             }
 
-            $pairExists = DB::table('stc_safetytbm_img')
-                ->where('stc_safetytbm_img_tbmid', $tid)
-                ->where('stc_safetytbm_img_location', $loc)
-                ->exists();
-
-            if (! $pairExists) {
-                $results[] = ['tbm_id' => $tid, 'success' => false, 'message' => 'TBM image record not found. Refresh the table and try again.'];
-                $fail++;
-                if ($i < $n - 1 && $usleep > 0) {
-                    usleep($usleep);
-                }
-
-                continue;
-            }
-
             if (isset($memoLoc[$loc])) {
                 $prev = $memoLoc[$loc];
                 $msg = $prev['success']
@@ -1055,6 +1057,17 @@ class MediaImagesController extends Controller
                 } else {
                     $fail++;
                 }
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            $pairKey = $tid . "\x1e" . $loc;
+            if (! ($snapshotTbmImgPair[$pairKey] ?? false)) {
+                $results[] = ['tbm_id' => $tid, 'success' => false, 'message' => 'TBM image record not found. Refresh the table and try again.'];
+                $fail++;
                 if ($i < $n - 1 && $usleep > 0) {
                     usleep($usleep);
                 }
@@ -1143,6 +1156,23 @@ class MediaImagesController extends Controller
             $repNearmissPerLoc[$loc] = isset($repNearmissPerLoc[$loc]) ? min($repNearmissPerLoc[$loc], $nid) : $nid;
         }
 
+        /** @var array<string, bool> Snapshot (nearmiss_id, img_location) before any migrate in this batch. */
+        $snapshotNearmissImgPair = [];
+        foreach ($items as $row) {
+            $nid = (int) ($row['nearmiss_id'] ?? 0);
+            $loc = trim((string) ($row['img_location'] ?? ''));
+            if ($nid < 1 || $loc === '' || $this->isRemoteUrl($loc)) {
+                continue;
+            }
+            $pairKey = $nid . "\x1e" . $loc;
+            if (! array_key_exists($pairKey, $snapshotNearmissImgPair)) {
+                $snapshotNearmissImgPair[$pairKey] = DB::table('stc_safetynearmiss_img')
+                    ->where('stc_safetynearmiss_img_nearmissid', $nid)
+                    ->where('stc_safetynearmiss_img_location', $loc)
+                    ->exists();
+            }
+        }
+
         $usleep = $this->cloudMigrateBatchUsleep();
         $results = [];
         $ok = 0;
@@ -1184,21 +1214,6 @@ class MediaImagesController extends Controller
                 continue;
             }
 
-            $pairExists = DB::table('stc_safetynearmiss_img')
-                ->where('stc_safetynearmiss_img_nearmissid', $nid)
-                ->where('stc_safetynearmiss_img_location', $loc)
-                ->exists();
-
-            if (! $pairExists) {
-                $results[] = ['nearmiss_id' => $nid, 'success' => false, 'message' => 'Near miss image record not found. Refresh the table and try again.'];
-                $fail++;
-                if ($i < $n - 1 && $usleep > 0) {
-                    usleep($usleep);
-                }
-
-                continue;
-            }
-
             if (isset($memoLoc[$loc])) {
                 $prev = $memoLoc[$loc];
                 $msg = $prev['success']
@@ -1210,6 +1225,17 @@ class MediaImagesController extends Controller
                 } else {
                     $fail++;
                 }
+                if ($i < $n - 1 && $usleep > 0) {
+                    usleep($usleep);
+                }
+
+                continue;
+            }
+
+            $pairKey = $nid . "\x1e" . $loc;
+            if (! ($snapshotNearmissImgPair[$pairKey] ?? false)) {
+                $results[] = ['nearmiss_id' => $nid, 'success' => false, 'message' => 'Near miss image record not found. Refresh the table and try again.'];
+                $fail++;
                 if ($i < $n - 1 && $usleep > 0) {
                     usleep($usleep);
                 }
