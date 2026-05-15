@@ -273,7 +273,6 @@ include("kattegat/role_check.php");
                                                                 type="text"
                                                                 placeholder="Product Name"
                                                                 class="form-control validate stcprosearchsame"
-                                                                required
                                                               />
                                                               <input type="hidden" name="search_alo_in">
                                                             </div>
@@ -289,10 +288,20 @@ include("kattegat/role_check.php");
                                                             </div>
                                                         </td>
                                                     </tr>
+                                                    <tr>
+                                                        <td colspan="3">
+                                                            <button type="button" class="btn btn-primary btn-block text-uppercase" id="stc-addproduct-view-search-btn">
+                                                              Search <i class="fa fa-search"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </form>
                                     </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xl-12 col-lg-12 col-md-12 text-center stc-addproduct-view-pagination" style="margin-bottom:12px;"></div>
                                 </div>
                                 <div class="row stc-call-view-product-row">
                                 </div>
@@ -460,63 +469,89 @@ include("kattegat/role_check.php");
             });
           });
 
-          var jsfiltercat;
-          var jsfiltersubcat;
-          var jsfiltername;
-          // filter function
-          // filter by cat
-          $("#filterbycat").change(function(e){
-            e.preventDefault();
-            $('.stc-call-view-product-row').html("Loading...");
-            jsfiltercat = $(this).val();
-            jsfiltersubcat = $('#filterbysubcat').val();
-            jsfiltername = $('#searchbystcname').val();
-            stc_filter_pro(jsfiltercat, jsfiltersubcat ,jsfiltername);
-          });
+          var stcAddProductViewPage = 1;
+          var stcAddProductViewPerPage = 30;
 
-          // filter by sub cat
-          $("#filterbysubcat").change(function(e){
-            e.preventDefault();
-            $('.stc-call-view-product-row').html("Loading...");
-            jsfiltercat = $('#filterbycat').val();
-            jsfiltersubcat = $(this).val();
-            jsfiltername = $('#searchbystcname').val();
-            stc_filter_pro(jsfiltercat, jsfiltersubcat ,jsfiltername);
-          });
-
-          // filter by name
-          $("#searchbystcname").on('keyup', function(e){
-            e.preventDefault();
-            jsfiltercat = $('#filterbycat').val();
-            jsfiltersubcat = $('#filterbysubcat').val();
-            jsfiltername = $(this).val();
-            var responset='<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12"><a href="#" class="btn btn-primary btn-block text-uppercase mb-3">Atleast type word in text field or search via category or sub category!!!</a></div>';
-            var countlen=jsfiltername.length;
-            if((+jsfiltername!='') && countlen>=3){
-              stc_filter_pro(jsfiltercat, jsfiltersubcat ,jsfiltername);
-            }else{
-              $('.stc-call-view-product-row').html(responset);
+          function renderStcAddProductViewPagination(totalPages, page) {
+            var $el = $('.stc-addproduct-view-pagination');
+            if (!totalPages || totalPages <= 1) {
+              $el.empty();
+              return;
             }
-          });
+            var html = '';
+            for (var i = 1; i <= totalPages; i++) {
+              var pgCls = i === page ? 'btn-success' : 'btn-default';
+              var pgTitle = i === page ? ' title="Reload this page"' : '';
+              html += '<a href="javascript:void(0)" class="btn btn-sm ' + pgCls + ' stc-addproduct-pg-page" style="margin:2px;" data-page="' + i + '"' + pgTitle + '>' + i + '</a>';
+            }
+            $el.html(html);
+          }
 
-          // filter function
-          function stc_filter_pro(jsfiltercat, jsfiltersubcat ,jsfiltername){
+          function stcAddProductGridValidate() {
+            var cat = $('#filterbycat').val();
+            var sub = $('#filterbysubcat').val();
+            var nameTrim = ($('#searchbystcname').val() || '').trim();
+            var responset = '<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12"><a href="#" class="btn btn-primary btn-block text-uppercase mb-3">Atleast type word in text field or search via category or sub category!!!</a></div>';
+            if (cat === 'NA' && sub === 'NA') {
+              if (nameTrim === '') {
+                $('.stc-call-view-product-row').html(responset);
+                return false;
+              }
+              if (nameTrim.length < 3) {
+                $('.stc-call-view-product-row').html(responset);
+                return false;
+              }
+            }
+            return true;
+          }
+
+          function stc_filter_pro_paged(goPage) {
+            if (typeof goPage === 'number' && goPage >= 1) {
+              stcAddProductViewPage = goPage;
+            }
+            if (!stcAddProductGridValidate()) {
+              $('.stc-addproduct-view-pagination').empty();
+              return;
+            }
+            $('.stc-call-view-product-row').html('<div class="col-xl-12 text-center py-3">Loading...</div>');
             $.ajax({
-              url     : "kattegat/ragnar_product.php",
-              method  : "post",
-              data    : {
-                stcaction:1,
-                phpfiltercatout:jsfiltercat,
-                phpfiltersubcatout:jsfiltersubcat,
-                phpfilternameout:jsfiltername
+              url: 'kattegat/ragnar_product.php',
+              method: 'post',
+              data: {
+                stcaction: 1,
+                product_view_paged: 1,
+                product_list_page: stcAddProductViewPage,
+                product_list_per_page: stcAddProductViewPerPage,
+                phpfiltercatout: $('#filterbycat').val(),
+                phpfiltersubcatout: $('#filterbysubcat').val(),
+                phpfilternameout: $('#searchbystcname').val() || ''
               },
-              // dataType : 'JSON',
-              success : function(data){
-                // console.log(data);
-                $('.stc-call-view-product-row').html(data);
+              dataType: 'json',
+              success: function (res) {
+                if (!res || typeof res.html === 'undefined') {
+                  $('.stc-call-view-product-row').html('<div class="col-xl-12 text-center text-danger">Error loading products.</div>');
+                  return;
+                }
+                stcAddProductViewPage = parseInt(res.page, 10) || 1;
+                $('.stc-call-view-product-row').html(res.html);
+                renderStcAddProductViewPagination(parseInt(res.total_pages, 10) || 1, stcAddProductViewPage);
+              },
+              error: function () {
+                $('.stc-call-view-product-row').html('<div class="col-xl-12 text-center text-danger">Error loading products.</div>');
               }
             });
           }
+
+          $('#stc-addproduct-view-search-btn').on('click', function (e) {
+            e.preventDefault();
+            stc_filter_pro_paged(1);
+          });
+
+          $('body').on('click', '.stc-addproduct-pg-page', function (e) {
+            e.preventDefault();
+            var p = parseInt($(this).data('page'), 10) || 1;
+            stc_filter_pro_paged(p);
+          });
 
           // search by item id from purchase
           $('.product-id-search-hit').on('click', function(e){

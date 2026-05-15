@@ -132,10 +132,8 @@ class ragnarProduct extends tesseract{
 	}
 
 	/*---------------------------- Filter product s-----------------------------*/
-	// filter product by all
-	public function stc_getpd_by_multiple_inp($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout){
-		$ivar='';
-			
+
+	private function stc_getpd_sql_filters($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout){
 		$array = array(
 			"bycat" => $bjornefiltercatout,
 			"bysubcat" => $bjornefiltersubcatout,
@@ -165,9 +163,23 @@ class ragnarProduct extends tesseract{
 				";
 			}
 		}
-		$endfilterqry='ORDER BY `stc_product_id` ASC LIMIT 0,30';
+		return array($category, $subcategory, $productname);
+	}
 
-		$ivarfilterquery=mysqli_query($this->stc_dbs, "
+	private function stc_getpd_join_from_where(){
+		return "
+			FROM `stc_product`
+			LEFT JOIN `stc_category` ON `stc_cat_id`=`stc_product_cat_id` 
+			LEFT JOIN `stc_sub_category` ON `stc_sub_cat_id`=`stc_product_sub_cat_id` 
+			LEFT JOIN `stc_rack` ON `stc_rack_id`=`stc_product_rack_id` 
+			LEFT JOIN `stc_item_inventory` ON `stc_item_inventory_pd_id`=`stc_product_id`
+			LEFT JOIN `stc_brand` ON `stc_brand_id`=`stc_product_brand_id`
+			WHERE 1=1
+		";
+	}
+
+	private function stc_getpd_select_distinct(){
+		return "
 			SELECT DISTINCT *,
 				( SELECT CASE WHEN EXISTS (
 					SELECT 1 FROM `stc_purchase_product_adhoc` A
@@ -180,17 +192,12 @@ class ragnarProduct extends tesseract{
 					WHERE A.`stc_purchase_product_adhoc_productid` = `stc_product`.`stc_product_id`
 					AND A.`stc_purchase_product_adhoc_status` != 1
 				) THEN 1 ELSE 0 END ) AS adhoc_badge_red
-			FROM `stc_product`
-			LEFT JOIN `stc_category` ON `stc_cat_id`=`stc_product_cat_id` 
-			LEFT JOIN `stc_sub_category` ON `stc_sub_cat_id`=`stc_product_sub_cat_id` 
-			LEFT JOIN `stc_rack` ON `stc_rack_id`=`stc_product_rack_id` 
-			LEFT JOIN `stc_item_inventory` ON `stc_item_inventory_pd_id`=`stc_product_id`
-			LEFT JOIN `stc_brand` ON `stc_brand_id`=`stc_product_brand_id`
-			WHERE 1=1
-			".$category.$subcategory.$productname.$endfilterqry
-		);
+		";
+	}
 
-		if(mysqli_num_rows($ivarfilterquery)>0){
+	private function stc_getpd_render_product_grid_rows($ivarfilterquery){
+		$ivar='';
+		if($ivarfilterquery && mysqli_num_rows($ivarfilterquery)>0){
 			foreach($ivarfilterquery as $filterrow){
 				$correct_stcpdname=strlen($filterrow["stc_product_name"]);
 				$stcqty=$filterrow["stc_item_inventory_pd_qty"];
@@ -265,6 +272,53 @@ class ragnarProduct extends tesseract{
 			';
 		}
 		return $ivar;
+	}
+
+	// filter product by all (first 30 — legacy behaviour for other callers)
+	public function stc_getpd_by_multiple_inp($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout){
+		list($category, $subcategory, $productname) = $this->stc_getpd_sql_filters($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout);
+		$endfilterqry='ORDER BY `stc_product_id` ASC LIMIT 0,30';
+		$ivarfilterquery=mysqli_query($this->stc_dbs,
+			$this->stc_getpd_select_distinct().$this->stc_getpd_join_from_where().$category.$subcategory.$productname.$endfilterqry
+		);
+		return $this->stc_getpd_render_product_grid_rows($ivarfilterquery);
+	}
+
+	/** Paginated grid for add-product.php (JSON). */
+	public function stc_getpd_by_multiple_inp_paged($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout, $page, $per_page){
+		list($category, $subcategory, $productname) = $this->stc_getpd_sql_filters($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout);
+		$joinWhere = $this->stc_getpd_join_from_where().$category.$subcategory.$productname;
+
+		$cntq = mysqli_query($this->stc_dbs, "
+			SELECT COUNT(DISTINCT `stc_product`.`stc_product_id`) AS cnt ".$joinWhere
+		);
+		$total = 0;
+		if($cntq && ($cr = mysqli_fetch_assoc($cntq))){
+			$total = (int) $cr['cnt'];
+		}
+
+		$page = max(1, (int) $page);
+		$per_page = max(1, min(100, (int) $per_page));
+		$total_pages = $total > 0 ? (int) ceil($total / $per_page) : 1;
+		if($page > $total_pages){
+			$page = $total_pages;
+		}
+		$offset = ($page - 1) * $per_page;
+
+		$endfilterqry = "ORDER BY `stc_product_id` ASC LIMIT ".(int) $offset.", ".(int) $per_page;
+		$ivarfilterquery = mysqli_query($this->stc_dbs,
+			$this->stc_getpd_select_distinct().$joinWhere.$endfilterqry
+		);
+
+		$html = $this->stc_getpd_render_product_grid_rows($ivarfilterquery);
+
+		return array(
+			'html' => $html,
+			'total' => $total,
+			'total_pages' => $total_pages,
+			'page' => $page,
+			'per_page' => $per_page
+		);
 	}
 
 	// by per line items id
@@ -1034,11 +1088,16 @@ if(isset($_POST['stcaction'])){
 	$bjornefiltercatout=$_POST['phpfiltercatout'];
 	$bjornefiltersubcatout=$_POST['phpfiltersubcatout'];
 	$bjornefilternameout=$_POST['phpfilternameout'];
-	$out='';
-	$objpdres=new ragnarProduct();	
+	$objpdres=new ragnarProduct();
+	if (!empty($_POST['product_view_paged'])) {
+		$page = isset($_POST['product_list_page']) ? (int) $_POST['product_list_page'] : 1;
+		$per_page = isset($_POST['product_list_per_page']) ? (int) $_POST['product_list_per_page'] : 30;
+		header('Content-Type: application/json; charset=UTF-8');
+		echo json_encode($objpdres->stc_getpd_by_multiple_inp_paged($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout, $page, $per_page));
+		exit();
+	}
 	$opobjpdres=$objpdres->stc_getpd_by_multiple_inp($bjornefiltercatout, $bjornefiltersubcatout, $bjornefilternameout);
-	$out=$opobjpdres;
-	echo $out;
+	echo $opobjpdres;
 }
 
 // search single item purchase
