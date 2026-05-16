@@ -1,1 +1,0 @@
-<?php echo "Hi from CI/CD";?>
