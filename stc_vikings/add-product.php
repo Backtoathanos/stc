@@ -300,10 +300,11 @@ include("kattegat/role_check.php");
                                         </form>
                                     </div>
                                 </div>
+                                <div class="row stc-call-view-product-row">
+                                </div>
+                                
                                 <div class="row">
                                     <div class="col-xl-12 col-lg-12 col-md-12 text-center stc-addproduct-view-pagination" style="margin-bottom:12px;"></div>
-                                </div>
-                                <div class="row stc-call-view-product-row">
                                 </div>
                                 <div 
                                   class="modal fade" id="stc-edit-product-modal" 
@@ -374,6 +375,7 @@ include("kattegat/role_check.php");
                                         </form>
                                     </div>
                                 </div>
+                                
 
                                 <div class="row stc-call-view-product-withid-row">                                  
                                 </div>
