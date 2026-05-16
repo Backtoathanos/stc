@@ -1,1 +1,12 @@
 .env
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+*.mp4
+*.zip
+uploads/
+images/
+safety_img/
+stc_sub_agent47/safety_img/
