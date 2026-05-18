@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/stc_gld/build/static/css/main.53450949.css",
+    "main.js": "/stc_gld/build/static/js/main.5384ea1c.js",
+    "index.html": "/stc_gld/build/index.html",
+    "main.53450949.css.map": "/stc_gld/build/static/css/main.53450949.css.map",
+    "main.5384ea1c.js.map": "/stc_gld/build/static/js/main.5384ea1c.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.53450949.css",
+    "static/js/main.5384ea1c.js"
+  ]
+}
