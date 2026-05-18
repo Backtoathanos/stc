@@ -15,22 +15,22 @@ export default function Login(){
     ? 'https://stcassociate.com/stc_gld/vanaheim'
     : 'http://localhost/stc/stc_gld/vanaheim';
     useEffect(() => {
-        let login=localStorage.getItem("login");
-        if(login){
+        const login = localStorage.getItem("login");
+        if (login) {
             navigate('/dashboard');
         }
-        let loginStatus=localStorage.getItem("loginStatus");
-        if(login){
+        const loginStatus = localStorage.getItem("loginStatus");
+        if (login) {
             setError(loginStatus);
-            setTimeout(function(){
+            setTimeout(function () {
                 localStorage.clear();
                 window.location.reload();
             }, 3000);
         }
-        setTimeout(function(){
+        setTimeout(function () {
             setMsg("");
-        }, 5000)
-    });
+        }, 5000);
+    }, [navigate]);
 
     const handleInputChange = (e, type) => {
         switch(type){

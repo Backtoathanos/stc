@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import './PrintPreview.css'; // Include external CSS file for print styles
@@ -11,11 +11,7 @@ const PrintPreview = () => {
         ? 'https://stcassociate.com/stc_gld/vanaheim'
         : 'http://localhost/stc/stc_gld/vanaheim';
 
-    // Function to extract query parameters
-    const getQueryParams = (query) => {
-        return new URLSearchParams(query);
-    };
-    const queryParams = getQueryParams(location.search);
+    const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
     useEffect(() => {
         let titlename = 'Invoice'; // Default title
 
@@ -23,7 +19,7 @@ const PrintPreview = () => {
             titlename = 'Challan';
         }
         document.title = "STC GLD || " + titlename + " Print Preview"; // Set the title
-    }, []);
+    }, [queryParams]);
 
     // Fetch challan details when the page loads
     useEffect(() => {
@@ -31,7 +27,7 @@ const PrintPreview = () => {
         let status = queryParams.get('status') || 'default';
         if (challanNo) {
             let geturl = `${API_BASE_URL}/index.php?action=getChallanDetails&challan_no=${challanNo}&status=challan`;
-            if (status == "billed") {
+            if (status === "billed") {
                 geturl = `${API_BASE_URL}/index.php?action=getChallanDetails&challan_no=${challanNo}&status=billed`;
             }
             // Fetch details of the selected challan
@@ -43,7 +39,7 @@ const PrintPreview = () => {
                     console.error('Error fetching challan details:', error);
                 });
         }
-    }, [location.search]);
+    }, [queryParams, API_BASE_URL]);
 
     if (!challanDetails) {
         return <div>Loading {queryParams.get('status') === 'billed' ? 'invoice' : 'challan'} details...</div>;
@@ -145,7 +141,7 @@ const PrintPreview = () => {
                                             <td className="text-right">{parseFloat(product.discount).toFixed(2)}</td>
                                             <td className="text-right">{parseFloat(product.dues - product.discount).toFixed(2)}</td>
                                             <td className="text-center">
-                                                {product.payment_status == 1 ? "Credit" : product.payment_status == 2 ? "AC" : "Cash"}
+                                                {product.payment_status === 1 ? "Credit" : product.payment_status === 2 ? "AC" : "Cash"}
                                             </td>
                                             <td className="text-center"></td>
                                         </tr>

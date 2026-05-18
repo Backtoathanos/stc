@@ -4,7 +4,7 @@ export default function Sidebar({ activeRoute }) {
     return (
         <div className="sidebar" data-color="purple" data-background-color="white" data-image={`${process.env.PUBLIC_URL}/assets/img/sidebar-1.jpg`}>
             <div className="logo">
-                <Link to="javascript:void(0)" className="simple-text logo-normal"> STC GLD </Link>
+                <span className="simple-text logo-normal"> STC GLD </span>
             </div>
             <div className="sidebar-wrapper">
                 <ul className="nav">

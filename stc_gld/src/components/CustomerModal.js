@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useEffect } from 'react';
-import { Modal, Button, Form, Row, Col, Badge } from 'react-bootstrap';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
+import { Modal, Button, Form, Row, Col } from 'react-bootstrap';
 import Select from 'react-select';
 import axios from 'axios';
 import Swal from 'sweetalert2'; // Import SweetAlert2
@@ -26,7 +26,6 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
     const [quantity, setQuantity] = useState(1);
     const [discount, setDiscount] = useState(0);
     const [pmargin, setPmargin] = useState(0);    
-    const [rate, setRate] = useState(productRate); // Start with the initial rate
     const [idu, setIdu] = useState('');
     const [odu, setOdu] = useState('');
     const [slno, setSlno] = useState('');
@@ -34,8 +33,6 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
     const [quantityError, setQuantityError] = useState('');
     const [rateError, setRateError] = useState('');
     const [customerError, setCustomerError] = useState('');
-    const [agentError, setAgentError] = useState('');
-
 
     // Fetch customer options when the modal is shown
     useEffect(() => {
@@ -56,7 +53,7 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
                 })
                 .catch(error => console.error('Error fetching customer options:', error));
         }
-    }, [show]);
+    }, [show, API_BASE_URL]);
 
     // get agents
     useEffect(() => {
@@ -77,7 +74,7 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
                 })
                 .catch(error => console.error('Error fetching customer options:', error));
         }
-    }, [show]);
+    }, [show, API_BASE_URL]);
     function getCookie(name) {
         // 1. Encode the cookie name to handle special characters
         const encodedName = encodeURIComponent(name) + "=";
@@ -138,13 +135,13 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
         }
         const customerId = selectedCustomer ? selectedCustomer.value : null;
 
-        if (customerId == null) {
-            if (customerName == "") {
+        if (customerId === null) {
+            if (customerName === "") {
                 setCustomerError(`Select customer or add new with new complete details.`);
                 return;
             }
-            if (customerContact == "") {
-                if (customerEmail == "") {
+            if (customerContact === "") {
+                if (customerEmail === "") {
                     setCustomerError(`Select customer or add new with new complete details.`);
                     return;
                 }
@@ -263,7 +260,7 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
 
 
     // Reset form fields
-    const resetForm = () => {
+    const resetForm = useCallback(() => {
         setSelectedCustomer(null);
         setCustomerName('');
         setCustomerContact('');
@@ -274,19 +271,18 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
         setQuantity(1);
         setDiscount(0);
         setPmargin(0);
-        setRate(productRate); // Reset rate to the initial product rate
         setIdu('');
         setOdu('');
         setSlno('');
         setIsSubmitting(false); // Reset the submission state
         setQuantityError(''); // Clear quantity error
         setRateError(''); // Clear rate error
-    };
+    }, []);
 
     useEffect(() => {
         // Reset form fields when modal is closed
         if (!show) resetForm();
-    }, [show]);
+    }, [show, resetForm]);
 
     const selectStyles = useMemo(() => ({
         control: (base, state) => ({
@@ -412,7 +408,6 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
                                     <Form.Control
                                         type="number"
                                         value={productRate}
-                                        onChange={e => setRate(e.target.value)}
                                         min="1"
                                         placeholder="Rate"
                                         readOnly
@@ -484,7 +479,6 @@ const CustomerModal = ({ show, handleClose, productId, productName = '', product
                                         maxMenuHeight={6 * 38}
                                         styles={selectStyles}
                                     />
-                                    {agentError && <div className="customer-modal-error">{agentError}</div>}
                                 </Form.Group>
                             </Col>
 

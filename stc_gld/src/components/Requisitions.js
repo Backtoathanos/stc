@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import DataTable from 'react-data-table-component';
 import Footer from "./layouts/Footer";
 import Navbar from "./layouts/Navbar";
@@ -36,33 +36,38 @@ export default function Requisitions() {
 
     const userIdCookie = document.cookie.split('; ').find(row => row.startsWith('user_id='));
     const userId = userIdCookie.split('=')[1];
-    const fetchData = debounce((query = '', pageNum = page, rowLimit = limit) => {
-        setLoading(true);
-        axios.get(`${API_BASE_URL}/index.php?action=getRequisitions`, {
-            params: { search: query, page: pageNum, limit: rowLimit, userId:userId }
-        })
-            .then(response => {
-                if (response.data && response.data.records) {
-                    setData(response.data.records);
-                    setTotalRows(response.data.total);
-                    setCurrentPage(pageNum);
-                } else {
-                    setData([]);
-                    setTotalRows(0);
-                }
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                setData([]);
-                setTotalRows(0);
-                setLoading(false);
-            });
-    }, 500);
+    const fetchData = useMemo(
+        () =>
+            debounce((query = '', pageNum = 1, rowLimit = 10) => {
+                setLoading(true);
+                axios.get(`${API_BASE_URL}/index.php?action=getRequisitions`, {
+                    params: { search: query, page: pageNum, limit: rowLimit, userId: userId }
+                })
+                    .then(response => {
+                        if (response.data && response.data.records) {
+                            setData(response.data.records);
+                            setTotalRows(response.data.total);
+                            setCurrentPage(pageNum);
+                        } else {
+                            setData([]);
+                            setTotalRows(0);
+                        }
+                        setLoading(false);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching data:', error);
+                        setData([]);
+                        setTotalRows(0);
+                        setLoading(false);
+                    });
+            }, 500),
+        [API_BASE_URL, userId]
+    );
 
     useEffect(() => {
         fetchData(search, page, limit);
-    }, [search, page, limit]);
+        return () => fetchData.cancel();
+    }, [search, page, limit, fetchData]);
 
     const handlePageChange = (newPage) => {
         setPage(newPage);

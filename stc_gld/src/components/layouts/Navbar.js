@@ -1,4 +1,4 @@
-import {useNavigate} from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { clearAllAuthCookies } from '../cookieUtils.js';
 export default function Navbar(){
     const navigate = useNavigate();
@@ -35,26 +35,26 @@ export default function Navbar(){
                 </form>
                 <ul className="navbar-nav">
                 <li className="nav-item dropdown">
-                    <a className="nav-link" href="/stc_gld/order" id="navbarDropdownMenuLink">
+                    <Link className="nav-link" to="/order" id="navbarDropdownMenuLink">
                     <i className="material-icons">notifications</i>
                     <span className="notification">
                     </span>
                     <p className="d-lg-none d-md-block">
                         Some Actions
                     </p>
-                    </a>
+                    </Link>
                 </li>
                 <li className="nav-item dropdown">
-                    <a className="nav-link" href="javascript:void(0)" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <button type="button" className="nav-link btn btn-link border-0 bg-transparent text-body" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i className="material-icons">person</i>
                     <p className="d-lg-none d-md-block">
                         Account
                     </p>
-                    </a>
+                    </button>
                     <div className="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
                     {/* <a className="dropdown-item" href="#">Profile</a> */}
                     <div className="dropdown-divider"></div>
-                    <a className="dropdown-item" onClick={logoutSubmit}>Log out</a>
+                    <button type="button" className="dropdown-item" onClick={logoutSubmit}>Log out</button>
                     </div>
                 </li>
                 </ul>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import DataTable from 'react-data-table-component';
 import Footer from "./layouts/Footer";
 import Navbar from "./layouts/Navbar";
@@ -64,7 +64,6 @@ export default function Dashboard() {
     const API_BASE_URL = process.env.NODE_ENV === 'production'
         ? 'https://stcassociate.com/stc_gld/vanaheim'
         : 'http://localhost/stc/stc_gld/vanaheim';
-    const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);
 
     const [data, setData] = useState([]);
@@ -110,36 +109,41 @@ export default function Dashboard() {
     }
 
     const locationcookie = getCookie("location_stc");
-    const fetchData = debounce((query = '', pageNum = page, rowLimit = limit) => {
-        if(query.length === 0 || query.length >= 3) {
-            setLoading(true);
-            axios.get(`${API_BASE_URL}/getInventoryData.php`, {
-                params: { search: query, page: pageNum, limit: rowLimit, location: locationcookie }
-            })
-                .then(response => {
-                    if (response.data && response.data.records) {
-                        setData(response.data.records);
-                        setTotalRows(response.data.total); // Assuming API returns total count
-                        setCurrentPage(pageNum);
-                    } else {
-                        setData([]);
-                        setTotalRows(0);
-                    }
-                    setLoading(false);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    setData([]);
-                    setTotalRows(0);
-                    setLoading(false);
-                });
-        }
-    }, 500);
+    const fetchData = useMemo(
+        () =>
+            debounce((query = '', pageNum = 1, rowLimit = 10) => {
+                if (query.length === 0 || query.length >= 3) {
+                    setLoading(true);
+                    axios.get(`${API_BASE_URL}/getInventoryData.php`, {
+                        params: { search: query, page: pageNum, limit: rowLimit, location: locationcookie }
+                    })
+                        .then(response => {
+                            if (response.data && response.data.records) {
+                                setData(response.data.records);
+                                setTotalRows(response.data.total); // Assuming API returns total count
+                                setCurrentPage(pageNum);
+                            } else {
+                                setData([]);
+                                setTotalRows(0);
+                            }
+                            setLoading(false);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                            setData([]);
+                            setTotalRows(0);
+                            setLoading(false);
+                        });
+                }
+            }, 500),
+        [API_BASE_URL, locationcookie]
+    );
 
     // Fetch data on component mount, page change, search change
     useEffect(() => {
         fetchData(search, page, limit);
-    }, [search, page, limit]); // fetchData is called when search, page, or limit changes
+        return () => fetchData.cancel();
+    }, [search, page, limit, fetchData]); // fetchData is called when search, page, or limit changes
 
     // Handle page change
     const handlePageChange = (newPage) => {
@@ -178,11 +182,10 @@ export default function Dashboard() {
                                 }}
                             />
                         </div>
-                        <a
-                            href="#"
-                            className="inventory-product-name-link"
-                            onClick={(e) => {
-                                e.preventDefault();
+                        <button
+                            type="button"
+                            className="btn btn-link inventory-product-name-link p-0 border-0 text-start"
+                            onClick={() => {
                                 setSelectedProductId(row.stc_product_id);
                                 setSecondModalOpen(true);
                             }}
@@ -190,7 +193,7 @@ export default function Dashboard() {
                             <span className="inventory-product-name" title={row.stc_product_name}>
                                 {row.stc_product_name}
                             </span>
-                        </a>
+                        </button>
                     </div>
                 );
             }
@@ -201,15 +204,16 @@ export default function Dashboard() {
             sortable: true,
             center: true,
             cell: row => (
-                <a
-                    href="#"
+                <button
+                    type="button"
+                    className="btn btn-link p-0 border-0"
                     onClick={() => {
                         setSelectedProductId(row.stc_product_id);
                         setSecondModalOpen(true);
                     }}
                 >
                     {row.stc_product_id}
-                </a>
+                </button>
             )
         },
         {
@@ -283,9 +287,9 @@ export default function Dashboard() {
                                 Add Requisition
                             </Button>
                         ) : (
-                            <a
-                                href="#"
-                                className="btn btn-primary"
+                            <button
+                                type="button"
+                                className="btn btn-primary btn-sm"
                                 onClick={() => {
                                     setSelectedProductId(row.stc_product_id);
                                         setSelectedProductName(row.stc_product_name || '');
@@ -296,7 +300,7 @@ export default function Dashboard() {
                                 }}
                             >
                                 Add
-                            </a>
+                            </button>
                         )}
                     </>
                 ) : null
@@ -358,20 +362,6 @@ export default function Dashboard() {
             .finally(() => setRequisitionLoading(false));
     };
 
-    const statusLabelMap = {
-        1: 'Pending',
-        2: 'Approved',
-        3: 'In Transit',
-        4: 'Completed'
-    };
-    const statusColorMap = {
-        1: '#ffc107', // yellow
-        2: '#17a2b8', // blue
-        3: '#fd7e14', // orange
-        4: '#28a745', // green
-        default: '#6c757d' // gray
-    };
-
     const [showTransferModal, setShowTransferModal] = useState(false);
     const [transferProductId, setTransferProductId] = useState(null);
     const [transferBranch, setTransferBranch] = useState('');
@@ -423,7 +413,6 @@ export default function Dashboard() {
 
     const [showRackModal, setShowRackModal] = useState(false);
     const [rackProductId, setRackProductId] = useState(null);
-    const [rackAdhocId, setRackAdhocId] = useState(null);
     const [rackList, setRackList] = useState([]);
     const [selectedRack, setSelectedRack] = useState('');
     const [newRackName, setNewRackName] = useState('');
@@ -432,7 +421,6 @@ export default function Dashboard() {
 
     const handleOpenRackModal = (row) => {
         setRackProductId(row.stc_product_id);
-        setRackAdhocId(row.adhoc_id || row.stc_purchase_product_adhoc_id || null);
         setSelectedRack(row.rack_id || '');
         setNewRackName('');
         setRackError('');

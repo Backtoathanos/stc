@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import DataTable from 'react-data-table-component';
 import Footer from "./layouts/Footer";
 import Navbar from "./layouts/Navbar";
 import Sidebar from './layouts/Sidebar';
 import { useLocation } from 'react-router-dom';
-import CustomerModal from './CustomerModal';
 import ProductModal from './ProductModal';
 import { RotatingLines } from 'react-loader-spinner'; // Importing spinner from react-loader-spinner
 import './Datatable.css';
@@ -22,13 +21,11 @@ export default function Order() {
         ? 'https://stcassociate.com/stc_gld/vanaheim'
         : 'http://localhost/stc/stc_gld/vanaheim';
     const [showModal, setShowModal] = useState(false);
-    const [isFirstModalOpen, setFirstModalOpen] = useState(false);
     const [isSecondModalOpen, setSecondModalOpen] = useState(false);
 
     const [data, setData] = useState([]);
     const [search, setSearch] = useState(''); // State for search filter
     const [loading, setLoading] = useState(true); // Loading state
-    const [modalShow, setModalShow] = useState(false); // State for modal visibility
     const [selectedProductId, setSelectedProductId] = useState(null);
     const [selectedQuantity, setSelectedQuantity] = useState(null);
     const [selecteduname, setselecteduname] = useState(null);
@@ -36,33 +33,40 @@ export default function Order() {
     const [selectedAddress, setselectedAddress] = useState(null);
     const [selectedRequisition, setselectedRequisition] = useState(null);
     const [selectedListId, setselectedListId] = useState(null);
-    
-    const [selectedProductRate, setSelectedProductRate] = useState(null);
-    const [selectedProductQuantity, setSelectedProductQuantity] = useState(null);
+
     const currentRoute = location.pathname === "/dashboard" ? "dashboard" : "order";
-    const [filteredData, setFilteredData] = useState([]); // To handle filtered data
-    
-    const fetchData = debounce((search = '') => {
-        setLoading(true);
-        axios.get(`${API_BASE_URL}/index.php?action=getRequisitions`, search)
-            .then(response => {
-                const resultData = response.data;
-                if (resultData.success && Array.isArray(resultData.products)) {
-                    setData(resultData.products);
-                } else {
-                    setData([]);
-                }
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                setData([]);
-                setLoading(false);
-            });
-    }, 500);
-    
+
+    const fetchDataRef = useRef(null);
+
     useEffect(() => {
-        fetchData(); // Fetch data initially without a query
+        const debounced = debounce((searchParam = '') => {
+            setLoading(true);
+            axios.get(`${API_BASE_URL}/index.php?action=getRequisitions`, searchParam)
+                .then(response => {
+                    const resultData = response.data;
+                    if (resultData.success && Array.isArray(resultData.products)) {
+                        setData(resultData.products);
+                    } else {
+                        setData([]);
+                    }
+                    setLoading(false);
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                    setData([]);
+                    setLoading(false);
+                });
+        }, 500);
+        fetchDataRef.current = debounced;
+        debounced();
+        return () => {
+            debounced.cancel();
+            fetchDataRef.current = null;
+        };
+    }, [API_BASE_URL]);
+
+    const fetchData = useCallback(() => {
+        fetchDataRef.current?.();
     }, []);
     
     // Define columns for DataTable
@@ -85,15 +89,16 @@ export default function Order() {
             sortable: true,
             center: true,
             cell: row => (
-                <a
-                    href="#"
+                <button
+                    type="button"
+                    className="btn btn-link p-0 border-0 align-baseline"
                     onClick={() => {
                         setSelectedProductId(row.stc_product_id);
                         setSecondModalOpen(true);
                     }}
                 >
                     {row.stc_product_id}
-                </a>
+                </button>
             )
         },
         {
@@ -126,8 +131,8 @@ export default function Order() {
             center: true,
             cell: row => (
                 row.status === 1 ? (
-                    <a
-                        href="#"
+                    <button
+                        type="button"
                         className="btn btn-primary"
                         onClick={() => {
                             setSelectedProductId(row.stc_product_id);
@@ -140,7 +145,7 @@ export default function Order() {
                         }}
                     >
                         Add
-                    </a>
+                    </button>
                 ) : (
                     <span>Challaned.</span> // Optional: render something else when condition is false
                 )

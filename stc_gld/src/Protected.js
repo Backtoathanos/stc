@@ -14,7 +14,7 @@ const Protected = (props) => {
             localStorage.setItem("loginStatus", "Please login.");
             navigate("/", {replace:true});
         }
-    }, []);
+    }, [navigate]);
     
     return (
         <Component />

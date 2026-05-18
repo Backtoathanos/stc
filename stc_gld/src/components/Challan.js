@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import DataTable from 'react-data-table-component';
 import Footer from './layouts/Footer';
 import Navbar from './layouts/Navbar';
@@ -41,31 +41,36 @@ export default function ChallanDashboard() {
     const [selectedChallanForView, setSelectedChallanForView] = useState(null);
 
 
-    const fetchData = debounce((query = '') => {
-        if (query.length > 3 || query === '') {
-            setLoading(true);
-            // Send the search query as a parameter to the API
-            axios.get(`${API_BASE_URL}/index.php?action=getChallan&search=${query}`)
-                .then(response => {
-                    const resultData = response.data;
-                    if (Array.isArray(resultData)) {
-                        setData(resultData); // Ensure data is an array
-                    } else {
-                        setData([]); // If it's not an array, set it to an empty array
-                    }
-                    setLoading(false);
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                    setData([]); // Set to an empty array in case of error
-                    setLoading(false);
-                });
-        }
-    }, 500);
+    const fetchData = useMemo(
+        () =>
+            debounce((query = '') => {
+                if (query.length > 3 || query === '') {
+                    setLoading(true);
+                    // Send the search query as a parameter to the API
+                    axios.get(`${API_BASE_URL}/index.php?action=getChallan&search=${query}`)
+                        .then(response => {
+                            const resultData = response.data;
+                            if (Array.isArray(resultData)) {
+                                setData(resultData); // Ensure data is an array
+                            } else {
+                                setData([]); // If it's not an array, set it to an empty array
+                            }
+                            setLoading(false);
+                        })
+                        .catch(error => {
+                            console.error('Error fetching data:', error);
+                            setData([]); // Set to an empty array in case of error
+                            setLoading(false);
+                        });
+                }
+            }, 500),
+        [API_BASE_URL]
+    );
 
     useEffect(() => {
         fetchData(search);
-    }, [search]);
+        return () => fetchData.cancel();
+    }, [search, fetchData]);
 
     const handleRowSelect = (row) => {
         const isSelected = selectedRows.includes(row.id);
@@ -348,7 +353,7 @@ export default function ChallanDashboard() {
         }
     };
 
-    const getChallan = () => {
+    const getChallan = useCallback(() => {
         axios.get(`${API_BASE_URL}/index.php?action=getDistinctChallanNos`)
             .then(response => {
                 const data = response.data;
@@ -362,12 +367,12 @@ export default function ChallanDashboard() {
             .catch(error => {
                 console.error('Error fetching challan numbers:', error);
             });
-    };
+    }, [API_BASE_URL]);
 
     // Call the getChallan function inside useEffect
     useEffect(() => {
         getChallan();
-    }, []);
+    }, [getChallan]);
 
     const handleSavePayment = () => {
         if (paymentAmount && selectedChallanForPayment) {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Modal } from 'react-bootstrap';
 import axios from 'axios';
 import './CustomerModal.css';
@@ -21,14 +21,12 @@ const ProductModal = ({ show, handleClose, productId }) => {
     const [percentage, setPercentage] = useState('');
     const [subCategory, setSubCategory] = useState('');
     const [unit, setUnit] = useState('');
-    const [gst, setGst] = useState('');
     const [brand, setBrand] = useState('');
     const [image, setImage] = useState('');
     const [costPrice, setCostPrice] = useState(null);
     const [mrp, setMrp] = useState(null);
     const [sellingPrice, setSellingPrice] = useState(null);
     const [stockQty, setStockQty] = useState(null);
-    const [statusLabel, setStatusLabel] = useState('');
 
     const API_BASE_URL = process.env.NODE_ENV === 'production'
     ? 'https://stcassociate.com/stc_gld/vanaheim'
@@ -52,24 +50,18 @@ const ProductModal = ({ show, handleClose, productId }) => {
                     setSubCategory(product.subCategoryName);
                     setUnit(product.unit);
                     setBrand(product.brandName);
-                    setGst(
-                        product.gst != null && product.gst !== ''
-                            ? `${product.gst}%`
-                            : '—'
-                    );
                     setImage(product.productImage ? String(product.productImage).trim() : '');
                     setCostPrice(product.costPrice ?? null);
                     setMrp(product.mrp ?? null);
                     setSellingPrice(product.sellingPrice ?? null);
                     setStockQty(product.stockQty ?? null);
-                    setStatusLabel(product.statusLabel || '');
                 })
                 .catch(error => console.error('Error fetching customer options:', error));
         }
-    }, [show, productId]);
+    }, [show, productId, API_BASE_URL]);
 
     // Reset form fields
-    const resetForm = () => {
+    const resetForm = useCallback(() => {
         setProductName('');
         setProductDescription('');
         setProductCategory('');
@@ -77,20 +69,18 @@ const ProductModal = ({ show, handleClose, productId }) => {
         setPercentage('');
         setSubCategory('');
         setUnit('');
-        setGst('');
         setBrand('');
         setImage('');
         setCostPrice(null);
         setMrp(null);
         setSellingPrice(null);
         setStockQty(null);
-        setStatusLabel('');
-    };
+    }, []);
 
     useEffect(() => {
         // Reset form fields when modal is closed
         if (!show) resetForm();
-    }, [show]);
+    }, [show, resetForm]);
 
     return (
         <Modal
