@@ -23,35 +23,13 @@ jobs:
           script: |
             export TERM=xterm
             cd ~/public_html
-
-            # Pull latest code
             git fetch origin
             git reset --hard origin/main
-
-            # Build React app on server
             cd ~/public_html/stc_gld
             npm ci
             npm run build
-
-            # Restore .htaccess files
-            cat > ~/public_html/stc_gld/.htaccess << 'HTEOF'
-RewriteEngine On
-RewriteBase /stc_gld/
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ build/index.html [QSA,L]
-HTEOF
-
-            cat > ~/public_html/stc_gld/build/.htaccess << 'HTEOF'
-RewriteEngine On
-RewriteBase /stc_gld/build/
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^ index.html [QSA,L]
-HTEOF
-
-            # Fix permissions
+            printf 'RewriteEngine On\nRewriteBase /stc_gld/\nRewriteCond %%{REQUEST_FILENAME} !-f\nRewriteCond %%{REQUEST_FILENAME} !-d\nRewriteRule ^ build/index.html [QSA,L]\n' > ~/public_html/stc_gld/.htaccess
+            printf 'RewriteEngine On\nRewriteBase /stc_gld/build/\nRewriteCond %%{REQUEST_FILENAME} !-f\nRewriteCond %%{REQUEST_FILENAME} !-d\nRewriteRule ^ index.html [QSA,L]\n' > ~/public_html/stc_gld/build/.htaccess
             find ~/public_html/stc_gld/build -type d -exec chmod 755 {} \;
             find ~/public_html/stc_gld/build -type f -exec chmod 644 {} \;
-
             echo "Deployed at $(date)"
