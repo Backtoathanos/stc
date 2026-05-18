@@ -1,0 +1,30 @@
+# GLD React app is served from the CRA "build" folder (not the stc_gld directory root).
+# PHP API stays under vanaheim/ and is not routed to React.
+
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+
+Options -MultiViews -Indexes
+DirectoryIndex build/index.html
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^vanaheim(/|$) - [L]
+
+    RewriteRule ^static/(.*)$ build/static/$1 [L]
+    RewriteRule ^assets/(.*)$ build/assets/$1 [L]
+    RewriteRule ^favicon\.ico$ build/favicon.ico [L]
+    RewriteRule ^logo192\.png$ build/logo192.png [L]
+    RewriteRule ^logo512\.png$ build/logo512.png [L]
+    RewriteRule ^manifest\.json$ build/manifest.json [L]
+    RewriteRule ^asset-manifest\.json$ build/asset-manifest.json [L]
+    RewriteRule ^robots\.txt$ build/robots.txt [L]
+
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    RewriteRule . build/index.html [L]
+</IfModule>

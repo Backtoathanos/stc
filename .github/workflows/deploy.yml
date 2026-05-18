@@ -13,6 +13,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: stc_gld/package-lock.json
+
+      - name: Build stc_gld (production bundle)
+        run: |
+          cd stc_gld
+          npm ci
+          npm run build
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
         with:
@@ -25,3 +38,14 @@ jobs:
             git fetch origin
             git reset --hard origin/main
             echo "Deployed at $(date)"
+
+      - name: Upload stc_gld/build to server
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "stc_gld/build/*"
+          target: "~/public_html/stc_gld/build"
+          rm: true
