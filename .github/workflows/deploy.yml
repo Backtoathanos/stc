@@ -26,6 +26,17 @@ jobs:
           npm ci
           npm run build
 
+      - name: Upload stc_gld/build to server
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          source: "stc_gld/build/*"
+          target: "~/public_html/stc_gld/build"
+          rm: true
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@master
         with:
@@ -37,15 +48,27 @@ jobs:
             cd ~/public_html
             git fetch origin
             git reset --hard origin/main
-            echo "Deployed at $(date)"
 
-      - name: Upload stc_gld/build to server
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.SSH_PORT }}
-          source: "stc_gld/build/*"
-          target: "~/public_html/stc_gld/build"
-          rm: true
+            # Restore stc_gld .htaccess
+            cat > ~/public_html/stc_gld/.htaccess << 'HTEOF'
+            RewriteEngine On
+            RewriteBase /stc_gld/
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteCond %{REQUEST_FILENAME} !-d
+            RewriteRule ^ build/index.html [QSA,L]
+            HTEOF
+
+            # Restore stc_gld/build .htaccess
+            cat > ~/public_html/stc_gld/build/.htaccess << 'HTEOF'
+            RewriteEngine On
+            RewriteBase /stc_gld/build/
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteCond %{REQUEST_FILENAME} !-d
+            RewriteRule ^ index.html [QSA,L]
+            HTEOF
+
+            # Fix permissions
+            find ~/public_html/stc_gld/build -type d -exec chmod 755 {} \;
+            find ~/public_html/stc_gld/build -type f -exec chmod 644 {} \;
+
+            echo "Deployed at $(date)"
