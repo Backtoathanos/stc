@@ -8,8 +8,8 @@
 # testing
 /coverage
 
-# production
-# /build
+# production (CRA output — deploy via build-archive.zip from deploy-stc-gld.ps1)
+/build
 
 # misc
 .DS_Store

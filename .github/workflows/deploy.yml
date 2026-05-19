@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Deploy and Build via SSH
+      - name: Deploy via SSH (unzip build-archive.zip)
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -28,14 +28,24 @@ jobs:
             git fetch origin
             git reset --hard origin/main
 
-            # Build React app
             cd ~/public_html/stc_gld
-            npm ci
-            npm run build
+
+            if [ ! -f build-archive.zip ]; then
+              echo "❌ build-archive.zip not found. Run deploy-stc-gld.ps1 (or deploy-stc-gld.sh) locally to build, zip, commit, and push."
+              exit 1
+            fi
+
+            echo "--- Expanding build-archive.zip into build/ ---"
+            rm -rf build
+            unzip -o -q build-archive.zip
+
+            if [ ! -f build/index.html ]; then
+              echo "❌ unzip did not produce build/index.html"
+              exit 1
+            fi
 
             # Do not overwrite stc_gld/.htaccess: the repo file maps /stc_gld/static and
-            # /stc_gld/assets into build/. A minimal catch-all-only rule serves index.html
-            # for *.js requests and breaks the app (Unexpected token '<').
+            # /stc_gld/assets into build/.
 
             # Fix permissions
             find ~/public_html/stc_gld/build -type d -exec chmod 755 {} \;
