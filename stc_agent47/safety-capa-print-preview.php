@@ -163,8 +163,8 @@ if(isset($_GET['capa_no'])){
       </table>
     </div>
     <div class="col-sm-2 col-md-2">
-      <div><img style="position:relative; top:10px; width:10cm;height:280px" src="https://stcassociate.com/stc_sub_agent47/safety_img/<?php echo $get_stc_safety['beforeimage']; ?>"><br><br><h4 class="text-center">Before</h4></div>
-      <div><img style="position:relative; top:10px; width:10cm;height:280px" src="https://stcassociate.com/stc_sub_agent47/safety_img/<?php echo $get_stc_safety['afterimage']; ?>"><br><br><h4 class="text-center">After</h4></div>
+      <div><img style="position:relative; top:10px; width:10cm;height:280px" src="<?php echo $get_stc_safety['beforeimage']; ?>"><br><br><h4 class="text-center">Before</h4></div>
+      <div><img style="position:relative; top:10px; width:10cm;height:280px" src="<?php echo $get_stc_safety['afterimage']; ?>"><br><br><h4 class="text-center">After</h4></div>
     </div>
   </div>
 
