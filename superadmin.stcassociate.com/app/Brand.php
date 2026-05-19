@@ -9,5 +9,5 @@ class Brand extends Model
     protected $table = 'stc_brand';
     public $timestamps = false;
     protected $primaryKey = 'stc_brand_id';
-    protected $fillable = ['stc_brand_title', 'stc_brand_status'];
+    protected $fillable = ['stc_brand_title', 'stc_brand_status', 'stc_brand_cat_id', 'stc_cat_id'];
 }

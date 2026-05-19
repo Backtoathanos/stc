@@ -456,10 +456,17 @@ md = {
       mobile_menu_content = '';
 
       nav_content = $navbar.html();
+      if (nav_content == null || nav_content === '') {
+        return;
+      }
 
       nav_content = '<ul class="nav navbar-nav nav-mobile-menu">' + nav_content + '</ul>';
 
-      navbar_form = $('nav').find('.navbar-form').get(0).outerHTML;
+      var navbar_form_el = $('nav').find('.navbar-form').get(0);
+      if (!navbar_form_el) {
+        return;
+      }
+      navbar_form = navbar_form_el.outerHTML;
 
       $sidebar_nav = $sidebar_wrapper.find(' > .nav');
 

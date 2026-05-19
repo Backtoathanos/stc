@@ -1,40 +1,42 @@
 
-
-form {
+.stc-electronics-login-form {
   border: 3px solid #f1f1f1;
+  border-radius: 4px;
+  background: #fff;
 }
 
-/* Full-width inputs */
-input[type=text], input[type=password] {
+/* Match both fields exactly (override theme quirks for text vs password) */
+.stc-electronics-login-form .login-form-fields label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.stc-electronics-login-form .login-field {
   width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
+  max-width: 100%;
   box-sizing: border-box;
+  min-height: 48px;
+  padding: 12px 16px;
+  margin: 0 0 1rem;
+  display: block;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #d2d6da;
+  border-radius: 4px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-/* Set a style for all buttons */
-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
+.stc-electronics-login-form .login-field:focus {
+  border-color: #9c27b0;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(156, 39, 176, 0.15);
 }
 
-/* Add a hover effect for buttons */
-button:hover {
-  opacity: 0.8;
-}
-
-/* Extra style for the cancel button (red) */
-.cancelbtn {
-  width: auto;
-  padding: 10px 18px;
-  background-color: #f44336;
+.stc-electronics-login-form .login-field::placeholder {
+  color: #999;
 }
 
 /* Center the avatar image inside this container */
@@ -50,8 +52,72 @@ img.avatar {
 }
 
 /* Add padding to containers */
-.container {
+.stc-electronics-login-form .container {
   padding: 16px;
+}
+
+.stc-electro-login-button {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #4caf50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  min-height: 48px;
+}
+
+.stc-electro-login-button:hover {
+  opacity: 0.9;
+  filter: brightness(1.02);
+}
+
+.stc-electro-login-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.login-inline-loader {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.login-forgot-link {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.login-forgot-link a {
+  color: #7b1fa2;
+  text-decoration: none;
+}
+
+.login-forgot-link a:hover {
+  text-decoration: underline;
+}
+
+.forgot-token-box .login-field.font-monospace {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 0.8rem;
+  min-height: auto;
+  resize: vertical;
+}
+
+.stc-electronics-login-form .error {
+  color: #c62828;
+}
+
+.stc-electronics-login-form .success {
+  color: #2e7d32;
 }
 
 /* The "Forgot password" text */
@@ -60,7 +126,6 @@ span.psw {
   padding-top: 16px;
 }
 
-/* Change styles for span and cancel button on extra small screens */
 @media screen and (max-width: 300px) {
   span.psw {
     display: block;

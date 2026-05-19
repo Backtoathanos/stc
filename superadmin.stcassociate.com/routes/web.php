@@ -162,6 +162,10 @@ Route::group(['middleware' => 'superadmin'], function(){
     //  product through ajax
     Route::get('/master/product', [ProductController::class, 'show']);    
     Route::get('/master/product/list', [ProductController::class, 'list']);
+    Route::get('/master/product/options/categories', [ProductController::class, 'optionsCategories']);
+    Route::get('/master/product/options/subcategories', [ProductController::class, 'optionsSubcategories']);
+    Route::get('/master/product/options/racks', [ProductController::class, 'optionsRacks']);
+    Route::get('/master/product/options/brands', [ProductController::class, 'optionsBrands']);
     Route::post('/master/product/create', [ProductController::class, 'create']); 
     Route::post('/master/product/edit', [ProductController::class, 'update']);    
     Route::get('/master/product/delete', [ProductController::class, 'delete']);

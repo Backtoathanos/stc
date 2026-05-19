@@ -9,10 +9,9 @@ const Protected = (props) => {
     useEffect(()=>{
         const authStatus = validateAuthCookies();
         
-        if(!authStatus.isValid){
-            console.log("Authentication failed - redirecting to login");
-            localStorage.setItem("loginStatus", "Please login.");
-            navigate("/", {replace:true});
+        if (!authStatus.isValid) {
+            localStorage.setItem('loginStatus', 'Please login.');
+            navigate('/', { replace: true });
         }
     }, [navigate]);
     

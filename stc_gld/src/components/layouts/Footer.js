@@ -6,7 +6,7 @@ export default function Footer(){
                     &copy;
                     <script>
                         document.write(new Date().getFullYear());
-                    </script>, made with <i className="material-icons">favorite</i> by <a href="bluenix.in">Bluenix</a>
+                    </script>, made with <i className="material-icons">favorite</i> by <a href="javascript:void(0)">Nausher Khan</a>
                 </div>
             </div>
         </footer>

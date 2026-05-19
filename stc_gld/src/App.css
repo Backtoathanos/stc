@@ -1,25 +1,15 @@
 
 
 
-/* Full-width inputs */
-input[type=text], input[type=password] {
+/* Login / auth forms: scoped field styles (avoid breaking Bootstrap navbars, modals, search inputs) */
+.stc-electronics-login-form input[type=text],
+.stc-electronics-login-form input[type=password] {
   width: 100%;
   padding: 12px 20px;
   margin: 8px 0;
   display: inline-block;
   border: 1px solid #ccc;
   box-sizing: border-box;
-}
-
-/* Set a style for all buttons */
-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
 }
 
 /* Bootstrap modal close (X) should not inherit global button styles */
@@ -46,11 +36,6 @@ button {
 
 .modal-header .btn-close:hover {
   opacity: 0.9;
-}
-
-/* Add a hover effect for buttons */
-button:hover {
-  opacity: 0.8;
 }
 
 /* Extra style for the cancel button (red) */
@@ -118,4 +103,86 @@ span.psw {
   border-radius: 5px;
   max-width: 400px;
   margin: auto;
+}
+
+/*
+ * Mobile sidebar / drawer (Material Dashboard moves navbar items into .nav-mobile-menu).
+ * Fixes misaligned icons/text (especially profile <button>) and improves tap targets.
+ */
+@media (max-width: 991px) {
+  :root {
+    /* Slightly wider drawer on phones; keeps transforms in sync via one variable */
+    --stc-drawer-w: min(300px, 90vw);
+  }
+
+  .sidebar,
+  .off-canvas-sidebar nav .navbar-collapse {
+    width: var(--stc-drawer-w) !important;
+    transform: translate3d(var(--stc-drawer-w), 0, 0) !important;
+    -webkit-transform: translate3d(var(--stc-drawer-w), 0, 0) !important;
+  }
+
+  .nav-open .off-canvas-sidebar .navbar-collapse,
+  .nav-open .sidebar {
+    transform: translate3d(0, 0, 0) !important;
+    -webkit-transform: translate3d(0, 0, 0) !important;
+  }
+
+  .nav-open .main-panel,
+  .nav-open .wrapper-full-page,
+  .nav-open .navbar .container .navbar-toggler,
+  .nav-open .navbar .container .navbar-wrapper,
+  .nav-open .navbar .container {
+    transform: translate3d(calc(-1 * var(--stc-drawer-w)), 0, 0) !important;
+    -webkit-transform: translate3d(calc(-1 * var(--stc-drawer-w)), 0, 0) !important;
+  }
+
+  #bodyClick {
+    right: var(--stc-drawer-w) !important;
+  }
+
+  .sidebar .sidebar-wrapper > .nav .nav-link,
+  .sidebar .nav-mobile-menu .nav-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    margin: 8px 12px 0 !important;
+    padding: 12px 14px !important;
+    width: calc(100% - 24px);
+    max-width: none;
+    box-sizing: border-box;
+    border-radius: 8px;
+    text-align: left;
+  }
+
+  .sidebar .sidebar-wrapper > .nav i.material-icons,
+  .sidebar .nav-mobile-menu i.material-icons {
+    float: none !important;
+    margin-right: 0 !important;
+    line-height: 1 !important;
+    flex-shrink: 0;
+    width: 30px;
+  }
+
+  .sidebar .sidebar-wrapper > .nav .nav-link p,
+  .sidebar .nav-mobile-menu .nav-link p {
+    margin: 0 !important;
+    line-height: 1.35 !important;
+    white-space: normal;
+    flex: 1;
+    position: relative;
+    height: auto;
+  }
+
+  .sidebar .nav-mobile-menu .nav-item > .nav-link {
+    text-transform: capitalize;
+  }
+
+  /* Slightly stronger white wash on sidebar photo for readability on small screens */
+  .sidebar[data-image] .sidebar-background::after,
+  .sidebar.has-image .sidebar-background::after {
+    opacity: 0.97;
+  }
 }

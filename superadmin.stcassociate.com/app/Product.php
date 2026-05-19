@@ -20,6 +20,7 @@ class Product extends Model
         'stc_product_hsncode', 
         'stc_product_gst',
         'stc_product_avail',
-        'stc_product_sale_percentage'
+        'stc_product_sale_percentage',
+        'stc_product_image',
     ];
 }
