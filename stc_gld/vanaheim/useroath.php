@@ -21,14 +21,18 @@ class dante extends tesseract {
 			AND `stc_trading_user_password` = '".$pass."'
 		");
 
+		$user_id = null;
+		$location = null;
+
 		if (mysqli_num_rows($checkbumblebee) > 0) {
 			$user_details = mysqli_fetch_assoc($checkbumblebee);
 			$op = "success";
-			$user_id = $user_details['stc_trading_user_id']; // Fetch user ID
-			$location = $user_details['stc_trading_user_location']; // Fetch user ID
+			$user_id = $user_details['stc_trading_user_id'];
+			$location = isset($user_details['stc_trading_user_location'])
+				? $user_details['stc_trading_user_location']
+				: null;
 		} else {
 			$op = "Please Check Username & Password Again.";
-			$user_id = null; // Set to null in case of failure
 		}
 
 		// Return both result and user ID
