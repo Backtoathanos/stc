@@ -215,6 +215,26 @@ class ProductController extends Controller
                 $request->merge([$key => null]);
             }
         }
+
+        // Legacy DB rows may use 0 as "no rack/brand"; treat like empty so nullable + exists rules pass.
+        foreach (['rack_id', 'brand_id'] as $key) {
+            $v = $request->input($key);
+            if ($v === 0 || $v === '0') {
+                $request->merge([$key => null]);
+            }
+        }
+    }
+
+    /**
+     * Rack / brand FK columns are NOT NULL in DB — store 0 when no selection (validation still uses null).
+     */
+    protected function rackBrandColumnValue($value): int
+    {
+        if ($value === null || $value === '' || $value === 0 || $value === '0') {
+            return 0;
+        }
+
+        return (int) $value;
     }
 
     // show through ajax
@@ -289,9 +309,13 @@ class ProductController extends Controller
                 'cat_label' => $cat_label,
                 'sub_cat_id' => $record->stc_product_sub_cat_id !== null ? (int) $record->stc_product_sub_cat_id : '',
                 'sub_cat_label' => $sub_cat_label,
-                'rack_id' => $record->stc_product_rack_id !== null ? (int) $record->stc_product_rack_id : '',
+                'rack_id' => ($record->stc_product_rack_id !== null && (int) $record->stc_product_rack_id !== 0)
+                    ? (int) $record->stc_product_rack_id
+                    : '',
                 'rack_label' => $rack_label,
-                'brand_id' => $record->stc_product_brand_id !== null ? (int) $record->stc_product_brand_id : '',
+                'brand_id' => ($record->stc_product_brand_id !== null && (int) $record->stc_product_brand_id !== 0)
+                    ? (int) $record->stc_product_brand_id
+                    : '',
                 'brand_label' => $brand_label,
                 'hsncode' => (string) ($record->stc_product_hsncode ?? ''),
                 'gst' => $record->stc_product_gst !== null && $record->stc_product_gst !== ''
@@ -326,10 +350,34 @@ class ProductController extends Controller
             $stc_product_id_html = '<span class="text-center d-block">' . $e($id) . '</span>';
             $stc_product_name_html = '<span>' . $e($name) . '</span>';
             $stc_product_desc_html = '<span class="small">' . $e($desc) . '</span>';
-            $stc_product_cat_id_html = '<span>' . $e($record->stc_product_cat_id) . '</span>';
-            $stc_product_sub_cat_id_html = '<span>' . $e($record->stc_product_sub_cat_id) . '</span>';
-            $stc_product_rack_id_html = '<span>' . $e($record->stc_product_rack_id) . '</span>';
-            $stc_product_brand_id_html = '<span>' . $e($record->stc_product_brand_id) . '</span>';
+            $catIdVal = $record->stc_product_cat_id;
+            $catTitle = ($catIdVal !== null && $catIdVal !== '') ? ' title="' . $e('ID: ' . $catIdVal) . '"' : '';
+            $stc_product_cat_id_html = '<span' . $catTitle . '>'
+                . ($cat_label !== '' ? $e($cat_label) : '<span class="text-muted">—</span>')
+                . '</span>';
+
+            $subCatIdVal = $record->stc_product_sub_cat_id;
+            $subCatTitle = ($subCatIdVal !== null && $subCatIdVal !== '') ? ' title="' . $e('ID: ' . $subCatIdVal) . '"' : '';
+            $stc_product_sub_cat_id_html = '<span' . $subCatTitle . '>'
+                . ($sub_cat_label !== '' ? $e($sub_cat_label) : '<span class="text-muted">—</span>')
+                . '</span>';
+
+            $rackIdVal = $record->stc_product_rack_id;
+            $rackTitle = ($rackIdVal !== null && $rackIdVal !== '' && (int) $rackIdVal !== 0)
+                ? ' title="' . $e('ID: ' . $rackIdVal) . '"'
+                : '';
+            $stc_product_rack_id_html = '<span' . $rackTitle . '>'
+                . ($rack_label !== '' ? $e($rack_label) : '<span class="text-muted">—</span>')
+                . '</span>';
+
+            $brandIdVal = $record->stc_product_brand_id;
+            $brandTitle = ($brandIdVal !== null && $brandIdVal !== '' && (int) $brandIdVal !== 0)
+                ? ' title="' . $e('ID: ' . $brandIdVal) . '"'
+                : '';
+            $stc_product_brand_id_html = '<span' . $brandTitle . '>'
+                . ($brand_label !== '' ? $e($brand_label) : '<span class="text-muted">—</span>')
+                . '</span>';
+
             $stc_product_unit_html = '<span>' . $e($stc_product_unit) . '</span>';
             $stc_product_hsncode_html = '<span>' . $e($stc_product_hsncode) . '</span>';
             $stc_product_gst_html = '<span>' . $e($stc_product_gst) . '%</span>';
@@ -391,8 +439,8 @@ class ProductController extends Controller
             'stc_product_desc' => $validated['desc'] ?? $validated['name'],
             'stc_product_cat_id' => $validated['cat_id'],
             'stc_product_sub_cat_id' => $validated['sub_cat_id'] ?? null,
-            'stc_product_rack_id' => $validated['rack_id'] ?? null,
-            'stc_product_brand_id' => $validated['brand_id'] ?? null,
+            'stc_product_rack_id' => $this->rackBrandColumnValue($validated['rack_id'] ?? null),
+            'stc_product_brand_id' => $this->rackBrandColumnValue($validated['brand_id'] ?? null),
             'stc_product_unit' => $validated['unit'] ?? '',
             'stc_product_hsncode' => $validated['hsncode'] ?? '',
             'stc_product_gst' => $validated['gst'] ?? null,
@@ -443,8 +491,8 @@ class ProductController extends Controller
             'stc_product_desc' => $validated['desc'] ?? $validated['name'],
             'stc_product_cat_id' => $validated['cat_id'],
             'stc_product_sub_cat_id' => $validated['sub_cat_id'] ?? null,
-            'stc_product_rack_id' => $validated['rack_id'] ?? null,
-            'stc_product_brand_id' => $validated['brand_id'] ?? null,
+            'stc_product_rack_id' => $this->rackBrandColumnValue($validated['rack_id'] ?? null),
+            'stc_product_brand_id' => $this->rackBrandColumnValue($validated['brand_id'] ?? null),
             'stc_product_unit' => $validated['unit'] ?? '',
             'stc_product_hsncode' => $validated['hsncode'] ?? '',
             'stc_product_gst' => $validated['gst'] ?? null,

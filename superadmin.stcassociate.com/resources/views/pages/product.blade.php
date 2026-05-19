@@ -68,10 +68,10 @@
                         <th class="text-center">ID</th>
                         <th class="text-center">Name</th>
                         <th class="text-center">Description</th>
-                        <th class="text-center">Cat ID</th>
-                        <th class="text-center">Sub Cat ID</th>
-                        <th class="text-center">Rack ID</th>
-                        <th class="text-center">Brand ID</th>
+                        <th class="text-center">Category</th>
+                        <th class="text-center">Sub category</th>
+                        <th class="text-center">Rack</th>
+                        <th class="text-center">Brand</th>
                         <th class="text-center">Unit</th>
                         <th class="text-center">HSN</th>
                         <th class="text-center">GST %</th>
@@ -88,10 +88,10 @@
                         <th class="text-center">ID</th>
                         <th class="text-center">Name</th>
                         <th class="text-center">Description</th>
-                        <th class="text-center">Cat ID</th>
-                        <th class="text-center">Sub Cat ID</th>
-                        <th class="text-center">Rack ID</th>
-                        <th class="text-center">Brand ID</th>
+                        <th class="text-center">Category</th>
+                        <th class="text-center">Sub category</th>
+                        <th class="text-center">Rack</th>
+                        <th class="text-center">Brand</th>
                         <th class="text-center">Unit</th>
                         <th class="text-center">HSN</th>
                         <th class="text-center">GST %</th>
@@ -587,14 +587,25 @@
         });
       }
 
+      function optionalSelectFk($el) {
+        var v = $el.val();
+        if (v === undefined || v === null || v === '') {
+          return null;
+        }
+        if (v === '0' || v === 0) {
+          return null;
+        }
+        return v;
+      }
+
       function collectProductPayload(prefix) {
         return {
           name: $('#' + prefix + '-name').val(),
           desc: $('#' + prefix + '-desc').val(),
           cat_id: $('#' + prefix + '-cat_id').val(),
           sub_cat_id: $('#' + prefix + '-sub_cat_id').val() || null,
-          rack_id: $('#' + prefix + '-rack_id').val() || null,
-          brand_id: $('#' + prefix + '-brand_id').val() || null,
+          rack_id: optionalSelectFk($('#' + prefix + '-rack_id')),
+          brand_id: optionalSelectFk($('#' + prefix + '-brand_id')),
           hsncode: $('#' + prefix + '-hsncode').val(),
           gst: $('#' + prefix + '-gst').val(),
           sale_percentage: $('#' + prefix + '-sale_percentage').val(),
