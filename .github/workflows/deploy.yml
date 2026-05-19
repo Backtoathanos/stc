@@ -1,4 +1,4 @@
-name: Deploy to GoDaddy
+name: Deploy to STC Associate
 
 on:
   push:
@@ -22,14 +22,44 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             export TERM=xterm
+
+            # Pull latest code
             cd ~/public_html
             git fetch origin
             git reset --hard origin/main
+
+            # Build React app
             cd ~/public_html/stc_gld
             npm ci
             npm run build
-            printf 'RewriteEngine On\nRewriteBase /stc_gld/\nRewriteCond %%{REQUEST_FILENAME} !-f\nRewriteCond %%{REQUEST_FILENAME} !-d\nRewriteRule ^ build/index.html [QSA,L]\n' > ~/public_html/stc_gld/.htaccess
+
+            # Restore stc_gld .htaccess
+            printf 'RewriteEngine On\nRewriteBase /stc_gld/\nRewriteRule ^$ build/index.html [L]\nRewriteRule ^build/(.*)$ build/$1 [L]\nRewriteCond %%{REQUEST_FILENAME} !-f\nRewriteCond %%{REQUEST_FILENAME} !-d\nRewriteRule ^ build/index.html [QSA,L]\n' > ~/public_html/stc_gld/.htaccess
+
+            # Restore build .htaccess
             printf 'RewriteEngine On\nRewriteBase /stc_gld/build/\nRewriteCond %%{REQUEST_FILENAME} !-f\nRewriteCond %%{REQUEST_FILENAME} !-d\nRewriteRule ^ index.html [QSA,L]\n' > ~/public_html/stc_gld/build/.htaccess
+
+            # Fix permissions
             find ~/public_html/stc_gld/build -type d -exec chmod 755 {} \;
             find ~/public_html/stc_gld/build -type f -exec chmod 644 {} \;
-            echo "Deployed at $(date)"
+
+            # Verify files exist
+            echo "--- Verify .htaccess ---"
+            cat ~/public_html/stc_gld/.htaccess
+            cat ~/public_html/stc_gld/build/.htaccess
+
+            echo "--- Verify build index ---"
+            ls -la ~/public_html/stc_gld/build/index.html
+
+            echo "✅ Deployed at $(date)"
+
+      - name: Verify site is live
+        run: |
+          sleep 5
+          STATUS=$(curl -o /dev/null -s -w "%{http_code}" https://stcassociate.com/stc_gld/build/)
+          echo "Site status: $STATUS"
+          if [ "$STATUS" != "200" ]; then
+            echo "❌ Site returned $STATUS — deploy may have failed!"
+            exit 1
+          fi
+          echo "✅ Site is live!"
