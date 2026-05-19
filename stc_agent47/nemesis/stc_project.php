@@ -4014,7 +4014,7 @@ class pirates_supervisor extends tesseract{
 				}
 
 				$safety_image='
-						<img src="https://stcassociate.com/stc_sub_agent47/safety_img/'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
+						<img src="'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
 						<a href="javascript:void(0)" class="btn btn-info stc-safety-tbm-image-show-btn">View</a>
 				';
 				if($img_path==""){
@@ -4032,9 +4032,8 @@ class pirates_supervisor extends tesseract{
 						<a href="#" class="form-control btn btn-secondary stc-safetytbm-edit" id="'.$optimusprimerow['stc_safetytbm_id'].'">View</a>
 						<a target="_blank" href="'.$website.'safety-tbm-print-preview.php?tbm_no='.$optimusprimerow['stc_safetytbm_id'].'" class="form-control btn btn-danger">Print</a>
 					';
-					// <img src="https://stcassociate.com/stc_sub_agent47/safety_img/'.$img_path.'" style="width: 150px;position: relative;left: 15%;padding: 0;margin: 0;">
 					$safety_image='
-							<a href="javascript:void(0)" class="btn btn-info stc-safety-tbm-image-show-btn" data-src="https://stcassociate.com/stc_sub_agent47/safety_img/'.$img_path.'">View</a>
+							<a href="javascript:void(0)" class="btn btn-info stc-safety-tbm-image-show-btn" data-src="'.$img_path.'">View</a>
 					';
 				}
 
