@@ -10,11 +10,31 @@ export default function Sidebar({ activeRoute }) {
      * Material Dashboard runs $(document).ready before React mounts, so $sidebar was empty and
      * md.checkSidebarImage / md.initSidebarsCheck never wired the photo or mobile nav (account).
      * Sync the global $sidebar and re-run mobile sidebar setup after this component exists.
+     *
+     * On Windows, material-dashboard.js calls perfectScrollbar() in an IIFE while <div id="root">
+     * is still empty (React bundle is defer). That can leave .main-panel without a working
+     * scrollbar instance while html.perfect-scrollbar-on still forces height:100% — blank main
+     * area on some hosts. Re-init after React has rendered the shell.
      */
     useLayoutEffect(() => {
         if (typeof window === 'undefined' || !window.$ || !window.md) return;
+        const $ = window.$;
 
-        window.$sidebar = window.$('.sidebar');
+        if ($('html').hasClass('perfect-scrollbar-on') && typeof $.fn.perfectScrollbar === 'function') {
+            const $scrollTargets = $('.sidebar .sidebar-wrapper, .main-panel');
+            try {
+                $scrollTargets.perfectScrollbar('destroy');
+            } catch {
+                /* no existing instance */
+            }
+            try {
+                $scrollTargets.perfectScrollbar();
+            } catch {
+                /* ignore */
+            }
+        }
+
+        window.$sidebar = $('.sidebar');
         window.md.initSidebarsCheck();
 
         const onResize = () => {
