@@ -6,6 +6,8 @@
 *.webp
 *.mp4
 *.zip
+# Allow committing the GLD production bundle (ignored by *.zip above)
+!stc_gld/build-archive.zip
 uploads/
 images/
 safety_img/
