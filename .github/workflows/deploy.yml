@@ -33,20 +33,17 @@ jobs:
             npm ci
             npm run build
 
-            # Restore stc_gld .htaccess
-            printf 'RewriteEngine On\nRewriteBase /stc_gld/\nRewriteRule ^$ build/index.html [L]\nRewriteRule ^build/(.*)$ build/$1 [L]\nRewriteCond %%{REQUEST_FILENAME} !-f\nRewriteCond %%{REQUEST_FILENAME} !-d\nRewriteRule ^ build/index.html [QSA,L]\n' > ~/public_html/stc_gld/.htaccess
-
-            # Restore build .htaccess
-            printf 'RewriteEngine On\nRewriteBase /stc_gld/build/\nRewriteCond %%{REQUEST_FILENAME} !-f\nRewriteCond %%{REQUEST_FILENAME} !-d\nRewriteRule ^ index.html [QSA,L]\n' > ~/public_html/stc_gld/build/.htaccess
+            # Do not overwrite stc_gld/.htaccess: the repo file maps /stc_gld/static and
+            # /stc_gld/assets into build/. A minimal catch-all-only rule serves index.html
+            # for *.js requests and breaks the app (Unexpected token '<').
 
             # Fix permissions
             find ~/public_html/stc_gld/build -type d -exec chmod 755 {} \;
             find ~/public_html/stc_gld/build -type f -exec chmod 644 {} \;
 
             # Verify files exist
-            echo "--- Verify .htaccess ---"
-            cat ~/public_html/stc_gld/.htaccess
-            cat ~/public_html/stc_gld/build/.htaccess
+            echo "--- Verify .htaccess (must rewrite assets + static into build/) ---"
+            head -n 30 ~/public_html/stc_gld/.htaccess
 
             echo "--- Verify build index ---"
             ls -la ~/public_html/stc_gld/build/index.html
@@ -56,10 +53,13 @@ jobs:
       - name: Verify site is live
         run: |
           sleep 5
-          STATUS=$(curl -o /dev/null -s -w "%{http_code}" https://stcassociate.com/stc_gld/build/)
-          echo "Site status: $STATUS"
-          if [ "$STATUS" != "200" ]; then
-            echo "❌ Site returned $STATUS — deploy may have failed!"
+          # App is served from /stc_gld/ with assets at /stc_gld/assets/ (not inside /build/ in the URL)
+          APP=$(curl -o /dev/null -s -w "%{http_code}" https://stcassociate.com/stc_gld/)
+          JS=$(curl -o /dev/null -s -w "%{http_code}" https://stcassociate.com/stc_gld/assets/js/core/jquery.min.js)
+          echo "GET /stc_gld/ -> $APP"
+          echo "GET /stc_gld/assets/js/core/jquery.min.js -> $JS"
+          if [ "$APP" != "200" ] || [ "$JS" != "200" ]; then
+            echo "❌ Expected 200 for app shell and jQuery — check .htaccess rewrites (APP=$APP JS=$JS)"
             exit 1
           fi
           echo "✅ Site is live!"
