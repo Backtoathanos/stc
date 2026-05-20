@@ -54,7 +54,7 @@ include("kattegat/role_check.php");
         max-width: 300px;
       }
 
-      #dropdown-search {
+      .adhoc-edit-select-search {
         margin-bottom: 10px;
       }
       .searchable-dropdown {
@@ -1186,21 +1186,17 @@ include("kattegat/role_check.php");
           });
 
 
-          $('#dropdown-search').on('input', function() {
+          $(document).on('input', '.adhoc-edit-select-search', function() {
             var searchTerm = $(this).val().toLowerCase();
-
-            // Loop through options and hide those that don't match the search term
-            $('#stcpoadhoceitemrack option').each(function() {
-              var text = $(this).text().toLowerCase();
-              if (text.includes(searchTerm)) {
-                $(this).show();
-              } else {
-                $(this).hide();
-              }
+            var $select = $(this).closest('.searchable-dropdown').find('select').first();
+            $select.find('option').each(function() {
+              var text = ($(this).text() || '').toLowerCase();
+              var valStr = (($(this).val() !== undefined && $(this).val() !== null) ? String($(this).val()) : '').toLowerCase();
+              $(this).toggle(text.includes(searchTerm) || valStr.includes(searchTerm));
             });
           });
 
-          // If a selector accidentally matches multiple inputs (duplicate IDs in legacy markup),
+// If a selector accidentally matches multiple inputs (duplicate IDs in legacy markup),
           // pick the first non-empty value (fallback to the first element).
           function stcPickInputValue(selector, defaultValue) {
             var $els = $(selector);
@@ -2106,19 +2102,44 @@ include("kattegat/role_check.php");
           });  
           
           $('body').delegate('.edit-itemname', 'click', function(e){
-            var item_name=$(this).html();
-            var item_rack = $(this).closest('tr').find('td:eq(5)').html().trim();
-            var item_unit=$(this).closest('tr').find('td:eq(6)').html();
-            var item_qty=$(this).closest('tr').find('td:eq(7)').html();
-            var item_remarks=$(this).closest('tr').find('td:eq(18)').html();
-            var item_id=$(this).attr("id");
+            var $link = $(this);
+            function stcPoaEnsureSelectOption($select, value) {
+              if (value === null || value === undefined) value = '';
+              value = String(value);
+              var found = false;
+              $select.find('option').each(function () {
+                if (($(this).attr('value') || '') === value) {
+                  found = true;
+                  return false;
+                }
+              });
+              if (!found && value !== '') {
+                $select.append($('<option/>', { value: value, text: value }));
+              }
+              $select.val(value);
+            }
+            var item_name = $link.text().trim();
+            var item_rack = $link.closest('tr').find('td:eq(5)').text().trim();
+            var item_unit=$link.closest('tr').find('td:eq(6)').text().trim();
+            var item_qty=$link.closest('tr').find('td:eq(7)').text().trim();
+            var item_remarks=$link.closest('tr').find('td:eq(18)').text().trim();
+            var item_source = $link.attr('data-poa-source') || '';
+            var item_destination = $link.attr('data-poa-destination') || '';
+            var item_id=$link.attr("id");
             $('#edit-pro-id').remove();
+
+            var $editModalRoot = $('.bd-modal-editproductname');
+            $editModalRoot.find('.adhoc-edit-select-search').val('');
+            $editModalRoot.find('.searchable-dropdown select option').show();
+
             $('#stcpoadhoceitemname').val(item_name);
             $('#stcpoadhoceitemrack option').filter(function() {
               return $(this).text().trim() === item_rack;
             }).prop('selected', true);
             $('#stcpoadhoceitemunit').val(item_unit);
             $('#stcpoadhoceitemqty').val(item_qty);
+            stcPoaEnsureSelectOption($('#stcpoadhoceitemsource'), item_source);
+            stcPoaEnsureSelectOption($('#stcpoadhoceitemdestination'), item_destination);
             $('#stcpoadhoceitemremarks').val(item_remarks);
             $('#stc-poadhocedit-id').val(item_id);
           });
@@ -2129,6 +2150,8 @@ include("kattegat/role_check.php");
             var adhoc_rack=$('#stcpoadhoceitemrack').val();
             var adhoc_unit=$('#stcpoadhoceitemunit').val();
             var adhoc_qty=$('#stcpoadhoceitemqty').val();
+            var adhoc_source=$('#stcpoadhoceitemsource').val();
+            var adhoc_destination=$('#stcpoadhoceitemdestination').val();
             var adhoc_remarks=$('#stcpoadhoceitemremarks').val();
             $.ajax({
               url     : "kattegat/ragnar_purchase.php",
@@ -2140,6 +2163,8 @@ include("kattegat/role_check.php");
                 adhoc_rack:adhoc_rack,
                 adhoc_unit:adhoc_unit,
                 adhoc_qty:adhoc_qty,
+                adhoc_source:adhoc_source,
+                adhoc_destination:adhoc_destination,
                 adhoc_remarks:adhoc_remarks
               },
               success : function(response_items){
@@ -2147,6 +2172,8 @@ include("kattegat/role_check.php");
                 if(response=="success"){
                   alert("Item Name Updated Successfully.");
                   $('#stcpoadhoceitemname').val("");
+                  $('#stcpoadhoceitemsource').val("");
+                  $('#stcpoadhoceitemdestination').val("");
                   Pagination.loadData(pagenumber);
                 }else{
                   alert("Something went wrong please check and try again.");
@@ -3620,7 +3647,7 @@ include("kattegat/role_check.php");
                       >Item Rack
                     </h5>
                     <div class="searchable-dropdown">
-                      <input type="text" id="dropdown-search" placeholder="Search..." class="form-control" />
+                      <input type="text" id="stcpoadhoceitemrack-search" placeholder="Search..." class="form-control adhoc-edit-select-search" autocomplete="off" />
                       <select id="stcpoadhoceitemrack" class="form-control validate">
                         <?php
                           $rackqry=mysqli_query($con, "
@@ -3661,7 +3688,80 @@ include("kattegat/role_check.php");
                       class="form-control validate"
                     />
                   </div>
-                </div>    
+                </div>
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5 for="">Source (supplier / location)</h5>
+                    <div class="searchable-dropdown">
+                      <input type="text" id="stcpoadhoceitemsource-search" placeholder="Search..." class="form-control adhoc-edit-select-search" autocomplete="off" />
+                      <select id="stcpoadhoceitemsource" class="form-control validate">
+                        <option value="">Select</option>
+                        <?php
+                          $poa_src_qry = mysqli_query($con, "
+                            SELECT DISTINCT `stc_purchase_product_adhoc_source` AS loc
+                            FROM `stc_purchase_product_adhoc`
+                            WHERE `stc_purchase_product_adhoc_source` IS NOT NULL
+                              AND TRIM(`stc_purchase_product_adhoc_source`) <> ''
+                            ORDER BY `stc_purchase_product_adhoc_source` ASC
+                          ");
+                          if ($poa_src_qry) {
+                            foreach ($poa_src_qry as $poa_src_row) {
+                              $lbl = htmlspecialchars((string)($poa_src_row['loc'] ?? ''), ENT_QUOTES, 'UTF-8');
+                              echo '<option value="'.$lbl.'">'.$lbl.'</option>';
+                            }
+                          }
+                        ?>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xl-12 col-md-12 col-sm-12">
+                  <div class="card-border mb-3 card card-body border-success">
+                    <h5 for="">Destination (location)</h5>
+                    <div class="searchable-dropdown">
+                      <input type="text" id="stcpoadhoceitemdestination-search" placeholder="Search..." class="form-control adhoc-edit-select-search" autocomplete="off" />
+                      <select id="stcpoadhoceitemdestination" class="form-control validate">
+                        <option value="">Select</option>
+                        <?php
+                          static $adhoc_dest_options = [
+                            'DHATKIDIH SHOP NO 2',
+                            'DHATKIDIH STORE',
+                            'DURGAPUR MAIN HOSPITAL',
+                            'KOLKATA STORE',
+                            'MANGO 17 NO STORE',
+                            'MANGO SHOP NO-1',
+                            'PARDIH STORE',
+                            'RAMGARH WAREHOUSE',
+                            'SARA INTERNATIONAL SCHOOL',
+                            'SARA GIRLS MISSION SCHOOL',
+                          ];
+                          $poa_dest_seen = [];
+                          $poa_dest_qry = mysqli_query($con, "
+                            SELECT DISTINCT `stc_purchase_product_adhoc_destination` AS loc
+                            FROM `stc_purchase_product_adhoc`
+                            WHERE `stc_purchase_product_adhoc_destination` IS NOT NULL
+                              AND TRIM(`stc_purchase_product_adhoc_destination`) <> ''
+                            ORDER BY `stc_purchase_product_adhoc_destination` ASC
+                          ");
+                          if ($poa_dest_qry) {
+                            foreach ($poa_dest_qry as $poa_dest_row) {
+                              $d = trim((string)($poa_dest_row['loc'] ?? ''));
+                              if ($d === '') continue;
+                              $poa_dest_seen[$d] = true;
+                              $lbl = htmlspecialchars($d, ENT_QUOTES, 'UTF-8');
+                              echo '<option value="'.$lbl.'">'.$lbl.'</option>';
+                            }
+                          }
+                          foreach ($adhoc_dest_options as $adhoc_dest_opt) {
+                            if (isset($poa_dest_seen[$adhoc_dest_opt])) continue;
+                            $lbl = htmlspecialchars($adhoc_dest_opt, ENT_QUOTES, 'UTF-8');
+                            echo '<option value="'.$lbl.'">'.$lbl.'</option>';
+                          }
+                        ?>
+                      </select>
+                    </div>
+                  </div>
+                </div>
                 <div class="col-xl-12 col-md-12 col-sm-12">
                   <div class="card-border mb-3 card card-body border-success">
                     <h5

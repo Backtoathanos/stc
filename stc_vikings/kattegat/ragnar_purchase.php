@@ -2786,6 +2786,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 				if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==6){
 					$checkbox="<div class='card-border mb-3 card-body border-success'><input type='checkbox' class='material-icons form-control common_selector' style='width:20px;' value='".$odinrow['stc_purchase_product_adhoc_id']."'></div>";
 				}
+				$poadhoc_edit_src_esc = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_source'] ?? ''), ENT_QUOTES, 'UTF-8');
+				$poadhoc_edit_dst_esc = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_destination'] ?? ''), ENT_QUOTES, 'UTF-8');
 				$odin.="
 					<tr>
 						<td class='text-center'>".$slno." ".$checkbox."</td>
@@ -2796,7 +2798,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 						</td>
 						<td style='width: 180px;'>".$productog."</td>
 						<td class='text-center'><b>".$odinrow['stc_product_id']."</b><br><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-product-history' class='form-conrtol show-product-history' id='".$odinrow['stc_product_id']."'>".$product_name."</a></td>
-						<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a> ".$addtoollist."</td>
+						<td style='width: 180px;'><a href='javascript:void(0)' data-toggle='modal' data-target='.bd-modal-editproductname' class='edit-itemname' id='".$odinrow['stc_purchase_product_adhoc_id']."' data-poa-source='".$poadhoc_edit_src_esc."' data-poa-destination='".$poadhoc_edit_dst_esc."'>".$odinrow['stc_purchase_product_adhoc_itemdesc']."</a> ".$addtoollist."</td>
 						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
 						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
@@ -2935,15 +2937,17 @@ class ragnarPurchaseAdhoc extends tesseract{
 	}
 
 	// update po adhoc item name
-	public function stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty, $adhoc_remarks){
+	public function stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty, $adhoc_remarks, $adhoc_source = '', $adhoc_destination = ''){
 		$odin='';
 		// Remove commas and ensure proper decimal formatting
 		$adhoc_qty = str_replace(',', '', $adhoc_qty);
 		// Convert to float to ensure proper number formatting, then back to string
 		$adhoc_qty = number_format((float)$adhoc_qty, 2, '.', '');
+		$adhoc_source = (string)$adhoc_source;
+		$adhoc_destination = (string)$adhoc_destination;
 		
 		$checkqry=mysqli_query($this->stc_dbs, "
-			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."', `stc_purchase_product_adhoc_qty`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_qty)."', `stc_purchase_product_adhoc_unit`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_unit)."', `stc_purchase_product_adhoc_rackid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_rack)."', `stc_purchase_product_adhoc_remarks`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_remarks)."'  WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."', `stc_purchase_product_adhoc_qty`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_qty)."', `stc_purchase_product_adhoc_unit`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_unit)."', `stc_purchase_product_adhoc_rackid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_rack)."', `stc_purchase_product_adhoc_remarks`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_remarks)."', `stc_purchase_product_adhoc_source`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_source)."', `stc_purchase_product_adhoc_destination`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_destination)."'  WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
 		");
 		if($checkqry){
 			$odin='success';
@@ -4723,8 +4727,10 @@ if(isset($_POST['stc_po_adhoc_update'])){
 	$adhoc_unit=$_POST['adhoc_unit'];
 	$adhoc_qty=$_POST['adhoc_qty'];
 	$adhoc_remarks=$_POST['adhoc_remarks'];
+	$adhoc_source = isset($_POST['adhoc_source']) ? (string)$_POST['adhoc_source'] : '';
+	$adhoc_destination = isset($_POST['adhoc_destination']) ? (string)$_POST['adhoc_destination'] : '';
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty, $adhoc_remarks);
+	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty, $adhoc_remarks, $adhoc_source, $adhoc_destination);
 	echo $outbjornestocking;
 }
 
