@@ -11,7 +11,7 @@ import { debounce } from 'lodash';
 import Swal from 'sweetalert2';
 import { Modal, Button } from 'react-bootstrap';
 import Select from 'react-select';
-import { FaEye, FaMoneyBillWave } from 'react-icons/fa';
+import { FaEye, FaMoneyBillWave, FaPrint } from 'react-icons/fa';
 
 export default function ChallanDashboard() {
     const location = useLocation();
@@ -427,11 +427,18 @@ export default function ChallanDashboard() {
                                         <h2 className="text-center">Invoice (RCM)</h2>
                                     </div>
                                     <div className="card-body">
-                                        <div className="form-group">
-                                            <button className="print-challan" onClick={handlePrintChallan}>Print Invoice (RCM)</button>
+                                        <div className="challan-toolbar">
+                                            <button
+                                                type="button"
+                                                className="btn btn-outline-primary challan-toolbar__print"
+                                                onClick={handlePrintChallan}
+                                            >
+                                                <FaPrint aria-hidden />
+                                                <span>Print Invoice (RCM)</span>
+                                            </button>
                                             <input
                                                 type="text"
-                                                className="form-control"
+                                                className="form-control challan-toolbar__search"
                                                 placeholder="Search by Challan Number, Product ID, etc..."
                                                 value={search}
                                                 onChange={(e) => setSearch(e.target.value)}
