@@ -2783,9 +2783,9 @@ class ragnarPurchaseAdhoc extends tesseract{
 					$addtoollist='<a href="javascript:void(0)" class="btn btn-success itt-create" data-toggle="modal" data-target=".bd-toolstracker-modal-lg" id="'.$odinrow['stc_purchase_product_adhoc_id'].'" data-adhoc-qty="'.$adhoc_qty_attr.'" data-remaining="'.$rem_attr.'" data-product-name="'.$product_name_attr.'" data-purchase-source="'.$source_attr.'" title="Add to Toollist (up to '.$remaining_tools.' more)"><i class="fa fa-tools"></i></a>';
 				}
 				$checkbox = '';
-				if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==6){
+				// if($_SESSION['stc_empl_id']==1 || $_SESSION['stc_empl_id']==2 || $_SESSION['stc_empl_id']==6){
 					$checkbox="<div class='card-border mb-3 card-body border-success'><input type='checkbox' class='material-icons form-control common_selector' style='width:20px;' value='".$odinrow['stc_purchase_product_adhoc_id']."'></div>";
-				}
+				// }
 				$poadhoc_edit_src_esc = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_source'] ?? ''), ENT_QUOTES, 'UTF-8');
 				$poadhoc_edit_dst_esc = htmlspecialchars((string)($odinrow['stc_purchase_product_adhoc_destination'] ?? ''), ENT_QUOTES, 'UTF-8');
 				$odin.="
@@ -2936,23 +2936,95 @@ class ragnarPurchaseAdhoc extends tesseract{
 		return $odin;
 	}
 
-	// update po adhoc item name
-	public function stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty, $adhoc_remarks, $adhoc_source = '', $adhoc_destination = ''){
+	// Resolve rack id from posted id or rack name (typed / free text).
+	public function stc_resolve_rack_id_for_update($rack_id_post, $rack_text_post){
+		$rack_id_post = trim((string)$rack_id_post);
+		$rack_text_post = trim((string)$rack_text_post);
+
+		if ($rack_id_post !== '' && ctype_digit($rack_id_post)) {
+			$i = (int)$rack_id_post;
+			if ($i > 0) {
+				$qi = mysqli_query($this->stc_dbs, "
+					SELECT `stc_rack_id` FROM `stc_rack` WHERE `stc_rack_id`='".mysqli_real_escape_string($this->stc_dbs, (string)$i)."' LIMIT 1
+				");
+				if ($qi && mysqli_num_rows($qi) > 0) {
+					return (string)$i;
+				}
+			}
+		}
+
+		if ($rack_text_post !== '') {
+			$esc = mysqli_real_escape_string($this->stc_dbs, $rack_text_post);
+			$qt = mysqli_query($this->stc_dbs, "
+				SELECT `stc_rack_id` FROM `stc_rack` WHERE LOWER(TRIM(`stc_rack_name`))=LOWER('".$esc."') LIMIT 1
+			");
+			if ($qt && mysqli_num_rows($qt) > 0) {
+				$row = mysqli_fetch_assoc($qt);
+
+				return (string)($row['stc_rack_id'] ?? '');
+			}
+
+			return false;
+		}
+
+		return '';
+	}
+
+	// update po adhoc item name (does not alter source / destination — use bulk locations)
+	public function stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty, $adhoc_remarks){
 		$odin='';
 		// Remove commas and ensure proper decimal formatting
 		$adhoc_qty = str_replace(',', '', $adhoc_qty);
 		// Convert to float to ensure proper number formatting, then back to string
 		$adhoc_qty = number_format((float)$adhoc_qty, 2, '.', '');
-		$adhoc_source = (string)$adhoc_source;
-		$adhoc_destination = (string)$adhoc_destination;
 		
 		$checkqry=mysqli_query($this->stc_dbs, "
-			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."', `stc_purchase_product_adhoc_qty`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_qty)."', `stc_purchase_product_adhoc_unit`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_unit)."', `stc_purchase_product_adhoc_rackid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_rack)."', `stc_purchase_product_adhoc_remarks`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_remarks)."', `stc_purchase_product_adhoc_source`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_source)."', `stc_purchase_product_adhoc_destination`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_destination)."'  WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_itemdesc`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_name)."', `stc_purchase_product_adhoc_qty`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_qty)."', `stc_purchase_product_adhoc_unit`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_unit)."', `stc_purchase_product_adhoc_rackid`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_rack)."', `stc_purchase_product_adhoc_remarks`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_remarks)."'  WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
 		");
 		if($checkqry){
 			$odin='success';
 		}else{
 			$odin='failed';
+		}
+		return $odin;
+	}
+
+	/**
+	 * Bulk set source / destination for many adhoc rows. Omit a column when not updating ($upd_* false).
+	 */
+	public function stc_poadhoc_bulk_locations(array $adhoc_ids, $upd_src, $src_val, $upd_dest, $dest_val){
+		$odin = 'failed';
+		$ids = [];
+		foreach ($adhoc_ids as $id) {
+			$id = (int)$id;
+			if ($id > 0) {
+				$ids[$id] = true;
+			}
+		}
+		if (empty($ids)) {
+			return 'invalid';
+		}
+		$upd_src = (bool)$upd_src;
+		$upd_dest = (bool)$upd_dest;
+		if (!$upd_src && !$upd_dest) {
+			return 'invalid';
+		}
+		$set = [];
+		if ($upd_src) {
+			$set[] = "`stc_purchase_product_adhoc_source`='".mysqli_real_escape_string($this->stc_dbs, (string)$src_val)."'";
+		}
+		if ($upd_dest) {
+			$set[] = "`stc_purchase_product_adhoc_destination`='".mysqli_real_escape_string($this->stc_dbs, (string)$dest_val)."'";
+		}
+		$in_ids = implode(',', array_keys($ids));
+		$sql = "
+			UPDATE `stc_purchase_product_adhoc`
+			SET ".implode(', ', $set)."
+			WHERE `stc_purchase_product_adhoc_id` IN (".$in_ids.")
+		";
+		$q = mysqli_query($this->stc_dbs, $sql);
+		if ($q) {
+			$odin = 'success';
 		}
 		return $odin;
 	}
@@ -4723,14 +4795,34 @@ if(isset($_POST['stc_po_adhoc_delete'])){
 if(isset($_POST['stc_po_adhoc_update'])){
 	$adhoc_id=$_POST['adhoc_id'];
 	$adhoc_name=$_POST['adhoc_name'];
-	$adhoc_rack=$_POST['adhoc_rack'];
 	$adhoc_unit=$_POST['adhoc_unit'];
 	$adhoc_qty=$_POST['adhoc_qty'];
 	$adhoc_remarks=$_POST['adhoc_remarks'];
-	$adhoc_source = isset($_POST['adhoc_source']) ? (string)$_POST['adhoc_source'] : '';
-	$adhoc_destination = isset($_POST['adhoc_destination']) ? (string)$_POST['adhoc_destination'] : '';
+	$rack_text = isset($_POST['adhoc_rack_text']) ? trim((string)$_POST['adhoc_rack_text']) : '';
 	$bjornestocking=new ragnarPurchaseAdhoc();
-	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty, $adhoc_remarks, $adhoc_source, $adhoc_destination);
+	$resolved = $bjornestocking->stc_resolve_rack_id_for_update($_POST['adhoc_rack'] ?? '', $rack_text);
+	if ($resolved === false) {
+		echo 'invalid_rack';
+		exit;
+	}
+	$adhoc_rack = $resolved;
+	$outbjornestocking=$bjornestocking->stc_poadhoc_update($adhoc_id, $adhoc_name, $adhoc_rack, $adhoc_unit, $adhoc_qty, $adhoc_remarks);
+	echo $outbjornestocking;
+}
+
+// bulk update po adhoc source / destination on selected IDs
+if (isset($_POST['stc_po_adhoc_bulk_locations'])) {
+	$raw = isset($_POST['ids']) ? $_POST['ids'] : '[]';
+	$decoded = json_decode((string)$raw, true);
+	$adhoc_ids = is_array($decoded) ? $decoded : [];
+
+	$upd_src = isset($_POST['upd_source']) && (int)$_POST['upd_source'] === 1;
+	$upd_dest = isset($_POST['upd_destination']) && (int)$_POST['upd_destination'] === 1;
+	$src_val = isset($_POST['source_val']) ? (string)$_POST['source_val'] : '';
+	$dest_val = isset($_POST['destination_val']) ? (string)$_POST['destination_val'] : '';
+
+	$bjornestocking = new ragnarPurchaseAdhoc();
+	$outbjornestocking = $bjornestocking->stc_poadhoc_bulk_locations($adhoc_ids, $upd_src, $src_val, $upd_dest, $dest_val);
 	echo $outbjornestocking;
 }
 

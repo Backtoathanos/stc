@@ -82,6 +82,147 @@ include("kattegat/role_check.php");
           background-color: #f5f5f5;
       }
 
+      .adhoc-rack-combo-wrap {
+        position: relative;
+        width: 100%;
+      }
+      .bulk-poa-dest-combo-wrap {
+        position: relative;
+        width: 100%;
+      }
+      .bulk-poa-src-combo-wrap {
+        position: relative;
+        width: 100%;
+      }
+
+      /* —— Bulk actions panel (floating); BS3-safe (no BS4-only utilities relied on here) —— */
+      .fixed-status-dropdown {
+        box-sizing: border-box;
+      }
+      .fixed-status-dropdown h6 {
+        margin-top: 0;
+        margin-bottom: 10px;
+        font-weight: 600;
+        font-size: 16px;
+      }
+      .stc-poa-bulk-intro {
+        margin: 0 0 12px;
+        font-size: 12px;
+        color: #666;
+        line-height: 1.4;
+      }
+      .stc-poa-bulk-actions-row {
+        margin-bottom: 12px;
+      }
+      .stc-poa-bulk-actions-row .btn {
+        margin-right: 8px;
+        margin-bottom: 6px;
+        vertical-align: middle;
+      }
+      .fixed-status-dropdown hr {
+        border-top-color: #e5e5e5;
+      }
+      .stc-poa-bulk-section-title {
+        margin: 0 0 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #222;
+      }
+      .stc-poa-bulk-section-hint {
+        margin: 0 0 14px;
+        font-size: 12px;
+        color: #666;
+        line-height: 1.4;
+      }
+      .stc-poa-bulk-location-field {
+        display: block;
+        width: 100%;
+        margin-bottom: 18px;
+        clear: both;
+      }
+      .stc-poa-bulk-location-field:last-child {
+        margin-bottom: 10px;
+      }
+      .stc-poa-bulk-location-label {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 12px;
+        font-weight: 600;
+        margin: 0 0 8px;
+        line-height: 1.35;
+        color: #333;
+      }
+      /* Undo legacy caps so source/destination combos span the panel width */
+      .fixed-status-dropdown .searchable-dropdown {
+        max-width: none !important;
+        display: block !important;
+        width: 100% !important;
+        vertical-align: top;
+      }
+      .stc-poa-bulk-location-field .bulk-poa-src-input,
+      .stc-poa-bulk-location-field .bulk-poa-destination-input {
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .stc-poa-bulk-location-field .form-text.text-muted {
+        display: block;
+        margin-top: 6px;
+        font-size: 11px;
+        line-height: 1.35;
+      }
+      .fixed-status-dropdown .dropdown-menu > .dropdown-status-link {
+        display: block;
+        padding: 8px 18px;
+        clear: both;
+        font-weight: normal;
+        white-space: nowrap;
+        color: #333;
+      }
+      .fixed-status-dropdown .dropdown-menu > .dropdown-status-link:hover {
+        background-color: #f5f5f5;
+        text-decoration: none;
+        color: #262626;
+      }
+
+      .adhoc-rack-combo-list {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: #fff;
+        border: 1px solid #ced4da;
+        border-radius: 0 0 4px 4px;
+        max-height: 220px;
+        overflow-y: auto;
+        z-index: 10060;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      }
+      .adhoc-rack-combo-list li {
+        padding: 8px 14px;
+        cursor: pointer;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 14px;
+      }
+      .adhoc-rack-combo-list li:hover,
+      .adhoc-rack-combo-list li.is-active {
+        background-color: #e7f1ff;
+      }
+      .adhoc-rack-combo-list li:last-child {
+        border-bottom: none;
+      }
+
+      /* Bootstrap 3 .modal { overflow: hidden } clips this dropdown; allow it to paint outside */
+      .bd-modal-editproductname.modal,
+      .bd-modal-editproductname .modal-dialog,
+      .bd-modal-editproductname .modal-content,
+      .bd-modal-editproductname .modal-body {
+        overflow: visible !important;
+      }
+
       /* Percentage calculation styling */
       .percentage-input {
           margin-top: 5px;
@@ -486,6 +627,111 @@ include("kattegat/role_check.php");
     </style>
 </head>
 <body>
+    <?php /* Cloned into “Bulk actions” when POA lines are selected — keep out of normal layout */
+    if (!isset($con)) {
+      include_once __DIR__ . '/../MCU/db.php';
+    }
+    $stc_poa_adhoc_dest_preset = [
+      'DHATKIDIH SHOP NO 2',
+      'DHATKIDIH STORE',
+      'DURGAPUR MAIN HOSPITAL',
+      'KOLKATA STORE',
+      'MANGO 17 NO STORE',
+      'MANGO SHOP NO-1',
+      'PARDIH STORE',
+      'RAMGARH WAREHOUSE',
+      'SARA INTERNATIONAL SCHOOL',
+      'SARA GIRLS MISSION SCHOOL',
+    ];
+    ?>
+    <div id="stc-poa-bulk-location-templates" style="display:none !important;" aria-hidden="true">
+      <div id="stc-poa-template-bulk-source">
+        <?php
+          $stc_poa_bulk_src_list = [];
+          if (!empty($con)) {
+            $poa_src_qry = mysqli_query($con, "
+              SELECT DISTINCT `stc_purchase_product_adhoc_source` AS loc
+              FROM `stc_purchase_product_adhoc`
+              WHERE `stc_purchase_product_adhoc_source` IS NOT NULL
+                AND TRIM(`stc_purchase_product_adhoc_source`) <> ''
+              ORDER BY `stc_purchase_product_adhoc_source` ASC
+            ");
+            if ($poa_src_qry) {
+              foreach ($poa_src_qry as $poa_src_row) {
+                $s = trim((string)($poa_src_row['loc'] ?? ''));
+                if ($s === '') {
+                  continue;
+                }
+                $stc_poa_bulk_src_list[] = $s;
+              }
+            }
+          }
+        ?>
+        <script>
+          window.STC_POA_BULK_SRC_LIST = <?php echo json_encode($stc_poa_bulk_src_list, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>;
+        </script>
+        <div class="searchable-dropdown bulk-poa-src-combo-wrap">
+          <input
+            type="text"
+            class="form-control bulk-poa-src-input"
+            placeholder="Search or type source…"
+            autocomplete="off"
+            aria-autocomplete="list"
+          />
+          <ul class="bulk-poa-src-list adhoc-rack-combo-list" role="listbox" aria-hidden="true" style="display:none;"></ul>
+          <small class="form-text text-muted">Suggestions are ul/li (no select). Leave empty to skip updating source.</small>
+        </div>
+      </div>
+      <div id="stc-poa-template-bulk-destination">
+        <?php
+          $stc_poa_bulk_dest_list = [];
+          $poa_dest_seen = [];
+          if (!empty($con)) {
+            $poa_dest_qry = mysqli_query($con, "
+              SELECT DISTINCT `stc_purchase_product_adhoc_destination` AS loc
+              FROM `stc_purchase_product_adhoc`
+              WHERE `stc_purchase_product_adhoc_destination` IS NOT NULL
+                AND TRIM(`stc_purchase_product_adhoc_destination`) <> ''
+              ORDER BY `stc_purchase_product_adhoc_destination` ASC
+            ");
+            if ($poa_dest_qry) {
+              foreach ($poa_dest_qry as $poa_dest_row) {
+                $d = trim((string)($poa_dest_row['loc'] ?? ''));
+                if ($d === '') {
+                  continue;
+                }
+                if (isset($poa_dest_seen[$d])) {
+                  continue;
+                }
+                $poa_dest_seen[$d] = true;
+                $stc_poa_bulk_dest_list[] = $d;
+              }
+            }
+          }
+          foreach ($stc_poa_adhoc_dest_preset as $adhoc_dest_opt) {
+            if (isset($poa_dest_seen[$adhoc_dest_opt])) {
+              continue;
+            }
+            $poa_dest_seen[$adhoc_dest_opt] = true;
+            $stc_poa_bulk_dest_list[] = $adhoc_dest_opt;
+          }
+        ?>
+        <script>
+          window.STC_POA_BULK_DEST_LIST = <?php echo json_encode($stc_poa_bulk_dest_list, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>;
+        </script>
+        <div class="searchable-dropdown bulk-poa-dest-combo-wrap">
+          <input
+            type="text"
+            class="form-control bulk-poa-destination-input"
+            placeholder="Search or type destination…"
+            autocomplete="off"
+            aria-autocomplete="list"
+          />
+          <ul class="bulk-poa-destination-list adhoc-rack-combo-list" role="listbox" aria-hidden="true" style="display:none;"></ul>
+          <small class="form-text text-muted">Suggestions are ul/li (no select). Leave empty to skip updating destination.</small>
+        </div>
+      </div>
+    </div>
     <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
         <?php include_once("header-nav.php");?>
         <div class="app-main">
@@ -922,6 +1168,37 @@ include("kattegat/role_check.php");
     <script type="text/javascript" src="./assets/scripts/jarvis.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <script>
+        <?php
+        if (!isset($con)) {
+          include_once __DIR__ . '/../MCU/db.php';
+        }
+        $stc_poa_edit_rack_list = [];
+        if (!empty($con)) {
+          $rackqry_init = mysqli_query($con, "
+            SELECT `stc_rack_id`, `stc_rack_name` FROM `stc_rack` ORDER BY `stc_rack_name` ASC
+          ");
+          if ($rackqry_init) {
+            while ($rr = mysqli_fetch_assoc($rackqry_init)) {
+              $stc_poa_edit_rack_list[] = [
+                'id' => (string)($rr['stc_rack_id'] ?? ''),
+                'name' => (string)($rr['stc_rack_name'] ?? ''),
+              ];
+            }
+          }
+        }
+        ?>
+        window.STC_POA_EDIT_RACK_LIST = <?php echo json_encode($stc_poa_edit_rack_list, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS); ?>;
+        <?php
+        $stc_poa_bulk_status_privileged = (
+          isset($_SESSION['stc_empl_id'])
+          && (
+            $_SESSION['stc_empl_id'] == 1
+            || $_SESSION['stc_empl_id'] == 2
+            || $_SESSION['stc_empl_id'] == 6
+          )
+        );
+        ?>
+        window.STC_POA_SHOW_BULK_STATUS_CHANGE = <?php echo $stc_poa_bulk_status_privileged ? 'true' : 'false'; ?>;
         function escapeHtml(str) {
           str = (str === undefined || str === null) ? '' : String(str);
           return str
@@ -932,8 +1209,258 @@ include("kattegat/role_check.php");
             .replace(/'/g, '&#039;');
         }
 
-        $(document).ready(function(){
+          $(document).ready(function(){
           const urlParams = new URLSearchParams(window.location.search);
+
+          /** POA edit modal: rack combobox (single field + ul/li, no &lt;select&gt;) */
+          var stcRackComboBlurTimer = null;
+          function stcPoaRackListRows() {
+            return window.STC_POA_EDIT_RACK_LIST || [];
+          }
+          function stcPoaRefreshRackComboList(term) {
+            var t = $.trim(String(term || '')).toLowerCase();
+            var $ul = $('#stcpoadhoceitemrack-list').empty();
+            var rows = stcPoaRackListRows();
+            var n = 0;
+            for (var i = 0; i < rows.length; i++) {
+              var row = rows[i];
+              var nm = String(row.name || '');
+              if (t === '' || nm.toLowerCase().indexOf(t) !== -1) {
+                $('<li role="option" tabindex="-1" />')
+                  .attr('data-rack-id', row.id)
+                  .text(nm)
+                  .appendTo($ul);
+                n++;
+                if (n > 500) break;
+              }
+            }
+            // “Add as typed” when no row matched but user typed something
+            var raw = $.trim(String(term || ''));
+            if (raw !== '' && n === 0) {
+              $('<li class="text-muted" role="option" tabindex="-1" />')
+                .attr('data-rack-id', '')
+                .attr('data-rack-free', '1')
+                .text('Use typed value: ' + raw)
+                .appendTo($ul);
+              n = 1;
+            }
+            if (n > 0) {
+              $ul.css('display', 'block').attr('aria-hidden', 'false');
+            } else {
+              $ul.hide().attr('aria-hidden', 'true');
+            }
+          }
+          function stcPoaEditSetRackFromRowName(displayName) {
+            var d = $.trim(String(displayName || ''));
+            $('#stcpoadhoceitemrack-input').val(d);
+            $('#stcpoadhoceitemrack').val('');
+            $('#stcpoadhoceitemrack-input').data('rack-picked-id', '');
+            if (d === '') return;
+            var rows = stcPoaRackListRows();
+            for (var i = 0; i < rows.length; i++) {
+              if ($.trim(rows[i].name || '') === d) {
+                $('#stcpoadhoceitemrack').val(rows[i].id);
+                $('#stcpoadhoceitemrack-input').data('rack-picked-id', rows[i].id);
+                return;
+              }
+            }
+            var dl = d.toLowerCase();
+            for (var j = 0; j < rows.length; j++) {
+              if (($.trim(rows[j].name || '')).toLowerCase() === dl) {
+                $('#stcpoadhoceitemrack').val(rows[j].id);
+                $('#stcpoadhoceitemrack-input').val(rows[j].name);
+                $('#stcpoadhoceitemrack-input').data('rack-picked-id', rows[j].id);
+                return;
+              }
+            }
+          }
+          $(document).on('focus', '#stcpoadhoceitemrack-input', function () {
+            window.clearTimeout(stcRackComboBlurTimer);
+            stcPoaRefreshRackComboList($(this).val());
+          });
+          $(document).on('input', '#stcpoadhoceitemrack-input', function () {
+            $('#stcpoadhoceitemrack').val('');
+            $('#stcpoadhoceitemrack-input').data('rack-picked-id', '');
+            window.clearTimeout(stcRackComboBlurTimer);
+            stcPoaRefreshRackComboList($(this).val());
+          });
+          $(document).on('mousedown', '#stcpoadhoceitemrack-list', function (e) {
+            e.preventDefault();
+          });
+          $(document).on('mousedown', '#stcpoadhoceitemrack-list li', function (e) {
+            e.preventDefault();
+            window.clearTimeout(stcRackComboBlurTimer);
+            var $li = $(this);
+            if ($li.attr('data-rack-free') === '1') {
+              $('#stcpoadhoceitemrack').val('');
+              $('#stcpoadhoceitemrack-input').data('rack-picked-id', '');
+            } else {
+              var id = String($li.attr('data-rack-id') || '');
+              var label = $li.text();
+              $('#stcpoadhoceitemrack').val(id);
+              $('#stcpoadhoceitemrack-input').val(label);
+              $('#stcpoadhoceitemrack-input').data('rack-picked-id', id);
+            }
+            $('#stcpoadhoceitemrack-list').hide().empty();
+          });
+          $(document).on('keydown', '#stcpoadhoceitemrack-input', function (e) {
+            if (e.keyCode !== 27) return;
+            $('#stcpoadhoceitemrack-list').hide().empty();
+          });
+          $(document).on('blur', '#stcpoadhoceitemrack-input', function () {
+            stcRackComboBlurTimer = window.setTimeout(function () {
+              $('#stcpoadhoceitemrack-list').hide().empty();
+            }, 250);
+          });
+          $(document).on('click', function (e) {
+            if (!$(e.target).closest('.adhoc-rack-combo-wrap').length) {
+              $('#stcpoadhoceitemrack-list').hide().empty();
+            }
+          });
+
+          /** Bulk source: single input + ul/li */
+          var stcBulkSrcBlurTimer = null;
+          function stcBulkSrcRows() {
+            return window.STC_POA_BULK_SRC_LIST || [];
+          }
+          function stcRefreshBulkSrcList($inp, term) {
+            var $wrap = $inp.closest('.bulk-poa-src-combo-wrap');
+            if (!$wrap.length) return;
+            var $ul = $wrap.find('.bulk-poa-src-list').empty();
+            var t = $.trim(String(term || '')).toLowerCase();
+            var rows = stcBulkSrcRows();
+            var n = 0;
+            var i;
+            for (i = 0; i < rows.length; i++) {
+              var nm = String(rows[i] || '');
+              if (t === '' || nm.toLowerCase().indexOf(t) !== -1) {
+                $('<li role="option" tabindex="-1" />').text(nm).appendTo($ul);
+                n++;
+                if (n > 400) break;
+              }
+            }
+            var raw = $.trim(String(term || ''));
+            if (raw !== '' && n === 0) {
+              $('<li class="text-muted" role="option" tabindex="-1" />')
+                .attr('data-src-free', '1')
+                .text('Use typed value: ' + raw)
+                .appendTo($ul);
+              n = 1;
+            }
+            if (n > 0) {
+              $ul.css('display', 'block').attr('aria-hidden', 'false');
+            } else {
+              $ul.hide().attr('aria-hidden', 'true');
+            }
+          }
+          $(document).on('focus', '.bulk-poa-src-input', function () {
+            window.clearTimeout(stcBulkSrcBlurTimer);
+            stcRefreshBulkSrcList($(this), $(this).val());
+          });
+          $(document).on('input', '.bulk-poa-src-input', function () {
+            window.clearTimeout(stcBulkSrcBlurTimer);
+            stcRefreshBulkSrcList($(this), $(this).val());
+          });
+          $(document).on('mousedown', '.bulk-poa-src-list', function (e) {
+            e.preventDefault();
+          });
+          $(document).on('mousedown', '.bulk-poa-src-list li', function (e) {
+            e.preventDefault();
+            window.clearTimeout(stcBulkSrcBlurTimer);
+            var $li = $(this);
+            var $wrap = $li.closest('.bulk-poa-src-combo-wrap');
+            var $inp = $wrap.find('.bulk-poa-src-input');
+            if ($li.attr('data-src-free') !== '1') {
+              $inp.val($li.text());
+            }
+            $wrap.find('.bulk-poa-src-list').hide().empty();
+          });
+          $(document).on('keydown', '.bulk-poa-src-input', function (e) {
+            if (e.keyCode !== 27) return;
+            $(this).closest('.bulk-poa-src-combo-wrap').find('.bulk-poa-src-list').hide().empty();
+          });
+          $(document).on('blur', '.bulk-poa-src-input', function () {
+            var $inp = $(this);
+            stcBulkSrcBlurTimer = window.setTimeout(function () {
+              $inp.closest('.bulk-poa-src-combo-wrap').find('.bulk-poa-src-list').hide().empty();
+            }, 250);
+          });
+
+          /** Bulk destination: single input + ul/li (same data as old select, no &lt;select&gt;) */
+          var stcBulkDestBlurTimer = null;
+          function stcBulkDestRows() {
+            return window.STC_POA_BULK_DEST_LIST || [];
+          }
+          function stcRefreshBulkDestList($inp, term) {
+            var $wrap = $inp.closest('.bulk-poa-dest-combo-wrap');
+            if (!$wrap.length) return;
+            var $ul = $wrap.find('.bulk-poa-destination-list').empty();
+            var t = $.trim(String(term || '')).toLowerCase();
+            var rows = stcBulkDestRows();
+            var n = 0;
+            var i;
+            for (i = 0; i < rows.length; i++) {
+              var nm = String(rows[i] || '');
+              if (t === '' || nm.toLowerCase().indexOf(t) !== -1) {
+                $('<li role="option" tabindex="-1" />').text(nm).appendTo($ul);
+                n++;
+                if (n > 400) break;
+              }
+            }
+            var raw = $.trim(String(term || ''));
+            if (raw !== '' && n === 0) {
+              $('<li class="text-muted" role="option" tabindex="-1" />')
+                .attr('data-dest-free', '1')
+                .text('Use typed value: ' + raw)
+                .appendTo($ul);
+              n = 1;
+            }
+            if (n > 0) {
+              $ul.css('display', 'block').attr('aria-hidden', 'false');
+            } else {
+              $ul.hide().attr('aria-hidden', 'true');
+            }
+          }
+          $(document).on('focus', '.bulk-poa-destination-input', function () {
+            window.clearTimeout(stcBulkDestBlurTimer);
+            stcRefreshBulkDestList($(this), $(this).val());
+          });
+          $(document).on('input', '.bulk-poa-destination-input', function () {
+            window.clearTimeout(stcBulkDestBlurTimer);
+            stcRefreshBulkDestList($(this), $(this).val());
+          });
+          $(document).on('mousedown', '.bulk-poa-destination-list', function (e) {
+            e.preventDefault();
+          });
+          $(document).on('mousedown', '.bulk-poa-destination-list li', function (e) {
+            e.preventDefault();
+            window.clearTimeout(stcBulkDestBlurTimer);
+            var $li = $(this);
+            var $wrap = $li.closest('.bulk-poa-dest-combo-wrap');
+            var $inp = $wrap.find('.bulk-poa-destination-input');
+            if ($li.attr('data-dest-free') !== '1') {
+              $inp.val($li.text());
+            }
+            $wrap.find('.bulk-poa-destination-list').hide().empty();
+          });
+          $(document).on('keydown', '.bulk-poa-destination-input', function (e) {
+            if (e.keyCode !== 27) return;
+            $(this).closest('.bulk-poa-dest-combo-wrap').find('.bulk-poa-destination-list').hide().empty();
+          });
+          $(document).on('blur', '.bulk-poa-destination-input', function () {
+            var $inp = $(this);
+            stcBulkDestBlurTimer = window.setTimeout(function () {
+              $inp.closest('.bulk-poa-dest-combo-wrap').find('.bulk-poa-destination-list').hide().empty();
+            }, 250);
+          });
+          $(document).on('click', function (e) {
+            if (!$(e.target).closest('.bulk-poa-dest-combo-wrap').length) {
+              $('.bulk-poa-destination-list').hide().empty();
+            }
+            if (!$(e.target).closest('.bulk-poa-src-combo-wrap').length) {
+              $('.bulk-poa-src-list').hide().empty();
+            }
+          });
 
           var purchaseRowWidthManual = false;
           var stcPoaRowWidthDrag = { active: false, startX: 0, startW: 0, touchId: null, lastX: 0 };
@@ -2103,28 +2630,11 @@ include("kattegat/role_check.php");
           
           $('body').delegate('.edit-itemname', 'click', function(e){
             var $link = $(this);
-            function stcPoaEnsureSelectOption($select, value) {
-              if (value === null || value === undefined) value = '';
-              value = String(value);
-              var found = false;
-              $select.find('option').each(function () {
-                if (($(this).attr('value') || '') === value) {
-                  found = true;
-                  return false;
-                }
-              });
-              if (!found && value !== '') {
-                $select.append($('<option/>', { value: value, text: value }));
-              }
-              $select.val(value);
-            }
             var item_name = $link.text().trim();
             var item_rack = $link.closest('tr').find('td:eq(5)').text().trim();
             var item_unit=$link.closest('tr').find('td:eq(6)').text().trim();
             var item_qty=$link.closest('tr').find('td:eq(7)').text().trim();
             var item_remarks=$link.closest('tr').find('td:eq(18)').text().trim();
-            var item_source = $link.attr('data-poa-source') || '';
-            var item_destination = $link.attr('data-poa-destination') || '';
             var item_id=$link.attr("id");
             $('#edit-pro-id').remove();
 
@@ -2133,13 +2643,11 @@ include("kattegat/role_check.php");
             $editModalRoot.find('.searchable-dropdown select option').show();
 
             $('#stcpoadhoceitemname').val(item_name);
-            $('#stcpoadhoceitemrack option').filter(function() {
-              return $(this).text().trim() === item_rack;
-            }).prop('selected', true);
+            stcPoaEditSetRackFromRowName(item_rack);
+            $('#stcpoadhoceitemrack-list').hide().empty();
+
             $('#stcpoadhoceitemunit').val(item_unit);
             $('#stcpoadhoceitemqty').val(item_qty);
-            stcPoaEnsureSelectOption($('#stcpoadhoceitemsource'), item_source);
-            stcPoaEnsureSelectOption($('#stcpoadhoceitemdestination'), item_destination);
             $('#stcpoadhoceitemremarks').val(item_remarks);
             $('#stc-poadhocedit-id').val(item_id);
           });
@@ -2148,10 +2656,9 @@ include("kattegat/role_check.php");
             var adhoc_id=$('#stc-poadhocedit-id').val();
             var adhoc_name=$('#stcpoadhoceitemname').val();
             var adhoc_rack=$('#stcpoadhoceitemrack').val();
+            var adhoc_rack_text=$.trim($('#stcpoadhoceitemrack-input').val() || '');
             var adhoc_unit=$('#stcpoadhoceitemunit').val();
             var adhoc_qty=$('#stcpoadhoceitemqty').val();
-            var adhoc_source=$('#stcpoadhoceitemsource').val();
-            var adhoc_destination=$('#stcpoadhoceitemdestination').val();
             var adhoc_remarks=$('#stcpoadhoceitemremarks').val();
             $.ajax({
               url     : "kattegat/ragnar_purchase.php",
@@ -2161,20 +2668,22 @@ include("kattegat/role_check.php");
                 adhoc_id:adhoc_id,
                 adhoc_name:adhoc_name,
                 adhoc_rack:adhoc_rack,
+                adhoc_rack_text:adhoc_rack_text,
                 adhoc_unit:adhoc_unit,
                 adhoc_qty:adhoc_qty,
-                adhoc_source:adhoc_source,
-                adhoc_destination:adhoc_destination,
                 adhoc_remarks:adhoc_remarks
               },
               success : function(response_items){
-                var response=response_items.trim();
-                if(response=="success"){
+                var response = String(response_items || '').replace(/^\uFEFF/, '').trim();
+                if(response==="success"){
                   alert("Item Name Updated Successfully.");
                   $('#stcpoadhoceitemname').val("");
-                  $('#stcpoadhoceitemsource').val("");
-                  $('#stcpoadhoceitemdestination').val("");
+                  $('#stcpoadhoceitemrack').val('');
+                  $('#stcpoadhoceitemrack-input').val('').removeData('rack-picked-id');
+                  $('#stcpoadhoceitemrack-list').hide().empty();
                   Pagination.loadData(pagenumber);
+                }else if(response==="invalid_rack"){
+                  alert("Rack could not be resolved. Pick a suggestion from the list or type an exact rack name.");
                 }else{
                   alert("Something went wrong please check and try again.");
                 }
@@ -3425,60 +3934,75 @@ include("kattegat/role_check.php");
             }
         }
         
-        // Show/hide dropdown based on checkbox selection (using event delegation for dynamic content)
+        // Bulk actions panel: status + source/destination (same pattern for 1 row or many)
         $(document).on('change', '.common_selector', function() {
-            var checkedBoxes = $('.common_selector:checked');
-            
-            if (checkedBoxes.length > 0) {
-                // Remove any existing fixed dropdown
-                $('.fixed-status-dropdown').remove();
-                
-                // Create fixed dropdown in top right corner
-                var dropdownHtml = '<div class="fixed-status-dropdown" style="position: fixed; top: 60px; right: 20px; z-index: 9999; background: white; padding: 15px; border: 1px solid #ddd; border-radius: 5px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">' +
-                    '<h6 style="margin-bottom: 10px;">Bulk Actions</h6>' +
-                    '<div class="dropdown" style="display: inline-block;">' +
-                    '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="bulkStatusDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                    'Change Status' +
-                    '</button>' +
-                    '<div class="dropdown-menu" aria-labelledby="bulkStatusDropdown">' +
-                    '<a class="dropdown-item bulk-status-change" href="javascript:void(0)" data-status="1">Accept All Selected</a>' +
-                    '<a class="dropdown-item bulk-status-change" href="javascript:void(0)" data-status="4">Approve All Selected</a>' +
-                    '<a class="dropdown-item bulk-status-change" href="javascript:void(0)" data-status="5">Reject All Selected</a>' +
-                    '</div>' +
-                    '</div>' +
-                    '<button class="btn btn-danger btn-sm ml-2" id="closeBulkActions" style="margin-left: 10px;">Close</button>' +
-                    '</div>';
-                
-                $('body').append(dropdownHtml);
-            } else {
-                // Hide fixed dropdown when no checkboxes are checked
-                $('.fixed-status-dropdown').remove();
-            }
+          var checkedBoxes = $('.common_selector:checked');
+          var totalCheckboxes = $('.common_selector').length;
+          var checkedCount = checkedBoxes.length;
+
+          if (checkedCount === 0) {
+            $('#selectAllCheckbox').prop('checked', false).prop('indeterminate', false);
+            $('.fixed-status-dropdown').remove();
+            return;
+          }
+          if (checkedCount === totalCheckboxes) {
+            $('#selectAllCheckbox').prop('checked', true).prop('indeterminate', false);
+          } else {
+            $('#selectAllCheckbox').prop('checked', false).prop('indeterminate', true);
+          }
+
+          $('.fixed-status-dropdown').remove();
+
+          var bulkStatusChangeHtml =
+            (typeof window.STC_POA_SHOW_BULK_STATUS_CHANGE !== 'undefined' && window.STC_POA_SHOW_BULK_STATUS_CHANGE)
+              ? (
+                  '<div class="dropdown" style="display:inline-block">' +
+                  '<button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="bulkStatusDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Change status</button>' +
+                  '<div class="dropdown-menu" aria-labelledby="bulkStatusDropdown">' +
+                  '<a class="bulk-status-change dropdown-status-link" href="javascript:void(0)" data-status="1">Accept all selected</a>' +
+                  '<a class="bulk-status-change dropdown-status-link" href="javascript:void(0)" data-status="4">Approve all selected</a>' +
+                  '<a class="bulk-status-change dropdown-status-link" href="javascript:void(0)" data-status="5">Reject all selected</a>' +
+                  '</div>' +
+                  '</div>'
+                )
+              : '';
+
+          var dropdownHtml = '' +
+              '<div class="fixed-status-dropdown" style="position: fixed; top: 60px; right: 16px; z-index: 10050; background: #fff; padding: 16px 18px; border: 1px solid #cfd4dc; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); width: min(420px, 96vw); min-width: 300px; max-height: min(560px, 92vh); overflow-x: visible; overflow-y: auto;">' +
+                  '<h6>Bulk actions</h6>' +
+                  '<p class="stc-poa-bulk-intro">Uses all rows you checked (single or multi-select).</p>' +
+                  '<div class="stc-poa-bulk-actions-row">' +
+                  bulkStatusChangeHtml +
+                  '<button type="button" class="btn btn-default btn-sm" id="closeBulkActionsTop">Close</button>' +
+                  '</div>' +
+                  '<hr style="margin:14px 0;">' +
+                  '<p class="stc-poa-bulk-section-title">Source &amp; destination</p>' +
+                  '<p class="stc-poa-bulk-section-hint">Type to filter suggestions (<code>ul</code>/<code>li</code>) or enter a new value. Leave a field empty to skip updating that column.</p>' +
+                  '<div class="bulk-location-insertion-point"></div>' +
+                  '<button type="button" class="btn btn-success btn-sm btn-block" style="margin-top:4px" id="bulkApplyLocations">Apply source / destination</button>' +
+              '</div>';
+          $('body').append(dropdownHtml);
+          var $dock = $('.fixed-status-dropdown').last();
+          var $slot = $dock.find('.bulk-location-insertion-point');
+          var $src = $('#stc-poa-template-bulk-source .searchable-dropdown').first().clone(true, true);
+          var $dst = $('#stc-poa-template-bulk-destination .searchable-dropdown').first().clone(true, true);
+          var $srcField = $('<div class="stc-poa-bulk-location-field"></div>');
+          var $dstField = $('<div class="stc-poa-bulk-location-field"></div>');
+          $srcField.append($('<span class="stc-poa-bulk-location-label">Source</span>'), $src);
+          $dstField.append($('<span class="stc-poa-bulk-location-label">Destination</span>'), $dst);
+          $slot.append($srcField, $dstField);
         });
         
-        // Close bulk actions dropdown
-        $(document).on('click', '#closeBulkActions', function() {
+        // Close bulk actions panel
+        $(document).on('click', '#closeBulkActions, #closeBulkActionsTop', function() {
             $('.fixed-status-dropdown').remove();
+            $("input[type='checkbox']").prop('checked', false);
         });
         
         // Handle Select All checkbox
         $(document).on('change', '#selectAllCheckbox', function() {
             var isChecked = $(this).is(':checked');
             $('.common_selector').prop('checked', isChecked).trigger('change');
-        });
-        
-        // Handle individual checkbox changes to update Select All state
-        $(document).on('change', '.common_selector', function() {
-            var totalCheckboxes = $('.common_selector').length;
-            var checkedCheckboxes = $('.common_selector:checked').length;
-            
-            if (checkedCheckboxes === 0) {
-                $('#selectAllCheckbox').prop('checked', false).prop('indeterminate', false);
-            } else if (checkedCheckboxes === totalCheckboxes) {
-                $('#selectAllCheckbox').prop('checked', true).prop('indeterminate', false);
-            } else {
-                $('#selectAllCheckbox').prop('checked', false).prop('indeterminate', true);
-            }
         });
         
         // Handle bulk status change
@@ -3568,6 +4092,73 @@ include("kattegat/role_check.php");
                 }
             }
         });
+
+        $(document).on('click', '#bulkApplyLocations', function() {
+          var checkedBoxes = $('.common_selector:checked');
+          var itemIds = [];
+          checkedBoxes.each(function() {
+            itemIds.push($(this).val());
+          });
+          if (itemIds.length === 0) {
+            alert('No rows selected.');
+            return;
+          }
+          var $panel = $(this).closest('.fixed-status-dropdown');
+          var srcVal = $.trim(String($panel.find('.bulk-poa-src-input').first().val() || ''));
+          var destVal = $.trim(String($panel.find('.bulk-poa-destination-input').first().val() || ''));
+          var updSrc = srcVal !== '' ? 1 : 0;
+          var updDest = destVal !== '' ? 1 : 0;
+          if (!updSrc && !updDest) {
+            alert('Choose at least one non-empty Source or Destination (leave destination blank to skip it).');
+            return;
+          }
+          var what = '';
+          if (updSrc) what += 'source';
+          if (updSrc && updDest) what += ' and ';
+          if (updDest) what += 'destination';
+          var n = itemIds.length;
+          if (!confirm('Update ' + what + ' on ' + n + ' selected row(s)?')) {
+            return;
+          }
+          var $btn = $(this).prop('disabled', true).text('Saving…');
+          $.ajax({
+            url: 'kattegat/ragnar_purchase.php',
+            type: 'POST',
+            dataType: 'text',
+            data: {
+              stc_po_adhoc_bulk_locations: 1,
+              ids: JSON.stringify(itemIds),
+              upd_source: updSrc,
+              upd_destination: updDest,
+              source_val: srcVal,
+              destination_val: destVal
+            },
+            success: function(r) {
+              var t = $.trim(String(r || ''));
+              if (t === 'success') {
+                alert('Updated ' + n + ' row(s).');
+                $('.common_selector').prop('checked', false);
+                $('#selectAllCheckbox').prop('checked', false).prop('indeterminate', false);
+                $('.fixed-status-dropdown').remove();
+                if (typeof Pagination !== 'undefined' && Pagination.loadData) {
+                  Pagination.loadData(typeof pagenumber !== 'undefined' ? pagenumber : 1);
+                } else {
+                  location.reload();
+                }
+              } else if (t === 'invalid') {
+                alert('Invalid request: nothing to apply.');
+              } else {
+                alert('Could not update. Please try again.');
+              }
+            },
+            error: function() {
+              alert('Request failed.');
+            },
+            complete: function() {
+              $btn.prop('disabled', false).text('Apply source / destination');
+            }
+          });
+        });
     </script>
 </body>
 </html>
@@ -3646,18 +4237,19 @@ include("kattegat/role_check.php");
                       for=""
                       >Item Rack
                     </h5>
-                    <div class="searchable-dropdown">
-                      <input type="text" id="stcpoadhoceitemrack-search" placeholder="Search..." class="form-control adhoc-edit-select-search" autocomplete="off" />
-                      <select id="stcpoadhoceitemrack" class="form-control validate">
-                        <?php
-                          $rackqry=mysqli_query($con, "
-                            SELECT `stc_rack_id`, `stc_rack_name` FROM `stc_rack` ORDER BY `stc_rack_name` ASC
-                          ");
-                          foreach($rackqry as $rackqrow){
-                            echo '<option value="'.$rackqrow['stc_rack_id'].'">'.$rackqrow['stc_rack_name'].'</option>';
-                          }
-                        ?>
-                      </select>
+                    <div class="adhoc-rack-combo-wrap">
+                      <input type="hidden" id="stcpoadhoceitemrack" value="" autocomplete="off" />
+                      <input
+                        id="stcpoadhoceitemrack-input"
+                        type="text"
+                        class="form-control validate"
+                        placeholder="Type to search racks, pick a row, or use your typed name"
+                        autocomplete="off"
+                        aria-autocomplete="list"
+                        aria-controls="stcpoadhoceitemrack-list"
+                      />
+                      <ul id="stcpoadhoceitemrack-list" class="adhoc-rack-combo-list" role="listbox" aria-hidden="true" style="display:none;"></ul>
+                      <small class="form-text text-muted">One field: suggestions are <strong>ul/li</strong>. If nothing matches, choose “Use typed value” or Save — server matches by rack name.</small>
                     </div>
                   </div>
                 </div>
@@ -3688,80 +4280,7 @@ include("kattegat/role_check.php");
                       class="form-control validate"
                     />
                   </div>
-                </div>
-                <div class="col-xl-12 col-md-12 col-sm-12">
-                  <div class="card-border mb-3 card card-body border-success">
-                    <h5 for="">Source (supplier / location)</h5>
-                    <div class="searchable-dropdown">
-                      <input type="text" id="stcpoadhoceitemsource-search" placeholder="Search..." class="form-control adhoc-edit-select-search" autocomplete="off" />
-                      <select id="stcpoadhoceitemsource" class="form-control validate">
-                        <option value="">Select</option>
-                        <?php
-                          $poa_src_qry = mysqli_query($con, "
-                            SELECT DISTINCT `stc_purchase_product_adhoc_source` AS loc
-                            FROM `stc_purchase_product_adhoc`
-                            WHERE `stc_purchase_product_adhoc_source` IS NOT NULL
-                              AND TRIM(`stc_purchase_product_adhoc_source`) <> ''
-                            ORDER BY `stc_purchase_product_adhoc_source` ASC
-                          ");
-                          if ($poa_src_qry) {
-                            foreach ($poa_src_qry as $poa_src_row) {
-                              $lbl = htmlspecialchars((string)($poa_src_row['loc'] ?? ''), ENT_QUOTES, 'UTF-8');
-                              echo '<option value="'.$lbl.'">'.$lbl.'</option>';
-                            }
-                          }
-                        ?>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-xl-12 col-md-12 col-sm-12">
-                  <div class="card-border mb-3 card card-body border-success">
-                    <h5 for="">Destination (location)</h5>
-                    <div class="searchable-dropdown">
-                      <input type="text" id="stcpoadhoceitemdestination-search" placeholder="Search..." class="form-control adhoc-edit-select-search" autocomplete="off" />
-                      <select id="stcpoadhoceitemdestination" class="form-control validate">
-                        <option value="">Select</option>
-                        <?php
-                          static $adhoc_dest_options = [
-                            'DHATKIDIH SHOP NO 2',
-                            'DHATKIDIH STORE',
-                            'DURGAPUR MAIN HOSPITAL',
-                            'KOLKATA STORE',
-                            'MANGO 17 NO STORE',
-                            'MANGO SHOP NO-1',
-                            'PARDIH STORE',
-                            'RAMGARH WAREHOUSE',
-                            'SARA INTERNATIONAL SCHOOL',
-                            'SARA GIRLS MISSION SCHOOL',
-                          ];
-                          $poa_dest_seen = [];
-                          $poa_dest_qry = mysqli_query($con, "
-                            SELECT DISTINCT `stc_purchase_product_adhoc_destination` AS loc
-                            FROM `stc_purchase_product_adhoc`
-                            WHERE `stc_purchase_product_adhoc_destination` IS NOT NULL
-                              AND TRIM(`stc_purchase_product_adhoc_destination`) <> ''
-                            ORDER BY `stc_purchase_product_adhoc_destination` ASC
-                          ");
-                          if ($poa_dest_qry) {
-                            foreach ($poa_dest_qry as $poa_dest_row) {
-                              $d = trim((string)($poa_dest_row['loc'] ?? ''));
-                              if ($d === '') continue;
-                              $poa_dest_seen[$d] = true;
-                              $lbl = htmlspecialchars($d, ENT_QUOTES, 'UTF-8');
-                              echo '<option value="'.$lbl.'">'.$lbl.'</option>';
-                            }
-                          }
-                          foreach ($adhoc_dest_options as $adhoc_dest_opt) {
-                            if (isset($poa_dest_seen[$adhoc_dest_opt])) continue;
-                            $lbl = htmlspecialchars($adhoc_dest_opt, ENT_QUOTES, 'UTF-8');
-                            echo '<option value="'.$lbl.'">'.$lbl.'</option>';
-                          }
-                        ?>
-                      </select>
-                    </div>
-                  </div>
-                </div>
+                </div>    
                 <div class="col-xl-12 col-md-12 col-sm-12">
                   <div class="card-border mb-3 card card-body border-success">
                     <h5
