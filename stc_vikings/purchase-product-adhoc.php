@@ -215,12 +215,29 @@ include("kattegat/role_check.php");
         border-bottom: none;
       }
 
-      /* Bootstrap 3 .modal { overflow: hidden } clips this dropdown; allow it to paint outside */
-      .bd-modal-editproductname.modal,
-      .bd-modal-editproductname .modal-dialog,
-      .bd-modal-editproductname .modal-content,
+      /* Edit item modal: scrollable body on short viewports (rack ul/li stays in flow / scrolls with form) */
+      .bd-modal-editproductname.modal {
+        overflow-y: auto;
+      }
+      .bd-modal-editproductname .modal-dialog {
+        margin: 24px auto;
+      }
+      .bd-modal-editproductname .modal-content {
+        display: flex;
+        flex-direction: column;
+        max-height: calc(100vh - 48px);
+        overflow: hidden;
+      }
+      .bd-modal-editproductname .modal-header,
+      .bd-modal-editproductname .modal-footer {
+        flex: 0 0 auto;
+      }
       .bd-modal-editproductname .modal-body {
-        overflow: visible !important;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto !important;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
       }
 
       /* Percentage calculation styling */
@@ -679,7 +696,7 @@ include("kattegat/role_check.php");
             aria-autocomplete="list"
           />
           <ul class="bulk-poa-src-list adhoc-rack-combo-list" role="listbox" aria-hidden="true" style="display:none;"></ul>
-          <small class="form-text text-muted">Suggestions are ul/li (no select). Leave empty to skip updating source.</small>
+          <!-- <small class="form-text text-muted">Suggestions are ul/li (no select). Leave empty to skip updating source.</small> -->
         </div>
       </div>
       <div id="stc-poa-template-bulk-destination">
@@ -728,7 +745,7 @@ include("kattegat/role_check.php");
             aria-autocomplete="list"
           />
           <ul class="bulk-poa-destination-list adhoc-rack-combo-list" role="listbox" aria-hidden="true" style="display:none;"></ul>
-          <small class="form-text text-muted">Suggestions are ul/li (no select). Leave empty to skip updating destination.</small>
+          <!-- <small class="form-text text-muted">Suggestions are ul/li (no select). Leave empty to skip updating destination.</small> -->
         </div>
       </div>
     </div>
@@ -4249,7 +4266,6 @@ include("kattegat/role_check.php");
                         aria-controls="stcpoadhoceitemrack-list"
                       />
                       <ul id="stcpoadhoceitemrack-list" class="adhoc-rack-combo-list" role="listbox" aria-hidden="true" style="display:none;"></ul>
-                      <small class="form-text text-muted">One field: suggestions are <strong>ul/li</strong>. If nothing matches, choose “Use typed value” or Save — server matches by rack name.</small>
                     </div>
                   </div>
                 </div>
@@ -5411,7 +5427,7 @@ include("kattegat/role_check.php");
                       <input type="text" class="form-control itt-type" placeholder="Enter Type" required>
                     </div>
                   </div>
-                  <div class="col-md-4">
+                  <div class="col-md-6">
                     <h5>Warranty</h5><br>
                     <div class="card mb-3 widget-content">
                       <input type="text" class="form-control itt-warranty" placeholder="Enter Warranty" required>
@@ -5425,13 +5441,13 @@ include("kattegat/role_check.php");
                         required>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-6">
                     <h5>Tax Invoice Number</h5><br>
                     <div class="card mb-3 widget-content">
                       <input type="text" class="form-control itt-tinnumber" placeholder="Enter Invoice Number" required>
                     </div>
                   </div>
-                  <div class="col-md-3">
+                  <div class="col-md-6">
                     <h5>Tax Invoice Date</h5><br>
                     <div class="card mb-3 widget-content">
                       <input type="date" class="form-control itt-tindate" value="<?php echo date('Y-m-d'); ?>" required>
