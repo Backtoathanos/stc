@@ -3101,6 +3101,16 @@ class ragnarPurchaseAdhoc extends tesseract{
 			$calculated_rate = $prate + ($prate * $percentage / 100);
 			$rate = $calculated_rate;
 		}
+		$checkqry=mysqli_query($this->stc_dbs, "
+			SELECT `stc_purchase_product_adhoc_productid` FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
+		");
+		if(mysqli_num_rows($checkqry)>0){
+			$row=mysqli_fetch_assoc($checkqry);
+			$product_id=$row['stc_purchase_product_adhoc_productid'];
+			mysqli_query($this->stc_dbs, "
+				UPDATE `stc_product` SET `stc_product_sale_percentage`='".mysqli_real_escape_string($this->stc_dbs, $percentage)."' WHERE `stc_product_id`='".mysqli_real_escape_string($this->stc_dbs, $product_id)."'
+			");
+		}
 		
 		$checkqry=mysqli_query($this->stc_dbs, "
 			UPDATE `stc_purchase_product_adhoc` SET `stc_purchase_product_adhoc_rate`='".mysqli_real_escape_string($this->stc_dbs, $rate)."', `stc_purchase_product_adhoc_prate`='".mysqli_real_escape_string($this->stc_dbs, $prate)."' WHERE `stc_purchase_product_adhoc_id`='".mysqli_real_escape_string($this->stc_dbs, $adhoc_id)."'
