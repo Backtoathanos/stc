@@ -26,10 +26,261 @@ if(empty(@$_SESSION['stc_school_user_id'])){
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
   <!-- CSS Files -->
   <link href="../assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css" />
   <style>
     .stc-schoolattendance-show {
-      width: auto;
-      overflow-x: scroll;
+      width: 100%;
+      overflow-x: hidden;
+      background: #f8f9fd;
+      border-radius: 12px;
+      padding: 0.35rem 0.2rem 0.55rem;
+      border: 1px solid rgba(92, 107, 192, 0.08);
+    }
+
+    #stc-questions-datatable_wrapper {
+      padding-top: 0.15rem;
+    }
+
+    #stc-questions-datatable_wrapper > .row {
+      align-items: flex-end;
+      margin-left: -10px;
+      margin-right: -10px;
+    }
+
+    #stc-questions-datatable_wrapper > .row > [class*="col-"] {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    #stc-questions-datatable_wrapper .dataTables_length,
+    #stc-questions-datatable_wrapper .dataTables_filter {
+      padding: 0.35rem 0 0.65rem;
+    }
+
+    #stc-questions-datatable_wrapper .dataTables_filter label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0;
+    }
+
+    #stc-questions-datatable_wrapper .dataTables_filter input {
+      border-radius: 8px;
+      border: 1px solid #c5cae9;
+      padding: 0.42rem 0.75rem;
+      min-width: 14rem;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(26, 35, 126, 0.05);
+    }
+
+    #stc-questions-datatable_wrapper .dataTables_length select {
+      border-radius: 8px;
+      border: 1px solid #c5cae9;
+      padding: 0.35rem 0.5rem;
+      background: #fff;
+      min-height: 38px;
+    }
+
+    #stc-questions-datatable_wrapper .dataTables_info {
+      padding-top: 0.75rem;
+      font-size: 0.85rem;
+      color: #546e7a;
+    }
+
+    #stc-questions-datatable_wrapper .dataTables_paginate {
+      padding-top: 0.45rem;
+    }
+
+    #stc-questions-datatable_wrapper .paginate_button {
+      padding: 0.32rem 0.65rem !important;
+      border-radius: 8px !important;
+      margin: 0 3px !important;
+      border: 1px solid rgba(92, 107, 192, 0.3) !important;
+      background: #fff !important;
+      color: #3949ab !important;
+    }
+
+    #stc-questions-datatable_wrapper .paginate_button.disabled {
+      opacity: 0.45 !important;
+    }
+
+    #stc-questions-datatable_wrapper .paginate_button:hover:not(.disabled) {
+      border-color: #3949ab !important;
+      background: #eef1fb !important;
+      color: #1a237e !important;
+    }
+
+    #stc-questions-datatable_wrapper .paginate_button.current,
+    #stc-questions-datatable_wrapper .paginate_button.current:hover {
+      background: #3949ab !important;
+      color: #fff !important;
+      border-color: #303f9f !important;
+    }
+
+    /* —— Questions Details page (fixes global .mb-3 grey boxes here) —— */
+    .stc-questions-mgmt .mb-3,
+    .stc-questions-mgmt .form-group {
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .stc-q-toolbar-card {
+      background: linear-gradient(135deg, #3949ab 0%, #5c6bc0 55%, #7986cb 100%);
+      color: #fff;
+      border-radius: 14px !important;
+      overflow: hidden;
+      box-shadow: 0 14px 40px rgba(26, 35, 126, 0.22) !important;
+    }
+
+    .stc-q-toolbar-card .card-body {
+      padding: 1.35rem 1.5rem 1.5rem !important;
+    }
+
+    .stc-q-toolbar-card label,
+    .stc-q-toolbar-card .small {
+      color: rgba(255, 255, 255, 0.92) !important;
+    }
+
+    .stc-q-toolbar-card .text-muted-soft {
+      color: rgba(255, 255, 255, 0.74) !important;
+      font-size: 0.8rem !important;
+    }
+
+    .stc-q-toolbar-card .form-control,
+    .stc-q-toolbar-card select.form-control {
+      border-radius: 10px !important;
+      border: 1px solid rgba(255, 255, 255, 0.35) !important;
+      background: rgba(255, 255, 255, 0.97) !important;
+      min-height: 42px !important;
+      padding: 0.45rem 0.85rem !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    }
+
+    .stc-q-toolbar-card select.form-control {
+      padding-right: 2rem !important;
+    }
+
+    .stc-q-toolbar-card label.text-up-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.38rem !important;
+      font-weight: 600;
+      opacity: 0.95;
+    }
+
+    .stc-q-btn-add {
+      border-radius: 10px !important;
+      padding: 0.55rem 1.35rem !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.03em !important;
+      box-shadow: 0 8px 20px rgba(46, 125, 50, 0.35) !important;
+      border: none !important;
+    }
+
+    .stc-q-btn-add .material-icons {
+      vertical-align: middle !important;
+      margin-right: 6px !important;
+      margin-top: -2px !important;
+      font-size: 21px !important;
+    }
+
+    .stc-q-btn-show {
+      border-radius: 10px !important;
+      padding: 0.55rem 1.35rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.04em !important;
+      background: #fff !important;
+      color: #283593 !important;
+      border: none !important;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12) !important;
+    }
+
+    .stc-q-btn-show:not(:disabled):hover {
+      background: #eef1fb !important;
+      color: #1a237e !important;
+    }
+
+    .stc-q-btn-show:disabled {
+      opacity: 0.6 !important;
+      cursor: wait !important;
+    }
+
+    .stc-q-btn-show .material-icons {
+      vertical-align: middle !important;
+      margin-right: 8px !important;
+      margin-top: -3px !important;
+      font-size: 21px !important;
+    }
+
+    .stc-q-toolbar-divider {
+      height: 1px !important;
+      background: rgba(255, 255, 255, 0.24) !important;
+      margin: 1rem 0 1.35rem !important;
+      border: none !important;
+    }
+
+    .stc-q-results-card {
+      border-radius: 14px !important;
+      overflow: hidden;
+      border: 1px solid rgba(92, 107, 192, 0.15) !important;
+      box-shadow: 0 8px 30px rgba(22, 40, 90, 0.08) !important;
+      background: #fff !important;
+    }
+
+    .stc-q-results-card .card-header {
+      padding: 0.85rem 1.35rem !important;
+      margin: 0 !important;
+      background: linear-gradient(180deg, #eef1fb 0%, #fff 100%) !important;
+      border-bottom: 1px solid rgba(92, 107, 192, 0.12) !important;
+      font-weight: 600 !important;
+      font-size: 0.95rem !important;
+      color: #1a237e !important;
+    }
+
+    #stc-questions-datatable {
+      table-layout: fixed !important;
+      width: 100% !important;
+      margin: 0 !important;
+      border-collapse: separate !important;
+      border-spacing: 0 !important;
+    }
+
+    #stc-questions-datatable thead th {
+      background: linear-gradient(180deg, #5c6bc0 0%, #3949ab 96%) !important;
+      color: #fff !important;
+      border: none !important;
+      font-weight: 500 !important;
+      font-size: 0.8rem !important;
+      vertical-align: middle !important;
+    }
+
+    #stc-questions-datatable thead th:first-child {
+      border-radius: 10px 0 0 0 !important;
+    }
+
+    #stc-questions-datatable thead th:last-child {
+      border-radius: 0 10px 0 0 !important;
+    }
+
+    #stc-questions-datatable tbody td {
+      vertical-align: middle !important;
+      font-size: 0.86rem !important;
+    }
+
+    #stc-questions-datatable tbody td:not(.stc-q-col-question) {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 0;
+    }
+
+    #stc-questions-datatable tbody td.stc-q-col-question {
+      white-space: normal !important;
+      word-break: break-word;
+      line-height: 1.44;
+      text-align: left !important;
+      font-size: 0.878rem;
+      color: #37474f;
     }
 
     .fade:not(.show) {
@@ -398,6 +649,274 @@ if(empty(@$_SESSION['stc_school_user_id'])){
     .stc_print_page i {
       color: black;
     }
+
+    /* Add Question modal — scoped layout (tabs + fields) */
+    .stc-school-showteacher-res .modal-dialog {
+      max-width: min(920px, 96vw);
+    }
+
+    .stc-school-showteacher-res .qm-modal-head {
+      border-bottom: none;
+      padding-bottom: 0;
+      background: linear-gradient(60deg, #5c6bc0 0%, #3949ab 92%);
+      color: #fff;
+    }
+
+    .stc-school-showteacher-res .qm-modal-head .modal-title {
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .stc-school-showteacher-res .qm-modal-head .close {
+      color: #fff;
+      opacity: 0.92;
+      text-shadow: none;
+    }
+
+    .stc-school-showteacher-res .qm-modal-head .subtitle {
+      display: block;
+      font-size: 0.8rem;
+      opacity: 0.88;
+      margin-top: 2px;
+    }
+
+    .stc-school-showteacher-res .modal-body.qm-modal-body {
+      padding-top: 0;
+      background: linear-gradient(to bottom, #f8faff 0%, #fff 40%);
+    }
+
+    .stc-school-showteacher-res .qm-tabs-card {
+      border-radius: 0 0 6px 6px;
+      box-shadow: 0 2px 12px rgba(22, 40, 80, 0.06);
+    }
+
+    .stc-school-showteacher-res .qm-tab-nav-wrap {
+      border-bottom: 1px solid rgba(25, 40, 80, 0.1);
+      margin: 0 -15px;
+      padding: 0 10px;
+    }
+
+    /* Modal tabs — override Material Dashboard nav-tabs (often white/low-contrast on pale bg). */
+    .stc-school-showteacher-res .qm-tab-nav-wrap.nav-tabs {
+      gap: 0.35rem;
+    }
+
+    .stc-school-showteacher-res .qm-tab-nav-wrap.nav-tabs > .nav-item > .nav-link {
+      font-weight: 600 !important;
+      font-size: 0.8125rem !important;
+      text-transform: none !important;
+      color: #1a237e !important;
+      background-color: #eef1fb !important;
+      border: 1px solid rgba(26, 35, 126, 0.18) !important;
+      margin: 0 2px !important;
+      border-radius: 8px !important;
+      padding: 0.62rem 0.85rem !important;
+      opacity: 1 !important;
+    }
+
+    .stc-school-showteacher-res .qm-tab-nav-wrap.nav-tabs > .nav-item > .nav-link:hover,
+    .stc-school-showteacher-res .qm-tab-nav-wrap.nav-tabs > .nav-item > .nav-link:focus {
+      color: #0d47a1 !important;
+      background-color: #dfe4fb !important;
+      border-color: rgba(26, 35, 126, 0.28) !important;
+    }
+
+    .stc-school-showteacher-res .qm-tab-nav-wrap.nav-tabs > .nav-item > .nav-link.active,
+    .stc-school-showteacher-res .qm-tab-nav-wrap.nav-tabs > .nav-item > .nav-link.active.show {
+      color: #ffffff !important;
+      background: linear-gradient(180deg, #5c6bc0 0%, #3949ab 100%) !important;
+      border-color: #303f9f !important;
+    }
+
+    .stc-school-showteacher-res .qm-tab-nav-wrap.nav-tabs > .nav-item > .nav-link .material-icons {
+      font-size: 18px !important;
+      vertical-align: middle !important;
+      margin-right: 6px !important;
+      color: inherit !important;
+      opacity: 1 !important;
+    }
+
+    /* Green action buttons inside modal stay readable even if `.form-control`/theme overrides text. */
+    .stc-school-showteacher-res .btn.btn-success {
+      color: #fff !important;
+      border-color: #43a047 !important;
+      background-color: #2e7d32 !important;
+    }
+
+    .stc-school-showteacher-res .btn.btn-success:hover,
+    .stc-school-showteacher-res .btn.btn-success:focus {
+      color: #fff !important;
+      background-color: #1b5e20 !important;
+      border-color: #1b5e20 !important;
+    }
+
+    .stc-school-showteacher-res .qm-tab-content {
+      padding-top: 1rem;
+    }
+
+    .stc-school-showteacher-res .qm-tab-content-outer {
+      position: relative;
+      min-height: 220px;
+    }
+
+    .stc-school-showteacher-res .qm-tab-loader {
+      position: absolute;
+      inset: 0;
+      z-index: 12;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.75rem;
+      background: rgba(255, 255, 255, 0.82);
+      border-radius: 8px;
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      transition: opacity 0.15s ease;
+    }
+
+    .stc-school-showteacher-res .qm-tab-loader-inner {
+      text-align: center;
+    }
+
+    .stc-school-showteacher-res .qm-tab-spinner {
+      display: inline-block;
+      width: 2.35rem;
+      height: 2.35rem;
+      border: 3px solid rgba(57, 73, 171, 0.18);
+      border-top-color: #3949ab;
+      border-radius: 50%;
+      animation: qm-tab-spin 0.72s linear infinite;
+      vertical-align: middle;
+    }
+
+    .stc-school-showteacher-res .qm-tab-loader-text {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #3949ab;
+    }
+
+    @keyframes qm-tab-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Snappier tab panes inside this modal (default BS fade feels sluggish). */
+    .stc-school-showteacher-res .tab-pane.fade {
+      transition: opacity 0.1s linear;
+    }
+
+    .stc-school-showteacher-res .mb-3.qm-field {
+      border: 1px solid rgba(25, 40, 80, 0.1);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 1rem !important;
+      margin-left: 0;
+      margin-right: 0;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 0 1px 6px rgba(22, 40, 80, 0.04);
+    }
+
+    .stc-school-showteacher-res .qm-field>h5 {
+      font-size: 0.73rem !important;
+      font-weight: 600 !important;
+      letter-spacing: 0.05em !important;
+      text-transform: uppercase !important;
+      color: rgba(43, 55, 120, 0.72) !important;
+      margin-bottom: 10px !important;
+    }
+
+    .stc-school-showteacher-res .qm-alert {
+      padding: 0.65rem 0.85rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      font-size: 0.815rem;
+      background: rgba(92, 107, 192, 0.08);
+      border: 1px solid rgba(92, 107, 192, 0.2);
+      color: rgba(26, 35, 90, 0.9);
+    }
+
+    .stc-school-showteacher-res .qm-actions .btn-success {
+      font-weight: 500;
+      border-radius: 8px !important;
+      padding: 0.55rem 1.25rem;
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+    }
+
+    .stc-school-showteacher-res .qm-table-wrap {
+      border-radius: 10px;
+      border: 1px solid rgba(25, 40, 80, 0.1);
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .stc-school-showteacher-res .qm-table-wrap thead th {
+      background: linear-gradient(180deg, #5c6bc0 0%, #3949ab 98%);
+      color: #fff;
+      border: none;
+      font-weight: 500;
+      font-size: 0.8125rem;
+      padding: 0.55rem !important;
+    }
+
+    .stc-school-showteacher-res .qm-table-wrap .table {
+      margin-bottom: 0 !important;
+    }
+
+    .stc-school-showteacher-res .qm-form-error {
+      font-size: 0.875rem;
+      border-radius: 8px !important;
+    }
+
+    .stc-school-showteacher-res .qm-form-error.alert-warning {
+      background: rgba(255, 193, 7, 0.15) !important;
+      border: 1px solid rgba(255, 152, 0, 0.55) !important;
+      color: #5d4037 !important;
+    }
+
+    .stc-school-showteacher-res .qm-form-error.alert-success {
+      background: rgba(46, 125, 50, 0.12) !important;
+      border: 1px solid rgba(76, 175, 80, 0.45) !important;
+      color: #1b5e20 !important;
+    }
+
+    .stc-school-showteacher-res .qm-steps .badge {
+      font-size: 0.72rem;
+      padding: 0.35rem 0.55rem;
+    }
+
+    .stc-school-showteacher-res .qm-section {
+      border: 1px solid rgba(26, 35, 126, 0.14) !important;
+      border-radius: 10px;
+      padding: 0.75rem 1rem 0.35rem !important;
+      margin-bottom: 1rem !important;
+      background: rgba(255, 255, 255, 0.98);
+    }
+
+    .stc-school-showteacher-res .qm-section legend {
+      width: auto;
+      padding: 0 0.35rem !important;
+      margin-bottom: 0 !important;
+      font-size: 0.8rem !important;
+      font-weight: 700 !important;
+      color: #3949ab !important;
+      text-transform: none;
+      border: none;
+    }
+
+    .stc-school-showteacher-res .qm-req {
+      color: #c62828 !important;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: help;
+    }
+
+    .stc-school-showteacher-res .qm-optional-note {
+      font-weight: normal;
+      font-size: 0.74rem;
+      color: rgba(93, 64, 55, 0.75);
+    }
   </style>
 </head>
 
@@ -431,64 +950,85 @@ if(empty(@$_SESSION['stc_school_user_id'])){
                 <div class="card-body">
                   <div class="tab-content">
                     <div class="tab-pane active" id="stc-create-attendance">
-                      <div class="row">
-                        <div class="col-12">
-                          <h2 class="tm-block-title d-inline-block">Questions Details</h2>
+                      <div class="stc-questions-mgmt">
+                        <div class="row align-items-start mb-3 mb-md-4">
+                          <div class="col-12">
+                            <h2 class="h4 mb-1 font-weight-bold d-inline-flex align-items-center"
+                              style="color:#283593;font-size:1.35rem;">
+                              <i class="material-icons mr-2" style="font-size:1.65rem;line-height:1;">quiz</i>
+                              Questions Details
+                            </h2>
+                            <p class="small text-muted mb-0 mt-1 pl-1 ml-1 ml-md-0 pl-md-0"
+                              style="max-width: 42rem;line-height:1.45;">
+                              Filter by month and class, then load rows. Search and paging apply to the table below after
+                              you click&nbsp;<strong>Show questions</strong>.
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                      <div class="row">
-                        <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
-                          <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
-                            <div class="row">
-                              <div class="col-sm-12 col-md-12 col-lg-12">
-                                <div class="mb-3">
-                                  <button type="button" class="form-control btn btn-success" id="stcschooladdquest">Add
-                                    Questions</button>
-                                </div>
+
+                        <div class="card stc-q-toolbar-card mb-4 border-0">
+                          <div class="card-body">
+                            <div class="d-flex flex-wrap align-items-start justify-content-between">
+                              <div class="mr-3 mb-3 mb-xl-0 pr-xl-4" style="max-width:520px;">
+                                <span class="text-up-label d-block">Create</span>
+                                <button type="button" id="stcschooladdquest"
+                                  class="btn btn-success stc-q-btn-add d-inline-flex align-items-center mb-2"
+                                  data-toggle="modal" data-target=".stc-school-showteacher-res">
+                                  <span class="material-icons" aria-hidden="true">post_add</span>
+                                  Add questions
+                                </button>
+                                <p class="small text-muted-soft mb-0">Opens timetable and syllabus modal for new lecture
+                                  questions.</p>
                               </div>
-                              <div class="col-sm-12 col-md-6 col-lg-6">
-                                <div class="mb-3">
-                                  <h5 for="name">Month
-                                  </h5>
-                                  <input name="stcattendmonth" type="month" class="form-control validate stcattendmonth"
-                                    value="<?php echo date('Y-m'); ?>" />
-                                </div>
+                              <div class="flex-grow-1" style="min-width:min(100%, 280px);">
+                                <span class="text-up-label d-block">Browse</span>
+                                <p class="small text-muted-soft mb-0">Same month and class apply to the list you load.
+                                </p>
                               </div>
-                              <div class="col-sm-12 col-md-6 col-lg-6">
-                                <div class="mb-3">
-                                  <h5 for="name">Class name
-                                  </h5>
-                                  <select name="stcattendclassname" class="form-control validate stcattendclassname"
-                                    style="padding-left: 15px;">
-                                    <?php 
-                                                        include_once("../../MCU/db.php");
-                                                        $school_sql=mysqli_query($con, "
-                                                            SELECT DISTINCT `stc_school_class_id`,`stc_school_class_title` FROM stc_school_class ORDER BY `stc_school_class_title` ASC
-                                                        ");
-                                                        foreach($school_sql as $school_row){
-                                                            echo '<option value="'.$school_row['stc_school_class_id'].'">'.$school_row['stc_school_class_title'].'</option>';
-                                                        }
-                                                    ?>
-                                  </select>
-                                </div>
+                            </div>
+                            <hr class="stc-q-toolbar-divider" />
+                            <div class="form-row align-items-end">
+                              <div class="form-group col-md-4 col-sm-12 mb-3 mb-md-0">
+                                <label class="text-up-label d-block" for="stcattendmonth-input">Month</label>
+                                <input id="stcattendmonth-input" name="stcattendmonth" type="month"
+                                  class="form-control validate stcattendmonth" value="<?php echo date('Y-m'); ?>" />
                               </div>
-                              <div class="col-sm-12 col-md-12 col-lg-12">
-                                <div class="mb-3">
-                                  <button type="button" class="form-control btn btn-success"
-                                    id="stcschoolattendance">Show Questions</button>
-                                </div>
+                              <div class="form-group col-md-4 col-sm-12 mb-3 mb-md-0">
+                                <label class="text-up-label d-block" for="stcattendclassname-input">Class</label>
+                                <select id="stcattendclassname-input" name="stcattendclassname"
+                                  class="form-control validate stcattendclassname">
+                                  <?php
+                                        include_once("../../MCU/db.php");
+                                        $school_sql=mysqli_query($con, "
+                                            SELECT DISTINCT `stc_school_class_id`,`stc_school_class_title` FROM stc_school_class ORDER BY `stc_school_class_title` ASC
+                                        ");
+                                        foreach($school_sql as $school_row){
+                                            echo '<option value="'.$school_row['stc_school_class_id'].'">'.$school_row['stc_school_class_title'].'</option>';
+                                        }
+                                    ?>
+                                </select>
+                              </div>
+                              <div class="form-group col-md-4 col-sm-12 mb-0">
+                                <label class="text-up-label d-none d-md-block" for="stcschoolattendance">&nbsp;</label>
+                                <button type="button" id="stcschoolattendance"
+                                  class="btn btn-block stc-q-btn-show d-inline-flex align-items-center justify-content-center mb-2 mb-md-0">
+                                  <span class="material-icons" aria-hidden="true">search</span>
+                                  Show questions
+                                </button>
                               </div>
                             </div>
                           </div>
-                          <div class="row stc-schoolattendance-div" style="display:none;">
-                            <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
-                              <div class="tm-bg-primary-dark tm-block tm-block-h-auto">
-                                <div class="row">
-                                  <div class="col-sm-12 col-md-12 col-lg-12">
-                                    <div class="mb-3 stc-schoolattendance-show">
+                        </div>
 
-                                    </div>
-                                  </div>
+                        <div class="row stc-schoolattendance-div" style="display:none;">
+                          <div class="col-12 mx-auto">
+                            <div class="card stc-q-results-card mb-4 border-0">
+                              <div class="card-header d-flex align-items-center">
+                                <i class="material-icons mr-2" style="color:#3949ab;">table_chart</i>
+                                Loaded questions
+                              </div>
+                              <div class="card-body py-4">
+                                <div class="px-1 stc-schoolattendance-show rounded" aria-live="polite">
                                 </div>
                               </div>
                             </div>
@@ -731,12 +1271,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
   </script>
   <script>
     $(document).ready(function () {
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
-      const value = urlParams.get('student-attendance');
-      if (value == "yes") {
-        $('.student-attendance').addClass('active');
-      }
+      $('.questions-management').addClass('active');
     });
   </script>
   <script>
@@ -771,16 +1306,57 @@ if(empty(@$_SESSION['stc_school_user_id'])){
   <!-- canteen section -->
   <script>
     $(document).ready(function () {
+      /** Destroy Questions DataTable before injecting new markup (avoid duplicate-ID / leaks). */
+      function stcDestroyQuestionsDataTable() {
+        var $t = $('#stc-questions-datatable');
+        if ($t.length && $.fn.DataTable && $.fn.DataTable.isDataTable($t)) {
+          $t.DataTable().destroy();
+        }
+      }
 
+      function stcInitQuestionsDataTable() {
+        var $t = $('#stc-questions-datatable');
+        if (!$t.length || !$.fn.DataTable) {
+          return;
+        }
+        $t.DataTable({
+          pageLength: 15,
+          lengthMenu: [[10, 15, 25, 50, 100], [10, 15, 25, 50, 100]],
+          ordering: true,
+          order: [[0, 'asc']],
+          searching: true,
+          info: true,
+          paging: true,
+          autoWidth: false,
+          columnDefs: [
+            { targets: 0, width: '3.5rem', className: 'text-center align-middle' },
+            { targets: [1, 2, 3], className: 'text-center align-middle' },
+            { targets: 4, className: 'stc-q-col-question text-left align-middle' }
+          ],
+          language: {
+            search: 'Search:',
+            lengthMenu: 'Show _MENU_ rows',
+            info: 'Showing _START_–_END_ of _TOTAL_',
+            infoEmpty: 'No rows',
+            zeroRecords: 'No matching rows',
+            paginate: { next: 'Next', previous: 'Prev' }
+          },
+          dom: "<'row'<'col-md-6'l><'col-md-6'f>>" + "rt<'row'<'col-md-5'i><'col-md-7'p>>",
+          initComplete: function () {
+            $('.stc-schoolattendance-show').find('.dataTables_filter input[type="search"]').attr({
+              'placeholder': 'Type to filter rows…',
+              'aria-label': 'Search questions'
+            });
+          }
+        });
+      }
 
-      $(document).on('click', '#stcschooladdquest', function (e) {
-        e.preventDefault();
-        $('.stc-school-showteacher-res').modal('show');
-      });
       $(document).on('click', '#stcschoolattendance', function (e) {
         e.preventDefault();
         var month = $('.stcattendmonth').val();
         var class_id = $('.stcattendclassname').val();
+        $('#stcschoolattendance').prop('disabled', true).addClass('disabled');
+        $('.stc-schoolattendance-div').hide();
         $.ajax({
           url: "../vanaheim/school-management.php",
           method: "POST",
@@ -790,9 +1366,27 @@ if(empty(@$_SESSION['stc_school_user_id'])){
             month: month
           },
           dataType: `JSON`,
-          success: function (response_student) {
+          complete: function () {
+            $('#stcschoolattendance').prop('disabled', false).removeClass('disabled');
+          },
+          error: function () {
+            stcDestroyQuestionsDataTable();
             $('.stc-schoolattendance-div').show();
-            $('.stc-schoolattendance-show').html(response_student);
+            $('.stc-schoolattendance-show').html(
+              '<p class="alert alert-danger mb-0"><strong>Load failed.</strong> Check your connection and click Show Questions again.</p>'
+            );
+          },
+          success: function (response_student) {
+            if (response_student && typeof response_student === 'object' && response_student.reload === 'reload') {
+              window.location.reload();
+              return;
+            }
+            stcDestroyQuestionsDataTable();
+            $('.stc-schoolattendance-div').show();
+            $('.stc-schoolattendance-show').html(typeof response_student === 'string' ? response_student : '');
+            window.requestAnimationFrame(function () {
+              stcInitQuestionsDataTable();
+            });
           }
         });
       });
@@ -863,91 +1457,201 @@ if(empty(@$_SESSION['stc_school_user_id'])){
         var space_width = $('.stc-schoolattendance-show table').width();
         // console.log(space_width);
       });
-      
 
-      
+      /** Add-question modal: trim / NA guards + banner messages */
+      var _qmTeacherModal = function () {
+        return $('.stc-school-showteacher-res');
+      };
+      function qmTrim(v) {
+        return $.trim((v !== undefined && v !== null ? String(v) : ''));
+      }
+      /** True when value has non-whitespace content and is not literal NA/select placeholder */
+      function qmFilledSel(v) {
+        var t = qmTrim(v);
+        return t !== '' && t.toUpperCase() !== 'NA';
+      }
+      function qmFilledText(v) {
+        return qmTrim(v) !== '';
+      }
+      function qmBannerClear() {
+        if (window._qmSuccTimer) {
+          clearTimeout(window._qmSuccTimer);
+          window._qmSuccTimer = null;
+        }
+        var $e = _qmTeacherModal().find('.qm-form-error');
+        $e.addClass('d-none').removeClass('alert-warning alert-success').empty();
+      }
+      function qmBannerMsg(html, isSuccess) {
+        qmBannerClear();
+        if (!html) {
+          return;
+        }
+        window._qmSuccTimer = isSuccess ? setTimeout(qmBannerClear, 5200) : null;
+        _qmTeacherModal().find('.qm-form-error').removeClass('d-none alert-warning alert-success')
+          .addClass(isSuccess ? 'alert-success' : 'alert-warning').html(html);
+      }
+      $(document).on('shown.bs.modal hidden.bs.modal', '.stc-school-showteacher-res', function () {
+        qmBannerClear();
+      });
 
-      $(document).on('click', '.save-lecture', function(e){
-          e.preventDefault();
-          var schedule_id=$('.stc-school-hidden-schedule-id').val();
-          var classtype=$('#classtype').val();
-          var chapter=$('#chapter').val();
-          var lession=$('#lession').val();
-          var Syllabus=$('#Syllabus').val();
-          var Unit=$('#unit-should-be').val();
-          var remarks=$('#remarks').val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_lecturedet_save : 1,
-              schedule_id : schedule_id,
-              classtype : classtype,
-              chapter : chapter,
-              lession : lession,
-              Syllabus : Syllabus,
-              Unit : Unit,
-              remarks : remarks
-            },
-            // dataType: `JSON`,
-            success   : function(response_student){
-             // console.log(response_student);
+      /** Tab / syllabus loaders (ref-counted overlay on `.qm-tab-content-outer`). */
+      var _qmTeacherLoaderDepth = 0;
+      function qmTeacherLoaderSync() {
+        var $l = _qmTeacherModal().find('.qm-tab-loader');
+        if (_qmTeacherLoaderDepth > 0) {
+          $l.removeClass('d-none').attr('aria-busy', 'true');
+        } else {
+          $l.addClass('d-none').removeAttr('aria-busy');
+        }
+      }
+      function qmTeacherLoaderBegin() {
+        _qmTeacherLoaderDepth++;
+        qmTeacherLoaderSync();
+      }
+      function qmTeacherLoaderEnd() {
+        _qmTeacherLoaderDepth = Math.max(0, _qmTeacherLoaderDepth - 1);
+        qmTeacherLoaderSync();
+      }
+      function qmTeacherLoaderReset() {
+        _qmTeacherLoaderDepth = 0;
+        qmTeacherLoaderSync();
+      }
+      $(document).on('hidden.bs.modal', '.stc-school-showteacher-res', function () {
+        qmTeacherLoaderReset();
+      });
+      $(document).on('show.bs.tab', '.stc-school-showteacher-res .qm-tab-nav-wrap a[data-toggle="tab"]', function () {
+        qmTeacherLoaderBegin();
+      });
+      $(document).on('shown.bs.tab', '.stc-school-showteacher-res .qm-tab-nav-wrap a[data-toggle="tab"]', function () {
+        qmTeacherLoaderEnd();
+      });
+
+      $(document).on('click', '.save-lecture', function (e) {
+        e.preventDefault();
+        qmBannerClear();
+
+        var schedule_id = qmTrim($('.stc-school-hidden-schedule-id').val());
+        var classtype = qmTrim($('#classtype').val());
+        var chapter = qmTrim($('#chapter').val());
+        var lession = qmTrim($('#lession').val());
+        var syllabus = qmTrim($('#Syllabus').val());
+        var unitSel = $('#unit-should-be').val();
+        var unit = ($.trim(unitSel) === '' || qmTrim(unitSel).toUpperCase() === 'NA') ? '' : qmTrim(unitSel);
+        var remarks = qmTrim($('#remarks').val());
+
+        var per = qmFilledSel($('.scheduledaily').val());
+        if (!(per && qmFilledSel(schedule_id))) {
+          $('#qm-tab-lecture-link').tab('show');
+          qmBannerMsg('<strong>Select a period first.</strong> Choose a timetable row under Schedule slot.');
+          $('.scheduledaily').focus();
+          return;
+        }
+        if (!qmFilledSel(classtype) || !qmFilledSel(syllabus) || !qmFilledSel(chapter) || !qmFilledSel(lession)) {
+          $('#qm-tab-lecture-link').tab('show');
+          qmBannerMsg('<strong>Required fields missing.</strong> Fill class type, syllabus title, chapter, and lesson (&ldquo;Select&rdquo; and blanks are ignored). Unit and remarks stay optional.');
+          return;
+        }
+
+        $.ajax({
+          url: "../vanaheim/school-management.php",
+          method: "POST",
+          data: {
+            stc_lecturedet_save: 1,
+            schedule_id: schedule_id,
+            classtype: classtype,
+            chapter: chapter,
+            lession: lession,
+            Syllabus: syllabus,
+            Unit: unit,
+            remarks: remarks
+          },
+          success: function (response_student) {
+            var response = $.trim(response_student);
+            if (response == "reload") {
+              window.location.reload();
+              return;
+            }
+            if (response == "success") {
               call_syllabus_det();
-              var response=response_student.trim();
-              if(response=="reload"){
-                window.location.reload();
-              }else if(response=="success"){
-                $('#classtype').val('NA');
-                $('#chapter').val('');
-                $('#lession').val('');
-                $('#Syllabus').val('');
-                $('#remarks').val('');
-                alert("Record updated!!!");
-              }else if(response=="empty"){
-                alert("Please fill all fields, if you dont have any then write NA.");
-              }else{
-                alert("Something went wrong!!! Please check & try again.");
-              }
+              $('#classtype').val('NA');
+              $('#Syllabus').html('<option value="NA">Select (after period)</option>');
+              $('#chapter').html('<option value="NA">Select</option>');
+              $('#lession').html('<option value="NA">Select</option>');
+              $('#unit-should-be').html('<option value="NA">Select</option>');
+              $('#remarks').val('');
+              $('#complete-date').val('');
+              $('#Questions').val('');
+              qmBannerMsg('<strong>Lecture saved.</strong> Review it under Saved lectures.', true);
+              return;
             }
-          });
+            if (response == "empty") {
+              $('#qm-tab-lecture-link').tab('show');
+              qmBannerMsg('<strong>Could not save.</strong> Avoid blank rows and &ldquo;Select&rdquo; placeholders for period, class type, syllabus, chapter, and lesson.');
+              return;
+            }
+            qmBannerMsg('<strong>Something went wrong.</strong> Please try again in a moment.');
+          }
         });
+      });
 
-        $(document).on('click', '.add-question', function(e){
-          e.preventDefault();
-          var schedule_id=$('.stc-school-hidden-schedule-id').val();
-          var questions=$('#Questions').val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_lecturedetquestion_save : 1,
-              schedule_id : schedule_id,
-              questions : questions
-            },
-            // dataType: `JSON`,
-            success   : function(response_student){
-             // console.log(response_student);
-              var response=response_student.trim();
-              if(response=="reload"){
-                window.location.reload();
-              }else if(response=="success"){
-                call_syllabus_quest();
-                alert("Record updated!!!");
-                $('#Questions').val('');
-              }else if(response=="empty"){
-                alert("Please fill all fields, if you dont have any then write NA.");
-              }else{
-                alert("Something went wrong!!! Please check & try again.");
-              }
+      $(document).on('click', '.add-question', function (e) {
+        e.preventDefault();
+        qmBannerClear();
+
+        var schedule_id = qmTrim($('.stc-school-hidden-schedule-id').val());
+        var questionsText = $('#Questions').val();
+        var questions = qmTrim(questionsText);
+
+        if (!$('.scheduledaily').val() || $('.scheduledaily').val() === 'NA' || !qmFilledSel(schedule_id)) {
+          $('#qm-tab-lecture-link').tab('show');
+          qmBannerMsg('<strong>Select a period first.</strong> Questions tie to today&rsquo;s schedule.');
+          $('.scheduledaily').focus();
+          return;
+        }
+        if (!qmFilledText(questions)) {
+          $('#qm-tab-questions-link').tab('show');
+          qmBannerMsg('<strong>Add question text.</strong> Whitespace-only lines are skipped.');
+          $('#Questions').focus();
+          return;
+        }
+
+        $.ajax({
+          url: "../vanaheim/school-management.php",
+          method: "POST",
+          data: {
+            stc_lecturedetquestion_save: 1,
+            schedule_id: schedule_id,
+            questions: questions
+          },
+          success: function (response_student) {
+            var response = $.trim(response_student);
+            if (response == "reload") {
+              window.location.reload();
+              return;
             }
-          });
+            if (response == "success") {
+              call_syllabus_quest();
+              $('#Questions').val('');
+              qmBannerMsg('<strong>Question added.</strong> It appears in the list below.', true);
+              $('#qm-tab-questions-link').tab('show');
+              return;
+            }
+            if (response == "empty") {
+              $('#qm-tab-questions-link').tab('show');
+              qmBannerMsg('<strong>Could not save question.</strong> Enter wording and ensure a timetable period is chosen.');
+              return;
+            }
+            qmBannerMsg('<strong>Something went wrong.</strong> Please try again in a moment.');
+          }
         });
+      });
 
         var sy_syllabus = new Array();
         function call_syllabus_det(){
           var schedule_id=$('.stc-school-hidden-schedule-id').val();
           var class_id=$('.stc-school-hidden-scclass-id').val();
           var sub_id=$('.stc-school-hidden-scsub-id').val();
+          qmTeacherLoaderBegin();
           $.ajax({
             url       : "../vanaheim/school-management.php",
             method    : "POST",  
@@ -958,9 +1662,13 @@ if(empty(@$_SESSION['stc_school_user_id'])){
               sub_id:sub_id
             },
             dataType: `JSON`,
+            complete  : function () {
+              qmTeacherLoaderEnd();
+            },
             success   : function(response_student){
               $('.stc-show-student-syllabusdet-show').html(response_student.lecture_details);
               var syl_result= response_student.syllabus_details;
+              sy_syllabus = [];
               sy_syllabus.push(syl_result);
               var syllabus_output='<option value="NA">Select</option>';
               for(var i=0; i<sy_syllabus[0].length;i++){
@@ -985,7 +1693,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
           var syll_id = $(this).val();
           var lession_output = '<option value="NA">Select</option>';
           for(var i=0; i<sy_syllabus[0].length;i++){
-            lession_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_lession + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_lession + '</option>';
+            lession_output+='<option value="' + sy_syllabus[0][i].stc_school_syllabus_lesson + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_lesson + '</option>';
           }
           $('#lession').html(lession_output);
         });
@@ -1013,6 +1721,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
         function call_syllabus_quest(){
           var question_id=$('.stc-syllabus-out:checked').attr("id");
           if(question_id>0){
+            qmTeacherLoaderBegin();
             $.ajax({
               url       : "../vanaheim/school-management.php",
               method    : "POST",  
@@ -1021,6 +1730,9 @@ if(empty(@$_SESSION['stc_school_user_id'])){
                 question_id:question_id
               },
               // dataType: `JSON`,
+              complete   : function () {
+                qmTeacherLoaderEnd();
+              },
               success   : function(response_student){
                 $('.stc-show-student-syllabusquest-show').html(response_student);
               }
@@ -1032,16 +1744,24 @@ if(empty(@$_SESSION['stc_school_user_id'])){
           call_syllabus_quest();
         });
 
-        $(document).on('click', '.scheduledaily', function() {            
+        $(document).on('change', '.scheduledaily', function() {            
+            qmBannerClear();
             var id = $(this).val();  
             var class_id = $(this).find('option:selected').attr('class_id');
             var sub_id = $(this).find('option:selected').attr('sub_id');
-            
+
             if (id != "NA") {
                 $('.stc-school-hidden-schedule-id').val(id);
                 $('.stc-school-hidden-scclass-id').val(class_id);
                 $('.stc-school-hidden-scsub-id').val(sub_id);
                 call_syllabus_det();
+            } else {
+                $('.stc-school-hidden-schedule-id, .stc-school-hidden-scclass-id, .stc-school-hidden-scsub-id').val('');
+                sy_syllabus = [];
+                $('#Syllabus').html('<option value="NA">Select (after period)</option>');
+                $('#chapter, #lession, #unit-should-be').html('<option value="NA">Select</option>');
+                $('#complete-date').val('');
+                $('.stc-show-student-syllabusdet-show').empty();
             }
         });
 
@@ -1113,167 +1833,241 @@ if(empty(@$_SESSION['stc_school_user_id'])){
   </div>
 </div>
 <!-- teacher modal -->
-<div class="modal bd-example-modal-xl stc-school-showteacher-res" tabindex="-1" role="dialog"
-  aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+<div class="modal fade bd-example-modal-xl qm-modal stc-school-showteacher-res" tabindex="-1" role="dialog"
+  aria-labelledby="qmAddQuestionTitle" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
     <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">Add Question</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <div class="modal-header qm-modal-head">
+        <div>
+          <h4 class="modal-title mb-0" id="qmAddQuestionTitle">Add question</h4>
+          <small class="subtitle">Use <strong>Lecture</strong> to bind today&rsquo;s period and syllabus rows, save, review under <strong>Saved lectures</strong>, then write questions. Blank entries are skipped.</small>
+        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
       </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="syllabus">Schedule</h5>
-              <span class="bmd-form-group">
-                <select class="form-control scheduledaily">
-                  <option value="NA">Select</option>
-                  <?php
-                    include_once("../../MCU/db.php");
-                    $date = date('l');//Tuesday
-                    $school_sql=mysqli_query($con, "
-                        SELECT `stc_school_teacher_schedule_id`, `stc_school_subject_id`, `stc_school_class_id`, `stc_school_subject_title`, `stc_school_class_title`, `stc_school_teacher_schedule_period` FROM `stc_school_teacher_schedule` LEFT JOIN `stc_school_subject` ON `stc_school_teacher_schedule_subjectid`=`stc_school_subject_id` LEFT JOIN `stc_school_class` ON `stc_school_teacher_schedule_classid`=`stc_school_class_id` WHERE `stc_school_teacher_schedule_day`='".$date."' AND `stc_school_teacher_schedule_teacherid`='".$_SESSION['stc_school_teacher_id']."' ORDER BY `stc_school_teacher_schedule_period` ASC
-                    ");
-                    foreach($school_sql as $school_row){
-                      $period=$school_row['stc_school_teacher_schedule_period'];
-                      if($period==1){$period=$period."st";}
-                      if($period==2){$period=$period."nd";}
-                      if($period==3){$period=$period."rd";}
-                      if($period>3){$period=$period."th";}                      
-                      echo '<option value="'.$school_row['stc_school_teacher_schedule_id'].'" class_id="'.$school_row['stc_school_class_id'].'" sub_id="'.$school_row['stc_school_subject_id'].'">'.$school_row['stc_school_subject_title'].' | '.$period.' | '.$school_row['stc_school_class_title'].'</option>';
-                    }
-                  ?>
-                </select>
-                <input type="hidden" class="stc-school-hidden-schedule-id">
-                <input type="hidden" class="stc-school-hidden-scclass-id">
-                <input type="hidden" class="stc-school-hidden-scsub-id">
-              </span>
-            </div>
+      <div class="modal-body qm-modal-body">
+        <div class="card mb-0 qm-tabs-card border-0 shadow-none">
+          <div class="px-3 pt-2">
+            <ul class="nav nav-tabs nav-justified qm-tab-nav-wrap" role="tablist">
+              <li class="nav-item">
+                <a class="nav-link active show" href="#qm-tab-lecture" id="qm-tab-lecture-link" data-toggle="tab" role="tab" aria-controls="qm-tab-lecture" aria-selected="true">
+                  <i class="material-icons">event_note</i> Lecture & syllabus
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#qm-tab-records" id="qm-tab-records-link" data-toggle="tab" role="tab" aria-controls="qm-tab-records" aria-selected="false">
+                  <i class="material-icons">list_alt</i> Saved lectures
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#qm-tab-questions" id="qm-tab-questions-link" data-toggle="tab" role="tab" aria-controls="qm-tab-questions" aria-selected="false">
+                  <i class="material-icons">help_outline</i> Questions
+                </a>
+              </li>
+            </ul>
           </div>
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="classtype">Class Type</h5>
-              <span class="bmd-form-group">
-                <select name="stcschoolmanagementteacherid" id="classtype" type="text" class="form-control validate classtype">
-                  <option value="NA">Select</option>
-                  <option value="Syllabus">Syllabus Class</option>
-                  <option value="Revised">Revised Class</option>
-                  <option value="Doubt">Doubt Class</option>
-                </select>
-              </span>
+          <div class="card-body">
+            <div class="qm-form-error alert mb-3 d-none" role="alert" aria-live="polite"></div>
+            <div class="qm-steps row mx-0 mb-3 pb-3 justify-content-between align-items-start border-bottom" style="border-color: rgba(0,0,0,.08)!important;">
+              <div class="col-4 px-2 text-center">
+                <span class="badge badge-pill badge-primary">1</span>
+                <div class="small text-secondary mt-1">Pick period</div>
+              </div>
+              <div class="col-4 px-2 text-center">
+                <span class="badge badge-pill badge-secondary">2</span>
+                <div class="small text-secondary mt-1">Syllabus + save</div>
+              </div>
+              <div class="col-4 px-2 text-center">
+                <span class="badge badge-pill badge-secondary">3</span>
+                <div class="small text-secondary mt-1">Add questions</div>
+              </div>
             </div>
-          </div>
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="syllabus">Syllabus</h5>
-              <span class="bmd-form-group">
-                <select name="stcschoolmanagementteacherid" id="Syllabus" type="text" class="form-control validate Syllabus">
-                  <option value="NA">Select</option>
-                </select>
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="chapter">Chapter</h5>
-              <span class="bmd-form-group">
-                <select name="stcschoolmanagementteacherid" id="chapter" type="text" class="form-control validate chapter">
-                  <option value="NA">Select</option>
-                </select>
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="lession">Lession</h5>
-              <span class="bmd-form-group">
-                <select name="stcschoolmanagementteacherid" id="lession" type="text" class="form-control validate lession">
-                  <option value="NA">Select</option>
-                </select>
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="lession">Unit</h5>
-              <span class="bmd-form-group">
-                <select name="stcschoolmanagementteacherid" id="unit-should-be" type="text" class="form-control validate unit-should-be">
-                  <option value="NA">Select</option>
-                </select>
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="lession">Complete date</h5>
-              <span class="bmd-form-group">
-                <input type="text" class="form-control" id="complete-date" placeholder="Type Here.." disabled>
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="syllabus">Remarks</h5>
-              <span class="bmd-form-group">
-                <textarea class="form-control" id="remarks" placeholder="Type Here.."></textarea>
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <span class="bmd-form-group">
-                <button class="btn btn-success form-control save-lecture">Save</button>
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <table class="table table-hover table-bordered table-responsive">
-                <thead>
-                  <tr>
-                    <th class="text-center">Select</th>
-                    <th class="text-center">Date</th>
-                    <th class="text-center">Class Type</th>
-                    <th class="text-center">Syllabus</th>
-                    <th class="text-center">Chapter</th>
-                    <th class="text-center">Lession</th>
-                  </tr>
-                </thead>
-                <tbody class="stc-show-student-syllabusdet-show">
+            <div class="qm-tab-content-outer">
+              <div class="qm-tab-loader d-none" aria-hidden="true">
+                <div class="qm-tab-loader-inner">
+                  <span class="qm-tab-spinner" aria-hidden="true"></span>
+                  <div class="qm-tab-loader-text">Loading…</div>
+                  <span class="sr-only">Loading tab content.</span>
+                </div>
+              </div>
+              <div class="tab-content qm-tab-content">
+              <!-- Tab 1: lecture form -->
+              <div class="tab-pane fade active show" id="qm-tab-lecture" role="tabpanel" aria-labelledby="qm-tab-lecture-link">
+                <p class="qm-alert mb-3">
+                  <strong><?php echo htmlspecialchars(date('l'), ENT_QUOTES, 'UTF-8'); ?>:</strong>
+                  only <strong>today&rsquo;s</strong> timetable rows load here. Pick the period first; if the list is empty, there is no schedule for this day.
+                </p>
+                <fieldset class="qm-section">
+                  <legend>Step 1&nbsp;&mdash; Period</legend>
+                  <div class="row">
+                    <div class="col-12">
+                      <div class="mb-3 qm-field">
+                        <h5>Schedule slot <abbr class="qm-req" title="required">*</abbr></h5>
+                        <span class="bmd-form-group">
+                          <select class="form-control scheduledaily" aria-required="true">
+                            <option value="NA">Select a period</option>
+                            <?php
+                              include_once("../../MCU/db.php");
+                              $date = date('l');
+                              $school_sql=mysqli_query($con, "
+                                  SELECT `stc_school_teacher_schedule_id`, `stc_school_subject_id`, `stc_school_class_id`, `stc_school_subject_title`, `stc_school_class_title`, `stc_school_teacher_schedule_period` FROM `stc_school_teacher_schedule` LEFT JOIN `stc_school_subject` ON `stc_school_teacher_schedule_subjectid`=`stc_school_subject_id` LEFT JOIN `stc_school_class` ON `stc_school_teacher_schedule_classid`=`stc_school_class_id` WHERE `stc_school_teacher_schedule_day`='".$date."' AND `stc_school_teacher_schedule_teacherid`='".$_SESSION['stc_school_teacher_id']."' ORDER BY `stc_school_teacher_schedule_period` ASC
+                              ");
+                              foreach($school_sql as $school_row){
+                                $period=$school_row['stc_school_teacher_schedule_period'];
+                                if($period==1){$period=$period."st";}
+                                if($period==2){$period=$period."nd";}
+                                if($period==3){$period=$period."rd";}
+                                if($period>3){$period=$period."th";}
+                                echo '<option value="'.$school_row['stc_school_teacher_schedule_id'].'" class_id="'.$school_row['stc_school_class_id'].'" sub_id="'.$school_row['stc_school_subject_id'].'">'.$school_row['stc_school_subject_title'].' | '.$period.' | '.$school_row['stc_school_class_title'].'</option>';
+                              }
+                            ?>
+                          </select>
+                          <input type="hidden" class="stc-school-hidden-schedule-id">
+                          <input type="hidden" class="stc-school-hidden-scclass-id">
+                          <input type="hidden" class="stc-school-hidden-scsub-id">
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+                <fieldset class="qm-section">
+                  <legend>Step 2&nbsp;&mdash; Syllabus row you covered</legend>
+                  <div class="row">
+                    <div class="col-xl-6 col-lg-6 col-md-12">
+                      <div class="mb-3 qm-field">
+                        <h5>Class type <abbr class="qm-req" title="required">*</abbr></h5>
+                        <span class="bmd-form-group">
+                          <select name="stcschoolmanagementteacherid" id="classtype" class="form-control validate classtype" aria-required="true">
+                            <option value="NA">Select</option>
+                            <option value="Syllabus">Syllabus class</option>
+                            <option value="Revised">Revised class</option>
+                            <option value="Doubt">Doubt class</option>
+                          </select>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12">
+                      <div class="mb-3 qm-field">
+                        <h5>Syllabus title <abbr class="qm-req" title="required">*</abbr></h5>
+                        <span class="bmd-form-group">
+                          <select name="stcschoolmanagementteacherid" id="Syllabus" class="form-control validate Syllabus" aria-required="true">
+                            <option value="NA">Select (after period)</option>
+                          </select>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12">
+                      <div class="mb-3 qm-field">
+                        <h5>Chapter <abbr class="qm-req" title="required">*</abbr></h5>
+                        <span class="bmd-form-group">
+                          <select name="stcschoolmanagementteacherid" id="chapter" class="form-control validate chapter" aria-required="true">
+                            <option value="NA">Select</option>
+                          </select>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12">
+                      <div class="mb-3 qm-field">
+                        <h5>Lesson <abbr class="qm-req" title="required">*</abbr></h5>
+                        <span class="bmd-form-group">
+                          <select name="stcschoolmanagementteacherid" id="lession" class="form-control validate lession" aria-required="true">
+                            <option value="NA">Select</option>
+                          </select>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+                <fieldset class="qm-section">
+                  <legend>Extras <span class="qm-optional-note">optional &mdash; skipped if left on &ldquo;Select&rdquo;</span></legend>
+                  <div class="row">
+                    <div class="col-xl-6 col-lg-6 col-md-12">
+                      <div class="mb-3 qm-field">
+                        <h5>Unit</h5>
+                        <span class="bmd-form-group">
+                          <select name="stcschoolmanagementteacherid" id="unit-should-be" class="form-control validate unit-should-be">
+                            <option value="NA">Select</option>
+                          </select>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-xl-6 col-lg-6 col-md-12">
+                      <div class="mb-3 qm-field">
+                        <h5>Complete date <span class="qm-optional-note">read-only</span></h5>
+                        <span class="bmd-form-group">
+                          <input type="text" class="form-control" id="complete-date" placeholder="From syllabus" disabled>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <div class="mb-3 qm-field">
+                        <h5>Remarks</h5>
+                        <span class="bmd-form-group">
+                          <textarea class="form-control" id="remarks" placeholder="Short note (optional)" rows="2"></textarea>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </fieldset>
+                <div class="qm-actions text-right mb-1">
+                  <button type="button" class="btn btn-success btn-block save-lecture">
+                    Save lecture entry
+                  </button>
+                  <small class="text-muted d-block mt-2 text-right">Only non-blank required fields are accepted. Open <strong>Saved lectures</strong> to confirm.</small>
+                </div>
+              </div>
 
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <h5 for="syllabus">Questions</h5>
-              <span class="bmd-form-group">
-                <input type="text" class="form-control" id="Questions" placeholder="Type Here..">
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <span class="bmd-form-group">
-                <button class="btn btn-success form-control add-question">Add</button>
-              </span>
-            </div>
-          </div>
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <div class="mb-3">
-              <table class="table table-hover table-bordered table-responsive">
-                <thead>
-                  <tr>
-                    <th class="text-center">Sl No</th>
-                    <th class="text-center">Questions</th>
-                  </tr>
-                </thead>
-                <tbody class="stc-show-student-syllabusquest-show">
+              <!-- Tab 2: saved lecture rows -->
+              <div class="tab-pane fade" id="qm-tab-records" role="tabpanel" aria-labelledby="qm-tab-records-link">
+                <p class="text-muted small mb-3">Pick a lecture row below (server markup may include radios or actions) before moving to Questions.</p>
+                <div class="table-responsive qm-table-wrap">
+                  <table class="table table-hover table-striped table-bordered mb-0">
+                    <thead>
+                      <tr>
+                        <th class="text-center">Select</th>
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Class type</th>
+                        <th class="text-center">Syllabus</th>
+                        <th class="text-center">Chapter</th>
+                        <th class="text-center">Lesson</th>
+                      </tr>
+                    </thead>
+                    <tbody class="stc-show-student-syllabusdet-show">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
 
-                </tbody>
-              </table>
+              <!-- Tab 3: questions -->
+              <div class="tab-pane fade" id="qm-tab-questions" role="tabpanel" aria-labelledby="qm-tab-questions-link">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="mb-3 qm-field">
+                      <h5>New question text</h5>
+                      <span class="bmd-form-group">
+                        <input type="text" class="form-control" id="Questions" placeholder="Enter question wording">
+                      </span>
+                    </div>
+                  </div>
+                  <div class="col-12 mb-3">
+                    <button type="button" class="btn btn-success btn-block add-question">Add to list</button>
+                  </div>
+                  <div class="col-12">
+                    <div class="table-responsive qm-table-wrap">
+                      <table class="table table-hover table-striped table-bordered mb-0">
+                        <thead>
+                          <tr>
+                            <th class="text-center">Sl no</th>
+                            <th class="text-center">Questions</th>
+                          </tr>
+                        </thead>
+                        <tbody class="stc-show-student-syllabusquest-show">
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              </div>
             </div>
           </div>
         </div>

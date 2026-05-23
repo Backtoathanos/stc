@@ -1,0 +1,665 @@
+/**
+ * STC School (stc_umbrella) — shared UI layer on Material Dashboard
+ * Scope everything under body.school-app to avoid unintended global overrides.
+ */
+
+body.school-app {
+  font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.school-app .main-panel {
+  background: linear-gradient(160deg, #f6f9fc 0%, #eef2fb 42%, #e8eef8 100%);
+}
+
+body.school-app .school-page-title {
+  font-size: 1.35rem;
+  font-weight: 500;
+  color: #2c387e;
+  letter-spacing: 0.02em;
+  margin: 1rem 0 1rem;
+}
+
+body.school-app .school-card-shell {
+  border: 0;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(22, 40, 80, 0.08), 0 2px 8px rgba(22, 40, 80, 0.04);
+  overflow: hidden;
+}
+
+body.school-app .school-card-shell .card-header.card-header-tabs.school-mgmt-header-tabs {
+  border-radius: 0;
+  padding: 1rem 1.35rem 0.95rem 1.5rem;
+}
+
+body.school-app .school-card-shell .school-mgmt-tabnav-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem 1.35rem;
+  padding: 0;
+  margin: 0;
+}
+
+body.school-app .school-card-shell .school-mgmt-tabnav-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0.35rem 0.75rem 0.35rem 0;
+  margin: 0;
+}
+
+body.school-app .school-card-shell .school-mgmt-tabnav-brand .nav-tabs-title {
+  font-weight: 600 !important;
+  font-size: 1.05rem !important;
+  letter-spacing: 0.02em !important;
+  opacity: 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.35 !important;
+  color: inherit;
+}
+
+body.school-app .school-card-shell .school-mgmt-tabnav-tagline {
+  display: block;
+  font-size: 0.695rem !important;
+  font-weight: 500;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  opacity: 0.78 !important;
+  line-height: 1.45 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.school-app .school-card-shell ul.school-nav-tabs.nav-tabs {
+  display: inline-flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 0.2rem !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+body.school-app .school-card-shell ul.school-nav-tabs .nav-item {
+  margin: 0 !important;
+}
+
+body.school-app .school-card-shell ul.school-nav-tabs .nav-link {
+  border: none !important;
+  margin: 0 !important;
+  border-radius: 10px !important;
+  padding: 0.45rem 0.92rem !important;
+  font-weight: 600 !important;
+  font-size: 0.78rem !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
+  opacity: 0.88 !important;
+  transition: opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.35rem !important;
+  white-space: nowrap;
+  color: rgba(255, 255, 255, 0.96) !important;
+}
+
+body.school-app .school-card-shell ul.school-nav-tabs .nav-link:not(.active):hover {
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.school-app .school-card-shell ul.school-nav-tabs .nav-link.active {
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.24) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+body.school-app .school-card-shell ul.school-nav-tabs .nav-link .school-nav-tab-icon {
+  vertical-align: middle;
+  margin: 0 !important;
+  font-size: 18px !important;
+  opacity: 0.95;
+}
+
+body.school-app .school-card-shell ul.school-nav-tabs .school-nav-tab-label {
+  vertical-align: middle;
+}
+
+@media (max-width: 767px) {
+  body.school-app .school-card-shell .card-header.card-header-tabs.school-mgmt-header-tabs {
+    padding: 0.95rem 1rem 1rem 1.1rem;
+  }
+
+  body.school-app .school-card-shell .school-mgmt-tabnav-brand {
+    padding: 0.15rem 0 0.45rem;
+  }
+
+  body.school-app .school-card-shell .school-mgmt-tabnav-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  body.school-app .school-card-shell ul.school-nav-tabs.nav-tabs {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  body.school-app .school-card-shell ul.school-nav-tabs .nav-link {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 2.65rem;
+  }
+}
+
+body.school-app .school-card-shell > .card-body {
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.55);
+}
+
+body.school-app .school-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+body.school-app .school-toolbar-row .btn-school-primary {
+  flex: 0 0 auto;
+}
+
+body.school-app .school-search-row {
+  max-width: 420px;
+  flex: 1 1 220px;
+}
+
+body.school-app .school-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 10px;
+  background: #fff;
+  border: 1px solid rgba(25, 40, 80, 0.08);
+  box-shadow: 0 6px 20px rgba(22, 40, 80, 0.05);
+}
+
+body.school-app .school-table-wrap .school-table-controls {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(25, 40, 80, 0.08);
+  margin: 0;
+}
+
+body.school-app .school-table-inner {
+  padding: 0;
+  white-space: nowrap;
+}
+
+body.school-app .school-table-inner .table {
+  margin-bottom: 0 !important;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+body.school-app .school-table-inner .table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, #5c6bc0 0%, #3949ab 100%);
+  color: #fff !important;
+  font-weight: 500;
+  vertical-align: middle;
+  padding: 0.65rem 0.85rem !important;
+  border: none;
+  white-space: nowrap;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+body.school-app .school-table-inner .table tbody td {
+  padding: 0.55rem 0.85rem !important;
+  vertical-align: middle !important;
+  border-color: rgba(25, 40, 80, 0.08);
+}
+
+body.school-app .school-table-inner .table.table-hover tbody tr:hover {
+  background-color: rgba(92, 107, 192, 0.06);
+}
+
+body.school-app .school-week-picker {
+  max-width: 220px;
+  margin-bottom: 0.75rem;
+  margin-top: 0.35rem;
+  border-radius: 8px;
+}
+
+body.school-app .modal .modal-dialog {
+  margin-top: 4rem;
+}
+
+body.school-app .modal .modal-header {
+  border-bottom: none;
+  background: linear-gradient(60deg, #5c6bc0 0%, #3949ab 95%);
+  padding: 1rem 1.25rem;
+  box-shadow: 0 8px 20px rgba(57, 73, 171, 0.25);
+}
+
+body.school-app .modal .modal-header .modal-title {
+  color: #fff;
+  font-weight: 500;
+  font-size: 1.2rem;
+}
+
+body.school-app .modal .modal-header .close {
+  color: #fff;
+  opacity: 0.9;
+  text-shadow: none;
+}
+
+body.school-app .modal .modal-header .close:hover {
+  opacity: 1;
+}
+
+body.school-app .modal .modal-body {
+  background: linear-gradient(to bottom, #fafbff 0%, #fff 52%);
+}
+
+body.school-app .modal .modal-footer {
+  border-top: 1px solid rgba(25, 40, 80, 0.08);
+}
+
+body.school-app .school-modal-save {
+  min-width: 160px;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+}
+
+.btn-school-primary.btn.btn-primary {
+  border-radius: 8px !important;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  box-shadow: 0 10px 20px rgba(57, 73, 171, 0.25);
+}
+
+.btn-school-primary.btn.btn-primary:hover {
+  transform: translateY(-1px);
+}
+
+body.school-app .modal-body h3,
+body.school-app .modal-body h5 {
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  color: rgba(43, 55, 120, 0.75);
+  margin-bottom: 6px !important;
+}
+
+body.school-app .modal-body .mb-3:not(.school-field-skip) {
+  padding: 0.85rem;
+  margin-bottom: 1rem !important;
+  border-radius: 10px;
+  border: 1px solid rgba(25, 40, 80, 0.1);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* Schedule grid */
+body.school-app .bootstrap-tagsinput {
+  width: 100%;
+}
+
+body.school-app .bootstrap-tagsinput .tag {
+  color: #111;
+}
+
+body.school-app .remove.icon {
+  display: none;
+  color: #e53935;
+  position: absolute;
+  margin-left: 3px;
+  margin-top: 38px;
+  cursor: pointer;
+}
+
+body.school-app .remove.icon:before,
+body.school-app .remove.icon:after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 2px;
+  background-color: currentColor;
+}
+
+body.school-app .remove.icon:before {
+  transform: rotate(45deg);
+}
+
+body.school-app .remove.icon:after {
+  transform: rotate(-45deg);
+}
+
+body.school-app .schedule-box {
+  position: relative;
+  border-radius: 10px;
+  background: linear-gradient(148deg, #e8f4fc 0%, #cce5f9 52%, #b8d9f6 100%);
+  padding: 4px;
+  vertical-align: middle !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.school-app .schedule-box.schedule-slot-active {
+  background: linear-gradient(148deg, #047857 0%, #0d9488 48%, #10b981 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22), 0 6px 18px rgba(5, 150, 105, 0.35);
+}
+
+body.school-app .schedule-box .schedule-slot-anchor {
+  display: block;
+  color: #1e3a5f;
+  text-decoration: none;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.42;
+  padding: 0.35rem 0.45rem;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.35);
+}
+
+body.school-app .schedule-box.schedule-slot-active .schedule-slot-anchor {
+  color: #fff !important;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+body.school-app .schedule-box:hover {
+  transform: translateY(-1px);
+}
+
+body.school-app .schedule-box:not(.schedule-slot-active):hover {
+  background: linear-gradient(148deg, #ffe7c2 0%, #ffc98a 85%);
+}
+
+body.school-app .schedule-box:not(.schedule-slot-active):hover .schedule-slot-anchor {
+  color: #0d2744;
+}
+
+body.school-app .schedule-box.schedule-slot-active:hover .schedule-slot-anchor {
+  color: #fff !important;
+}
+
+body.school-app .schedule-box:hover .remove.icon {
+  display: block;
+}
+
+/* Legacy anchor rule — keep specificity with .schedule-slot-anchor */
+body.school-app .schedule-box:hover .schedule-slot-anchor {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+body.school-app .schedule-show-na.schedule-slot-empty {
+  text-align: center;
+  vertical-align: middle !important;
+  padding: 0.75rem 0.35rem !important;
+  font-size: inherit;
+  font-weight: inherit;
+  border-radius: 8px;
+  background: #f5f8fb !important;
+}
+
+body.school-app .schedule-na-mark {
+  display: inline-block;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #90a4ae;
+  font-style: normal;
+}
+
+body.school-app #stc-create-shedule .stc-weekly-sched-grid thead th {
+  background: linear-gradient(180deg, #3f6fba 0%, #2d5ea3 95%) !important;
+  background-color: transparent !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  vertical-align: middle !important;
+  padding: 0.65rem 0.5rem !important;
+  border: none !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+  font-size: 0.86rem !important;
+}
+
+body.school-app #stc-create-shedule .stc-weekly-sched-grid thead th:last-child {
+  border-right: none !important;
+}
+
+body.school-app #stc-create-shedule .stc-weekly-sched-grid tbody td.stc-sched-class-col {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: #1e293b !important;
+  background: linear-gradient(to bottom, #edf1f7, #f4f7fb) !important;
+}
+
+body.school-app #stc-create-shedule .stc-weekly-sched-grid.table-striped > tbody > tr:nth-of-type(odd) > td {
+  box-shadow: none;
+}
+
+body.school-app #stc-create-shedule .stc-weekly-sched-grid.table-striped > tbody > tr:nth-of-type(odd) > td:not(.schedule-box):not(.schedule-slot-active):not(.stc-sched-class-col):not(.schedule-slot-empty) {
+  background-color: #fff;
+}
+
+body.school-app #stc-create-shedule .stc-weekly-sched-grid.table-striped > tbody > tr:nth-of-type(even) > td:not(.schedule-box):not(.schedule-slot-active):not(.stc-sched-class-col):not(.schedule-slot-empty) {
+  background-color: #fafdff;
+}
+
+body.school-app #stc-create-shedule .stc-weekly-sched-grid tbody > tr > td.schedule-slot-empty {
+  background: #f5f8fb !important;
+}
+
+body.school-app .hover-box {
+  display: block;
+  padding: 8px;
+  border-radius: 10px;
+  background: linear-gradient(120deg, #26c6da 0%, #5c6bc0 100%);
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+body.school-app .hover-box:hover {
+  filter: brightness(1.06);
+  text-decoration: none;
+  transform: translateY(-1px);
+}
+
+body.school-app .school-search-field {
+  border-radius: 8px !important;
+}
+
+/* —— Weekly schedule tab (management) layout —— */
+body.school-app #stc-create-shedule .school-weekly-surface {
+  padding: 1.25rem 1.35rem 1.5rem;
+  border-radius: 14px;
+  background: linear-gradient(158deg, rgba(255, 255, 255, 0.96) 0%, rgba(245, 248, 255, 0.88) 100%);
+  border: 1px solid rgba(92, 107, 192, 0.12);
+  box-shadow: 0 8px 28px rgba(25, 40, 80, 0.06), 0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+@media (min-width: 992px) {
+  body.school-app #stc-create-shedule .school-weekly-surface {
+    padding: 1.5rem 1.85rem 1.75rem;
+  }
+}
+
+body.school-app #stc-create-shedule .school-weekly-title {
+  font-size: 1.42rem !important;
+  letter-spacing: 0.01em !important;
+  margin-top: 0 !important;
+  background: linear-gradient(90deg, #1e2b6f 0%, #3949ab 55%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+  body.school-app #stc-create-shedule .school-weekly-title {
+    color: #1e2b6f;
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+  }
+}
+
+body.school-app #stc-create-shedule .school-weekly-lead {
+  font-size: 0.9275rem;
+  line-height: 1.6;
+  color: #546e7a !important;
+  max-width: 62rem;
+}
+
+body.school-app #stc-create-shedule .school-weekly-mono {
+  font-family: "Roboto Mono", ui-monospace, monospace;
+  font-size: 0.84em;
+  font-weight: 600;
+  padding: 0.12rem 0.35rem;
+  border-radius: 4px;
+  background: rgba(92, 107, 192, 0.1);
+  color: #3949ab;
+}
+
+body.school-app #stc-create-shedule .school-week-active-word {
+  color: #047857 !important;
+  font-weight: 600;
+}
+
+body.school-app #stc-create-shedule .school-weekly-controls {
+  margin-top: 1.35rem;
+}
+
+body.school-app #stc-create-shedule .school-weekly-controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem 1.35rem;
+}
+
+body.school-app #stc-create-shedule .btn-school-lg {
+  white-space: nowrap;
+  padding: 0.65rem 1.35rem !important;
+  font-size: 0.875rem !important;
+  text-transform: uppercase;
+  letter-spacing: 0.06em !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 22px rgba(57, 73, 171, 0.3) !important;
+}
+
+body.school-app #stc-create-shedule .school-weekly-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+body.school-app #stc-create-shedule .school-weekly-field-day {
+  flex: 0 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  body.school-app #stc-create-shedule .school-weekly-field-day {
+    width: 13.5rem;
+  }
+}
+
+body.school-app #stc-create-shedule .school-inline-label {
+  font-size: 0.725rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: rgba(55, 71, 107, 0.78) !important;
+  margin-bottom: 0.35rem !important;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+body.school-app #stc-create-shedule .school-field-icon {
+  font-size: 16px !important;
+  opacity: 0.82;
+}
+
+body.school-app #stc-create-shedule .school-week-picker {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  border-radius: 10px !important;
+  border: 1px solid rgba(25, 40, 80, 0.12);
+  padding: 0.45rem 0.65rem;
+  box-shadow: 0 1px 4px rgba(22, 40, 80, 0.04);
+}
+
+@media (min-width: 768px) {
+  body.school-app #stc-create-shedule .school-weekly-field-search.flex-grow-md-1 {
+    flex: 1 1 280px;
+    min-width: 200px;
+  }
+}
+
+body.school-app #stc-create-shedule .school-search-input-wrap {
+  position: relative;
+}
+
+body.school-app #stc-create-shedule .school-weekly-field-search .school-search-field {
+  padding-top: 0.55rem !important;
+  padding-bottom: 0.55rem !important;
+  border: 1px solid rgba(25, 40, 80, 0.12);
+  box-shadow: 0 2px 8px rgba(22, 40, 80, 0.04);
+}
+
+body.school-app #stc-create-shedule .school-weekly-table-wrap {
+  margin-top: 1.5rem !important;
+  overflow: visible;
+  border-radius: 12px;
+  border: 1px solid rgba(92, 107, 192, 0.1);
+}
+
+body.school-app #stc-create-shedule .school-weekly-table-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  background: linear-gradient(90deg, rgba(239, 242, 255, 0.95) 0%, rgba(255, 255, 255, 0.92) 100%);
+  border-bottom: 1px solid rgba(25, 40, 80, 0.07);
+}
+
+body.school-app #stc-create-shedule .school-weekly-table-bar-title {
+  font-weight: 600;
+  letter-spacing: 0.035em;
+  font-size: 0.8625rem;
+  color: #303f75;
+}
+
+body.school-app #stc-create-shedule .school-weekly-table-bar-title .material-icons {
+  opacity: 0.88;
+  font-size: 20px !important;
+}
+
+body.school-app #stc-create-shedule .school-weekly-table-hint {
+  font-size: 0.7825rem;
+}
+
+body.school-app #stc-create-shedule .school-weekly-table-wrap .school-table-inner {
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+/* Manage grids — server-backed pagination controls */
+body.school-app .school-rec-pagination-nav .pagination {
+  flex-wrap: wrap;
+}
+
+body.school-app .school-rec-pagination-nav .page-item.disabled .page-link {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+body.school-app .school-rec-pagination-info {
+  margin-top: 0.15rem;
+}

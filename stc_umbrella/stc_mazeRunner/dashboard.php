@@ -5,6 +5,107 @@ session_start();
 if(empty(@$_SESSION['stc_school_user_id'])){
     header('location:../index.html');
 }
+
+include_once(__DIR__ . '/../../MCU/db.php');
+
+$d_user_for = (int) (@$_SESSION['stc_school_user_for'] ?? 0);
+$d_teacher_pk = (int) (@$_SESSION['stc_school_teacher_id'] ?? 0);
+/** Admin (3) = school-wide counts; teacher (4) = counts for this teacher’s timetable only. */
+$d_show_school_stats = ($d_user_for === 3 || $d_user_for === 4);
+$d_is_teacher_dashboard = ($d_user_for === 4);
+
+$d_student_count = $d_teacher_count = $d_subject_count = $d_class_count = $d_schedule_count = $d_schedule_today_count = 0;
+
+if ($d_show_school_stats && isset($con) && $con) {
+	if ($d_is_teacher_dashboard && $d_teacher_pk > 0) {
+		$tesc = mysqli_real_escape_string($con, (string) $d_teacher_pk);
+		$day_esc = mysqli_real_escape_string($con, date('l'));
+
+		$q = @mysqli_query($con, "
+			SELECT COUNT(DISTINCT s.`stc_school_student_id`) AS c
+			FROM `stc_school_student` s
+			INNER JOIN `stc_school_teacher_schedule` sch
+			  ON sch.`stc_school_teacher_schedule_classid` = s.`stc_school_student_classroomid`
+			 AND sch.`stc_school_teacher_schedule_teacherid` = '".$tesc."'
+		");
+		if ($q && ($row = mysqli_fetch_assoc($q))) {
+			$d_student_count = (int) $row['c'];
+		}
+
+		$q = @mysqli_query($con, "
+			SELECT COUNT(DISTINCT `stc_school_teacher_schedule_subjectid`) AS c
+			FROM `stc_school_teacher_schedule`
+			WHERE `stc_school_teacher_schedule_teacherid` = '".$tesc."'
+		");
+		if ($q && ($row = mysqli_fetch_assoc($q))) {
+			$d_subject_count = (int) $row['c'];
+		}
+
+		$q = @mysqli_query($con, "
+			SELECT COUNT(DISTINCT `stc_school_teacher_schedule_classid`) AS c
+			FROM `stc_school_teacher_schedule`
+			WHERE `stc_school_teacher_schedule_teacherid` = '".$tesc."'
+		");
+		if ($q && ($row = mysqli_fetch_assoc($q))) {
+			$d_class_count = (int) $row['c'];
+		}
+
+		$q = @mysqli_query($con, "
+			SELECT COUNT(*) AS c FROM `stc_school_teacher_schedule`
+			WHERE `stc_school_teacher_schedule_teacherid` = '".$tesc."'
+		");
+		if ($q && ($row = mysqli_fetch_assoc($q))) {
+			$d_schedule_count = (int) $row['c'];
+		}
+
+		$qtoday = @mysqli_query($con, "
+			SELECT COUNT(*) AS c FROM `stc_school_teacher_schedule`
+			WHERE `stc_school_teacher_schedule_teacherid` = '".$tesc."'
+			  AND `stc_school_teacher_schedule_day` = '".$day_esc."'
+		");
+		if ($qtoday && ($rowtoday = mysqli_fetch_assoc($qtoday))) {
+			$d_schedule_today_count = (int) $rowtoday['c'];
+		}
+	} elseif ($d_user_for === 3) {
+		$counts = [];
+		$table_counts = [
+			'students' => '`stc_school_student`',
+			'teachers' => '`stc_school_teacher`',
+			'subjects' => '`stc_school_subject`',
+			'classes' => '`stc_school_class`',
+			'schedule' => '`stc_school_teacher_schedule`',
+		];
+		foreach ($table_counts as $alias => $table) {
+			$q = @mysqli_query($con, 'SELECT COUNT(*) AS c FROM ' . $table);
+			if ($q && ($row = mysqli_fetch_assoc($q))) {
+				$counts[$alias] = (int) $row['c'];
+			} else {
+				$counts[$alias] = 0;
+			}
+		}
+		$d_student_count = $counts['students'];
+		$d_teacher_count = $counts['teachers'];
+		$d_subject_count = $counts['subjects'];
+		$d_class_count = $counts['classes'];
+		$d_schedule_count = $counts['schedule'];
+
+		$day_esc = mysqli_real_escape_string($con, date('l'));
+		$qtoday = @mysqli_query($con, "
+			SELECT COUNT(*) AS c FROM `stc_school_teacher_schedule`
+			WHERE `stc_school_teacher_schedule_day` = '".$day_esc."'
+		");
+		if ($qtoday && ($rowtoday = mysqli_fetch_assoc($qtoday))) {
+			$d_schedule_today_count = (int) $rowtoday['c'];
+		}
+	}
+}
+
+$d_board_name = htmlspecialchars((string) (@$_SESSION['stc_school_user_name'] ?? ''), ENT_QUOTES, 'UTF-8');
+
+/** Legacy Chart.js placeholders (dashboard has no canvas in markup by default). */
+$agent_name = [];
+$sales = [];
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,7 +143,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
               <div class="card card-stats">
                 <div class="card-header card-header-warning card-header-icon">
                   <h3 class="card-title text-left mt-4 ml-4">
-                    Hi <?php echo $_SESSION['stc_school_user_name']; ?>
+                    Hi <?php echo $d_board_name; ?>
                   </h3>
                 </div>
                 <div class="card-footer">
@@ -52,6 +153,123 @@ if(empty(@$_SESSION['stc_school_user_id'])){
               </div>
             </div>
           </div>
+
+          <?php if ($d_show_school_stats): ?>
+          <?php if ($d_is_teacher_dashboard && $d_teacher_pk <= 0): ?>
+          <p class="text-muted small mx-2 mb-3"><i class="material-icons align-middle" style="font-size:18px;">info</i> Your account is missing a linked teacher id, so enrolment totals will show zero until login is paired with staff records.</p>
+          <?php endif; ?>
+
+          <div class="row dashboard-school-stats-row">
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+              <div class="card card-stats mb-2">
+                <div class="card-header card-header-info card-header-icon">
+                  <div class="card-icon">
+                    <i class="material-icons">school</i>
+                  </div>
+                  <p class="card-category"><?php echo $d_is_teacher_dashboard ? 'Students (your classes)' : 'Students'; ?></p>
+                  <h3 class="card-title"><?php echo number_format((int) $d_student_count); ?></h3>
+                </div>
+                <div class="card-footer">
+                  <div class="stats">
+                    <?php if ($d_is_teacher_dashboard): ?>
+                    <span class="text-muted">Enrolled under classes on your timetable</span>
+                    <?php else: ?>
+                    <a href="school-management.php" class="text-muted">Open school management<i class="fa fa-angle-right ml-1"></i></a>
+                    <?php endif; ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <?php if (!$d_is_teacher_dashboard): ?>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+              <div class="card card-stats mb-2">
+                <div class="card-header card-header-success card-header-icon">
+                  <div class="card-icon">
+                    <i class="material-icons">person</i>
+                  </div>
+                  <p class="card-category">Teachers</p>
+                  <h3 class="card-title"><?php echo number_format((int) $d_teacher_count); ?></h3>
+                </div>
+                <div class="card-footer">
+                  <div class="stats">
+                    <span class="text-muted">Teaching staff roster</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <?php endif; ?>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+              <div class="card card-stats mb-2">
+                <div class="card-header card-header-danger card-header-icon">
+                  <div class="card-icon">
+                    <i class="material-icons">menu_book</i>
+                  </div>
+                  <p class="card-category"><?php echo $d_is_teacher_dashboard ? 'Subjects (yours)' : 'Subjects'; ?></p>
+                  <h3 class="card-title"><?php echo number_format((int) $d_subject_count); ?></h3>
+                </div>
+                <div class="card-footer">
+                  <div class="stats">
+                    <span class="text-muted"><?php echo $d_is_teacher_dashboard ? 'Distinct subjects on your timetable' : 'All subject records'; ?></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+              <div class="card card-stats mb-2">
+                <div class="card-header card-header-warning card-header-icon">
+                  <div class="card-icon">
+                    <i class="material-icons">class</i>
+                  </div>
+                  <p class="card-category"><?php echo $d_is_teacher_dashboard ? 'Classrooms (yours)' : 'Classrooms'; ?></p>
+                  <h3 class="card-title"><?php echo number_format((int) $d_class_count); ?></h3>
+                </div>
+                <div class="card-footer">
+                  <div class="stats">
+                    <span class="text-muted"><?php echo $d_is_teacher_dashboard ? 'Classes assigned to you' : 'Classes / cohorts'; ?></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+              <div class="card card-stats mb-2">
+                <div class="card-header card-header-primary card-header-icon">
+                  <div class="card-icon">
+                    <i class="material-icons">event_note</i>
+                  </div>
+                  <p class="card-category"><?php echo $d_is_teacher_dashboard ? 'Your schedule slots' : 'All schedule slots'; ?></p>
+                  <h3 class="card-title"><?php echo number_format((int) $d_schedule_count); ?></h3>
+                </div>
+                <div class="card-footer">
+                  <div class="stats">
+                    <?php if ($d_is_teacher_dashboard): ?>
+                    <a href="daily-schedule.php?daily-schedule=yes" class="text-muted">Open daily schedule<i class="fa fa-angle-right ml-1"></i></a>
+                    <?php else: ?>
+                    <a href="school-management.php" class="text-muted">Weekly planner in School management<i class="fa fa-angle-right ml-1"></i></a>
+                    <?php endif; ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+              <div class="card card-stats mb-2">
+                <div class="card-header card-header-rose card-header-icon">
+                  <div class="card-icon">
+                    <i class="material-icons">today</i>
+                  </div>
+                  <p class="card-category"><?php echo $d_is_teacher_dashboard ? 'Your periods today' : 'Today’s schedules'; ?></p>
+                  <h3 class="card-title"><?php echo number_format((int) $d_schedule_today_count); ?></h3>
+                </div>
+                <div class="card-footer">
+                  <div class="stats">
+                    <span class="text-muted d-block mb-1"><?php echo htmlspecialchars(date('l'), ENT_QUOTES, 'UTF-8'); ?></span>
+                    <a href="daily-schedule.php?daily-schedule=yes" class="text-muted">Open daily schedule<i class="fa fa-angle-right ml-1"></i></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <?php endif; ?>
+
         </div>
       </div>
     </div>
@@ -102,7 +320,10 @@ if(empty(@$_SESSION['stc_school_user_id'])){
   <script src="../assets/demo/demo.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
   <script type="text/javascript">
-    var ctx = document.getElementById("chartjs_bar").getContext('2d');
+    (function () {
+      var chartEl = document.getElementById("chartjs_bar");
+      if (!chartEl || !chartEl.getContext) return;
+      var ctx = chartEl.getContext('2d');
               var myChart = new Chart(ctx, {
                   type: 'bar',
                   data: {
@@ -139,6 +360,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
   
               }
               });
+    })();
   </script>
   <script>
     $(document).ready(function() {

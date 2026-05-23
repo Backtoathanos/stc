@@ -26,489 +26,61 @@
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
     <!-- CSS Files -->
     <link href="../assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <!-- <link href="../assets/demo/demo.css" rel="stylesheet" /> -->
-    <style>
-        .fade:not(.show) {
-          opacity: 10;
-        }
-      .d-flex {
-        display: -webkit-box;
-        display: -ms-flexbox;
-        display: flex;
-      }
-
-      .mb-3{
-        border-block: initial;
-        border: 2px solid grey;
-        border-bottom-left-radius: 10px;
-        border-bottom-right-radius: 10px;
-        border-top-left-radius: 10px;
-        border-top-right-radius: 10px;
-        padding: 10px;
-        margin: 5px;
-      }
-      .align-center {
-        -webkit-box-align: center;
-        -ms-flex-align: center;
-        align-items: center;
-      }
-
-      .flex-centerY-centerX {
-        justify-content: center;
-        -webkit-box-pack: center;
-        -ms-flex-pack: center;
-        justify-content: center;
-        -webkit-box-align: center;
-        -ms-flex-align: center;
-        align-items: center;
-      }
-
-      .page-wrapper {
-        height: 100%;
-        display: table;
-      }
-
-      .page-wrapper .page-inner {
-        display: table-cell;
-        vertical-align: middle;
-      }
-
-      .el-wrapper {
-        width: 360px;
-        padding: 15px;
-        margin: 15px auto;
-        background-color: #fff;
-      }
-
-      @media (max-width: 991px) {
-        .el-wrapper {
-          width: 345px;
-        }
-      }
-
-      @media (max-width: 767px) {
-        .el-wrapper {
-          width: 290px;
-          margin: 30px auto;
-        }
-      }
-
-      .el-wrapper:hover .h-bg {
-        left: 0px;
-      }
-
-      .el-wrapper:hover .price {
-        left: 20px;
-        -webkit-transform: translateY(-50%);
-        -ms-transform: translateY(-50%);
-        -o-transform: translateY(-50%);
-        transform: translateY(-50%);
-        color: #818181;
-      }
-
-      .el-wrapper:hover .add-to-cart {
-        left: 50%;
-      }
-
-      .el-wrapper:hover .img {
-        webkit-filter: blur(7px);
-        -o-filter: blur(7px);
-        -ms-filter: blur(7px);
-        filter: blur(7px);
-        filter: progid:DXImageTransform.Microsoft.Blur(pixelradius='7', shadowopacity='0.0');
-        opacity: 0.4;
-      }
-
-      .el-wrapper:hover .info-inner {
-        bottom: 155px;
-      }
-
-      .el-wrapper:hover .a-size {
-        -webkit-transition-delay: 300ms;
-        -o-transition-delay: 300ms;
-        transition-delay: 300ms;
-        bottom: 50px;
-        opacity: 1;
-      }
-
-      .el-wrapper .box-down {
-        width: 100%;
-        height: 60px;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .el-wrapper .box-up {
-        width: 100%;
-        height: 400px;
-        position: relative;
-        overflow: hidden;
-        text-align: center;
-      }
-
-      .el-wrapper .img {
-        padding: 20px 0;
-        -webkit-transition: all 800ms cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition: all 800ms cubic-bezier(0, 0, 0.18, 1);
-        -o-transition: all 800ms cubic-bezier(0, 0, 0.18, 1);
-        transition: all 800ms cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        -webkit-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -o-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-      }
-
-      .h-bg {
-        -webkit-transition: all 800ms cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition: all 800ms cubic-bezier(0, 0, 0.18, 1);
-        -o-transition: all 800ms cubic-bezier(0, 0, 0.18, 1);
-        transition: all 800ms cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        -webkit-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -o-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        width: 660px;
-        height: 100%;
-        background-color: #3f96cd;
-        position: absolute;
-        left: -659px;
-      }
-
-      .h-bg .h-bg-inner {
-        width: 50%;
-        height: 100%;
-        background-color: #464646;
-      }
-
-      .info-inner {
-        -webkit-transition: all 400ms cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition: all 400ms cubic-bezier(0, 0, 0.18, 1);
-        -o-transition: all 400ms cubic-bezier(0, 0, 0.18, 1);
-        transition: all 400ms cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        -webkit-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -o-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        position: absolute;
-        width: 100%;
-        bottom: 25px;
-      }
-
-      .info-inner .p-name,
-      .info-inner .p-company,
-       .info-inner .p-qty {
-        display: block;
-      }
-
-      .info-inner .p-name {
-        font-family: 'PT Sans', sans-serif;
-        font-size: 18px;
-        color: #252525;
-      }
-
-      .info-inner .p-company {
-        font-family: 'Lato', sans-serif;
-        font-size: 12px;
-        text-transform: uppercase;
-        color: #8c8c8c;
-      }
-
-      .info-inner .p-qty {
-        font-family: 'Lato', sans-serif;
-        font-size: 25px;
-        font-weight: bold;
-        text-transform: uppercase;
-        color: #020822;;
-      }
-
-      .a-size {
-        -webkit-transition: all 300ms cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition: all 300ms cubic-bezier(0, 0, 0.18, 1);
-        -o-transition: all 300ms cubic-bezier(0, 0, 0.18, 1);
-        transition: all 300ms cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        -webkit-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -o-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        position: absolute;
-        width: 100%;
-        bottom: -20px;
-        font-family: 'PT Sans', sans-serif;
-        color: #828282;
-        opacity: 0;
-      }
-
-      .a-size .size {
-        color: #252525;
-      }
-
-      .cart {
-        display: block;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        font-family: 'Lato', sans-serif;
-        font-weight: 700;
-      }
-
-      .cart .price {
-        -webkit-transition: all 600ms cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition: all 600ms cubic-bezier(0, 0, 0.18, 1);
-        -o-transition: all 600ms cubic-bezier(0, 0, 0.18, 1);
-        transition: all 600ms cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        -webkit-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -o-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        -webkit-transition-delay: 100ms;
-        -o-transition-delay: 100ms;
-        transition-delay: 100ms;
-        display: block;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        -webkit-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-        -o-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
-        font-size: 16px;
-        color: #252525;
-      }
-
-      .cart .add-to-cart {
-        -webkit-transition: all 600ms cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition: all 600ms cubic-bezier(0, 0, 0.18, 1);
-        -o-transition: all 600ms cubic-bezier(0, 0, 0.18, 1);
-        transition: all 600ms cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        -webkit-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -moz-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        -o-transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        transition-timing-function: cubic-bezier(0, 0, 0.18, 1);
-        /* ease-out */
-        -webkit-transition-delay: 100ms;
-        -o-transition-delay: 100ms;
-        transition-delay: 100ms;
-        display: block;
-        position: absolute;
-        top: 50%;
-        left: 110%;
-        -webkit-transform: translate(-50%, -50%);
-        -ms-transform: translate(-50%, -50%);
-        -o-transform: translate(-50%, -50%);
-        transform: translate(-50%, -50%);
-      }
-
-      .cart .add-to-cart .txt {
-        font-size: 12px;
-        color: #fff;
-        letter-spacing: 0.045em;
-        text-transform: uppercase;
-        white-space: nowrap;
-      }
-
-      .bootstrap-tagsinput {
-       width: 100%;
-       color: blue;
-      }
-      .bootstrap-tagsinput .tag {
-         color: black;
-       }
-
-      .search-box,.close-icon,.search-wrapper {
-        position: relative;
-        padding: 10px;
-      }
-      .search-wrapper {
-        width: 500px;
-        margin: auto;
-        margin-top: 50px;
-      }
-      .search-box {
-        width: 98%;
-        border: 1px solid #ccc;
-        outline: 0;
-        border-radius: 15px;
-      }
-      .search-box:focus {
-        box-shadow: 0 0 15px 5px #b0e0ee;
-        border: 2px solid #bebede;
-      }
-      .close-icon {
-        border:1px solid transparent;
-        background-color: transparent;
-        display: inline-block;
-        vertical-align: middle;
-        outline: 0;
-        cursor: pointer;
-      }
-      .close-icon:after {
-        content: "X";
-        display: block;
-        width: 15px;
-        height: 15px;
-        position: absolute;
-        background-color: #FA9595;
-        z-index:1;
-        right: 35px;
-        top: 0;
-        bottom: 0;
-        margin: auto;
-        padding: 0px;
-        border-radius: 50%;
-        text-align: center;
-        color: white;
-        font-weight: normal;
-        font-size: 12px;
-        box-shadow: 0 0 2px #E50F0F;
-        cursor: pointer;
-      }
-      .search-box:not(:valid) ~ .close-icon {
-        display: none;
-      }
-      .stc_print_page i{
-        color: black;
-      }
-
-      .remove.icon{
-        display: none;
-      }
-
-      .schedule-box{
-        background: linear-gradient(37deg, #d4fffd , #1de4ff)
-      }
-      .schedule-box a{
-        color: #7e6060;
-        text-decoration: none;
-        font-size: 15px;
-        font-weight: bold;
-      }
-      .schedule-box:hover  {
-        background: linear-gradient(37deg, #eecda3, #ef629f);
-      }
-
-      .schedule-box:hover .remove.icon{
-        display: block;
-      }
-
-      .schedule-box:hover a{
-        font-size: 17px;
-        color: black;
-      }
-
-      .schedule-box a:hover .remove.icon{
-        display: block;
-      }
-
-      .schedule-show-na{
-        text-align: center;
-        font-size: 40px;
-        font-weight: bold;
-        background: linear-gradient(45deg, #f31414, #c5f72c);
-      }
-      .remove.icon {
-        color: red;
-        position: absolute;
-        margin-left: 3px;
-        margin-top: 38px;
-        background-color: #000;
-      }
-
-      .remove.icon:before {
-        content: '';
-        position: absolute;
-        width: 15px;
-        height: 2px;
-        background-color: #000;
-        background-color: currentColor;
-        -webkit-transform: rotate(45deg);
-                transform: rotate(45deg);
-      }
-
-      .remove.icon:after {
-        content: '';
-        position: absolute;
-        width: 15px;
-        height: 2px;
-        background-color: #000;
-        background-color: currentColor;
-        -webkit-transform: rotate(-45deg);
-                transform: rotate(-45deg);
-      }
-
-      .hover-box{
-        display: block;padding: 5px;
-        background: linear-gradient(45deg, #00c9b0, #e9ad02);
-        font-size: 20px;
-        font-weight: bold;
-        color: #4affdf;
-      }
-
-      .hover-box:hover{
-        background: linear-gradient(45deg, #ff6565, #df7bff);
-        text-decoration: underline;
-        color: black;
-      }
-    </style>
+    <link href="../assets/css/school-theme.css?v=6" rel="stylesheet" />
   </head>
 
-  <body>
+  <body class="school-app">
     <div class="wrapper ">
       <?php include_once("bar/sidebar.php");?>
       <div class="main-panel">
         <!-- Navbar -->
-        <?php include_once("bar/navbar.php");?>
+        <?php $stc_nav_page_title = 'School Management'; include_once("bar/navbar.php");?>
         <!-- End Navbar -->
         <div class="content">
           <div class="container-fluid">
             <div class="row">
               <div class="col-lg-12 col-md-12">
-                <div class="card">
-                  <div class="card-header card-header-tabs card-header-primary">
-                    <div class="nav-tabs-navigation">
-                      <div class="nav-tabs-wrapper">
-                        <span class="nav-tabs-title">Tasks:</span>
-                        <ul class="nav nav-tabs" data-tabs="tabs">
-                          <li class="nav-item">
-                            <a class="nav-link active" href="#stc-create-teacher" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> teacher
+                <div class="card school-card-shell">
+                  <div class="card-header card-header-tabs card-header-primary school-mgmt-header-tabs">
+                    <div class="nav-tabs-navigation school-mgmt-tabnav">
+                      <div class="nav-tabs-wrapper school-mgmt-tabnav-inner">
+                        <div class="school-mgmt-tabnav-brand">
+                          <span class="nav-tabs-title" id="school-mgmt-tabs-heading">Manage</span>
+                          <small class="school-mgmt-tabnav-tagline">Teachers, cohorts &amp; timetable</small>
+                        </div>
+                        <ul class="nav nav-tabs school-nav-tabs" data-tabs="tabs" role="tablist" aria-labelledby="school-mgmt-tabs-heading">
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link active" href="#stc-create-teacher" id="school-tab-teachers" role="tab" aria-controls="stc-create-teacher" aria-selected="true">
+                              <i class="material-icons school-nav-tab-icon" aria-hidden="true">person_add_alt_1</i>
+                              <span class="school-nav-tab-label">Teachers</span>
                               <div class="ripple-container"></div>
                             </a>
                           </li>
-                          <li class="nav-item">
-                            <a class="nav-link " href="#stc-create-student" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> student
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link" href="#stc-create-student" id="school-tab-students" role="tab" aria-controls="stc-create-student" aria-selected="false">
+                              <i class="material-icons school-nav-tab-icon" aria-hidden="true">school</i>
+                              <span class="school-nav-tab-label">Students</span>
                               <div class="ripple-container"></div>
                             </a>
                           </li>
-                          <li class="nav-item">
-                            <a class="nav-link " href="#stc-create-subject" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Subject
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link" href="#stc-create-subject" id="school-tab-subjects" role="tab" aria-controls="stc-create-subject" aria-selected="false">
+                              <i class="material-icons school-nav-tab-icon" aria-hidden="true">menu_book</i>
+                              <span class="school-nav-tab-label">Subjects</span>
                               <div class="ripple-container"></div>
                             </a>
                           </li>
-                          <li class="nav-item">
-                            <a class="nav-link " href="#stc-create-classroom" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Class Room
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link" href="#stc-create-classroom" id="school-tab-classrooms" role="tab" aria-controls="stc-create-classroom" aria-selected="false">
+                              <i class="material-icons school-nav-tab-icon" aria-hidden="true">class</i>
+                              <span class="school-nav-tab-label">Classrooms</span>
                               <div class="ripple-container"></div>
                             </a>
                           </li>
-                          <li class="nav-item">
-                            <a class="nav-link " href="#stc-create-shedule" data-toggle="tab">
-                              <i class="material-icons">add_circle</i> Schedule
+                          <li class="nav-item" role="presentation">
+                            <a class="nav-link" href="#stc-create-shedule" id="school-tab-schedule" role="tab" aria-controls="stc-create-shedule" aria-selected="false">
+                              <i class="material-icons school-nav-tab-icon" aria-hidden="true">event_note</i>
+                              <span class="school-nav-tab-label">Schedule</span>
                               <div class="ripple-container"></div>
                             </a>
                           </li>
@@ -518,28 +90,27 @@
                   </div>
                   <div class="card-body">
                     <div class="tab-content">
-                      <div class="tab-pane active" id="stc-create-teacher">
+                      <div class="tab-pane active" id="stc-create-teacher" role="tabpanel" aria-labelledby="school-tab-teachers">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Add Teacher</h2>
+                            <h2 class="school-page-title mb-3">Teachers</h2>
                           </div>
                         </div>
                         <div class="row">
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
-                            <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
-                              <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <a
-                                      href="javascript:void(0)"
-                                      class="form-control btn btn-success stc-school-show-teach-btn"
-                                    >Add Teacher</a>
+                              <div class="row align-items-start">
+                                <div class="col-12">
+                                  <div class="school-toolbar-row">
+                                    <button type="button" class="btn btn-primary btn-school-primary stc-school-show-teach-btn">Add teacher</button>
+                                    <div class="school-search-row">
+                                      <input id="teachersearch" type="text" class="form-control school-search-field" placeholder="Search teachers..." />
+                                    </div>
                                   </div>
                                 </div>
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-                                  <div class="mb-3"  style="width: auto;overflow-x: auto; white-space: nowrap;" >
-                                    <input id="teachersearch" type="text" class="form-control mb-3" placeholder="Search here...">
-                                    <table class="table table-hover table-bordered mb-3">
+                                <div class="col-12 mx-auto">
+                                  <div class="school-table-wrap">
+                                    <div class="school-table-inner">
+                                      <table class="table table-hover table-striped mb-3">
                                       <thead>
                                         <tr>
                                           <th class="text-center"><b>Sl No</b></th>
@@ -558,39 +129,38 @@
                                       </thead>
                                       <tbody class="stc-teacher-rec-show"></tbody>
                                     </table>
+                                    </div>
                                   </div>
+                                  <div class="stc-teacher-pagination school-rec-pagination-holder"></div>
                                 </div>
                               </div>
-                            </div>
                           </div>
                         </div>
                       </div>
 
                       <!-- Create Student -->
 
-                      <div class="tab-pane " id="stc-create-student">
+                      <div class="tab-pane" id="stc-create-student" role="tabpanel" aria-labelledby="school-tab-students">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Add Student</h2>
+                            <h2 class="school-page-title mb-3">Students</h2>
                           </div>
                         </div>
                         <div class="row">
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
-                            <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
-                              <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <a
-                                      href="javascript:void(0)"
-                                      class="btn btn-success form-control stc-school-show-stud-btn"
-                                      value=""
-                                    >Add Student</a>
+                              <div class="row align-items-start">
+                                <div class="col-12">
+                                  <div class="school-toolbar-row">
+                                    <button type="button" class="btn btn-primary btn-school-primary stc-school-show-stud-btn">Add student</button>
+                                    <div class="school-search-row">
+                                      <input id="studentsearch" type="text" class="form-control school-search-field" placeholder="Search students..." />
+                                    </div>
                                   </div>
                                 </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3"  style="width: auto;overflow-x: auto; white-space: nowrap;" >
-                                    <input id="studentsearch" type="text" class="form-control mb-3" placeholder="Search here...">
-                                    <table class="table table-hover table-bordered mb-3">
+                                <div class="col-12 mx-auto">
+                                  <div class="school-table-wrap">
+                                    <div class="school-table-inner">
+                                      <table class="table table-hover table-striped mb-3">
                                       <thead>
                                         <tr>
                                           <th class="text-center"><b>Sl No</b></th>
@@ -611,39 +181,38 @@
                                       </thead>
                                       <tbody class="stc-student-rec-show"></tbody>
                                     </table>
+                                    </div>
                                   </div>
+                                  <div class="stc-student-pagination school-rec-pagination-holder"></div>
                                 </div>
                               </div>
-                            </div>
                           </div>
                         </div>
                       </div>
 
                       <!-- Field Create Subject -->
 
-                      <div class="tab-pane " id="stc-create-subject">
+                      <div class="tab-pane" id="stc-create-subject" role="tabpanel" aria-labelledby="school-tab-subjects">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Add Subject</h2>
+                            <h2 class="school-page-title mb-3">Subjects</h2>
                           </div>
                         </div>
                         <div class="row">
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
-                            <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
-                              <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <a
-                                      href="javascript:void(0)"
-                                      class="form-control btn btn-success stc-school-show-subject-btn"
-                                      value=""
-                                    >Add Subject</a>
+                              <div class="row align-items-start">
+                                <div class="col-12">
+                                  <div class="school-toolbar-row">
+                                    <button type="button" class="btn btn-primary btn-school-primary stc-school-show-subject-btn">Add subject</button>
+                                    <div class="school-search-row">
+                                      <input id="subjectsearch" type="text" class="form-control school-search-field" placeholder="Search subjects..." />
+                                    </div>
                                   </div>
                                 </div>
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-                                  <div class="mb-3" style="width: auto;overflow-x: auto; white-space: nowrap;">
-                                    <input id="subjectsearch" type="text" class="form-control mb-3" placeholder="Search here...">
-                                    <table class="table table-hover table-bordered mb-3">
+                                <div class="col-12 mx-auto">
+                                  <div class="school-table-wrap">
+                                    <div class="school-table-inner">
+                                      <table class="table table-hover table-striped mb-3">
                                       <thead>
                                         <tr>
                                           <th class="text-center"><b>Subject Id</b></th>
@@ -656,39 +225,38 @@
                                       </thead>
                                       <tbody class="stc-subject-rec-show"></tbody>
                                     </table>
+                                    </div>
                                   </div>
+                                  <div class="stc-subject-pagination school-rec-pagination-holder"></div>
                                 </div>
                               </div>
-                            </div>
                           </div>
                         </div>
                       </div>
 
                       <!-- Field Class Room -->
 
-                      <div class="tab-pane " id="stc-create-classroom">
+                      <div class="tab-pane" id="stc-create-classroom" role="tabpanel" aria-labelledby="school-tab-classrooms">
                         <div class="row">
                           <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Add Class Room</h2>
+                            <h2 class="school-page-title mb-3">Classrooms</h2>
                           </div>
                         </div>
                         <div class="row">
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
-                            <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
-                              <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <a
-                                      href="javascript:void(0)"
-                                      class="form-control btn btn-success stc-school-show-classroom-btn"
-                                      value=""
-                                    >Add Classroom</a>
+                              <div class="row align-items-start">
+                                <div class="col-12">
+                                  <div class="school-toolbar-row">
+                                    <button type="button" class="btn btn-primary btn-school-primary stc-school-show-classroom-btn">Add classroom</button>
+                                    <div class="school-search-row">
+                                      <input id="classsearch" type="text" class="form-control school-search-field" placeholder="Search classrooms..." />
+                                    </div>
                                   </div>
                                 </div>
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-                                  <div class="mb-3" style="width: auto;overflow-x: auto; white-space: nowrap;">
-                                    <input id="classsearch" type="text" class="form-control mb-3" placeholder="Search here...">
-                                    <table class="table table-hover table-bordered mb-3">
+                                <div class="col-12 mx-auto">
+                                  <div class="school-table-wrap">
+                                    <div class="school-table-inner">
+                                      <table class="table table-hover table-striped mb-3">
                                       <thead>
                                         <tr>
                                           <th class="text-center"><b>Classroom ID</b></th>
@@ -702,71 +270,80 @@
                                       </thead>
                                       <tbody class="stc-classroom-rec-show"></tbody>
                                     </table>
+                                    </div>
                                   </div>
+                                  <div class="stc-classroom-pagination school-rec-pagination-holder"></div>
                                 </div>
                               </div>
-                            </div>
                           </div>
                         </div>
                       </div>                     
 
                       <!-- Field Schedule Routine -->
 
-                      <div class="tab-pane " id="stc-create-shedule">
-                        <div class="row">
-                          <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Add Schedule</h2>
-                          </div>
-                        </div>
-                        <div class="row">
-                          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
-                            <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
-                              <div class="row">
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <a
-                                      href="javascript:void(0)"
-                                      class="form-control btn btn-success stc-school-show-schedule-btn"
-                                      value=""
-                                    >Add Schedule</a>
-                                  </div>
-                                </div>
-                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-                                  <select class="form-control btn btn-info stc-schedule-week">
-                                    <option>Select</option>
-                                    <?php
-                                    $day_arr=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
-                                    $day=date("l");
-                                      foreach($day_arr as $day_arr_row){
-                                        if($day==$day_arr_row){
-                                          echo '<option selected>'.$day_arr_row.'</option>';
-                                        }else{
-                                          echo '<option>'.$day_arr_row.'</option>';
-                                        }
-                                      }
-                                    ?>
-                                  </select>                       
-                                  <div class="mb-3" style="width: auto;overflow-x: auto; white-space: nowrap;">
-                                    <input id="schedulesearch" type="text" class="form-control mb-3" placeholder="Search here...">
-                                    <table class="table table-hover table-bordered mb-3">
-                                      <thead>
-                                        <tr>
-                                          <td class="text-center"><b>Class</b></td>
-                                          <td class="text-center"><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></td>
-                                          <td class="text-center"><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></td>
-                                          <td class="text-center"><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></td>
-                                          <td class="text-center"><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                          <td class="text-center"><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                          <td class="text-center"><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                          <td class="text-center"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></td>
-                                        </tr>
-                                      </thead>
-                                      <tbody class="stc-schedule-rec-show"></tbody>
-                                    </table>
-                                  </div>
+                      <div class="tab-pane" id="stc-create-shedule" role="tabpanel" aria-labelledby="school-tab-schedule">
+                        <div class="school-weekly-surface">
+                          <header class="school-weekly-header">
+                            <div class="school-weekly-header-copy">
+                              <h2 class="school-page-title school-weekly-title mb-2">Weekly schedule</h2>
+                              <p class="school-weekly-lead mb-0">Pick a weekday to load all classes for that day. Unused slots show <span class="school-weekly-mono">na</span>; the card in the matching time band is tinted as <strong class="school-week-active-word">live</strong> when viewing today.</p>
+                            </div>
+                          </header>
+
+                          <div class="school-weekly-controls">
+                            <div class="school-weekly-controls-row">
+                              <button type="button" class="btn btn-primary btn-school-primary btn-school-lg stc-school-show-schedule-btn">
+                                <i class="material-icons align-middle mr-2" aria-hidden="true" style="font-size:18px;">add_circle_outline</i>
+                                Add timetable entry
+                              </button>
+                              <div class="school-weekly-field school-weekly-field-day">
+                                <label class="school-inline-label" for="weekly-sched-day-select"><i class="material-icons school-field-icon" aria-hidden="true">event</i> Day</label>
+                                <select id="weekly-sched-day-select" class="form-control school-week-picker stc-schedule-week" autocomplete="off">
+                                  <option>Select</option>
+                                  <?php
+                                  $day_arr=array('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday');
+                                  $day=date('l');
+                                  foreach($day_arr as $day_arr_row){
+                                    if ($day === $day_arr_row) {
+                                      echo '<option selected>'.htmlspecialchars($day_arr_row, ENT_QUOTES, 'UTF-8').'</option>';
+                                    } else {
+                                      echo '<option>'.htmlspecialchars($day_arr_row, ENT_QUOTES, 'UTF-8').'</option>';
+                                    }
+                                  }
+                                  ?>
+                                </select>
+                              </div>
+                              <div class="school-weekly-field school-weekly-field-search flex-grow-md-1">
+                                <label class="school-inline-label" for="schedulesearch"><i class="material-icons school-field-icon" aria-hidden="true">search</i> Search classes</label>
+                                <div class="school-search-input-wrap">
+                                  <input id="schedulesearch" type="text" class="form-control school-search-field" placeholder="Filter by class, subject or teacher..." autocomplete="off" />
                                 </div>
                               </div>
                             </div>
+                          </div>
+
+                          <div class="school-table-wrap school-weekly-table-wrap">
+                            <div class="school-weekly-table-bar">
+                              <span class="school-weekly-table-bar-title"><i class="material-icons align-middle mr-2" aria-hidden="true">grid_on</i> Weekly grid</span>
+                              <small class="text-muted school-weekly-table-hint d-none d-md-inline ml-md-4">Swipe or scroll sideways on phones.</small>
+                            </div>
+                            <div class="school-table-inner">
+                                  <table class="table table-hover table-striped mb-0 stc-weekly-sched-grid">
+                                    <thead>
+                                      <tr>
+                                        <th class="text-center"><b>Class</b></th>
+                                        <th class="text-center"><b>1<span style="vertical-align: top;font-size: 11px;">st</span> Period</b></th>
+                                        <th class="text-center"><b>2<span style="vertical-align: top;font-size: 11px;">nd</span> Period</b></th>
+                                        <th class="text-center"><b>3<span style="vertical-align: top;font-size: 11px;">rd</span> Period</b></th>
+                                        <th class="text-center"><b>4<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></th>
+                                        <th class="text-center"><b>5<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></th>
+                                        <th class="text-center"><b>6<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></th>
+                                        <th class="text-center"><b>7<span style="vertical-align: top;font-size: 11px;">th</span> Period</b></th>
+                                      </tr>
+                                    </thead>
+                                    <tbody class="stc-schedule-rec-show"></tbody>
+                                  </table>
+                                </div>
                           </div>
                         </div>
                       </div>
@@ -779,774 +356,6 @@
         </div>
       </div>
     </div>
-
-    <!--   Core JS Files   -->
-    <script src="../assets/js/core/jquery.min.js"></script>
-    <script src="../assets/js/core/popper.min.js"></script>
-    <script src="../assets/js/core/bootstrap-material-design.min.js"></script>
-    <script src="../assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-    <!-- Plugin for the momentJs  -->
-    <script src="../assets/js/plugins/moment.min.js"></script>
-    <!--  Plugin for Sweet Alert -->
-    <script src="../assets/js/plugins/sweetalert2.js"></script>
-    <!-- Forms Validations Plugin -->
-    <script src="../assets/js/plugins/jquery.validate.min.js"></script>
-    <!-- Plugin for the Wizard, full documentation here: https://github.com/VinceG/twitter-bootstrap-wizard -->
-    <script src="../assets/js/plugins/jquery.bootstrap-wizard.js"></script>
-    <!--  Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
-    <script src="../assets/js/plugins/bootstrap-selectpicker.js"></script>
-    <!--  Plugin for the DateTimePicker, full documentation here: https://eonasdan.github.io/bootstrap-datetimepicker/ -->
-    <script src="../assets/js/plugins/bootstrap-datetimepicker.min.js"></script>
-    <!--  DataTables.net Plugin, full documentation here: https://datatables.net/  -->
-    <script src="../assets/js/plugins/jquery.dataTables.min.js"></script>
-    <!--  Plugin for Tags, full documentation here: https://github.com/bootstrap-tagsinput/bootstrap-tagsinputs  -->
-    <script src="../assets/js/plugins/bootstrap-tagsinput.js"></script>
-    <!-- Plugin for Fileupload, full documentation here: http://www.jasny.net/bootstrap/javascript/#fileinput -->
-    <script src="../assets/js/plugins/jasny-bootstrap.min.js"></script>
-    <!--  Full Calendar Plugin, full documentation here: https://github.com/fullcalendar/fullcalendar    -->
-    <script src="../assets/js/plugins/fullcalendar.min.js"></script>
-    <!-- Vector Map plugin, full documentation here: http://jvectormap.com/documentation/ -->
-    <script src="../assets/js/plugins/jquery-jvectormap.js"></script>
-    <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
-    <script src="../assets/js/plugins/nouislider.min.js"></script>
-    <!-- Include a polyfill for ES6 Promises (optional) for IE11, UC Browser and Android browser support SweetAlert -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.js"></script>
-    <!-- Library for adding dinamically elements -->
-    <script src="../assets/js/plugins/arrive.min.js"></script>
-    <!--  Google Maps Plugin    -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
-    <!-- Chartist JS -->
-    <script src="../assets/js/plugins/chartist.min.js"></script>
-    <!--  Notifications Plugin    -->
-    <script src="../assets/js/plugins/bootstrap-notify.js"></script>
-    <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
-    <script src="../assets/js/material-dashboard.js?v=2.1.2" type="text/javascript"></script>
-    <!-- Material Dashboard DEMO methods, don't include it in your project! -->
-    <script src="../assets/demo/demo.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
-    <script>
-      $(document).ready(function() {
-        $().ready(function() {
-          $sidebar = $('.sidebar');
-
-          $sidebar_img_container = $sidebar.find('.sidebar-background');
-
-          $full_page = $('.full-page');
-
-          $sidebar_responsive = $('body > .navbar-collapse');
-
-          window_width = $(window).width();
-
-          fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
-
-          if (window_width > 767 && fixed_plugin_open == 'Dashboard') {
-            if ($('.fixed-plugin .dropdown').hasClass('show-dropdown')) {
-              $('.fixed-plugin .dropdown').addClass('open');
-            }
-
-          }
-
-          $('.fixed-plugin a').click(function(event) {
-            // Alex if we click on switch, stop propagation of the event, so the dropdown will not be hide, otherwise we set the  section active
-            if ($(this).hasClass('switch-trigger')) {
-              if (event.stopPropagation) {
-                event.stopPropagation();
-              } else if (window.event) {
-                window.event.cancelBubble = true;
-              }
-            }
-          });
-
-          $('.fixed-plugin .active-color span').click(function() {
-            $full_page_background = $('.full-page-background');
-
-            $(this).siblings().removeClass('active');
-            $(this).addClass('active');
-
-            var new_color = $(this).data('color');
-
-            if ($sidebar.length != 0) {
-              $sidebar.attr('data-color', new_color);
-            }
-
-            if ($full_page.length != 0) {
-              $full_page.attr('filter-color', new_color);
-            }
-
-            if ($sidebar_responsive.length != 0) {
-              $sidebar_responsive.attr('data-color', new_color);
-            }
-          });
-
-          $('.fixed-plugin .background-color .badge').click(function() {
-            $(this).siblings().removeClass('active');
-            $(this).addClass('active');
-
-            var new_color = $(this).data('background-color');
-
-            if ($sidebar.length != 0) {
-              $sidebar.attr('data-background-color', new_color);
-            }
-          });
-
-          $('.fixed-plugin .img-holder').click(function() {
-            $full_page_background = $('.full-page-background');
-
-            $(this).parent('li').siblings().removeClass('active');
-            $(this).parent('li').addClass('active');
-
-
-            var new_image = $(this).find("img").attr('src');
-
-            if ($sidebar_img_container.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
-              $sidebar_img_container.fadeOut('fast', function() {
-                $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
-                $sidebar_img_container.fadeIn('fast');
-              });
-            }
-
-            if ($full_page_background.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
-              var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
-
-              $full_page_background.fadeOut('fast', function() {
-                $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
-                $full_page_background.fadeIn('fast');
-              });
-            }
-
-            if ($('.switch-sidebar-image input:checked').length == 0) {
-              var new_image = $('.fixed-plugin li.active .img-holder').find("img").attr('src');
-              var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
-
-              $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
-              $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
-            }
-
-            if ($sidebar_responsive.length != 0) {
-              $sidebar_responsive.css('background-image', 'url("' + new_image + '")');
-            }
-          });
-
-          $('.switch-sidebar-image input').change(function() {
-            $full_page_background = $('.full-page-background');
-
-            $input = $(this);
-
-            if ($input.is(':checked')) {
-              if ($sidebar_img_container.length != 0) {
-                $sidebar_img_container.fadeIn('fast');
-                $sidebar.attr('data-image', '#');
-              }
-
-              if ($full_page_background.length != 0) {
-                $full_page_background.fadeIn('fast');
-                $full_page.attr('data-image', '#');
-              }
-
-              background_image = true;
-            } else {
-              if ($sidebar_img_container.length != 0) {
-                $sidebar.removeAttr('data-image');
-                $sidebar_img_container.fadeOut('fast');
-              }
-
-              if ($full_page_background.length != 0) {
-                $full_page.removeAttr('data-image', '#');
-                $full_page_background.fadeOut('fast');
-              }
-
-              background_image = false;
-            }
-          });
-
-          $('.switch-sidebar-mini input').change(function() {
-            $body = $('body');
-
-            $input = $(this);
-
-            if (md.misc.sidebar_mini_active == true) {
-              $('body').removeClass('sidebar-mini');
-              md.misc.sidebar_mini_active = false;
-
-              $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar();
-
-            } else {
-
-              $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar('destroy');
-
-              setTimeout(function() {
-                $('body').addClass('sidebar-mini');
-
-                md.misc.sidebar_mini_active = true;
-              }, 300);
-            }
-
-            // we simulate the window Resize so the charts will get updated in realtime.
-            var simulateWindowResize = setInterval(function() {
-              window.dispatchEvent(new Event('resize'));
-            }, 180);
-
-            // we stop the simulation of Window Resize after the animations are completed
-            setTimeout(function() {
-              clearInterval(simulateWindowResize);
-            }, 1000);
-
-          });
-        });
-      });
-    </script>
-    <script>
-      $(document).ready(function() {
-        // Javascript method's body can be found in assets/js/demos.js
-        md.initDashboardPageCharts();
-
-      });
-    </script>
-    <script>
-      $(document).ready(function() {
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        const value = urlParams.get('school-management');
-        if(value=="yes"){
-          $('.school-management').addClass('active');
-        }
-      });
-    </script>
-    <script>
-      $(document).ready(function(){
-        $('.close-icon').on('click', function(e){
-          e.preventDefault();
-            $('.stc-electro-pd-show-ch').fadeOut(500);
-        });
-
-        $('.upward').on('click', function(e){
-          e.preventDefault();
-            $('.downward').toggle(500);
-            $('.stc-electro-pd-show-ch').fadeOut(500);
-            $('.upward').fadeOut(500);
-        });
-
-        $('.downward').on('click', function(e){
-          e.preventDefault();
-            $('.upward').toggle(500);
-            $('.stc-electro-pd-show-ch').toggle(500);
-            $('.downward').fadeOut(500);
-        });
-
-        $(".ddd").on("click", function(w) {
-          w.preventDefault();
-          var $button = $(this);
-          var $input = $button.closest('.sp-quantity').find("input.quntity-input");
-          $input.val((i, v) => Math.max(0, +v + 1 * $button.data('multi')));
-        });
-      });
-    </script>
-    <!-- data show section -->
-    <script>
-      $(document).ready(function(){
-        $("#teachersearch").on("keyup", function() {
-          var value = $(this).val().toLowerCase();
-          $(".stc-teacher-rec-show tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-          });
-        });
-
-        $("#studentsearch").on("keyup", function() {
-          var value = $(this).val().toLowerCase();
-          $(".stc-student-rec-show tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-          });
-        });
-
-        $("#classsearch").on("keyup", function() {
-          var value = $(this).val().toLowerCase();
-          $(".stc-classroom-rec-show tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-          });
-        });
-
-        $("#subjectsearch").on("keyup", function() {
-          var value = $(this).val().toLowerCase();
-          $(".stc-subject-rec-show tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-          });
-        });
-
-        $("#schedulesearch").on("keyup", function() {
-          var value = $(this).val().toLowerCase();
-          $(".stc-schedule-rec-show tr").filter(function() {
-            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-          });
-        });
-
-        // save teacher to db
-        $(document).on('click', '#stcschoolteachersave', function(e){
-          e.preventDefault();
-          var stcschoolmanagementteacherid              = $('.stcschoolmanagementteacherid').val();
-          var stcschoolmanagementteacherfirstname       = $('.stcschoolmanagementteacherfirstname').val();
-          var stcschoolmanagementteacherlastname        = $('.stcschoolmanagementteacherlastname').val();
-          var stcschoolmanagementteacherdateofbirth     = $('.stcschoolmanagementteacherdateofbirth').val();
-          var stcschoolmanagementteachergender          = $('.stcschoolmanagementteachergender:checked').val();
-          var stcschoolmanagementteacherbloodgroup      = $('.stcschoolmanagementteacherbloodgroup').val();
-          var stcschoolmanagementteacheremail           = $('.stcschoolmanagementteacheremail').val();
-          var stcschoolmanagementteachernumber          = $('.stcschoolmanagementteachernumber').val();
-          var stcschoolmanagementteacheraddress         = $('.stcschoolmanagementteacheraddress').val();
-          var stcschoolmanagementteacherskills          = $('.stcschoolmanagementteacherskills').val();
-          var stcschoolmanagementteacherreligion        = $('.stcschoolmanagementteacherreligion').val();
-          var stcschoolmanagementteacherjoiningdate     = $('.stcschoolmanagementteacherjoiningdate').val();
-          var stcschoolmanagementteacherremarks         = $('.stcschoolmanagementteacherremarks').val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stcschoolmanagementteacherid:stcschoolmanagementteacherid,
-              stcschoolmanagementteacherfirstname:stcschoolmanagementteacherfirstname,
-              stcschoolmanagementteacherlastname:stcschoolmanagementteacherlastname,
-              stcschoolmanagementteacherdateofbirth:stcschoolmanagementteacherdateofbirth,
-              stcschoolmanagementteachergender:stcschoolmanagementteachergender,
-              stcschoolmanagementteacherbloodgroup:stcschoolmanagementteacherbloodgroup,
-              stcschoolmanagementteacheremail:stcschoolmanagementteacheremail,
-              stcschoolmanagementteachernumber:stcschoolmanagementteachernumber,
-              stcschoolmanagementteacheraddress:stcschoolmanagementteacheraddress,
-              stcschoolmanagementteacherskills:stcschoolmanagementteacherskills,
-              stcschoolmanagementteacherreligion:stcschoolmanagementteacherreligion,
-              stcschoolmanagementteacherjoiningdate:stcschoolmanagementteacherjoiningdate,
-              stcschoolmanagementteacherremarks:stcschoolmanagementteacherremarks,
-              save_teacheradd_action : 1
-            },
-            // dataType: `JSON`,
-            success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="success"){
-              alert("Record saved successfully.");
-              window.location.reload();
-             }else if(response=="reload"){
-              window.location.reload();
-             }else if(response=="empty"){
-              alert("Do not let any field empty.");
-             }else if(response=="wrong"){
-              alert("Something went wrong record not saved! Please try again.");
-             }else if(response=="duplicate"){
-              alert("Duplicate details found! Please check contact and email and try again.");
-             }
-            }
-          });
-        });
-
-
-        // save student to db
-        $(document).on('click', '#stcschoolstudentsave', function(e){
-          e.preventDefault();
-          var stcschoolmanagementstudentid              = $('.stcschoolmanagementstudentid').val();
-          var stcschoolmanagementstudentfirstname       = $('.stcschoolmanagementstudentfirstname').val();
-          var stcschoolmanagementstudentlastname        = $('.stcschoolmanagementstudentlastname').val();
-          var stcschoolmanagementstudentdateofbirth     = $('.stcschoolmanagementstudentdateofbirth').val();
-          var stcschoolmanagementstudentgender          = $('.stcschoolmanagementstudentgender:checked').val();
-          var stcschoolmanagementstudentbloodgroup      = $('.stcschoolmanagementstudentbloodgroup').val();
-          var stcschoolmanagementstudentemail           = $('.stcschoolmanagementstudentemail').val();
-          var stcschoolmanagementstudentnumber          = $('.stcschoolmanagementstudentnumber').val();
-          var stcschoolmanagementStudentaddress         = $('.stcschoolmanagementStudentaddress').val();
-          var stcschoolmanagementstudentreligion          = $('.stcschoolmanagementstudentreligion').val();
-          var stcschoolmanagementstudentjoiningdate        = $('.stcschoolmanagementstudentjoiningdate').val();
-          var stcschoolmanagementstudentclassroom     = $('.stcschoolmanagementstudentclassroom').val();
-          var stcschoolmanagementstudentparentguardianfullname         = $('.stcschoolmanagementstudentparentguardianfullname').val();
-          var stcschoolmanagementstudentremarks         = $('.stcschoolmanagementstudentremarks').val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stcschoolmanagementstudentid:stcschoolmanagementstudentid,
-              stcschoolmanagementstudentfirstname:stcschoolmanagementstudentfirstname,
-              stcschoolmanagementstudentlastname:stcschoolmanagementstudentlastname,
-              stcschoolmanagementstudentdateofbirth:stcschoolmanagementstudentdateofbirth,
-              stcschoolmanagementstudentgender:stcschoolmanagementstudentgender,
-              stcschoolmanagementstudentbloodgroup:stcschoolmanagementstudentbloodgroup,
-              stcschoolmanagementstudentemail:stcschoolmanagementstudentemail,
-              stcschoolmanagementstudentnumber:stcschoolmanagementstudentnumber,
-              stcschoolmanagementStudentaddress:stcschoolmanagementStudentaddress,
-              stcschoolmanagementstudentreligion:stcschoolmanagementstudentreligion,
-              stcschoolmanagementstudentjoiningdate:stcschoolmanagementstudentjoiningdate,
-              stcschoolmanagementstudentclassroom:stcschoolmanagementstudentclassroom,
-              stcschoolmanagementstudentparentguardianfullname:stcschoolmanagementstudentparentguardianfullname,
-              stcschoolmanagementstudentremarks:stcschoolmanagementstudentremarks,
-              save_studentadd_action : 1
-            },
-            // dataType: `JSON`,
-            success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="success"){
-              alert("Record saved successfully.");
-              // window.location.reload();
-             }else if(response=="reload"){
-              window.location.reload();
-             }else if(response=="empty"){
-              alert("Do not let any field empty.");
-             }else if(response=="wrong"){
-              alert("Something went wrong record not saved! Please try again.");
-             }else if(response=="duplicate"){
-              alert("Duplicate details found! Please check contact and email other, details and try again.");
-             }
-            }
-          });
-        });
-
-
-        // save subject to db
-        $(document).on('click', '#stcschoolsubjectsave', function(e){
-          e.preventDefault();
-          var stcschoolmanagementsubjectid        = $('.stcschoolmanagementsubjectid').val();
-          var stcschoolmanagementsubjecttitle     = $('.stcschoolmanagementsubjecttitle').val();
-          var stcschoolmanagementsubjectdetails   = $('.stcschoolmanagementsubjectdetails').val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stcschoolmanagementsubjectid:stcschoolmanagementsubjectid,
-              stcschoolmanagementsubjecttitle:stcschoolmanagementsubjecttitle,
-              stcschoolmanagementsubjectdetails:stcschoolmanagementsubjectdetails,
-              save_subjectadd_action : 1
-            },
-            // dataType: `JSON`,
-            success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="success"){
-              alert("Record saved successfully.");
-              window.location.reload();
-             }else if(response=="reload"){
-              window.location.reload();
-             }else if(response=="empty"){
-              alert("Do not let any field empty.");
-             }else if(response=="wrong"){
-              alert("Something went wrong record not saved! Please try again.");
-             }else if(response=="duplicate"){
-              alert("Duplicate details found! Please check and try again.");
-             }
-            }
-          });
-        });
-
-        // get url 
-        const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        const value = urlParams.get('modal');
-        
-        var syllabus_id=0;
-        if(value=="access"){
-          $('.stc-school-addsyllabus-res').modal('show');
-        }
-        if(value=="accessview"){
-          $('.stc-school-viewsyllabus-res').modal('show');
-          syllabus_id = urlParams.get('id');
-          load_syllabus_pert(syllabus_id)
-        }
-
-        // save syllabus
-        $(document).on('click', '.stc-school-sylsave-btn', function(e){
-          e.preventDefault();
-          var title=$('.stc-school-sylTitle').val();
-          var chapter=$('.stc-school-sylChapter').val();
-          var lesson=$('.stc-school-sylLesson').val();
-          var unit=$('.stc-school-sylUnit').val();
-          var date=$('.stc-school-sylDate').val();
-          var subject_id = urlParams.get('id');
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_add_syllabus_action : 1,
-              stc_subject_id:subject_id,
-              stc_title:title,
-              stc_chapter:chapter,
-              stc_lesson:lesson,
-              stc_unit:unit,
-              stc_date:date
-            },
-            success   : function(response){
-             // console.log(response);
-             response=response.trim();
-             if(response=="success"){
-              alert("Syllabus saved successfully.");
-              $('.stc-school-addsyllabus-res .form-control').val('');
-             }else if(response="empty"){
-              alert("Please enter title.");
-             }else if(response="failed"){
-              alert("Syllabus not saved. Please check and try again");
-             }else if(response="reload"){
-              window.location.reload();
-             }
-            }
-          });
-        });
-
-        // save class to db
-        $(document).on('click', '#stcschoolclassroomsave', function(e){
-          e.preventDefault();
-          var stcschoolmanagementclassroomid        = $('.stcschoolmanagementclassroomid').val();
-          var stcschoolmanagementclassroomtitle     = $('.stcschoolmanagementclassroomtitle').val();
-          var stcschoolmanagementclassroomlocation   = $('.stcschoolmanagementclassroomlocation').val();
-          var stcschoolmanagementclassroomcapacity   = $('.stcschoolmanagementclassroomcapacity').val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stcschoolmanagementclassroomid:stcschoolmanagementclassroomid,
-              stcschoolmanagementclassroomtitle:stcschoolmanagementclassroomtitle,
-              stcschoolmanagementclassroomlocation:stcschoolmanagementclassroomlocation,
-              stcschoolmanagementclassroomcapacity:stcschoolmanagementclassroomcapacity,
-              save_classadd_action : 1
-            },
-            // dataType: `JSON`,
-            success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="success"){
-              alert("Record saved successfully.");
-              window.location.reload();
-             }else if(response=="reload"){
-              window.location.reload();
-             }else if(response=="empty"){
-              alert("Do not let any field empty.");
-             }else if(response=="wrong"){
-              alert("Something went wrong record not saved! Please try again.");
-             }else if(response=="duplicate"){
-              alert("Duplicate details found! Please check and try again.");
-             }
-            }
-          });
-        });
-
-        // save shedule to db
-        $(document).on('click', '#stcschoolschedulesave', function(e){
-          e.preventDefault();
-          var stcschoolscheduletype         = $('.stcschoolscheduletype').val();
-          var stcschoolscheduleteacher      = $('.stcschoolscheduleteacher').val();
-          var stcschoolschedulesubject      = $('.stcschoolschedulesubject').val();
-          var stcschoolscheduleclass        = $('.stcschoolscheduleclass').val();
-          var stcschoolscheduleday          = $('.stcschoolscheduleday').val();
-          var stcschoolschedulestarttime    = $('.stcschoolschedulestarttime').val();
-          var stcschoolscheduleendtime      = $('.stcschoolscheduleendtime').val();
-          var stcschoolscheduleperiod      = $('.stcschoolscheduleperiod').val();
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stcschoolscheduleteacher:stcschoolscheduleteacher,
-              stcschoolscheduletype:stcschoolscheduletype,
-              stcschoolschedulesubject:stcschoolschedulesubject,
-              stcschoolscheduleclass:stcschoolscheduleclass,
-              stcschoolscheduleday:stcschoolscheduleday,
-              stcschoolschedulestarttime:stcschoolschedulestarttime,
-              stcschoolscheduleendtime:stcschoolscheduleendtime,
-              stcschoolscheduleperiod:stcschoolscheduleperiod,
-              save_schduleadd_action : 1
-            },
-            // dataType: `JSON`,
-            success   : function(data){
-             // console.log(data);
-             var response=data.trim();
-             if(response=="success"){
-              alert("Record saved successfully.");
-              // window.location.reload();
-             }else if(response=="reload"){
-              window.location.reload();
-             }else if(response=="empty"){
-              alert("Do not let any field empty.");
-             }else if(response=="wrong"){
-              alert("Something went wrong record not saved! Please try again.");
-             }else if(response=="duplicate"){
-              alert("Busy schedule, Please check availability first.");
-             }
-            }
-          });
-        });
-
-        // show data sections 
-        call_records();
-        function call_records(){          
-          $.ajax({  
-            url       : "../vanaheim/school-management.php",
-            method    : "POST",  
-            data      : {
-              stc_load_record_action : 1
-            },
-            dataType: `JSON`,
-            success   : function(response){
-             // console.log(response);
-             if(response.status=="success"){
-              var teacher=response.response_teacher;
-              $('.stc-teacher-rec-show').html(teacher);
-
-
-              var student=response.response_student;
-              $('.stc-student-rec-show').html(student);
-
-
-              var subject=response.response_subject;
-              $('.stc-subject-rec-show').html(subject);
-
-
-              var classroom=response.response_class;
-              $('.stc-classroom-rec-show').html(classroom);
-              
-             }else if(response.status="reload"){
-              window.location.reload();
-             }
-            }
-          });
-        }
-
-        load_schedule();
-        function load_schedule(){
-          var day=$('.stc-schedule-week').val();
-          if(day!="Select"){
-            $.ajax({  
-              url       : "../vanaheim/school-management.php",
-              method    : "POST",  
-              data      : {
-                stc_load_schedule_action : 1,
-                day:day
-              },
-              dataType: `JSON`,
-              success   : function(response){
-               // console.log(response);
-               if(response.status=="success"){
-
-                var schedule=response.response_schedule;
-                $('.stc-schedule-rec-show').html(schedule);
-                // $('.remove.icon').hide();
-
-                
-               }else if(response.status="reload"){
-                window.location.reload();
-               }
-              }
-            });
-          }
-        }
-
-        $(document).on('change', '.stc-schedule-week', function(e){
-          e.preventDefault();
-          load_schedule();
-        });
-
-        $(document).on('hover', '.schedule-box', function(e){
-          e.preventDefault();
-          $('.remove.icon').show();
-        });
-
-        $(document).on('click', '.hover-box', function(e){
-          e.preventDefault();
-          var box_name = $(this).attr('id');
-          $('.schedule-box').css({ 'color': 'white', 'background': 'linear-gradient(37deg, #d4fffd , #1de4ff)', 'font-size': '20px' });
-          $('.box-rep-'+box_name).css({ 'color': 'white', 'background': 'linear-gradient(37deg, rgb(24 129 124), rgb(158 243 255)) black', 'font-size': '20px' });
-        });
-        
-        $(document).on('click', '.stc-remove-schedule-btn', function(e){
-          e.preventDefault();
-          var sched_id=$(this).attr("id");
-          if (confirm("Are you sure you want to remove this schedule.") == true) {
-            $.ajax({  
-              url       : "../vanaheim/school-management.php",
-              method    : "POST",  
-              data      : {
-                stc_remove_schedule_action : 1,
-                sched_id:sched_id
-              },
-              dataType: `JSON`,
-              success   : function(response){
-               // console.log(response);
-               if(response.status=="success"){
-                alert(response.message);
-                load_schedule();
-               }else if(response.status="failed"){
-                alert(response.message);
-               }else if(response.status="reload"){
-                window.location.reload();
-               }
-              }
-            });
-          }
-        });
-        
-        function load_syllabus_pert(syllabus_id){
-          $.ajax({  
-              url       : "../vanaheim/school-management.php",
-              method    : "POST",  
-              data      : {
-                stc_get_syllabus_details : 1,
-                syllabus_id:syllabus_id
-              },
-              dataType: `JSON`,
-              success   : function(response){
-                // console.log(response);
-                if(response.status=="success"){
-                  var syllabus=response.data;
-                  $('.show-syllabus-data').html(syllabus);
-                }else if(response.status="reload"){
-                  window.location.reload();
-                }
-              }
-            });
-        }
-
-        $(document).on('click', '.stc-school-show-teach-btn', function(e){
-          e.preventDefault();
-          call_records();
-          $('.stc-school-showteacher-res').modal('show');
-        });
-
-        $(document).on('click', '.stc-school-show-stud-btn', function(e){
-          e.preventDefault();
-          call_records();
-          $('.stc-school-showstud-res').modal('show');
-        }); 
-
-        $(document).on('click', '.stc-school-show-subject-btn', function(e){
-          e.preventDefault();
-          call_records();
-          $('.stc-school-showsub-res').modal('show');
-        }); 
-
-        $(document).on('click', '.stc-school-show-classroom-btn', function(e){
-          e.preventDefault();
-          call_records();
-          $('.stc-school-showclassroom-res').modal('show');
-        }); 
-
-        $(document).on('click', '.stc-school-show-schedule-btn', function(e){
-          e.preventDefault();
-          $('.stc-school-showschedule-res').modal('show');
-          load_schedule();
-        }); 
-
-
-        $(document).on('click', '.stc-class-upd-btn-show', function(e){
-          e.preventDefault();
-          $(this).hide();
-          $(this).parent().parent().find('.stc-class-upd-btn-save').show();
-          $(this).parent().parent().find('.stc-class-title-upd').show();
-          $(this).parent().parent().find('.stc-class-location-upd').show();
-          $(this).parent().parent().find('.stc-class-capacity-upd').show();
-        }); 
-
-        $(document).on('click', '.stc-class-upd-btn-save', function(e){
-          e.preventDefault();
-          $(this).hide();
-          $(this).parent().parent().find('.stc-class-title-upd').hide();
-          $(this).parent().parent().find('.stc-class-location-upd').hide();
-          $(this).parent().parent().find('.stc-class-capacity-upd').hide();
-          $(this).parent().parent().find('.stc-class-upd-btn-show').show();
-        }); 
-        
-      });
-    </script>
-  </body>
-</html>
-  
 
 <!-- syllabus modal -->
 
@@ -1590,7 +399,7 @@
             </div>
           </div>
           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto mt-3 mb-3">
-            <button class="btn btn-success stc-school-sylsave-btn form-control">Save</button>  
+        <button class="btn btn-success school-modal-save stc-school-sylsave-btn">Save syllabus</button>  
           </div>
         </div>
       </div>
@@ -1865,7 +674,7 @@
           </div>
           <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="mb-3">
-              <button type="button" name="search" class="form-control btn btn-success" id="stcschoolteachersave">Add Teacher</button>
+              <button type="button" name="search" class="btn btn-success school-modal-save" id="stcschoolteachersave">Add Teacher</button>
             </div>
           </div>
         </div>
@@ -2132,7 +941,7 @@
                   </div>
                   <div class="col-sm-12 col-md-12 col-lg-12">
                     <div class="mb-3">
-                      <button type="button" name="search" class="form-control btn btn-success" id="stcschoolstudentsave">Add Student</button>
+                      <button type="button" name="search" class="btn btn-success school-modal-save" id="stcschoolstudentsave">Add Student</button>
                     </div>
                   </div>
                 </div>
@@ -2201,7 +1010,7 @@
           </div>
           <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="mb-3">
-              <button type="button" name="search" class="form-control btn btn-success" id="stcschoolsubjectsave">Add Subject</button>
+              <button type="button" name="search" class="btn btn-success school-modal-save" id="stcschoolsubjectsave">Add Subject</button>
             </div>
           </div>
         </div>
@@ -2215,7 +1024,7 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h4 class="modal-title">School Clasroom</h4>
+        <h4 class="modal-title">Classroom</h4>
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
@@ -2282,7 +1091,7 @@
           </div>
           <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="mb-3">
-              <button type="button" name="search" class="form-control btn btn-success" id="stcschoolclassroomsave">Add Class Room</button>
+              <button type="button" name="search" class="btn btn-success school-modal-save" id="stcschoolclassroomsave">Add Class Room</button>
             </div>
           </div>
         </div>
@@ -2409,8 +1218,8 @@
                 name="stcschoolscheduleday"
                 type="text"
                 class="form-control validate stcschoolscheduleday"
-                >
-                ><option value="NA">Select</option>
+              >
+                <option value="NA">Select</option>
                 <option value="Monday">Monday</option>
                 <option value="Tuesday">Tuesday</option>
                 <option value="Wednesday">Wednesday</option>
@@ -2471,7 +1280,7 @@
           </div>
           <div class="col-sm-12 col-md-12 col-lg-12">
             <div class="mb-3">
-              <button type="button" name="search" class="form-control btn btn-success" id="stcschoolschedulesave">Add Schedule</button>
+              <button type="button" name="search" class="btn btn-success school-modal-save" id="stcschoolschedulesave">Add Schedule</button>
             </div>
           </div>
         </div>
@@ -2479,3 +1288,817 @@
     </div>
   </div>
 </div>
+
+
+    <!--   Core JS Files   -->
+    <script src="../assets/js/core/jquery.min.js"></script>
+    <script src="../assets/js/core/popper.min.js"></script>
+    <script src="../assets/js/core/bootstrap-material-design.min.js"></script>
+    <script src="../assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
+    <!-- Plugin for the momentJs  -->
+    <script src="../assets/js/plugins/moment.min.js"></script>
+    <!--  Plugin for Sweet Alert -->
+    <script src="../assets/js/plugins/sweetalert2.js"></script>
+    <!-- Forms Validations Plugin -->
+    <script src="../assets/js/plugins/jquery.validate.min.js"></script>
+    <!-- Plugin for the Wizard, full documentation here: https://github.com/VinceG/twitter-bootstrap-wizard -->
+    <script src="../assets/js/plugins/jquery.bootstrap-wizard.js"></script>
+    <!--  Plugin for Select, full documentation here: http://silviomoreto.github.io/bootstrap-select -->
+    <script src="../assets/js/plugins/bootstrap-selectpicker.js"></script>
+    <!--  Plugin for the DateTimePicker, full documentation here: https://eonasdan.github.io/bootstrap-datetimepicker/ -->
+    <script src="../assets/js/plugins/bootstrap-datetimepicker.min.js"></script>
+    <!--  DataTables.net Plugin, full documentation here: https://datatables.net/  -->
+    <script src="../assets/js/plugins/jquery.dataTables.min.js"></script>
+    <!--  Plugin for Tags, full documentation here: https://github.com/bootstrap-tagsinput/bootstrap-tagsinputs  -->
+    <script src="../assets/js/plugins/bootstrap-tagsinput.js"></script>
+    <!-- Plugin for Fileupload, full documentation here: http://www.jasny.net/bootstrap/javascript/#fileinput -->
+    <script src="../assets/js/plugins/jasny-bootstrap.min.js"></script>
+    <!--  Full Calendar Plugin, full documentation here: https://github.com/fullcalendar/fullcalendar    -->
+    <script src="../assets/js/plugins/fullcalendar.min.js"></script>
+    <!-- Vector Map plugin, full documentation here: http://jvectormap.com/documentation/ -->
+    <script src="../assets/js/plugins/jquery-jvectormap.js"></script>
+    <!--  Plugin for the Sliders, full documentation here: http://refreshless.com/nouislider/ -->
+    <script src="../assets/js/plugins/nouislider.min.js"></script>
+    <!-- Include a polyfill for ES6 Promises (optional) for IE11, UC Browser and Android browser support SweetAlert -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/2.4.1/core.js"></script>
+    <!-- Library for adding dinamically elements -->
+    <script src="../assets/js/plugins/arrive.min.js"></script>
+    <!--  Google Maps Plugin    -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY_HERE"></script>
+    <!-- Chartist JS -->
+    <script src="../assets/js/plugins/chartist.min.js"></script>
+    <!--  Notifications Plugin    -->
+    <script src="../assets/js/plugins/bootstrap-notify.js"></script>
+    <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="../assets/js/material-dashboard.js?v=2.1.2" type="text/javascript"></script>
+    <!-- Material Dashboard DEMO methods, don't include it in your project! -->
+    <script src="../assets/demo/demo.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        $().ready(function() {
+          $sidebar = $('.sidebar');
+
+          $sidebar_img_container = $sidebar.find('.sidebar-background');
+
+          $full_page = $('.full-page');
+
+          $sidebar_responsive = $('body > .navbar-collapse');
+
+          window_width = $(window).width();
+
+          fixed_plugin_open = $('.sidebar .sidebar-wrapper .nav li.active a p').html();
+
+          if (window_width > 767 && fixed_plugin_open == 'Dashboard') {
+            if ($('.fixed-plugin .dropdown').hasClass('show-dropdown')) {
+              $('.fixed-plugin .dropdown').addClass('open');
+            }
+
+          }
+
+          $('.fixed-plugin a').click(function(event) {
+            // Alex if we click on switch, stop propagation of the event, so the dropdown will not be hide, otherwise we set the  section active
+            if ($(this).hasClass('switch-trigger')) {
+              if (event.stopPropagation) {
+                event.stopPropagation();
+              } else if (window.event) {
+                window.event.cancelBubble = true;
+              }
+            }
+          });
+
+          $('.fixed-plugin .active-color span').click(function() {
+            $full_page_background = $('.full-page-background');
+
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
+
+            var new_color = $(this).data('color');
+
+            if ($sidebar.length != 0) {
+              $sidebar.attr('data-color', new_color);
+            }
+
+            if ($full_page.length != 0) {
+              $full_page.attr('filter-color', new_color);
+            }
+
+            if ($sidebar_responsive.length != 0) {
+              $sidebar_responsive.attr('data-color', new_color);
+            }
+          });
+
+          $('.fixed-plugin .background-color .badge').click(function() {
+            $(this).siblings().removeClass('active');
+            $(this).addClass('active');
+
+            var new_color = $(this).data('background-color');
+
+            if ($sidebar.length != 0) {
+              $sidebar.attr('data-background-color', new_color);
+            }
+          });
+
+          $('.fixed-plugin .img-holder').click(function() {
+            $full_page_background = $('.full-page-background');
+
+            $(this).parent('li').siblings().removeClass('active');
+            $(this).parent('li').addClass('active');
+
+
+            var new_image = $(this).find("img").attr('src');
+
+            if ($sidebar_img_container.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
+              $sidebar_img_container.fadeOut('fast', function() {
+                $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
+                $sidebar_img_container.fadeIn('fast');
+              });
+            }
+
+            if ($full_page_background.length != 0 && $('.switch-sidebar-image input:checked').length != 0) {
+              var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
+
+              $full_page_background.fadeOut('fast', function() {
+                $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
+                $full_page_background.fadeIn('fast');
+              });
+            }
+
+            if ($('.switch-sidebar-image input:checked').length == 0) {
+              var new_image = $('.fixed-plugin li.active .img-holder').find("img").attr('src');
+              var new_image_full_page = $('.fixed-plugin li.active .img-holder').find('img').data('src');
+
+              $sidebar_img_container.css('background-image', 'url("' + new_image + '")');
+              $full_page_background.css('background-image', 'url("' + new_image_full_page + '")');
+            }
+
+            if ($sidebar_responsive.length != 0) {
+              $sidebar_responsive.css('background-image', 'url("' + new_image + '")');
+            }
+          });
+
+          $('.switch-sidebar-image input').change(function() {
+            $full_page_background = $('.full-page-background');
+
+            $input = $(this);
+
+            if ($input.is(':checked')) {
+              if ($sidebar_img_container.length != 0) {
+                $sidebar_img_container.fadeIn('fast');
+                $sidebar.attr('data-image', '#');
+              }
+
+              if ($full_page_background.length != 0) {
+                $full_page_background.fadeIn('fast');
+                $full_page.attr('data-image', '#');
+              }
+
+              background_image = true;
+            } else {
+              if ($sidebar_img_container.length != 0) {
+                $sidebar.removeAttr('data-image');
+                $sidebar_img_container.fadeOut('fast');
+              }
+
+              if ($full_page_background.length != 0) {
+                $full_page.removeAttr('data-image', '#');
+                $full_page_background.fadeOut('fast');
+              }
+
+              background_image = false;
+            }
+          });
+
+          $('.switch-sidebar-mini input').change(function() {
+            $body = $('body');
+
+            $input = $(this);
+
+            if (md.misc.sidebar_mini_active == true) {
+              $('body').removeClass('sidebar-mini');
+              md.misc.sidebar_mini_active = false;
+
+              $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar();
+
+            } else {
+
+              $('.sidebar .sidebar-wrapper, .main-panel').perfectScrollbar('destroy');
+
+              setTimeout(function() {
+                $('body').addClass('sidebar-mini');
+
+                md.misc.sidebar_mini_active = true;
+              }, 300);
+            }
+
+            // we simulate the window Resize so the charts will get updated in realtime.
+            var simulateWindowResize = setInterval(function() {
+              window.dispatchEvent(new Event('resize'));
+            }, 180);
+
+            // we stop the simulation of Window Resize after the animations are completed
+            setTimeout(function() {
+              clearInterval(simulateWindowResize);
+            }, 1000);
+
+          });
+        });
+      });
+    </script>
+    <script>
+      $(document).ready(function() {
+        // Javascript method's body can be found in assets/js/demos.js
+        md.initDashboardPageCharts();
+
+      });
+    </script>
+    <script>
+      $(document).ready(function() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const value = urlParams.get('school-management');
+        if(value=="yes"){
+          $('.school-management').addClass('active');
+        }
+      });
+    </script>
+    <script>
+      $(document).ready(function(){
+        $('.close-icon').on('click', function(e){
+          e.preventDefault();
+            $('.stc-electro-pd-show-ch').fadeOut(500);
+        });
+
+        $('.upward').on('click', function(e){
+          e.preventDefault();
+            $('.downward').toggle(500);
+            $('.stc-electro-pd-show-ch').fadeOut(500);
+            $('.upward').fadeOut(500);
+        });
+
+        $('.downward').on('click', function(e){
+          e.preventDefault();
+            $('.upward').toggle(500);
+            $('.stc-electro-pd-show-ch').toggle(500);
+            $('.downward').fadeOut(500);
+        });
+
+        $(".ddd").on("click", function(w) {
+          w.preventDefault();
+          var $button = $(this);
+          var $input = $button.closest('.sp-quantity').find("input.quntity-input");
+          $input.val((i, v) => Math.max(0, +v + 1 * $button.data('multi')));
+        });
+      });
+    </script>
+    <!-- data show section -->
+    <script>
+      $(document).ready(function(){
+        var schoolRecPageState = { teacher_page: 1, student_page: 1, subject_page: 1, class_page: 1 };
+
+        /* Bootstrap's tab.js is not loaded on this page; toggle panes manually (Material Dashboard + BM-D only). */
+        $(document).on('click', '.school-mgmt-header-tabs .nav-link[href^="#"]', function (e) {
+          e.preventDefault();
+          var $link = $(this);
+          var sel = $link.attr('href');
+          if (!sel || sel.indexOf('#') !== 0) return;
+          var $shell = $link.closest('.school-card-shell');
+          if (!$shell.length) return;
+
+          var $pane = $(sel);
+          if (!$pane.length || !$pane.hasClass('tab-pane')) return;
+
+          $shell.find('.school-mgmt-header-tabs .nav-link').removeClass('active');
+          $shell.find('.tab-content > .tab-pane').removeClass('active');
+
+          $link.addClass('active');
+          $pane.addClass('active');
+
+          $shell.find('.school-mgmt-header-tabs .nav-link[role="tab"]').attr('aria-selected', 'false');
+          $link.attr('aria-selected', 'true');
+
+          /* Schedule grid is date-driven; refresh when that tab opens */
+          if (sel === '#stc-create-shedule' && typeof load_schedule === 'function') {
+            load_schedule();
+          }
+        });
+
+        $("#teachersearch").on("keyup", function() {
+          clearTimeout(window.__stc_mgmt_ttimer);
+          window.__stc_mgmt_ttimer = setTimeout(function(){ call_records({teacher_page: 1}); }, 350);
+        });
+
+        $("#studentsearch").on("keyup", function() {
+          clearTimeout(window.__stc_mgmt_sttimer);
+          window.__stc_mgmt_sttimer = setTimeout(function(){ call_records({student_page: 1}); }, 350);
+        });
+
+        $("#classsearch").on("keyup", function() {
+          clearTimeout(window.__stc_mgmt_ctimer);
+          window.__stc_mgmt_cttimer = setTimeout(function(){ call_records({class_page: 1}); }, 350);
+        });
+
+        $("#subjectsearch").on("keyup", function() {
+          clearTimeout(window.__stc_mgmt_subtimer);
+          window.__stc_mgmt_subtimer = setTimeout(function(){ call_records({subject_page: 1}); }, 350);
+        });
+
+        $("#schedulesearch").on("keyup", function() {
+          var value = $(this).val().toLowerCase();
+          $(".stc-schedule-rec-show tr").filter(function() {
+            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+          });
+        });
+
+        // save teacher to db
+        $(document).on('click', '#stcschoolteachersave', function(e){
+          e.preventDefault();
+          var stcschoolmanagementteacherid              = $('.stcschoolmanagementteacherid').val();
+          var stcschoolmanagementteacherfirstname       = $('.stcschoolmanagementteacherfirstname').val();
+          var stcschoolmanagementteacherlastname        = $('.stcschoolmanagementteacherlastname').val();
+          var stcschoolmanagementteacherdateofbirth     = $('.stcschoolmanagementteacherdateofbirth').val();
+          var stcschoolmanagementteachergender          = $('.stcschoolmanagementteachergender:checked').val();
+          var stcschoolmanagementteacherbloodgroup      = $('.stcschoolmanagementteacherbloodgroup').val();
+          var stcschoolmanagementteacheremail           = $('.stcschoolmanagementteacheremail').val();
+          var stcschoolmanagementteachernumber          = $('.stcschoolmanagementteachernumber').val();
+          var stcschoolmanagementteacheraddress         = $('.stcschoolmanagementteacheraddress').val();
+          var stcschoolmanagementteacherskills          = $('.stcschoolmanagementteacherskills').val();
+          var stcschoolmanagementteacherreligion        = $('.stcschoolmanagementteacherreligion').val();
+          var stcschoolmanagementteacherjoiningdate     = $('.stcschoolmanagementteacherjoiningdate').val();
+          var stcschoolmanagementteacherremarks         = $('.stcschoolmanagementteacherremarks').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stcschoolmanagementteacherid:stcschoolmanagementteacherid,
+              stcschoolmanagementteacherfirstname:stcschoolmanagementteacherfirstname,
+              stcschoolmanagementteacherlastname:stcschoolmanagementteacherlastname,
+              stcschoolmanagementteacherdateofbirth:stcschoolmanagementteacherdateofbirth,
+              stcschoolmanagementteachergender:stcschoolmanagementteachergender,
+              stcschoolmanagementteacherbloodgroup:stcschoolmanagementteacherbloodgroup,
+              stcschoolmanagementteacheremail:stcschoolmanagementteacheremail,
+              stcschoolmanagementteachernumber:stcschoolmanagementteachernumber,
+              stcschoolmanagementteacheraddress:stcschoolmanagementteacheraddress,
+              stcschoolmanagementteacherskills:stcschoolmanagementteacherskills,
+              stcschoolmanagementteacherreligion:stcschoolmanagementteacherreligion,
+              stcschoolmanagementteacherjoiningdate:stcschoolmanagementteacherjoiningdate,
+              stcschoolmanagementteacherremarks:stcschoolmanagementteacherremarks,
+              save_teacheradd_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              alert("Record saved successfully.");
+              window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check contact and email and try again.");
+             }
+            }
+          });
+        });
+
+
+        // save student to db
+        $(document).on('click', '#stcschoolstudentsave', function(e){
+          e.preventDefault();
+          var stcschoolmanagementstudentid              = $('.stcschoolmanagementstudentid').val();
+          var stcschoolmanagementstudentfirstname       = $('.stcschoolmanagementstudentfirstname').val();
+          var stcschoolmanagementstudentlastname        = $('.stcschoolmanagementstudentlastname').val();
+          var stcschoolmanagementstudentdateofbirth     = $('.stcschoolmanagementstudentdateofbirth').val();
+          var stcschoolmanagementstudentgender          = $('.stcschoolmanagementstudentgender:checked').val();
+          var stcschoolmanagementstudentbloodgroup      = $('.stcschoolmanagementstudentbloodgroup').val();
+          var stcschoolmanagementstudentemail           = $('.stcschoolmanagementstudentemail').val();
+          var stcschoolmanagementstudentnumber          = $('.stcschoolmanagementstudentnumber').val();
+          var stcschoolmanagementStudentaddress         = $('.stcschoolmanagementStudentaddress').val();
+          var stcschoolmanagementstudentreligion          = $('.stcschoolmanagementstudentreligion').val();
+          var stcschoolmanagementstudentjoiningdate        = $('.stcschoolmanagementstudentjoiningdate').val();
+          var stcschoolmanagementstudentclassroom     = $('.stcschoolmanagementstudentclassroom').val();
+          var stcschoolmanagementstudentparentguardianfullname         = $('.stcschoolmanagementstudentparentguardianfullname').val();
+          var stcschoolmanagementstudentremarks         = $('.stcschoolmanagementstudentremarks').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stcschoolmanagementstudentid:stcschoolmanagementstudentid,
+              stcschoolmanagementstudentfirstname:stcschoolmanagementstudentfirstname,
+              stcschoolmanagementstudentlastname:stcschoolmanagementstudentlastname,
+              stcschoolmanagementstudentdateofbirth:stcschoolmanagementstudentdateofbirth,
+              stcschoolmanagementstudentgender:stcschoolmanagementstudentgender,
+              stcschoolmanagementstudentbloodgroup:stcschoolmanagementstudentbloodgroup,
+              stcschoolmanagementstudentemail:stcschoolmanagementstudentemail,
+              stcschoolmanagementstudentnumber:stcschoolmanagementstudentnumber,
+              stcschoolmanagementStudentaddress:stcschoolmanagementStudentaddress,
+              stcschoolmanagementstudentreligion:stcschoolmanagementstudentreligion,
+              stcschoolmanagementstudentjoiningdate:stcschoolmanagementstudentjoiningdate,
+              stcschoolmanagementstudentclassroom:stcschoolmanagementstudentclassroom,
+              stcschoolmanagementstudentparentguardianfullname:stcschoolmanagementstudentparentguardianfullname,
+              stcschoolmanagementstudentremarks:stcschoolmanagementstudentremarks,
+              save_studentadd_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              alert("Record saved successfully.");
+              // window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check contact and email other, details and try again.");
+             }
+            }
+          });
+        });
+
+
+        // save subject to db
+        $(document).on('click', '#stcschoolsubjectsave', function(e){
+          e.preventDefault();
+          var stcschoolmanagementsubjectid        = $('.stcschoolmanagementsubjectid').val();
+          var stcschoolmanagementsubjecttitle     = $('.stcschoolmanagementsubjecttitle').val();
+          var stcschoolmanagementsubjectdetails   = $('.stcschoolmanagementsubjectdetails').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stcschoolmanagementsubjectid:stcschoolmanagementsubjectid,
+              stcschoolmanagementsubjecttitle:stcschoolmanagementsubjecttitle,
+              stcschoolmanagementsubjectdetails:stcschoolmanagementsubjectdetails,
+              save_subjectadd_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              alert("Record saved successfully.");
+              window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check and try again.");
+             }
+            }
+          });
+        });
+
+        // get url 
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const value = urlParams.get('modal');
+        
+        var syllabus_id=0;
+        if(value=="access"){
+          $('.stc-school-addsyllabus-res').modal('show');
+        }
+        if(value=="accessview"){
+          $('.stc-school-viewsyllabus-res').modal('show');
+          syllabus_id = urlParams.get('id');
+          load_syllabus_pert(syllabus_id)
+        }
+
+        // save syllabus
+        $(document).on('click', '.stc-school-sylsave-btn', function(e){
+          e.preventDefault();
+          var title=$('.stc-school-sylTitle').val();
+          var chapter=$('.stc-school-sylChapter').val();
+          var lesson=$('.stc-school-sylLesson').val();
+          var unit=$('.stc-school-sylUnit').val();
+          var date=$('.stc-school-sylDate').val();
+          var subject_id = urlParams.get('id');
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_add_syllabus_action : 1,
+              stc_subject_id:subject_id,
+              stc_title:title,
+              stc_chapter:chapter,
+              stc_lesson:lesson,
+              stc_unit:unit,
+              stc_date:date
+            },
+            success   : function(response){
+             // console.log(response);
+             response=response.trim();
+             if(response=="success"){
+              alert("Syllabus saved successfully.");
+              $('.stc-school-addsyllabus-res .form-control').val('');
+             }else if(response=="empty"){
+              alert("Please enter title.");
+             }else if(response="failed"){
+              alert("Syllabus not saved. Please check and try again");
+             }else if(response="reload"){
+              window.location.reload();
+             }
+            }
+          });
+        });
+
+        // save class to db
+        $(document).on('click', '#stcschoolclassroomsave', function(e){
+          e.preventDefault();
+          var stcschoolmanagementclassroomid        = $('.stcschoolmanagementclassroomid').val();
+          var stcschoolmanagementclassroomtitle     = $('.stcschoolmanagementclassroomtitle').val();
+          var stcschoolmanagementclassroomlocation   = $('.stcschoolmanagementclassroomlocation').val();
+          var stcschoolmanagementclassroomcapacity   = $('.stcschoolmanagementclassroomcapacity').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stcschoolmanagementclassroomid:stcschoolmanagementclassroomid,
+              stcschoolmanagementclassroomtitle:stcschoolmanagementclassroomtitle,
+              stcschoolmanagementclassroomlocation:stcschoolmanagementclassroomlocation,
+              stcschoolmanagementclassroomcapacity:stcschoolmanagementclassroomcapacity,
+              save_classadd_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              alert("Record saved successfully.");
+              window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Duplicate details found! Please check and try again.");
+             }
+            }
+          });
+        });
+
+        // save shedule to db
+        $(document).on('click', '#stcschoolschedulesave', function(e){
+          e.preventDefault();
+          var stcschoolscheduletype         = $('.stcschoolscheduletype').val();
+          var stcschoolscheduleteacher      = $('.stcschoolscheduleteacher').val();
+          var stcschoolschedulesubject      = $('.stcschoolschedulesubject').val();
+          var stcschoolscheduleclass        = $('.stcschoolscheduleclass').val();
+          var stcschoolscheduleday          = $('.stcschoolscheduleday').val();
+          var stcschoolschedulestarttime    = $('.stcschoolschedulestarttime').val();
+          var stcschoolscheduleendtime      = $('.stcschoolscheduleendtime').val();
+          var stcschoolscheduleperiod      = $('.stcschoolscheduleperiod').val();
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stcschoolscheduleteacher:stcschoolscheduleteacher,
+              stcschoolscheduletype:stcschoolscheduletype,
+              stcschoolschedulesubject:stcschoolschedulesubject,
+              stcschoolscheduleclass:stcschoolscheduleclass,
+              stcschoolscheduleday:stcschoolscheduleday,
+              stcschoolschedulestarttime:stcschoolschedulestarttime,
+              stcschoolscheduleendtime:stcschoolscheduleendtime,
+              stcschoolscheduleperiod:stcschoolscheduleperiod,
+              save_schduleadd_action : 1
+            },
+            // dataType: `JSON`,
+            success   : function(data){
+             // console.log(data);
+             var response=data.trim();
+             if(response=="success"){
+              alert("Record saved successfully.");
+              // window.location.reload();
+             }else if(response=="reload"){
+              window.location.reload();
+             }else if(response=="empty"){
+              alert("Do not let any field empty.");
+             }else if(response=="wrong"){
+              alert("Something went wrong record not saved! Please try again.");
+             }else if(response=="duplicate"){
+              alert("Busy schedule, Please check availability first.");
+             }
+            }
+          });
+        });
+
+        // show data sections (paginated lists)
+        function call_records(extra){
+          if (extra){ $.extend(schoolRecPageState, extra); }
+          $.ajax({  
+            url       : "../vanaheim/school-management.php",
+            method    : "POST",  
+            data      : {
+              stc_load_record_action : 1,
+              teacher_page : schoolRecPageState.teacher_page,
+              student_page : schoolRecPageState.student_page,
+              subject_page : schoolRecPageState.subject_page,
+              class_page : schoolRecPageState.class_page,
+              teacher_search : ($('#teachersearch').val()||'').trim(),
+              student_search : ($('#studentsearch').val()||'').trim(),
+              subject_search : ($('#subjectsearch').val()||'').trim(),
+              class_search : ($('#classsearch').val()||'').trim()
+            },
+            dataType: `JSON`,
+            success   : function(response){
+             // console.log(response);
+             if(response.status=="success"){
+              $('.stc-teacher-rec-show').html(response.response_teacher || '');
+              $('.stc-teacher-pagination').html(response.response_teacher_pagination || '');
+
+              $('.stc-student-rec-show').html(response.response_student || '');
+              $('.stc-student-pagination').html(response.response_student_pagination || '');
+
+              $('.stc-subject-rec-show').html(response.response_subject || '');
+              $('.stc-subject-pagination').html(response.response_subject_pagination || '');
+
+              $('.stc-classroom-rec-show').html(response.response_class || '');
+              $('.stc-classroom-pagination').html(response.response_class_pagination || '');
+              
+             }else if(response.status=="reload"){
+              window.location.reload();
+             }
+            }
+          });
+        }
+
+        $(document).on('click', '.school-rec-pagination .page-link[data-page]', function(e){
+          e.preventDefault();
+          var $a = $(this);
+          var $li = $a.closest('.page-item');
+          if ($li.hasClass('disabled')) return false;
+          var pg = parseInt($a.attr('data-page'), 10);
+          if (!pg || pg < 1) return false;
+          var $navUl = $a.closest('[data-pagination-for]');
+          if (!$navUl.length) return false;
+          var kind = $navUl.attr('data-pagination-for');
+          var map = {teacher:'teacher_page',student:'student_page',subject:'subject_page',classroom:'class_page'};
+          var key = map[kind];
+          if (!key || $li.hasClass('active')) return false;
+          var patch={};
+          patch[key]=pg;
+          call_records(patch);
+          return false;
+        });
+
+        call_records();
+
+        load_schedule();
+        function load_schedule(){
+          var day=$('.stc-schedule-week').val();
+          if(day && day!=="Select"){
+            $.ajax({  
+              url       : "../vanaheim/school-management.php",
+              method    : "POST",  
+              data      : {
+                stc_load_schedule_action : 1,
+                day:day
+              },
+              dataType: `JSON`,
+              success   : function(response){
+               // console.log(response);
+               if(response.status=="success"){
+
+                var schedule=response.response_schedule;
+                $('.stc-schedule-rec-show').html(schedule);
+                // $('.remove.icon').hide();
+
+                
+               }else if(response.status=="reload"){
+                window.location.reload();
+               }
+              }
+            });
+          }
+        }
+
+        $(document).on('change', '.stc-schedule-week', function(e){
+          e.preventDefault();
+          load_schedule();
+        });
+
+        $(document).on('hover', '.schedule-box', function(e){
+          e.preventDefault();
+          $('.remove.icon').show();
+        });
+
+        $(document).on('click', '.hover-box', function(e){
+          e.preventDefault();
+          var box_name = $(this).attr('id');
+          $('.schedule-box').css({ 'color': 'white', 'background': 'linear-gradient(37deg, #d4fffd , #1de4ff)', 'font-size': '20px' });
+          $('.box-rep-'+box_name).css({ 'color': 'white', 'background': 'linear-gradient(37deg, rgb(24 129 124), rgb(158 243 255)) black', 'font-size': '20px' });
+        });
+        
+        $(document).on('click', '.stc-remove-schedule-btn', function(e){
+          e.preventDefault();
+          var sched_id=$(this).attr("id");
+          if (confirm("Are you sure you want to remove this schedule.") == true) {
+            $.ajax({  
+              url       : "../vanaheim/school-management.php",
+              method    : "POST",  
+              data      : {
+                stc_remove_schedule_action : 1,
+                sched_id:sched_id
+              },
+              dataType: `JSON`,
+              success   : function(response){
+               // console.log(response);
+               if(response.status=="success"){
+                alert(response.message);
+                load_schedule();
+               }else if(response.status==="failed"){
+                alert(response.message);
+               }else if(response.status=="reload"){
+                window.location.reload();
+               }
+              }
+            });
+          }
+        });
+        
+        function load_syllabus_pert(syllabus_id){
+          $.ajax({  
+              url       : "../vanaheim/school-management.php",
+              method    : "POST",  
+              data      : {
+                stc_get_syllabus_details : 1,
+                syllabus_id:syllabus_id
+              },
+              dataType: `JSON`,
+              success   : function(response){
+                // console.log(response);
+                if(response.status=="success"){
+                  var syllabus=response.data;
+                  $('.show-syllabus-data').html(syllabus);
+                }else if(response.status=="reload"){
+                  window.location.reload();
+                }
+              }
+            });
+        }
+
+        $(document).on('click', '.stc-school-show-teach-btn', function(e){
+          e.preventDefault();
+          call_records();
+          $('.stc-school-showteacher-res').modal('show');
+        });
+
+        $(document).on('click', '.stc-school-show-stud-btn', function(e){
+          e.preventDefault();
+          call_records();
+          $('.stc-school-showstud-res').modal('show');
+        }); 
+
+        $(document).on('click', '.stc-school-show-subject-btn', function(e){
+          e.preventDefault();
+          call_records();
+          $('.stc-school-showsub-res').modal('show');
+        }); 
+
+        $(document).on('click', '.stc-school-show-classroom-btn', function(e){
+          e.preventDefault();
+          call_records();
+          $('.stc-school-showclassroom-res').modal('show');
+        }); 
+
+        $(document).on('click', '.stc-school-show-schedule-btn', function(e){
+          e.preventDefault();
+          $('.stc-school-showschedule-res').modal('show');
+          load_schedule();
+        }); 
+
+
+        $(document).on('click', '.stc-class-upd-btn-show', function(e){
+          e.preventDefault();
+          $(this).hide();
+          $(this).parent().parent().find('.stc-class-upd-btn-save').show();
+          $(this).parent().parent().find('.stc-class-title-upd').show();
+          $(this).parent().parent().find('.stc-class-location-upd').show();
+          $(this).parent().parent().find('.stc-class-capacity-upd').show();
+        }); 
+
+        $(document).on('click', '.stc-class-upd-btn-save', function(e){
+          e.preventDefault();
+          $(this).hide();
+          $(this).parent().parent().find('.stc-class-title-upd').hide();
+          $(this).parent().parent().find('.stc-class-location-upd').hide();
+          $(this).parent().parent().find('.stc-class-capacity-upd').hide();
+          $(this).parent().parent().find('.stc-class-upd-btn-show').show();
+        }); 
+        
+      });
+    </script>
+  </body>
+</html>

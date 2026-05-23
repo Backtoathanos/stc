@@ -31,7 +31,7 @@ if($_SESSION['stc_school_user_for']==2){
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput-typeahead.css" />
     <style>
         .fade:not(.show) {
-          opacity: 10;
+          opacity: 0;
         }
       .d-flex {
         display: -webkit-box;
@@ -591,9 +591,45 @@ if($_SESSION['stc_school_user_for']==2){
       </div>
     </div>
     
+    <!-- Nested canteen detail modal (must live inside body; needs Bootstrap modal JS + data-dismiss) -->
+    <div class="modal fade bd-example-modal-xl stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="schoolCanteenNestedModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title" id="schoolCanteenNestedModalLabel">School Canteen</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
+                <h5>School Canteen</h5>
+                <table class="table table-hover table-bordered">
+                  <thead>
+                    <tr>
+                      <th class="text-center">Time</th>
+                      <th class="text-center">Student</th>
+                      <th class="text-center">Teacher</th>
+                      <th class="text-center">Staff</th>
+                      <th class="text-center">Guest</th>
+                    </tr>
+                  </thead>
+                  <tbody class="stc-show-canteen-nested-show">
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
   <!--   Core JS Files   -->
   <script src="../assets/js/core/jquery.min.js"></script>
   <script src="../assets/js/core/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
   <script src="../assets/js/core/bootstrap-material-design.min.js"></script>
   <script src="../assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
   <!-- Plugin for the momentJs  -->
@@ -978,8 +1014,8 @@ if($_SESSION['stc_school_user_for']==2){
             // dataType: `JSON`,
             success   : function(response_canteen){
              // console.log(data);
-             $('.stc-school-showdeep-res').modal("show");
              $('.stc-show-canteen-nested-show').html(response_canteen);
+             $('.stc-school-showdeep-res').modal('show');
             }
           });
         });
@@ -987,38 +1023,3 @@ if($_SESSION['stc_school_user_for']==2){
     </script>
   </body>
   </html>
-
-<div class="modal fade bd-example-modal-xl stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">School Canteen</h4>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div class="row">
-          <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto">
-            <h5>School Canteen</h5>
-            <table class="table table-hover table-bordered">
-              <thead>
-                <tr>
-                  <th class="text-center">Time</th>
-                  <th class="text-center">Student</th>
-                  <th class="text-center">Teacher</th>
-                  <th class="text-center">Staff</th>
-                  <th class="text-center">Guest</th>
-                </tr>
-              </thead>
-              <tbody class="stc-show-canteen-nested-show">
-                
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-  </div>
-</div>

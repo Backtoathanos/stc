@@ -590,7 +590,7 @@ class Yggdrasil extends tesseract{
 					<tr>
 						<td class="text-center">'.$odinrow['stc_school_fee_which_school'].'</td>
 						<td class="text-center">'.date("d-m-Y", strtotime($odinrow['stc_school_month_closing_date'])).'</td>
-						<td class="text-right">'.number_format($odinrow['stc_school_month_closing_value'], 2).'</td>
+						<td class="text-right">'.number_format((float) $odinrow['stc_school_month_closing_value'], 2).'</td>
 					</tr>
 			';
 		}

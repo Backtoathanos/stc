@@ -370,10 +370,10 @@ class Yggdrasil extends tesseract{
     	");
     	
     	foreach($day_array as $day){
-    		$tr_color='';
+    		$days=date("l");
+    		$tr_cls=($day==$days) ? ' class="stc-sched-tr-today"' : '';
     		$counter=0;
     		$periods='';
-    		$days=date("l");
 			$range=$type>1 ? 3 : 7;
     		for($i=0;$i<$range;$i++){
     			$counter++;
@@ -405,29 +405,27 @@ class Yggdrasil extends tesseract{
     			if(mysqli_num_rows($periodquery)>0){
 					foreach($periodquery as $period){
 						
-						$time=date('h:i');
 						$time_flag="n";
 						if($day==$days){
-							$tr_color="style='background:#fdff32;'";
-							// $time_flag = ($time > date('h:i', strtotime($period['stc_school_teacher_schedule_begtime']))) && ($time < date('h:i', strtotime($period['stc_school_teacher_schedule_endtime']))) ? "y" : "n";
-							if(date('h', strtotime($period['stc_school_teacher_schedule_begtime']))=="12" && date('h', strtotime($period['stc_school_teacher_schedule_endtime']))=="1"){	
-								$time_flag = "y";
-							}else{	
-								if(
-									($time > date('h:i', strtotime($period['stc_school_teacher_schedule_begtime'])) && 
-									$time < date('h:i', strtotime($period['stc_school_teacher_schedule_endtime'])))
-								){
-									$time_flag = "y";
-								}else{
-									$time_flag = "n";
+							/* Compare using full timestamps (fixes string "h:i" bugs + 12h ambiguity). */
+							$today = date('Y-m-d');
+							$begStr = trim((string) $period['stc_school_teacher_schedule_begtime']);
+							$endStr = trim((string) $period['stc_school_teacher_schedule_endtime']);
+							$tBeg = strtotime($today . ' ' . $begStr);
+							$tEnd = strtotime($today . ' ' . $endStr);
+							$tNow = time();
+							if ($tBeg !== false && $tEnd !== false) {
+								if ($tEnd < $tBeg) {
+									$tEnd += 86400;
 								}
+								$time_flag = ($tNow >= $tBeg && $tNow <= $tEnd) ? 'y' : 'n';
 							}
 						} 
 						if($att_counter>0){
 							if($time_flag=="y"){
 								$periods.='                                                        
-								<td class="text-center">
-									<a href="javascript:void(0);" class="stc-school-show-student-default"  data-toggle="modal" data-target="#exampleModal" id="'.$period['stc_school_teacher_schedule_id'].'" class-id="'.$period['stc_school_teacher_schedule_classid'].'" sub-id="'.$period['stc_school_teacher_schedule_subjectid'].'">
+								<td class="text-center stc-sched-td-slot stc-sched-td-live">
+									<a href="javascript:void(0);" class="stc-sched-period-link stc-school-show-student-default"  data-toggle="modal" data-target="#exampleModal" id="'.$period['stc_school_teacher_schedule_id'].'" class-id="'.$period['stc_school_teacher_schedule_classid'].'" sub-id="'.$period['stc_school_teacher_schedule_subjectid'].'">
 										<b>
 										Class - '.$period['stc_school_class_title'].'<br>
 										'.$period['stc_school_subject_title'].'<br>
@@ -439,7 +437,7 @@ class Yggdrasil extends tesseract{
 								';
 							}else{
 								$periods.='
-								<td class="text-center">
+								<td class="text-center stc-sched-td-slot">
 									<b>
 									Class - '.$period['stc_school_class_title'].'<br>
 									'.$period['stc_school_subject_title'].'<br>
@@ -452,8 +450,8 @@ class Yggdrasil extends tesseract{
 						}else{
 							if($time_flag=="y"){
 								$periods.='
-								<td class="text-center"  style="background: #8cff32;font-weight: bold;">
-									<a href="javascript:void(0);" class="stc-school-show-student" data-toggle="modal" data-target="#exampleModal" id="'.$period['stc_school_teacher_schedule_id'].'" class-id="'.$period['stc_school_teacher_schedule_classid'].'" sub-id="'.$period['stc_school_teacher_schedule_subjectid'].'">
+								<td class="text-center stc-sched-td-slot stc-sched-td-live">
+									<a href="javascript:void(0);" class="stc-sched-period-link stc-school-show-student" data-toggle="modal" data-target="#exampleModal" id="'.$period['stc_school_teacher_schedule_id'].'" class-id="'.$period['stc_school_teacher_schedule_classid'].'" sub-id="'.$period['stc_school_teacher_schedule_subjectid'].'">
 										<b>
 										Class - '.$period['stc_school_class_title'].'<br>
 										'.$period['stc_school_subject_title'].'<br>
@@ -465,7 +463,7 @@ class Yggdrasil extends tesseract{
 								';
 							}else{
 								$periods.='
-								<td class="text-center">
+								<td class="text-center stc-sched-td-slot">
 									<b>
 									Class - '.$period['stc_school_class_title'].'<br>
 									'.$period['stc_school_subject_title'].'<br>
@@ -478,13 +476,13 @@ class Yggdrasil extends tesseract{
 						}
 					}
     			}else{
-    	      		$periods.='<td class="text-center">NA</td>';
+    	      		$periods.='<td class="text-center stc-sched-td-na"><span class="stc-sched-na">NA</span></td>';
     			}
     		}
     	  
     		$odin .= '
-    			<tr '.$tr_color.'>
-    				<td>'.$day.'</td>
+    			<tr'.$tr_cls.'>
+    				<td class="stc-sched-day-cell">'.$day.'</td>
     				'.$periods.'
     			</tr>    
     		';
@@ -1025,8 +1023,165 @@ class Yggdrasil extends tesseract{
 		return $odin;
 	}
 
+	private function stc_school_mgmt_pagination_markup($kind, $page, $total_records, $per_page){
+		$page = max(1, (int) $page);
+		$per_page = max(1, (int) $per_page);
+		$total_records = max(0, (int) $total_records);
+		if ($total_records === 0){
+			return '';
+		}
+		$total_pages = (int) max(1, ceil($total_records / $per_page));
+		if ($page > $total_pages){
+			$page = $total_pages;
+		}
+		$prev = max(1, $page - 1);
+		$next = min($total_pages, $page + 1);
+		$start_rec = (($page - 1) * $per_page) + 1;
+		$end_rec = min($total_records, $page * $per_page);
+		$kind_esc = htmlspecialchars((string) $kind, ENT_QUOTES, 'UTF-8');
+		$html = '<nav class="school-rec-pagination-nav" aria-label="'.$kind_esc.' pagination"><ul class="pagination pagination-sm justify-content-end mb-1 school-rec-pagination" data-pagination-for="'.$kind_esc.'">';
+		$html .= '<li class="page-item'.($page <= 1 ? ' disabled' : '').'"><a class="page-link" href="#" data-page="'.$prev.'"'.($page <= 1 ? ' aria-disabled="true"' : '').'>Prev</a></li>';
+		$window = 7;
+		$start = max(1, $page - (int) floor($window / 2));
+		$end = min($total_pages, $start + $window - 1);
+		$start = max(1, $end - $window + 1);
+		for ($i = $start; $i <= $end; $i++){
+			$active = ($i === $page) ? ' active' : '';
+			$html .= '<li class="page-item'.$active.'"><a class="page-link" href="#" data-page="'.$i.'">'.$i.'</a></li>';
+		}
+		$html .= '<li class="page-item'.($page >= $total_pages ? ' disabled' : '').'"><a class="page-link" href="#" data-page="'.$next.'"'.($page >= $total_pages ? ' aria-disabled="true"' : '').'>Next</a></li>';
+		$html .= '</ul>';
+		$html .= '<div class="small text-muted text-right school-rec-pagination-info mb-3">Showing '.$start_rec.'–'.$end_rec.' of '.$total_records.' (page '.$page.' / '.$total_pages.')</div></nav>';
+		return $html;
+	}
+
 	public function stc_call_records(){
-		$bgroup=array( "a_positive" => "A+", "b_positive" => "B+", "o_positive" => "O+", "ab_positive" => "AB+", "a_negative" => "A-", "b_negative" => "B-", "o_negative" => "O-", "ab_negative" => "AB-", "0" => "NA");
+		$per_page = 25;
+		$teacher_page = max(1, (int) ($_POST['teacher_page'] ?? 1));
+		$student_page = max(1, (int) ($_POST['student_page'] ?? 1));
+		$subject_page = max(1, (int) ($_POST['subject_page'] ?? 1));
+		$class_page = max(1, (int) ($_POST['class_page'] ?? 1));
+
+		$tsearch_raw = trim((string) ($_POST['teacher_search'] ?? ''));
+		$tsearch_esc = mysqli_real_escape_string($this->stc_dbs, $tsearch_raw);
+		$t_where = '';
+		if ($tsearch_raw !== ''){
+			$t_where = "
+				WHERE (
+					`stc_school_teacher_firstname` LIKE '%".$tsearch_esc."%'
+					OR `stc_school_teacher_lastname` LIKE '%".$tsearch_esc."%'
+					OR CONCAT(`stc_school_teacher_firstname`, ' ', `stc_school_teacher_lastname`) LIKE '%".$tsearch_esc."%'
+					OR `stc_school_teacher_email` LIKE '%".$tsearch_esc."%'
+					OR `stc_school_teacher_contact` LIKE '%".$tsearch_esc."%'
+					OR `stc_school_teacher_teachid` LIKE '%".$tsearch_esc."%'
+				)
+			";
+		}
+
+		$tcount_row = mysqli_fetch_assoc(mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) AS cnt FROM `stc_school_teacher`".$t_where."
+		"));
+		$teacher_total = (int) ($tcount_row['cnt'] ?? 0);
+		$teacher_pages = max(1, (int) ceil($teacher_total / $per_page));
+		if ($teacher_page > $teacher_pages){
+			$teacher_page = $teacher_pages;
+		}
+		$t_offset = max(0, ($teacher_page - 1) * $per_page);
+		$t_limit = (int) $per_page;
+
+		$bgroup=array(
+			"a_positive" => "A+", "b_positive" => "B+", "o_positive" => "O+", "ab_positive" => "AB+",
+			"a_negative" => "A-", "b_negative" => "B-", "o_negative" => "O-", "ab_negative" => "AB-",
+			"0" => "NA",
+			"" => "",
+			"NA" => "NA", "N/A" => "NA", "n/a" => "NA",
+		);
+		$bgroup_display=function($raw) use ($bgroup){
+			$k=trim((string)$raw);
+			return array_key_exists($k,$bgroup) ? $bgroup[$k] : $k;
+		};
+
+		$ssearch_raw = trim((string) ($_POST['student_search'] ?? ''));
+		$ssearch_esc = mysqli_real_escape_string($this->stc_dbs, $ssearch_raw);
+		$s_where = '';
+		if ($ssearch_raw !== ''){
+			$s_where = "
+				WHERE (
+					`stc_school_student_studid` LIKE '%".$ssearch_esc."%'
+					OR `stc_school_student_firstname` LIKE '%".$ssearch_esc."%'
+					OR `stc_school_student_lastname` LIKE '%".$ssearch_esc."%'
+					OR CONCAT(`stc_school_student_firstname`, ' ', `stc_school_student_lastname`) LIKE '%".$ssearch_esc."%'
+					OR `stc_school_student_email` LIKE '%".$ssearch_esc."%'
+					OR `stc_school_student_contact` LIKE '%".$ssearch_esc."%'
+					OR `stc_school_student_address` LIKE '%".$ssearch_esc."%'
+					OR `stc_school_student_guardianname` LIKE '%".$ssearch_esc."%'
+					OR `stc_school_class_title` LIKE '%".$ssearch_esc."%'
+				)
+			";
+		}
+		$scount_row = mysqli_fetch_assoc(mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) AS cnt FROM `stc_school_student`
+			LEFT JOIN `stc_school` ON `stc_school_user_id`=`stc_school_student_createdby`
+			LEFT JOIN `stc_school_class` ON `stc_school_class_id`=`stc_school_student_classroomid`
+			".$s_where."
+		"));
+		$student_total = (int) ($scount_row['cnt'] ?? 0);
+		$student_pages = max(1, (int) ceil($student_total / $per_page));
+		if ($student_page > $student_pages){
+			$student_page = $student_pages;
+		}
+		$s_offset = max(0, ($student_page - 1) * $per_page);
+
+		$subsearch_raw = trim((string) ($_POST['subject_search'] ?? ''));
+		$subsearch_esc = mysqli_real_escape_string($this->stc_dbs, $subsearch_raw);
+		$sub_where = '';
+		if ($subsearch_raw !== ''){
+			$sub_where = "
+				WHERE (
+					`stc_school_subject_title` LIKE '%".$subsearch_esc."%'
+					OR `stc_school_subject_subid` LIKE '%".$subsearch_esc."%'
+					OR `stc_school_subject_syllabusdetails` LIKE '%".$subsearch_esc."%'
+					OR `stc_school_user_fullName` LIKE '%".$subsearch_esc."%'
+				)
+			";
+		}
+		$subcount_row = mysqli_fetch_assoc(mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) AS cnt FROM `stc_school_subject`
+			LEFT JOIN `stc_school` ON `stc_school_user_id`=`stc_school_subject_createdby`
+			".$sub_where."
+		"));
+		$subject_total = (int) ($subcount_row['cnt'] ?? 0);
+		$subject_pages_max = max(1, (int) ceil($subject_total / $per_page));
+		if ($subject_page > $subject_pages_max){
+			$subject_page = $subject_pages_max;
+		}
+		$sub_offset = max(0, ($subject_page - 1) * $per_page);
+
+		$csearch_raw = trim((string) ($_POST['class_search'] ?? ''));
+		$csearch_esc = mysqli_real_escape_string($this->stc_dbs, $csearch_raw);
+		$class_where = '';
+		if ($csearch_raw !== ''){
+			$class_where = "
+				WHERE (
+					`stc_school_class_title` LIKE '%".$csearch_esc."%'
+					OR `stc_school_class_classid` LIKE '%".$csearch_esc."%'
+					OR `stc_school_class_location` LIKE '%".$csearch_esc."%'
+					OR CAST(`stc_school_class_capacity` AS CHAR) LIKE '%".$csearch_esc."%'
+					OR `stc_school_user_fullName` LIKE '%".$csearch_esc."%'
+				)
+			";
+		}
+		$classcount_row = mysqli_fetch_assoc(mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) AS cnt FROM `stc_school_class`
+			LEFT JOIN `stc_school` ON `stc_school_user_id`=`stc_school_class_createdby`
+			".$class_where."
+		"));
+		$class_total = (int) ($classcount_row['cnt'] ?? 0);
+		$class_pages_max = max(1, (int) ceil($class_total / $per_page));
+		if ($class_page > $class_pages_max){
+			$class_page = $class_pages_max;
+		}
+		$c_offset = max(0, ($class_page - 1) * $per_page);
 		
 		$odinteacherqry=mysqli_query($this->stc_dbs, "
 			SELECT
@@ -1053,11 +1208,13 @@ class Yggdrasil extends tesseract{
 			    `stc_school`
 			ON
 			    `stc_school_user_id`=`stc_school_teacher_createdby`
+			".$t_where."
 			ORDER BY `stc_school_teacher_firstname` ASC
+			LIMIT ".(int) $t_offset.", ".(int) $t_limit."
 		");
 		$teacher_records='';
-		if(mysqli_num_rows($odinteacherqry)>0){
-			$slno=0;
+		if($odinteacherqry && mysqli_num_rows($odinteacherqry)>0){
+			$slno=$t_offset;
 			foreach($odinteacherqry as $row){
 				$slno++;
 				$teacher_records.='
@@ -1066,7 +1223,7 @@ class Yggdrasil extends tesseract{
 						<td>'.ucfirst(strtolower($row['stc_school_teacher_firstname'])).' '.ucfirst(strtolower($row['stc_school_teacher_lastname'])).'</td>
 						<td class="text-center">'.date('d-m-Y', strtotime($row['stc_school_teacher_dob'])).'</td>
 						<td>'.$row['stc_school_teacher_gender'].'</td>
-						<td class="text-center">'.$bgroup[trim($row['stc_school_teacher_bloodgroup'])].'</td>
+						<td class="text-center">'.$bgroup_display($row['stc_school_teacher_bloodgroup']).'</td>
 						<td>'.strtolower($row['stc_school_teacher_email']).'</td>
 						<td>'.$row['stc_school_teacher_contact'].'</td>
 						<td>'.$row['stc_school_teacher_address'].'</td>
@@ -1077,6 +1234,8 @@ class Yggdrasil extends tesseract{
 					</tr>
 				';
 			}
+		}else{
+			$teacher_records='<tr><td colspan="12" class="text-center">No teachers found.</td></tr>';
 		}
 
 		$odinstudentqry=mysqli_query($this->stc_dbs, "
@@ -1112,11 +1271,13 @@ class Yggdrasil extends tesseract{
 			    `stc_school_class`
 			ON
 			    `stc_school_class_id`=`stc_school_student_classroomid`
+			".$s_where."
 			ORDER BY `stc_school_student_firstname` ASC
+			LIMIT ".(int) $s_offset.", ".(int) $t_limit."
 		");
 		$student_records='';
-		if(mysqli_num_rows($odinstudentqry)>0){
-			$slno=0;
+		if($odinstudentqry && mysqli_num_rows($odinstudentqry)>0){
+			$slno=$s_offset;
 			foreach($odinstudentqry as $row){
 				$slno++;
 				$student_records.='
@@ -1126,7 +1287,7 @@ class Yggdrasil extends tesseract{
 						<td>'.$row['stc_school_student_firstname'].' '.$row['stc_school_student_lastname'].'</td>
 						<td class="text-center">'.date('d-m-Y', strtotime($row['stc_school_student_dob'])).'</td>
 						<td>'.$row['stc_school_student_gender'].'</td>
-						<td class="text-center">'.$bgroup[trim($row['stc_school_student_bloodgroup'])].'</td>
+						<td class="text-center">'.$bgroup_display($row['stc_school_student_bloodgroup']).'</td>
 						<td>'.$row['stc_school_student_email'].'</td>
 						<td>'.$row['stc_school_student_contact'].'</td>
 						<td>'.$row['stc_school_student_address'].'</td>
@@ -1138,6 +1299,8 @@ class Yggdrasil extends tesseract{
 					</tr>
 				';
 			}
+		}else{
+			$student_records='<tr><td colspan="14" class="text-center">No students found.</td></tr>';
 		}
 
 		$odinsubjectqry=mysqli_query($this->stc_dbs, "
@@ -1155,13 +1318,13 @@ class Yggdrasil extends tesseract{
 			    `stc_school`
 			ON
 			    `stc_school_user_id`=`stc_school_subject_createdby`
+			".$sub_where."
 			ORDER BY `stc_school_subject_title` ASC
+			LIMIT ".(int) $sub_offset.", ".(int) $t_limit."
 		");
 		$subject_records='';
-		if(mysqli_num_rows($odinsubjectqry)>0){
-			$slno=0;
+		if($odinsubjectqry && mysqli_num_rows($odinsubjectqry)>0){
 			foreach($odinsubjectqry as $row){
-				$slno++;
 				$subject_records.='
 					<tr>
 						<td class="text-center">'.$row['stc_school_subject_id'].'</td>
@@ -1176,6 +1339,8 @@ class Yggdrasil extends tesseract{
 					</tr>
 				';
 			}
+		}else{
+			$subject_records='<tr><td colspan="6" class="text-center">No subjects found.</td></tr>';
 		}
 
 		$odinclassqry=mysqli_query($this->stc_dbs, "
@@ -1194,13 +1359,13 @@ class Yggdrasil extends tesseract{
 			    `stc_school`
 			ON
 			    `stc_school_user_id`=`stc_school_class_createdby`
+			".$class_where."
 			ORDER BY `stc_school_class_title` ASC
+			LIMIT ".(int) $c_offset.", ".(int) $t_limit."
 		");
 		$class_records='';
-		if(mysqli_num_rows($odinclassqry)>0){
-			$slno=0;
+		if($odinclassqry && mysqli_num_rows($odinclassqry)>0){
 			foreach($odinclassqry as $row){
-				$slno++;
 				$class_records.='
 					<tr>
 						<td class="text-center">'.$row['stc_school_class_id'].'</td>
@@ -1222,6 +1387,8 @@ class Yggdrasil extends tesseract{
 					</tr>
 				';
 			}
+		}else{
+			$class_records='<tr><td colspan="7" class="text-center">No classrooms found.</td></tr>';
 		}
 		
 		$odin['status']="success";
@@ -1229,11 +1396,17 @@ class Yggdrasil extends tesseract{
 		$odin['response_student']=$student_records;
 		$odin['response_subject']=$subject_records;
 		$odin['response_class']=$class_records;
+		$odin['response_teacher_pagination']=$this->stc_school_mgmt_pagination_markup('teacher', $teacher_page, $teacher_total, $per_page);
+		$odin['response_student_pagination']=$this->stc_school_mgmt_pagination_markup('student', $student_page, $student_total, $per_page);
+		$odin['response_subject_pagination']=$this->stc_school_mgmt_pagination_markup('subject', $subject_page, $subject_total, $per_page);
+		$odin['response_class_pagination']=$this->stc_school_mgmt_pagination_markup('classroom', $class_page, $class_total, $per_page);
 		return $odin;
 	}
 
 	public function stc_call_schedule($day){
+		date_default_timezone_set('Asia/Kolkata');
 		$schedule_records='';
+		$day_esc = mysqli_real_escape_string($this->stc_dbs, $day);
     	$odinclassqry=mysqli_query($this->stc_dbs, "
     		SELECT
 			    `stc_school_class_id`,
@@ -1249,10 +1422,14 @@ class Yggdrasil extends tesseract{
 			ORDER BY `stc_school_class_title` ASC
     	");
     	$teacher_name=array();
-    	$schedule_id=array();
+    	$todays_weekday = date('l');
+    	$today_ymd = date('Y-m-d');
+    	$now_ts = time();
+    	$viewing_today = ($day === $todays_weekday);
     	foreach($odinclassqry as $row){
     		$data='';
     		$class_id=$row['stc_school_class_id'];
+    		$class_id_esc = mysqli_real_escape_string($this->stc_dbs, $class_id);
 
 	    	$odinscheduleqrycounter=mysqli_query($this->stc_dbs, "
 	    		SELECT
@@ -1282,27 +1459,48 @@ class Yggdrasil extends tesseract{
 				ON 
 					`stc_school_teacher_id`=`stc_school_teacher_schedule_teacherid`
 				WHERE
-				    `stc_school_teacher_schedule_day`='".$day."'
+				    `stc_school_teacher_schedule_day`='".$day_esc."'
                 AND
-                	`stc_school_teacher_schedule_classid`='".$class_id."'
+                	`stc_school_teacher_schedule_classid`='".$class_id_esc."'
                 ORDER BY `stc_school_teacher_schedule_period` ASC
 	    	");
-	    	$routinecounter=0;
-	    	$boxcounter=0;
-	    	for($i=0;$i<7;$i++){
-	    		$routinecounter++;
-	    		$tracker=1;
-	    		foreach($odinscheduleqrycounter as $odinscheduleqrycounterrow){
-	    			if($routinecounter==$odinscheduleqrycounterrow['stc_school_teacher_schedule_period']){
-	    				$boxcounter++;
-	    				$teacher_title = $odinscheduleqrycounterrow['stc_school_teacher_firstname'].'-'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'];
-	    				$teacher_title=str_replace(" ","",$teacher_title);
-	    				$teacher_title=str_replace("","",$teacher_title);
-	    				array_push($teacher_name, $teacher_title);
-	    				$data.='
-							<td title="Click here to remove schedule" class="text-center schedule-box box-rep-'.$teacher_title.'">
+
+	    	$period_map = array();
+	    	if ($odinscheduleqrycounter && mysqli_num_rows($odinscheduleqrycounter) > 0) {
+	    		while ($pr = mysqli_fetch_assoc($odinscheduleqrycounter)) {
+	    			$pk = (int) $pr['stc_school_teacher_schedule_period'];
+	    			$period_map[$pk] = $pr;
+	    		}
+	    	}
+
+	    	for ($routinecounter = 1; $routinecounter <= 7; $routinecounter++) {
+	    		if (isset($period_map[$routinecounter])) {
+	    			$odinscheduleqrycounterrow = $period_map[$routinecounter];
+	    			$teacher_title = $odinscheduleqrycounterrow['stc_school_teacher_firstname'].'-'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'];
+	    			$teacher_title = str_replace(' ', '', $teacher_title);
+	    			$teacher_title = str_replace('', '', $teacher_title);
+	    			array_push($teacher_name, $teacher_title);
+
+	    			$active_class = '';
+	    			if ($viewing_today) {
+	    				$begStr = trim((string) $odinscheduleqrycounterrow['stc_school_teacher_schedule_begtime']);
+	    				$endStr = trim((string) $odinscheduleqrycounterrow['stc_school_teacher_schedule_endtime']);
+	    				$tBeg = strtotime($today_ymd . ' ' . $begStr);
+	    				$tEnd = strtotime($today_ymd . ' ' . $endStr);
+	    				if ($tBeg !== false && $tEnd !== false) {
+	    					if ($tEnd <= $tBeg) {
+	    						$tEnd += 86400;
+	    					}
+	    					if ($now_ts >= $tBeg && $now_ts <= $tEnd) {
+	    						$active_class = ' schedule-slot-active';
+	    					}
+	    				}
+	    			}
+
+	    			$data.='
+							<td title="Click here to remove schedule" class="text-center schedule-box'.$active_class.' box-rep-'.$teacher_title.'">
 								<div class="remove icon"></div>
-								<a href="javascript:void(0)" class="stc-remove-schedule-btn" id="'.$odinscheduleqrycounterrow['stc_school_teacher_schedule_id'].'">
+								<a href="javascript:void(0)" class="stc-remove-schedule-btn schedule-slot-anchor" id="'.$odinscheduleqrycounterrow['stc_school_teacher_schedule_id'].'">
 									'.$odinscheduleqrycounterrow['stc_school_subject_title'].'<br>
 									'.$odinscheduleqrycounterrow['stc_school_teacher_firstname'].' 
 									'.$odinscheduleqrycounterrow['stc_school_teacher_lastname'].'<br>
@@ -1311,22 +1509,14 @@ class Yggdrasil extends tesseract{
 			    				</a>
 							</td>
 						';
-						$tracker=1;
-						break;
-	    			}else{
-	    				$tracker=0;
-	    			}
-	    		}
-	    		if($tracker==0){
-	    			if($boxcounter<7){
-	    				$data.='<td class="schedule-show-na">NA</td>';
-	    				$boxcounter++;
-	    			}
+	    		} else {
+	    			$data.='<td class="text-center schedule-show-na schedule-slot-empty"><span class="schedule-na-mark">NA</span></td>';
 	    		}
 	    	}
+
 	    	$schedule_records.='
 					<tr>
-						<td class="text-center"><b>'.$row['stc_school_class_title'].'</b></td>
+						<td class="text-center stc-sched-class-col"><b>'.$row['stc_school_class_title'].'</b></td>
 						'.$data.'
 					</tr>
 			';
@@ -1568,7 +1758,7 @@ class Yggdrasil extends tesseract{
 	
 		// Start building the HTML table
 		$odin = '
-			<table class="table table-hover table-bordered">
+			<table id="stc-questions-datatable" class="table table-hover table-bordered table-striped" style="width:100%">
 				<thead>
 					<tr>
 						<th class="text-center headcol">Sl No</th>
@@ -1578,7 +1768,7 @@ class Yggdrasil extends tesseract{
 						<th class="text-center headcol">Questions</th>
 					</tr>
 				</thead>
-				<tbody class="stc-schoolattendance-show">
+				<tbody>
 		';
 	
 		// Query to fetch the questions for the given class and month
@@ -1612,10 +1802,9 @@ class Yggdrasil extends tesseract{
 			}
 		} else {
 			// If no records are found, display a message
-			$colspan = $counter + 4; // Adjust colspan to include all columns
 			$odin .= "
 				<tr>
-					<td colspan='" . $colspan . "'>No record found.</td>
+					<td colspan='5' class='text-center'>No record found.</td>
 				</tr>
 			";
 		}
@@ -2001,33 +2190,42 @@ if(isset($_POST['stc_student_save'])){
 
 // save lecture details
 if(isset($_POST['stc_lecturedet_save'])){
-	$schedule_id=$_POST['schedule_id'];
-	$classtype=$_POST['classtype'];
-	$chapter=$_POST['chapter'];
-	$lession=$_POST['lession'];
-	$Syllabus=$_POST['Syllabus'];
-	$Unit=$_POST['Unit'];
-	$remarks=$_POST['remarks'];
+	$schedule_id=trim((string)($_POST['schedule_id'] ?? ''));
+	$classtype=trim((string)($_POST['classtype'] ?? ''));
+	$chapter=trim((string)($_POST['chapter'] ?? ''));
+	$lession=trim((string)($_POST['lession'] ?? ''));
+	$Syllabus=trim((string)($_POST['Syllabus'] ?? ''));
+	$Unit=trim((string)($_POST['Unit'] ?? ''));
+	$remarks=trim((string)($_POST['remarks'] ?? ''));
+
+	$qm_is_blank = function ($v) {
+		if ($v === null) {
+			return true;
+		}
+		$v = trim((string) $v);
+		return $v === '' || strcasecmp($v, 'NA') === 0;
+	};
+
 	$out='';
 	if(empty($_SESSION['stc_school_user_id'])){
 		$out="reload";
-	}elseif(($classtype=='NA') || (empty($chapter)) || (empty($lession)) || (empty($Syllabus))){
+	}elseif($qm_is_blank($schedule_id) || $qm_is_blank($classtype) || $qm_is_blank($Syllabus) || $qm_is_blank($chapter) || $qm_is_blank($lession)){
 		$out="empty";
 	}else{
 		$valkyrie=new Yggdrasil();
-		$out=$valkyrie->stc_call_school_lecturedetails_save($schedule_id, $classtype, $chapter, $lession, $Syllabus, $Unit, $remarks);
+		$out=$valkyrie->stc_call_school_lecturedetails_save($schedule_id, $classtype, $chapter, $lession, $Syllabus, $qm_is_blank($Unit) ? '' : $Unit, $remarks);
 	}
 	echo $out;
 }
 
 // save lecture details
 if(isset($_POST['stc_lecturedetquestion_save'])){
-	$schedule_id=$_POST['schedule_id'];
-	$questions=$_POST['questions'];
+	$schedule_id=trim((string)($_POST['schedule_id'] ?? ''));
+	$questions=trim((string)($_POST['questions'] ?? ''));
 	$out='';
 	if(empty($_SESSION['stc_school_user_id'])){
 		$out="reload";
-	}elseif(empty($questions)){
+	}elseif($schedule_id==="" || strcasecmp($schedule_id, 'NA')===0 || $questions===''){
 		$out="empty";
 	}else{
 		$valkyrie=new Yggdrasil();
