@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `stc_school_parent_request` (
   `stc_school_parent_request_student_id` VARCHAR(64) NOT NULL DEFAULT '',
   `stc_school_parent_request_subject` VARCHAR(255) NOT NULL,
   `stc_school_parent_request_message` TEXT NOT NULL,
+  `stc_school_parent_request_action_taken` TEXT NULL,
   `stc_school_parent_request_status` ENUM('new','read','closed') NOT NULL DEFAULT 'new',
   `stc_school_parent_request_createdate` DATETIME NOT NULL,
   PRIMARY KEY (`stc_school_parent_request_id`),

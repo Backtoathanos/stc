@@ -19,13 +19,192 @@ $csrf_safe = htmlspecialchars((string) ($_SESSION['parent_req_csrf'] ?? ''), ENT
 	<meta charset="utf-8" />
 	<link rel="icon" type="image/png" href="assets/img/stc_logo_title.png">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+	<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport" />
 	<title>STC School — Parent / Guardian Request</title>
 	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
 	<link href="assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
 	<style>
 		.parent-request-page .card { max-width: 720px; margin: 2rem auto; }
 		.parent-request-page .badge-public { letter-spacing: 0.06em; }
+		.parent-request-page .navbar-wrapper { flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+
+		/* Mobile / small tablet: sidebar is not an off-canvas drawer on this public page */
+		@media (max-width: 991.98px) {
+			.parent-request-page { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
+			.parent-request-page .wrapper {
+				height: auto;
+				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
+			}
+			.parent-request-page .sidebar {
+				position: relative;
+				inset: auto;
+				width: 100%;
+				height: auto;
+				flex-shrink: 0;
+				z-index: 3;
+				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+				transform: none !important;
+				-webkit-transform: none !important;
+			}
+			.parent-request-page .sidebar .logo {
+				padding: 10px 14px;
+				text-align: center;
+				background-color: white;
+			}
+			.parent-request-page .sidebar .logo .simple-text {
+				white-space: normal;
+				line-height: 1.35;
+				font-size: 1rem;
+				background-color:white;
+			}
+			.parent-request-page .sidebar .sidebar-wrapper {
+				width: 100%;
+				height: auto;
+				overflow: visible;
+				padding-bottom: 0;
+			}
+			.parent-request-page .sidebar .nav {
+				display: flex;
+				flex-direction: row;
+				margin: 0;
+			}
+			.parent-request-page .sidebar .nav-item {
+				flex: 1 1 50%;
+				text-align: center;
+				border-top: 1px solid rgba(0, 0, 0, 0.06);
+			}
+			.parent-request-page .sidebar .nav-item + .nav-item {
+				border-left: 1px solid rgba(0, 0, 0, 0.06);
+			}
+			.parent-request-page .sidebar .nav-link {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				float: none;
+				min-height: 56px;
+				padding: 8px 6px !important;
+				margin: 0 !important;
+				border-radius: 0 !important;
+			}
+			.parent-request-page .sidebar .nav i.material-icons {
+				margin: 0 0 2px !important;
+				line-height: 1 !important;
+				font-size: 22px !important;
+				width: auto !important;
+			}
+			.parent-request-page .sidebar .nav p {
+				margin: 0 !important;
+				font-size: 11px !important;
+				line-height: 1.2;
+				white-space: normal !important;
+			}
+
+			.parent-request-page .main-panel {
+				float: none;
+				width: 100% !important;
+				flex: 1 1 auto;
+				transition: none !important;
+				transform: none !important;
+				-webkit-transform: none !important;
+			}
+			.parent-request-page .main-panel > .navbar {
+				position: relative;
+				padding: 12px 10px;
+				margin-bottom: 0;
+			}
+			.parent-request-page .main-panel > .navbar.navbar-transparent {
+				background-color: #fafafa !important;
+				border-bottom: 1px solid #e9ecef;
+				padding-top: 12px;
+			}
+			.parent-request-page .navbar-wrapper {
+				width: 100%;
+				display: flex;
+			}
+			.parent-request-page .navbar-brand {
+				float: none;
+				padding: 0;
+				margin: 0;
+				font-size: 1.1rem;
+				line-height: 1.35;
+				white-space: normal !important;
+				flex: 1 1 auto;
+				min-width: 0;
+			}
+
+			.parent-request-page .main-panel > .content {
+				margin-top: 0 !important;
+				padding: 12px 0 92px !important;
+				min-height: 0 !important;
+			}
+			.parent-request-page .footer {
+				position: relative;
+				padding: 12px 10px;
+				margin-top: auto;
+				font-size: 0.8125rem;
+			}
+
+			.parent-request-page .mx-4 {
+				margin-left: 12px !important;
+				margin-right: 12px !important;
+			}
+			.parent-request-page .parent-request-intro {
+				font-size: 0.9375rem;
+				line-height: 1.5;
+			}
+			.parent-request-page .card {
+				margin-left: auto;
+				margin-right: auto;
+				margin-top: 0.5rem;
+			}
+
+			/* iOS Safari: ≥16px on inputs avoids focus zoom */
+			.parent-request-page .form-control { font-size: 16px; }
+			.parent-request-page .form-group label {
+				font-weight: 500;
+				font-size: 14px;
+			}
+			.parent-request-page .form-group small.form-text {
+				font-size: 12px !important;
+			}
+
+			.parent-request-page .card-body .btn,
+			.parent-request-page .card-body button[type="submit"] {
+				min-height: 44px;
+				padding-left: 1rem;
+				padding-right: 1rem;
+				touch-action: manipulation;
+			}
+			.parent-request-page textarea.form-control {
+				min-height: 148px;
+			}
+			.parent-request-page #parent-request-success-panel .alert,
+			.parent-request-page #parent-request-error-panel .alert {
+				padding: 14px;
+			}
+		}
+
+		@media (max-width: 575.98px) {
+			.parent-request-page .px-4 { padding-left: 12px !important; padding-right: 12px !important; }
+			.parent-request-page .mx-4 { margin-left: 10px !important; margin-right: 10px !important; }
+			.parent-request-page .card .card-body,
+			.parent-request-page .card .card-header { padding-left: 14px !important; padding-right: 14px !important; }
+			.parent-request-page #parent-request-form .btn,
+			.parent-request-page #parent-request-form button[type="submit"] {
+				display: block;
+				width: 100%;
+				margin-right: 0 !important;
+				margin-bottom: 10px;
+			}
+			.parent-request-page #parent-request-success-panel .btn {
+				display: block;
+				width: 100%;
+				margin-bottom: 8px !important;
+			}
+		}
 	</style>
 </head>
 <body class="parent-request-page bg-light">
@@ -33,7 +212,6 @@ $csrf_safe = htmlspecialchars((string) ($_SESSION['parent_req_csrf'] ?? ''), ENT
 		<div class="sidebar" data-color="azure" data-background-color="white">
 			<div class="logo"><span class="simple-text logo-normal">STC School</span></div>
 			<div class="sidebar-wrapper"><ul class="nav">
-				<li class="nav-item"><a class="nav-link" href="index.html"><i class="material-icons">login</i><p>Staff login</p></a></li>
 				<li class="nav-item active"><a class="nav-link" href="parent-request.php"><i class="material-icons">mail_outline</i><p>Parent request</p></a></li>
 			</ul></div>
 		</div>
@@ -50,16 +228,16 @@ $csrf_safe = htmlspecialchars((string) ($_SESSION['parent_req_csrf'] ?? ''), ENT
 				<div class="container-fluid">
 				<div class="row">
 				<div class="col-lg-12">
-					<p class="text-muted px-4">Use this form to send a concern or question to the school office. Staff will reply using the email or phone you provide — you do not need a login.</p>
+					<p class="parent-request-intro text-muted px-4">Use this form to send a concern or question to the school office. Staff will reply using the email or phone you provide — you do not need a login.</p>
 
-					<div id="parent-request-success-panel" class="alert alert-success mx-4 d-none" role="alert">
+					<div id="parent-request-success-panel" class="alert alert-success mx-4 px-4 d-none" role="alert">
 						<strong>Thank you.</strong> Your request has been submitted. School staff may contact you on the phone or email you shared.
 						<hr class="mb-2">
 						<a href="parent-request.php" class="btn btn-sm btn-default">Submit another request</a>
 						<a href="index.html" class="btn btn-sm btn-default">Staff login</a>
 					</div>
 
-					<div id="parent-request-error-panel" class="alert alert-danger mx-4 d-none" role="alert">
+					<div id="parent-request-error-panel" class="alert alert-danger mx-4 px-4 d-none" role="alert">
 						<strong>Please fix:</strong>
 						<ul id="parent-request-error-list" class="mb-0 pl-3"></ul>
 					</div>

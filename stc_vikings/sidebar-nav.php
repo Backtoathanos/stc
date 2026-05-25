@@ -219,6 +219,12 @@
                                 Summary
                             </a>
                         </li>
+                        <li>
+                            <a href="stc-school-parent-guradian-complaint.php?page=complaints" class="complaints">
+                                <i class="metismenu-icon pe-7s-note2"></i>
+                                Complaints
+                            </a>
+                        </li>
                         <!-- Reports -->
                         <li>
                             <a href="reports.php?page=reports" class="reports">

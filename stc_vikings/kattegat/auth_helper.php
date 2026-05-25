@@ -91,6 +91,22 @@ class STCAuthHelper {
     }
     
     /**
+     * Same-origin AJAX: resume session without redirect (uses cookie restore when needed).
+     */
+    public static function resumeSessionForApi() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        if (isset($_SESSION["stc_empl_id"]) && ($_SESSION["stc_empl_role"] > 0)) {
+            return true;
+        }
+        if (self::checkAuthFromCookie()) {
+            return self::restoreSessionFromCookie();
+        }
+        return false;
+    }
+    
+    /**
      * Clear authentication cookie
      */
     public static function clearAuthCookie() {
