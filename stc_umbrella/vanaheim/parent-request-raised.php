@@ -17,6 +17,39 @@ function pr_parent_req_phone_digits($s) {
 	return preg_replace('/\D+/', '', (string) $s);
 }
 
+function pr_parent_req_text_len($s) {
+	if (function_exists('mb_strlen')) {
+		return mb_strlen((string) $s, 'UTF-8');
+	}
+	return strlen((string) $s);
+}
+
+function pr_parent_req_hash_equals($known, $user) {
+	if (function_exists('hash_equals')) {
+		return hash_equals((string) $known, (string) $user);
+	}
+	$known = (string) $known;
+	$user = (string) $user;
+	if (strlen($known) !== strlen($user)) {
+		return false;
+	}
+	$result = 0;
+	for ($i = 0, $len = strlen($known); $i < $len; $i++) {
+		$result |= ord($known[$i]) ^ ord($user[$i]);
+	}
+	return $result === 0;
+}
+
+function pr_parent_req_random_token() {
+	if (function_exists('random_bytes')) {
+		return bin2hex(random_bytes(32));
+	}
+	if (function_exists('openssl_random_pseudo_bytes')) {
+		return bin2hex(openssl_random_pseudo_bytes(32));
+	}
+	return sha1(uniqid((string) mt_rand(), true) . microtime(true));
+}
+
 /**
  * True if submitted phone matches DB contact (+91 / spaces allowed; same last 10 digits if both long enough).
  */
@@ -200,8 +233,9 @@ class PrParentRequestHel extends tesseract {
 			mysqli_stmt_close($stmt);
 			return ['ok' => false, 'message' => 'Could not verify student details. Please try again later.'];
 		}
-		$res = mysqli_stmt_get_result($stmt);
-		$row = $res ? mysqli_fetch_assoc($res) : null;
+		$student_contact = null;
+		mysqli_stmt_bind_result($stmt, $student_contact);
+		$row = mysqli_stmt_fetch($stmt) ? ['stc_school_student_contact' => $student_contact] : null;
 		mysqli_stmt_close($stmt);
 
 		if (!$row) {
@@ -230,7 +264,7 @@ class PrParentRequestHel extends tesseract {
 		$subject = isset($p['subject']) ? trim((string) $p['subject']) : '';
 		$message = isset($p['message']) ? trim((string) $p['message']) : '';
 
-		if ($parent_name === '' || mb_strlen($parent_name) > 160) {
+		if ($parent_name === '' || pr_parent_req_text_len($parent_name) > 160) {
 			$errors[] = 'Please enter parent / guardian name (max 160 characters).';
 		}
 		if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 190) {
@@ -239,13 +273,13 @@ class PrParentRequestHel extends tesseract {
 		if ($phone === '' || strlen($phone) > 40) {
 			$errors[] = 'Please enter contact number.';
 		}
-		if ($subject === '' || mb_strlen($subject) > 255) {
+		if ($subject === '' || pr_parent_req_text_len($subject) > 255) {
 			$errors[] = 'Please enter a short topic for your request.';
 		}
-		if ($message === '' || mb_strlen($message) > 6000) {
+		if ($message === '' || pr_parent_req_text_len($message) > 6000) {
 			$errors[] = 'Please describe your request (maximum 6000 characters).';
 		}
-		if (mb_strlen($student_name) > 160 || strlen($student_id) > 64) {
+		if (pr_parent_req_text_len($student_name) > 160 || strlen($student_id) > 64) {
 			$errors[] = 'Student details are too long.';
 		}
 
@@ -284,8 +318,10 @@ class PrParentRequestHel extends tesseract {
 				$today_ymd,
 				$study_id_trim
 			);
-			if (mysqli_stmt_execute($dup_stmt) && ($dr = mysqli_fetch_assoc(mysqli_stmt_get_result($dup_stmt)))) {
-				if ((int) $dr['c'] > 0) {
+			if (mysqli_stmt_execute($dup_stmt)) {
+				$dup_count = 0;
+				mysqli_stmt_bind_result($dup_stmt, $dup_count);
+				if (mysqli_stmt_fetch($dup_stmt) && (int) $dup_count > 0) {
 					$dup_msg = ($study_id_trim === '')
 						? 'You have already submitted a request today using this email address (same calendar day). You can submit again tomorrow, or call the school office if it is urgent.'
 						: 'You have already submitted a request today using this email and the same student admission / ID number. You can submit again tomorrow, call the office if urgent, or use a different student ID only if sending for another learner.';
@@ -374,7 +410,7 @@ if (isset($_POST['save_parent_request_action'])) {
 	$response = ['success' => false, 'errors' => [], 'csrf' => null];
 
 	$csrf = isset($_POST['csrf_token']) ? (string) $_POST['csrf_token'] : '';
-	if (!hash_equals($_SESSION['parent_req_csrf'] ?? '', $csrf)) {
+	if (!pr_parent_req_hash_equals($_SESSION['parent_req_csrf'] ?? '', $csrf)) {
 		$response['errors'][] = 'Session expired — please reload the page and try again.';
 		echo json_encode($response);
 		exit;
@@ -416,7 +452,7 @@ if (isset($_POST['save_parent_request_action'])) {
 		pr_parent_req_send_notification_mails($result['mail_payload']);
 	}
 
-	$_SESSION['parent_req_csrf'] = bin2hex(random_bytes(32));
+	$_SESSION['parent_req_csrf'] = pr_parent_req_random_token();
 	$response['success'] = true;
 	$response['csrf'] = $_SESSION['parent_req_csrf'];
 	echo json_encode($response);

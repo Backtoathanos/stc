@@ -6,8 +6,18 @@
 date_default_timezone_set('Asia/Kolkata');
 session_start();
 
+function parent_req_random_token() {
+	if (function_exists('random_bytes')) {
+		return bin2hex(random_bytes(32));
+	}
+	if (function_exists('openssl_random_pseudo_bytes')) {
+		return bin2hex(openssl_random_pseudo_bytes(32));
+	}
+	return sha1(uniqid((string) mt_rand(), true) . microtime(true));
+}
+
 if (empty($_SESSION['parent_req_csrf']) || !is_string($_SESSION['parent_req_csrf'])) {
-	$_SESSION['parent_req_csrf'] = bin2hex(random_bytes(32));
+	$_SESSION['parent_req_csrf'] = parent_req_random_token();
 }
 
 $csrf_safe = htmlspecialchars((string) ($_SESSION['parent_req_csrf'] ?? ''), ENT_QUOTES, 'UTF-8');
