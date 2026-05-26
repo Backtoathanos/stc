@@ -43,7 +43,7 @@ function stc_prc_map_row_full(array $r): array {
 }
 
 function stc_prc_message_preview(string $msg, int $max = 120): string {
-	if (function_exists('mb_substr')) {
+	if (function_exists('mb_substr') && function_exists('mb_strlen')) {
 		$t = mb_substr($msg, 0, $max, 'UTF-8');
 		if (mb_strlen($msg, 'UTF-8') > $max) {
 			$t .= '…';
@@ -52,6 +52,13 @@ function stc_prc_message_preview(string $msg, int $max = 120): string {
 	}
 	$t = substr($msg, 0, $max);
 	return strlen($msg) > $max ? $t . '…' : $t;
+}
+
+function stc_prc_text_len(string $msg): int {
+	if (function_exists('mb_strlen')) {
+		return mb_strlen($msg, 'UTF-8');
+	}
+	return strlen($msg);
 }
 
 if (isset($_POST['stc_list_parent_complaints'])) {
@@ -130,8 +137,52 @@ if (isset($_POST['stc_get_parent_complaint'])) {
 		echo json_encode(['success' => false, 'message' => 'Could not load record.']);
 		exit;
 	}
-	$res = mysqli_stmt_get_result($stmt);
-	$r = $res ? mysqli_fetch_assoc($res) : null;
+	$r = null;
+	if (function_exists('mysqli_stmt_get_result')) {
+		$res = mysqli_stmt_get_result($stmt);
+		$r = $res ? mysqli_fetch_assoc($res) : null;
+	} else {
+		$row_id = null;
+		$parent_name = null;
+		$email = null;
+		$phone = null;
+		$student_name = null;
+		$student_id = null;
+		$subject = null;
+		$message = null;
+		$status = null;
+		$action_taken = null;
+		$createdate = null;
+		mysqli_stmt_bind_result(
+			$stmt,
+			$row_id,
+			$parent_name,
+			$email,
+			$phone,
+			$student_name,
+			$student_id,
+			$subject,
+			$message,
+			$status,
+			$action_taken,
+			$createdate
+		);
+		if (mysqli_stmt_fetch($stmt)) {
+			$r = [
+				'stc_school_parent_request_id' => $row_id,
+				'stc_school_parent_request_parent_name' => $parent_name,
+				'stc_school_parent_request_email' => $email,
+				'stc_school_parent_request_phone' => $phone,
+				'stc_school_parent_request_student_name' => $student_name,
+				'stc_school_parent_request_student_id' => $student_id,
+				'stc_school_parent_request_subject' => $subject,
+				'stc_school_parent_request_message' => $message,
+				'stc_school_parent_request_status' => $status,
+				'stc_school_parent_request_action_taken' => $action_taken,
+				'stc_school_parent_request_createdate' => $createdate,
+			];
+		}
+	}
 	mysqli_stmt_close($stmt);
 	if (!$r) {
 		echo json_encode(['success' => false, 'message' => 'Record not found.']);
@@ -176,7 +227,7 @@ if (isset($_POST['stc_close_parent_complaint'])) {
 		echo json_encode(['success' => false, 'message' => 'Invalid id.']);
 		exit;
 	}
-	if ($action === '' || mb_strlen($action) > 8000) {
+	if ($action === '' || stc_prc_text_len($action) > 8000) {
 		echo json_encode(['success' => false, 'message' => 'Please enter action taken (1–8000 characters).']);
 		exit;
 	}

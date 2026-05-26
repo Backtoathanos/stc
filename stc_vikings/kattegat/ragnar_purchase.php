@@ -2600,7 +2600,8 @@ class ragnarPurchaseAdhoc extends tesseract{
 				`stc_user_name`,
 				`stc_purchase_product_adhoc_created_date`,
 				`stc_purchase_product_adhoc_updated_by`,
-				`stc_purchase_product_adhoc_updated_date`
+				`stc_purchase_product_adhoc_updated_date`,
+				`stc_product_sale_percentage`
 			FROM `stc_purchase_product_adhoc`
 			LEFT JOIN `stc_product` ON `stc_purchase_product_adhoc_productid`=`stc_product_id`
 			LEFT JOIN `stc_category` ON `stc_product_cat_id`=`stc_cat_id`
@@ -2802,7 +2803,14 @@ class ragnarPurchaseAdhoc extends tesseract{
 						<td class='text-center' style='width: 70px;'>".$odinrow['stc_rack_name']."</td>
 						<td class='text-center'>".$odinrow['stc_purchase_product_adhoc_unit']."</td>
 						<td class='text-right'>".number_format($odinrow['stc_purchase_product_adhoc_qty'], 2)."</td>
-						<td class='text-right' style='width: 125px;'><a href='javascript:void(0)' class='img-inputbtnshow'>".number_format($odinrow['stc_purchase_product_adhoc_prate'], 2)."</br>".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."</a>".$pro_prate.$pro_percentage.$pro_rate."</td>
+						<td class='text-right' style='width: 125px;'>
+							<a href='javascript:void(0)' class='img-inputbtnshow'>
+								".number_format($odinrow['stc_purchase_product_adhoc_prate'], 2)."</br>
+								<span>".number_format($odinrow['stc_product_sale_percentage'], 2)."</span>%</br>
+								".number_format($odinrow['stc_purchase_product_adhoc_rate'], 2)."
+							</a>
+							".$pro_prate.$pro_percentage.$pro_rate."
+						</td>
 						<td class='text-right'>".number_format($stock, 2)."</td>
 						".$shop_td."
 						<td class='text-center' style='width: 180px;'>

@@ -125,98 +125,180 @@ if(empty(@$_SESSION['stc_school_user_id'])){
     }
 
     .stc-q-toolbar-card {
-      background: linear-gradient(135deg, #3949ab 0%, #5c6bc0 55%, #7986cb 100%);
+      position: relative;
       color: #fff;
-      border-radius: 14px !important;
+      border-radius: 18px !important;
       overflow: hidden;
-      box-shadow: 0 14px 40px rgba(26, 35, 126, 0.22) !important;
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.22), transparent 30%),
+        linear-gradient(135deg, #243c96 0%, #4e63d7 54%, #6f80ee 100%);
+      box-shadow: 0 18px 44px rgba(36, 60, 150, 0.26) !important;
+    }
+
+    .stc-q-toolbar-card::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      top: -80px;
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      pointer-events: none;
     }
 
     .stc-q-toolbar-card .card-body {
-      padding: 1.35rem 1.5rem 1.5rem !important;
+      position: relative;
+      z-index: 1;
+      padding: 1.35rem !important;
     }
 
-    .stc-q-toolbar-card label,
-    .stc-q-toolbar-card .small {
-      color: rgba(255, 255, 255, 0.92) !important;
+    .stc-q-toolbar-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
+    .stc-q-toolbar-title {
+      margin: 0;
+      color: #fff;
+      font-size: 1.02rem;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .stc-q-toolbar-subtitle,
     .stc-q-toolbar-card .text-muted-soft {
-      color: rgba(255, 255, 255, 0.74) !important;
-      font-size: 0.8rem !important;
-    }
-
-    .stc-q-toolbar-card .form-control,
-    .stc-q-toolbar-card select.form-control {
-      border-radius: 10px !important;
-      border: 1px solid rgba(255, 255, 255, 0.35) !important;
-      background: rgba(255, 255, 255, 0.97) !important;
-      min-height: 42px !important;
-      padding: 0.45rem 0.85rem !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    }
-
-    .stc-q-toolbar-card select.form-control {
-      padding-right: 2rem !important;
-    }
-
-    .stc-q-toolbar-card label.text-up-label {
-      font-size: 0.72rem;
-      letter-spacing: 0.06em;
-      margin-bottom: 0.38rem !important;
-      font-weight: 600;
-      opacity: 0.95;
+      margin: 0.25rem 0 0;
+      color: rgba(255, 255, 255, 0.76) !important;
+      font-size: 0.82rem !important;
+      line-height: 1.45;
     }
 
     .stc-q-btn-add {
-      border-radius: 10px !important;
-      padding: 0.55rem 1.35rem !important;
-      font-weight: 600 !important;
-      letter-spacing: 0.03em !important;
-      box-shadow: 0 8px 20px rgba(46, 125, 50, 0.35) !important;
-      border: none !important;
+      flex: 0 0 auto;
+      border-radius: 999px !important;
+      padding: 0.55rem 1.1rem !important;
+      font-weight: 700 !important;
+      letter-spacing: 0.02em !important;
+      background: #22c55e !important;
+      color: #fff !important;
+      border: 1px solid rgba(255, 255, 255, 0.24) !important;
+      box-shadow: 0 10px 22px rgba(21, 128, 61, 0.34) !important;
+      text-transform: none !important;
     }
 
-    .stc-q-btn-add .material-icons {
+    .stc-q-btn-add .material-icons,
+    .stc-q-btn-show .material-icons,
+    .stc-q-filter-icon {
+      font-size: 20px !important;
+      line-height: 1 !important;
+      margin: 0 0.42rem 0 0 !important;
       vertical-align: middle !important;
-      margin-right: 6px !important;
-      margin-top: -2px !important;
-      font-size: 21px !important;
+    }
+
+    .stc-q-filter-grid {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.35fr) minmax(190px, 0.85fr);
+      gap: 1rem;
+      align-items: end;
+    }
+
+    .stc-q-field {
+      margin: 0 !important;
+      min-width: 0;
+    }
+
+    .stc-q-field label.text-up-label {
+      display: block;
+      color: rgba(255, 255, 255, 0.88) !important;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      margin: 0 0 0.45rem !important;
+    }
+
+    .stc-q-input-wrap {
+      display: flex;
+      align-items: center;
+      min-height: 48px;
+      padding: 0 0.85rem;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.12);
+    }
+
+    .stc-q-filter-icon {
+      color: #4e63d7;
+      opacity: 0.9;
+    }
+
+    .stc-q-input-wrap .form-control,
+    .stc-q-input-wrap select.form-control {
+      height: 46px !important;
+      min-height: 46px !important;
+      padding: 0 !important;
+      border: 0 !important;
+      background: transparent !important;
+      box-shadow: none !important;
+      color: #1f2937 !important;
+      font-weight: 600;
+    }
+
+    .stc-q-input-wrap .form-control:focus {
+      box-shadow: none !important;
     }
 
     .stc-q-btn-show {
-      border-radius: 10px !important;
-      padding: 0.55rem 1.35rem !important;
-      font-weight: 700 !important;
+      width: 100%;
+      min-height: 48px;
+      border-radius: 14px !important;
+      padding: 0.7rem 1.25rem !important;
+      font-weight: 800 !important;
       letter-spacing: 0.04em !important;
-      background: #fff !important;
-      color: #283593 !important;
-      border: none !important;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12) !important;
+      background: linear-gradient(135deg, #ffffff 0%, #eef2ff 100%) !important;
+      color: #263a9b !important;
+      border: 1px solid rgba(255, 255, 255, 0.7) !important;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18) !important;
+      text-transform: uppercase !important;
     }
 
     .stc-q-btn-show:not(:disabled):hover {
-      background: #eef1fb !important;
-      color: #1a237e !important;
+      transform: translateY(-1px);
+      color: #172554 !important;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.22) !important;
     }
 
     .stc-q-btn-show:disabled {
-      opacity: 0.6 !important;
+      opacity: 0.65 !important;
       cursor: wait !important;
     }
 
-    .stc-q-btn-show .material-icons {
-      vertical-align: middle !important;
-      margin-right: 8px !important;
-      margin-top: -3px !important;
-      font-size: 21px !important;
+    @media (max-width: 991.98px) {
+      .stc-q-filter-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+      .stc-q-action-field {
+        grid-column: 1 / -1;
+      }
     }
 
-    .stc-q-toolbar-divider {
-      height: 1px !important;
-      background: rgba(255, 255, 255, 0.24) !important;
-      margin: 1rem 0 1.35rem !important;
-      border: none !important;
+    @media (max-width: 575.98px) {
+      .stc-q-toolbar-top,
+      .stc-q-filter-grid {
+        display: block;
+      }
+      .stc-q-btn-add,
+      .stc-q-field {
+        width: 100%;
+        margin-top: 0.85rem !important;
+      }
     }
 
     .stc-q-results-card {
@@ -968,47 +1050,47 @@ if(empty(@$_SESSION['stc_school_user_id'])){
 
                         <div class="card stc-q-toolbar-card mb-4 border-0">
                           <div class="card-body">
-                            <div class="d-flex flex-wrap align-items-start justify-content-between">
-                              <div class="mr-3 mb-3 mb-xl-0 pr-xl-4" style="max-width:520px;">
-                                <span class="text-up-label d-block">Create</span>
+                            <div class="stc-q-toolbar-top">
+                              <div>
+                                <p class="stc-q-toolbar-title">Question browser</p>
+                                <p class="stc-q-toolbar-subtitle">Choose a month and class, then load saved lecture questions.</p>
+                              </div>
+                              <div>
                                 <button type="button" id="stcschooladdquest"
-                                  class="btn btn-success stc-q-btn-add d-inline-flex align-items-center mb-2"
-                                  data-toggle="modal" data-target=".stc-school-showteacher-res">
+                                  class="btn btn-success stc-q-btn-add d-inline-flex align-items-center mb-2">
                                   <span class="material-icons" aria-hidden="true">post_add</span>
                                   Add questions
                                 </button>
-                                <p class="small text-muted-soft mb-0">Opens timetable and syllabus modal for new lecture
-                                  questions.</p>
-                              </div>
-                              <div class="flex-grow-1" style="min-width:min(100%, 280px);">
-                                <span class="text-up-label d-block">Browse</span>
-                                <p class="small text-muted-soft mb-0">Same month and class apply to the list you load.
-                                </p>
                               </div>
                             </div>
-                            <hr class="stc-q-toolbar-divider" />
-                            <div class="form-row align-items-end">
-                              <div class="form-group col-md-4 col-sm-12 mb-3 mb-md-0">
+                            <div class="stc-q-filter-grid">
+                              <div class="form-group stc-q-field">
                                 <label class="text-up-label d-block" for="stcattendmonth-input">Month</label>
-                                <input id="stcattendmonth-input" name="stcattendmonth" type="month"
-                                  class="form-control validate stcattendmonth" value="<?php echo date('Y-m'); ?>" />
+                                <div class="stc-q-input-wrap">
+                                  <span class="material-icons stc-q-filter-icon" aria-hidden="true">calendar_today</span>
+                                  <input id="stcattendmonth-input" name="stcattendmonth" type="month"
+                                    class="form-control validate stcattendmonth" value="<?php echo date('Y-m'); ?>" />
+                                </div>
                               </div>
-                              <div class="form-group col-md-4 col-sm-12 mb-3 mb-md-0">
+                              <div class="form-group stc-q-field">
                                 <label class="text-up-label d-block" for="stcattendclassname-input">Class</label>
-                                <select id="stcattendclassname-input" name="stcattendclassname"
-                                  class="form-control validate stcattendclassname">
-                                  <?php
-                                        include_once("../../MCU/db.php");
-                                        $school_sql=mysqli_query($con, "
-                                            SELECT DISTINCT `stc_school_class_id`,`stc_school_class_title` FROM stc_school_class ORDER BY `stc_school_class_title` ASC
-                                        ");
-                                        foreach($school_sql as $school_row){
-                                            echo '<option value="'.$school_row['stc_school_class_id'].'">'.$school_row['stc_school_class_title'].'</option>';
-                                        }
-                                    ?>
-                                </select>
+                                <div class="stc-q-input-wrap">
+                                  <span class="material-icons stc-q-filter-icon" aria-hidden="true">school</span>
+                                  <select id="stcattendclassname-input" name="stcattendclassname"
+                                    class="form-control validate stcattendclassname">
+                                    <?php
+                                          include_once("../../MCU/db.php");
+                                          $school_sql=mysqli_query($con, "
+                                              SELECT DISTINCT `stc_school_class_id`,`stc_school_class_title` FROM stc_school_class ORDER BY `stc_school_class_title` ASC
+                                          ");
+                                          foreach($school_sql as $school_row){
+                                              echo '<option value="'.$school_row['stc_school_class_id'].'">'.$school_row['stc_school_class_title'].'</option>';
+                                          }
+                                      ?>
+                                  </select>
+                                </div>
                               </div>
-                              <div class="form-group col-md-4 col-sm-12 mb-0">
+                              <div class="form-group stc-q-field stc-q-action-field">
                                 <label class="text-up-label d-none d-md-block" for="stcschoolattendance">&nbsp;</label>
                                 <button type="button" id="stcschoolattendance"
                                   class="btn btn-block stc-q-btn-show d-inline-flex align-items-center justify-content-center mb-2 mb-md-0">
@@ -1306,6 +1388,56 @@ if(empty(@$_SESSION['stc_school_user_id'])){
   <!-- canteen section -->
   <script>
     $(document).ready(function () {
+      function stcCleanupModalState(force) {
+        if (force || $('.modal.in:visible, .modal.show:visible').length === 0) {
+          $('body').removeClass('modal-open').css({ 'padding-right': '', 'overflow': '' });
+          $('.modal-backdrop').remove();
+        }
+      }
+
+      // Keep Bootstrap modals under <body> so close/open does not leave a stale backdrop.
+      $('.stc-school-showattendancedet-res, .stc-school-showteacher-res').appendTo('body');
+      $(document).on('hidden.bs.modal', '.stc-school-showattendancedet-res, .stc-school-showteacher-res', function () {
+        setTimeout(stcCleanupModalState, 10);
+      });
+      function stcShowPageModal($modal) {
+        if (!$modal.length) {
+          return;
+        }
+        stcCleanupModalState(true);
+        $modal.appendTo('body')
+          .css('display', 'block')
+          .removeAttr('aria-hidden')
+          .attr('aria-modal', 'true')
+          .addClass('show in');
+        $('body').addClass('modal-open');
+        $('<div class="modal-backdrop fade show in"></div>').appendTo('body');
+        $modal.trigger('shown.bs.modal');
+      }
+      function stcHidePageModal($modal) {
+        if (!$modal.length) {
+          return;
+        }
+        $modal.removeClass('show in')
+          .css('display', 'none')
+          .attr('aria-hidden', 'true')
+          .removeAttr('aria-modal');
+        stcCleanupModalState(true);
+        $modal.trigger('hidden.bs.modal');
+      }
+      $('#stcschooladdquest').off('click.stcPageModal').on('click.stcPageModal', function (e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        stcShowPageModal($('.stc-school-showteacher-res'));
+      });
+      $('.stc-school-showteacher-res .close, .stc-school-showattendancedet-res .close')
+        .off('click.stcPageModal')
+        .on('click.stcPageModal', function (e) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          stcHidePageModal($(this).closest('.modal'));
+        });
+
       /** Destroy Questions DataTable before injecting new markup (avoid duplicate-ID / leaks). */
       function stcDestroyQuestionsDataTable() {
         var $t = $('#stc-questions-datatable');
@@ -1428,8 +1560,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
               $('.stcattendmonth').val(month);
               $('.stcattendclassname').val(classes);
               $('#stcschoolattendance').click();
-              $('#stcschoolattendance').after('<a href="javascript:void(0)" id="stc-school-showattendancedet-res-btn" data-toggle="modal" data-target="#exampleModal" ></a>');
-              $('#stc-school-showattendancedet-res-btn').click();
+              stcShowPageModal($('#exampleModal'));
             }
           }
         });
@@ -1437,11 +1568,9 @@ if(empty(@$_SESSION['stc_school_user_id'])){
 
       // hide attendance modal
       $(document).on('click', '.stc-school-exit-attend-details', function (e) {
-        // $('.stc-school-showattendancedet-res').modal('hide');
-        // $('.stc-school-showattendancedet-res').css('display', 'none');
-        var month = $('.stcattendmonth').val();
-        var classes = $('.stcattendclassname').val();
-        window.location.href = "student-attendance.php?student-attendance=yes&action=hit" + '&month=' + month + '&class=' + classes;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        stcHidePageModal($('.stc-school-showattendancedet-res'));
       });
 
       if (urlParams.get('action') != undefined) {
@@ -1767,16 +1896,13 @@ if(empty(@$_SESSION['stc_school_user_id'])){
 
     });
   </script>
-</body>
-
-</html>
 <div class="modal fade stc-school-showattendancedet-res" data-backdrop="static" data-keyboard="false" id="exampleModal"
   tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">Questions Details</h5>
-        <button type="button" class="close stc-school-exit-attend-details" data-dismiss="modal"
+        <button type="button" class="close stc-school-exit-attend-details"
           aria-label="Close">X</button>
       </div>
       <div class="modal-body">
@@ -1842,7 +1968,7 @@ if(empty(@$_SESSION['stc_school_user_id'])){
           <h4 class="modal-title mb-0" id="qmAddQuestionTitle">Add question</h4>
           <small class="subtitle">Use <strong>Lecture</strong> to bind today&rsquo;s period and syllabus rows, save, review under <strong>Saved lectures</strong>, then write questions. Blank entries are skipped.</small>
         </div>
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <button type="button" class="close" aria-hidden="true">&times;</button>
       </div>
       <div class="modal-body qm-modal-body">
         <div class="card mb-0 qm-tabs-card border-0 shadow-none">
@@ -2075,3 +2201,5 @@ if(empty(@$_SESSION['stc_school_user_id'])){
     </div>
   </div>
 </div>
+</body>
+</html>

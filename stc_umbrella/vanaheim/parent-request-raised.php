@@ -263,18 +263,24 @@ class PrParentRequestHel extends tesseract {
 		$student_id = isset($p['student_id']) ? trim((string) $p['student_id']) : '';
 		$subject = isset($p['subject']) ? trim((string) $p['subject']) : '';
 		$message = isset($p['message']) ? trim((string) $p['message']) : '';
+		$allowed_subjects = [
+			'Academic Related' => true,
+			'Accommodation Related' => true,
+			'Behaviour Based' => true,
+			'Miscellaneous' => true,
+		];
 
 		if ($parent_name === '' || pr_parent_req_text_len($parent_name) > 160) {
 			$errors[] = 'Please enter parent / guardian name (max 160 characters).';
 		}
-		if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 190) {
-			$errors[] = 'Please enter a valid email address.';
+		if ($email !== '' && (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 190)) {
+			$errors[] = 'Please enter a valid email address, or leave email blank.';
 		}
 		if ($phone === '' || strlen($phone) > 40) {
 			$errors[] = 'Please enter contact number.';
 		}
-		if ($subject === '' || pr_parent_req_text_len($subject) > 255) {
-			$errors[] = 'Please enter a short topic for your request.';
+		if ($subject === '' || empty($allowed_subjects[$subject])) {
+			$errors[] = 'Please select a valid topic for your request.';
 		}
 		if ($message === '' || pr_parent_req_text_len($message) > 6000) {
 			$errors[] = 'Please describe your request (maximum 6000 characters).';
@@ -303,18 +309,21 @@ class PrParentRequestHel extends tesseract {
 			return ['ok' => false, 'messages' => ['Service temporarily unavailable — please try again later.']];
 		}
 
-		$email_for_dup = strtolower(trim($email));
+		$contact_for_dup = ($email !== '') ? strtolower(trim($email)) : trim($phone);
+		$contact_column = ($email !== '')
+			? 'LOWER(TRIM(`stc_school_parent_request_email`))'
+			: 'TRIM(`stc_school_parent_request_phone`)';
 		$study_id_trim = trim($student_id_db);
 		$dup_stmt = mysqli_prepare($con, '
 			SELECT COUNT(*) AS c
 			FROM `stc_school_parent_request`
-			WHERE LOWER(TRIM(`stc_school_parent_request_email`)) = ?
+			WHERE ' . $contact_column . ' = ?
 			  AND DATE(`stc_school_parent_request_createdate`) = ?
 			  AND TRIM(`stc_school_parent_request_student_id`) = ?
 		');
 		if ($dup_stmt) {
 			mysqli_stmt_bind_param($dup_stmt, 'sss',
-				$email_for_dup,
+				$contact_for_dup,
 				$today_ymd,
 				$study_id_trim
 			);
@@ -322,9 +331,10 @@ class PrParentRequestHel extends tesseract {
 				$dup_count = 0;
 				mysqli_stmt_bind_result($dup_stmt, $dup_count);
 				if (mysqli_stmt_fetch($dup_stmt) && (int) $dup_count > 0) {
+					$contact_label = ($email !== '') ? 'email' : 'phone number';
 					$dup_msg = ($study_id_trim === '')
-						? 'You have already submitted a request today using this email address (same calendar day). You can submit again tomorrow, or call the school office if it is urgent.'
-						: 'You have already submitted a request today using this email and the same student admission / ID number. You can submit again tomorrow, call the office if urgent, or use a different student ID only if sending for another learner.';
+						? 'You have already submitted a request today using this ' . $contact_label . ' (same calendar day). You can submit again tomorrow, or call the school office if it is urgent.'
+						: 'You have already submitted a request today using this ' . $contact_label . ' and the same student admission / ID number. You can submit again tomorrow, call the office if urgent, or use a different student ID only if sending for another learner.';
 					mysqli_stmt_close($dup_stmt);
 					return ['ok' => false, 'messages' => [$dup_msg]];
 				}

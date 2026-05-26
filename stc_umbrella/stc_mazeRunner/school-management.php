@@ -8,6 +8,18 @@
   if($_SESSION['stc_school_user_for']==4){
       header('location:forbidden.html');
   }
+  $stc_school_sections = array(
+    'teachers' => array('label' => 'Teacher Management', 'icon' => 'person_add_alt_1', 'pane' => 'stc-create-teacher'),
+    'students' => array('label' => 'Student Management', 'icon' => 'school', 'pane' => 'stc-create-student'),
+    'subjects' => array('label' => 'Subject Management', 'icon' => 'menu_book', 'pane' => 'stc-create-subject'),
+    'classes' => array('label' => 'Class Management', 'icon' => 'class', 'pane' => 'stc-create-classroom'),
+    'schedule' => array('label' => 'Schedule Management', 'icon' => 'event_note', 'pane' => 'stc-create-shedule'),
+  );
+  $stc_school_section = isset($_GET['school-section']) ? (string) $_GET['school-section'] : 'teachers';
+  if (!isset($stc_school_sections[$stc_school_section])) {
+    $stc_school_section = 'teachers';
+  }
+  $stc_school_current = $stc_school_sections[$stc_school_section];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -34,63 +46,29 @@
       <?php include_once("bar/sidebar.php");?>
       <div class="main-panel">
         <!-- Navbar -->
-        <?php $stc_nav_page_title = 'School Management'; include_once("bar/navbar.php");?>
+        <?php $stc_nav_page_title = $stc_school_current['label']; include_once("bar/navbar.php");?>
         <!-- End Navbar -->
         <div class="content">
           <div class="container-fluid">
             <div class="row">
               <div class="col-lg-12 col-md-12">
                 <div class="card school-card-shell">
-                  <div class="card-header card-header-tabs card-header-primary school-mgmt-header-tabs">
-                    <div class="nav-tabs-navigation school-mgmt-tabnav">
-                      <div class="nav-tabs-wrapper school-mgmt-tabnav-inner">
+                  <div class="card-header card-header-primary school-mgmt-header-tabs">
+                    <div class="school-mgmt-tabnav">
+                      <div class="school-mgmt-tabnav-inner">
                         <div class="school-mgmt-tabnav-brand">
-                          <span class="nav-tabs-title" id="school-mgmt-tabs-heading">Manage</span>
-                          <small class="school-mgmt-tabnav-tagline">Teachers, cohorts &amp; timetable</small>
+                          <span class="nav-tabs-title" id="school-mgmt-tabs-heading">
+                            <i class="material-icons school-nav-tab-icon" aria-hidden="true"><?php echo htmlspecialchars($stc_school_current['icon'], ENT_QUOTES, 'UTF-8'); ?></i>
+                            <?php echo htmlspecialchars($stc_school_current['label'], ENT_QUOTES, 'UTF-8'); ?>
+                          </span>
+                          <small class="school-mgmt-tabnav-tagline">Opened from the left menu as a separate management page.</small>
                         </div>
-                        <ul class="nav nav-tabs school-nav-tabs" data-tabs="tabs" role="tablist" aria-labelledby="school-mgmt-tabs-heading">
-                          <li class="nav-item" role="presentation">
-                            <a class="nav-link active" href="#stc-create-teacher" id="school-tab-teachers" role="tab" aria-controls="stc-create-teacher" aria-selected="true">
-                              <i class="material-icons school-nav-tab-icon" aria-hidden="true">person_add_alt_1</i>
-                              <span class="school-nav-tab-label">Teachers</span>
-                              <div class="ripple-container"></div>
-                            </a>
-                          </li>
-                          <li class="nav-item" role="presentation">
-                            <a class="nav-link" href="#stc-create-student" id="school-tab-students" role="tab" aria-controls="stc-create-student" aria-selected="false">
-                              <i class="material-icons school-nav-tab-icon" aria-hidden="true">school</i>
-                              <span class="school-nav-tab-label">Students</span>
-                              <div class="ripple-container"></div>
-                            </a>
-                          </li>
-                          <li class="nav-item" role="presentation">
-                            <a class="nav-link" href="#stc-create-subject" id="school-tab-subjects" role="tab" aria-controls="stc-create-subject" aria-selected="false">
-                              <i class="material-icons school-nav-tab-icon" aria-hidden="true">menu_book</i>
-                              <span class="school-nav-tab-label">Subjects</span>
-                              <div class="ripple-container"></div>
-                            </a>
-                          </li>
-                          <li class="nav-item" role="presentation">
-                            <a class="nav-link" href="#stc-create-classroom" id="school-tab-classrooms" role="tab" aria-controls="stc-create-classroom" aria-selected="false">
-                              <i class="material-icons school-nav-tab-icon" aria-hidden="true">class</i>
-                              <span class="school-nav-tab-label">Classrooms</span>
-                              <div class="ripple-container"></div>
-                            </a>
-                          </li>
-                          <li class="nav-item" role="presentation">
-                            <a class="nav-link" href="#stc-create-shedule" id="school-tab-schedule" role="tab" aria-controls="stc-create-shedule" aria-selected="false">
-                              <i class="material-icons school-nav-tab-icon" aria-hidden="true">event_note</i>
-                              <span class="school-nav-tab-label">Schedule</span>
-                              <div class="ripple-container"></div>
-                            </a>
-                          </li>
-                        </ul>
                       </div>
                     </div>
                   </div>
                   <div class="card-body">
                     <div class="tab-content">
-                      <div class="tab-pane active" id="stc-create-teacher" role="tabpanel" aria-labelledby="school-tab-teachers">
+                      <div class="tab-pane<?php echo $stc_school_section === 'teachers' ? ' active' : ''; ?>" id="stc-create-teacher" role="tabpanel" aria-labelledby="school-tab-teachers">
                         <div class="row">
                           <div class="col-12">
                             <h2 class="school-page-title mb-3">Teachers</h2>
@@ -140,7 +118,7 @@
 
                       <!-- Create Student -->
 
-                      <div class="tab-pane" id="stc-create-student" role="tabpanel" aria-labelledby="school-tab-students">
+                      <div class="tab-pane<?php echo $stc_school_section === 'students' ? ' active' : ''; ?>" id="stc-create-student" role="tabpanel" aria-labelledby="school-tab-students">
                         <div class="row">
                           <div class="col-12">
                             <h2 class="school-page-title mb-3">Students</h2>
@@ -192,7 +170,7 @@
 
                       <!-- Field Create Subject -->
 
-                      <div class="tab-pane" id="stc-create-subject" role="tabpanel" aria-labelledby="school-tab-subjects">
+                      <div class="tab-pane<?php echo $stc_school_section === 'subjects' ? ' active' : ''; ?>" id="stc-create-subject" role="tabpanel" aria-labelledby="school-tab-subjects">
                         <div class="row">
                           <div class="col-12">
                             <h2 class="school-page-title mb-3">Subjects</h2>
@@ -236,7 +214,7 @@
 
                       <!-- Field Class Room -->
 
-                      <div class="tab-pane" id="stc-create-classroom" role="tabpanel" aria-labelledby="school-tab-classrooms">
+                      <div class="tab-pane<?php echo $stc_school_section === 'classes' ? ' active' : ''; ?>" id="stc-create-classroom" role="tabpanel" aria-labelledby="school-tab-classrooms">
                         <div class="row">
                           <div class="col-12">
                             <h2 class="school-page-title mb-3">Classrooms</h2>
@@ -281,7 +259,7 @@
 
                       <!-- Field Schedule Routine -->
 
-                      <div class="tab-pane" id="stc-create-shedule" role="tabpanel" aria-labelledby="school-tab-schedule">
+                      <div class="tab-pane<?php echo $stc_school_section === 'schedule' ? ' active' : ''; ?>" id="stc-create-shedule" role="tabpanel" aria-labelledby="school-tab-schedule">
                         <div class="school-weekly-surface">
                           <header class="school-weekly-header">
                             <div class="school-weekly-header-copy">
@@ -1517,8 +1495,9 @@
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
         const value = urlParams.get('school-management');
+        const section = urlParams.get('school-section') || 'teachers';
         if(value=="yes"){
-          $('.school-management').addClass('active');
+          $('.school-management-' + section).addClass('active');
         }
       });
     </script>

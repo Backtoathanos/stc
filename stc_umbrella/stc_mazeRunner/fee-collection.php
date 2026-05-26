@@ -385,6 +385,388 @@ if($_SESSION['stc_school_user_for']>3){
     .stc_print_page i{
       color: black;
     }
+
+    /* Fee collection UI refresh */
+    .fee-collection-page {
+      color: #263238;
+    }
+
+    .fee-collection-page .fc-page-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      padding: 1rem 1.15rem;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #eef2ff 0%, #fff 58%, #ecfeff 100%);
+      border: 1px solid rgba(63, 81, 181, 0.12);
+      box-shadow: 0 10px 28px rgba(26, 35, 126, 0.08);
+    }
+
+    .fee-collection-page .fc-page-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-bottom: 0.3rem;
+      color: #3949ab;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .fee-collection-page .fc-page-title {
+      margin: 0;
+      color: #1a237e;
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.25;
+    }
+
+    .fee-collection-page .fc-page-subtitle {
+      margin: 0.35rem 0 0;
+      max-width: 44rem;
+      color: #64748b;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .fee-collection-page .fc-pill {
+      flex: 0 0 auto;
+      padding: 0.48rem 0.8rem;
+      border-radius: 999px;
+      background: #fff;
+      color: #3949ab;
+      font-size: 0.76rem;
+      font-weight: 800;
+      box-shadow: 0 8px 20px rgba(26, 35, 126, 0.1);
+      border: 1px solid rgba(63, 81, 181, 0.12);
+    }
+
+    .fee-collection-page .fc-entry-tabs {
+      margin-top: 1rem;
+    }
+
+    .fee-collection-page .fc-entry-tab-nav.nav-tabs {
+      display: flex;
+      gap: 0.7rem;
+      margin: 0 0 1rem;
+      padding: 0.6rem;
+      border: 0;
+      border-radius: 16px;
+      background: #eef2ff;
+      box-shadow: inset 0 0 0 1px rgba(63, 81, 181, 0.12);
+    }
+
+    .fee-collection-page .fc-entry-tab-nav .nav-item {
+      flex: 1 1 0;
+      margin: 0;
+    }
+
+    .fee-collection-page .fc-entry-tab-nav .nav-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      min-height: 48px;
+      margin: 0 !important;
+      padding: 0.7rem 1rem !important;
+      border: 1px solid transparent !important;
+      border-radius: 12px !important;
+      background: transparent !important;
+      color: #3949ab !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      opacity: 1 !important;
+    }
+
+    .fee-collection-page .fc-entry-tab-nav .nav-link.active,
+    .fee-collection-page .fc-entry-tab-nav .nav-link.active.show {
+      background: #fff !important;
+      color: #1a237e !important;
+      border-color: rgba(63, 81, 181, 0.14) !important;
+      box-shadow: 0 10px 24px rgba(26, 35, 126, 0.12);
+    }
+
+    .fee-collection-page .fc-entry-tab-nav .material-icons {
+      font-size: 20px;
+      line-height: 1;
+    }
+
+    .fee-collection-page .fc-save-bar {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 16px;
+      background: #f8fafc;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    .fee-collection-page .tm-bg-primary-dark.tm-block {
+      padding: 0 !important;
+      border-radius: 18px !important;
+      overflow: hidden;
+      background: #fff !important;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      box-shadow: 0 12px 34px rgba(15, 23, 42, 0.08);
+    }
+
+    .fee-collection-page .stc-view + .stc-view {
+      margin-top: 1.1rem;
+    }
+
+    .fee-collection-page .fc-section-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin: 0 !important;
+      padding: 1rem 1.25rem !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      color: #fff;
+      box-shadow: none !important;
+    }
+
+    .fee-collection-page .fc-section-banner.fc-income {
+      background: linear-gradient(135deg, #0f9f6e 0%, #10b981 52%, #38bdf8 100%);
+    }
+
+    .fee-collection-page .fc-section-banner.fc-expense {
+      background: linear-gradient(135deg, #f97316 0%, #ef4444 58%, #a855f7 100%);
+    }
+
+    .fee-collection-page .fc-section-banner h3 {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      margin: 0;
+      color: #fff;
+      font-size: 1.08rem;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+    }
+
+    .fee-collection-page #stc-create-canteen .tm-block > .row,
+    .fee-collection-page .fc-panel-body {
+      margin: 0;
+      padding: 1.15rem;
+    }
+
+    .fee-collection-page #stc-create-canteen .mb-3:not(.fc-section-banner),
+    .fee-collection-page .show-monthly-income-modal .mb-3 {
+      margin: 0 0 1rem !important;
+      padding: 0 !important;
+      border: 0 !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+
+    .fee-collection-page #stc-create-canteen h5,
+    .fee-collection-page .fc-field-label,
+    .fee-collection-page .show-monthly-income-modal h5 {
+      margin: 0 0 0.45rem;
+      color: #475569;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .fee-collection-page #stc-create-canteen .form-control,
+    .fee-collection-page .fc-filter-card .form-control,
+    .fee-collection-page .show-monthly-income-modal .form-control {
+      min-height: 46px;
+      border-radius: 12px !important;
+      border: 1px solid #dbe3ef !important;
+      background: #f8fafc !important;
+      color: #1e293b !important;
+      font-weight: 600;
+      box-shadow: none !important;
+      padding: 0.55rem 0.8rem !important;
+    }
+
+    .fee-collection-page #stc-create-canteen .form-control:focus,
+    .fee-collection-page .fc-filter-card .form-control:focus,
+    .fee-collection-page .show-monthly-income-modal .form-control:focus {
+      border-color: #4f46e5 !important;
+      background: #fff !important;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12) !important;
+    }
+
+    .fee-collection-page textarea.form-control {
+      min-height: 94px;
+      resize: vertical;
+    }
+
+    .fee-collection-page #stcschoolreached,
+    .fee-collection-page .stc-monthly-income-btn {
+      min-height: 48px;
+      border-radius: 14px !important;
+      border: 0 !important;
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%) !important;
+      color: #fff !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.04em;
+      box-shadow: 0 12px 26px rgba(22, 163, 74, 0.24) !important;
+      text-transform: uppercase;
+    }
+
+    .fee-collection-page .fc-filter-card {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f8fafc 0%, #fff 100%);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+    }
+
+    .fee-collection-page .fc-filter-row {
+      display: grid;
+      grid-template-columns: minmax(180px, 1fr) minmax(150px, 0.35fr);
+      gap: 0.85rem;
+      align-items: end;
+    }
+
+    .fee-collection-page .fc-btn-primary,
+    .fee-collection-page #schoolsearch,
+    .fee-collection-page .call-monthly-income-modal {
+      min-height: 46px;
+      border-radius: 12px !important;
+      border: 0 !important;
+      background: linear-gradient(135deg, #3949ab 0%, #5c6bc0 100%) !important;
+      color: #fff !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.03em;
+      box-shadow: 0 10px 24px rgba(57, 73, 171, 0.22) !important;
+      text-transform: uppercase;
+    }
+
+    .fee-collection-page .fc-table-panel {
+      margin-top: 1rem;
+      border-radius: 16px;
+      overflow-x: auto;
+      background: #fff;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+    }
+
+    .fee-collection-page .fc-table-panel table {
+      margin-bottom: 0 !important;
+      background: #fff;
+    }
+
+    .fee-collection-page .fc-table-panel th {
+      background: #eef2ff;
+      color: #1a237e;
+      font-weight: 800;
+      border-top: 0 !important;
+    }
+
+    .fee-collection-page .show-monthly-income-modal .modal-content,
+    .fee-collection-page .stc-school-showdeep-res .modal-content {
+      border: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 54px rgba(15, 23, 42, 0.24);
+    }
+
+    .fee-collection-page .show-monthly-income-modal .modal-header,
+    .fee-collection-page .stc-school-showdeep-res .modal-header {
+      background: linear-gradient(135deg, #3949ab 0%, #5c6bc0 100%);
+      color: #fff;
+      border-bottom: 0;
+    }
+
+    .fee-collection-page .show-monthly-income-modal .modal-title,
+    .fee-collection-page .stc-school-showdeep-res .modal-title,
+    .fee-collection-page .show-monthly-income-modal .close,
+    .fee-collection-page .stc-school-showdeep-res .close {
+      color: #fff;
+      opacity: 0.95;
+      text-shadow: none;
+    }
+
+    @media (max-width: 767.98px) {
+      .fee-collection-page .fc-page-head,
+      .fee-collection-page .fc-filter-row {
+        display: block;
+      }
+
+      .fee-collection-page .fc-pill {
+        display: inline-block;
+        margin-top: 0.85rem;
+      }
+
+      .fee-collection-page .fc-filter-row > * + * {
+        margin-top: 0.85rem;
+      }
+    }
+
+    .show-monthly-income-modal .modal-content,
+    .stc-school-showdeep-res .modal-content {
+      border: 0;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 54px rgba(15, 23, 42, 0.24);
+    }
+
+    .show-monthly-income-modal .modal-header,
+    .stc-school-showdeep-res .modal-header {
+      background: linear-gradient(135deg, #3949ab 0%, #5c6bc0 100%);
+      color: #fff;
+      border-bottom: 0;
+    }
+
+    .show-monthly-income-modal .modal-title,
+    .stc-school-showdeep-res .modal-title,
+    .show-monthly-income-modal .close,
+    .stc-school-showdeep-res .close {
+      color: #fff;
+      opacity: 0.95;
+      text-shadow: none;
+    }
+
+    .show-monthly-income-modal .mb-3 {
+      margin: 0 0 1rem !important;
+      padding: 0 !important;
+      border: 0 !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+
+    .show-monthly-income-modal h5 {
+      margin: 0 0 0.45rem;
+      color: #475569;
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .show-monthly-income-modal .form-control {
+      min-height: 46px;
+      border-radius: 12px !important;
+      border: 1px solid #dbe3ef !important;
+      background: #f8fafc !important;
+      color: #1e293b !important;
+      font-weight: 600;
+      box-shadow: none !important;
+      padding: 0.55rem 0.8rem !important;
+    }
+
+    .show-monthly-income-modal .stc-monthly-income-btn {
+      min-height: 48px;
+      border-radius: 14px !important;
+      border: 0 !important;
+      background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%) !important;
+      color: #fff !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.04em;
+      box-shadow: 0 12px 26px rgba(22, 163, 74, 0.24) !important;
+      text-transform: uppercase;
+    }
   </style>
   </head>
 
@@ -428,23 +810,39 @@ if($_SESSION['stc_school_user_for']>3){
                     </div>
                   </div>
                   <div class="card-body">
-                    <div class="tab-content">
+                    <div class="tab-content fee-collection-page">
                       <div class="tab-pane active" id="stc-create-canteen">
-                        <div class="row">
-                          <div class="col-12">
-                            <h2 class="tm-block-title d-inline-block">Create Fee</h2>
+                        <div class="fc-page-head">
+                          <div>
+                            <span class="fc-page-kicker"><i class="material-icons">receipt_long</i> Fee Collection</span>
+                            <h2 class="fc-page-title">Create Fee Entry</h2>
+                            <p class="fc-page-subtitle">Record monthly income and expenditure for the selected school. Use zero or leave blank where a head does not apply.</p>
                           </div>
+                          <span class="fc-pill">Create</span>
                         </div>
+                        <div class="fc-entry-tabs">
+                          <ul class="nav nav-tabs fc-entry-tab-nav" role="tablist">
+                            <li class="nav-item">
+                              <a class="nav-link active show" href="#fc-income-entry" data-toggle="tab" role="tab" aria-controls="fc-income-entry" aria-selected="true">
+                                <i class="material-icons">south_west</i> Income
+                              </a>
+                            </li>
+                            <li class="nav-item">
+                              <a class="nav-link" href="#fc-expense-entry" data-toggle="tab" role="tab" aria-controls="fc-expense-entry" aria-selected="false">
+                                <i class="material-icons">north_east</i> Expenditure
+                              </a>
+                            </li>
+                          </ul>
+                          <div class="tab-content">
+                            <div class="tab-pane fade active show" id="fc-income-entry" role="tabpanel">
                         <div class="row">
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
                             <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
                               <div class="row">
                                 <div class="col-sm-12 col-md-12 col-lg-12" >
-                                  <div class="mb-3" style="background: rgb(41,121,9);background: linear-gradient(8deg, rgb(138 253 93) 42%, rgb(16 215 255) 65%);">
-                                    <h3                                       
-                                      for="name"
-                                      >Income <i class="fa fa-arrow-down"></i>
-                                    </h3>
+                                  <div class="mb-3 fc-section-banner fc-income">
+                                    <h3><i class="material-icons">south_west</i> Income</h3>
+                                    <span>Collections</span>
                                   </div>
                                 </div>
                                 <div class="col-sm-12 col-md-12 col-lg-12">
@@ -610,16 +1008,16 @@ if($_SESSION['stc_school_user_for']>3){
                             </div>
                           </div>
                         </div>
+                            </div>
+                            <div class="tab-pane fade" id="fc-expense-entry" role="tabpanel">
                         <div class="row">
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
                             <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
                               <div class="row">
                                 <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3" style="background: rgb(41,121,9);background: linear-gradient(8deg, rgb(255 124 62) 42%, rgb(75 255 122) 65%);">
-                                    <h3
-                                      for="name"
-                                      >Expenditure <i class="fa fa-arrow-down"></i>
-                                    </h3>
+                                  <div class="mb-3 fc-section-banner fc-expense">
+                                    <h3><i class="material-icons">north_east</i> Expenditure</h3>
+                                    <span>Outgoings</span>
                                   </div>
                                 </div>
                                 <div class="col-sm-12 col-md-6 col-lg-6">
@@ -762,61 +1160,57 @@ if($_SESSION['stc_school_user_for']>3){
                                     /></textarea>
                                   </div>
                                 </div>
-                                <div class="col-sm-12 col-md-12 col-lg-12">
-                                  <div class="mb-3">
-                                    <button type="button" name="search" class="form-control btn btn-success" id="stcschoolreached">Save</button>
-                                  </div>
-                                </div>
                               </div>
                             </div>
                           </div>
                         </div>
+                            </div>
+                          </div>
+                          <div class="fc-save-bar">
+                            <button type="button" name="search" class="form-control btn btn-success" id="stcschoolreached">Save Fee Entry</button>
+                          </div>
+                        </div>
                       </div>
                       <div class="tab-pane" id="stc-show-canteen">
+                        <div class="fc-page-head">
+                          <div>
+                            <span class="fc-page-kicker"><i class="material-icons">search</i> Reports</span>
+                            <h2 class="fc-page-title">Show Fee</h2>
+                            <p class="fc-page-subtitle">Search by month and review saved fee entries in one place.</p>
+                          </div>
+                          <span class="fc-pill">Browse</span>
+                        </div>
                         <div class="row">
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
                             <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
-                              <div class="row">
-                                <div class="col-12">
-                                  <h2 class="tm-block-title d-inline-block">Show Fee</h2>
-                                </div>
-                              </div>
-                              <div class="row stc-view-product-row">
+                              <div class="row stc-view-product-row fc-panel-body">
                                 <div class="col-xl-12 col-lg-12 col-md-12">
-                                  <form action="" class="stc-silent-challan-form">
-                                      <table class="table table-hover">
-                                        <thead>
-                                          <tr>
-                                            <th scope="col" width="70%">By Date</th>
-                                            <th scope="col">Search</th>
-                                          </tr>
-                                        </thead>
-                                        <tbody>
-                                          <tr>
-                                            <td>
-                                              <?php 
-                                                  $date = date("d-m-Y");
-                                                  $currentDate = date('Y-m', strtotime($date)); 
-                                              ?>    
-                                              <input
-                                                type="month"
-                                                class="form-control validate stcfilterbyattr"
-                                                value="<?php echo $currentDate;?>"
-                                                required
-                                              />
-                                            </td>
-                                            <td>
-                                              <button type="button" name="challansearch" class="btn btn-primary" id="schoolsearch">Search</button>
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
+                                  <form action="" class="stc-silent-challan-form fc-filter-card">
+                                    <?php
+                                        $date = date("d-m-Y");
+                                        $currentDate = date('Y-m', strtotime($date));
+                                    ?>
+                                    <div class="fc-filter-row">
+                                      <div>
+                                        <p class="fc-field-label">By Date</p>
+                                        <input
+                                          type="month"
+                                          class="form-control validate stcfilterbyattr"
+                                          value="<?php echo $currentDate;?>"
+                                          required
+                                        />
+                                      </div>
+                                      <div>
+                                        <p class="fc-field-label">&nbsp;</p>
+                                        <button type="button" name="challansearch" class="btn btn-primary btn-block" id="schoolsearch">Search</button>
+                                      </div>
+                                    </div>
                                   </form>
                                 </div>
                               </div>
-                              <div class="row stc-view-canteen-row" style="width: auto;overflow-x: auto; white-space: nowrap;">
+                              <div class="row stc-view-canteen-row fc-panel-body">
                                 <div class="col-xl-12 col-lg-12 col-md-12">
-                                  <form action="" class="stc-view-silent-fee-row-fetch">
+                                  <form action="" class="stc-view-silent-fee-row-fetch fc-table-panel">
                                       <table class="table table-hover table-responsive">
                                         <tr><td>Loading....</td></tr>
                                       </table>
@@ -828,22 +1222,25 @@ if($_SESSION['stc_school_user_for']>3){
                         </div>
                       </div>
                       <div class="tab-pane" id="stc-show-monthly-close">
+                        <div class="fc-page-head">
+                          <div>
+                            <span class="fc-page-kicker"><i class="material-icons">event_available</i> Month End</span>
+                            <h2 class="fc-page-title">Monthly Closing</h2>
+                            <p class="fc-page-subtitle">Add monthly income and review closing entries for school fee records.</p>
+                          </div>
+                          <span class="fc-pill">Closing</span>
+                        </div>
                         <div class="row">
                           <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mx-auto stc-view">
                             <div class="tm-bg-primary-dark tm-block tm-block-h-auto" >
-                              <div class="row">
-                                <div class="col-12">
-                                  <h2 class="tm-block-title d-inline-block">Monthly Closing</h2>
-                                </div>
-                              </div>
-                              <div class="row stc-view-product-row">
+                              <div class="row stc-view-product-row fc-panel-body">
                                 <div class="col-xl-12 col-lg-12 col-md-12">
                                   <a href="#" class="form-control btn btn-primary call-monthly-income-modal">Add Monthly Income</a>
                                 </div>
                               </div>
-                              <div class="row stc-view-canteen-row" style="width: auto;overflow-x: auto; white-space: nowrap;">
+                              <div class="row stc-view-canteen-row fc-panel-body">
                                 <div class="col-xl-12 col-lg-12 col-md-12">
-                                  <form action="" class="stc-view-silent-monthly-closer-row-fetch">
+                                  <form action="" class="stc-view-silent-monthly-closer-row-fetch fc-table-panel">
                                       <table class="table table-hover table-responsive">
                                         <tr><td>Loading....</td></tr>
                                       </table>
@@ -1129,8 +1526,6 @@ if($_SESSION['stc_school_user_for']>3){
         });
       });
   </script>
-</body>
-</html>
 <div class="modal fade bd-example-modal-xl stc-school-showdeep-res" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -1211,3 +1606,5 @@ if($_SESSION['stc_school_user_for']>3){
     </div>
   </div>
 </div>
+</body>
+</html>

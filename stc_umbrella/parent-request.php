@@ -263,8 +263,8 @@ $csrf_safe = htmlspecialchars((string) ($_SESSION['parent_req_csrf'] ?? ''), ENT
 
 								<div class="form-group"><label>Name (parent / guardian) *</label>
 									<input class="form-control" type="text" name="parent_name" required maxlength="160" placeholder="Full name" autocomplete="name"></div>
-								<div class="form-group"><label>Email *</label>
-									<input class="form-control" type="email" name="email" required maxlength="190" placeholder="you@example.com" autocomplete="email"></div>
+								<div class="form-group"><label>Email</label>
+									<input class="form-control" type="email" name="email" maxlength="190" placeholder="you@example.com (optional)" autocomplete="email"></div>
 								<div class="form-group"><label>Mobile / Phone *</label>
 									<small class="form-text text-muted d-block mb-1">Must match the contact number saved for this learner in school records (+91 spacing is ignored).</small>
 									<input class="form-control" type="tel" name="phone" required maxlength="40" placeholder="Contact number on file for the student" autocomplete="tel"></div>
@@ -273,7 +273,13 @@ $csrf_safe = htmlspecialchars((string) ($_SESSION['parent_req_csrf'] ?? ''), ENT
 								<div class="form-group"><label>Student admission / ID number *</label>
 									<input class="form-control" type="text" name="student_id" required maxlength="64" placeholder="As on admit card / school ID" autocomplete="off"></div>
 								<div class="form-group"><label>Subject / Topic *</label>
-									<input class="form-control" type="text" name="request_subject" maxlength="255" placeholder="e.g. Transport, Fees, PTA, Academics" autocomplete="off"></div>
+									<select class="form-control" name="request_subject" required>
+										<option value="">Select subject / topic</option>
+										<option value="Academic Related">Academic Related</option>
+										<option value="Accommodation Related">Accommodation Related</option>
+										<option value="Behaviour Based">Behaviour Based</option>
+										<option value="Miscellaneous">Miscellaneous</option>
+									</select></div>
 								<div class="form-group"><label>Details *</label>
 									<textarea class="form-control" name="message" rows="6" maxlength="6000" placeholder="Explain your query so staff can respond." autocomplete="off"></textarea></div>
 

@@ -30,13 +30,51 @@
           </li>';
           }
           if($_SESSION['stc_school_user_for']==3){
+            $stc_school_side_section = isset($_GET['school-section']) ? (string) $_GET['school-section'] : '';
+            if ($stc_school_side_section === '' && basename($_SERVER['PHP_SELF']) === 'school-management.php') {
+              $stc_school_side_section = 'teachers';
+            }
+            $stc_school_side_active = function ($section) use ($stc_school_side_section) {
+              return $stc_school_side_section === $section ? ' active' : '';
+            };
             echo '
-          <li class="nav-item school-management">
-            <a class="nav-link" href="./school-management.php?school-management=yes">
+
+          <li class="nav-item school-management-students'.$stc_school_side_active('students').'">
+            <a class="nav-link" href="./school-management.php?school-management=yes&school-section=students">
                 <i class="material-icons">school</i>
-                <p>School Management</p>
+                <p>Student Management</p>
             </a>
-          </li>';
+          </li>
+
+          <li class="nav-item school-management-teachers'.$stc_school_side_active('teachers').'">
+            <a class="nav-link" href="./school-management.php?school-management=yes&school-section=teachers">
+                <i class="material-icons">person_add_alt_1</i>
+                <p>Teacher Management</p>
+            </a>
+          </li>
+
+          <li class="nav-item school-management-classes'.$stc_school_side_active('classes').'">
+            <a class="nav-link" href="./school-management.php?school-management=yes&school-section=classes">
+                <i class="material-icons">class</i>
+                <p>Class Management</p>
+            </a>
+          </li>
+
+          <li class="nav-item school-management-subjects'.$stc_school_side_active('subjects').'">
+            <a class="nav-link" href="./school-management.php?school-management=yes&school-section=subjects">
+                <i class="material-icons">menu_book</i>
+                <p>Subject Management</p>
+            </a>
+          </li>
+
+          <li class="nav-item school-management-schedule'.$stc_school_side_active('schedule').'">
+            <a class="nav-link" href="./school-management.php?school-management=yes&school-section=schedule">
+                <i class="material-icons">event_note</i>
+                <p>Schedule Management</p>
+            </a>
+          </li>
+          
+          ';
           }
           if($_SESSION['stc_school_user_for']==4){
             echo '

@@ -31,6 +31,7 @@ if (empty($GLOBALS['_stc_parent_req_mail_embedded'])) {
 /** @var callable $h */
 
 $telRaw = isset($phone) ? preg_replace('/\D+/', '', (string) $phone) : '';
+$emailRaw = isset($email) ? trim((string) $email) : '';
 $snempty = isset($student_name) && (string) $student_name !== '';
 $sidempty = isset($student_id) && (string) $student_id !== '';
 $sn = $snempty ? $h($student_name) : '<span style="color:#999;">—</span>';
@@ -64,7 +65,12 @@ $msgHtml = nl2br($h(isset($message_body) ? (string) $message_body : ''));
 								</tr>
 								<tr>
 									<td style="padding:10px 14px;border:1px solid #e0e0e0;font-weight:600;color:#424242;">Email</td>
-									<td style="padding:10px 14px;border:1px solid #e0e0e0;"><a href="mailto:<?php echo $h((string) (isset($email) ? $email : '')); ?>" style="color:#1565c0;"><?php echo $h((string) (isset($email) ? $email : '')); ?></a></td>
+									<td style="padding:10px 14px;border:1px solid #e0e0e0;"><?php
+									if ($emailRaw !== ''): ?>
+									<a href="mailto:<?php echo $h($emailRaw); ?>" style="color:#1565c0;"><?php echo $h($emailRaw); ?></a>
+									<?php else: ?>
+									<span style="color:#999;">Not provided</span>
+									<?php endif; ?></td>
 								</tr>
 								<tr style="background:#fafafa;">
 									<td style="padding:10px 14px;border:1px solid #e0e0e0;font-weight:600;color:#424242;">Phone</td>
