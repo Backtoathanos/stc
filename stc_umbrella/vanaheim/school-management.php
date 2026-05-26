@@ -1,7 +1,12 @@
 <?php
-session_start();
+if (!ob_get_level()) {
+	ob_start();
+}
+if (session_status() === PHP_SESSION_NONE) {
+	session_start();
+}
 date_default_timezone_set('Asia/Kolkata');
-include "../../MCU/obdb.php";
+include __DIR__ . "/../../MCU/obdb.php";
 /*------------------------------------------------------------------------------------------------*/
 /*---------------------------------------For School Canteen --------------------------------------*/
 /*------------------------------------------------------------------------------------------------*/
@@ -173,6 +178,468 @@ class Yggdrasil extends tesseract{
 			}
 		}
 		return $odin;
+	}
+
+	private function stc_school_student_csv_headers(){
+		return array(
+			'student_id',
+			'first_name',
+			'last_name',
+			'dob',
+			'gender',
+			'blood_group',
+			'email',
+			'contact',
+			'address',
+			'religion',
+			'admission_date',
+			'classroom_id',
+			'parent_guardian_name',
+			'remarks'
+		);
+	}
+
+	private function stc_school_student_csv_key($value){
+		$key = strtolower(trim((string) $value));
+		$key = preg_replace('/^\xEF\xBB\xBF/', '', $key);
+		$key = preg_replace('/[^a-z0-9]+/', '_', $key);
+		$key = trim($key, '_');
+		$aliases = array(
+			'studentid' => 'student_id',
+			'student_id_no' => 'student_id',
+			'student_admission_no' => 'student_id',
+			'student_admission_number' => 'student_id',
+			'student_admission_id' => 'student_id',
+			'admission_id' => 'student_id',
+			'firstname' => 'first_name',
+			'student_first_name' => 'first_name',
+			'lastname' => 'last_name',
+			'student_last_name' => 'last_name',
+			'date_of_birth' => 'dob',
+			'student_dob' => 'dob',
+			'bloodgroup' => 'blood_group',
+			'student_blood_group' => 'blood_group',
+			'mobile' => 'contact',
+			'phone' => 'contact',
+			'contact_no' => 'contact',
+			'contact_number' => 'contact',
+			'mobile_phone' => 'contact',
+			'admissiondate' => 'admission_date',
+			'class_id' => 'classroom_id',
+			'classroom' => 'classroom_id',
+			'class' => 'classroom_title',
+			'class_title' => 'classroom_title',
+			'guardian_name' => 'parent_guardian_name',
+			'parent_name' => 'parent_guardian_name',
+			'parent_guardian' => 'parent_guardian_name',
+			'parentguardian_name' => 'parent_guardian_name',
+			'parent_guardian_full_name' => 'parent_guardian_name',
+			'parent_guardian_fullname' => 'parent_guardian_name'
+		);
+		return isset($aliases[$key]) ? $aliases[$key] : $key;
+	}
+
+	private function stc_school_student_csv_date($value){
+		$value = trim((string) $value);
+		if($value === ''){
+			return '';
+		}
+		if(is_numeric($value) && (float) $value > 20000 && (float) $value < 70000){
+			return date('Y-m-d', strtotime('1899-12-30 +'.(int) floor((float) $value).' days'));
+		}
+		$value = str_replace('/', '-', $value);
+		if(preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)){
+			return $value;
+		}
+		if(preg_match('/^(\d{2})-(\d{2})-(\d{4})$/', $value, $m)){
+			return $m[3].'-'.$m[2].'-'.$m[1];
+		}
+		$time = strtotime($value);
+		return $time ? date('Y-m-d', $time) : $value;
+	}
+
+	private function stc_school_student_csv_gender($value){
+		$value = strtolower(trim((string) $value));
+		return (strpos($value, 'f') === 0) ? 'Female' : 'Male';
+	}
+
+	private function stc_school_student_csv_blood_group($value){
+		$value = trim((string) $value);
+		if($value === ''){
+			return '0';
+		}
+		$key = strtolower(str_replace(array(' ', '-'), array('_', '_'), $value));
+		$map = array(
+			'0' => '0',
+			'a+' => 'a_positive',
+			'a_positive' => 'a_positive',
+			'a-' => 'a_negative',
+			'a_negative' => 'a_negative',
+			'b+' => 'b_positive',
+			'b_positive' => 'b_positive',
+			'b-' => 'b_negative',
+			'b_negative' => 'b_negative',
+			'o+' => 'o_positive',
+			'o_positive' => 'o_positive',
+			'o-' => 'o_negative',
+			'o_negative' => 'o_negative',
+			'ab+' => 'ab_positive',
+			'ab_positive' => 'ab_positive',
+			'ab-' => 'ab_negative',
+			'ab_negative' => 'ab_negative'
+		);
+		return isset($map[$key]) ? $map[$key] : $value;
+	}
+
+	private function stc_school_student_classroom_id($classroom_id, $classroom_title = ''){
+		$classroom_id = trim((string) $classroom_id);
+		if($classroom_id !== '' && ctype_digit($classroom_id)){
+			return $classroom_id;
+		}
+		$classroom_title = trim((string) $classroom_title);
+		if($classroom_title === ''){
+			return '0';
+		}
+		$classroom_title_esc = mysqli_real_escape_string($this->stc_dbs, $classroom_title);
+		$class_qry = mysqli_query($this->stc_dbs, "
+			SELECT `stc_school_class_id`
+			FROM `stc_school_class`
+			WHERE `stc_school_class_title`='".$classroom_title_esc."'
+			   OR `stc_school_class_classid`='".$classroom_title_esc."'
+			LIMIT 1
+		");
+		if($class_qry && mysqli_num_rows($class_qry)>0){
+			$class_row = mysqli_fetch_assoc($class_qry);
+			return (string) $class_row['stc_school_class_id'];
+		}
+		return '0';
+	}
+
+	private function stc_school_student_sample_rows(){
+		return array(
+			$this->stc_school_student_csv_headers(),
+			array(
+				'STU-1001',
+				'Aarav',
+				'Kumar',
+				'2012-04-15',
+				'Male',
+				'a_positive',
+				'aarav.parent@example.com',
+				'9876543210',
+				'Sample address',
+				'Hindu',
+				'2026-04-01',
+				'1',
+				'Rajesh Kumar',
+				'Sample row - replace before upload'
+			)
+		);
+	}
+
+	private function stc_school_student_xlsx_xml($value){
+		return htmlspecialchars((string) $value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
+	}
+
+	private function stc_school_student_xlsx_col($idx){
+		$idx = (int) $idx;
+		$col = '';
+		while($idx > 0){
+			$idx--;
+			$col = chr(65 + ($idx % 26)).$col;
+			$idx = (int) floor($idx / 26);
+		}
+		return $col;
+	}
+
+	private function stc_school_student_xlsx_col_index($col){
+		$col = strtoupper((string) $col);
+		$n = 0;
+		for($i = 0; $i < strlen($col); $i++){
+			$n = ($n * 26) + (ord($col[$i]) - 64);
+		}
+		return max(1, $n);
+	}
+
+	private function stc_school_student_xlsx_sheet_xml(array $rows, array &$shared_strings){
+		$last_col = $this->stc_school_student_xlsx_col(count($rows[0]));
+		$last_row = count($rows);
+		$xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+			.'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+			.'<dimension ref="A1:'.$last_col.$last_row.'"/>'
+			.'<sheetViews><sheetView tabSelected="1" workbookViewId="0"/></sheetViews><sheetFormatPr defaultRowHeight="15"/><sheetData>';
+		foreach($rows as $ridx => $row){
+			$row_num = $ridx + 1;
+			$xml .= '<row r="'.$row_num.'">';
+			foreach(array_values($row) as $cidx => $value){
+				$cell = $this->stc_school_student_xlsx_col($cidx + 1).$row_num;
+				$shared_strings[] = (string) $value;
+				$xml .= '<c r="'.$cell.'" t="s"><v>'.(count($shared_strings) - 1).'</v></c>';
+			}
+			$xml .= '</row>';
+		}
+		return $xml.'</sheetData><pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/></worksheet>';
+	}
+
+	private function stc_school_student_xlsx_shared_strings_xml(array $shared_strings){
+		$xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+			.'<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="'.count($shared_strings).'" uniqueCount="'.count($shared_strings).'">';
+		foreach($shared_strings as $value){
+			$xml .= '<si><t>'.$this->stc_school_student_xlsx_xml($value).'</t></si>';
+		}
+		return $xml.'</sst>';
+	}
+
+	public function stc_download_student_sample_xlsx(){
+		$xlsx_base64 = <<<'XLSX'
+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
+XLSX;
+		$xlsx_bytes = base64_decode(preg_replace('/\s+/', '', $xlsx_base64));
+		while(ob_get_level() > 0){ ob_end_clean(); }
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment; filename="student-upload-sample.xlsx"');
+		header('Content-Length: '.strlen($xlsx_bytes));
+		header('Pragma: no-cache');
+		header('Expires: 0');
+		echo $xlsx_bytes;
+		exit;
+	}
+
+	private function stc_school_student_import_rows(array $sheet_rows){
+		$result = array(
+			'status' => 'failed',
+			'message' => 'Could not import student file.',
+			'inserted' => 0,
+			'duplicates' => 0,
+			'failed' => 0,
+			'details' => array()
+		);
+		$required = array('student_id', 'first_name', 'last_name', 'email', 'contact', 'parent_guardian_name');
+		$raw_header = array();
+		$header_idx = -1;
+		foreach($sheet_rows as $idx => $possible_header){
+			$norm = array();
+			foreach($possible_header as $h){
+				$norm[] = $this->stc_school_student_csv_key($h);
+			}
+			$match_count = 0;
+			foreach($required as $key){
+				if(in_array($key, $norm, true)){
+					$match_count++;
+				}
+			}
+			if($match_count >= 3){
+				$raw_header = $possible_header;
+				$header_idx = $idx;
+				break;
+			}
+		}
+		if(!$raw_header){
+			$result['message'] = 'Spreadsheet header row is missing.';
+			return $result;
+		}
+		$sheet_rows = array_slice($sheet_rows, $header_idx + 1);
+		$headers = array();
+		foreach($raw_header as $h){
+			$headers[] = $this->stc_school_student_csv_key($h);
+		}
+		$missing = array();
+		foreach($required as $key){
+			if(!in_array($key, $headers, true)){
+				$missing[] = $key;
+			}
+		}
+		if(!empty($missing)){
+			$result['message'] = 'Missing required columns: '.implode(', ', $missing).'.';
+			return $result;
+		}
+		$row_no = 1;
+		foreach($sheet_rows as $row){
+			$row_no++;
+			$joined = trim(implode('', array_map('trim', $row)));
+			if($joined === ''){
+				continue;
+			}
+			$data = array();
+			foreach($headers as $idx => $key){
+				if($key !== ''){
+					$data[$key] = isset($row[$idx]) ? trim((string) $row[$idx]) : '';
+				}
+			}
+			$blank_required = array();
+			foreach($required as $key){
+				if(trim((string) ($data[$key] ?? '')) === ''){
+					$blank_required[] = $key;
+				}
+			}
+			if(!empty($blank_required)){
+				$result['failed']++;
+				if(count($result['details']) < 10){
+					$result['details'][] = 'Row '.$row_no.': missing '.implode(', ', $blank_required).'.';
+				}
+				continue;
+			}
+			$save = $this->stc_save_school_student(
+				$data['student_id'] ?? '',
+				$data['first_name'] ?? '',
+				$data['last_name'] ?? '',
+				$this->stc_school_student_csv_date($data['dob'] ?? ''),
+				$this->stc_school_student_csv_gender($data['gender'] ?? ''),
+				$this->stc_school_student_csv_blood_group($data['blood_group'] ?? ''),
+				$data['email'] ?? '',
+				$data['contact'] ?? '',
+				$data['address'] ?? '',
+				$data['religion'] ?? '',
+				$this->stc_school_student_csv_date($data['admission_date'] ?? ''),
+				$this->stc_school_student_classroom_id($data['classroom_id'] ?? '', $data['classroom_title'] ?? ''),
+				$data['parent_guardian_name'] ?? '',
+				$data['remarks'] ?? ''
+			);
+			if($save === 'success'){
+				$result['inserted']++;
+			}elseif($save === 'duplicate'){
+				$result['duplicates']++;
+			}else{
+				$result['failed']++;
+				if(count($result['details']) < 10){
+					$result['details'][] = 'Row '.$row_no.': could not save student.';
+				}
+			}
+		}
+		$result['status'] = 'success';
+		$result['message'] = 'Student import complete.';
+		return $result;
+	}
+
+	public function stc_import_student_csv($file){
+		if(!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])){
+			return array('status' => 'failed', 'message' => 'Please choose a student import file.', 'inserted' => 0, 'duplicates' => 0, 'failed' => 0, 'details' => array());
+		}
+		$handle = fopen($file['tmp_name'], 'r');
+		if(!$handle){
+			return array('status' => 'failed', 'message' => 'Could not read uploaded file.', 'inserted' => 0, 'duplicates' => 0, 'failed' => 0, 'details' => array());
+		}
+		$rows = array();
+		while(($row = fgetcsv($handle)) !== false){
+			$rows[] = $row;
+		}
+		fclose($handle);
+		return $this->stc_school_student_import_rows($rows);
+	}
+
+	private function stc_school_student_xlsx_cell_text_from_xml($cell_xml, $attrs, array $shared_strings){
+		$type = '';
+		if(preg_match('/\bt="([^"]*)"/', $attrs, $tm)){
+			$type = (string) $tm[1];
+		}
+		if($type === 's'){
+			$val = '';
+			if(preg_match('/<[^:>]*(?::)?v[^>]*>(.*?)<\/[^:>]*(?::)?v>/s', $cell_xml, $m)){
+				$val = html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
+			}
+			return isset($shared_strings[(int) $val]) ? $shared_strings[(int) $val] : '';
+		}
+		if($type === 'inlineStr'){
+			$text = '';
+			if(preg_match_all('/<[^:>]*(?::)?t\b[^>]*>(.*?)<\/[^:>]*(?::)?t>/s', $cell_xml, $matches)){
+				foreach($matches[1] as $part){
+					$text .= html_entity_decode(strip_tags($part), ENT_QUOTES, 'UTF-8');
+				}
+				return $text;
+			}
+			return trim(strip_tags($cell_xml));
+		}
+		if(preg_match('/<[^:>]*(?::)?v[^>]*>(.*?)<\/[^:>]*(?::)?v>/s', $cell_xml, $m)){
+			return html_entity_decode($m[1], ENT_QUOTES, 'UTF-8');
+		}
+		return '';
+	}
+
+	public function stc_import_student_xlsx($file){
+		if(!class_exists('ZipArchive') || !function_exists('simplexml_load_string')){
+			return array('status' => 'failed', 'message' => 'XLSX upload requires PHP Zip and SimpleXML extensions.', 'inserted' => 0, 'duplicates' => 0, 'failed' => 0, 'details' => array());
+		}
+		$zip = new ZipArchive();
+		if($zip->open($file['tmp_name']) !== true){
+			return array('status' => 'failed', 'message' => 'Could not open XLSX file.', 'inserted' => 0, 'duplicates' => 0, 'failed' => 0, 'details' => array());
+		}
+		$shared_strings = array();
+		$shared_xml = $zip->getFromName('xl/sharedStrings.xml');
+		if($shared_xml !== false && preg_match_all('/<[^:>]*(?::)?si\b[^>]*>(.*?)<\/[^:>]*(?::)?si>/s', $shared_xml, $sis)){
+			foreach($sis[1] as $si){
+				$text = '';
+				if(preg_match_all('/<[^:>]*(?::)?t\b[^>]*>(.*?)<\/[^:>]*(?::)?t>/s', $si, $ts)){
+					foreach($ts[1] as $t){
+						$text .= html_entity_decode(strip_tags($t), ENT_QUOTES, 'UTF-8');
+					}
+				}
+				$shared_strings[] = $text;
+			}
+		}
+		$sheet_xml = $zip->getFromName('xl/worksheets/sheet1.xml');
+		if($sheet_xml === false){
+			for($i = 0; $i < $zip->numFiles; $i++){
+				$name = $zip->getNameIndex($i);
+				if(strpos($name, 'xl/worksheets/') === 0 && substr($name, -4) === '.xml'){
+					$sheet_xml = $zip->getFromName($name);
+					break;
+				}
+			}
+		}
+		$zip->close();
+		if($sheet_xml === false){
+			return array('status' => 'failed', 'message' => 'No worksheet found in XLSX file.', 'inserted' => 0, 'duplicates' => 0, 'failed' => 0, 'details' => array());
+		}
+		$rows = array();
+		if(!preg_match_all('/<[^:>]*(?::)?row\b[^>]*>(.*?)<\/[^:>]*(?::)?row>/s', $sheet_xml, $row_matches)){
+			return array('status' => 'failed', 'message' => 'No rows found in worksheet.', 'inserted' => 0, 'duplicates' => 0, 'failed' => 0, 'details' => array());
+		}
+		foreach($row_matches[1] as $row_xml){
+			$cells = array();
+			$max = 0;
+			$auto_idx = 1;
+			if(!preg_match_all('/<[^:>]*(?::)?c\b([^>]*)>(.*?)<\/[^:>]*(?::)?c>/s', $row_xml, $cell_matches, PREG_SET_ORDER)){
+				continue;
+			}
+			foreach($cell_matches as $cell_match){
+				$attrs = (string) $cell_match[1];
+				$cell_xml = (string) $cell_match[2];
+				$idx = $auto_idx;
+				if(preg_match('/\br="([^"]+)"/', $attrs, $rm)){
+					$col = preg_replace('/\d+/', '', $rm[1]);
+					$idx = $this->stc_school_student_xlsx_col_index($col);
+				}
+				$cells[$idx - 1] = $this->stc_school_student_xlsx_cell_text_from_xml($cell_xml, $attrs, $shared_strings);
+				$max = max($max, $idx);
+				$auto_idx = $idx + 1;
+			}
+			$out = array();
+			for($i = 0; $i < $max; $i++){
+				$out[] = isset($cells[$i]) ? $cells[$i] : '';
+			}
+			$rows[] = $out;
+		}
+		return $this->stc_school_student_import_rows($rows);
+	}
+
+	public function stc_import_student_spreadsheet($file){
+		if(!isset($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])){
+			return array('status' => 'failed', 'message' => 'Please choose a student import file.', 'inserted' => 0, 'duplicates' => 0, 'failed' => 0, 'details' => array());
+		}
+		if((int) ($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK){
+			return array('status' => 'failed', 'message' => 'Upload failed. Please choose the file again.', 'inserted' => 0, 'duplicates' => 0, 'failed' => 0, 'details' => array());
+		}
+		if((int) ($file['size'] ?? 0) > 5242880){
+			return array('status' => 'failed', 'message' => 'Upload file is too large. Maximum size is 5 MB.', 'inserted' => 0, 'duplicates' => 0, 'failed' => 0, 'details' => array());
+		}
+		$ext = strtolower(pathinfo((string) ($file['name'] ?? ''), PATHINFO_EXTENSION));
+		if($ext === 'xlsx'){
+			return $this->stc_import_student_xlsx($file);
+		}
+		if(in_array($ext, array('csv', 'txt'), true)){
+			return $this->stc_import_student_csv($file);
+		}
+		return array('status' => 'failed', 'message' => 'Please upload an XLSX file.', 'inserted' => 0, 'duplicates' => 0, 'failed' => 0, 'details' => array());
 	}
 
 	public function stc_save_school_subject($stcschoolmanagementsubjectid, $stcschoolmanagementsubjecttitle, $stcschoolmanagementsubjectdetails){
@@ -1039,24 +1506,36 @@ class Yggdrasil extends tesseract{
 		$start_rec = (($page - 1) * $per_page) + 1;
 		$end_rec = min($total_records, $page * $per_page);
 		$kind_esc = htmlspecialchars((string) $kind, ENT_QUOTES, 'UTF-8');
-		$html = '<nav class="school-rec-pagination-nav" aria-label="'.$kind_esc.' pagination"><ul class="pagination pagination-sm justify-content-end mb-1 school-rec-pagination" data-pagination-for="'.$kind_esc.'">';
+		$html = '<nav class="school-rec-pagination-nav" aria-label="'.$kind_esc.' pagination">';
+		$html .= '<div class="school-rec-pagination-shell">';
+		$html .= '<div class="school-rec-pagination-info"><span>Showing <strong>'.$start_rec.'–'.$end_rec.'</strong> of <strong>'.$total_records.'</strong></span><span>Page '.$page.' / '.$total_pages.'</span></div>';
+		$html .= '<ul class="pagination pagination-sm school-rec-pagination" data-pagination-for="'.$kind_esc.'">';
+		$html .= '<li class="page-item'.($page <= 1 ? ' disabled' : '').'"><a class="page-link" href="#" data-page="1"'.($page <= 1 ? ' aria-disabled="true"' : '').' aria-label="First page">&laquo;</a></li>';
 		$html .= '<li class="page-item'.($page <= 1 ? ' disabled' : '').'"><a class="page-link" href="#" data-page="'.$prev.'"'.($page <= 1 ? ' aria-disabled="true"' : '').'>Prev</a></li>';
-		$window = 7;
+		$window = 5;
 		$start = max(1, $page - (int) floor($window / 2));
 		$end = min($total_pages, $start + $window - 1);
 		$start = max(1, $end - $window + 1);
+		if ($start > 1){
+			$html .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+		}
 		for ($i = $start; $i <= $end; $i++){
 			$active = ($i === $page) ? ' active' : '';
 			$html .= '<li class="page-item'.$active.'"><a class="page-link" href="#" data-page="'.$i.'">'.$i.'</a></li>';
 		}
+		if ($end < $total_pages){
+			$html .= '<li class="page-item disabled"><span class="page-link">...</span></li>';
+		}
 		$html .= '<li class="page-item'.($page >= $total_pages ? ' disabled' : '').'"><a class="page-link" href="#" data-page="'.$next.'"'.($page >= $total_pages ? ' aria-disabled="true"' : '').'>Next</a></li>';
-		$html .= '</ul>';
-		$html .= '<div class="small text-muted text-right school-rec-pagination-info mb-3">Showing '.$start_rec.'–'.$end_rec.' of '.$total_records.' (page '.$page.' / '.$total_pages.')</div></nav>';
+		$html .= '<li class="page-item'.($page >= $total_pages ? ' disabled' : '').'"><a class="page-link" href="#" data-page="'.$total_pages.'"'.($page >= $total_pages ? ' aria-disabled="true"' : '').' aria-label="Last page">&raquo;</a></li>';
+		$html .= '</ul></div></nav>';
 		return $html;
 	}
 
 	public function stc_call_records(){
 		$per_page = 25;
+		$student_per_page = (int) ($_POST['student_per_page'] ?? 25);
+		$student_per_page = in_array($student_per_page, [15, 25, 50], true) ? $student_per_page : 25;
 		$teacher_page = max(1, (int) ($_POST['teacher_page'] ?? 1));
 		$student_page = max(1, (int) ($_POST['student_page'] ?? 1));
 		$subject_page = max(1, (int) ($_POST['subject_page'] ?? 1));
@@ -1126,11 +1605,11 @@ class Yggdrasil extends tesseract{
 			".$s_where."
 		"));
 		$student_total = (int) ($scount_row['cnt'] ?? 0);
-		$student_pages = max(1, (int) ceil($student_total / $per_page));
+		$student_pages = max(1, (int) ceil($student_total / $student_per_page));
 		if ($student_page > $student_pages){
 			$student_page = $student_pages;
 		}
-		$s_offset = max(0, ($student_page - 1) * $per_page);
+		$s_offset = max(0, ($student_page - 1) * $student_per_page);
 
 		$subsearch_raw = trim((string) ($_POST['subject_search'] ?? ''));
 		$subsearch_esc = mysqli_real_escape_string($this->stc_dbs, $subsearch_raw);
@@ -1273,7 +1752,7 @@ class Yggdrasil extends tesseract{
 			    `stc_school_class_id`=`stc_school_student_classroomid`
 			".$s_where."
 			ORDER BY `stc_school_student_firstname` ASC
-			LIMIT ".(int) $s_offset.", ".(int) $t_limit."
+			LIMIT ".(int) $s_offset.", ".(int) $student_per_page."
 		");
 		$student_records='';
 		if($odinstudentqry && mysqli_num_rows($odinstudentqry)>0){
@@ -1397,7 +1876,7 @@ class Yggdrasil extends tesseract{
 		$odin['response_subject']=$subject_records;
 		$odin['response_class']=$class_records;
 		$odin['response_teacher_pagination']=$this->stc_school_mgmt_pagination_markup('teacher', $teacher_page, $teacher_total, $per_page);
-		$odin['response_student_pagination']=$this->stc_school_mgmt_pagination_markup('student', $student_page, $student_total, $per_page);
+		$odin['response_student_pagination']=$this->stc_school_mgmt_pagination_markup('student', $student_page, $student_total, $student_per_page);
 		$odin['response_subject_pagination']=$this->stc_school_mgmt_pagination_markup('subject', $subject_page, $subject_total, $per_page);
 		$odin['response_class_pagination']=$this->stc_school_mgmt_pagination_markup('classroom', $class_page, $class_total, $per_page);
 		return $odin;
@@ -1986,6 +2465,30 @@ class Yggdrasil extends tesseract{
 #<------------------------------------------------------------------------------------------>
 #<-----------------------------School School Obj Section----------------------------------->
 #<------------------------------------------------------------------------------------------>
+// download sample student import file
+if(isset($_GET['download_student_sample'])){
+	if(empty($_SESSION['stc_school_user_id'])){
+		header('Content-Type: text/plain; charset=UTF-8');
+		echo 'Session expired. Please sign in again.';
+		exit;
+	}
+	$valkyrie=new Yggdrasil();
+	$valkyrie->stc_download_student_sample_xlsx();
+}
+
+// upload student import file
+if(isset($_POST['stc_student_excel_upload_action'])){
+	header('Content-Type: application/json; charset=UTF-8');
+	if(empty($_SESSION['stc_school_user_id'])){
+		echo json_encode(array('status' => 'reload'));
+		exit;
+	}
+	$valkyrie=new Yggdrasil();
+	$out=$valkyrie->stc_import_student_spreadsheet($_FILES['student_excel_file'] ?? array());
+	echo json_encode($out);
+	exit;
+}
+
 // save teacher
 if(isset($_POST['save_teacheradd_action'])){
 	$out='';

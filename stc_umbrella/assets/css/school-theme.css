@@ -175,6 +175,51 @@ body.school-app .school-search-row {
   flex: 1 1 220px;
 }
 
+body.school-app .school-page-size-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.5rem 0.35rem 0.7rem;
+  border: 1px solid rgba(25, 40, 80, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 3px 12px rgba(22, 40, 80, 0.04);
+}
+
+body.school-app .school-page-size-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(43, 55, 120, 0.72);
+}
+
+body.school-app .school-page-size-select.form-control {
+  width: 72px;
+  height: 34px;
+  padding: 0.25rem 0.45rem;
+  margin: 0;
+  border-radius: 8px !important;
+}
+
+body.school-app .school-student-excel-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+body.school-app .school-student-excel-btn.btn {
+  margin: 0 !important;
+  border-radius: 8px !important;
+  padding: 0.48rem 0.78rem !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  white-space: nowrap;
+}
+
 body.school-app .school-table-wrap {
   width: 100%;
   overflow-x: auto;
@@ -651,15 +696,81 @@ body.school-app #stc-create-shedule .school-weekly-table-wrap .school-table-inne
 }
 
 /* Manage grids — server-backed pagination controls */
+body.school-app .school-rec-pagination-holder {
+  margin-top: 0.85rem;
+}
+
+body.school-app .school-rec-pagination-shell {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba(25, 40, 80, 0.08);
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.95), rgba(246, 248, 255, 0.92));
+  box-shadow: 0 6px 20px rgba(22, 40, 80, 0.05);
+}
+
 body.school-app .school-rec-pagination-nav .pagination {
   flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  margin: 0;
+}
+
+body.school-app .school-rec-pagination-nav .page-link {
+  min-width: 34px;
+  text-align: center;
+  border: 1px solid rgba(57, 73, 171, 0.14);
+  border-radius: 8px !important;
+  color: #3949ab;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(22, 40, 80, 0.04);
+}
+
+body.school-app .school-rec-pagination-nav .page-item.active .page-link {
+  color: #fff;
+  background: linear-gradient(60deg, #5c6bc0 0%, #3949ab 95%);
+  border-color: transparent;
+  box-shadow: 0 6px 14px rgba(57, 73, 171, 0.24);
 }
 
 body.school-app .school-rec-pagination-nav .page-item.disabled .page-link {
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.58;
+  color: #78909c;
+  background: #f5f7fb;
 }
 
 body.school-app .school-rec-pagination-info {
-  margin-top: 0.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #607086;
+}
+
+body.school-app .school-rec-pagination-info strong {
+  color: #303f75;
+  font-weight: 700;
+}
+
+@media (max-width: 575.98px) {
+  body.school-app .school-page-size-row {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  body.school-app .school-student-excel-row,
+  body.school-app .school-student-excel-btn.btn {
+    width: 100%;
+  }
+
+  body.school-app .school-rec-pagination-shell,
+  body.school-app .school-rec-pagination-nav .pagination {
+    justify-content: center;
+  }
 }

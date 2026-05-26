@@ -38,7 +38,7 @@
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"> -->
     <!-- CSS Files -->
     <link href="../assets/css/material-dashboard.css?v=2.1.2" rel="stylesheet" />
-    <link href="../assets/css/school-theme.css?v=6" rel="stylesheet" />
+    <link href="../assets/css/school-theme.css?v=8" rel="stylesheet" />
   </head>
 
   <body class="school-app">
@@ -132,6 +132,19 @@
                                     <button type="button" class="btn btn-primary btn-school-primary stc-school-show-stud-btn">Add student</button>
                                     <div class="school-search-row">
                                       <input id="studentsearch" type="text" class="form-control school-search-field" placeholder="Search students..." />
+                                    </div>
+                                    <div class="school-page-size-row">
+                                      <label for="studentPageLimit" class="school-page-size-label">Rows</label>
+                                      <select id="studentPageLimit" class="form-control school-page-size-select" aria-label="Students per page">
+                                        <option value="15">15</option>
+                                        <option value="25" selected>25</option>
+                                        <option value="50">50</option>
+                                      </select>
+                                    </div>
+                                    <div class="school-student-excel-row">
+                                      <a href="../vanaheim/school-management.php?download_student_sample=1" class="btn btn-info btn-sm school-student-excel-btn">Sample Excel</a>
+                                      <button type="button" class="btn btn-success btn-sm school-student-excel-btn stc-student-excel-upload-btn">Upload Excel</button>
+                                      <input id="studentExcelUpload" type="file" class="d-none" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
                                     </div>
                                   </div>
                                 </div>
@@ -1533,7 +1546,17 @@
     <!-- data show section -->
     <script>
       $(document).ready(function(){
-        var schoolRecPageState = { teacher_page: 1, student_page: 1, subject_page: 1, class_page: 1 };
+        var schoolRecPageState = { teacher_page: 1, student_page: 1, student_per_page: 25, subject_page: 1, class_page: 1 };
+
+        function schoolStudentUploadAlert(title, text, type) {
+          if (window.Swal && typeof window.Swal.fire === 'function') {
+            window.Swal.fire(title, text, type || 'info');
+          } else if (typeof window.swal === 'function') {
+            window.swal(title, text, type || 'info');
+          } else {
+            alert(title + (text ? "\n" + text : ""));
+          }
+        }
 
         /* Bootstrap's tab.js is not loaded on this page; toggle panes manually (Material Dashboard + BM-D only). */
         $(document).on('click', '.school-mgmt-header-tabs .nav-link[href^="#"]', function (e) {
@@ -1570,6 +1593,55 @@
         $("#studentsearch").on("keyup", function() {
           clearTimeout(window.__stc_mgmt_sttimer);
           window.__stc_mgmt_sttimer = setTimeout(function(){ call_records({student_page: 1}); }, 350);
+        });
+
+        $("#studentPageLimit").on("change", function() {
+          var perPage = parseInt($(this).val(), 10) || 25;
+          call_records({student_page: 1, student_per_page: perPage});
+        });
+
+        $(".stc-student-excel-upload-btn").on("click", function(e) {
+          e.preventDefault();
+          $("#studentExcelUpload").trigger("click");
+        });
+
+        $("#studentExcelUpload").on("change", function() {
+          var input = this;
+          if (!input.files || !input.files.length) return;
+
+          var formData = new FormData();
+          formData.append("stc_student_excel_upload_action", "1");
+          formData.append("student_excel_file", input.files[0]);
+
+          $.ajax({
+            url: "../vanaheim/school-management.php",
+            method: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "JSON",
+            success: function(response) {
+              input.value = "";
+              if (!response || response.status === "reload") {
+                window.location.reload();
+                return;
+              }
+              if (response.status !== "success") {
+                schoolStudentUploadAlert("Upload failed", response.message || "Could not upload student file.", "error");
+                return;
+              }
+              var msg = "Inserted: " + (response.inserted || 0) + ", duplicates: " + (response.duplicates || 0) + ", failed: " + (response.failed || 0) + ".";
+              if (response.details && response.details.length) {
+                msg += "\n\n" + response.details.slice(0, 6).join("\n");
+              }
+              schoolStudentUploadAlert("Student upload complete", msg, response.failed > 0 ? "warning" : "success");
+              call_records({student_page: 1});
+            },
+            error: function() {
+              input.value = "";
+              schoolStudentUploadAlert("Upload failed", "Could not reach server. Please try again.", "error");
+            }
+          });
         });
 
         $("#classsearch").on("keyup", function() {
@@ -1883,6 +1955,7 @@
               stc_load_record_action : 1,
               teacher_page : schoolRecPageState.teacher_page,
               student_page : schoolRecPageState.student_page,
+              student_per_page : schoolRecPageState.student_per_page,
               subject_page : schoolRecPageState.subject_page,
               class_page : schoolRecPageState.class_page,
               teacher_search : ($('#teachersearch').val()||'').trim(),
