@@ -1072,6 +1072,7 @@ if($_SESSION['stc_school_user_for']==2){
                             <tr>
                               <th class="text-center">Sl no</th>
                               <th class="text-center">Questions</th>
+                              <th class="text-center">Created date</th>
                             </tr>
                           </thead>
                           <tbody class="stc-show-student-syllabusquest-show">
@@ -1804,6 +1805,9 @@ if($_SESSION['stc_school_user_for']==2){
           var syll_id = $(this).val();
           var chapter_output = '<option value="NA">Select</option>';
           for (var i = 0; i < sy_syllabus[0].length; i++) {
+            if(sy_syllabus[0][i].stc_school_syllabus_chapter==""){
+              continue;
+            }
             chapter_output += '<option value="' + sy_syllabus[0][i].stc_school_syllabus_chapter + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_chapter + '</option>';
           }
           $('#chapter').html(chapter_output);
@@ -1813,6 +1817,9 @@ if($_SESSION['stc_school_user_for']==2){
           var syll_id = $(this).val();
           var lession_output = '<option value="NA">Select</option>';
           for (var i = 0; i < sy_syllabus[0].length; i++) {
+            if(sy_syllabus[0][i].stc_school_syllabus_lesson==""){
+              continue;
+            }
             lession_output += '<option value="' + sy_syllabus[0][i].stc_school_syllabus_lesson + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_lesson + '</option>';
           }
           $('#lession').html(lession_output);
@@ -1822,6 +1829,9 @@ if($_SESSION['stc_school_user_for']==2){
           var syll_id = $(this).val();
           var unit_output = '<option value="NA">Select</option>';
           for (var i = 0; i < sy_syllabus[0].length; i++) {
+            if(sy_syllabus[0][i].stc_school_syllabus_unit==""){
+              continue;
+            }
             unit_output += '<option value="' + sy_syllabus[0][i].stc_school_syllabus_unit + '" syll-id="' + sy_syllabus[0][i].stc_school_syllabus_id + '">' + sy_syllabus[0][i].stc_school_syllabus_unit + '</option>';
           }
           $('#unit-should-be').html(unit_output);
@@ -1832,6 +1842,9 @@ if($_SESSION['stc_school_user_for']==2){
           var cdate_output = '';
           for (var i = 0; i < sy_syllabus[0].length; i++) {
             if (syll_id == sy_syllabus[0][i].stc_school_syllabus_id) {
+              if(sy_syllabus[0][i].stc_school_syllabus_completedate==""){
+                continue;
+              }
               cdate_output = sy_syllabus[0][i].stc_school_syllabus_completedate;
             }
           }

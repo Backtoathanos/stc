@@ -1464,27 +1464,32 @@ XLSX;
 		$odin='';
 		$odinqry=mysqli_query($this->stc_dbs, "
 			SELECT
-				`stc_school_lecture_question_question`
+				`stc_school_lecture_question_question`,
+				`stc_school_lecture_question_createdate`
 			FROM
 				`stc_school_lecture_question`
 			WHERE
 				`stc_school_lecture_question_lectureid`='".mysqli_real_escape_string($this->stc_dbs, $question_id)."'
-			ORDER BY `stc_school_lecture_question_question` ASC
+			ORDER BY `stc_school_lecture_question_createdate` DESC, `stc_school_lecture_question_question` ASC
 		");
 		if(mysqli_num_rows($odinqry)>0){
 			$sl=0;
 			foreach($odinqry as $odinrow){
 				$sl++;
+				$createdate = !empty($odinrow['stc_school_lecture_question_createdate'])
+					? date('d-m-Y', strtotime($odinrow['stc_school_lecture_question_createdate']))
+					: '—';
 				$odin.='
 					<tr>
 						<td class="text-center">'.$sl.'</td>
 						<td>'.$odinrow['stc_school_lecture_question_question'].'</td>
+						<td class="text-center">'.$createdate.'</td>
 					</tr>
 				';
 			}
 		}else{
 			$odin.='
-				<tr><td colspan="4">No records found.</td></tr>
+				<tr><td colspan="3" class="text-center">No records found.</td></tr>
 			';
 		}
 		return $odin;
