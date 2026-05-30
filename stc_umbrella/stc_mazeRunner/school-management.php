@@ -1931,7 +1931,8 @@
              var response=data.trim();
              if(response=="success"){
               alert("Record saved successfully.");
-              // window.location.reload();
+              $('.stc-school-showschedule-res').modal('hide');
+              load_schedule();
              }else if(response=="reload"){
               window.location.reload();
              }else if(response=="empty"){
@@ -2129,7 +2130,41 @@
           e.preventDefault();
           $('.stc-school-showschedule-res').modal('show');
           load_schedule();
-        }); 
+        });
+
+        $(document).on('click', '.stc-add-schedule-from-na', function(e){
+          e.preventDefault();
+          var $slot = $(this);
+          var classId = $slot.data('class-id');
+          var day = $slot.data('day');
+          var period = $slot.data('period');
+
+          if (day && day !== 'Select') {
+            $('.stcschoolscheduleday').val(day);
+          } else {
+            var weekDay = $('.stc-schedule-week').val();
+            if (weekDay && weekDay !== 'Select') {
+              $('.stcschoolscheduleday').val(weekDay);
+            }
+          }
+
+          if (classId) {
+            $('.stcschoolscheduleclass').val(String(classId));
+          }
+
+          if (period) {
+            $('.stcschoolscheduleperiod').val(String(period));
+          }
+
+          $('.stc-school-showschedule-res').modal('show');
+        });
+
+        $(document).on('keydown', '.stc-add-schedule-from-na', function(e){
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            $(this).trigger('click');
+          }
+        });
 
 
         $(document).on('click', '.stc-class-upd-btn-show', function(e){

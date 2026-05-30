@@ -1989,7 +1989,7 @@ XLSX;
 							</td>
 						';
 	    		} else {
-	    			$data.='<td class="text-center schedule-show-na schedule-slot-empty"><span class="schedule-na-mark">NA</span></td>';
+	    			$data.='<td class="text-center schedule-show-na schedule-slot-empty stc-add-schedule-from-na" title="Add schedule for this slot" data-class-id="'.(int)$class_id.'" data-day="'.htmlspecialchars($day, ENT_QUOTES, 'UTF-8').'" data-period="'.(int)$routinecounter.'" role="button" tabindex="0"><div class="schedule-na-slot"><span class="schedule-na-mark">NA</span><span class="schedule-na-add-btn" aria-hidden="true"><i class="fa fa-plus"></i></span></div></td>';
 	    		}
 	    	}
 
