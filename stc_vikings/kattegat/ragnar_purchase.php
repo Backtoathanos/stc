@@ -1,6 +1,7 @@
 <?php
 include "../../MCU/obdb.php";
 session_start();
+require_once __DIR__ . '/includes/vikings_session_defaults.php';
 class ragnarPurchaseAdd extends tesseract{
 	// call vendor on po page
 	public function stc_call_vendor(){

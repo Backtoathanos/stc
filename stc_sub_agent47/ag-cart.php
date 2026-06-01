@@ -1,16 +1,4 @@
-<?php  
-session_start(); 
-if(isset($_SESSION["stc_agent_sub_id"])){ 
-    // if(time()-$_SESSION["login_time_stamp"] >600)   
-    // { 
-    //     session_unset(); 
-    //     session_destroy(); 
-    //     header("Location:index.html"); 
-    // } 
-}else{ 
-    header("Location:index.html"); 
-} 
-?> 
+<?php require_once __DIR__ . '/includes/agent_auth.php'; ?> 
 <!doctype html>
 <html lang="en">
 

@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../includes/agent_session_defaults.php';
 date_default_timezone_set('Asia/Kolkata');
 include "../../MCU/obdb.php";
 /*------------------------------------------------------------------------------------------------*/
@@ -175,11 +176,26 @@ class transformers extends tesseract{
 
 	// call job variites
 	public function stc_call_job_varities($job_type){	
-		$job_type=implode(',', $job_type);
+		if (is_array($job_type)) {
+			$parts = array_filter(array_map('trim', $job_type), 'strlen');
+		} else {
+			$parts = array_filter(array_map('trim', explode(',', (string) $job_type)), 'strlen');
+		}
+		if (empty($parts)) {
+			return "<option value='NA' selected>Select Job Varieties</option>";
+		}
+		$escaped = array();
+		foreach ($parts as $part) {
+			$escaped[] = "'" . mysqli_real_escape_string($this->stc_dbs, $part) . "'";
+		}
+		$job_type_sql = implode(',', $escaped);
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
-			SELECT DISTINCT `stc_status_down_list_job_type_id`,`stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_title` IN (".$job_type.") ORDER BY `stc_status_down_list_job_type_sub_title` ASC
+			SELECT DISTINCT `stc_status_down_list_job_type_id`,`stc_status_down_list_job_type_sub_title` FROM `stc_status_down_list_job_type` WHERE `stc_status_down_list_job_type_title` IN (".$job_type_sql.") ORDER BY `stc_status_down_list_job_type_sub_title` ASC
 		");
 		$optimusprime='<option value="NA" selected>Select Job Varieties</option>';
+		if ($optimusprimequery === false) {
+			return "<option value='NA' selected>No Job Varieties Found!!</option>";
+		}
 		$do_action=mysqli_num_rows($optimusprimequery);
 		if($do_action == 0){
 			$optimusprime = "<option value='NA' selected>No Job Varieties Found!!</option>";
@@ -197,12 +213,6 @@ class transformers extends tesseract{
 	public function stc_std_save($stc_slocation, $stc_location, $stc_dept, $stc_area, $stc_j_plannning, $reason, $eq_type, $action_status, $creator_details){
 		$optimusprime='';
 		$date=date("Y-m-d H:i:s");
-		$tools_req='';
-		if(!empty($stc_tools_req)){
-			foreach($stc_tools_req as $stc_tools_row){
-				$tools_req.=$stc_tools_row.', ';
-			}
-		}
 		$status="Running";
 		if($stc_j_plannning=="BREAKDOWN MAINTENANCE" || $action_status==2){
 			$status="Down";
@@ -1195,7 +1205,7 @@ if(isset($_POST['call_location'])){
 
 // call departemnt
 if(isset($_POST['call_department'])){
-	$loca_id=$_POST['loca_id'];
+	$loca_id = $_POST['loca_id'] ?? '';
 	$metabots=new transformers();
 	$opmetabots=$metabots->stc_call_deptloc($loca_id);
 	echo json_encode($opmetabots);
@@ -1208,7 +1218,7 @@ if(isset($_POST['call_department'])){
 // 	echo $opmetabots;
 // }
 if(isset($_POST['stc_std_perticular_jvarities_hit'])){
-	$jvarites=$_POST['jvarities'];
+	$jvarites = $_POST['jvarities'] ?? '';
 	$metabots=new transformers();
 	$opmetabots=$metabots->stc_call_jvarities($jvarites);
 	echo json_encode($opmetabots);
@@ -1224,8 +1234,8 @@ if(isset($_POST['stc_std_perticular_jvarities_hit'])){
 
 // call area
 if(isset($_POST['call_area'])){
-	$loca_id=$_POST['loca_id'];
-	$loca_sub_name=$_POST['loca_sub_name'];
+	$loca_id = $_POST['loca_id'] ?? '';
+	$loca_sub_name = $_POST['loca_sub_name'] ?? '';
 	$metabots=new transformers();
 	$opmetabots=$metabots->stc_call_area($loca_id, $loca_sub_name);
 	echo $opmetabots;
@@ -1233,9 +1243,9 @@ if(isset($_POST['call_area'])){
 
 // call equipment type
 if(isset($_POST['call_eq_type'])){
-	$loca_id=$_POST['loca_id'];
-	$area_name=$_POST['area_name'];
-	$department=$_POST['department'];
+	$loca_id = $_POST['loca_id'] ?? '';
+	$area_name = $_POST['area_name'] ?? '';
+	$department = $_POST['department'] ?? '';
 	$metabots=new transformers();
 	$opmetabots=$metabots->stc_call_eq_type($loca_id, $area_name, $department);
 	echo $opmetabots;
@@ -1243,9 +1253,9 @@ if(isset($_POST['call_eq_type'])){
 
 // call equipment number
 if(isset($_POST['call_eq_number'])){
-	$loca_id=$_POST['loca_id'];
-	$eq_type_id=$_POST['eq_type_id'];
-	$eq_type_nu=$_POST['eq_type_nu'];
+	$loca_id = $_POST['loca_id'] ?? '';
+	$eq_type_id = $_POST['eq_type_id'] ?? '';
+	$eq_type_nu = $_POST['eq_type_nu'] ?? '';
 	$metabots=new transformers();
 	$opmetabots=$metabots->stc_call_eq_number($loca_id, $eq_type_id, $eq_type_nu);
 	echo $opmetabots;
@@ -1253,7 +1263,7 @@ if(isset($_POST['call_eq_number'])){
 
 // call job varities
 if(isset($_POST['call_j_varities'])){
-	$job_type=$_POST['job_type'];
+	$job_type = $_POST['job_type'] ?? '';
 	$metabots=new transformers();
 	$opmetabots=$metabots->stc_call_job_varities($job_type);
 	echo $opmetabots;
@@ -1343,8 +1353,8 @@ if(isset($_POST['stc_update_std_hit'])){
 
 // tool requisition
 if(isset($_POST['stc_update_std_toolsreq_hit'])){
-	$std_id=$_POST['std_id'];
-	$tools_req=$_POST['tools_req'];
+	$std_id = $_POST['std_id'] ?? '';
+	$tools_req = $_POST['tools_req'] ?? array();
 
 	$metabots=new transformers();
 	if(empty($_SESSION['stc_agent_sub_id'])){

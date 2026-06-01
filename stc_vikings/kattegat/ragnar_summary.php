@@ -1,6 +1,7 @@
 <?php
 include "../../MCU/obdb.php";
 session_start();
+require_once __DIR__ . '/includes/vikings_session_defaults.php';
 // reports merchant ledger
 class ragnarSummary extends tesseract{
    // safety

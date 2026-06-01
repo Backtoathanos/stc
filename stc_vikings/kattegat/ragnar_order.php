@@ -1,6 +1,7 @@
 <?php
 include "../../MCU/obdb.php";
 session_start();
+require_once __DIR__ . '/includes/vikings_session_defaults.php';
 // call order class
 class ragnarOrderView extends tesseract{
 	// call customer on po page
@@ -1007,6 +1008,7 @@ class ragnarRequisitionView extends tesseract{
 			ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
 			WHERE `stc_requisition_combiner_req_comb_id`='".mysqli_real_escape_string($this->stc_dbs, $stc_req_comb_id)."'
 		");
+		if ($ivarsiteqry && mysqli_num_rows($ivarsiteqry) > 0) {
 		foreach($ivarsiteqry as $ivarsiterow){
 			$ivar.='
 				<tr>
@@ -1162,6 +1164,7 @@ class ragnarRequisitionView extends tesseract{
 						</tr>
 				';
 			}
+		}
 		}
 		$ivar.='
 			</table>
@@ -1508,7 +1511,7 @@ class ragnarRequisitionView extends tesseract{
 			".$category.$subcategory.$productname.$endfilterqry
 		);
 
-		if(mysqli_num_rows($ivarfilterquery)>0){
+		if($ivarfilterquery && mysqli_num_rows($ivarfilterquery)>0){
 			foreach($ivarfilterquery as $filterrow){$loki_findratefrompo=mysqli_query($this->stc_dbs, "
 					SELECT * FROM `stc_purchase_product_items` 
 					WHERE `stc_purchase_product_items_product_id`='".$filterrow["stc_product_id"]."' 
@@ -1986,7 +1989,7 @@ class ragnarRequisitionView extends tesseract{
 					'".mysqli_real_escape_string($this->stc_dbs, $title)."',
 					'".mysqli_real_escape_string($this->stc_dbs, $message)."',
 					'1',
-					'".$_SESSION['stc_agent_id']."'
+					'".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_empl_id'])."'
 				)
 			");
 			$odin="Requisition Item Type, Quantity & Unit Updated Successfully. Reload to see.";
@@ -3287,7 +3290,7 @@ class ragnarRequisitionPertView extends tesseract{
 			".$category.$subcategory.$productname.$endfilterqry
 		);
 
-		if(mysqli_num_rows($ivarfilterquery)>0){
+		if($ivarfilterquery && mysqli_num_rows($ivarfilterquery)>0){
 			foreach($ivarfilterquery as $filterrow){$loki_findratefrompo=mysqli_query($this->stc_dbs, "
 					SELECT * FROM `stc_purchase_product_items` 
 					WHERE `stc_purchase_product_items_product_id`='".$filterrow["stc_product_id"]."' 

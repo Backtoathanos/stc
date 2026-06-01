@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../includes/agent_session_defaults.php';
 date_default_timezone_set('Asia/Kolkata');
 include "../../MCU/obdb.php";
 /*------------------------------------------------------------------------------------------------*/
@@ -31,11 +32,11 @@ class prime extends tesseract{
 	
 		if (mysqli_num_rows($checkbumblebee) > 0) {
 			$user_details = mysqli_fetch_assoc($checkbumblebee);
-			$_SESSION['stc_agent_sub_id'] = $user_details['stc_cust_pro_supervisor_id'];
-			$_SESSION['stc_agent_sub_name'] = $user_details['stc_cust_pro_supervisor_fullname'];
-			$_SESSION['stc_agent_sub_cont'] = $user_details['stc_cust_pro_supervisor_contact'];
-			$_SESSION['stc_agent_sub_category'] = $user_details['stc_cust_pro_supervisor_category'];
-			$_SESSION['stc_agent_sub_image'] = $user_details['stc_cust_pro_supervisor_image'];
+			$_SESSION['stc_agent_sub_id'] = $user_details['stc_cust_pro_supervisor_id'] ?? '';
+			$_SESSION['stc_agent_sub_name'] = $user_details['stc_cust_pro_supervisor_fullname'] ?? '';
+			$_SESSION['stc_agent_sub_cont'] = $user_details['stc_cust_pro_supervisor_contact'] ?? '';
+			$_SESSION['stc_agent_sub_category'] = $user_details['stc_cust_pro_supervisor_category'] ?? '';
+			$_SESSION['stc_agent_sub_image'] = $user_details['stc_cust_pro_supervisor_image'] ?? '';
 			$op = "success";
 		} else {
 			$op = "Please Check Username & Password Again.";
@@ -113,12 +114,12 @@ class prime extends tesseract{
 		if($result){
 			$checkbumblebee=mysqli_query($this->stc_dbs, "SELECT `stc_cust_pro_supervisor_id`, `stc_cust_pro_supervisor_fullname`, `stc_cust_pro_supervisor_category` FROM `stc_cust_pro_supervisor` WHERE `stc_cust_pro_supervisor_id`='".mysqli_real_escape_string($this->stc_dbs, $agent_id)."'");
 			$user_details=mysqli_fetch_assoc($checkbumblebee);
-			$user_name=$user_details['stc_cust_pro_supervisor_fullname'];
-			$user_id=$user_details['stc_cust_pro_supervisor_id'];
-			$category=$user_details['stc_cust_pro_supervisor_category'];
-			$_SESSION['stc_agent_sub_id']=$user_id;
-			$_SESSION['stc_agent_sub_name']=$user_name;
-			$_SESSION['stc_agent_sub_category']=$category;
+			$user_name = $user_details['stc_cust_pro_supervisor_fullname'] ?? '';
+			$user_id = $user_details['stc_cust_pro_supervisor_id'] ?? '';
+			$category = $user_details['stc_cust_pro_supervisor_category'] ?? '';
+			$_SESSION['stc_agent_sub_id'] = $user_id;
+			$_SESSION['stc_agent_sub_name'] = $user_name;
+			$_SESSION['stc_agent_sub_category'] = $category;
 			$op = "success";
 		} else {
 			$op = "error";

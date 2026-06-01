@@ -287,7 +287,7 @@
 			<ul>
 				<li><a href="../index.html"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a> <i>/</i></li>
 				<li>Product <i>/</i></li>
-				<li><?php echo $_GET['product'];?></li>
+				<li><?php echo isset($_GET['product']) ? htmlspecialchars((string) $_GET['product'], ENT_QUOTES, 'UTF-8') : 'All'; ?></li>
 			</ul>
 		</div>
 	</div>
@@ -301,15 +301,19 @@
 						<div class="clearfix"> </div>
 					</div>
 		<?php 
-			if(isset($_GET['product']) && !empty($_GET['product'])){
+			if(isset($_GET['product']) && trim((string) $_GET['product']) !== ''){
 				include_once("../MCU/db.php");
+				$product_term = mysqli_real_escape_string($con, trim((string) $_GET['product']));
 				$stconpdqry=mysqli_query($con, "
 					SELECT * FROM `stc_product`
 					INNER JOIN `stc_sub_category`
 					ON `stc_product_sub_cat_id`=`stc_sub_cat_id`
-					WHERE `stc_product_name` REGEXP '".$_GET['product']."'
-					OR `stc_product_desc` REGEXP '".$_GET['product']."'
+					WHERE `stc_product_name` LIKE '%".$product_term."%'
+					OR `stc_product_desc` LIKE '%".$product_term."%'
 				");
+				if($stconpdqry === false){
+					echo "No product found!!!";
+				}else{
 				$checkrow=mysqli_num_rows($stconpdqry);
 				if($checkrow>0){
 					foreach($stconpdqry as $getproductrow){
@@ -369,6 +373,7 @@
 					}
 				}else{
 					echo "No product found!!!";
+				}
 				}
 			}else{
 				echo "No product found!!!";

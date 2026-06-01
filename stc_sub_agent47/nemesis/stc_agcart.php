@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../includes/agent_session_defaults.php';
 date_default_timezone_set('Asia/Kolkata');
 include "../../MCU/obdb.php";
 /*------------------------------------------------------------------------------------------------*/
@@ -215,7 +216,7 @@ class witcher_supervisor extends tesseract{
 				FROM `stc_cust_super_requisition_list_items` A 
 				LEFT JOIN `stc_cust_super_requisition_list_items_rec` B ON A.stc_cust_super_requisition_list_id=B.stc_cust_super_requisition_list_items_rec_list_item_id 
 				LEFT JOIN `stc_purchase_product_adhoc` C ON B.stc_cust_super_requisition_list_items_rec_list_poaid=C.stc_purchase_product_adhoc_id 
-				WHERE (A.stc_cust_super_requisition_list_items_product_id<>0 OR A.stc_cust_super_requisition_list_items_product_id<>NULL) AND (A.stc_cust_super_requisition_list_items_title LIKE '".mysqli_real_escape_string($this->stc_dbs, $desct)."' OR A.stc_cust_super_requisition_list_items_title='".mysqli_real_escape_string($this->stc_dbs, $desct)."')
+				WHERE (A.stc_cust_super_requisition_list_items_product_id<>0 OR A.stc_cust_super_requisition_list_items_product_id<>NULL) AND (A.stc_cust_super_requisition_list_items_title LIKE '".mysqli_real_escape_string($this->stc_dbs, $desc)."' OR A.stc_cust_super_requisition_list_items_title='".mysqli_real_escape_string($this->stc_dbs, $desc)."')
 			");
 			$product_id=0;
 			if(mysqli_num_rows($qry)>0){
@@ -1082,6 +1083,11 @@ class witcher_supervisor extends tesseract{
 
 	public function stc_search_item($search){
 		$odin=[];
+		$search = trim((string) $search);
+		if ($search === '') {
+			return $odin;
+		}
+		$search_esc = mysqli_real_escape_string($this->stc_dbs, $search);
 		$query = mysqli_query($this->stc_dbs, "
 			SELECT DISTINCT 
 				IFNULL(P.stc_product_name, A.stc_cust_super_requisition_list_items_title) AS stc_cust_super_requisition_list_items_title
@@ -1089,12 +1095,14 @@ class witcher_supervisor extends tesseract{
 			LEFT JOIN stc_product P 
 				ON P.stc_product_name = A.stc_cust_super_requisition_list_items_title
 			WHERE A.stc_cust_super_requisition_list_items_title <> ''
-			AND A.stc_cust_super_requisition_list_items_title REGEXP '$search'
+			AND A.stc_cust_super_requisition_list_items_title LIKE '%".$search_esc."%'
 			ORDER BY stc_cust_super_requisition_list_items_title ASC
 		");
 
-		while($row = mysqli_fetch_assoc($query)){
-			$odin[] = $row['stc_cust_super_requisition_list_items_title'];
+		if ($query !== false) {
+			while($row = mysqli_fetch_assoc($query)){
+				$odin[] = $row['stc_cust_super_requisition_list_items_title'];
+			}
 		}
 
 		return $odin;

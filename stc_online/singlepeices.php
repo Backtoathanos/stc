@@ -296,7 +296,10 @@
 			<ul>
 				<li><a href="../index.html"><span class="glyphicon glyphicon-home" aria-hidden="true"></span> Home</a> <i>/</i></li>
 				<li>Single Pieces <i>/</i></li>
-				<li><?php echo substr($_GET['productname'], 0, 40);?> <i>
+				<li><?php
+					$productname = isset($_GET['productname']) ? (string) $_GET['productname'] : '';
+					echo htmlspecialchars(substr($productname, 0, 40), ENT_QUOTES, 'UTF-8');
+				?> <i>
 			</ul>
 		</div>
 	</div>
@@ -306,10 +309,18 @@
 		<div class="container">
 		<?php 
 			include_once("../MCU/db.php");
-			if(isset($_GET['pdid']) && !empty($_GET['pdid'])){				
+			$pdid = isset($_GET['pdid']) ? (int) $_GET['pdid'] : 0;
+			if($pdid > 0){
 				$stconpdqry=mysqli_query($con, "
-					SELECT * FROM `stc_product` WHERE `stc_product_id`='".$_GET['pdid']."'
+					SELECT * FROM `stc_product` WHERE `stc_product_id`='".$pdid."'
 				");
+				if($stconpdqry === false){
+					echo '
+						<div class="col-md-12 single-left">
+							<h4>No product found!!!</h4>
+						</div>
+					';
+				}else{
 				$checkrow=mysqli_num_rows($stconpdqry);
 				if($checkrow>0){
 					$callonlinepro=mysqli_fetch_assoc($stconpdqry);
@@ -365,6 +376,13 @@
 						</div>
 					';
 				}
+				}
+			}else{
+				echo '
+					<div class="col-md-12 single-left">
+						<h4>No product found!!!</h4>
+					</div>
+				';
 			}
 		?>
 			<div class="clearfix"> </div>
@@ -501,8 +519,9 @@
 				INNER JOIN `stc_sub_category`
 				ON `stc_product_sub_cat_id`=`stc_sub_cat_id`
 				ORDER BY RAND()
-				LIMIT 0,10;
-			");	
+				LIMIT 0,10
+			");
+			if($relatedqry !== false){
 			foreach($relatedqry as $getrelatpro){
 				echo '
 					<li>
@@ -526,6 +545,7 @@
 						</div>
 					</li>
 				';
+			}
 			}
 			?>
 				
@@ -563,12 +583,13 @@
 	</div>
 	<!-- //Related Products -->
 	<?php
+		if(isset($relatedqry) && $relatedqry !== false){
 		foreach($relatedqry as $getrelatproa){
 			$subcat='';
-			if($getrelatpro['stc_sub_cat_name']=="OTHERS"){
+			if($getrelatproa['stc_sub_cat_name']=="OTHERS"){
 				$subcat='';
 			}else{
-				$subcat=$getrelatpro['stc_sub_cat_name'];
+				$subcat=$getrelatproa['stc_sub_cat_name'];
 			}
 			echo '
 				<div class="modal video-modal fade" id="myModal'.$getrelatproa['stc_product_id'].'" tabindex="-1" role="dialog" aria-labelledby="myModal'.$getrelatproa['stc_product_id'].'">
@@ -598,6 +619,7 @@
 					</div>
 				</div>
 			';
+		}
 		}
 	?>
 						

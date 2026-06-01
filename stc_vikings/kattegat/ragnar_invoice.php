@@ -1,6 +1,7 @@
 <?php
 include "../../MCU/obdb.php";
 session_start();
+require_once __DIR__ . '/includes/vikings_session_defaults.php';
 // call adjust tax invoice 
 class ragnarAdjustTaxInvoiceView extends tesseract{
 	// call vendor on po page

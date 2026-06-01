@@ -1,5 +1,6 @@
 <?php
 session_start();
+require_once __DIR__ . '/../includes/agent_session_defaults.php';
 date_default_timezone_set('Asia/Kolkata');
 include "../../MCU/obdb.php";
 /*------------------------------------------------------------------------------------------------*/
@@ -23,9 +24,9 @@ class witcher_supervisor extends tesseract{
 				stc_cust_pro_attend_supervise sas 
 				ON sas.stc_cust_pro_attend_supervise_super_id = sps.stc_cust_pro_supervisor_id
 			WHERE 
-				sps.stc_cust_pro_supervisor_id = '".$_SESSION['stc_agent_sub_id']."'
+				sps.stc_cust_pro_supervisor_id = '".mysqli_real_escape_string($this->stc_dbs, $_SESSION['stc_agent_sub_id'])."'
 		");
-		if(mysqli_num_rows($query)>0){
+		if($query !== false && mysqli_num_rows($query)>0){
 			foreach($query as $row){
 				$tbm_id = $tbm_id==""?$row['stc_cust_pro_attend_supervise_pro_id']:$tbm_id.','.$row['stc_cust_pro_attend_supervise_pro_id'];
 			}
@@ -68,14 +69,16 @@ class witcher_supervisor extends tesseract{
 			LIMIT " . intval($offset) . ", " . intval($pageSize) . "
 		");
 		
-		if(mysqli_num_rows($optimusprimequery)>0){
+		if($optimusprimequery !== false && mysqli_num_rows($optimusprimequery)>0){
 			foreach($optimusprimequery as $optimusprimerow){
 				$optimusprimeimgqry=mysqli_query($this->stc_dbs, "
-					SELECT `stc_safetytbm_img_location` FROM `stc_safetytbm_img` WHERE `stc_safetytbm_img_tbmid`='".$optimusprimerow['stc_safetytbm_id']."'
+					SELECT `stc_safetytbm_img_location` FROM `stc_safetytbm_img` WHERE `stc_safetytbm_img_tbmid`='".mysqli_real_escape_string($this->stc_dbs, $optimusprimerow['stc_safetytbm_id'])."'
 				");
 				$img_path='';
+				if ($optimusprimeimgqry !== false) {
 				foreach($optimusprimeimgqry as $optimusprimeimgrow){
 					$img_path=$optimusprimeimgrow['stc_safetytbm_img_location'];
+				}
 				}
 				// <img src="safety_img/'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
 

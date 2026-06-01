@@ -2,6 +2,7 @@
 ini_set("session.gc_maxlifetime", 21600);
 session_set_cookie_params(21600);
 session_start();
+require_once __DIR__ . '/includes/school_session_defaults.php';
 if(empty(@$_SESSION['stc_school_user_id'])){
     header('location:../index.html');
 }

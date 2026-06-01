@@ -1,6 +1,7 @@
 <?php
 include "../../MCU/obdb.php";
 session_start();
+require_once __DIR__ . '/includes/vikings_session_defaults.php';
 // view deposit & amount
 class ragnarliveAccountView extends tesseract{
 	// call live account amount
@@ -73,7 +74,7 @@ class ragnarDepositView extends tesseract{
 			".$bankname.$depositor.$refrence.$endfilterqry
 		);
 
-		if(mysqli_num_rows($ivarfilterquery)>0){
+		if($ivarfilterquery && mysqli_num_rows($ivarfilterquery)>0){
 			foreach($ivarfilterquery as $row){            	
               	// $ponumber = substr("0000{$row["stc_accounts_deposit_id"]}", -$str_length);
 				$ivar.='
@@ -544,7 +545,7 @@ class ragnarPaymentRequestView extends tesseract{
 			".$merchant.$refrno.$status.$endfilterqry
 		);
 
-		if(mysqli_num_rows($ivarfilterquery)>0){
+		if($ivarfilterquery && mysqli_num_rows($ivarfilterquery)>0){
 			foreach($ivarfilterquery as $ivarpayreqrow){
 				$status='';
 				$passedamt=0;
@@ -1270,7 +1271,7 @@ class ragnarPaymentProcessView extends tesseract{
 			".$merchant.$refrno.$status.$endfilterqry
 		);
 
-		if(mysqli_num_rows($ivarfilterquery)>0){
+		if($ivarfilterquery && mysqli_num_rows($ivarfilterquery)>0){
 			foreach($ivarfilterquery as $ivarpayreqrow){
 				$status='';
 				$passedamt=0;

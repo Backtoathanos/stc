@@ -1,6 +1,7 @@
 <?php
 include "../../MCU/obdb.php";
 session_start();
+require_once __DIR__ . '/includes/vikings_session_defaults.php';
 // reports merchant ledger
 class ragnarReportsViewMerchantLedger extends tesseract{
    // call merchant
@@ -231,6 +232,9 @@ class ragnarReportsViewMerchantLedger extends tesseract{
       }
 
       // loop for get grn or direct challan records from session
+      if (!is_array($_SESSION['stc_merchant_invoice_sort'])) {
+         $_SESSION['stc_merchant_invoice_sort'] = [];
+      }
       foreach($_SESSION['stc_merchant_invoice_sort'] as $reportsessrow){
          $basicamount=0;
          $totalamount=0;
@@ -610,7 +614,7 @@ class ragnarReportsViewRequiReports extends tesseract{
       $pendingjon48=0;
 
       $outputcheck = '';
-      if(mysqli_num_rows($ivarpreqry)>0){
+      if($ivarpreqry && mysqli_num_rows($ivarpreqry)>0){
          $currenthr=date("Y/m/d");
          foreach($ivarpreqry as $prerow){
             $today = date("Y/m/d") ; 
@@ -791,7 +795,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                   ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
             ";
             $ivarpreqry=mysqli_query($this->stc_dbs, $filteredqry);
-            if(mysqli_num_rows($ivarpreqry)>0){
+            if($ivarpreqry && mysqli_num_rows($ivarpreqry)>0){
                $result=mysqli_fetch_assoc($ivarpreqry);
                $totalp48 = $result['bmplanning48'] + $result['cplanning48'] + $result['djaplanning48'] + $result['pmplanning48'];
                $totalpending48 = $result['bmpendingjon48'] + $result['cpendingjon48'] + $result['djapendingjon48'] + $result['pmpendingjon48'];
@@ -879,7 +883,7 @@ class ragnarReportsViewRequiReports extends tesseract{
                WHERE `stc_status_down_list_equipment_type`<>'' AND `stc_status_down_list_date`<>'' AND `stc_status_down_list_date`> NOW() - INTERVAL 48 HOUR ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
             ";
             $ivarpreqry=mysqli_query($this->stc_dbs, $filteredqry);
-            if(mysqli_num_rows($ivarpreqry)>0){
+            if($ivarpreqry && mysqli_num_rows($ivarpreqry)>0){
                $result=mysqli_fetch_assoc($ivarpreqry);
                $totalp48 = $result['bmplanning48'] + $result['cplanning48'] + $result['djaplanning48'] + $result['pmplanning48'];
                $totalwp48 = $result['bmprogress48'] + $result['cprogress48'] + $result['djaprogress48'] + $result['pmprogress48'];
@@ -1944,8 +1948,10 @@ class ragnarReportsViewRequiReports extends tesseract{
                $qry=mysqli_query($this->stc_dbs, "
                   SELECT `message` FROM `stc_cust_super_requisition_list_items_log` WHERE title='Pending' AND `item_id`='".$requisitionrow['reqlistid']."'
                ");
-               foreach($qry as $result){
-                  $pendingreason.=$result['message'].'<br>';
+               if ($qry && mysqli_num_rows($qry) > 0) {
+                  foreach($qry as $result){
+                     $pendingreason.=$result['message'].'<br>';
+                  }
                }
                if($requisitionrow['stc_cust_super_requisition_list_items_status']==8){
                   $stcpendingqty=0.00;

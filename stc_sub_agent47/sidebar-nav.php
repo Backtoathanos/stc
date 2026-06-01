@@ -1,3 +1,4 @@
+<?php require_once __DIR__ . '/includes/agent_session_defaults.php'; ?>
 <div class="app-sidebar sidebar-shadow">
     <div class="app-header__logo">
         <div class="logo-src"></div>

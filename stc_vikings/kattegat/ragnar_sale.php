@@ -1,6 +1,7 @@
 <?php
 include "../../MCU/obdb.php";
 session_start();
+require_once __DIR__ . '/includes/vikings_session_defaults.php';
 // call standard challan class
 class ragnarStandardChallanView extends tesseract{
 	// call vendor on po page
@@ -391,10 +392,12 @@ class ragnarStandardChallanView extends tesseract{
 class ragnarStandardChallanAdd extends tesseract{
 	// go data to sale table
 	public function sale_process($customer_id, $sale_custorderdate,  $sale_custordernumber,  $sale_stcfc,  $sale_stcpf, $order_waybillno, $order_lrno, $order_suppdate, $order_suppplace, $order_refrence, $order_sitename, $order_contperson, $order_contnumber, $order_shipadd, $order_tandc, $order_notes){	
-		$maxgst='';
+		$maxgst=array();
 		$date=date("Y-m-d H:i:s");
-		foreach($_SESSION["stc_sale_order_sess"] as $keys => $values) {
-			$maxgst=array($values['product_gst']);
+		if (!empty($_SESSION["stc_sale_order_sess"]) && is_array($_SESSION["stc_sale_order_sess"])) {
+			foreach($_SESSION["stc_sale_order_sess"] as $keys => $values) {
+				$maxgst[]=$values['product_gst'];
+			}
 		}
 		$odin='';
 		$lokiinsertsale=mysqli_query($this->stc_dbs, "
@@ -432,7 +435,7 @@ class ragnarStandardChallanAdd extends tesseract{
 				'".mysqli_real_escape_string($this->stc_dbs, $order_lrno)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $sale_stcfc)."', 
 				'".mysqli_real_escape_string($this->stc_dbs, $sale_stcpf)."',
-				'".max($maxgst)."',
+				'".(empty($maxgst) ? 0 : max($maxgst))."',
 				'".mysqli_real_escape_string($this->stc_dbs, $order_notes)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $order_refrence)."',
 				'".mysqli_real_escape_string($this->stc_dbs, $order_suppdate)."',
@@ -1448,10 +1451,12 @@ class ragnarDirectChallanAdd extends tesseract{
 
 	// go data to direct challan table
 	public function sale_process($customer_id, $sale_custorderdate,  $sale_custordernumber,  $sale_mername, $sale_billinvono, $sale_billinvodate, $sale_stcfc,  $sale_stcpf, $order_waybillno, $order_lrno, $order_suppdate, $order_suppplace, $order_refrence, $order_sitename, $order_contperson, $order_contnumber, $order_shipadd, $order_tandc, $order_notes){	
-		$maxgst='';
+		$maxgst=array();
 		$date=date("Y-m-d H:i:s");
-		foreach($_SESSION["stc_direct_challan_sess"] as $keys => $values) {
-			$maxgst=array($values['product_gst']);
+		if (!empty($_SESSION["stc_direct_challan_sess"]) && is_array($_SESSION["stc_direct_challan_sess"])) {
+			foreach($_SESSION["stc_direct_challan_sess"] as $keys => $values) {
+				$maxgst[]=$values['product_gst'];
+			}
 		}
 		$odin='';
 		$lokiinsertsale=mysqli_query($this->stc_dbs, "
@@ -1493,7 +1498,7 @@ class ragnarDirectChallanAdd extends tesseract{
 				'".$order_lrno."',
 				'".$sale_stcfc."', 
 				'".$sale_stcpf."',
-				'".max($maxgst)."',
+				'".(empty($maxgst) ? 0 : max($maxgst))."',
 				'".$order_notes."',
 				'".$order_refrence."',
 				'".$order_suppdate."',
@@ -1984,7 +1989,7 @@ class ragnarVirtualChallanAdd extends tesseract{
 			FROM `stc_sale_product` 
 			WHERE `stc_sale_product_refr_grn_no`='".$order_grnno."'
 		");
-		$countrow=mysqli_num_rows($check_query);
+		$countrow=($check_query ? mysqli_num_rows($check_query) : 0);
 		if(empty($countrow)){
 			$lokiinsertsale=mysqli_query($this->stc_dbs, "
 				INSERT INTO `stc_sale_product`(
@@ -2419,8 +2424,8 @@ if(isset($_POST['save_sale_action'])){
 	$customer_id=$_POST['customer_id'];
 	$sale_custorderdate=$_POST['sale_custorderdate'];
 	$sale_custordernumber=$_POST['sale_custordernumber'];
-	$sale_stcfc=$_POST['sale_stcfc'];
-	$sale_stcpf=$_POST['sale_stcpf'];
+	$sale_stcfc=$_POST['sale_stcfc'] ?? '';
+	$sale_stcpf=$_POST['sale_stcpf'] ?? '';
 	$order_waybillno=$_POST['sale_waybillno'];
 	$order_lrno=$_POST['sale_lrno'];
 	$order_suppdate=$_POST['sale_supplydate'];
