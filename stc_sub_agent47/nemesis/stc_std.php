@@ -186,7 +186,20 @@ class transformers extends tesseract{
 		}
 		$escaped = array();
 		foreach ($parts as $part) {
+			// Incoming values sometimes include wrapped quotes like \'MECHANICAL\'
+			// Normalize to MECHANICAL before building the IN (...) list.
+			$part = stripslashes((string) $part);
+			$part = trim($part);
+			$part = trim($part, " \t\n\r\0\x0B'\"\\");
+
+			if ($part === '') {
+				continue;
+			}
+
 			$escaped[] = "'" . mysqli_real_escape_string($this->stc_dbs, $part) . "'";
+		}
+		if (empty($escaped)) {
+			return "<option value='NA' selected>Select Job Varieties</option>";
 		}
 		$job_type_sql = implode(',', $escaped);
 		$optimusprimequery=mysqli_query($this->stc_dbs, "
