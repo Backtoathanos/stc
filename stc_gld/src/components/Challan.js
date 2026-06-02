@@ -40,14 +40,19 @@ export default function ChallanDashboard() {
     const [showViewModal, setShowViewModal] = useState(false);
     const [selectedChallanForView, setSelectedChallanForView] = useState(null);
 
-
+    
     const fetchData = useMemo(
         () =>
             debounce((query = '') => {
                 if (query.length > 3 || query === '') {
+                    const userIdCookie = document.cookie.split('; ').find(row => row.startsWith('user_id='));
+                    if (!userIdCookie) {
+                        return;  // Stop the function execution if no user_id cookie is found
+                    }
+                    const userId = userIdCookie.split('=')[1];
                     setLoading(true);
                     // Send the search query as a parameter to the API
-                    axios.get(`${API_BASE_URL}/index.php?action=getChallan&search=${query}`)
+                    axios.get(`${API_BASE_URL}/index.php?action=getChallan&search=${query}&userId=${userId}`)
                         .then(response => {
                             const resultData = response.data;
                             if (Array.isArray(resultData)) {

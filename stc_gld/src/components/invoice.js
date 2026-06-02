@@ -46,8 +46,13 @@ export default function ChallanDashboard() {
             debounce((query = '') => {
                 if (query.length > 3 || query === '') {
                     setLoading(true);
+                    const userIdCookie = document.cookie.split('; ').find(row => row.startsWith('user_id='));
+                    if (!userIdCookie) {
+                        return;  // Stop the function execution if no user_id cookie is found
+                    }
+                    const userId = userIdCookie.split('=')[1];
                     // Send the search query as a parameter to the API
-                    axios.get(`${API_BASE_URL}/index.php?action=getChallaned&search=${query}`)
+                    axios.get(`${API_BASE_URL}/index.php?action=getChallaned&search=${query}&userId=${userId}`)
                         .then(response => {
                             const resultData = response.data;
                             if (Array.isArray(resultData)) {
@@ -91,51 +96,6 @@ export default function ChallanDashboard() {
         setSelectedChallanForView(row);
         setShowViewModal(true);
     };
-    // const handleDelete = (id) => {
-    //     Swal.fire({
-    //         title: 'Are you sure?',
-    //         text: "Do you really want to delete this record? This process cannot be undone.",
-    //         icon: 'warning',
-    //         showCancelButton: true,
-    //         confirmButtonColor: '#3085d6',
-    //         cancelButtonColor: '#d33',
-    //         confirmButtonText: 'Yes, delete it!'
-    //     }).then((result) => {
-    //         if (result.isConfirmed) {
-    //             // Make the API call to delete the record
-    //             axios.post(`${API_BASE_URL}/index.php?action=deleteChallan`, {
-    //                 id: id
-    //             })
-    //             .then(response => {
-    //                 // Handle successful deletion
-    //                 if(response.data.success) {
-    //                     Swal.fire(
-    //                         'Deleted!',
-    //                         'Your record has been deleted.',
-    //                         'success'
-    //                     );
-    //                     fetchData(search);
-    //                 } else {
-    //                     // Handle if the server responds with failure
-    //                     Swal.fire(
-    //                         'Failed!',
-    //                         'The record could not be deleted.',
-    //                         'error'
-    //                     );
-    //                 }
-    //             })
-    //             .catch(error => {
-    //                 // Handle error if the request fails
-    //                 Swal.fire(
-    //                     'Error!',
-    //                     'An error occurred while trying to delete the record.',
-    //                     'error'
-    //                 );
-    //                 console.error('Delete error:', error);
-    //             });
-    //         }
-    //     });
-    // };
 
     const formatMoney = (v) => {
         const n = Number(v);

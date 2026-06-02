@@ -247,7 +247,12 @@ function addCustomer($conn) {
 // Function to fetch customers from the database
 function getChallan($conn) {
     $search = isset($_GET['search']) ? $_GET['search'] : '';
-    $query = "SELECT GC.id, CONCAT(COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name), IF(GC.pdetails IS NULL OR GC.pdetails = '', '', CONCAT(' - ', GC.pdetails))) AS stc_product_name, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, ROUND(rate, 2) AS rate, ROUND(discount, 2) AS discount, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%') AND status=0 ORDER BY TIMESTAMP(`created_date`) DESC";
+    $userId = isset($_GET['userId']) ? $_GET['userId'] : '';
+    $query = "SELECT GC.id, CONCAT(COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name), IF(GC.pdetails IS NULL OR GC.pdetails = '', '', CONCAT(' - ', GC.pdetails))) AS stc_product_name, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, ROUND(rate, 2) AS rate, ROUND(discount, 2) AS discount, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE status=0 AND created_by=$userId";
+    if($search!=""){
+        $query .= " AND (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%')";
+    }
+    $query .= " ORDER BY TIMESTAMP(`created_date`) DESC";
 
     $result = $conn->query($query);
 
@@ -264,8 +269,12 @@ function getChallan($conn) {
 // Function to fetch customers from the database
 function getChallaned($conn) {
     $search = isset($_GET['search']) ? $_GET['search'] : '';
-    $query = "SELECT GC.id, CONCAT(COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name), IF(GC.pdetails IS NULL OR GC.pdetails = '', '', CONCAT(' - ', GC.pdetails))) AS stc_product_name, bill_number, challan_number, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, stc_product_unit, ROUND(rate, 2) AS rate, ROUND(discount, 2) AS discount, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%') AND (status=1 OR status=2 OR status=3) ORDER BY TIMESTAMP(`created_date`) DESC";
-
+    $userId = isset($_GET['userId']) ? $_GET['userId'] : '';
+    $query = "SELECT GC.id, CONCAT(COALESCE(CONCAT(stc_product_name, ' (', stc_brand_title, ')'), stc_product_name), IF(GC.pdetails IS NULL OR GC.pdetails = '', '', CONCAT(' - ', GC.pdetails))) AS stc_product_name, bill_number, challan_number, gld_customer_title, requisition_id, challan_number, ROUND(qty, 2) AS qty, stc_product_unit, ROUND(rate, 2) AS rate, ROUND(discount, 2) AS discount, ROUND(paid_amount, 2) AS paid_amount, payment_status, status, created_date, stc_trading_user_name FROM gld_challan GC LEFT JOIN stc_product ON GC.product_id = stc_product_id LEFT JOIN gld_customer ON GC.cust_id = gld_customer_id LEFT JOIN stc_trading_user ON GC.created_by = stc_trading_user_id LEFT JOIN stc_brand ON stc_product.stc_product_brand_id = stc_brand.stc_brand_id WHERE (status=1 OR status=2 OR status=3) AND created_by=$userId ";
+    if($search!=""){
+        $query .= " AND (challan_number LIKE '%$search%' OR stc_product_name LIKE '%$search%' OR gld_customer_title LIKE '%$search%' OR payment_status LIKE '%$search%')";
+    }
+    $query .= " ORDER BY TIMESTAMP(`created_date`) DESC";
     $result = $conn->query($query);
 
     $challanData = [];
