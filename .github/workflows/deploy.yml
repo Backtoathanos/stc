@@ -14,12 +14,15 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Deploy via SSH (unzip build-archive.zip)
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT }}
+          # Default connection wait is 30s; shared hosts often need longer or IP allowlisting.
+          timeout: 120s
+          command_timeout: 15m
           script: |
             export TERM=xterm
 
