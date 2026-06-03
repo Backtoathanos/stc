@@ -1005,6 +1005,20 @@ if($_SESSION['stc_school_user_for']>3){
                                     />
                                   </div>
                                 </div>
+                                <div class="col-sm-12 col-md-12 col-lg-12">
+                                  <div class="mb-3">
+                                    <h5
+                                      for="name"
+                                      >Remarks
+                                    </h5>
+                                    <textarea
+                                      name="stcschoolremarks"
+                                      type="text"
+                                      class="form-control validate stcschoolremarks"
+                                      placeholder="Enter Remarks"
+                                    /></textarea>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -1373,7 +1387,9 @@ if($_SESSION['stc_school_user_for']>3){
           var stcschoolexpenses             =  $('.stcschoolexpenses').val();
           var stcschoolmaintcost            =  $('.stcschoolmaintcost').val();
           var stcschoolprojectcost          =  $('.stcschoolprojectcost').val();
-          var stcschoolremarks              =  $('.stcschoolremarks').val();
+          var stcschoolremarks1              =  $('.stcschoolremarks:eq(0)').val();
+          var stcschoolremarks2              =  $('.stcschoolremarks:eq(1)').val();
+          var stcschoolremarks              =  stcschoolremarks1 + " " + stcschoolremarks2;
           $.ajax({  
             url       : "../vanaheim/fee-raised.php",
             method    : "POST",  
