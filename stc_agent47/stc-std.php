@@ -222,7 +222,7 @@ else {
                                 <div class="col-md-12 col-xl-12"> 
                                     <div class="main-card mb-3 card">
                                         <div class="card-body">
-                                            <div class="card mb-3 widget-content stc-std-search-result" >
+                                            <div class="card mb-3 widget-content stc-std-search-result row" >
                                             </div>
                                         </div>
                                     </div>
@@ -331,7 +331,7 @@ else {
             });
 
             $('body').delegate('.stc-sdl-per-page', 'change', function(){
-                sdlPageState.per_page = parseInt($(this).val(), 10) || 25;
+                sdlPageState.per_page = parseInt($(this).val(), 10) || 15;
                 sdlPageState.page = 1;
                 $('.stc-sdl-per-page').val(String(sdlPageState.per_page));
                 stcLoadDownList(1);

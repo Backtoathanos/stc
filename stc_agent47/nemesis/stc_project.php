@@ -3528,6 +3528,7 @@ class pirates_supervisor extends tesseract{
 		$offset=($page - 1) * $per_page;
 
 		$optimusprime='
+		<div class="col-sm-12">
 			<table class="table table-bordered table-responsive">
 				<thead>
 					<tr>
@@ -3915,6 +3916,7 @@ class pirates_supervisor extends tesseract{
 		$optimusprime.='
 				</tbody>
 			</table>
+		</div>
 		';
 		$optimusprime.=$pagination_html;
 		return $optimusprime;
@@ -3934,26 +3936,28 @@ class pirates_supervisor extends tesseract{
 			? 'Showing '.$range_start.'–'.$range_end.' of '.number_format($total_records).' records'
 			: 'No records found';
 		return '
-			<div class="stc-sdl-pagination-wrap mb-3 mt-2">
-				<div class="d-flex flex-wrap align-items-center justify-content-between" style="gap:12px;">
-					<span class="stc-sdl-page-info text-muted">'.$range_text.'</span>
-					<div class="d-flex align-items-center" style="gap:8px;">
-						<label class="mb-0 text-muted">Per page</label>
-						<select class="form-control form-control-sm stc-sdl-per-page" style="width:auto;">'.$per_page_options.'</select>
+			<div class="col-sm-12">
+				<div class="stc-sdl-pagination-wrap mb-3 mt-2">
+					<div class="d-flex flex-wrap align-items-center justify-content-between" style="gap:12px;">
+						<span class="stc-sdl-page-info text-muted">'.$range_text.'</span>
+						<div class="d-flex align-items-center" style="gap:8px;">
+							<span class="mb-0 text-muted">Per page</span>
+							<select class="form-control form-control-sm stc-sdl-per-page" style="width:auto;">'.$per_page_options.'</select>
+						</div>
+						<nav aria-label="Status down list pagination">
+							<ul class="pagination pagination-sm mb-0">
+								<li class="page-item'.$prev_disabled.'">
+									<a href="#" class="page-link stc-sdl-page-link" data-page="'.$prev_page.'" aria-label="Previous">&laquo; Prev</a>
+								</li>
+								<li class="page-item active">
+									<span class="page-link">Page '.$page.' of '.$total_pages.'</span>
+								</li>
+								<li class="page-item'.$next_disabled.'">
+									<a href="#" class="page-link stc-sdl-page-link" data-page="'.$next_page.'" aria-label="Next">Next &raquo;</a>
+								</li>
+							</ul>
+						</nav>
 					</div>
-					<nav aria-label="Status down list pagination">
-						<ul class="pagination pagination-sm mb-0">
-							<li class="page-item'.$prev_disabled.'">
-								<a href="#" class="page-link stc-sdl-page-link" data-page="'.$prev_page.'" aria-label="Previous">&laquo; Prev</a>
-							</li>
-							<li class="page-item active">
-								<span class="page-link">Page '.$page.' of '.$total_pages.'</span>
-							</li>
-							<li class="page-item'.$next_disabled.'">
-								<a href="#" class="page-link stc-sdl-page-link" data-page="'.$next_page.'" aria-label="Next">Next &raquo;</a>
-							</li>
-						</ul>
-					</nav>
 				</div>
 			</div>
 		';
