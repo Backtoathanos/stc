@@ -75,6 +75,18 @@ else {
         .stc-datatable-filter{
             z-index: 90;
         }
+        .stc-sdl-pagination-wrap .pagination .page-item.disabled .page-link{
+            pointer-events: none;
+            opacity: 0.55;
+        }
+        .stc-std-search-result .table-responsive{
+            overflow-x: auto;
+        }
+        .stc-sdl-loading{
+            padding: 24px;
+            text-align: center;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -262,35 +274,67 @@ else {
             var percent=finalwidth/screenwidth * 100;
             $('.stc-std-search-result').width(finalwidth);
 
-            // call status down list
-            $('body').delegate('.stc-std-list-show-hit', 'click', function(e){
-                e.preventDefault();
-                $('.stc-datatable-filter-ul').hide();
+            var sdlPageState = { page: 1, per_page: 25 };
+
+            function stcLoadDownList(page){
                 var location_id=$('#stc-agent-sup-std-location-find').val();
                 var search=$('.stc-agent-sup-search-field').val();
                 var emptype=$('.stc-agent-sup-emptype').val();
                 var status=$('.stc-agent-sup-status').val();
-                if(location_id!="NA"){
-                    $.ajax({
-                        url         : "nemesis/stc_project.php",
-                        method      : "POST",
-                        data        : {
-                            stc_down_list_hit:1,
-                            location_id:location_id,
-                            search:search,
-                            emptype:emptype,
-                            status:status
-                        },
-                        success     : function(response_sdl){
-                            // console.log(response_sdl);
-                            $('.stc-std-search-result').html(response_sdl);
-                            $('.stc-datatable-filter-ul').show();
-                            $('.stc-datatable-filter').prop('checked', false);
-                        }
-                    });
-                }else{
+                if(location_id=="NA"){
                     alert("Please select location/sitename");
+                    return;
                 }
+                if(page){
+                    sdlPageState.page = parseInt(page, 10) || 1;
+                }
+                $('.stc-datatable-filter-ul').hide();
+                $('.stc-std-search-result').html('<div class="stc-sdl-loading">Loading records...</div>');
+                $.ajax({
+                    url         : "nemesis/stc_project.php",
+                    method      : "POST",
+                    data        : {
+                        stc_down_list_hit:1,
+                        location_id:location_id,
+                        search:search,
+                        emptype:emptype,
+                        status:status,
+                        sdl_page:sdlPageState.page,
+                        sdl_per_page:sdlPageState.per_page
+                    },
+                    success     : function(response_sdl){
+                        $('.stc-std-search-result').html(response_sdl);
+                        $('.stc-datatable-filter-ul').show();
+                        $('.stc-datatable-filter').prop('checked', false);
+                        $('.stc-sdl-per-page').val(String(sdlPageState.per_page));
+                    },
+                    error       : function(){
+                        $('.stc-std-search-result').html('<div class="stc-sdl-loading text-danger">Failed to load records. Please try again.</div>');
+                    }
+                });
+            }
+
+            // call status down list
+            $('body').delegate('.stc-std-list-show-hit', 'click', function(e){
+                e.preventDefault();
+                sdlPageState.page = 1;
+                stcLoadDownList(1);
+            });
+
+            $('body').delegate('.stc-sdl-page-link', 'click', function(e){
+                e.preventDefault();
+                if($(this).closest('.page-item').hasClass('disabled')){
+                    return;
+                }
+                var page=$(this).data('page');
+                stcLoadDownList(page);
+            });
+
+            $('body').delegate('.stc-sdl-per-page', 'change', function(){
+                sdlPageState.per_page = parseInt($(this).val(), 10) || 25;
+                sdlPageState.page = 1;
+                $('.stc-sdl-per-page').val(String(sdlPageState.per_page));
+                stcLoadDownList(1);
             });
 
             $('body').delegate('tr', 'click', function(e){
@@ -334,7 +378,7 @@ else {
                     },
                     success     : function(response_sdl){
                         alert(response_sdl);
-                        $('.stc-std-list-show-hit').click();
+                        stcLoadDownList(sdlPageState.page);
                     }
                 });
             });

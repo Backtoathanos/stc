@@ -3521,7 +3521,12 @@ class pirates_supervisor extends tesseract{
 	}
 
 	// call status down list
-	public function stc_call_status_down_list($location_id, $search, $emptype, $status){
+	public function stc_call_status_down_list($location_id, $search, $emptype, $status, $page=1, $per_page=25){
+		$page=max(1, (int)$page);
+		$allowed_per_page=array(15, 25, 50);
+		$per_page=in_array((int)$per_page, $allowed_per_page, true) ? (int)$per_page : 25;
+		$offset=($page - 1) * $per_page;
+
 		$optimusprime='
 			<table class="table table-bordered table-responsive">
 				<thead>
@@ -3589,6 +3594,41 @@ class pirates_supervisor extends tesseract{
 		if($_SESSION['stc_agent_role']==3){
 			$showbystatus='';
 		}
+		$where_sql="
+			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
+			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field."
+		";
+		$from_sql="
+			FROM `stc_status_down_list` 
+			LEFT JOIN `stc_cust_project` 
+			ON `stc_cust_project_id`=`stc_status_down_list_location` 
+			LEFT JOIN `stc_customer_pump_details` a
+			ON `stc_status_down_list_equipment_number`=a.`stc_cpumpd_id` 
+			LEFT JOIN `stc_customer_pump_details` b 
+			ON `stc_status_down_list_equipment_type`=b.`stc_cpumpd_id` 
+			LEFT JOIN `stc_cust_pro_supervisor` 
+			ON `stc_status_down_list_created_by`=`stc_cust_pro_supervisor_id` 
+		";
+		$total_records=0;
+		$countqry=mysqli_query($this->stc_dbs, "
+			SELECT COUNT(DISTINCT `stc_status_down_list_id`) AS total
+			".$from_sql."
+			".$where_sql."
+		");
+		if($countqry){
+			$countrow=mysqli_fetch_assoc($countqry);
+			$total_records=(int)$countrow['total'];
+		}
+		$total_pages=$total_records>0 ? (int)ceil($total_records / $per_page) : 1;
+		if($page>$total_pages){
+			$page=$total_pages;
+			$offset=($page - 1) * $per_page;
+		}
+		$range_start=$total_records>0 ? $offset + 1 : 0;
+		$range_end=min($offset + $per_page, $total_records);
+		$pagination_html=$this->stc_build_sdl_pagination_html($page, $per_page, $total_pages, $total_records, $range_start, $range_end);
+		$optimusprime=$pagination_html.$optimusprime;
+
 		$optimusprimeqry=mysqli_query($this->stc_dbs, "
 			SELECT DISTINCT
 			    `stc_status_down_list_id`,
@@ -3630,18 +3670,10 @@ class pirates_supervisor extends tesseract{
 				`stc_status_down_list_status_updated_by`,
 				`stc_status_down_list_status_updated_on`,
 				`stc_status_down_list_wipstatus`
-			FROM `stc_status_down_list` 
-			LEFT JOIN `stc_cust_project` 
-			ON `stc_cust_project_id`=`stc_status_down_list_location` 
-			LEFT JOIN `stc_customer_pump_details` a
-			ON `stc_status_down_list_equipment_number`=a.`stc_cpumpd_id` 
-			LEFT JOIN `stc_customer_pump_details` b 
-			ON `stc_status_down_list_equipment_type`=b.`stc_cpumpd_id` 
-			LEFT JOIN `stc_cust_pro_supervisor` 
-			ON `stc_status_down_list_created_by`=`stc_cust_pro_supervisor_id` 
-			WHERE `stc_status_down_list_plocation`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
-			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' ".$search_field."
+			".$from_sql."
+			".$where_sql."
 			ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
+			LIMIT ".$offset.", ".$per_page."
 		");
 		if($optimusprimeqry && mysqli_num_rows($optimusprimeqry)>0){
 			foreach($optimusprimeqry as $row){
@@ -3884,7 +3916,47 @@ class pirates_supervisor extends tesseract{
 				</tbody>
 			</table>
 		';
+		$optimusprime.=$pagination_html;
 		return $optimusprime;
+	}
+
+	private function stc_build_sdl_pagination_html($page, $per_page, $total_pages, $total_records, $range_start, $range_end){
+		$prev_page=max(1, $page - 1);
+		$next_page=min($total_pages, $page + 1);
+		$prev_disabled=$page<=1 ? ' disabled' : '';
+		$next_disabled=$page>=$total_pages ? ' disabled' : '';
+		$per_page_options='';
+		foreach(array(15, 25, 50) as $option){
+			$selected=$per_page==$option ? ' selected' : '';
+			$per_page_options.='<option value="'.$option.'"'.$selected.'>'.$option.'</option>';
+		}
+		$range_text=$total_records>0
+			? 'Showing '.$range_start.'–'.$range_end.' of '.number_format($total_records).' records'
+			: 'No records found';
+		return '
+			<div class="stc-sdl-pagination-wrap mb-3 mt-2">
+				<div class="d-flex flex-wrap align-items-center justify-content-between" style="gap:12px;">
+					<span class="stc-sdl-page-info text-muted">'.$range_text.'</span>
+					<div class="d-flex align-items-center" style="gap:8px;">
+						<label class="mb-0 text-muted">Per page</label>
+						<select class="form-control form-control-sm stc-sdl-per-page" style="width:auto;">'.$per_page_options.'</select>
+					</div>
+					<nav aria-label="Status down list pagination">
+						<ul class="pagination pagination-sm mb-0">
+							<li class="page-item'.$prev_disabled.'">
+								<a href="#" class="page-link stc-sdl-page-link" data-page="'.$prev_page.'" aria-label="Previous">&laquo; Prev</a>
+							</li>
+							<li class="page-item active">
+								<span class="page-link">Page '.$page.' of '.$total_pages.'</span>
+							</li>
+							<li class="page-item'.$next_disabled.'">
+								<a href="#" class="page-link stc-sdl-page-link" data-page="'.$next_page.'" aria-label="Next">Next &raquo;</a>
+							</li>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		';
 	}
 
 	// change job done details
@@ -5642,8 +5714,10 @@ if(isset($_POST['stc_down_list_hit'])){
 	$search=$_POST['search'];
 	$emptype=$_POST['emptype'];
 	$status=$_POST['status'];
+	$page=isset($_POST['sdl_page']) ? (int)$_POST['sdl_page'] : 1;
+	$per_page=isset($_POST['sdl_per_page']) ? (int)$_POST['sdl_per_page'] : 25;
 	$metabots=new pirates_supervisor();
-	$opmetabots=$metabots->stc_call_status_down_list($location_id, $search, $emptype, $status);
+	$opmetabots=$metabots->stc_call_status_down_list($location_id, $search, $emptype, $status, $page, $per_page);
 	echo $opmetabots;
 }
 
