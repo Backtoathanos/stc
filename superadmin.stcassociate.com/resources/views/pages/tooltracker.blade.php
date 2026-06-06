@@ -12,7 +12,8 @@
         top: 0;
     }
     #view-track-modal .modal-body,
-    #no-project-track-modal .modal-body {
+    #no-project-track-modal .modal-body,
+    #edit-track-modal .modal-body {
         max-height: 70vh;
         overflow-y: auto;
     }
@@ -204,6 +205,36 @@
         }
         bindSuggestion($('#edit-track-supervisor-wrapper'));
 
+        function toDatetimeLocalValue(value){
+            if(!value) return '';
+            var normalized = String(value).trim().replace(' ', 'T');
+            if(normalized.length >= 16) return normalized.substring(0, 16);
+            return normalized;
+        }
+
+        function fillEditTrackForm(record){
+            $('#edit_track_id').val(record.id || '');
+            $('#edit-track-toolsdetails_id').val(record.toolsdetails_id || '');
+            $('#edit-track-issuedby').val(record.issuedby || '');
+            $('#edit-track-supervisor-display').val(record.supervisor_name || '');
+            $('#edit-track-user_id').val(record.user_id || '');
+            $('#edit-track-status').val(record.status != null ? record.status : 0);
+            $('#edit-track-location').val(record.location || '');
+            $('#edit-track-issueddate').val(record.issueddate ? String(record.issueddate).split(' ')[0] : '');
+            $('#edit-track-receivedby').val(record.receivedby || '');
+            $('#edit-track-handoverto').val(record.handoverto || '');
+            $('#edit-track-created_date').val(toDatetimeLocalValue(record.created_date));
+            $('#edit-track-created_by').val(record.created_by != null && record.created_by !== '' ? record.created_by : '');
+            var $idType = $('#edit-track-id_type');
+            $idType.val(record.id_type || '');
+            if(record.id_type && $idType.val() !== String(record.id_type)){
+                $idType.append('<option value="'+record.id_type+'" selected>'+record.id_type+'</option>');
+            }
+            $('#edit-track-req_requisition_list_id').val(record.req_requisition_list_id != null && record.req_requisition_list_id !== '' ? record.req_requisition_list_id : '');
+            $('#edit-track-req_requisition_item_id').val(record.req_requisition_item_id != null && record.req_requisition_item_id !== '' ? record.req_requisition_item_id : '');
+            $('#edit-track-req_poa_adhoc_id').val(record.req_poa_adhoc_id != null && record.req_poa_adhoc_id !== '' ? record.req_poa_adhoc_id : '');
+        }
+
         $('#edit-track-user_id').on('change', function(){
             var uid = $(this).val();
             var $projectSelect = $('#edit-track-project_id');
@@ -342,14 +373,7 @@
                 success: function(response) {
                     if(response.success && response.data) {
                         var record = response.data;
-                        $('#edit_track_id').val(record.id);
-                        $('#edit-track-issuedby').val(record.issuedby || '');
-                        $('#edit-track-supervisor-display').val(record.supervisor_name || '');
-                        $('#edit-track-user_id').val(record.user_id || '');
-                        $('#edit-track-status').val(record.status);
-                        $('#edit-track-location').val(record.location || '');
-                        $('#edit-track-issueddate').val(record.issueddate ? record.issueddate.split(' ')[0] : '');
-                        $('#edit-track-receivedby').val(record.receivedby || '');
+                        fillEditTrackForm(record);
                         var $projectSelect = $('#edit-track-project_id');
                         $projectSelect.html('<option value="">-- Select Project --</option>');
                         $.ajax({
@@ -431,6 +455,7 @@
                 type: 'POST',
                 data: {
                     id: id,
+                    toolsdetails_id: $('#edit-track-toolsdetails_id').val() || null,
                     issuedby: $('#edit-track-issuedby').val() || '',
                     user_id: $('#edit-track-user_id').val() || '',
                     status: $('#edit-track-status').val() || 0,
@@ -438,6 +463,13 @@
                     location: $('#edit-track-location').val() || '',
                     issueddate: $('#edit-track-issueddate').val() || null,
                     receivedby: $('#edit-track-receivedby').val() || '',
+                    handoverto: $('#edit-track-handoverto').val() || '',
+                    created_date: $('#edit-track-created_date').val() || null,
+                    created_by: $('#edit-track-created_by').val() || null,
+                    id_type: $('#edit-track-id_type').val() || '',
+                    req_requisition_list_id: $('#edit-track-req_requisition_list_id').val() || null,
+                    req_requisition_item_id: $('#edit-track-req_requisition_item_id').val() || null,
+                    req_poa_adhoc_id: $('#edit-track-req_poa_adhoc_id').val() || null,
                     _token: "{{ csrf_token() }}"
                 },
                 url: "{{ url('/branch/stc/tooltracker/edit-track') }}",
@@ -760,7 +792,7 @@
 
 <!-- edit track modal (stc_tooldetails_track) -->
 <div class="modal fade" id="edit-track-modal">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title">Edit Track Record (stc_tooldetails_track)</h4>
@@ -771,15 +803,21 @@
       <div class="modal-body">
         <div class="card-body">
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="edit-track-toolsdetails_id">Tool Details ID</label>
+                <input type="number" min="1" class="form-control" id="edit-track-toolsdetails_id" name="edit-track-toolsdetails_id" placeholder="stc_tooldetails.id">
+              </div>
+            </div>
+            <div class="col-md-4">
               <div class="form-group">
                 <label for="edit-track-issuedby">Issued By</label>
                 <input type="text" class="form-control" id="edit-track-issuedby" name="edit-track-issuedby" placeholder="Enter Issued By">
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="form-group suggestion-wrapper" id="edit-track-supervisor-wrapper">
-                <label for="edit-track-supervisor-display">Supervisor</label>
+                <label for="edit-track-supervisor-display">Supervisor (user_id)</label>
                 <input type="text" class="form-control suggestion-input" id="edit-track-supervisor-display" placeholder="Type to search">
                 <input type="hidden" id="edit-track-user_id" name="edit-track-user_id">
                 <ul class="suggestion-list" data-input="edit-track-supervisor-display" data-hidden-for="edit-track-user_id">
@@ -791,7 +829,15 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="edit-track-project_id">Project (project_id)</label>
+                <select class="form-control" id="edit-track-project_id" name="edit-track-project_id">
+                  <option value="">-- Select Project --</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
               <div class="form-group">
                 <label for="edit-track-status">Status</label>
                 <select class="form-control" id="edit-track-status" name="edit-track-status">
@@ -801,34 +847,74 @@
                 </select>
               </div>
             </div>
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="edit-track-project_id">Project</label>
-                <select class="form-control" id="edit-track-project_id" name="edit-track-project_id">
-                  <option value="">-- Select Project --</option>
-                </select>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="form-group">
                 <label for="edit-track-location">Location</label>
                 <input type="text" class="form-control" id="edit-track-location" name="edit-track-location" placeholder="Enter Location">
               </div>
             </div>
-            <div class="col-md-6">
+          </div>
+          <div class="row">
+            <div class="col-md-4">
               <div class="form-group">
                 <label for="edit-track-issueddate">Issued Date</label>
                 <input type="date" class="form-control" id="edit-track-issueddate" name="edit-track-issueddate" placeholder="Issued Date">
               </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
+            <div class="col-md-4">
               <div class="form-group">
                 <label for="edit-track-receivedby">Received By</label>
                 <input type="text" class="form-control" id="edit-track-receivedby" name="edit-track-receivedby" placeholder="Enter Received By">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="edit-track-handoverto">Handover To</label>
+                <input type="text" class="form-control" id="edit-track-handoverto" name="edit-track-handoverto" placeholder="Enter Handover To">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="edit-track-created_date">Created Date</label>
+                <input type="datetime-local" class="form-control" id="edit-track-created_date" name="edit-track-created_date">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="edit-track-created_by">Created By</label>
+                <input type="number" min="0" class="form-control" id="edit-track-created_by" name="edit-track-created_by" placeholder="User / employee ID">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="edit-track-id_type">ID Type</label>
+                <select class="form-control" id="edit-track-id_type" name="edit-track-id_type">
+                  <option value="">-- Select --</option>
+                  <option value="vikings">vikings</option>
+                  <option value="subagent">subagent</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="edit-track-req_requisition_list_id">Requisition List ID</label>
+                <input type="number" min="0" class="form-control" id="edit-track-req_requisition_list_id" name="edit-track-req_requisition_list_id" placeholder="req_requisition_list_id">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="edit-track-req_requisition_item_id">Requisition Item ID</label>
+                <input type="number" min="0" class="form-control" id="edit-track-req_requisition_item_id" name="edit-track-req_requisition_item_id" placeholder="req_requisition_item_id">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="edit-track-req_poa_adhoc_id">POA Adhoc ID</label>
+                <input type="number" min="0" class="form-control" id="edit-track-req_poa_adhoc_id" name="edit-track-req_poa_adhoc_id" placeholder="req_poa_adhoc_id">
               </div>
             </div>
           </div>

@@ -255,13 +255,21 @@ class ToolTrackerController extends Controller
 
     public function updateTrack(Request $request){
         $update = [
+            'toolsdetails_id' => $request->toolsdetails_id ?: null,
             'issuedby' => $request->issuedby ?? '',
-            'user_id' => $request->user_id ?? '',
+            'user_id' => $request->user_id ?: null,
             'project_id' => $request->project_id ?: null,
             'status' => $request->status ?? 0,
             'location' => $request->location ?? '',
-            'issueddate' => $request->issueddate ?? null,
+            'issueddate' => $request->issueddate ?: null,
             'receivedby' => $request->receivedby ?? '',
+            'handoverto' => $request->handoverto ?? '',
+            'created_date' => $request->created_date ? str_replace('T', ' ', $request->created_date) : null,
+            'created_by' => $request->created_by ?: null,
+            'id_type' => $request->id_type ?? '',
+            'req_requisition_list_id' => $request->req_requisition_list_id ?: null,
+            'req_requisition_item_id' => $request->req_requisition_item_id ?: null,
+            'req_poa_adhoc_id' => $request->req_poa_adhoc_id ?: null,
         ];
         $edit = StcTooldetailsTrack::where('id', $request->id)->update($update);
         if($edit){
