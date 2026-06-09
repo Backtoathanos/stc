@@ -58,6 +58,15 @@ else {
         .fade:not(.show) {
           opacity: 10;
         }
+        .stc-safety-tbm-pagination-wrap .pagination .page-item.disabled .page-link{
+            pointer-events: none;
+            opacity: 0.55;
+        }
+        .stc-safety-tbm-loading{
+            padding: 16px;
+            text-align: center;
+            color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -189,6 +198,7 @@ else {
                                     <div class="col-md-12 col-xl-12"> 
                                         <div class="main-card mb-3 card">
                                             <div class="card-body">
+                                                <div class="stc-safety-tbm-pagination-wrap"></div>
                                                 <table class="mb-0 table table-hover table-bordered">
                                                     <thead>
                                                         <tr>
@@ -727,25 +737,62 @@ else {
             var location = '';
             var month = '';
             var supervise_name = '';
+            var tbmPageState = { page: 1, per_page: 25 };
+
             $('body').delegate('.safety-filter-by-search', 'click', function() {
                 location = $('.safety-filter-by-location').val();
                 month = $('.safety-filter-by-month').val();
                 supervise_name=$('.safety-filter-by-supervisorname').val();
-                // call tbm
-                call_tbm(location, month, supervise_name);
+                tbmPageState.page = 1;
+                call_tbm(location, month, supervise_name, 1);
             });
+
+            function renderTbmList(response_tbm){
+                $('.stc-safety-tbm-pagination-wrap').html(response_tbm.pagination || '');
+                $('.stc-safety-tbm-res-table').html(response_tbm.rows || '');
+                $('.stc-safety-tbm-per-page').val(String(tbmPageState.per_page));
+            }
             
-            function call_tbm(location, month, supervise_name){
+            function call_tbm(location, month, supervise_name, page){
+                if(page){
+                    tbmPageState.page = parseInt(page, 10) || 1;
+                }
+                $('.stc-safety-tbm-pagination-wrap').html('');
+                $('.stc-safety-tbm-res-table').html('<tr><td colspan="6" class="stc-safety-tbm-loading">Loading...</td></tr>');
                 $.ajax({
                     url         : "nemesis/stc_project.php",
                     method      : "POST",
-                    data        : {stc_safety_calltbm:1, location:location, month:month, supervise_name:supervise_name},
+                    dataType    : "json",
+                    data        : {
+                        stc_safety_calltbm:1,
+                        location:location,
+                        month:month,
+                        supervise_name:supervise_name,
+                        tbm_page:tbmPageState.page,
+                        tbm_per_page:tbmPageState.per_page
+                    },
                     success     : function(response_tbm){
-                        // console.log(response_tbm);
-                        $('.stc-safety-tbm-res-table').html(response_tbm);
+                        renderTbmList(response_tbm);
+                    },
+                    error       : function(){
+                        $('.stc-safety-tbm-res-table').html('<tr><td colspan="6" class="text-danger text-center">Failed to load records.</td></tr>');
                     }
                 });
             }
+
+            $('body').delegate('.stc-safety-tbm-page-link', 'click', function(e){
+                e.preventDefault();
+                if($(this).closest('.page-item').hasClass('disabled')){
+                    return;
+                }
+                call_tbm(location, month, supervise_name, $(this).data('page'));
+            });
+
+            $('body').delegate('.stc-safety-tbm-per-page', 'change', function(){
+                tbmPageState.per_page = parseInt($(this).val(), 10) || 25;
+                tbmPageState.page = 1;
+                call_tbm(location, month, supervise_name, 1);
+            });
 
             // add image for tbm
             $('body').delegate('.stc-safety-tbm-image-show-btn', 'click', function() {
@@ -879,7 +926,7 @@ else {
                     success     : function(response_tbm){
                         var response=response_tbm.trim();
                         if(response=="success"){
-                            call_tbm(month, supervise_name);
+                            call_tbm(location, month, supervise_name, tbmPageState.page);
                         }else{
                             alert("Something went wrong, please check and try again.");
                         }
@@ -1101,7 +1148,7 @@ else {
                         data=data.trim();
                         if(data=="success"){
                             alert("Image added!!");
-                            call_tbm(month, supervise_name);
+                            call_tbm(location, month, supervise_name, tbmPageState.page);
                             $('#safety-image-upload-form')[0].reset();
                         }
                     }
