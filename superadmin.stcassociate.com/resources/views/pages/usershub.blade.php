@@ -645,71 +645,71 @@
     $('#modal-uadmin').modal('show');
   });
 
-  document.querySelectorAll('.btn-edit-hub').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var type = btn.getAttribute('data-type');
-      var id = btn.getAttribute('data-id');
-      var r = routes[type];
-      if (!r) return;
-      fetch(r.json(id), { headers: headers, credentials: 'same-origin' })
-        .then(function (res) { return res.json(); })
-        .then(function (d) {
-          if (type === 'electronics') {
-            hideErrors('form-electronics-errors');
-            fillElectronics(d);
-            document.getElementById('form-electronics').setAttribute('action', r.edit(id));
-            $('#modal-electronics').modal('show');
-          } else if (type === 'trading') {
-            hideErrors('form-trading-errors');
-            fillTrading(d);
-            document.getElementById('form-trading').setAttribute('action', r.edit(id));
-            $('#modal-trading').modal('show');
-          } else if (type === 'groceries') {
-            hideErrors('form-groceries-errors');
-            fillGroceries(d);
-            document.getElementById('form-groceries').setAttribute('action', r.edit(id));
-            $('#modal-groceries').modal('show');
-          } else if (type === 'manager') {
-            hideErrors('form-manager-errors');
-            fillManager(d);
-            document.getElementById('form-manager').setAttribute('action', r.edit(id));
-            $('#modal-manager').modal('show');
-          } else if (type === 'school') {
-            hideErrors('form-school-errors');
-            fillSchool(d);
-            document.getElementById('form-school').setAttribute('action', r.edit(id));
-            $('#modal-school').modal('show');
-          } else if (type === 'site') {
-            hideErrors('form-site-errors');
-            fillSite(d);
-            document.getElementById('form-site').setAttribute('action', r.edit(id));
-            $('#modal-site').modal('show');
-          } else if (type === 'uadmin') {
-            hideErrors('form-uadmin-errors');
-            fillUadmin(d);
-            document.getElementById('form-uadmin').setAttribute('action', r.edit(id));
-            $('#modal-uadmin').modal('show');
-          }
-        });
-    });
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.btn-edit-hub');
+    if (!btn) return;
+    var type = btn.getAttribute('data-type');
+    var id = btn.getAttribute('data-id');
+    var r = routes[type];
+    if (!r) return;
+    fetch(r.json(id), { headers: headers, credentials: 'same-origin' })
+      .then(function (res) { return res.json(); })
+      .then(function (d) {
+        if (type === 'electronics') {
+          hideErrors('form-electronics-errors');
+          fillElectronics(d);
+          document.getElementById('form-electronics').setAttribute('action', r.edit(id));
+          $('#modal-electronics').modal('show');
+        } else if (type === 'trading') {
+          hideErrors('form-trading-errors');
+          fillTrading(d);
+          document.getElementById('form-trading').setAttribute('action', r.edit(id));
+          $('#modal-trading').modal('show');
+        } else if (type === 'groceries') {
+          hideErrors('form-groceries-errors');
+          fillGroceries(d);
+          document.getElementById('form-groceries').setAttribute('action', r.edit(id));
+          $('#modal-groceries').modal('show');
+        } else if (type === 'manager') {
+          hideErrors('form-manager-errors');
+          fillManager(d);
+          document.getElementById('form-manager').setAttribute('action', r.edit(id));
+          $('#modal-manager').modal('show');
+        } else if (type === 'school') {
+          hideErrors('form-school-errors');
+          fillSchool(d);
+          document.getElementById('form-school').setAttribute('action', r.edit(id));
+          $('#modal-school').modal('show');
+        } else if (type === 'site') {
+          hideErrors('form-site-errors');
+          fillSite(d);
+          document.getElementById('form-site').setAttribute('action', r.edit(id));
+          $('#modal-site').modal('show');
+        } else if (type === 'uadmin') {
+          hideErrors('form-uadmin-errors');
+          fillUadmin(d);
+          document.getElementById('form-uadmin').setAttribute('action', r.edit(id));
+          $('#modal-uadmin').modal('show');
+        }
+      });
   });
 
-  document.querySelectorAll('.btn-delete-hub').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var type = btn.getAttribute('data-type');
-      var id = btn.getAttribute('data-id');
-      var r = routes[type];
-      if (!r || !confirm('Delete this user?')) return;
-      var fd = new FormData();
-      fd.append('_token', csrf);
-      fetch(r.del(id), { method: 'POST', body: fd, headers: headers, credentials: 'same-origin' })
-        .then(function (res) { return res.text().then(function (t) { try { return JSON.parse(t); } catch (e) { return {}; } }); })
-        .then(function (body) {
-          if (body.success) window.location.reload();
-          else alert(body.message || 'Delete failed');
-        })
-        .catch(function () { alert('Delete failed'); });
-    });
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('.btn-delete-hub');
+    if (!btn) return;
+    var type = btn.getAttribute('data-type');
+    var id = btn.getAttribute('data-id');
+    var r = routes[type];
+    if (!r || !confirm('Delete this user?')) return;
+    var fd = new FormData();
+    fd.append('_token', csrf);
+    fetch(r.del(id), { method: 'POST', body: fd, headers: headers, credentials: 'same-origin' })
+      .then(function (res) { return res.text().then(function (t) { try { return JSON.parse(t); } catch (e) { return {}; } }); })
+      .then(function (body) {
+        if (body.success) window.location.reload();
+        else alert(body.message || 'Delete failed');
+      })
+      .catch(function () { alert('Delete failed'); });
   });
 
   var dtOpts = {
