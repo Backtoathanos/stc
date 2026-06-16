@@ -17,39 +17,42 @@ import { FaEdit } from 'react-icons/fa';
 const INVENTORY_TABLE_STYLES = {
     table: {
         style: {
-            borderCollapse: 'collapse'
+            width: '100%',
         }
     },
     headRow: {
         style: {
-            minHeight: '44px',
+            minHeight: '38px',
             backgroundColor: '#f8f9fa',
             borderBottom: '2px solid #dee2e6'
         }
     },
     headCells: {
         style: {
-            paddingLeft: '12px',
-            paddingRight: '12px',
-            paddingTop: '10px',
-            paddingBottom: '10px',
+            paddingLeft: '8px',
+            paddingRight: '8px',
+            paddingTop: '6px',
+            paddingBottom: '6px',
             fontWeight: 600,
-            fontSize: '13px',
+            fontSize: '12px',
             color: '#333'
         }
     },
     rows: {
         style: {
-            minHeight: '56px',
-            fontSize: '14px'
+            minHeight: '52px',
+            fontSize: '13px',
+            alignItems: 'flex-start',
+            paddingTop: '6px',
+            paddingBottom: '6px',
         }
     },
     cells: {
         style: {
-            paddingLeft: '12px',
-            paddingRight: '12px',
-            paddingTop: '8px',
-            paddingBottom: '8px',
+            paddingLeft: '8px',
+            paddingRight: '8px',
+            paddingTop: '5px',
+            paddingBottom: '5px',
             verticalAlign: 'middle'
         }
     }
@@ -165,8 +168,10 @@ export default function Dashboard() {
             name: 'Product',
             selector: row => row.stc_product_name,
             sortable: true,
-            minWidth: '240px',
-            grow: 2,
+            grow: 3,
+            minWidth: '150px',
+            wrap: true,
+            left: true,
             cell: row => {
                 const raw = row.stc_product_image ? String(row.stc_product_image).trim() : '';
                 const imageUrl = raw ? raw : defaultImageUrl;
@@ -203,10 +208,13 @@ export default function Dashboard() {
             selector: row => row.stc_product_id,
             sortable: true,
             center: true,
+            grow: 1,
+            minWidth: '80px',
             cell: row => (
                 <button
                     type="button"
                     className="btn btn-link p-0 border-0"
+                    style={{ fontSize: '12px' }}
                     onClick={() => {
                         setSelectedProductId(row.stc_product_id);
                         setSecondModalOpen(true);
@@ -221,14 +229,16 @@ export default function Dashboard() {
             selector: row => row.stc_rack_name,
             sortable: true,
             center: true,
+            grow: 1.2,
+            minWidth: '90px',
             cell: row => (
                 locationcookie !== 'Root' ? (
                     <Button
-                        style={{ display: 'flex', alignItems: 'center', gap: 6, backgroundColor: 'rgb(155 216 143)', color: '#000000', fontWeight: 'bold' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 4, backgroundColor: 'rgb(155 216 143)', color: '#000000', fontWeight: 'bold', padding: '3px 7px', fontSize: '12px' }}
                         onClick={() => handleOpenRackModal(row)}
                         title="Edit Rack"
                     >
-                        <FaEdit style={{ color: 'rgb(129 10 255)', fontSize: '18px' }} />
+                        <FaEdit style={{ color: 'rgb(129 10 255)', fontSize: '14px' }} />
                         <span>{row.stc_rack_name}</span>
                     </Button>
                 ) : (
@@ -240,13 +250,17 @@ export default function Dashboard() {
             name: 'Unit',
             selector: row => row.stc_product_unit,
             sortable: true,
-            center: true
+            center: true,
+            grow: 0.6,
+            minWidth: '60px',
         },
         {
             name: 'Inv Qty.',
             selector: row => `${row.stc_item_inventory_pd_qty} ${row.stc_product_unit}`,
             sortable: true,
             right: true,
+            grow: 0.7,
+            minWidth: '65px',
             cell: row => (
                 <span className="inventory-qty-pill">
                     <span className="inventory-qty-value">{row.stc_item_inventory_pd_qty}</span>
@@ -258,21 +272,25 @@ export default function Dashboard() {
             name: 'Sale Rate',
             selector: row => row.rate_including_gst,
             sortable: true,
-            right: true
+            right: true,
+            grow: 1,
+            minWidth: '80px',
         },
         {
             name: 'Action',
             selector: row => row.stc_product_id,
             sortable: false,
             center: true,
+            grow: 1.8,
+            minWidth: '130px',
             cell: row => (
                 locationcookie !== 'Root' ? (
-                    <>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'nowrap' }}>
                         {Number(row.stc_item_inventory_pd_qty) > 0 && (
                             <Button
                                 variant="info"
                                 size="sm"
-                                style={{ marginRight: 8 }}
+                                style={{ padding: '2px 7px', fontSize: '12px' }}
                                 onClick={() => handleOpenTransferModal(row)}
                             >
                                 Transfer
@@ -282,18 +300,20 @@ export default function Dashboard() {
                             <Button
                                 variant="warning"
                                 size="sm"
+                                style={{ padding: '2px 7px', fontSize: '12px' }}
                                 onClick={() => handleOpenRequisitionModal(row)}
                             >
-                                Add Requisition
+                                Add Req.
                             </Button>
                         ) : (
                             <button
                                 type="button"
                                 className="btn btn-primary btn-sm"
+                                style={{ padding: '2px 7px', fontSize: '12px' }}
                                 onClick={() => {
                                     setSelectedProductId(row.stc_product_id);
-                                        setSelectedProductName(row.stc_product_name || '');
-                                        setSelectedProductCategory(row.stc_cat_name || '');
+                                    setSelectedProductName(row.stc_product_name || '');
+                                    setSelectedProductCategory(row.stc_cat_name || '');
                                     setSelectedProductRate(row.rate_including_gst);
                                     setSelectedProductQuantity(Number(row.stc_item_inventory_pd_qty));
                                     setModalShow(true);
@@ -302,7 +322,7 @@ export default function Dashboard() {
                                 Add
                             </button>
                         )}
-                    </>
+                    </div>
                 ) : null
             )
         }
