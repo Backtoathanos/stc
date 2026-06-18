@@ -435,8 +435,50 @@ else {
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Tools & Tackles Power Tools & Callibaration comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body">
+                                                <h5 class="card-title">AUD-07 Audit Register Electric Tool</h5>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="position-relative form-group">
+                                                            <label>By Month</label>
+                                                            <input type="month" class="form-control safety-pt-filter-by-month" value="<?php echo date("Y-m");?>">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <div class="position-relative form-group">
+                                                            <label>By Site Name / Work Order No</label>
+                                                            <input type="text" class="form-control safety-pt-filter-by-keyword" placeholder="Enter site name or work order no">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="position-relative form-group">
+                                                            <button class="form-control btn btn-primary safety-pt-filter-by-search">Search</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">SL No.</th>
+                                                            <th class="text-center">Date</th>
+                                                            <th class="text-center">Site Name</th>
+                                                            <th class="text-center">Work Order No</th>
+                                                            <th width="12%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-powertools-res-table">
+                                                        <tr><td colspan="5">Loading...</td></tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="stc-safety-powertools-pagination" style="margin-top:15px;text-align:center;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -1938,6 +1980,89 @@ else {
                 }else{
                     alert("Please enter name of workmen!!!");
                 }
+            });
+        });
+    </script>
+    <!-- ===== Power Tools AUD-07 JS ===== -->
+    <script>
+        $(document).ready(function(){
+            var ptMonth   = '<?php echo date("Y-m"); ?>';
+            var ptKeyword = '';
+            window.ptAgentPage    = 1;
+            window.ptAgentPageSz  = 10;
+
+            // Initial load
+            call_powertools_agent(ptMonth, ptKeyword, 1);
+
+            // Search button
+            $('body').delegate('.safety-pt-filter-by-search', 'click', function(){
+                ptMonth   = $('.safety-pt-filter-by-month').val();
+                ptKeyword = $('.safety-pt-filter-by-keyword').val();
+                call_powertools_agent(ptMonth, ptKeyword, 1);
+            });
+
+            // Also search on Enter key in keyword field
+            $('body').delegate('.safety-pt-filter-by-keyword', 'keypress', function(e){
+                if(e.which === 13){
+                    ptMonth   = $('.safety-pt-filter-by-month').val();
+                    ptKeyword = $(this).val();
+                    call_powertools_agent(ptMonth, ptKeyword, 1);
+                }
+            });
+
+            function call_powertools_agent(month, keyword, page){
+                window.ptAgentPage = page || 1;
+                $.ajax({
+                    url      : "nemesis/stc_project.php",
+                    method   : "POST",
+                    dataType : "JSON",
+                    data     : {
+                        stc_safety_callpowertools : 1,
+                        month    : month,
+                        keyword  : keyword,
+                        page     : window.ptAgentPage,
+                        pageSize : window.ptAgentPageSz
+                    },
+                    success  : function(res){
+                        $('.stc-safety-powertools-res-table').html(res.data);
+                        renderPtPagination(res.total_count, month, keyword);
+                    },
+                    error    : function(){
+                        $('.stc-safety-powertools-res-table').html('<tr><td colspan="5">Error loading data.</td></tr>');
+                    }
+                });
+            }
+
+            function renderPtPagination(total, month, keyword){
+                var totalPages = Math.ceil(total / window.ptAgentPageSz);
+                var html = '';
+                if(totalPages > 1){
+                    html = '<nav><ul class="pagination justify-content-center">';
+                    if(window.ptAgentPage > 1){
+                        html += '<li class="page-item"><a class="page-link stc-pt-page" data-page="'+(window.ptAgentPage-1)+'" href="javascript:void(0)">Prev</a></li>';
+                    }
+                    var s = Math.max(1, window.ptAgentPage-2);
+                    var e = Math.min(totalPages, window.ptAgentPage+2);
+                    if(s>1){ html+='<li class="page-item"><a class="page-link stc-pt-page" data-page="1" href="javascript:void(0)">1</a></li>'; if(s>2) html+='<li class="page-item disabled"><span class="page-link">...</span></li>'; }
+                    for(var i=s;i<=e;i++){
+                        var act=(i===window.ptAgentPage)?' active':'';
+                        html+='<li class="page-item'+act+'"><a class="page-link stc-pt-page" data-page="'+i+'" href="javascript:void(0)">'+i+'</a></li>';
+                    }
+                    if(e<totalPages){ if(e<totalPages-1) html+='<li class="page-item disabled"><span class="page-link">...</span></li>'; html+='<li class="page-item"><a class="page-link stc-pt-page" data-page="'+totalPages+'" href="javascript:void(0)">'+totalPages+'</a></li>'; }
+                    if(window.ptAgentPage < totalPages){
+                        html += '<li class="page-item"><a class="page-link stc-pt-page" data-page="'+(window.ptAgentPage+1)+'" href="javascript:void(0)">Next</a></li>';
+                    }
+                    html += '</ul></nav>';
+                }
+                $('.stc-safety-powertools-pagination').html(html);
+            }
+
+            // Pagination click
+            $('body').delegate('.stc-pt-page', 'click', function(){
+                var pg = parseInt($(this).data('page'));
+                ptMonth   = $('.safety-pt-filter-by-month').val();
+                ptKeyword = $('.safety-pt-filter-by-keyword').val();
+                call_powertools_agent(ptMonth, ptKeyword, pg);
             });
         });
     </script>

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 session_start();
 require_once __DIR__ . '/../includes/agent_session_defaults.php';
 date_default_timezone_set('Asia/Kolkata');
@@ -2754,4 +2754,195 @@ if(isset($_POST['stc-capaafter-no'])){
 	echo $opobjsearchreq;
 }
 
+/*-------------------------------------For Power Tools AUD-07------------------------------------*/
+class witcher_powertools extends tesseract{
+
+    private function ensure_tables(){
+        mysqli_query($this->stc_dbs, "
+            CREATE TABLE IF NOT EXISTS `stc_safety_powertools_aud07` (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `work_orderno` varchar(255) NOT NULL DEFAULT '',
+                `sitename` varchar(255) NOT NULL DEFAULT '',
+                `starting_date` varchar(20) NOT NULL DEFAULT '',
+                `created_date` date DEFAULT NULL,
+                `created_by` int(11) NOT NULL DEFAULT 0,
+                PRIMARY KEY (`id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        ");
+        mysqli_query($this->stc_dbs, "
+            CREATE TABLE IF NOT EXISTS `stc_safety_powertools_aud07_items` (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `powertools_id` int(11) NOT NULL,
+                `name_type_make` varchar(255) NOT NULL DEFAULT '',
+                `serial_no` varchar(100) NOT NULL DEFAULT '',
+                `three_core_cable_plug` varchar(20) NOT NULL DEFAULT 'OK',
+                `insulation` varchar(20) NOT NULL DEFAULT 'OK',
+                `earthing_connection` varchar(20) NOT NULL DEFAULT 'OK',
+                `handle` varchar(20) NOT NULL DEFAULT 'OK',
+                `safe_to_work` varchar(10) NOT NULL DEFAULT 'Yes',
+                `supr_engg_name` varchar(255) NOT NULL DEFAULT '',
+                `sign_date` varchar(100) NOT NULL DEFAULT '',
+                PRIMARY KEY (`id`),
+                KEY `idx_powertools_id` (`powertools_id`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        ");
+    }
+
+    public function stc_hit_powertools_call_no(){
+        $this->ensure_tables();
+        $date = date("Y-m-d");
+        $sid  = mysqli_real_escape_string($this->stc_dbs, (string)$_SESSION['stc_agent_sub_id']);
+        $q = mysqli_query($this->stc_dbs,
+            "INSERT INTO `stc_safety_powertools_aud07`(`created_date`,`created_by`) VALUES ('".$date."','".$sid."')"
+        );
+        $id = '';
+        if($q){
+            $q2 = mysqli_query($this->stc_dbs,
+                "SELECT `id` FROM `stc_safety_powertools_aud07` WHERE `created_by`='".$sid."' ORDER BY `id` DESC LIMIT 1"
+            );
+            foreach($q2 as $r){ $id = $r['id']; }
+        }
+        return $id;
+    }
+
+    public function stc_call_powertools($page=1,$pageSize=10){
+        $this->ensure_tables();
+        $offset   = ($page-1)*$pageSize;
+        $sid      = mysqli_real_escape_string($this->stc_dbs, (string)$_SESSION['stc_agent_sub_id']);
+        $cq       = mysqli_query($this->stc_dbs,"SELECT COUNT(*) as total FROM `stc_safety_powertools_aud07` WHERE `created_by`='".$sid."'");
+        $cr       = mysqli_fetch_assoc($cq);
+        $total    = (int)$cr['total'];
+        $website  = ($_SERVER['SERVER_NAME']==='localhost') ? '..' : 'https://stcassociate.com/';
+        $html     = '';
+        $q = mysqli_query($this->stc_dbs,
+            "SELECT * FROM `stc_safety_powertools_aud07` WHERE `created_by`='".$sid."' ORDER BY `id` DESC LIMIT ".(int)$offset.",".(int)$pageSize
+        );
+        if(mysqli_num_rows($q)>0){
+            $sl = $offset;
+            foreach($q as $row){
+                $sl++;
+                $acts='
+                    <a href="'.$website.'/stc_agent47/safety-tandtpower-print-preview.php?powertools_id='.$row['id'].'" target="_blank" class="btn btn-success btn-sm" title="Print Preview"><i class="fa fa-print"></i></a>
+                    <a href="#" class="btn btn-secondary btn-sm stc-safetypowertools-edit" id="'.$row['id'].'" title="Edit"><i class="fa fa-edit"></i></a>
+                    <a href="#" class="btn btn-danger btn-sm stc-safetypowertools-delete" id="'.$row['id'].'" title="Delete"><i class="fa fa-trash"></i></a>
+                ';
+                $html.='<tr>
+                    <td>'.htmlspecialchars((string)$sl).'</td>
+                    <td>'.htmlspecialchars($row['sitename']).'</td>
+                    <td>'.htmlspecialchars($row['work_orderno']).'</td>
+                    <td>'.$acts.'</td>
+                </tr>';
+            }
+        }else{
+            $html='<tr><td colspan="4" class="text-center">No data found</td></tr>';
+        }
+        return array('data'=>$html,'total_count'=>$total);
+    }
+
+    public function stc_delete_powertools($id){
+        $id = (int)$id;
+        $q  = mysqli_query($this->stc_dbs,"DELETE FROM `stc_safety_powertools_aud07` WHERE `id`='".$id."'");
+        if($q){
+            mysqli_query($this->stc_dbs,"DELETE FROM `stc_safety_powertools_aud07_items` WHERE `powertools_id`='".$id."'");
+            return "success";
+        }
+        return "error";
+    }
+
+    public function stc_call_powertools_fields($id){
+        $id     = (int)$id;
+        $result = array('main'=>null,'items'=>array());
+        $q      = mysqli_query($this->stc_dbs,"SELECT * FROM `stc_safety_powertools_aud07` WHERE `id`='".$id."'");
+        foreach($q as $r){ $result['main']=$r; }
+        $q2     = mysqli_query($this->stc_dbs,"SELECT * FROM `stc_safety_powertools_aud07_items` WHERE `powertools_id`='".$id."' ORDER BY `id` ASC");
+        foreach($q2 as $r){ $result['items'][]=$r; }
+        return $result;
+    }
+
+    public function stc_update_powertools($id,$work_orderno,$sitename,$starting_date){
+        $id = (int)$id;
+        $q  = mysqli_query($this->stc_dbs,"
+            UPDATE `stc_safety_powertools_aud07` SET
+                `work_orderno`='".mysqli_real_escape_string($this->stc_dbs,$work_orderno)."',
+                `sitename`='".mysqli_real_escape_string($this->stc_dbs,$sitename)."',
+                `starting_date`='".mysqli_real_escape_string($this->stc_dbs,$starting_date)."'
+            WHERE `id`='".$id."'
+        ");
+        return $q ? "success" : "error";
+    }
+
+    public function stc_save_powertools_item($powertools_id,$name_type_make,$serial_no,$three_core,$insulation,$earthing,$handle,$safe_to_work,$supr_engg_name,$sign_date){
+        $q = mysqli_query($this->stc_dbs,"
+            INSERT INTO `stc_safety_powertools_aud07_items`
+            (`powertools_id`,`name_type_make`,`serial_no`,`three_core_cable_plug`,`insulation`,`earthing_connection`,`handle`,`safe_to_work`,`supr_engg_name`,`sign_date`)
+            VALUES (
+                '".(int)$powertools_id."',
+                '".mysqli_real_escape_string($this->stc_dbs,$name_type_make)."',
+                '".mysqli_real_escape_string($this->stc_dbs,$serial_no)."',
+                '".mysqli_real_escape_string($this->stc_dbs,$three_core)."',
+                '".mysqli_real_escape_string($this->stc_dbs,$insulation)."',
+                '".mysqli_real_escape_string($this->stc_dbs,$earthing)."',
+                '".mysqli_real_escape_string($this->stc_dbs,$handle)."',
+                '".mysqli_real_escape_string($this->stc_dbs,$safe_to_work)."',
+                '".mysqli_real_escape_string($this->stc_dbs,$supr_engg_name)."',
+                '".mysqli_real_escape_string($this->stc_dbs,$sign_date)."'
+            )
+        ");
+        return $q ? "success" : "error";
+    }
+
+    public function stc_delete_powertools_item($item_id){
+        $q = mysqli_query($this->stc_dbs,"DELETE FROM `stc_safety_powertools_aud07_items` WHERE `id`='".(int)$item_id."'");
+        return $q ? "success" : "error";
+    }
+}
+
+// add powertools record
+if(isset($_POST['stc_safety_addpowertools'])){
+    $obj=new witcher_powertools();
+    if(empty($_SESSION['stc_agent_sub_id'])){ echo "reload"; }
+    else{ echo $obj->stc_hit_powertools_call_no(); }
+}
+
+// call powertools list
+if(isset($_POST['stc_safety_callpowertools'])){
+    $page     = isset($_POST['page'])     ? (int)$_POST['page']     : 1;
+    $pageSize = isset($_POST['pageSize']) ? (int)$_POST['pageSize'] : 10;
+    $obj=new witcher_powertools();
+    echo json_encode($obj->stc_call_powertools($page,$pageSize));
+}
+
+// delete powertools record
+if(isset($_POST['stc_safety_deletepowertools'])){
+    $obj=new witcher_powertools();
+    echo $obj->stc_delete_powertools($_POST['powertools_id']);
+}
+
+// call powertools fields
+if(isset($_POST['stc_safety_callpowertoolsfields'])){
+    $obj=new witcher_powertools();
+    echo json_encode($obj->stc_call_powertools_fields($_POST['powertools_id']));
+}
+
+// update powertools main record
+if(isset($_POST['stc_safety_updatepowertools'])){
+    $obj=new witcher_powertools();
+    echo $obj->stc_update_powertools($_POST['powertools_id'],$_POST['work_orderno'],$_POST['sitename'],$_POST['starting_date']);
+}
+
+// save powertools item
+if(isset($_POST['stc_safety_savepowertoolsitem'])){
+    $obj=new witcher_powertools();
+    echo $obj->stc_save_powertools_item(
+        $_POST['powertools_id'],$_POST['name_type_make'],$_POST['serial_no'],
+        $_POST['three_core_cable_plug'],$_POST['insulation'],$_POST['earthing_connection'],
+        $_POST['handle'],$_POST['safe_to_work'],$_POST['supr_engg_name'],$_POST['sign_date']
+    );
+}
+
+// delete powertools item
+if(isset($_POST['stc_safety_deletepowertoolsitem'])){
+    $obj=new witcher_powertools();
+    echo $obj->stc_delete_powertools_item($_POST['item_id']);
+}
 ?>

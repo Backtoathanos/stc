@@ -4397,6 +4397,55 @@ class pirates_supervisor extends tesseract{
 		return $optimusprime;
 	}
 
+	// call power tools AUD-07
+	public function stc_call_powertools($month, $keyword, $page=1, $pageSize=10){
+		$offset = ($page-1)*$pageSize;
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$m = $month_arr[0];
+		$y = $month_arr[1];
+		$kw = mysqli_real_escape_string($this->stc_dbs, $keyword);
+		$keyword_cond = '';
+		if($kw !== ''){
+			$keyword_cond = "AND (`sitename` LIKE '%".$kw."%' OR `work_orderno` LIKE '%".$kw."%')";
+		}
+		$countq = mysqli_query($this->stc_dbs,"
+			SELECT COUNT(*) as total FROM `stc_safety_powertools_aud07`
+			WHERE MONTH(`created_date`)='".$m."' AND YEAR(`created_date`)='".$y."'
+			".$keyword_cond."
+		");
+		$cr    = mysqli_fetch_assoc($countq);
+		$total = (int)$cr['total'];
+		$website = ($_SERVER['SERVER_NAME']==='localhost') ? '' : 'https://stcassociate.com/stc_agent47/';
+		$html = '';
+		$q = mysqli_query($this->stc_dbs,"
+			SELECT * FROM `stc_safety_powertools_aud07`
+			WHERE MONTH(`created_date`)='".$m."' AND YEAR(`created_date`)='".$y."'
+			".$keyword_cond."
+			ORDER BY `id` DESC
+			LIMIT ".(int)$offset.",".(int)$pageSize."
+		");
+		if(mysqli_num_rows($q) > 0){
+			$sl = $offset;
+			foreach($q as $row){
+				$sl++;
+				$html .= '
+					<tr>
+						<td class="text-center">'.htmlspecialchars((string)$sl).'</td>
+						<td class="text-center">'.date('d-m-Y', strtotime($row['created_date'])).'</td>
+						<td>'.htmlspecialchars($row['sitename']).'</td>
+						<td>'.htmlspecialchars($row['work_orderno']).'</td>
+						<td class="text-center">
+							<a href="'.$website.'safety-tandtpower-print-preview.php?powertools_id='.$row['id'].'" target="_blank" class="btn btn-success btn-sm"><i class="fa fa-print"></i> Print</a>
+						</td>
+					</tr>
+				';
+			}
+		}else{
+			$html = '<tr><td colspan="5" class="text-center">No data found</td></tr>';
+		}
+		return array('data'=>$html, 'total_count'=>$total);
+	}
+
 	// call vhl
 	public function stc_call_vhl($month, $supervise_name){
 		$optimusprime='';
@@ -4794,6 +4843,16 @@ if(isset($_POST['stc_safety_callcapa'])){
 	$objsearchreq=new pirates_supervisor();
 	$opobjsearchreq=$objsearchreq->stc_call_capa($month, $supervise_name);
 	echo $opobjsearchreq;
+}
+
+// call power tools AUD-07
+if(isset($_POST['stc_safety_callpowertools'])){
+	$month    = isset($_POST['month'])    ? $_POST['month']    : date('Y-m');
+	$keyword  = isset($_POST['keyword'])  ? $_POST['keyword']  : '';
+	$page     = isset($_POST['page'])     ? (int)$_POST['page']     : 1;
+	$pageSize = isset($_POST['pageSize']) ? (int)$_POST['pageSize'] : 10;
+	$objsearchreq = new pirates_supervisor();
+	echo json_encode($objsearchreq->stc_call_powertools($month, $keyword, $page, $pageSize));
 }
 
 // create project

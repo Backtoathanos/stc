@@ -296,8 +296,29 @@
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
-                                            <div class="card-body"><h5 class="card-title">Tools & Tackles Power Tools & Callibaration comes here</h5>
-                                                blah blah blah...
+                                            <div class="card-body">
+                                                <h5 class="card-title">AUD-07 Audit Register Electric Tool</h5>
+                                                <a href="#" class="form-control btn btn-success add-powertools-modal">Add Power Tools &amp; Calibration</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 col-xl-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <table class="mb-0 table table-hover table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center">SL No.</th>
+                                                            <th class="text-center">Site Name</th>
+                                                            <th class="text-center">Work Order No</th>
+                                                            <th width="15%" class="text-center">Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="stc-safety-powertools-res-table">
+                                                        <tr><td colspan="4">Loading...</td></tr>
+                                                    </tbody>
+                                                </table>
+                                                <div class="stc-safety-powertools-pagination" style="margin-top:20px;text-align:center;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -2573,6 +2594,222 @@
 
         });
     </script>
+    <!-- ===== Power Tools AUD-07 JS ===== -->
+    <script>
+        $(document).ready(function(){
+
+            // ---- Pagination state ----
+            window.ptCurrentPage = 1;
+            window.ptPageSize = 10;
+
+            // ---- Load list ----
+            window.call_powertools = function(page){
+                if(page) window.ptCurrentPage = page;
+                $.ajax({
+                    url      : "nemesis/stc_safety.php",
+                    method   : "POST",
+                    data     : {stc_safety_callpowertools:1, page:window.ptCurrentPage, pageSize:window.ptPageSize},
+                    dataType : "JSON",
+                    success  : function(res){
+                        $('.stc-safety-powertools-res-table').html(res.data);
+                        updatePtPagination(res.total_count);
+                    },
+                    error    : function(){
+                        $('.stc-safety-powertools-res-table').html('<tr><td colspan="4">Error loading data.</td></tr>');
+                    }
+                });
+            };
+            call_powertools(1);
+
+            function updatePtPagination(total){
+                var totalPages = Math.ceil(total / window.ptPageSize);
+                var html = '';
+                if(totalPages > 1){
+                    html = '<nav><ul class="pagination justify-content-center">';
+                    if(window.ptCurrentPage > 1){
+                        html += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_powertools('+(window.ptCurrentPage-1)+')">Prev</a></li>';
+                    }
+                    var start = Math.max(1, window.ptCurrentPage-2);
+                    var end   = Math.min(totalPages, window.ptCurrentPage+2);
+                    if(start>1){ html += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_powertools(1)">1</a></li>'; if(start>2) html+='<li class="page-item disabled"><span class="page-link">...</span></li>'; }
+                    for(var i=start;i<=end;i++){
+                        var act=(i==window.ptCurrentPage)?' active':'';
+                        html+='<li class="page-item'+act+'"><a class="page-link" href="javascript:void(0)" onclick="call_powertools('+i+')">'+i+'</a></li>';
+                    }
+                    if(end<totalPages){ if(end<totalPages-1) html+='<li class="page-item disabled"><span class="page-link">...</span></li>'; html+='<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_powertools('+totalPages+')">'+totalPages+'</a></li>'; }
+                    if(window.ptCurrentPage<totalPages){
+                        html+='<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_powertools('+(window.ptCurrentPage+1)+')">Next</a></li>';
+                    }
+                    html += '</ul></nav>';
+                }
+                $('.stc-safety-powertools-pagination').html(html);
+            }
+
+            // ---- Open Add modal ----
+            $('body').delegate('.add-powertools-modal', 'click', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url    : "nemesis/stc_safety.php",
+                    method : "POST",
+                    data   : {stc_safety_addpowertools:1},
+                    success: function(res){
+                        var response = res.trim();
+                        if(response === "reload"){ window.location.reload(); return; }
+                        $('.stc-powertools-no').val(response);
+                        $('#stc-pt-wono,#stc-pt-sitename,#stc-pt-suprname').val('');
+                        $('#stc-pt-startingdate').val('');
+                        $('.stc-pt-items-table').html('<tr><td colspan="11" class="text-center text-muted">No items yet</td></tr>');
+                        $('.bd-powertools-modal-lg').modal('show');
+                        call_powertools();
+                    }
+                });
+            });
+
+            // ---- Edit ----
+            $('body').delegate('.stc-safetypowertools-edit', 'click', function(e){
+                e.preventDefault();
+                var pid = $(this).attr("id");
+                $('.stc-powertools-no').val(pid);
+                $('.bd-powertools-modal-lg').modal('show');
+                call_pt_fields();
+                call_powertools();
+            });
+
+            // ---- Delete record ----
+            $('body').delegate('.stc-safetypowertools-delete', 'click', function(e){
+                e.preventDefault();
+                if(!confirm('Remove this record?')) return;
+                var pid = $(this).attr("id");
+                $.ajax({
+                    url    : "nemesis/stc_safety.php",
+                    method : "POST",
+                    data   : {stc_safety_deletepowertools:1, powertools_id:pid},
+                    success: function(res){
+                        if(res.trim()==="success"){ call_powertools(); }
+                        else{ alert("Error deleting record."); }
+                    }
+                });
+            });
+
+            // ---- Load fields into edit modal ----
+            function call_pt_fields(){
+                var pid = $('.stc-powertools-no').val();
+                $.ajax({
+                    url      : "nemesis/stc_safety.php",
+                    method   : "POST",
+                    data     : {stc_safety_callpowertoolsfields:1, powertools_id:pid},
+                    dataType : "JSON",
+                    success  : function(res){
+                        if(res.main){
+                            $('#stc-pt-wono').val(res.main.work_orderno);
+                            $('#stc-pt-sitename').val(res.main.sitename);
+                            $('#stc-pt-startingdate').val(res.main.starting_date);
+                        }
+                        render_pt_items(res.items);
+                    }
+                });
+            }
+
+            function render_pt_items(items){
+                if(!items || items.length===0){
+                    $('.stc-pt-items-table').html('<tr><td colspan="11" class="text-center text-muted">No items yet</td></tr>');
+                    return;
+                }
+                var html=''; var sl=0;
+                for(var i=0;i<items.length;i++){
+                    sl++;
+                    html += '<tr>';
+                    html += '<td>'+sl+'</td>';
+                    html += '<td>'+items[i].name_type_make+'</td>';
+                    html += '<td>'+items[i].serial_no+'</td>';
+                    html += '<td>'+items[i].three_core_cable_plug+'</td>';
+                    html += '<td>'+items[i].insulation+'</td>';
+                    html += '<td>'+items[i].earthing_connection+'</td>';
+                    html += '<td>'+items[i].handle+'</td>';
+                    html += '<td>'+items[i].safe_to_work+'</td>';
+                    html += '<td>'+items[i].supr_engg_name+'</td>';
+                    html += '<td>'+items[i].sign_date+'</td>';
+                    html += '<td><a href="javascript:void(0)" class="btn btn-danger btn-xs stc-pt-item-delete" data-id="'+items[i].id+'"><i class="fa fa-trash"></i></a></td>';
+                    html += '</tr>';
+                }
+                $('.stc-pt-items-table').html(html);
+            }
+
+            // ---- Auto-save main fields on focusout ----
+            $('body').delegate('.stc-powertools-fields', 'focusout', function(){
+                save_pt_main();
+                call_powertools();
+                $('.pt-saved-popup').remove();
+                $(this).after('<p class="pt-saved-popup text-success" style="font-size:11px;">Saved</p>');
+                setTimeout(function(){ $('.pt-saved-popup').remove(); }, 2000);
+            });
+
+            function save_pt_main(){
+                var pid    = $('.stc-powertools-no').val();
+                var wono   = $('#stc-pt-wono').val();
+                var site   = $('#stc-pt-sitename').val();
+                var dtval  = $('#stc-pt-startingdate').val();
+                $.ajax({
+                    url    : "nemesis/stc_safety.php",
+                    method : "POST",
+                    data   : {stc_safety_updatepowertools:1, powertools_id:pid, work_orderno:wono, sitename:site, starting_date:dtval}
+                });
+            }
+
+            // ---- Add item row ----
+            $('body').delegate('#stc-pt-item-addbtn', 'click', function(e){
+                e.preventDefault();
+                var pid    = $('.stc-powertools-no').val();
+                var name   = $('#stc-pt-item-name').val();
+                var serial = $('#stc-pt-item-serial').val();
+                var core3  = $('#stc-pt-item-3core').val();
+                var insul  = $('#stc-pt-item-insulation').val();
+                var earth  = $('#stc-pt-item-earthing').val();
+                var handle = $('#stc-pt-item-handle').val();
+                var safe   = $('#stc-pt-item-safetowork').val();
+                var supr   = $('#stc-pt-item-suprname').val();
+                var sign   = $('#stc-pt-item-signdate').val();
+                if(name===''){alert('Please enter Name/Type/Make'); return;}
+                $.ajax({
+                    url    : "nemesis/stc_safety.php",
+                    method : "POST",
+                    data   : {
+                        stc_safety_savepowertoolsitem:1,
+                        powertools_id:pid,
+                        name_type_make:name, serial_no:serial,
+                        three_core_cable_plug:core3, insulation:insul,
+                        earthing_connection:earth, handle:handle,
+                        safe_to_work:safe, supr_engg_name:supr, sign_date:sign
+                    },
+                    success: function(res){
+                        if(res.trim()==="success"){
+                            $('#stc-pt-item-name,#stc-pt-item-serial,#stc-pt-item-suprname,#stc-pt-item-signdate').val('');
+                            $('#stc-pt-item-3core,#stc-pt-item-insulation,#stc-pt-item-earthing,#stc-pt-item-handle').val('OK');
+                            $('#stc-pt-item-safetowork').val('Yes');
+                            call_pt_fields();
+                        }else{alert("Error saving item.");}
+                    }
+                });
+            });
+
+            // ---- Delete item row ----
+            $('body').delegate('.stc-pt-item-delete', 'click', function(e){
+                e.preventDefault();
+                if(!confirm('Remove this row?')) return;
+                var item_id = $(this).data('id');
+                $.ajax({
+                    url    : "nemesis/stc_safety.php",
+                    method : "POST",
+                    data   : {stc_safety_deletepowertoolsitem:1, item_id:item_id},
+                    success: function(res){
+                        if(res.trim()==="success"){ call_pt_fields(); }
+                        else{ alert("Error deleting item."); }
+                    }
+                });
+            });
+
+        });
+    </script>
     <script>
         $(document).ready(function(){  
             // call nearmiss
@@ -4631,6 +4868,144 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ===== AUD-07 Power Tools & Calibration Modal ===== -->
+<div class="modal fade bd-powertools-modal-lg" tabindex="-1" role="dialog" aria-labelledby="powertoolsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="powertoolsModalLabel">AUD-07 &mdash; Audit Register Electric Tool</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" class="stc-powertools-no">
+                <small class="text-muted">* Fields are auto-saved when you leave them</small>
+                <div class="row mt-2">
+                    <div class="col-md-4 col-sm-12">
+                        <div class="form-group">
+                            <label><strong>Work Order No.</strong></label>
+                            <input type="text" class="form-control stc-powertools-fields" id="stc-pt-wono" placeholder="Work Order No.">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-12">
+                        <div class="form-group">
+                            <label><strong>Job Site Name</strong></label>
+                            <input type="text" class="form-control stc-powertools-fields" id="stc-pt-sitename" placeholder="Job Site Name">
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-12">
+                        <div class="form-group">
+                            <label><strong>Starting Date</strong></label>
+                            <input type="date" class="form-control stc-powertools-fields" id="stc-pt-startingdate">
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <h6><strong>Add Tool Entry</strong></h6>
+                <div class="row">
+                    <div class="col-md-3 col-sm-6">
+                        <div class="form-group">
+                            <label>Name / Type / Make</label>
+                            <input type="text" class="form-control" id="stc-pt-item-name" placeholder="Name/Type/Make">
+                        </div>
+                    </div>
+                    <div class="col-md-2 col-sm-6">
+                        <div class="form-group">
+                            <label>Serial No.</label>
+                            <input type="text" class="form-control" id="stc-pt-item-serial" placeholder="Serial No.">
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-sm-4">
+                        <div class="form-group">
+                            <label>3 Core Cable &amp; Plug</label>
+                            <select class="form-control" id="stc-pt-item-3core">
+                                <option value="OK">OK</option>
+                                <option value="Not OK">Not OK</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-sm-4">
+                        <div class="form-group">
+                            <label>Insulation</label>
+                            <select class="form-control" id="stc-pt-item-insulation">
+                                <option value="OK">OK</option>
+                                <option value="Not OK">Not OK</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-sm-4">
+                        <div class="form-group">
+                            <label>Earthing Conn.</label>
+                            <select class="form-control" id="stc-pt-item-earthing">
+                                <option value="OK">OK</option>
+                                <option value="Not OK">Not OK</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-sm-4">
+                        <div class="form-group">
+                            <label>Handle</label>
+                            <select class="form-control" id="stc-pt-item-handle">
+                                <option value="OK">OK</option>
+                                <option value="Not OK">Not OK</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-sm-4">
+                        <div class="form-group">
+                            <label>Safe To Work</label>
+                            <select class="form-control" id="stc-pt-item-safetowork">
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-sm-6">
+                        <div class="form-group">
+                            <label>SUPR/ENGR Name</label>
+                            <input type="text" class="form-control" id="stc-pt-item-suprname" placeholder="Name">
+                        </div>
+                    </div>
+                    <div class="col-md-1 col-sm-6">
+                        <div class="form-group">
+                            <label>Sign/Date</label>
+                            <input type="text" class="form-control" id="stc-pt-item-signdate" placeholder="Sign/Date">
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 mt-1 mb-2">
+                        <a href="javascript:void(0)" class="btn btn-success" id="stc-pt-item-addbtn"><i class="fa fa-plus"></i> Add Row</a>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>SN</th>
+                                <th>Name/Type/Make</th>
+                                <th>Serial No.</th>
+                                <th>3 Core Cable &amp; Plug</th>
+                                <th>Insulation</th>
+                                <th>Earthing Conn.</th>
+                                <th>Handle</th>
+                                <th>Safe To Work</th>
+                                <th>SUPR/ENGR Name</th>
+                                <th>Sign/Date</th>
+                                <th>Del</th>
+                            </tr>
+                        </thead>
+                        <tbody class="stc-pt-items-table">
+                            <tr><td colspan="11" class="text-center text-muted">No items yet</td></tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
             <div class="modal-footer">
