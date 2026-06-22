@@ -192,10 +192,10 @@ include_once("../MCU/db.php");
                                                         </div>
                                                         <div id="stc-ord-bulk-bar" style="display:none;margin-bottom:8px;padding:8px 12px;background:#fffbe6;border:1px solid #ffe58f;border-radius:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
                                                             <span style="font-weight:600;color:#555;margin-right:6px;"><span id="stc-ord-sel-count">0</span> item(s) selected</span>
-                                                            <button class="btn btn-success btn-sm" id="stc-ord-bulk-approve"><i class="fas fa-check-circle"></i> Approve Selected</button>
-                                                            <button class="btn btn-warning btn-sm" id="stc-ord-bulk-reject" style="color:#fff;"><i class="fas fa-ban"></i> Reject Selected</button>
-                                                            <button class="btn btn-danger btn-sm" id="stc-ord-bulk-delete"><i class="fas fa-trash"></i> Delete Selected</button>
-                                                            <button class="btn btn-default btn-sm" id="stc-ord-bulk-clear" style="margin-left:4px;"><i class="fas fa-times"></i> Clear</button>
+                                                            <button type="button" class="btn btn-success btn-sm" id="stc-ord-bulk-approve"><i class="fas fa-check-circle"></i> Approve Selected</button>
+                                                            <button type="button" class="btn btn-warning btn-sm" id="stc-ord-bulk-reject" style="color:#fff;"><i class="fas fa-ban"></i> Reject Selected</button>
+                                                            <button type="button" class="btn btn-danger btn-sm" id="stc-ord-bulk-delete"><i class="fas fa-trash"></i> Delete Selected</button>
+                                                            <button type="button" class="btn btn-default btn-sm" id="stc-ord-bulk-clear" style="margin-left:4px;"><i class="fas fa-times"></i> Clear</button>
                                                         </div>
                                                         <div class="col-md-12" style="overflow-x:auto;">
                                                             <table class="mb-0 table table-hover table-bordered" id="stc-requis-table">
@@ -336,7 +336,9 @@ include_once("../MCU/db.php");
                             + '<td class="text-center"><input type="checkbox" class="stc-ord-check" style="width:16px;height:16px;cursor:pointer;"'
                             +     ' data-item-id="'+r.item_list_id+'"'
                             +     ' data-list-id="'+r.list_id+'"'
-                            +     ' data-req-qty="'+r.req_qty_raw+'"></td>'
+                            +     ' data-req-qty="'+r.req_qty_raw+'"'
+                            +     ' data-item-title="'+stcOrdEscAttr(r.item_title)+'"'
+                            +     ' data-req-date="'+stcOrdEscAttr(r.req_date)+'"></td>'
                             + '<td class="text-center">'+r.sl+'</td>'
                             + '<td>'+r.list_id+' <br> '+stcOrdEsc(r.req_date)+'</td>'
                             + '<td>'+stcOrdEsc(r.project_title)+'</td>'
@@ -405,9 +407,11 @@ include_once("../MCU/db.php");
             var items = [];
             $('.stc-ord-check:checked').each(function(){
                 items.push({
-                    item_id : $(this).data('item-id'),
-                    list_id : $(this).data('list-id'),
-                    req_qty : $(this).data('req-qty')
+                    item_id    : $(this).data('item-id'),
+                    list_id    : $(this).data('list-id'),
+                    req_qty    : $(this).data('req-qty'),
+                    item_title : $(this).data('item-title') || '—',
+                    req_date   : $(this).data('req-date')   || '—'
                 });
             });
             return items;
@@ -435,7 +439,6 @@ include_once("../MCU/db.php");
                 url: 'nemesis/stc_project.php',
                 method: 'POST',
                 dataType: 'json',
-                traditional: true,
                 data: {
                     stc_bulk_order_action: 1,
                     action: action,
@@ -556,17 +559,40 @@ include_once("../MCU/db.php");
             });
 
             /* Bulk Delete */
-            $('#stc-ord-bulk-delete').on('click', function(){
+            $('#stc-ord-bulk-delete').on('click', function(e){
+                e.preventDefault();
                 var items = stcOrdGetChecked();
                 if (!items.length) return;
+
+                // Build item list HTML for the confirmation dialog
+                var listHtml = '<div style="max-height:260px;overflow-y:auto;margin-top:8px;">'
+                    + '<table style="width:100%;border-collapse:collapse;font-size:13px;">'
+                    + '<thead><tr style="background:#f8d7da;">'
+                    + '<th style="padding:6px 8px;border:1px solid #f5c6cb;text-align:left;">#</th>'
+                    + '<th style="padding:6px 8px;border:1px solid #f5c6cb;text-align:left;">Item Description</th>'
+                    + '<th style="padding:6px 8px;border:1px solid #f5c6cb;text-align:left;">Req. Date</th>'
+                    + '</tr></thead><tbody>';
+                $.each(items, function(i, it){
+                    var bg = i % 2 === 0 ? '#fff' : '#fff5f5';
+                    listHtml += '<tr style="background:'+bg+';">'
+                        + '<td style="padding:5px 8px;border:1px solid #f5c6cb;">'+(i+1)+'</td>'
+                        + '<td style="padding:5px 8px;border:1px solid #f5c6cb;font-weight:600;">' + $('<div>').text(it.item_title).html() + '</td>'
+                        + '<td style="padding:5px 8px;border:1px solid #f5c6cb;white-space:nowrap;">' + $('<div>').text(it.req_date).html() + '</td>'
+                        + '</tr>';
+                });
+                listHtml += '</tbody></table></div>'
+                    + '<p style="margin-top:10px;color:#e74c3c;font-weight:600;font-size:13px;">&#9888; This action cannot be undone.</p>';
+
                 Swal.fire({
                     icon: 'warning',
                     title: 'Delete ' + items.length + ' Item(s)?',
-                    text: 'This action cannot be undone.',
+                    html: listHtml,
                     showCancelButton: true,
                     confirmButtonColor: '#e74c3c',
-                    confirmButtonText: '<i class="fas fa-trash"></i> Yes, Delete',
-                    cancelButtonText: 'Cancel'
+                    confirmButtonText: '<i class="fas fa-trash"></i> Yes, Delete All',
+                    cancelButtonText: 'Cancel',
+                    width: 560,
+                    customClass: { htmlContainer: 'text-left' }
                 }).then(function(result) {
                     if (result.isConfirmed) stcOrdDoBulkAction('delete', items, 'Deleted via bulk action.');
                 });
