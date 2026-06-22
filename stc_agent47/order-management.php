@@ -194,7 +194,7 @@ include_once("../MCU/db.php");
                                                             <span style="font-weight:600;color:#555;margin-right:6px;"><span id="stc-ord-sel-count">0</span> item(s) selected</span>
                                                             <button type="button" class="btn btn-success btn-sm" id="stc-ord-bulk-approve"><i class="fas fa-check-circle"></i> Approve Selected</button>
                                                             <button type="button" class="btn btn-warning btn-sm" id="stc-ord-bulk-reject" style="color:#fff;"><i class="fas fa-ban"></i> Reject Selected</button>
-                                                            <button type="button" class="btn btn-danger btn-sm" id="stc-ord-bulk-delete"><i class="fas fa-trash"></i> Delete Selected</button>
+                                                            <!-- <button type="button" class="btn btn-danger btn-sm" id="stc-ord-bulk-delete"><i class="fas fa-trash"></i> Delete Selected</button> -->
                                                             <button type="button" class="btn btn-default btn-sm" id="stc-ord-bulk-clear" style="margin-left:4px;"><i class="fas fa-times"></i> Clear</button>
                                                         </div>
                                                         <div class="col-md-12" style="overflow-x:auto;">
