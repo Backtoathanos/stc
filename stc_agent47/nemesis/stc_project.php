@@ -2319,6 +2319,140 @@ class pirates_project extends tesseract{
 		fclose($out);
 	}
 
+	// Paginated order list for order-management.php
+	public function stc_order_list_paginated($page = 1, $per_page = 15, $agent_id = 0, $agent_role = 0, $search = '', $sort_col = 'req_date', $sort_dir = 'DESC') {
+		$page       = max(1, (int)$page);
+		$per_page   = max(5, min(100, (int)$per_page));
+		$offset     = ($page - 1) * $per_page;
+		$agent_id   = (int)$agent_id;
+		$agent_role = (int)$agent_role;
+		$search     = trim(mysqli_real_escape_string($this->stc_dbs, $search));
+		$sort_dir   = strtoupper($sort_dir) === 'ASC' ? 'ASC' : 'DESC';
+		$sort_map   = [
+			'req_date'        => 'DATE(`stc_cust_super_requisition_list_date`)',
+			'project_title'   => '`stc_cust_project_title`',
+			'supervisor_name' => '`stc_cust_pro_supervisor_fullname`',
+			'item_title'      => '`stc_cust_super_requisition_list_items_title`',
+		];
+		$sort_col   = isset($sort_map[$sort_col]) ? $sort_col : 'req_date';
+		$order_expr = $sort_map[$sort_col];
+
+		$ownershipWhere = ($agent_role === 2) ? "" : "
+			AND (
+				`stc_cust_project_createdby`='{$agent_id}' OR
+				`stc_cust_project_collaborate_teamid`='{$agent_id}'
+			) AND (
+				`stc_cust_pro_supervisor_created_by`='{$agent_id}' OR
+				`stc_cust_pro_supervisor_collaborate_teamid`='{$agent_id}'
+			)";
+
+		$searchWhere = '';
+		if ($search !== '') {
+			$searchWhere = "
+				AND (
+					`stc_cust_project_title` LIKE '%{$search}%'
+					OR `stc_cust_pro_supervisor_fullname` LIKE '%{$search}%'
+					OR `stc_cust_super_requisition_list_items_title` LIKE '%{$search}%'
+					OR `stc_cust_super_requisition_items_type` LIKE '%{$search}%'
+				)";
+		}
+
+		$joins = "
+			FROM `stc_cust_super_requisition_list_items`
+			LEFT JOIN `stc_cust_super_requisition_list`
+				ON `stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`=`stc_cust_super_requisition_list_items_req_id`
+			LEFT JOIN `stc_cust_pro_supervisor`
+				ON `stc_cust_pro_supervisor_id`=`stc_cust_super_requisition_list_super_id`
+			LEFT JOIN `stc_cust_project`
+				ON `stc_cust_project_id`=`stc_cust_super_requisition_list_project_id`
+			LEFT JOIN `stc_cust_project_collaborate`
+				ON `stc_cust_project_id`=`stc_cust_project_collaborate_projectid`
+			LEFT JOIN `stc_cust_pro_supervisor_collaborate`
+				ON `stc_cust_pro_supervisor_id`=`stc_cust_pro_supervisor_collaborate_userid`
+			WHERE `stc_cust_super_requisition_list_status`<3
+			AND `stc_cust_super_requisition_list_items_approved_qty`=0
+			AND `stc_cust_super_requisition_list_items_status`=1
+			{$ownershipWhere}
+			{$searchWhere}
+		";
+
+		// Count total distinct items
+		$countqry = mysqli_query($this->stc_dbs,
+			"SELECT COUNT(*) as total FROM (
+				SELECT DISTINCT `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
+				{$joins}
+			) as stc_ord_cnt"
+		);
+		$total = 0;
+		if ($countqry && $crow = mysqli_fetch_assoc($countqry)) {
+			$total = (int)$crow['total'];
+		}
+		$total_pages = ($per_page > 0 && $total > 0) ? (int)ceil($total / $per_page) : 1;
+
+		// Main paginated query
+		$mainqry = mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT
+				`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` as list_id,
+				`stc_cust_super_requisition_list_date`,
+				`stc_cust_project_title`,
+				`stc_cust_pro_supervisor_fullname`,
+				`stc_cust_super_requisition_list_status`,
+				`stc_cust_super_requisition_list_items_req_id`,
+				`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as item_list_id,
+				`stc_cust_super_requisition_list_items_title`,
+				`stc_cust_super_requisition_list_items_unit`,
+				`stc_cust_super_requisition_list_items_reqqty`,
+				`stc_cust_super_requisition_list_items_approved_qty`,
+				`stc_cust_super_requisition_list_items_status`,
+				`stc_cust_super_requisition_items_finalqty`,
+				`stc_cust_super_requisition_items_priority`,
+				`stc_cust_super_requisition_items_type`
+			{$joins}
+			ORDER BY {$order_expr} {$sort_dir}
+			LIMIT {$offset}, {$per_page}
+		");
+
+		$rows = [];
+		if ($mainqry && mysqli_num_rows($mainqry) > 0) {
+			$sl = $offset;
+			foreach ($mainqry as $r) {
+				$sl++;
+				$is_urgent  = ((int)$r['stc_cust_super_requisition_items_priority'] === 2);
+				$req_status = (int)$r['stc_cust_super_requisition_list_status'];
+				$rows[] = [
+					'sl'              => $sl,
+					'list_id'         => $r['list_id'],
+					'req_date'        => date('d-m-Y h:i a', strtotime($r['stc_cust_super_requisition_list_date'])),
+					'project_title'   => $r['stc_cust_project_title'],
+					'supervisor_name' => $r['stc_cust_pro_supervisor_fullname'],
+					'req_status'      => $req_status,
+					'item_list_id'    => $r['item_list_id'],
+					'item_title'      => $r['stc_cust_super_requisition_list_items_title'],
+					'unit'            => $r['stc_cust_super_requisition_list_items_unit'],
+					'req_qty'         => number_format((float)$r['stc_cust_super_requisition_list_items_reqqty'], 2),
+					'req_qty_raw'     => (float)$r['stc_cust_super_requisition_list_items_reqqty'],
+					'approved_qty'    => (float)$r['stc_cust_super_requisition_list_items_approved_qty'],
+					'remaining_qty'   => number_format((float)$r['stc_cust_super_requisition_list_items_reqqty'], 2),
+					'item_status'     => (int)$r['stc_cust_super_requisition_list_items_status'],
+					'priority'        => $is_urgent ? 'Urgent' : 'Normal',
+					'is_urgent'       => $is_urgent,
+					'type'            => (string)$r['stc_cust_super_requisition_items_type'],
+				];
+			}
+		}
+
+		return [
+			'success'     => true,
+			'total'       => $total,
+			'page'        => $page,
+			'per_page'    => $per_page,
+			'total_pages' => $total_pages,
+			'sort_col'    => $sort_col,
+			'sort_dir'    => $sort_dir,
+			'rows'        => $rows,
+		];
+	}
+
 }
 
 class pirates_supervisor extends tesseract{
@@ -6286,5 +6420,73 @@ if (isset($_POST['get_logequipmentdetailsBydate'])) {
 	// echo $output;
 }
 
+// bulk approve / reject / delete for order-management.php
+if (isset($_POST['stc_bulk_order_action'])) {
+	if (empty($_SESSION['stc_agent_id'])) {
+		header('Content-Type: application/json');
+		echo json_encode(['success' => false, 'message' => 'Session expired']);
+	} else {
+		$action   = isset($_POST['action'])   ? trim($_POST['action'])   : '';
+		$item_ids = isset($_POST['item_ids']) ? (array)$_POST['item_ids'] : [];
+		$list_ids = isset($_POST['list_ids']) ? (array)$_POST['list_ids'] : [];
+		$req_qtys = isset($_POST['req_qtys']) ? (array)$_POST['req_qtys'] : [];
+		$reason   = isset($_POST['reason'])   ? trim($_POST['reason'])   : 'Bulk action by ' . $_SESSION['stc_agent_name'];
+		$done = 0; $fail = 0;
+		$obj = new pirates_supervisor();
+
+		if ($action === 'approve') {
+			foreach ($item_ids as $i => $raw_id) {
+				$item_id = (int)$raw_id;
+				if ($item_id <= 0) { $fail++; continue; }
+				$qty_raw = isset($req_qtys[$i]) ? (float)$req_qtys[$i] : 0;
+				if ($qty_raw <= 0) {
+					// fall back to DB value
+					$qryq = mysqli_query($obj->stc_dbs, "SELECT `stc_cust_super_requisition_list_items_reqqty` FROM `stc_cust_super_requisition_list_items` WHERE `stc_cust_super_requisition_list_id`='{$item_id}'");
+					if ($qryq && $rq = mysqli_fetch_assoc($qryq)) { $qty_raw = (float)$rq['stc_cust_super_requisition_list_items_reqqty']; }
+				}
+				$res = $obj->stc_add_to_purchase($item_id, $qty_raw, 1);
+				if ($res === 'success') { $done++; } else { $fail++; }
+			}
+		} elseif ($action === 'reject' || $action === 'delete') {
+			foreach ($item_ids as $i => $raw_id) {
+				$item_id = (int)$raw_id;
+				$list_id = isset($list_ids[$i]) ? (int)$list_ids[$i] : 0;
+				if ($item_id <= 0 || $list_id <= 0) { $fail++; continue; }
+				$res = $obj->stc_delete_requisition_item($item_id, $list_id, $reason);
+				if ($res === 'yes') { $done++; } else { $fail++; }
+			}
+		} else {
+			$fail = count($item_ids);
+		}
+		header('Content-Type: application/json');
+		echo json_encode(['success' => true, 'results' => ['success' => $done, 'fail' => $fail]]);
+	}
+}
+
+// get paginated order list for order-management.php
+if (isset($_POST['get_order_list'])) {
+	if (empty($_SESSION['stc_agent_id'])) {
+		header('Content-Type: application/json');
+		echo json_encode(['success' => false, 'message' => 'Session expired']);
+	} else {
+		$page     = isset($_POST['page'])     ? (int)$_POST['page']     : 1;
+		$per_page = isset($_POST['per_page']) ? (int)$_POST['per_page'] : 15;
+		$search   = isset($_POST['search'])   ? trim($_POST['search'])   : '';
+		$sort_col = isset($_POST['sort_col']) ? trim($_POST['sort_col']) : 'req_date';
+		$sort_dir = isset($_POST['sort_dir']) ? trim($_POST['sort_dir']) : 'DESC';
+		$obj = new pirates_project();
+		$result = $obj->stc_order_list_paginated(
+			$page,
+			$per_page,
+			(int)$_SESSION['stc_agent_id'],
+			(int)(isset($_SESSION['stc_agent_role']) ? $_SESSION['stc_agent_role'] : 0),
+			$search,
+			$sort_col,
+			$sort_dir
+		);
+		header('Content-Type: application/json');
+		echo json_encode($result);
+	}
+}
 
 ?>

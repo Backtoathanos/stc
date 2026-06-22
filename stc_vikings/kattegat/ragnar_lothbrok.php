@@ -1768,6 +1768,222 @@ class sceptor extends tesseract{
 			return ['success' => false, 'message' => 'Failed to update status: ' . mysqli_error($this->stc_dbs)];
 		}
 	}
+
+	// Pending list: auto-revert accepted→pending after 48 hrs + paginated + search + sort
+	public function stc_pending_list($page = 1, $per_page = 15, $search_site = '', $search_item = '', $search_reason = '', $sort_col = 'req_date', $sort_dir = 'DESC'){
+		$page     = max(1, (int)$page);
+		$per_page = max(1, min(50, (int)$per_page));
+
+		// Whitelist sort columns → actual SQL expressions
+		$sort_map = [
+			'req_date'  => 'DATE(`stc_cust_super_requisition_list_date`)',
+			'site_name' => '`stc_cust_project_title`',
+			'item_desc' => '`stc_cust_super_requisition_list_items_title`',
+			'duration'  => 'DATE(`created_date`)',
+		];
+		$sort_dir   = strtoupper($sort_dir) === 'ASC' ? 'ASC' : 'DESC';
+		$order_expr = isset($sort_map[$sort_col]) ? $sort_map[$sort_col] : $sort_map['req_date'];
+
+		// Build dynamic search conditions
+		$search_where = '';
+		if(!empty($search_site)){
+			$search_where .= " AND `stc_cust_project_title` LIKE '%" . mysqli_real_escape_string($this->stc_dbs, trim($search_site)) . "%'";
+		}
+		if(!empty($search_item)){
+			$search_where .= " AND `stc_cust_super_requisition_list_items_title` LIKE '%" . mysqli_real_escape_string($this->stc_dbs, trim($search_item)) . "%'";
+		}
+		if(!empty($search_reason)){
+			$search_where .= " AND `message` LIKE '%" . mysqli_real_escape_string($this->stc_dbs, trim($search_reason)) . "%'";
+		}
+
+		// 48hr auto-pending: move Accepted (status=3) items to Pending (status=9)
+		// if the combiner (procurement order) date is older than 48 hours with no action
+		$auto48q = mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT i.`stc_cust_super_requisition_list_id` AS item_id
+			FROM `stc_cust_super_requisition_list_items` i
+			INNER JOIN `stc_requisition_combiner_req` cr
+				ON cr.`stc_requisition_combiner_req_requisition_id` = i.`stc_cust_super_requisition_list_items_req_id`
+			INNER JOIN `stc_requisition_combiner` c
+				ON c.`stc_requisition_combiner_id` = cr.`stc_requisition_combiner_req_comb_id`
+			WHERE i.`stc_cust_super_requisition_list_items_status` = '3'
+			AND i.`stc_cust_super_requisition_items_finalqty` != 0
+			AND c.`stc_requisition_combiner_date` <= DATE_SUB(NOW(), INTERVAL 48 HOUR)
+		");
+		if($auto48q && mysqli_num_rows($auto48q) > 0){
+			$sysDate = date('d-M-Y h:i A');
+			$sysMsg  = mysqli_real_escape_string($this->stc_dbs,
+				"This requisition item has been automatically moved to Pending status by the GLD System. " .
+				"The item remained in Accepted status for more than 48 hours without any procurement update or dispatch action recorded. " .
+				"Automated review triggered on " . $sysDate . ". " .
+				"Kindly review and initiate the required procurement action at the earliest to avoid further delays. " .
+				"— Updated to Pending by GLD System"
+			);
+			foreach($auto48q as $ar){
+				$aid = (int)$ar['item_id'];
+				mysqli_query($this->stc_dbs, "
+					UPDATE `stc_cust_super_requisition_list_items`
+					SET `stc_cust_super_requisition_list_items_status` = '9'
+					WHERE `stc_cust_super_requisition_list_id` = '$aid'
+					AND `stc_cust_super_requisition_list_items_status` = '3'
+				");
+				mysqli_query($this->stc_dbs, "
+					INSERT INTO `stc_cust_super_requisition_list_items_log`(
+						`item_id`, `title`, `message`, `status`, `created_by`
+					) VALUES ('$aid', 'Pending', '$sysMsg', '9', '0')
+				");
+			}
+		}
+
+		// Count total distinct pending items (same WHERE/JOIN + search filters, no LIMIT)
+		$cntq = mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) as total FROM (
+				SELECT DISTINCT `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_items_title`
+				FROM `stc_cust_super_requisition_list_items`
+				INNER JOIN `stc_cust_super_requisition_list`
+					ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+				INNER JOIN `stc_cust_project`
+					ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
+				INNER JOIN `stc_requisition_combiner_req`
+					ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+				INNER JOIN `stc_requisition_combiner`
+					ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id`
+				INNER JOIN `stc_cust_super_requisition_list_items_log`
+					ON `item_id`=`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
+				WHERE `stc_cust_super_requisition_items_finalqty`!=0
+					AND `stc_cust_super_requisition_list_items_status`='9'
+					AND `title`='Pending'
+					AND `stc_requisition_combiner_date` >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
+					$search_where
+				GROUP BY `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_items_title`
+			) as cnt_tbl
+		");
+		$cnt_row     = mysqli_fetch_assoc($cntq);
+		$total       = (int)($cnt_row['total'] ?? 0);
+		$total_pages = $total > 0 ? (int)ceil($total / $per_page) : 1;
+		if($page > $total_pages) $page = $total_pages;
+		$offset = ($page - 1) * $per_page;
+
+		// Paginated main query with search filters + dynamic sort
+		$mainq = mysqli_query($this->stc_dbs, "
+			SELECT DISTINCT
+				`stc_requisition_combiner_id`,
+				DATE(`stc_requisition_combiner_date`) as stc_req_comb_date,
+				`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
+				DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
+				`stc_cust_super_requisition_list_items_req_id`,
+				`stc_cust_project_title`,
+				`stc_cust_super_requisition_list_items_title`,
+				`stc_cust_super_requisition_list_items_unit`,
+				`stc_cust_super_requisition_items_finalqty`,
+				`stc_cust_super_requisition_list_items_status`,
+				DATE(MIN(`created_date`)) as stc_log_date
+			FROM `stc_cust_super_requisition_list_items`
+			INNER JOIN `stc_cust_super_requisition_list`
+				ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_cust_project`
+				ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
+			INNER JOIN `stc_requisition_combiner_req`
+				ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
+			INNER JOIN `stc_requisition_combiner`
+				ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id`
+			INNER JOIN `stc_cust_super_requisition_list_items_log`
+				ON `item_id`=`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
+			WHERE `stc_cust_super_requisition_items_finalqty`!=0
+				AND `stc_cust_super_requisition_list_items_status`='9'
+				AND `title`='Pending'
+				AND `stc_requisition_combiner_date` >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
+				$search_where
+			GROUP BY `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_items_title`
+			ORDER BY $order_expr $sort_dir
+			LIMIT $offset, $per_page
+		");
+
+		$rows = [];
+		$slno = $offset;
+		foreach($mainq as $r){
+			$slno++;
+			$reqlistid = $r['reqlistid'];
+			$req_id    = $r['stc_cust_super_requisition_list_items_req_id'];
+
+			// Dispatched qty
+			$dispq = mysqli_query($this->stc_dbs, "
+				SELECT `stc_cust_super_requisition_list_items_rec_recqty`
+				FROM `stc_cust_super_requisition_list_items_rec`
+				WHERE `stc_cust_super_requisition_list_items_rec_list_id`='".mysqli_real_escape_string($this->stc_dbs, $req_id)."'
+				AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".mysqli_real_escape_string($this->stc_dbs, $reqlistid)."'
+			");
+			$dispatched_qty = 0;
+			foreach($dispq as $dr){ $dispatched_qty += (float)$dr['stc_cust_super_requisition_list_items_rec_recqty']; }
+
+			$final_qty   = (float)$r['stc_cust_super_requisition_items_finalqty'];
+			$pending_qty = $final_qty - $dispatched_qty;
+
+			// Pending duration & colour coding
+			$days_pending   = 0;
+			$months_pending = 0;
+			$dur_bg    = '#ffffff';
+			$dur_color = '#000000';
+			if(!empty($r['stc_log_date'])){
+				$log_dt         = new DateTime($r['stc_log_date']);
+				$today          = new DateTime();
+				$days_pending   = (int)$log_dt->diff($today)->days;
+				$months_pending = (int)floor($days_pending / 30);
+				if($months_pending >= 3)     { $dur_bg = '#ff0000'; $dur_color = '#ffffff'; }
+				elseif($months_pending >= 2) { $dur_bg = '#ff8800'; $dur_color = '#ffffff'; }
+				elseif($months_pending >= 1) { $dur_bg = '#ffd700'; $dur_color = '#000000'; }
+			}
+
+			// Pending reason (all log messages with title='Pending' for this item)
+			$logq = mysqli_query($this->stc_dbs, "
+				SELECT `message` FROM `stc_cust_super_requisition_list_items_log`
+				WHERE `title`='Pending' AND `item_id`='".mysqli_real_escape_string($this->stc_dbs, $reqlistid)."'
+			");
+			$full_message = '';
+			foreach($logq as $lr){ $full_message .= $lr['message'] . '<br>'; }
+
+			$reason_truncated = '';
+			if(!empty($full_message)){
+				$clean = strip_tags($full_message);
+				if(preg_match('/Pending by\s+(.+?)\s+on/i', $clean, $m)){
+					$reason_truncated = 'Pending by ' . trim($m[1]);
+				} else {
+					$reason_truncated = substr($clean, 0, 30);
+				}
+			}
+
+			$rows[] = [
+				'slno'             => $slno,
+				'req_date'         => $r['stc_req_date'],
+				'req_id'           => $req_id,
+				'project_title'    => $r['stc_cust_project_title'],
+				'item_title'       => $r['stc_cust_super_requisition_list_items_title'],
+				'unit'             => $r['stc_cust_super_requisition_list_items_unit'],
+				'final_qty'        => number_format($final_qty, 2),
+				'dispatched_qty'   => number_format($dispatched_qty, 2),
+				'pending_qty'      => $pending_qty,
+				'status'           => (int)$r['stc_cust_super_requisition_list_items_status'],
+				'req_list_id'      => (int)$reqlistid,
+				'combiner_id'      => (int)$r['stc_requisition_combiner_id'],
+				'days_pending'     => $days_pending,
+				'months_pending'   => $months_pending,
+				'dur_bg'           => $dur_bg,
+				'dur_color'        => $dur_color,
+				'reason_truncated' => $reason_truncated,
+				'reason_full'      => $full_message,
+			];
+		}
+
+		return [
+			'success'     => true,
+			'total'       => $total,
+			'page'        => $page,
+			'per_page'    => $per_page,
+			'total_pages' => $total_pages,
+			'sort_col'    => $sort_col,
+			'sort_dir'    => $sort_dir,
+			'rows'        => $rows,
+		];
+	}
 }
 
 #<------------------------------------------------------------------------------->
@@ -1960,6 +2176,23 @@ if(isset($_POST["update_pending_requisition_status"])){
     $result = $obj->stc_update_pending_requisition_status($item_id, $status, $reason);
     header('Content-Type: application/json');
     echo json_encode($result);
+    exit;
+}
+
+// API endpoint for AJAX paginated pending list (dashboard) — supports search + sort
+if(isset($_POST["pending_list"])){
+    session_start();
+    $page          = isset($_POST['page'])          ? max(1, (int)$_POST['page'])               : 1;
+    $per_page      = isset($_POST['per_page'])      ? max(1, min(50, (int)$_POST['per_page']))   : 15;
+    $search_site   = isset($_POST['search_site'])   ? trim($_POST['search_site'])                : '';
+    $search_item   = isset($_POST['search_item'])   ? trim($_POST['search_item'])                : '';
+    $search_reason = isset($_POST['search_reason']) ? trim($_POST['search_reason'])              : '';
+    $sort_col      = isset($_POST['sort_col'])      ? trim($_POST['sort_col'])                   : 'req_date';
+    $sort_dir      = isset($_POST['sort_dir'])      ? trim($_POST['sort_dir'])                   : 'DESC';
+    $obj = new sceptor();
+    $out = $obj->stc_pending_list($page, $per_page, $search_site, $search_item, $search_reason, $sort_col, $sort_dir);
+    header('Content-Type: application/json');
+    echo json_encode($out);
     exit;
 }
 ?>

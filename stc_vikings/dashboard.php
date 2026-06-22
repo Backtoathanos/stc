@@ -478,309 +478,68 @@ STCAuthHelper::checkAuth();
                                 <div class="card mb-3 border-success shadow-sm">
                                     <div class="card-body p-4">
                                         <h5 class="card-title font-weight-bold mb-4 text-dark text-center">Pending List</h5>
-                                        <div class="table-responsive">
-                                        <table class="mb-0 table table-bordered" id="stc-reports-requisition-pending-view">
-                                <thead>
-                                <tr>
-                                    <th class="text-center">#</th>
-                                    <th class="text-center" width="10%">PR Date &<br>No</th>
-                                    <th class="text-center" style="width: 300px;text-align: center;height: 118px;">Site Name</th>
-                                    <th class="text-center" style="width: 500px;text-align: center;height: 118px;word-wrap: break-word;white-space: normal;">Item Desc</th>
-                                    <th class="text-center" style="width: 40px;text-align: center;height: 118px;word-wrap: break-word;white-space: normal;">Unit</th>
-                                    <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Proc Apprv Qty</div></th>
-                                    <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Dispatch Qty</div></th>
-                                    <th class="text-center" style="width: 80px;text-align: center;height: 118px;"><div style="transform: rotate(-90deg); white-space: nowrap; width: 20px;">Pending Qty</div></th>
-                                    <th class="text-center">Status</th>
-                                    <th class="text-center" style="width: 200px;text-align: center;">Pending Duration</th>
-                                    <th class="text-center" style="width: 500px;">Pending Reason</th>
-                                </tr>
-                                </thead>
-                                <tbody class="stc-reports-pending-view">
-                                 <?php
-                                 include_once("../MCU/db.php");
-                                 $optimusprime='';
-                                 $slno=0;
-                                 $loopcount=0;
-                                 $query="
-                                    SELECT DISTINCT
-                                       `stc_requisition_combiner_id`,
-                                       DATE(`stc_requisition_combiner_date`) as stc_req_comb_date,
-                                       `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id` as reqlistid,
-                                       DATE(`stc_cust_super_requisition_list_date`) as stc_req_date,
-                                       `stc_cust_super_requisition_list_items_req_id`,
-                                       `stc_cust_project_title`,
-                                       `stc_cust_super_requisition_list_items_title`,
-                                       `stc_cust_super_requisition_list_items_unit`,
-                                       `stc_cust_super_requisition_list_items_reqqty`,
-                                       `stc_cust_super_requisition_list_items_approved_qty`,
-                                       `stc_cust_super_requisition_items_finalqty`,
-                                       `stc_cust_super_requisition_list_items_status`,
-                                       DATE(`created_date`) as stc_log_date
-                                    FROM `stc_cust_super_requisition_list_items`
-                                    INNER JOIN `stc_cust_super_requisition_list` 
-                                    ON `stc_cust_super_requisition_list_items_req_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id`
-                                    INNER JOIN `stc_cust_project` 
-                                    ON `stc_cust_super_requisition_list_project_id`=`stc_cust_project_id`
-                                    INNER JOIN `stc_requisition_combiner_req` 
-                                    ON `stc_requisition_combiner_req_requisition_id`=`stc_cust_super_requisition_list`.`stc_cust_super_requisition_list_id` 
-                                    INNER JOIN `stc_requisition_combiner` 
-                                    ON `stc_requisition_combiner_id`=`stc_requisition_combiner_req_comb_id` 
-                                    INNER JOIN `stc_cust_super_requisition_list_items_log` 
-                                    ON `item_id`=`stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_id`
-                                    WHERE `stc_cust_super_requisition_items_finalqty`!=0 AND `stc_cust_super_requisition_list_items_status`='9' AND `title`='Pending' 
-                                    AND `stc_requisition_combiner_date` >= DATE_SUB(NOW(), INTERVAL 3 MONTH)
-                                    GROUP BY `stc_cust_super_requisition_list_items`.`stc_cust_super_requisition_list_items_title`
-                                    ORDER BY DATE(`stc_cust_super_requisition_list_date`) DESC
-                                 ";
-                                 $getrequisitionsqry=mysqli_query($con, $query);
-                                 if(mysqli_num_rows($getrequisitionsqry)>0){
-                                    foreach($getrequisitionsqry as$requisitionrow){
-                                        $loopcount++;
-                                        $slno++;
-                                        $rqitemstts='';
-                                        $stcdispatchedqty=0;
-                                        $stcrecievedqty=0;
-                                        $stcpendingqty=0;
-                                        $rqitemstts2='';
-                                        $currentStatus = $requisitionrow['stc_cust_super_requisition_list_items_status'];
-                                        $reqlistid = $requisitionrow['reqlistid'];
-                                        if($requisitionrow['stc_cust_super_requisition_list_items_status']==9){
-                                               $rqitemstts2='<span style="background-color:rgb(255, 47, 47); color: white; padding: 2px 6px; border-radius: 3px;">Pending</span>';
-                                        }
-                                        // Create dropdown for status change (only for pending items)
-                                        if($currentStatus == 9){ // Pending status
-                                            $rqitemstts = '<select class="form-control status-dropdown" data-item-id="'.$reqlistid.'" data-old-status="9" style="font-size: 12px; padding: 2px 5px; min-width: 100px;">';
-                                            $rqitemstts .= '<option value="9" selected>Select Status</option>';
-                                            $rqitemstts .= '<option value="6">Reject</option>';
-                                            $rqitemstts .= '<option value="10">Close</option>';
-                                            $rqitemstts .= '</select>';
-                                        } else {
-                                            // Display status badge for non-pending items
-                                            if($currentStatus==1){
-                                                $rqitemstts='<span style="background-color: #3498db; color: white; padding: 2px 6px; border-radius: 3px;">Ordered</span>';
-                                            }elseif($currentStatus==2){
-                                                $rqitemstts='<span style="background-color: #2ecc71; color: white; padding: 2px 6px; border-radius: 3px;">Approved</span>';
-                                            }elseif($currentStatus==3){
-                                                $rqitemstts='<span style="background-color: #27ae60; color: white; padding: 2px 6px; border-radius: 3px;">Accepted</span>';
-                                            }elseif($currentStatus==4){
-                                                $rqitemstts='<span style="background-color: #f39c12; color: white; padding: 2px 6px; border-radius: 3px;">Dispatched</span>';
-                                            }elseif($currentStatus==5){
-                                                $rqitemstts='<span style="background-color: #16a085; color: white; padding: 2px 6px; border-radius: 3px;">Received</span>';
-                                            }elseif($currentStatus==6){
-                                                $rqitemstts='<span style="background-color: #e74c3c; color: white; padding: 2px 6px; border-radius: 3px;">Rejected</span>';
-                                            }elseif($currentStatus==7){
-                                             $rqitemstts='<span style="background-color: #95a5a6; color: white; padding: 2px 6px; border-radius: 3px;">Canceled</span>';
-                                            }elseif($currentStatus==8){
-                                                $rqitemstts='<span style="background-color: #9b59b6; color: white; padding: 2px 6px; border-radius: 3px;">Returned</span>';
-                                            }elseif($currentStatus==10){
-                                                $rqitemstts='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
-                                            }else{
-                                                $rqitemstts='<span style="background-color: #34495e; color: white; padding: 2px 6px; border-radius: 3px;">Closed</span>';
-                                            }
-                                        }
-                                       $stcdecqtyqry=mysqli_query($con, "
-                                          SELECT 
-                                             `stc_cust_super_requisition_list_items_rec_recqty`
-                                          FROM `stc_cust_super_requisition_list_items_rec` 
-                                          WHERE 
-                                             `stc_cust_super_requisition_list_items_rec_list_id`='".$requisitionrow['stc_cust_super_requisition_list_items_req_id']."' 
-                                          AND `stc_cust_super_requisition_list_items_rec_list_item_id`='".$requisitionrow['reqlistid']."'  
-                                       ");
-                                       foreach($stcdecqtyqry as $dispatchedrow){
-                                          $stcdispatchedqty+=$dispatchedrow['stc_cust_super_requisition_list_items_rec_recqty'];
-                                       }
-                                   
-                                       $stcrecqtyqry=mysqli_query($con, "
-                                          SELECT 
-                                             `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty`
-                                          FROM `stc_cust_super_requisition_rec_items_fr_supervisor` 
-                                          WHERE `stc_cust_super_requisition_rec_items_fr_supervisor_rqitemid`='".$requisitionrow['reqlistid']."'  
-                                       ");
-                                       foreach($stcrecqtyqry as $recievedrow){
-                                          $stcrecievedqty+=$recievedrow['stc_cust_super_requisition_rec_items_fr_supervisor_rqitemqty'];
-                                       }
-                                   
-                                       $stcconsumedqty=0;
-                                       $stcconsrecqtyqry=mysqli_query($con, "
-                                          SELECT 
-                                             SUM(`stc_cust_super_list_items_consumption_items_qty`) AS consumable_qty
-                                          FROM `stc_cust_super_list_items_consumption_items` 
-                                          WHERE `stc_cust_super_list_items_consumption_items_name`='".$requisitionrow['reqlistid']."'  
-                                       ");
-                                       foreach($stcconsrecqtyqry as $consumedrow){
-                                          $stcconsumedqty+=$consumedrow['consumable_qty'];
-                                       }
-                                   
-                                       $challanqry=mysqli_query($con, "
-                                          SELECT DISTINCT
-                                             `stc_sale_product_id`,
-                                             `stc_sale_product_date`
-                                          FROM
-                                             `stc_sale_product`
-                                          INNER JOIN 
-                                             `stc_sale_product_items` 
-                                          ON 
-                                             `stc_sale_product_items_sale_product_id`=`stc_sale_product_id`
-                                          INNER JOIN 
-                                             `stc_cust_super_requisition_list_items` 
-                                          ON 
-                                             `stc_cust_super_requisition_list_items_req_id`=`stc_sale_product_order_id`
-                                          INNER JOIN 
-                                             `stc_cust_super_requisition_list_items_rec` 
-                                          ON 
-                                             `stc_cust_super_requisition_list_items_rec_list_item_id`=`stc_cust_super_requisition_list_id`
-                                          WHERE
-                                             `stc_sale_product_order_id`='".mysqli_real_escape_string($con, $requisitionrow['stc_cust_super_requisition_list_items_req_id'])."'
-                                          AND 
-                                             `stc_cust_super_requisition_list_id`='".mysqli_real_escape_string($con, $requisitionrow['reqlistid'])."'
-                                       ");
-                                       $challaninfo='';
-                                       foreach($challanqry as $challanrow){
-                                          $challaninfo.=
-                                              '<a href="challan-preview.php?pid='.$challanrow['stc_sale_product_id'].'">'.
-                                                   date('d-m-Y',strtotime($challanrow['stc_sale_product_date'])).
-                                                '<br>'.
-                                                   $challanrow['stc_sale_product_id'].
-                                                '<br>
-                                              </a>
-                                             '
-                                          ;
-                                       }
-                                       $stcpendingqty=$requisitionrow['stc_cust_super_requisition_items_finalqty'] - $stcdispatchedqty;
-                                           
-                                           $cosump_bal_qty = $stcrecievedqty - $stcconsumedqty;
-                                           $stcbalqtymark = '';
-                                        if($cosump_bal_qty>0){
-                                          $stcbalqtymark='
-                                             <p class="form-control" style="
-                                                 background: #ffd81a;
-                                                 color: red;
-                                             ">
-                                                '.number_format($cosump_bal_qty, 2).'
-                                             </b>
-                                          ';
-                                       }else{
-                                          $stcbalqtymark=number_format($cosump_bal_qty, 2);
-                                       }
-                                       if($stcpendingqty>0){
-                                          $stcpendingqty='
-                                             <p class="form-control" style="
-                                                 background: #ffd81a;
-                                                 color: red;
-                                             ">
-                                                '.number_format($stcpendingqty, 2).'
-                                             </b>
-                                          ';
-                                          // Calculate Pending Duration
-                                          $pendingduration = '';
-                                          if(!empty($requisitionrow['stc_log_date'])){
-                                             $log_date = new DateTime($requisitionrow['stc_log_date']);
-                                             $today = new DateTime();
-                                             $interval = $log_date->diff($today);
-                                             $months = $interval->y * 12 + $interval->m;
-                                             
-                                             // Calculate total days for more accurate month calculation
-                                             $total_days = $log_date->diff($today)->days;
-                                             $months_precise = floor($total_days / 30);
-                                             
-                                             // Determine color based on months
-                                             $bg_color = '';
-                                             $text_color = '#000000';
-                                             
-                                             if($months_precise >= 3){
-                                                $bg_color = '#ff0000'; // Red for 3+ months
-                                                $text_color = '#ffffff';
-                                             }elseif($months_precise >= 2){
-                                                $bg_color = '#ff8800'; // Orange for 2 months
-                                                $text_color = '#ffffff';
-                                             }elseif($months_precise >= 1){
-                                                $bg_color = '#ffd700'; // Yellow/Gold for 1 month
-                                                $text_color = '#000000';
-                                             }else{
-                                                $bg_color = '#ffffff'; // White for less than 1 month
-                                                $text_color = '#000000';
-                                             }
-                                             
-                                             $pendingduration = '
-                                                <div style="
-                                                   background-color: '.$bg_color.';
-                                                   color: '.$text_color.';
-                                                   padding: 5px 10px;
-                                                   border-radius: 3px;
-                                                   text-align: center;
-                                                   font-weight: bold;
-                                                ">
-                                                   '.$months_precise.' Month'.($months_precise != 1 ? 's' : '').' ('.$total_days.' Days)
-                                                </div>
-                                             ';
-                                          }else{
-                                             $pendingduration = '<div style="padding: 5px 10px;">N/A</div>';
-                                          }
-                                          
-                                          $pendingreason='';
-                                          $fullMessage='';
-                                          $qry=mysqli_query($con, "
-                                             SELECT `message` FROM `stc_cust_super_requisition_list_items_log` WHERE title='Pending' AND `item_id`='".$requisitionrow['reqlistid']."'
-                                          ");
-                                          foreach($qry as $result){
-                                             $fullMessage.=$result['message'].'<br>';
-                                          }
-                                          
-                                          // Extract name from message for truncated display
-                                          $truncatedText = '';
-                                          $uniqueId = 'pending-reason-'.$requisitionrow['stc_requisition_combiner_id'].'-'.$requisitionrow['reqlistid'];
-                                          if(!empty($fullMessage)){
-                                             // Try to extract name from "Pending by [Name] on"
-                                             // Remove HTML tags first for better matching
-                                             $cleanMessage = strip_tags($fullMessage);
-                                             if(preg_match('/Pending by\s+(.+?)\s+on/i', $cleanMessage, $matches)){
-                                                $name = trim($matches[1]);
-                                                $truncatedText = 'Pending by '.$name;
-                                             } else {
-                                                // Fallback: use first part of message
-                                                $truncatedText = substr($cleanMessage, 0, 30);
-                                             }
-                                          }
-                                          
-                                          // Create the link with truncated text and separate read more functionality
-                                          $pendingreason = '<div class="pending-reason-container" id="'.$uniqueId.'">';
-                                          $pendingreason .= '<a href="stc-requisition-combiner-fsale.php?requi_id='.$requisitionrow['stc_requisition_combiner_id'].'" target="__blank" class="pending-reason-link">'.$truncatedText.'</a>';
-                                          $pendingreason .= ' <a href="#" class="pending-read-more" style="color: #007bff; text-decoration: underline; cursor: pointer;">...read more</a>';
-                                          $pendingreason .= '<span class="pending-reason-full" style="display: none;">'.$fullMessage.'</span>';
-                                          $pendingreason .= '</div>';
-                                               $optimusprime.='
-                                                       <tr>
-                                                           <td>'.$slno.'</td>
-                                                           <td>
-                                                               '.$requisitionrow['stc_req_date'].'<br>
-                                                               '.$requisitionrow['stc_cust_super_requisition_list_items_req_id'].'
-                                                           </td>
-                                                           <td>'.$requisitionrow['stc_cust_project_title'].'</td>
-                                                           <td>'.$requisitionrow['stc_cust_super_requisition_list_items_title'].'</td>
-                                                           <td>'.$requisitionrow['stc_cust_super_requisition_list_items_unit'].'</td>
-                                                           <td align="right">'.number_format($requisitionrow['stc_cust_super_requisition_items_finalqty'], 2).'</td>
-                                                           <td align="right">'.number_format($stcdispatchedqty, 2).'</td>
-                                                           <td align="right">'.$stcpendingqty.'</td>
-                                                           <td>'.$rqitemstts2.$rqitemstts.'</td>
-                                                           <td style="font-size:10px;">'.$pendingduration.'</td>
-                                                           <td>'.$pendingreason.'</td>
-                                                       </tr>
-                                               ';
-                                       }
-                                               
-                                    }
-                                 }else{
-                                    $optimusprime.='
-                                          <tr>
-                                             <td colspan="11">No requisition found!!!</td>
-                                          </tr>
-                                    ';
-                                 }
-                                 echo $optimusprime;
-                                 ?>
-                                </tbody>
-                              </table>
+
+                                        <!-- Search bar -->
+                                        <div class="row mb-3 align-items-end" id="stc-pending-search-bar">
+                                            <div class="col-md-3 mb-2">
+                                                <span style="font-size:11px;font-weight:600;color:#555;margin-bottom:3px;">Site Name</span>
+                                                <input type="text" id="stc-search-site" class="form-control form-control-sm" placeholder="Search site name...">
+                                            </div>
+                                            <div class="col-md-3 mb-2">
+                                                <span style="font-size:11px;font-weight:600;color:#555;margin-bottom:3px;">Item Description</span>
+                                                <input type="text" id="stc-search-item" class="form-control form-control-sm" placeholder="Search item description...">
+                                            </div>
+                                            <div class="col-md-3 mb-2">
+                                                <span style="font-size:11px;font-weight:600;color:#555;margin-bottom:3px;">Pending Reason</span>
+                                                <input type="text" id="stc-search-reason" class="form-control form-control-sm" placeholder="Search pending reason...">
+                                            </div>
+                                            <div class="col-md-3 mb-2 d-flex" style="gap:6px;">
+                                                <button id="stc-pending-search-btn" class="btn btn-primary btn-sm" style="min-width:72px;">
+                                                    <i class="fa fa-search"></i> Search
+                                                </button>
+                                                <button id="stc-pending-reset-btn" class="btn btn-outline-secondary btn-sm" style="min-width:64px;">
+                                                    Reset
+                                                </button>
+                                            </div>
                                         </div>
+
+                                        <div class="table-responsive">
+                                            <table class="mb-0 table table-bordered" id="stc-reports-requisition-pending-view">
+                                                <thead>
+                                                <tr>
+                                                    <th class="text-center">#</th>
+                                                    <th class="text-center stc-sortable" data-col="req_date" width="10%" style="cursor:pointer;white-space:nowrap;">
+                                                        PR Date&nbsp;<span class="stc-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span><br>
+                                                        <span style="font-size:10px;font-weight:normal;color:#777;">&amp; No</span>
+                                                    </th>
+                                                    <th class="text-center stc-sortable" data-col="site_name" style="width:300px;text-align:center;height:118px;cursor:pointer;">
+                                                        Site Name&nbsp;<span class="stc-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span>
+                                                    </th>
+                                                    <th class="text-center stc-sortable" data-col="item_desc" style="width:500px;text-align:center;height:118px;word-wrap:break-word;white-space:normal;cursor:pointer;">
+                                                        Item Desc&nbsp;<span class="stc-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span>
+                                                    </th>
+                                                    <th class="text-center" style="width:40px;text-align:center;height:118px;word-wrap:break-word;white-space:normal;">Unit</th>
+                                                    <th class="text-center" style="width:80px;text-align:center;height:118px;"><div style="transform:rotate(-90deg);white-space:nowrap;width:20px;">Proc Apprv Qty</div></th>
+                                                    <th class="text-center" style="width:80px;text-align:center;height:118px;"><div style="transform:rotate(-90deg);white-space:nowrap;width:20px;">Dispatch Qty</div></th>
+                                                    <th class="text-center" style="width:80px;text-align:center;height:118px;"><div style="transform:rotate(-90deg);white-space:nowrap;width:20px;">Pending Qty</div></th>
+                                                    <th class="text-center">Status</th>
+                                                    <th class="text-center stc-sortable" data-col="duration" style="width:200px;text-align:center;cursor:pointer;">
+                                                        Pending Duration&nbsp;<span class="stc-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span>
+                                                    </th>
+                                                    <th class="text-center" style="width:500px;">Pending Reason</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody class="stc-reports-pending-view">
+                                                <!-- pending list rows injected via AJAX by stcLoadPendingList() -->
+                                                <tr id="stc-pending-loader">
+                                                    <td colspan="11" class="text-center" style="padding:25px; color:#888;">
+                                                        <i>Loading pending list&hellip;</i>
+                                                    </td>
+                                                </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div id="stc-pending-pagination"></div>
                                     </div>
                                 </div>
                             </div>
@@ -1075,21 +834,215 @@ STCAuthHelper::checkAuth();
             // });
         });
         
-        // Function to toggle pending reason display
+        // =====================================================================
+        // PENDING LIST — AJAX loader with pagination, search, sort (no page reload)
+        // =====================================================================
+        var stcPendingCurrentPage = 1;
+        var stcPendingSortCol     = 'req_date';
+        var stcPendingSortDir     = 'DESC';
+
+        function stcLoadPendingList(page){
+            stcPendingCurrentPage = page;
+            var $tbody = $('.stc-reports-pending-view');
+            var $pag   = $('#stc-pending-pagination');
+
+            $tbody.html('<tr><td colspan="11" class="text-center" style="padding:25px;color:#888;"><i>Loading&hellip;</i></td></tr>');
+            $pag.html('');
+
+            $.ajax({
+                url     : 'kattegat/ragnar_lothbrok.php',
+                method  : 'POST',
+                data    : {
+                    pending_list  : 1,
+                    page          : page,
+                    per_page      : 15,
+                    search_site   : $('#stc-search-site').val().trim(),
+                    search_item   : $('#stc-search-item').val().trim(),
+                    search_reason : $('#stc-search-reason').val().trim(),
+                    sort_col      : stcPendingSortCol,
+                    sort_dir      : stcPendingSortDir
+                },
+                dataType: 'json',
+                success : function(data){
+                    if(!data || !data.success){
+                        $tbody.html('<tr><td colspan="11" class="text-center text-danger">Failed to load pending list.</td></tr>');
+                        return;
+                    }
+                    if(data.rows.length === 0){
+                        $tbody.html('<tr><td colspan="11" class="text-center" style="padding:20px;">No requisition found!!!</td></tr>');
+                        return;
+                    }
+
+                    var html = '';
+                    $.each(data.rows, function(i, r){
+                        // Pending qty cell
+                        var pendingQtyHtml = '';
+                        if(parseFloat(r.pending_qty) > 0){
+                            pendingQtyHtml = '<p class="form-control" style="background:#ffd81a;color:red;">' +
+                                parseFloat(r.pending_qty).toFixed(2) + '</p>';
+                        } else {
+                            pendingQtyHtml = parseFloat(r.pending_qty).toFixed(2);
+                        }
+
+                        // Status cell
+                        var statusHtml = '<span style="background-color:rgb(255,47,47);color:white;padding:2px 6px;border-radius:3px;">Pending</span>';
+                        if(r.status == 9){
+                            statusHtml += ' <select class="form-control status-dropdown" data-item-id="' + r.req_list_id + '" data-old-status="9" style="font-size:12px;padding:2px 5px;min-width:100px;display:inline-block;width:auto;">' +
+                                '<option value="9" selected>Select Status</option>' +
+                                '<option value="6">Reject</option>' +
+                                '<option value="10">Close</option>' +
+                                '</select>';
+                        }
+
+                        // Duration cell — show badge whenever log date exists (days >= 0)
+                        var durHtml = '<div style="padding:5px 10px;text-align:center;color:#aaa;">N/A</div>';
+                        if(r.days_pending >= 0 && r.dur_bg !== undefined && r.dur_bg !== ''){
+                            var mLabel = r.months_pending + ' Month' + (r.months_pending !== 1 ? 's' : '') + ' (' + r.days_pending + ' Day' + (r.days_pending !== 1 ? 's' : '') + ')';
+                            durHtml = '<div style="background-color:' + r.dur_bg + ';color:' + r.dur_color + ';padding:5px 10px;border-radius:3px;text-align:center;font-weight:bold;">' + mLabel + '</div>';
+                        }
+
+                        // Pending reason cell
+                        var uniqueId  = 'pending-reason-' + r.combiner_id + '-' + r.req_list_id;
+                        var reasonHtml = '<div class="pending-reason-container" id="' + uniqueId + '">' +
+                            '<span class="pending-reason-short"><a href="stc-requisition-combiner-fsale.php?requi_id=' + r.combiner_id + '" target="__blank" class="pending-reason-link">' + (r.reason_truncated || '') + '</a></span>' +
+                            '<span class="pending-reason-full" style="display:none;">' + (r.reason_full || '') + '</span>' +
+                            ' <a href="#" class="pending-read-more" style="color:#007bff;text-decoration:underline;cursor:pointer;">...read more</a>' +
+                            '</div>';
+
+                        html += '<tr>' +
+                            '<td>' + r.slno + '</td>' +
+                            '<td>' + (r.req_date || '') + '<br>' + (r.req_id || '') + '</td>' +
+                            '<td>' + (r.project_title || '') + '</td>' +
+                            '<td>' + (r.item_title || '') + '</td>' +
+                            '<td>' + (r.unit || '') + '</td>' +
+                            '<td align="right">' + r.final_qty + '</td>' +
+                            '<td align="right">' + r.dispatched_qty + '</td>' +
+                            '<td align="right">' + pendingQtyHtml + '</td>' +
+                            '<td>' + statusHtml + '</td>' +
+                            '<td style="font-size:10px;">' + durHtml + '</td>' +
+                            '<td>' + reasonHtml + '</td>' +
+                            '</tr>';
+                    });
+                    $tbody.html(html);
+
+                    // Build pagination controls
+                    var pagHtml = '';
+                    if(data.total_pages > 1){
+                        var from = (data.page - 1) * data.per_page + 1;
+                        var to   = Math.min(data.page * data.per_page, data.total);
+                        pagHtml += '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:10px 4px;gap:8px;">';
+                        pagHtml += '<div style="font-size:12px;color:#555;">Showing <strong>' + from + '</strong> &ndash; <strong>' + to + '</strong> of <strong>' + data.total + '</strong> items</div>';
+                        pagHtml += '<nav><ul class="pagination pagination-sm mb-0" style="flex-wrap:wrap;">';
+
+                        // Prev
+                        if(data.page > 1){
+                            pagHtml += '<li class="page-item"><a class="page-link stc-pending-page-btn" data-page="' + (data.page - 1) + '" href="#">&laquo; Prev</a></li>';
+                        } else {
+                            pagHtml += '<li class="page-item disabled"><span class="page-link">&laquo; Prev</span></li>';
+                        }
+                        // First page + ellipsis
+                        var pgRange = 2;
+                        var pgStart = Math.max(1, data.page - pgRange);
+                        var pgEnd   = Math.min(data.total_pages, data.page + pgRange);
+                        if(pgStart > 1){
+                            pagHtml += '<li class="page-item"><a class="page-link stc-pending-page-btn" data-page="1" href="#">1</a></li>';
+                            if(pgStart > 2) pagHtml += '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+                        }
+                        for(var pg = pgStart; pg <= pgEnd; pg++){
+                            if(pg === data.page){
+                                pagHtml += '<li class="page-item active"><span class="page-link">' + pg + '</span></li>';
+                            } else {
+                                pagHtml += '<li class="page-item"><a class="page-link stc-pending-page-btn" data-page="' + pg + '" href="#">' + pg + '</a></li>';
+                            }
+                        }
+                        // Last page + ellipsis
+                        if(pgEnd < data.total_pages){
+                            if(pgEnd < data.total_pages - 1) pagHtml += '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+                            pagHtml += '<li class="page-item"><a class="page-link stc-pending-page-btn" data-page="' + data.total_pages + '" href="#">' + data.total_pages + '</a></li>';
+                        }
+                        // Next
+                        if(data.page < data.total_pages){
+                            pagHtml += '<li class="page-item"><a class="page-link stc-pending-page-btn" data-page="' + (data.page + 1) + '" href="#">Next &raquo;</a></li>';
+                        } else {
+                            pagHtml += '<li class="page-item disabled"><span class="page-link">Next &raquo;</span></li>';
+                        }
+                        pagHtml += '</ul></nav></div>';
+                    }
+                    $pag.html(pagHtml);
+                },
+                error: function(){
+                    $tbody.html('<tr><td colspan="11" class="text-center text-danger" style="padding:20px;">Error loading pending list. Please refresh the page.</td></tr>');
+                }
+            });
+        }
+
+        // Load page 1 on ready
+        stcLoadPendingList(1);
+
+        // Pagination button click (delegated — works after AJAX inject)
+        $(document).on('click', '.stc-pending-page-btn', function(e){
+            e.preventDefault();
+            var pg = parseInt($(this).data('page'), 10);
+            if(pg && pg !== stcPendingCurrentPage){
+                stcLoadPendingList(pg);
+                var $tbl = $('#stc-reports-requisition-pending-view');
+                if($tbl.length){ $('html,body').animate({ scrollTop: $tbl.offset().top - 80 }, 300); }
+            }
+        });
+
+        // Search button
+        $('#stc-pending-search-btn').on('click', function(){
+            stcLoadPendingList(1);
+        });
+
+        // Reset button — clear fields + reset sort
+        $('#stc-pending-reset-btn').on('click', function(){
+            $('#stc-search-site, #stc-search-item, #stc-search-reason').val('');
+            stcPendingSortCol = 'req_date';
+            stcPendingSortDir = 'DESC';
+            $('.stc-sort-icon').html('&#8645;').css('color','#aaa');
+            stcLoadPendingList(1);
+        });
+
+        // Enter key in any search field triggers search
+        $('#stc-search-site, #stc-search-item, #stc-search-reason').on('keypress', function(e){
+            if(e.which === 13){ stcLoadPendingList(1); }
+        });
+
+        // Sortable column header click
+        $(document).on('click', '.stc-sortable', function(){
+            var col = $(this).data('col');
+            if(stcPendingSortCol === col){
+                stcPendingSortDir = stcPendingSortDir === 'ASC' ? 'DESC' : 'ASC';
+            } else {
+                stcPendingSortCol = col;
+                stcPendingSortDir = 'ASC';
+            }
+            // Reset all icons then set active
+            $('.stc-sort-icon').html('&#8645;').css('color','#aaa');
+            var icon = stcPendingSortDir === 'ASC' ? '&#8593;' : '&#8595;';
+            $(this).find('.stc-sort-icon').html(icon).css('color','#333');
+            stcLoadPendingList(1);
+        });
+        // =====================================================================
+
+        // Toggle pending reason — short text hides when expanded so full message shows,
+        // then the "read less" link always appears at the very end after the message.
         $(document).on('click', '.pending-read-more', function(e) {
             e.preventDefault();
-            var $container = $(this).closest('.pending-reason-container');
-            var $readMoreLink = $(this);
-            var $fullSpan = $container.find('.pending-reason-full');
-            
+            var $container    = $(this).closest('.pending-reason-container');
+            var $link         = $(this);
+            var $shortSpan    = $container.find('.pending-reason-short');
+            var $fullSpan     = $container.find('.pending-reason-full');
+
             if($fullSpan.is(':visible')) {
-                // Collapse: hide full message, show truncated version
                 $fullSpan.hide();
-                $readMoreLink.text('...read more');
+                $shortSpan.show();
+                $link.text('...read more');
             } else {
-                // Expand: show full message
+                $shortSpan.hide();
                 $fullSpan.show();
-                $readMoreLink.text(' read less');
+                $link.text('read less');
             }
         });
         
