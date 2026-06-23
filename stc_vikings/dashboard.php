@@ -507,7 +507,9 @@ STCAuthHelper::checkAuth();
                                             <table class="mb-0 table table-bordered" id="stc-reports-requisition-pending-view">
                                                 <thead>
                                                 <tr>
-                                                    <th class="text-center">#</th>
+                                                    <th class="text-center" style="width:40px;">
+                                                        <input type="checkbox" id="stc-pending-select-all" title="Select all" style="cursor:pointer;width:15px;height:15px;">
+                                                    </th>
                                                     <th class="text-center stc-sortable" data-col="req_date" width="10%" style="cursor:pointer;white-space:nowrap;">
                                                         PR Date&nbsp;<span class="stc-sort-icon" style="font-size:11px;color:#aaa;">&#8645;</span><br>
                                                         <span style="font-size:10px;font-weight:normal;color:#777;">&amp; No</span>
@@ -540,12 +542,67 @@ STCAuthHelper::checkAuth();
                                             </table>
                                         </div>
                                         <div id="stc-pending-pagination"></div>
+
+                                        <!-- Bulk Action Bar (shown when rows are checked) -->
+                                        <div id="stc-bulk-action-bar" style="display:none;position:sticky;bottom:0;background:#fff;border-top:2px solid #dee2e6;padding:10px 14px;z-index:100;align-items:center;gap:10px;flex-wrap:wrap;box-shadow:0 -2px 8px rgba(0,0,0,0.08);">
+                                            <span id="stc-bulk-selected-count" style="font-size:13px;font-weight:600;color:#555;">0 item(s) selected</span>
+                                            <div style="position:relative;display:inline-block;margin-left:8px;">
+                                                <button type="button" id="stc-fix-btn" style="background:#dc3545;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;">
+                                                    <i class="fa fa-pencil-square-o"></i> Status <i class="fa fa-caret-down" style="margin-left:2px;"></i>
+                                                </button>
+                                            </div>
+                                            <button type="button" id="stc-bulk-pending-btn" style="background:#f0ad4e;color:#fff;border:none;border-radius:4px;padding:5px 12px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;margin-left:4px;">
+                                                <i class="fa fa-clock-o"></i> Pending
+                                            </button>
+                                        </div>
+                                        <!-- Custom Status Dropdown (moved to body via JS, opens upward) -->
+                                        <div id="stc-status-dropdown-menu" style="display:none;position:fixed;top:auto;background:#fff;border:1px solid #dee2e6;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:99999;min-width:140px;overflow:hidden;">
+                                            <a href="#" class="stc-bulk-fix-action" data-status="6" data-label="Reject" style="display:block;padding:9px 16px;font-size:13px;color:#333;text-decoration:none;border-bottom:1px solid #f0f0f0;transition:background .15s;">
+                                                <i class="fa fa-times-circle" style="color:#dc3545;margin-right:7px;"></i> Reject
+                                            </a>
+                                            <a href="#" class="stc-bulk-fix-action" data-status="10" data-label="Close" style="display:block;padding:9px 16px;font-size:13px;color:#333;text-decoration:none;transition:background .15s;">
+                                                <i class="fa fa-lock" style="color:#6c757d;margin-right:7px;"></i> Close
+                                            </a>
+                                        </div>
+                                        <style>
+                                            #stc-status-dropdown-menu a:hover { background:#f8f9fa; color:#000; }
+                                        </style>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+        </div>
+    </div>
+
+    <!-- Pending Note Modal -->
+    <div class="modal fade" id="stcPendingNoteModal" tabindex="-1" role="dialog" aria-labelledby="stcPendingNoteModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#f8f9fa;border-bottom:1px solid #dee2e6;">
+                    <h5 class="modal-title" id="stcPendingNoteModalLabel" style="font-size:15px;font-weight:700;">
+                        <i class="fa fa-clock-o" style="color:#f0ad4e;"></i> Add Pending Note
+                    </h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding:16px 20px;">
+                    <p id="stc-pending-note-info" style="font-size:12px;color:#888;margin-bottom:12px;padding:6px 10px;background:#fff8e1;border-left:3px solid #f0ad4e;border-radius:3px;"></p>
+                    <div style="margin-bottom:4px;">
+                        <span style="font-size:13px;font-weight:600;color:#333;display:block;margin-bottom:6px;">Pending Message <span style="color:#e74c3c;">*</span></span>
+                        <textarea id="stc-pending-note-msg" class="form-control" rows="4" placeholder="Enter reason or note for pending status..." style="font-size:13px;resize:vertical;width:100%;box-sizing:border-box;"></textarea>
+                        <span id="stc-pending-note-err" style="display:none;color:#e74c3c;font-size:12px;margin-top:4px;">Please enter a message.</span>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background:#f8f9fa;">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-warning btn-sm" id="stc-pending-note-submit">
+                        <i class="fa fa-save"></i> Update Pending
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
@@ -909,8 +966,11 @@ STCAuthHelper::checkAuth();
                             ' <a href="#" class="pending-read-more" style="color:#007bff;text-decoration:underline;cursor:pointer;">...read more</a>' +
                             '</div>';
 
-                        html += '<tr>' +
-                            '<td>' + r.slno + '</td>' +
+                        html += '<tr data-item-id="' + r.req_list_id + '">' +
+                            '<td class="text-center" style="vertical-align:middle;">' +
+                                '<input type="checkbox" class="stc-pending-row-cb" data-item-id="' + r.req_list_id + '" style="cursor:pointer;width:15px;height:15px;">' +
+                                '<div style="font-size:10px;color:#999;margin-top:2px;">' + r.slno + '</div>' +
+                            '</td>' +
                             '<td>' + (r.req_date || '') + '<br>' + (r.req_id || '') + '</td>' +
                             '<td>' + (r.project_title || '') + '</td>' +
                             '<td>' + (r.item_title || '') + '</td>' +
@@ -1121,6 +1181,191 @@ STCAuthHelper::checkAuth();
                 }
             });
         });
+
+        // =====================================================================
+        // Bulk checkbox feature for pending table
+        // =====================================================================
+
+        // Helper: update action bar visibility + count
+        function stcUpdateBulkBar(){
+            var checked = $('.stc-pending-row-cb:checked').length;
+            if(checked > 0){
+                $('#stc-bulk-selected-count').text(checked + ' item(s) selected');
+                $('#stc-bulk-action-bar').css('display','flex');
+            } else {
+                $('#stc-bulk-action-bar').css('display','none');
+                $('#stc-pending-select-all').prop('checked', false).prop('indeterminate', false);
+            }
+            // Sync select-all state
+            var total = $('.stc-pending-row-cb').length;
+            if(total > 0){
+                if(checked === 0){
+                    $('#stc-pending-select-all').prop('checked', false).prop('indeterminate', false);
+                } else if(checked === total){
+                    $('#stc-pending-select-all').prop('checked', true).prop('indeterminate', false);
+                } else {
+                    $('#stc-pending-select-all').prop('checked', false).prop('indeterminate', true);
+                }
+            }
+        }
+
+        // After AJAX loads rows, re-bind select-all state (rows replaced)
+        // We patch stcLoadPendingList via a post-load hook using MutationObserver
+        var _stcPendingObserver = null;
+        function stcWatchPendingTbody(){
+            var tbody = document.querySelector('.stc-reports-pending-view');
+            if(!tbody) return;
+            if(_stcPendingObserver) _stcPendingObserver.disconnect();
+            _stcPendingObserver = new MutationObserver(function(){
+                stcUpdateBulkBar();
+            });
+            _stcPendingObserver.observe(tbody, { childList: true });
+        }
+        stcWatchPendingTbody();
+
+        // Select all checkbox
+        $(document).on('change', '#stc-pending-select-all', function(){
+            var checked = $(this).is(':checked');
+            $('.stc-pending-row-cb').prop('checked', checked);
+            stcUpdateBulkBar();
+        });
+
+        // Individual row checkbox
+        $(document).on('change', '.stc-pending-row-cb', function(){
+            stcUpdateBulkBar();
+        });
+
+        // Highlight row on check
+        $(document).on('change', '.stc-pending-row-cb', function(){
+            var $row = $(this).closest('tr');
+            if($(this).is(':checked')){
+                $row.css('background-color','#fff8e1');
+            } else {
+                $row.css('background-color','');
+            }
+        });
+
+        // Custom Status dropdown toggle — appended to body to escape overflow clipping
+        var $stcStatusMenu = $('#stc-status-dropdown-menu').appendTo('body');
+
+        $(document).on('click', '#stc-fix-btn', function(e){
+            e.stopPropagation();
+            var rect = this.getBoundingClientRect();
+            var menuH = $stcStatusMenu.outerHeight(true) || 80;
+            // Open upward so it never goes below the viewport (bar is sticky-bottom)
+            $stcStatusMenu.css({
+                top  : 'auto',
+                bottom: (window.innerHeight - rect.top + 4) + 'px',
+                left : rect.left + 'px'
+            });
+            $stcStatusMenu.toggle();
+        });
+
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e){
+            if(!$(e.target).closest('#stc-fix-btn, #stc-status-dropdown-menu').length){
+                $stcStatusMenu.hide();
+            }
+        });
+
+        // Status dropdown option click (Reject / Close) — bulk
+        $(document).on('click', '.stc-bulk-fix-action', function(e){
+            e.preventDefault();
+            $stcStatusMenu.hide();
+            var status = $(this).data('status');
+            var label  = $(this).data('label');
+            var ids    = [];
+            $('.stc-pending-row-cb:checked').each(function(){
+                ids.push($(this).data('item-id'));
+            });
+            if(ids.length === 0){ alert('No items selected.'); return; }
+
+            if(!confirm('Are you sure you want to ' + label + ' ' + ids.length + ' selected item(s)?')){ return; }
+
+            var reason = prompt('Enter a reason for ' + label + ':');
+            if(reason === null){ return; }
+            if(reason.trim() === ''){ alert('Reason is required.'); return; }
+
+            $('#stc-fix-btn').prop('disabled', true).css('opacity','0.65').html('<i class="fa fa-spinner fa-spin"></i> Updating...');
+
+            $.ajax({
+                url    : 'kattegat/ragnar_lothbrok.php',
+                method : 'POST',
+                data   : {
+                    bulk_update_pending_status : 1,
+                    item_ids : ids,
+                    status   : status,
+                    reason   : reason.trim()
+                },
+                dataType: 'json',
+                success : function(res){
+                    $('#stc-fix-btn').prop('disabled', false).css('opacity','1').html('<i class="fa fa-pencil-square-o"></i> Status <i class="fa fa-caret-down" style="margin-left:2px;"></i>');
+                    if(res.success){
+                        alert(res.message || 'Updated successfully.');
+                        stcLoadPendingList(stcPendingCurrentPage);
+                    } else {
+                        alert('Error: ' + (res.message || 'Update failed.'));
+                    }
+                },
+                error: function(){
+                    $('#stc-fix-btn').prop('disabled', false).css('opacity','1').html('<i class="fa fa-pencil-square-o"></i> Status <i class="fa fa-caret-down" style="margin-left:2px;"></i>');
+                    alert('Network error. Please try again.');
+                }
+            });
+        });
+
+        // Pending button — open pending note modal
+        $(document).on('click', '#stc-bulk-pending-btn', function(){
+            var ids = [];
+            $('.stc-pending-row-cb:checked').each(function(){ ids.push($(this).data('item-id')); });
+            if(ids.length === 0){ alert('No items selected.'); return; }
+
+            $('#stc-pending-note-info').text(ids.length + ' item(s) selected. The note will be logged for each selected product.');
+            $('#stc-pending-note-msg').val('');
+            $('#stc-pending-note-err').hide();
+            $('#stcPendingNoteModal').modal('show');
+        });
+
+        // Pending note submit
+        $('#stc-pending-note-submit').on('click', function(){
+            var msg = $('#stc-pending-note-msg').val().trim();
+            if(!msg){ $('#stc-pending-note-err').show(); return; }
+            $('#stc-pending-note-err').hide();
+
+            var ids = [];
+            $('.stc-pending-row-cb:checked').each(function(){ ids.push($(this).data('item-id')); });
+            if(ids.length === 0){ $('#stcPendingNoteModal').modal('hide'); return; }
+
+            var $btn = $(this);
+            $btn.prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Updating...');
+
+            $.ajax({
+                url    : 'kattegat/ragnar_lothbrok.php',
+                method : 'POST',
+                data   : {
+                    bulk_add_pending_note : 1,
+                    item_ids : ids,
+                    message  : msg
+                },
+                dataType: 'json',
+                success : function(res){
+                    $btn.prop('disabled', false).html('<i class="fa fa-save"></i> Update Pending');
+                    if(res.success){
+                        $('#stcPendingNoteModal').modal('hide');
+                        alert(res.message || 'Pending notes added successfully.');
+                        stcLoadPendingList(stcPendingCurrentPage);
+                    } else {
+                        alert('Error: ' + (res.message || 'Failed to update.'));
+                    }
+                },
+                error: function(){
+                    $btn.prop('disabled', false).html('<i class="fa fa-save"></i> Update Pending');
+                    alert('Network error. Please try again.');
+                }
+            });
+        });
+
+        // =====================================================================
 
 		// GLD purchase location -> product breakup modal
 		$(document).on('click', '.js-gld-purchase-breakdown', function(){

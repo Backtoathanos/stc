@@ -1769,6 +1769,60 @@ class sceptor extends tesseract{
 		}
 	}
 
+	// Bulk update status (Reject=6 / Close=10) for multiple items
+	public function stc_bulk_update_pending_status($item_ids, $status, $reason = ''){
+		if(empty($item_ids) || !is_array($item_ids) || ($status != 6 && $status != 10)){
+			return ['success' => false, 'message' => 'Invalid parameters'];
+		}
+		$updated = 0;
+		$errors  = 0;
+		foreach($item_ids as $raw_id){
+			$item_id = intval($raw_id);
+			if($item_id <= 0){ continue; }
+			$result = $this->stc_update_pending_requisition_status($item_id, $status, $reason);
+			if($result['success']) $updated++;
+			else $errors++;
+		}
+		if($updated > 0){
+			$label = ($status == 6) ? 'Rejected' : 'Closed';
+			return ['success' => true, 'message' => $updated . ' item(s) marked as ' . $label . ($errors > 0 ? ' (' . $errors . ' failed)' : '')];
+		}
+		return ['success' => false, 'message' => 'No items were updated. ' . $errors . ' error(s).'];
+	}
+
+	// Bulk add a pending note (log entry only, no status change) for multiple items
+	public function stc_bulk_add_pending_note($item_ids, $message){
+		if(empty($item_ids) || !is_array($item_ids) || empty(trim($message))){
+			return ['success' => false, 'message' => 'Invalid parameters'];
+		}
+		$user_name = isset($_SESSION['stc_empl_name']) ? $_SESSION['stc_empl_name'] : 'System';
+		$user_id   = isset($_SESSION['stc_empl_id'])   ? intval($_SESSION['stc_empl_id']) : 0;
+		$full_msg  = "Pending Note by " . $user_name . " on " . date('d-m-Y h:i A') . " <br> " . $message;
+		$updated   = 0;
+		$errors    = 0;
+		foreach($item_ids as $raw_id){
+			$item_id = intval($raw_id);
+			if($item_id <= 0){ continue; }
+			$logQuery = "
+				INSERT INTO `stc_cust_super_requisition_list_items_log`(
+					`item_id`, `title`, `message`, `status`, `created_by`
+				) VALUES (
+					'" . mysqli_real_escape_string($this->stc_dbs, $item_id) . "',
+					'Pending',
+					'" . mysqli_real_escape_string($this->stc_dbs, $full_msg) . "',
+					'1',
+					'" . mysqli_real_escape_string($this->stc_dbs, $user_id) . "'
+				)
+			";
+			if(mysqli_query($this->stc_dbs, $logQuery)) $updated++;
+			else $errors++;
+		}
+		if($updated > 0){
+			return ['success' => true, 'message' => 'Pending note added to ' . $updated . ' item(s).' . ($errors > 0 ? ' (' . $errors . ' failed)' : '')];
+		}
+		return ['success' => false, 'message' => 'Failed to add pending notes. ' . $errors . ' error(s).'];
+	}
+
 	// Pending list: auto-revert accepted→pending after 48 hrs + paginated + search + sort
 	public function stc_pending_list($page = 1, $per_page = 15, $search_site = '', $search_item = '', $search_reason = '', $sort_col = 'req_date', $sort_dir = 'DESC'){
 		$page     = max(1, (int)$page);
@@ -1917,6 +1971,9 @@ class sceptor extends tesseract{
 
 			$final_qty   = (float)$r['stc_cust_super_requisition_items_finalqty'];
 			$pending_qty = $final_qty - $dispatched_qty;
+
+			// Skip rows where nothing is pending
+			if($pending_qty <= 0) { $slno--; continue; }
 
 			// Pending duration & colour coding
 			$days_pending   = 0;
@@ -2193,6 +2250,31 @@ if(isset($_POST["pending_list"])){
     $out = $obj->stc_pending_list($page, $per_page, $search_site, $search_item, $search_reason, $sort_col, $sort_dir);
     header('Content-Type: application/json');
     echo json_encode($out);
+    exit;
+}
+
+if(isset($_POST['bulk_update_pending_status'])){
+    session_start();
+    $raw_ids = isset($_POST['item_ids']) ? $_POST['item_ids'] : [];
+    $status  = isset($_POST['status'])   ? intval($_POST['status'])  : 0;
+    $reason  = isset($_POST['reason'])   ? trim($_POST['reason'])    : '';
+    if(!is_array($raw_ids)) $raw_ids = [$raw_ids];
+    $obj    = new sceptor();
+    $result = $obj->stc_bulk_update_pending_status($raw_ids, $status, $reason);
+    header('Content-Type: application/json');
+    echo json_encode($result);
+    exit;
+}
+
+if(isset($_POST['bulk_add_pending_note'])){
+    session_start();
+    $raw_ids = isset($_POST['item_ids']) ? $_POST['item_ids'] : [];
+    $message = isset($_POST['message'])  ? trim($_POST['message'])   : '';
+    if(!is_array($raw_ids)) $raw_ids = [$raw_ids];
+    $obj    = new sceptor();
+    $result = $obj->stc_bulk_add_pending_note($raw_ids, $message);
+    header('Content-Type: application/json');
+    echo json_encode($result);
     exit;
 }
 ?>
