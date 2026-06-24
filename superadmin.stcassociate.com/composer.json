@@ -13,7 +13,8 @@
         "fideloper/proxy": "^4.4",
         "laravel/framework": "^6.20",
         "laravel/tinker": "^2.5",
-        "league/flysystem-aws-s3-v3": "~1.0"
+        "league/flysystem-aws-s3-v3": "~1.0",
+        "phpoffice/phpspreadsheet": "^1.12"
     },
     "require-dev": {
         "facade/ignition": "^1.16.4",
