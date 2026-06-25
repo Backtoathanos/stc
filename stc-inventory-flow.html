@@ -3,1412 +3,1320 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>STC Inventory & Purchase Flow</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<title>STC — Purchase & Inventory Flow</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --navy: #0A1628;
-    --navy2: #0F1E38;
-    --navy3: #162240;
-    --cyan: #00D4FF;
-    --cyan-dim: rgba(0,212,255,0.15);
-    --cyan-glow: rgba(0,212,255,0.08);
-    --amber: #F5A623;
-    --amber-dim: rgba(245,166,35,0.15);
-    --green: #27AE60;
-    --green-dim: rgba(39,174,96,0.15);
-    --red: #E74C3C;
-    --red-dim: rgba(231,76,60,0.15);
-    --purple: #8B5CF6;
-    --purple-dim: rgba(139,92,246,0.15);
-    --teal: #14B8A6;
-    --teal-dim: rgba(20,184,166,0.15);
-    --text-primary: #F0F4FF;
-    --text-secondary: #8899BB;
-    --text-muted: #4A5A7A;
-    --border: rgba(0,212,255,0.1);
-    --border-strong: rgba(0,212,255,0.25);
-    --card-bg: rgba(15, 30, 56, 0.8);
-  }
+:root {
+  --bg:        #F1F5F9;
+  --surface:   #FFFFFF;
+  --surface2:  #F8FAFC;
+  --border:    #E2E8F0;
+  --border2:   #CBD5E1;
+  --text:      #0F172A;
+  --text2:     #475569;
+  --text3:     #94A3B8;
 
-  html { scroll-behavior: smooth; }
+  --d1:  #0284C7;  --d1-bg: #EFF8FF;  --d1-bd: #BAE6FD;
+  --d2:  #16A34A;  --d2-bg: #F0FDF4;  --d2-bd: #BBF7D0;
+  --d3:  #D97706;  --d3-bg: #FFFBEB;  --d3-bd: #FDE68A;
+  --d4:  #7C3AED;  --d4-bg: #F5F3FF;  --d4-bd: #DDD6FE;
 
-  body {
-    font-family: 'Inter', sans-serif;
-    background: var(--navy);
-    color: var(--text-primary);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  --radius: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+}
 
-  /* ── BACKGROUND GRID ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
-    pointer-events: none;
-    z-index: 0;
-  }
+html { scroll-behavior: smooth; }
 
-  /* ── HERO ── */
-  .hero {
-    position: relative;
-    z-index: 1;
-    padding: 80px 40px 60px;
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(0,212,255,0.04) 0%, transparent 100%);
-  }
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--cyan-dim);
-    border: 1px solid var(--border-strong);
-    border-radius: 999px;
-    padding: 6px 16px;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--cyan);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    margin-bottom: 32px;
-  }
-  .hero-badge::before { content: '●'; font-size: 8px; animation: pulse 2s infinite; }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
 
-  .hero h1 {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(36px, 6vw, 72px);
-    font-weight: 800;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    color: var(--text-primary);
-    margin-bottom: 20px;
-  }
-  .hero h1 span { color: var(--cyan); }
+/* ── HEADER ── */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.06);
+}
+.header-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+}
+.header-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.header-badge {
+  background: #EFF8FF;
+  color: var(--d1);
+  border: 1px solid var(--d1-bd);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
 
-  .hero-sub {
-    font-size: 18px;
-    color: var(--text-secondary);
-    max-width: 600px;
-    margin: 0 auto 48px;
-    line-height: 1.6;
-    font-weight: 300;
-  }
+/* ── DEPT STEPPER ── */
+.stepper {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.stepper::-webkit-scrollbar { display: none; }
 
-  .hero-stats {
-    display: flex;
-    justify-content: center;
-    gap: 48px;
-    flex-wrap: wrap;
-  }
-  .hero-stat { text-align: center; }
-  .hero-stat-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--cyan);
-    display: block;
-    line-height: 1;
-  }
-  .hero-stat-label {
-    font-size: 12px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-top: 4px;
-    display: block;
-  }
+.dept-tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  position: relative;
+}
+.dept-tab:hover { background: var(--bg); }
+.dept-tab.active { border-bottom-color: var(--active-color, var(--d1)); background: var(--active-bg, var(--d1-bg)); }
+.dept-tab[data-dept="1"] { --active-color: var(--d1); --active-bg: var(--d1-bg); }
+.dept-tab[data-dept="2"] { --active-color: var(--d2); --active-bg: var(--d2-bg); }
+.dept-tab[data-dept="3"] { --active-color: var(--d3); --active-bg: var(--d3-bg); }
+.dept-tab[data-dept="4"] { --active-color: var(--d4); --active-bg: var(--d4-bg); }
 
-  /* ── NAV PILLS ── */
-  .nav-pills {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(10,22,40,0.95);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 12px 40px;
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .nav-pills::-webkit-scrollbar { display: none; }
-  .nav-pill {
-    flex-shrink: 0;
-    padding: 6px 16px;
-    border-radius: 999px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text-secondary);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none;
-    transition: all 0.2s;
-    font-family: 'Inter', sans-serif;
-  }
-  .nav-pill:hover { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
-  .nav-pill.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-dim); }
+.dept-tab-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 13px;
+  background: var(--border); color: var(--text3);
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.dept-tab[data-dept="1"] .dept-tab-num { background: var(--d1-bd); color: var(--d1); }
+.dept-tab[data-dept="2"] .dept-tab-num { background: var(--d2-bd); color: var(--d2); }
+.dept-tab[data-dept="3"] .dept-tab-num { background: var(--d3-bd); color: var(--d3); }
+.dept-tab[data-dept="4"] .dept-tab-num { background: var(--d4-bd); color: var(--d4); }
 
-  /* ── SECTION ── */
-  .section {
-    position: relative;
-    z-index: 1;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 80px 40px;
-  }
-  .section + .section { padding-top: 0; }
+.dept-tab-info { line-height: 1.3; }
+.dept-tab-name { font-weight: 600; font-size: 13px; }
+.dept-tab-role { font-size: 11px; color: var(--text3); }
+.dept-tab.done .dept-tab-num::after {
+  content: '✓';
+}
+.dept-tab.done .dept-tab-num span { display: none; }
+.dept-connector {
+  flex-shrink: 0;
+  width: 24px; height: 2px;
+  background: var(--border2);
+  margin: 0;
+  align-self: center;
+}
 
-  .section-eyebrow {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--cyan);
-    margin-bottom: 12px;
-  }
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(26px, 4vw, 40px);
-    font-weight: 700;
-    margin-bottom: 16px;
-    line-height: 1.15;
-  }
-  .section-desc {
-    font-size: 15px;
-    color: var(--text-secondary);
-    line-height: 1.7;
-    max-width: 640px;
-    margin-bottom: 48px;
-  }
+/* ── MAIN LAYOUT ── */
+.main {
+  max-width: 1060px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
 
-  /* ── DIVIDER ── */
-  .divider {
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
-    margin: 0;
-  }
+/* ── DEPT PAGE ── */
+.dept-page { display: none; }
+.dept-page.active { display: block; }
 
-  /* ── ACTOR MAP ── */
-  .actor-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-  }
-  .actor-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px 20px;
-    transition: border-color 0.2s, transform 0.2s;
-    position: relative;
-    overflow: hidden;
-  }
-  .actor-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    border-radius: 16px 16px 0 0;
-  }
-  .actor-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
-  .actor-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    margin-bottom: 16px;
-  }
-  .actor-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-  .actor-dir {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-family: 'Inter', monospace;
-    margin-bottom: 12px;
-  }
-  .actor-role {
-    font-size: 13px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-  }
-  .actor-card.cyan::before { background: var(--cyan); }
-  .actor-card.amber::before { background: var(--amber); }
-  .actor-card.green::before { background: var(--green); }
-  .actor-card.purple::before { background: var(--purple); }
-  .actor-card.teal::before { background: var(--teal); }
-  .actor-card.cyan .actor-icon { background: var(--cyan-dim); color: var(--cyan); }
-  .actor-card.amber .actor-icon { background: var(--amber-dim); color: var(--amber); }
-  .actor-card.green .actor-icon { background: var(--green-dim); color: var(--green); }
-  .actor-card.purple .actor-icon { background: var(--purple-dim); color: var(--purple); }
-  .actor-card.teal .actor-icon { background: var(--teal-dim); color: var(--teal); }
+/* ── DEPT HERO ── */
+.dept-hero {
+  border-radius: var(--radius);
+  padding: 32px;
+  margin-bottom: 32px;
+  border: 1px solid;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+.dept-hero[data-dept="1"] { background: var(--d1-bg); border-color: var(--d1-bd); }
+.dept-hero[data-dept="2"] { background: var(--d2-bg); border-color: var(--d2-bd); }
+.dept-hero[data-dept="3"] { background: var(--d3-bg); border-color: var(--d3-bd); }
+.dept-hero[data-dept="4"] { background: var(--d4-bg); border-color: var(--d4-bd); }
 
-  /* ── PHASE BANNER ── */
-  .phase-banner {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--cyan);
-    border-radius: 0 12px 12px 0;
-    padding: 20px 24px;
-    margin-bottom: 40px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  .phase-banner.phase2 { border-left-color: var(--amber); }
-  .phase-banner.phase3 { border-left-color: var(--teal); }
-  .phase-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 48px;
-    font-weight: 800;
-    line-height: 1;
-    opacity: 0.15;
-    flex-shrink: 0;
-  }
-  .phase-info h3 {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-  .phase-info p { font-size: 14px; color: var(--text-secondary); }
+.dept-hero-icon {
+  width: 56px; height: 56px;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+}
+.dept-hero[data-dept="1"] .dept-hero-icon { background: rgba(2,132,199,0.12); }
+.dept-hero[data-dept="2"] .dept-hero-icon { background: rgba(22,163,74,0.12); }
+.dept-hero[data-dept="3"] .dept-hero-icon { background: rgba(217,119,6,0.12); }
+.dept-hero[data-dept="4"] .dept-hero-icon { background: rgba(124,58,237,0.12); }
 
-  /* ── FLOW STEPS ── */
-  .flow-steps {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-  .flow-step {
-    display: grid;
-    grid-template-columns: 60px 1fr;
-    gap: 0 24px;
-    position: relative;
-  }
-  .step-spine {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .step-dot {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2px solid var(--cyan);
-    background: var(--navy);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--cyan);
-    flex-shrink: 0;
-    position: relative;
-    z-index: 2;
-    transition: background 0.2s, box-shadow 0.2s;
-  }
-  .flow-step:hover .step-dot {
-    background: var(--cyan-dim);
-    box-shadow: 0 0 0 8px rgba(0,212,255,0.06);
-  }
-  .step-line {
-    width: 2px;
-    flex: 1;
-    background: linear-gradient(180deg, var(--cyan) 0%, rgba(0,212,255,0.1) 100%);
-    min-height: 40px;
-    margin-top: 2px;
-  }
-  .flow-step:last-child .step-line { display: none; }
+.dept-hero-eyebrow {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.12em;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.dept-hero[data-dept="1"] .dept-hero-eyebrow { color: var(--d1); }
+.dept-hero[data-dept="2"] .dept-hero-eyebrow { color: var(--d2); }
+.dept-hero[data-dept="3"] .dept-hero-eyebrow { color: var(--d3); }
+.dept-hero[data-dept="4"] .dept-hero-eyebrow { color: var(--d4); }
 
-  .step-body {
-    padding-bottom: 40px;
-    padding-top: 4px;
-  }
-  .step-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-  }
-  .step-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    flex: 1;
-  }
-  .step-badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 12px;
-    border-radius: 999px;
-    letter-spacing: 0.05em;
-    white-space: nowrap;
-    margin-top: 4px;
-  }
-  .step-file {
-    font-size: 12px;
-    font-family: 'Inter', monospace;
-    color: var(--text-muted);
-    background: rgba(0,212,255,0.05);
-    border: 1px solid var(--border);
-    padding: 4px 10px;
-    border-radius: 6px;
-    margin-bottom: 12px;
-    display: inline-block;
-  }
-  .step-desc {
-    font-size: 14px;
-    color: var(--text-secondary);
-    line-height: 1.7;
-    margin-bottom: 20px;
-  }
+.dept-hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 700; line-height: 1.2; margin-bottom: 10px;
+}
+.dept-hero-desc { font-size: 14px; color: var(--text2); line-height: 1.7; max-width: 600px; }
 
-  /* ── DETAIL CARD ── */
-  .detail-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 16px;
-  }
-  .detail-card-header {
-    padding: 12px 16px;
-    background: rgba(0,212,255,0.05);
-    border-bottom: 1px solid var(--border);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .detail-card-body { padding: 16px; }
+/* ── STEP FLOW ── */
+.steps-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
 
-  /* ── ACTION GRID ── */
-  .action-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 10px;
-  }
-  .action-item {
-    background: rgba(0,212,255,0.03);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px;
-    transition: border-color 0.2s;
-  }
-  .action-item:hover { border-color: var(--border-strong); }
-  .action-icon { font-size: 18px; margin-bottom: 8px; }
-  .action-name { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
-  .action-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+.step-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  margin-bottom: 8px;
+}
+.step-card-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.step-card-head:hover { background: var(--surface2); }
+.step-num {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 14px;
+  flex-shrink: 0;
+}
+.step-card-title { font-weight: 600; font-size: 15px; flex: 1; }
+.step-card-desc-short { font-size: 12px; color: var(--text3); }
+.step-toggle {
+  font-size: 18px; color: var(--text3);
+  transition: transform 0.2s;
+  margin-left: auto;
+}
+.step-card.open .step-toggle { transform: rotate(180deg); }
+.step-card-body {
+  border-top: 1px solid var(--border);
+  padding: 24px;
+  display: none;
+}
+.step-card.open .step-card-body { display: block; }
 
-  /* ── ENDPOINT TABLE ── */
-  .endpoint-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-  .endpoint-table th {
-    text-align: left;
-    padding: 8px 12px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-  }
-  .endpoint-table td {
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(0,212,255,0.05);
-    vertical-align: top;
-    color: var(--text-secondary);
-  }
-  .endpoint-table td:first-child {
-    font-family: 'Inter', monospace;
-    font-size: 12px;
-    color: var(--cyan);
-  }
-  .endpoint-table tr:last-child td { border-bottom: none; }
-  .endpoint-table tr:hover td { background: rgba(0,212,255,0.02); }
+/* default open on first load */
+.step-card.default-open .step-card-body { display: block; }
 
-  /* ── STATUS GRID ── */
-  .status-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 12px;
-  }
-  .status-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    transition: border-color 0.2s;
-  }
-  .status-item:hover { border-color: var(--border-strong); }
-  .status-badge-big {
-    min-width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 14px;
-    flex-shrink: 0;
-  }
-  .status-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
-  .status-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+/* ── COLUMN TABLE ── */
+.col-section-title {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text3); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.col-section-title::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
 
-  /* ── JOURNEY TIMELINE ── */
-  .journey {
-    display: flex;
-    align-items: flex-start;
-    gap: 0;
-    overflow-x: auto;
-    padding-bottom: 16px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent;
-  }
-  .journey-step {
-    flex: 1;
-    min-width: 120px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-  }
-  .journey-connector {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    right: -50%;
-    height: 2px;
-    background: linear-gradient(90deg, var(--border-strong), var(--border));
-    z-index: 0;
-  }
-  .journey-step:last-child .journey-connector { display: none; }
-  .journey-dot {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 700;
-    font-size: 13px;
-    position: relative;
-    z-index: 1;
-    background: var(--navy);
-  }
-  .journey-label {
-    font-size: 11px;
-    font-weight: 600;
-    margin-top: 10px;
-    text-align: center;
-  }
-  .journey-actor {
-    font-size: 10px;
-    color: var(--text-muted);
-    margin-top: 4px;
-    text-align: center;
-  }
+.col-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+  margin-bottom: 20px;
+}
+.col-pill {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  transition: border-color 0.15s;
+}
+.col-pill:hover { border-color: var(--border2); }
+.col-pill-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.col-pill-name { font-size: 13px; font-weight: 600; line-height: 1.3; }
+.col-pill-note { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
-  /* ── DB TABLE ── */
-  .db-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 12px;
-  }
-  .db-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px;
-    font-size: 13px;
-  }
-  .db-name {
-    font-family: 'Inter', monospace;
-    font-size: 12px;
-    color: var(--cyan);
-    background: var(--cyan-dim);
-    padding: 4px 10px;
-    border-radius: 6px;
-    display: inline-block;
-    margin-bottom: 10px;
-  }
-  .db-desc { color: var(--text-secondary); font-size: 13px; }
+/* ── FLOW MINI ── */
+.flow-mini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.flow-mini-node {
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12px; font-weight: 600;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.flow-mini-arrow {
+  color: var(--text3); font-size: 16px; font-weight: 300;
+}
 
-  /* ── BADGE COLORS ── */
-  .badge-cyan { background: var(--cyan-dim); color: var(--cyan); border: 1px solid rgba(0,212,255,0.3); }
-  .badge-amber { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245,166,35,0.3); }
-  .badge-green { background: var(--green-dim); color: var(--green); border: 1px solid rgba(39,174,96,0.3); }
-  .badge-red { background: var(--red-dim); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
-  .badge-purple { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(139,92,246,0.3); }
-  .badge-teal { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(20,184,166,0.3); }
+/* ── DECISION BOX ── */
+.decision-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin: 16px 0;
+}
+.decision-diamond {
+  background: var(--d3-bg);
+  border: 2px solid var(--d3-bd);
+  border-radius: 12px;
+  padding: 14px 28px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--d3);
+  text-align: center;
+  position: relative;
+}
+.decision-branches {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  width: 100%;
+  margin-top: 20px;
+}
+.decision-branch {
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid;
+}
+.branch-yes { background: var(--d2-bg); border-color: var(--d2-bd); }
+.branch-no  { background: #FFF1F2; border-color: #FECDD3; }
+.branch-label {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; margin-bottom: 8px;
+}
+.branch-yes .branch-label { color: var(--d2); }
+.branch-no  .branch-label { color: #E11D48; }
+.branch-title { font-weight: 600; font-size: 13px; margin-bottom: 6px; }
+.branch-desc  { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.branch-arrow { text-align: center; font-size: 24px; margin-bottom: 8px; }
 
-  /* ── FOOTER ── */
-  .footer {
-    position: relative;
-    z-index: 1;
-    border-top: 1px solid var(--border);
-    padding: 40px;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 13px;
-  }
+/* ── INFO BOX ── */
+.info-box {
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  border: 1px solid;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.info-box.blue  { background: var(--d1-bg); border-color: var(--d1-bd); color: var(--text2); }
+.info-box.green { background: var(--d2-bg); border-color: var(--d2-bd); color: var(--text2); }
+.info-box.amber { background: var(--d3-bg); border-color: var(--d3-bd); color: var(--text2); }
+.info-box.purple{ background: var(--d4-bg); border-color: var(--d4-bd); color: var(--text2); }
+.info-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
 
-  /* ── SCROLL ANIMATIONS ── */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ── STEP CONNECTOR ── */
+.step-connector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 28px;
+  color: var(--text3);
+  font-size: 20px;
+}
 
-  /* ── FLOW ARROW ── */
-  .flow-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 0;
-    color: var(--text-muted);
-    font-size: 20px;
-  }
+/* ── NAV FOOTER ── */
+.dept-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+.dept-progress {
+  font-size: 13px;
+  color: var(--text3);
+}
+.dept-progress strong { color: var(--text); }
+.btn-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-nav.primary {
+  background: var(--text);
+  color: #fff;
+}
+.btn-nav.primary:hover { background: #1e293b; transform: translateX(2px); }
+.btn-nav.secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border2);
+}
+.btn-nav.secondary:hover { background: var(--surface2); }
 
-  /* ── MINI FLOW ── */
-  .mini-flow {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    padding: 16px;
-    background: rgba(0,212,255,0.03);
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    margin-top: 16px;
-  }
-  .mini-node {
-    padding: 6px 14px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    border: 1px solid;
-    white-space: nowrap;
-  }
-  .mini-arrow { color: var(--text-muted); font-size: 14px; }
+/* ── DONE STATE ── */
+.dept-done {
+  text-align: center;
+  padding: 60px 24px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.done-icon { font-size: 56px; margin-bottom: 16px; }
+.done-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 28px; font-weight: 700; margin-bottom: 10px;
+}
+.done-desc { color: var(--text2); font-size: 15px; line-height: 1.7; max-width: 480px; margin: 0 auto 32px; }
 
-  @media (max-width: 680px) {
-    .hero { padding: 60px 20px 40px; }
-    .section { padding: 60px 20px; }
-    .nav-pills { padding: 12px 20px; }
-    .hero-stats { gap: 24px; }
-    .actor-grid { grid-template-columns: 1fr 1fr; }
-    .flow-step { grid-template-columns: 44px 1fr; gap: 0 16px; }
-  }
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .header { padding: 14px 16px; }
+  .main { padding: 24px 12px 60px; }
+  .dept-hero { flex-direction: column; padding: 20px; }
+  .decision-branches { grid-template-columns: 1fr; }
+  .stepper { padding: 0 12px; }
+  .dept-tab { padding: 12px 14px; }
+  .dept-tab-role { display: none; }
+}
 </style>
 </head>
 <body>
 
-<!-- ── HERO ── -->
-<section class="hero">
-  <div class="hero-badge">STC System Documentation</div>
-  <h1>Purchase &amp; <span>Inventory</span><br/>Management Flow</h1>
-  <p class="hero-sub">A complete guide to the end-to-end procurement lifecycle — from site requisition to delivery, challan, and ledger.</p>
-  <div class="hero-stats">
-    <div class="hero-stat">
-      <span class="hero-stat-num">5</span>
-      <span class="hero-stat-label">Actor Roles</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-num">9</span>
-      <span class="hero-stat-label">Item Statuses</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-num">2</span>
-      <span class="hero-stat-label">Flow Phases</span>
-    </div>
-    <div class="hero-stat">
-      <span class="hero-stat-num">4</span>
-      <span class="hero-stat-label">Item Types</span>
+<!-- ── HEADER ── -->
+<header class="header">
+  <div>
+    <div class="header-title">STC Purchase &amp; Inventory Flow</div>
+    <div class="header-sub">Step-by-step department guide</div>
+  </div>
+  <span class="header-badge" id="header-badge">Department 1 of 4</span>
+</header>
+
+<!-- ── STEPPER ── -->
+<nav class="stepper" id="stepper">
+  <div class="dept-tab active" data-dept="1" onclick="goTo(1)">
+    <div class="dept-tab-num"><span>1</span></div>
+    <div class="dept-tab-info">
+      <div class="dept-tab-name">Procurement</div>
+      <div class="dept-tab-role">Add products &amp; buy stock</div>
     </div>
   </div>
-</section>
-
-<!-- ── NAV ── -->
-<nav class="nav-pills">
-  <a class="nav-pill" href="#actors">Actors</a>
-  <a class="nav-pill" href="#phase1">Phase 1 — Inbound</a>
-  <a class="nav-pill" href="#phase2">Phase 2 — Outward</a>
-  <a class="nav-pill" href="#adhoc">Adhoc & Inventory</a>
-  <a class="nav-pill" href="#statuses">Statuses</a>
-  <a class="nav-pill" href="#journey">Item Journey</a>
-  <a class="nav-pill" href="#database">Database</a>
+  <div class="dept-connector"></div>
+  <div class="dept-tab" data-dept="2" onclick="goTo(2)">
+    <div class="dept-tab-num"><span>2</span></div>
+    <div class="dept-tab-info">
+      <div class="dept-tab-name">Warehouse</div>
+      <div class="dept-tab-role">Rack &amp; receive products</div>
+    </div>
+  </div>
+  <div class="dept-connector"></div>
+  <div class="dept-tab" data-dept="3" onclick="goTo(3)">
+    <div class="dept-tab-num"><span>3</span></div>
+    <div class="dept-tab-info">
+      <div class="dept-tab-name">Dispatch</div>
+      <div class="dept-tab-role">Pending list &amp; dispatch</div>
+    </div>
+  </div>
+  <div class="dept-connector"></div>
+  <div class="dept-tab" data-dept="4" onclick="goTo(4)">
+    <div class="dept-tab-num"><span>4</span></div>
+    <div class="dept-tab-info">
+      <div class="dept-tab-name">Delivery</div>
+      <div class="dept-tab-role">Customer receipt &amp; close</div>
+    </div>
+  </div>
 </nav>
 
-<!-- ── ACTORS ── -->
-<div id="actors" class="divider"></div>
-<section class="section fade-in">
-  <p class="section-eyebrow">Who does what</p>
-  <h2 class="section-title">System Actors</h2>
-  <p class="section-desc">Five distinct roles manage the purchase lifecycle, each operating in their own portal with specific responsibilities and access levels.</p>
+<!-- ── MAIN ── -->
+<main class="main">
 
-  <div class="actor-grid">
-    <div class="actor-card cyan">
-      <div class="actor-icon">👷</div>
-      <div class="actor-name">Supervisor</div>
-      <div class="actor-dir">stc_sub_agent47/</div>
-      <div class="actor-role">Raises material requisitions for a site or project. Receives dispatched items and confirms receipt quantities.</div>
-    </div>
-    <div class="actor-card amber">
-      <div class="actor-icon">📋</div>
-      <div class="actor-name">Manager (Agent)</div>
-      <div class="actor-dir">stc_agent47/</div>
-      <div class="actor-role">Reviews supervisor requisitions. Approves or rejects each line item with a quantity, or rejects with a reason.</div>
-    </div>
-    <div class="actor-card green">
-      <div class="actor-icon">🛒</div>
-      <div class="actor-name">Procurement</div>
-      <div class="actor-dir">stc_agent47/</div>
-      <div class="actor-role">Combines approved items from multiple managers into a single consolidated Purchase Requisition (PR) to STC GLD.</div>
-    </div>
-    <div class="actor-card purple">
-      <div class="actor-icon">🏭</div>
-      <div class="actor-name">STC GLD (Vikings)</div>
-      <div class="actor-dir">stc_vikings/</div>
-      <div class="actor-role">Receives PRs, links product codes from Adhoc catalog, dispatches stock, manages racks, and issues challans.</div>
-    </div>
-    <div class="actor-card teal">
-      <div class="actor-icon">📦</div>
-      <div class="actor-name">GLD Agent Orders</div>
-      <div class="actor-dir">stc_vikings/</div>
-      <div class="actor-role">Manages outward orders from STC GLD to its own customers — daily sale analysis, transfer challans, and ledger.</div>
-    </div>
-  </div>
-</section>
+  <!-- ════════════════════════════════════
+       DEPARTMENT 1 — PROCUREMENT
+  ════════════════════════════════════ -->
+  <div class="dept-page active" id="dept-1">
 
-<!-- ── PHASE 1 ── -->
-<div id="phase1" class="divider"></div>
-<section class="section fade-in">
-  <p class="section-eyebrow">Phase 1</p>
-  <h2 class="section-title">Inbound Purchase Flow</h2>
-  <p class="section-desc">From a supervisor raising a site requisition, through manager approval and procurement consolidation, to STC GLD dispatching items and issuing a challan.</p>
-
-  <div class="phase-banner">
-    <div class="phase-num">01</div>
-    <div class="phase-info">
-      <h3>Site → STC GLD</h3>
-      <p>Supervisor → Manager → Procurement → GLD Dispatch → Challan → Ledger</p>
-    </div>
-  </div>
-
-  <div class="flow-steps">
-
-    <!-- Step 1 -->
-    <div class="flow-step">
-      <div class="step-spine">
-        <div class="step-dot">1</div>
-        <div class="step-line"></div>
+    <div class="dept-hero" data-dept="1">
+      <div class="dept-hero-icon">🛒</div>
+      <div>
+        <div class="dept-hero-eyebrow">Department 1 — Procurement</div>
+        <div class="dept-hero-title">Adding Products &amp; Purchasing Stock</div>
+        <div class="dept-hero-desc">This department is responsible for two things: first, registering new products into the system catalog; second, creating purchases (Adhoc) that bring stock into the warehouse. Everything in the system starts here.</div>
       </div>
-      <div class="step-body">
-        <div class="step-header">
-          <div class="step-title">Supervisor Requisition</div>
-          <span class="step-badge badge-cyan">Supervisor</span>
-        </div>
-        <div class="step-file">stc_sub_agent47/stc-requisition.php</div>
-        <p class="step-desc">The Supervisor opens the Add Requisition modal, selects the site, and adds one or more line items. Each item has a description, quantity, unit, type (Consumable / PPE / Supply / Tools &amp; Tackles), and a priority (Normal or Urgent — urgent rows highlighted red).</p>
+    </div>
 
-        <div class="detail-card">
-          <div class="detail-card-header">📝 Fields per line item</div>
-          <div class="detail-card-body">
-            <div class="action-grid">
-              <div class="action-item">
-                <div class="action-name">Item Description</div>
-                <div class="action-desc">Autocomplete from existing items (3+ chars)</div>
+    <div class="steps-flow">
+
+      <!-- STEP 1A -->
+      <div class="step-card open default-open">
+        <div class="step-card-head" onclick="toggleStep(this)">
+          <div class="step-num" style="background:#EFF8FF;color:var(--d1);">1A</div>
+          <div>
+            <div class="step-card-title">Add Products to Catalog</div>
+            <div class="step-card-desc-short">Register a new item so it can be purchased and tracked</div>
+          </div>
+          <div class="step-toggle">⌄</div>
+        </div>
+        <div class="step-card-body">
+          <div class="info-box blue">
+            <span class="info-icon">💡</span>
+            <div>Before any purchase can happen, the product must exist in the system. This is like creating a product profile — name, category, what unit it's measured in. Once added, it can be bought, stored, and dispatched.</div>
+          </div>
+          <div class="col-section-title">Fields filled when adding a product</div>
+          <div class="col-grid">
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Product Code</div>
+                <div class="col-pill-note">Unique ID for the item</div>
               </div>
-              <div class="action-item">
-                <div class="action-name">Quantity</div>
-                <div class="action-desc">Must be greater than 0</div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Item Name</div>
+                <div class="col-pill-note">Full descriptive name</div>
               </div>
-              <div class="action-item">
-                <div class="action-name">Unit</div>
-                <div class="action-desc">KGS, NOS, MTR, LTR, BOX, etc.</div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Category</div>
+                <div class="col-pill-note">e.g. Electrical, Mechanical</div>
               </div>
-              <div class="action-item">
-                <div class="action-name">Type</div>
-                <div class="action-desc">Consumable / PPE / Supply / Tools &amp; Tackles</div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Sub-Category</div>
+                <div class="col-pill-note">Narrower classification</div>
               </div>
-              <div class="action-item">
-                <div class="action-name">Priority</div>
-                <div class="action-desc">Normal or Urgent (urgent = red row)</div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Unit of Measure</div>
+                <div class="col-pill-note">KGS, NOS, MTR, LTR, BOX…</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Item Type</div>
+                <div class="col-pill-note">Consumable / PPE / Supply / Tools</div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="detail-card">
-          <div class="detail-card-header">⚡ Key AJAX — nemesis/stc_agcart.php</div>
-          <div class="detail-card-body">
-            <table class="endpoint-table">
-              <tr><th>Action</th><th>POST Key</th></tr>
-              <tr><td>stc-sup-hit</td><td>Creates requisition + items</td></tr>
-              <tr><td>call_searched_requisition</td><td>Paginated results (25/page)</td></tr>
-              <tr><td>stc_rec_qntyhit</td><td>Record received quantity at site</td></tr>
-              <tr><td>stc_req_edit_item_update</td><td>Edit item name/qty/unit/type</td></tr>
-              <tr><td>stc_req_edit_item_delete</td><td>Remove item before approval</td></tr>
-            </table>
+      <div class="step-connector">↓</div>
+
+      <!-- STEP 1B -->
+      <div class="step-card">
+        <div class="step-card-head" onclick="toggleStep(this)">
+          <div class="step-num" style="background:#EFF8FF;color:var(--d1);">1B</div>
+          <div>
+            <div class="step-card-title">Create Purchase — Add to Adhoc Stock</div>
+            <div class="step-card-desc-short">Buy the product from a supplier and bring it into warehouse stock</div>
           </div>
+          <div class="step-toggle">⌄</div>
         </div>
-      </div>
-    </div>
-
-    <!-- Step 2 -->
-    <div class="flow-step">
-      <div class="step-spine">
-        <div class="step-dot">2</div>
-        <div class="step-line"></div>
-      </div>
-      <div class="step-body">
-        <div class="step-header">
-          <div class="step-title">Manager Review &amp; Approval</div>
-          <span class="step-badge badge-amber">Manager</span>
-        </div>
-        <div class="step-file">stc_agent47/order-management.php</div>
-        <p class="step-desc">The Manager sees all pending requisition line items for their projects and collaborators. They set an approved quantity for each item (must be ≤ requested qty) and either approve or reject with a mandatory reason.</p>
-
-        <div class="detail-card">
-          <div class="detail-card-header">✅ Manager Actions</div>
-          <div class="detail-card-body">
-            <div class="action-grid">
-              <div class="action-item">
-                <div class="action-icon">✅</div>
-                <div class="action-name">Approve Item</div>
-                <div class="action-desc">Set qty &gt; 0 and ≤ req qty. Item moves to status Accepted → visible to Procurement.</div>
+        <div class="step-card-body">
+          <div class="info-box blue">
+            <span class="info-icon">📦</span>
+            <div>A purchase (called an <strong>Adhoc</strong> in this system) records what was bought, from whom, at what price, and how many units arrived. This is the moment stock enters the warehouse. Each purchase creates an <strong>Adhoc PPA (Purchase Advice)</strong> record that tracks that batch of stock separately.</div>
+          </div>
+          <div class="flow-mini">
+            <div class="flow-mini-node" style="background:var(--d1-bg);border-color:var(--d1-bd);color:var(--d1);">Select Product</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d1-bg);border-color:var(--d1-bd);color:var(--d1);">Enter Purchase Details</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d1-bg);border-color:var(--d1-bd);color:var(--d1);">Assign Rack</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d2-bg);border-color:var(--d2-bd);color:var(--d2);">Stock Added ✓</div>
+          </div>
+          <div class="col-section-title">Fields filled when purchasing</div>
+          <div class="col-grid">
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Product</div>
+                <div class="col-pill-note">Linked from catalog (Step 1A)</div>
               </div>
-              <div class="action-item">
-                <div class="action-icon">🚫</div>
-                <div class="action-name">Reject Item</div>
-                <div class="action-desc">Must enter a rejection reason. Status becomes Rejected.</div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Supplier Name</div>
+                <div class="col-pill-note">Who we bought it from</div>
               </div>
-              <div class="action-item">
-                <div class="action-icon">✏️</div>
-                <div class="action-name">Edit Name / Priority</div>
-                <div class="action-desc">Can change item name and urgency before placing.</div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Invoice / Bill No.</div>
+                <div class="col-pill-note">Supplier's invoice reference</div>
               </div>
-              <div class="action-item">
-                <div class="action-icon">📤</div>
-                <div class="action-name">Place Order</div>
-                <div class="action-desc">Moves the entire requisition to order state.</div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Purchase Date</div>
+                <div class="col-pill-note">When the purchase was made</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Quantity Purchased</div>
+                <div class="col-pill-note">How many units bought</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Rate / Unit Price</div>
+                <div class="col-pill-note">Price per unit</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d1);"></div>
+              <div>
+                <div class="col-pill-name">Total Amount</div>
+                <div class="col-pill-note">Auto-calculated</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">Rack Assignment</div>
+                <div class="col-pill-note">Where it will be stored</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">PPA Reference</div>
+                <div class="col-pill-note">Batch ID for this purchase</div>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        <div class="detail-card">
-          <div class="detail-card-header">⚡ Key AJAX — nemesis/stc_project.php</div>
-          <div class="detail-card-body">
-            <table class="endpoint-table">
-              <tr><th>Action</th><th>POST Key</th></tr>
-              <tr><td>stc_addtopurchase</td><td>Approve item with qty</td></tr>
-              <tr><td>stc_req_edit_item_delete</td><td>Reject item with reason</td></tr>
-              <tr><td>stc_req_edit_item_update</td><td>Edit name/priority</td></tr>
-              <tr><td>place_order</td><td>Move requisition to order</td></tr>
-            </table>
-          </div>
-        </div>
+    </div><!-- /steps-flow -->
+
+    <div class="dept-nav">
+      <div class="dept-progress">Step <strong>1</strong> of 4</div>
+      <button class="btn-nav primary" onclick="goTo(2)">Warehouse (Dept 2) &nbsp;→</button>
+    </div>
+  </div>
+
+
+  <!-- ════════════════════════════════════
+       DEPARTMENT 2 — WAREHOUSE
+  ════════════════════════════════════ -->
+  <div class="dept-page" id="dept-2">
+
+    <div class="dept-hero" data-dept="2">
+      <div class="dept-hero-icon">🗄️</div>
+      <div>
+        <div class="dept-hero-eyebrow">Department 2 — Warehouse</div>
+        <div class="dept-hero-title">Rack Management &amp; Receiving Products</div>
+        <div class="dept-hero-desc">After Procurement buys the stock, Warehouse takes over. They organize products into racks, update stock balances, and confirm physical receipt of any goods that arrive at the store.</div>
       </div>
     </div>
 
-    <!-- Step 3 -->
-    <div class="flow-step">
-      <div class="step-spine">
-        <div class="step-dot">3</div>
-        <div class="step-line"></div>
-      </div>
-      <div class="step-body">
-        <div class="step-header">
-          <div class="step-title">Procurement — Combine &amp; Place Order</div>
-          <span class="step-badge badge-green">Procurement</span>
-        </div>
-        <div class="step-file">stc_agent47/procurement-management.php</div>
-        <p class="step-desc">Procurement sees all manager-approved items (list_status = 2). They select items from multiple projects, combine them into a single cart, enter a reference number, and place one consolidated Purchase Requisition (PR) to STC GLD.</p>
+    <div class="steps-flow">
 
-        <div class="detail-card">
-          <div class="detail-card-header">🔄 Procurement Workflow</div>
-          <div class="detail-card-body">
-            <div class="mini-flow">
-              <span class="mini-node badge-green">Requisition Tab</span>
-              <span class="mini-arrow">→</span>
-              <span class="mini-node badge-cyan">Select Items</span>
-              <span class="mini-arrow">→</span>
-              <span class="mini-node badge-amber">Accept to Cart</span>
-              <span class="mini-arrow">→</span>
-              <span class="mini-node badge-purple">Combine Groups</span>
-              <span class="mini-arrow">→</span>
-              <span class="mini-node badge-teal">Enter Ref No.</span>
-              <span class="mini-arrow">→</span>
-              <span class="mini-node badge-green">Place PR → GLD</span>
+      <!-- STEP 2A -->
+      <div class="step-card open default-open">
+        <div class="step-card-head" onclick="toggleStep(this)">
+          <div class="step-num" style="background:var(--d2-bg);color:var(--d2);">2A</div>
+          <div>
+            <div class="step-card-title">Update Rack for Product</div>
+            <div class="step-card-desc-short">Assign purchased stock to a physical rack location</div>
+          </div>
+          <div class="step-toggle">⌄</div>
+        </div>
+        <div class="step-card-body">
+          <div class="info-box green">
+            <span class="info-icon">🗄️</span>
+            <div>Every item in the warehouse sits in a named Rack. When a new purchase arrives, warehouse staff assign it to a rack. The rack name is recorded against the Adhoc PPA so that when dispatching later, staff know exactly where to pick from.</div>
+          </div>
+          <div class="col-section-title">Rack update fields</div>
+          <div class="col-grid">
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">Product Code</div>
+                <div class="col-pill-note">Which item is being stored</div>
+              </div>
             </div>
-          </div>
-        </div>
-
-        <div class="detail-card">
-          <div class="detail-card-header">⚡ Key AJAX — nemesis/stc_procurement.php</div>
-          <div class="detail-card-body">
-            <table class="endpoint-table">
-              <tr><th>Action</th><th>POST Key</th></tr>
-              <tr><td>go_for_req_sess</td><td>Add item to session cart</td></tr>
-              <tr><td>call_reuisition_appr_cart_call</td><td>Load current cart content</td></tr>
-              <tr><td>requisition_combined</td><td>Mark requisition group for combining</td></tr>
-              <tr><td>place_req_sess_act</td><td>Create combined PR → sends to GLD</td></tr>
-              <tr><td>remove_requisition</td><td>Remove requisition block from cart</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 4 -->
-    <div class="flow-step">
-      <div class="step-spine">
-        <div class="step-dot">4</div>
-        <div class="step-line"></div>
-      </div>
-      <div class="step-body">
-        <div class="step-header">
-          <div class="step-title">STC GLD — Check &amp; Dispatch</div>
-          <span class="step-badge badge-purple">STC GLD (Vikings)</span>
-        </div>
-        <div class="step-file">stc_vikings/daily-requisition.php</div>
-        <p class="step-desc">GLD receives all PRs placed by Procurement. For each line item, they link a product code from the Adhoc catalog, verify available stock in the rack, and dispatch the required quantity. If stock is insufficient, the item is marked Pending with a remark.</p>
-
-        <div class="detail-card">
-          <div class="detail-card-header">🏭 GLD Dispatch Workflow</div>
-          <div class="detail-card-body">
-            <div class="action-grid">
-              <div class="action-item">
-                <div class="action-icon">🔗</div>
-                <div class="action-name">Link Item Code</div>
-                <div class="action-desc">Search Adhoc catalog by category, subcategory, or name. Select a product to link.</div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">Rack Name / Number</div>
+                <div class="col-pill-note">Physical storage location</div>
               </div>
-              <div class="action-item">
-                <div class="action-icon">📊</div>
-                <div class="action-name">Check Balance</div>
-                <div class="action-desc">View available Adhoc PPA stock and rack location for linked product.</div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">PPA Reference</div>
+                <div class="col-pill-note">Which purchase batch</div>
               </div>
-              <div class="action-item">
-                <div class="action-icon">🚚</div>
-                <div class="action-name">Dispatch</div>
-                <div class="action-desc">Select Adhoc PPA, enter dispatch qty, confirm. Balance updates in real time.</div>
-              </div>
-              <div class="action-item">
-                <div class="action-icon">⏳</div>
-                <div class="action-name">Mark Pending</div>
-                <div class="action-desc">If Adhoc balance is insufficient, mark Pending (status 9) with a reason remark.</div>
-              </div>
-              <div class="action-item">
-                <div class="action-icon">🔧</div>
-                <div class="action-name">Tools Track</div>
-                <div class="action-desc">For Tools &amp; Tackles: after dispatch, select the PPA tool and send to Tools Track record.</div>
-              </div>
-              <div class="action-item">
-                <div class="action-icon">📋</div>
-                <div class="action-name">View Logs</div>
-                <div class="action-desc">Every status change is logged with timestamp. Log count shown on the row.</div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">Balance Quantity</div>
+                <div class="col-pill-note">Units available in this rack</div>
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="detail-card">
-          <div class="detail-card-header">⚡ Key AJAX — kattegat/ragnar_order.php</div>
-          <div class="detail-card-body">
-            <table class="endpoint-table">
-              <tr><th>Action</th><th>POST Key</th></tr>
-              <tr><td>stc_call_daily_requisitions</td><td>Paginated PR list (JSON)</td></tr>
-              <tr><td>stc_call_daily_requisition_balance</td><td>Adhoc balance for linked product</td></tr>
-              <tr><td>stc_dispatch_daily_requisition_balance</td><td>Dispatch stock from Adhoc</td></tr>
-              <tr><td>stc_update_daily_requisition_item_code</td><td>Link product to requisition item</td></tr>
-              <tr><td>stc_update_daily_requisition_qty_unit</td><td>Edit balance qty, unit, type</td></tr>
-              <tr><td>stc_dr_copy_tool_track</td><td>Record tool dispatch in Tools Track</td></tr>
-              <tr><td>update_requisition_status</td><td>Mark Pending with remarks</td></tr>
-              <tr><td>stc_call_daily_requisition_logs</td><td>Fetch status change log entries</td></tr>
-            </table>
+          <div class="info-box green">
+            <span class="info-icon">📌</span>
+            <div><strong>Important:</strong> When balance reaches <strong>0</strong>, the rack row is automatically removed from the active dispatch list. Warehouse must keep this updated.</div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Step 5 -->
-    <div class="flow-step">
-      <div class="step-spine">
-        <div class="step-dot">5</div>
-        <div class="step-line"></div>
-      </div>
-      <div class="step-body">
-        <div class="step-header">
-          <div class="step-title">Challan Generation</div>
-          <span class="step-badge badge-purple">STC GLD</span>
+      <div class="step-connector">↓</div>
+
+      <!-- STEP 2B -->
+      <div class="step-card">
+        <div class="step-card-head" onclick="toggleStep(this)">
+          <div class="step-num" style="background:var(--d2-bg);color:var(--d2);">2B</div>
+          <div>
+            <div class="step-card-title">Receive Products</div>
+            <div class="step-card-desc-short">Confirm physical arrival of goods and record received quantity</div>
+          </div>
+          <div class="step-toggle">⌄</div>
         </div>
-        <div class="step-file">stc_vikings/verify-challan.php</div>
-        <p class="step-desc">Once dispatched, a physical delivery challan is generated for the PR batch. A Verify step (role-restricted to select employees) marks each dispatch line as physically confirmed — after which quantities cannot be edited.</p>
-
-        <div class="detail-card">
-          <div class="detail-card-header">📄 Challan Contents</div>
-          <div class="detail-card-body">
-            <div class="action-grid">
-              <div class="action-item"><div class="action-name">PR Reference</div><div class="action-desc">Reference number and PR ID</div></div>
-              <div class="action-item"><div class="action-name">Project &amp; Supervisor</div><div class="action-desc">Delivery destination details</div></div>
-              <div class="action-item"><div class="action-name">Item List</div><div class="action-desc">Product codes, descriptions, units</div></div>
-              <div class="action-item"><div class="action-name">Dispatched Quantities</div><div class="action-desc">Per item, per Adhoc PPA</div></div>
-              <div class="action-item"><div class="action-name">Rack / Adhoc Source</div><div class="action-desc">Traceability of stock origin</div></div>
-              <div class="action-item"><div class="action-name">Date &amp; Verification</div><div class="action-desc">Dispatch date, verified status</div></div>
+        <div class="step-card-body">
+          <div class="info-box green">
+            <span class="info-icon">✅</span>
+            <div>When dispatched goods arrive at a site, the Supervisor confirms receipt. Warehouse records the received quantity against the dispatched quantity. If there's a shortfall, it's noted and can trigger a follow-up order.</div>
+          </div>
+          <div class="flow-mini">
+            <div class="flow-mini-node" style="background:var(--d2-bg);border-color:var(--d2-bd);color:var(--d2);">Goods Arrive at Site</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d2-bg);border-color:var(--d2-bd);color:var(--d2);">Supervisor Counts</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d2-bg);border-color:var(--d2-bd);color:var(--d2);">Enter Received Qty</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d2-bg);border-color:var(--d2-bd);color:var(--d2);">Status → Received ✓</div>
+          </div>
+          <div class="col-section-title">Fields filled when receiving</div>
+          <div class="col-grid">
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">PPA / PR Reference</div>
+                <div class="col-pill-note">Which dispatch batch</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">Product &amp; Description</div>
+                <div class="col-pill-note">What was expected</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">Quantity Received</div>
+                <div class="col-pill-note">Actual count on arrival</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">Date of Receipt</div>
+                <div class="col-pill-note">When goods arrived</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d2);"></div>
+              <div>
+                <div class="col-pill-name">Received By</div>
+                <div class="col-pill-note">Supervisor who confirmed</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
     </div>
 
-    <!-- Step 6 -->
-    <div class="flow-step">
-      <div class="step-spine">
-        <div class="step-dot">6</div>
-      </div>
-      <div class="step-body">
-        <div class="step-header">
-          <div class="step-title">Ledger &amp; Reconciliation</div>
-          <span class="step-badge badge-teal">Finance / GLD</span>
-        </div>
-        <div class="step-file">stc_vikings/stc-requisition-combiner-fsale.php</div>
-        <p class="step-desc">The PR-level ledger page (linked from the PR Name column in Daily Requisition) shows all supervisor requisitions combined in that PR, tracks dispatched vs remaining quantities, and forms the basis for financial reconciliation against Adhoc purchase invoices.</p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ── PHASE 2 ── -->
-<div id="phase2" class="divider"></div>
-<section class="section fade-in">
-  <p class="section-eyebrow">Phase 2</p>
-  <h2 class="section-title">Outward Flow — GLD to Customer</h2>
-  <p class="section-desc">STC GLD also acts as a distributor to its own customers. This reverse flow is managed in agent-order.php and is driven by daily sale patterns.</p>
-
-  <div class="phase-banner phase2">
-    <div class="phase-num">02</div>
-    <div class="phase-info">
-      <h3>STC GLD → Customer</h3>
-      <p>Daily sale analysis → internal requisition → Transfer Challan → Customer delivery → Ledger</p>
+    <div class="dept-nav">
+      <button class="btn-nav secondary" onclick="goTo(1)">← Procurement</button>
+      <div class="dept-progress">Step <strong>2</strong> of 4</div>
+      <button class="btn-nav primary" onclick="goTo(3)">Dispatch (Dept 3) &nbsp;→</button>
     </div>
   </div>
 
-  <div class="mini-flow" style="margin-bottom: 32px;">
-    <span class="mini-node badge-amber">Daily Sale Analysis</span>
-    <span class="mini-arrow">→</span>
-    <span class="mini-node badge-amber">Create Requisition</span>
-    <span class="mini-arrow">→</span>
-    <span class="mini-node badge-amber">Transfer Challan</span>
-    <span class="mini-arrow">→</span>
-    <span class="mini-node badge-amber">Customer Order</span>
-    <span class="mini-arrow">→</span>
-    <span class="mini-node badge-amber">Delivery + Challan</span>
-    <span class="mini-arrow">→</span>
-    <span class="mini-node badge-amber">Ledger Update</span>
-  </div>
 
-  <div class="detail-card">
-    <div class="detail-card-header">🗝️ Key Features of Phase 2</div>
-    <div class="detail-card-body">
-      <div class="action-grid">
-        <div class="action-item">
-          <div class="action-icon">📈</div>
-          <div class="action-name">Daily Sale Driven</div>
-          <div class="action-desc">Orders are placed based on daily sale patterns, not just ad hoc requests — proactive replenishment.</div>
-        </div>
-        <div class="action-item">
-          <div class="action-icon">🔄</div>
-          <div class="action-name">Transfer Challan</div>
-          <div class="action-desc">Internal stock movement document created before dispatching to customer.</div>
-        </div>
-        <div class="action-item">
-          <div class="action-icon">👤</div>
-          <div class="action-name">Customer Challan</div>
-          <div class="action-desc">Each customer order generates its own delivery challan document.</div>
-        </div>
-        <div class="action-item">
-          <div class="action-icon">📒</div>
-          <div class="action-name">Ledger Reconciliation</div>
-          <div class="action-desc">All outward transactions reconcile in the ledger for financial accuracy.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+  <!-- ════════════════════════════════════
+       DEPARTMENT 3 — DISPATCH
+  ════════════════════════════════════ -->
+  <div class="dept-page" id="dept-3">
 
-<!-- ── ADHOC ── -->
-<div id="adhoc" class="divider"></div>
-<section class="section fade-in">
-  <p class="section-eyebrow">Inventory Management</p>
-  <h2 class="section-title">Adhoc &amp; Special Item Tracking</h2>
-  <p class="section-desc">The Adhoc warehouse is the central inventory from which all dispatches originate. Special item types have dedicated tracking layers beyond standard stock movements.</p>
-
-  <div class="phase-banner phase3">
-    <div class="phase-num">AD</div>
-    <div class="phase-info">
-      <h3>Adhoc → Rack → Dispatch → Track</h3>
-      <p>Rack Management · Tools Track (PPA) · PPE Tracker · RCM Transfer Challan</p>
-    </div>
-  </div>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-
-    <div class="detail-card">
-      <div class="detail-card-header">🗄️ Rack Management</div>
-      <div class="detail-card-body" style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
-        Adhoc stock is physically stored in named Racks. When dispatching, GLD staff select the specific Adhoc PPA (Purchase Advice) and rack. Each PPA tracks a balance quantity — when it reaches 0, it is removed from the active dispatch list. Rack names appear in dispatch records for full traceability.
-      </div>
-    </div>
-
-    <div class="detail-card">
-      <div class="detail-card-header">🔧 Tools Track (PPA)</div>
-      <div class="detail-card-body" style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
-        For <strong style="color:var(--text-primary)">Tools &amp; Tackles</strong> items, each purchased tool gets a unique serial/asset ID (PPA tool row). After dispatching from Adhoc, GLD staff select the specific tool from the dropdown and click Send — creating a record in <code style="color:var(--cyan); font-size:11px;">stc_tooldetails_track</code> that links the tool to the exact requisition and site it was sent to.
-        <br/><br/>
-        <em style="color:var(--text-muted)">Prerequisite: Tool rows must be created at purchase time. Without them, dispatch cannot be tracked.</em>
-      </div>
-    </div>
-
-    <div class="detail-card">
-      <div class="detail-card-header">🦺 PPE Notes &amp; Tracker</div>
-      <div class="detail-card-body" style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
-        <strong style="color:var(--text-primary)">PPE (Personal Protective Equipment)</strong> items follow a similar pattern. At dispatch, a PPE Note records: item, quantity issued, recipient (supervisor/site), date, and Adhoc PPA reference. The PPE Tracker maintains a running log for audits and per-site balance checks.
-      </div>
-    </div>
-
-    <div class="detail-card">
-      <div class="detail-card-header">📄 RCM Transfer Challan</div>
-      <div class="detail-card-body" style="font-size:13px; color:var(--text-secondary); line-height:1.7;">
-        For internal stock movements, an RCM Transfer Challan is generated — covering the product code, description, quantity, unit, Adhoc PPA reference, and authorized signatory. Physical goods move with this challan. At the destination, Verify Dispatch marks it as confirmed and updates the ledger (stock out against PPA).
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ── STATUSES ── -->
-<div id="statuses" class="divider"></div>
-<section class="section fade-in">
-  <p class="section-eyebrow">Reference</p>
-  <h2 class="section-title">Item Status Reference</h2>
-  <p class="section-desc">Every requisition line item passes through these nine statuses. Color coding is consistent across all portals.</p>
-
-  <div class="status-grid">
-    <div class="status-item">
-      <div class="status-badge-big badge-cyan" style="background:rgba(52,152,219,0.2);color:#3498db;">1</div>
+    <div class="dept-hero" data-dept="3">
+      <div class="dept-hero-icon">🚚</div>
       <div>
-        <div class="status-name" style="color:#3498db;">Ordered</div>
-        <div class="status-desc">Supervisor placed the requisition. Awaiting manager review.</div>
+        <div class="dept-hero-eyebrow">Department 3 — Dispatch</div>
+        <div class="dept-hero-title">Check Pending Orders &amp; Dispatch Stock</div>
+        <div class="dept-hero-desc">This department receives order requests from sites and customers. They check what's needed, verify if stock is available in the warehouse, then either dispatch immediately or route back to Procurement if stock is low.</div>
       </div>
     </div>
-    <div class="status-item">
-      <div class="status-badge-big badge-green" style="background:rgba(46,204,113,0.2);color:#2ecc71;">2</div>
-      <div>
-        <div class="status-name" style="color:#2ecc71;">Approved</div>
-        <div class="status-desc">Manager set approved qty. Awaiting procurement.</div>
+
+    <div class="steps-flow">
+
+      <!-- STEP 3A -->
+      <div class="step-card open default-open">
+        <div class="step-card-head" onclick="toggleStep(this)">
+          <div class="step-num" style="background:var(--d3-bg);color:var(--d3);">3A</div>
+          <div>
+            <div class="step-card-title">Check Pending List from Sites &amp; Customers</div>
+            <div class="step-card-desc-short">View all open requisitions waiting to be fulfilled</div>
+          </div>
+          <div class="step-toggle">⌄</div>
+        </div>
+        <div class="step-card-body">
+          <div class="info-box amber">
+            <span class="info-icon">📋</span>
+            <div>Sites raise requisitions (material requests). These appear in the Dispatch department's pending list. Each line shows what's needed, how much, and how urgently — <span style="color:#DC2626;font-weight:600;">urgent rows are highlighted in red</span>.</div>
+          </div>
+          <div class="col-section-title">What the pending list shows</div>
+          <div class="col-grid">
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Requisition ID</div>
+                <div class="col-pill-note">Unique order reference</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Site / Customer</div>
+                <div class="col-pill-note">Who raised the request</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Item Description</div>
+                <div class="col-pill-note">What is needed</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Quantity Required</div>
+                <div class="col-pill-note">How many units needed</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Unit</div>
+                <div class="col-pill-note">KGS, NOS, MTR, etc.</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Priority</div>
+                <div class="col-pill-note">Normal or Urgent (red)</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Request Date</div>
+                <div class="col-pill-note">When it was raised</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Current Status</div>
+                <div class="col-pill-note">Ordered / Approved / Pending</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <div class="step-connector">↓</div>
+
+      <!-- STEP 3B — DECISION -->
+      <div class="step-card open">
+        <div class="step-card-head" onclick="toggleStep(this)">
+          <div class="step-num" style="background:var(--d3-bg);color:var(--d3);">3B</div>
+          <div>
+            <div class="step-card-title">Check Stock Availability</div>
+            <div class="step-card-desc-short">Is there enough in the rack to fulfil the order?</div>
+          </div>
+          <div class="step-toggle">⌄</div>
+        </div>
+        <div class="step-card-body">
+          <div class="info-box amber">
+            <span class="info-icon">🔍</span>
+            <div>For each pending item, Dispatch checks the Adhoc rack balance. They link the requested item to the matching product in the warehouse catalog, then see how much is available. The result determines what happens next.</div>
+          </div>
+
+          <div class="decision-wrap">
+            <div class="decision-diamond">Is stock available in rack?</div>
+            <div class="decision-branches">
+              <div class="decision-branch branch-yes">
+                <div class="branch-arrow">✅</div>
+                <div class="branch-label">Yes — Stock Available</div>
+                <div class="branch-title">→ Go to Step 3C: Dispatch</div>
+                <div class="branch-desc">Select the Adhoc PPA, enter the dispatch quantity, and confirm. Balance reduces automatically.</div>
+              </div>
+              <div class="decision-branch branch-no">
+                <div class="branch-arrow">⚠️</div>
+                <div class="branch-label">No — Insufficient Stock</div>
+                <div class="branch-title">→ Route to Department 1</div>
+                <div class="branch-desc">Mark the item as <strong>Pending</strong> with a remark. Send a purchase request to Procurement (Dept 1) to buy more stock.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="step-connector">↓</div>
+
+      <!-- STEP 3C -->
+      <div class="step-card">
+        <div class="step-card-head" onclick="toggleStep(this)">
+          <div class="step-num" style="background:var(--d3-bg);color:var(--d3);">3C</div>
+          <div>
+            <div class="step-card-title">Dispatch the Item</div>
+            <div class="step-card-desc-short">Stock is picked from rack and dispatched to site or customer</div>
+          </div>
+          <div class="step-toggle">⌄</div>
+        </div>
+        <div class="step-card-body">
+          <div class="flow-mini">
+            <div class="flow-mini-node" style="background:var(--d3-bg);border-color:var(--d3-bd);color:var(--d3);">Link Product Code</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d3-bg);border-color:var(--d3-bd);color:var(--d3);">Select Adhoc PPA</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d3-bg);border-color:var(--d3-bd);color:var(--d3);">Enter Dispatch Qty</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d2-bg);border-color:var(--d2-bd);color:var(--d2);">Balance Updated ✓</div>
+          </div>
+          <div class="col-section-title">Fields filled when dispatching</div>
+          <div class="col-grid">
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Requisition ID</div>
+                <div class="col-pill-note">Which order this fulfils</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Product Code</div>
+                <div class="col-pill-note">Linked from Adhoc catalog</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Adhoc PPA Used</div>
+                <div class="col-pill-note">Which purchase batch is used</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Rack Name</div>
+                <div class="col-pill-note">Where it was picked from</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Dispatch Quantity</div>
+                <div class="col-pill-note">Units being sent out</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Dispatch Date</div>
+                <div class="col-pill-note">When it left the warehouse</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d3);"></div>
+              <div>
+                <div class="col-pill-name">Dispatched By</div>
+                <div class="col-pill-note">GLD staff name</div>
+              </div>
+            </div>
+          </div>
+          <div class="info-box amber">
+            <span class="info-icon">🔧</span>
+            <div><strong>Special items:</strong> For <strong>Tools &amp; Tackles</strong> — after dispatching, the specific tool's serial/asset ID must also be recorded in Tools Track. For <strong>PPE</strong> items — a PPE Note is generated with recipient details.</div>
+          </div>
+        </div>
+      </div>
+
     </div>
-    <div class="status-item">
-      <div class="status-badge-big" style="background:rgba(39,174,96,0.2);color:#27ae60;">3</div>
-      <div>
-        <div class="status-name" style="color:#27ae60;">Accepted</div>
-        <div class="status-desc">Procurement accepted into a consolidated PR.</div>
-      </div>
-    </div>
-    <div class="status-item">
-      <div class="status-badge-big" style="background:rgba(243,156,18,0.2);color:#f39c12;">4</div>
-      <div>
-        <div class="status-name" style="color:#f39c12;">Dispatched</div>
-        <div class="status-desc">STC GLD dispatched from Adhoc stock.</div>
-      </div>
-    </div>
-    <div class="status-item">
-      <div class="status-badge-big" style="background:rgba(22,160,133,0.2);color:#16a085;">5</div>
-      <div>
-        <div class="status-name" style="color:#16a085;">Received</div>
-        <div class="status-desc">Supervisor confirmed receipt at site.</div>
-      </div>
-    </div>
-    <div class="status-item">
-      <div class="status-badge-big badge-red" style="background:rgba(231,76,60,0.2);color:#e74c3c;">6</div>
-      <div>
-        <div class="status-name" style="color:#e74c3c;">Rejected</div>
-        <div class="status-desc">Rejected by manager or procurement (with reason).</div>
-      </div>
-    </div>
-    <div class="status-item">
-      <div class="status-badge-big" style="background:rgba(149,165,166,0.2);color:#95a5a6;">7</div>
-      <div>
-        <div class="status-name" style="color:#95a5a6;">Canceled</div>
-        <div class="status-desc">Requisition or item canceled.</div>
-      </div>
-    </div>
-    <div class="status-item">
-      <div class="status-badge-big badge-purple" style="background:rgba(155,89,182,0.2);color:#9b59b6;">8</div>
-      <div>
-        <div class="status-name" style="color:#9b59b6;">Returned</div>
-        <div class="status-desc">Item returned by supervisor.</div>
-      </div>
-    </div>
-    <div class="status-item">
-      <div class="status-badge-big badge-red" style="background:rgba(255,47,47,0.2);color:rgb(255,47,47);">9</div>
-      <div>
-        <div class="status-name" style="color:rgb(255,47,47);">Pending</div>
-        <div class="status-desc">GLD marked pending — insufficient Adhoc stock. With remarks.</div>
-      </div>
+
+    <div class="dept-nav">
+      <button class="btn-nav secondary" onclick="goTo(2)">← Warehouse</button>
+      <div class="dept-progress">Step <strong>3</strong> of 4</div>
+      <button class="btn-nav primary" onclick="goTo(4)">Delivery (Dept 4) &nbsp;→</button>
     </div>
   </div>
 
-  <div style="margin-top: 40px;">
-    <h3 style="font-family:'Syne',sans-serif; font-size:18px; font-weight:700; margin-bottom:16px;">Item Types &amp; Their Tracking</h3>
-    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:12px;">
-      <div class="status-item">
-        <div class="status-badge-big" style="background:rgba(0,212,255,0.1);color:var(--cyan);font-size:11px;min-width:44px;">CON</div>
-        <div>
-          <div class="status-name">Consumable</div>
-          <div class="status-desc">Standard dispatch. No special tracker required.</div>
+
+  <!-- ════════════════════════════════════
+       DEPARTMENT 4 — DELIVERY & CLOSE
+  ════════════════════════════════════ -->
+  <div class="dept-page" id="dept-4">
+
+    <div class="dept-hero" data-dept="4">
+      <div class="dept-hero-icon">📦</div>
+      <div>
+        <div class="dept-hero-eyebrow">Department 4 — Delivery</div>
+        <div class="dept-hero-title">Customer Receipt, Challan &amp; Closing Outlets</div>
+        <div class="dept-hero-desc">After dispatch, this department ensures goods reach the customer with a proper challan (delivery document), confirms receipt, and closes out the order once everything is accounted for — either received or transferred.</div>
+      </div>
+    </div>
+
+    <div class="steps-flow">
+
+      <!-- STEP 4A -->
+      <div class="step-card open default-open">
+        <div class="step-card-head" onclick="toggleStep(this)">
+          <div class="step-num" style="background:var(--d4-bg);color:var(--d4);">4A</div>
+          <div>
+            <div class="step-card-title">Generate Delivery Challan</div>
+            <div class="step-card-desc-short">Create the physical delivery document that travels with the goods</div>
+          </div>
+          <div class="step-toggle">⌄</div>
+        </div>
+        <div class="step-card-body">
+          <div class="info-box purple">
+            <span class="info-icon">📄</span>
+            <div>A challan is the delivery slip that physically accompanies the goods. It lists what was dispatched, to whom, from which warehouse batch (PPA), and must be signed off when received. Once verified, quantities <strong>cannot be edited</strong>.</div>
+          </div>
+          <div class="col-section-title">Challan contains</div>
+          <div class="col-grid">
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Challan Number</div>
+                <div class="col-pill-note">Unique delivery document ID</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">PR Reference</div>
+                <div class="col-pill-note">Purchase Requisition number</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Project &amp; Site Name</div>
+                <div class="col-pill-note">Delivery destination</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Item List</div>
+                <div class="col-pill-note">Product codes &amp; descriptions</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Dispatched Quantities</div>
+                <div class="col-pill-note">Per item, per PPA batch</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Adhoc / Rack Source</div>
+                <div class="col-pill-note">Traceability of stock origin</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Dispatch Date</div>
+                <div class="col-pill-note">When goods left warehouse</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Verified By</div>
+                <div class="col-pill-note">Authorised staff signature</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="status-item">
-        <div class="status-badge-big" style="background:rgba(245,166,35,0.1);color:var(--amber);font-size:11px;min-width:44px;">PPE</div>
-        <div>
-          <div class="status-name">PPE</div>
-          <div class="status-desc">PPE Notes + PPE Tracker recorded on dispatch.</div>
+
+      <div class="step-connector">↓</div>
+
+      <!-- STEP 4B -->
+      <div class="step-card">
+        <div class="step-card-head" onclick="toggleStep(this)">
+          <div class="step-num" style="background:var(--d4-bg);color:var(--d4);">4B</div>
+          <div>
+            <div class="step-card-title">Customer Receives or Transfers</div>
+            <div class="step-card-desc-short">Goods delivered to site, or transferred to another location</div>
+          </div>
+          <div class="step-toggle">⌄</div>
+        </div>
+        <div class="step-card-body">
+          <div class="info-box purple">
+            <span class="info-icon">🤝</span>
+            <div>When the goods arrive, the customer/supervisor either <strong>receives them directly</strong> (confirms qty on site) or they may be <strong>transferred</strong> to another location via a Transfer Challan. Both outcomes must be recorded to close the order.</div>
+          </div>
+          <div class="decision-branches" style="margin:16px 0;">
+            <div class="decision-branch" style="background:var(--d4-bg);border-color:var(--d4-bd);">
+              <div class="branch-arrow">📬</div>
+              <div class="branch-label" style="color:var(--d4);">Direct Receipt</div>
+              <div class="branch-title">Supervisor confirms at site</div>
+              <div class="branch-desc">Quantity received is entered. Status changes to <strong>Received</strong>. Ledger updated.</div>
+            </div>
+            <div class="decision-branch" style="background:#FFF7ED;border-color:#FED7AA;">
+              <div class="branch-arrow">🔄</div>
+              <div class="branch-label" style="color:#C2410C;">Transfer Challan</div>
+              <div class="branch-title">Moved to another location</div>
+              <div class="branch-desc">A Transfer Challan is generated with product, qty, source, and destination. Verify Dispatch confirms receipt at new location.</div>
+            </div>
+          </div>
+          <div class="col-section-title">Fields filled on receipt / transfer</div>
+          <div class="col-grid">
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Received Quantity</div>
+                <div class="col-pill-note">Actual count by customer</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Date Received</div>
+                <div class="col-pill-note">Arrival date</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Received By</div>
+                <div class="col-pill-note">Supervisor / customer name</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Transfer Destination</div>
+                <div class="col-pill-note">If transferred, where to</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="status-item">
-        <div class="status-badge-big" style="background:rgba(39,174,96,0.1);color:var(--green);font-size:11px;min-width:44px;">SUP</div>
-        <div>
-          <div class="status-name">Supply</div>
-          <div class="status-desc">Standard dispatch. No special tracker required.</div>
+
+      <div class="step-connector">↓</div>
+
+      <!-- STEP 4C -->
+      <div class="step-card">
+        <div class="step-card-head" onclick="toggleStep(this)">
+          <div class="step-num" style="background:var(--d4-bg);color:var(--d4);">4C</div>
+          <div>
+            <div class="step-card-title">Close the Outlet Order &amp; Update Ledger</div>
+            <div class="step-card-desc-short">All items accounted for — order is marked complete and ledger reconciled</div>
+          </div>
+          <div class="step-toggle">⌄</div>
+        </div>
+        <div class="step-card-body">
+          <div class="info-box purple">
+            <span class="info-icon">📒</span>
+            <div>An outlet order is <strong>closed</strong> when every line item has been either received or transferred. The ledger page then shows dispatched vs remaining quantities for financial reconciliation against the original Adhoc purchase invoices.</div>
+          </div>
+          <div class="flow-mini">
+            <div class="flow-mini-node" style="background:var(--d4-bg);border-color:var(--d4-bd);color:var(--d4);">All items received / transferred</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d4-bg);border-color:var(--d4-bd);color:var(--d4);">Mark Order Closed</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d4-bg);border-color:var(--d4-bd);color:var(--d4);">Ledger Reconciled</div>
+            <div class="flow-mini-arrow">→</div>
+            <div class="flow-mini-node" style="background:var(--d2-bg);border-color:var(--d2-bd);color:var(--d2);">Cycle Complete ✓</div>
+          </div>
+          <div class="col-section-title">Ledger records</div>
+          <div class="col-grid">
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">PR Reference</div>
+                <div class="col-pill-note">The purchase requisition</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Total Dispatched</div>
+                <div class="col-pill-note">Units sent from warehouse</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Total Received</div>
+                <div class="col-pill-note">Confirmed by customer</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Remaining / Pending</div>
+                <div class="col-pill-note">Any shortfall outstanding</div>
+              </div>
+            </div>
+            <div class="col-pill">
+              <div class="col-pill-dot" style="background:var(--d4);"></div>
+              <div>
+                <div class="col-pill-name">Invoice Matched</div>
+                <div class="col-pill-note">Matched against Adhoc purchase</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="status-item">
-        <div class="status-badge-big" style="background:rgba(139,92,246,0.1);color:var(--purple);font-size:11px;min-width:44px;">T&T</div>
-        <div>
-          <div class="status-name">Tools &amp; Tackles</div>
-          <div class="status-desc">Tools Track (PPA) must be recorded after dispatch.</div>
-        </div>
-      </div>
+
+    </div>
+
+    <div class="dept-nav">
+      <button class="btn-nav secondary" onclick="goTo(3)">← Dispatch</button>
+      <div class="dept-progress">Step <strong>4</strong> of 4</div>
+      <button class="btn-nav primary" onclick="goTo('done')">Complete Flow &nbsp;✓</button>
     </div>
   </div>
-</section>
 
-<!-- ── JOURNEY ── -->
-<div id="journey" class="divider"></div>
-<section class="section fade-in">
-  <p class="section-eyebrow">End-to-End</p>
-  <h2 class="section-title">Single Item Journey</h2>
-  <p class="section-desc">Follow a single line item from the moment a supervisor creates a requisition through to final receipt and ledger update.</p>
 
-  <div class="journey" style="margin-bottom:32px;">
-    <div class="journey-step">
-      <div class="journey-connector"></div>
-      <div class="journey-dot" style="border-color:#3498db;color:#3498db;">1</div>
-      <div class="journey-label" style="color:#3498db;">Ordered</div>
-      <div class="journey-actor">Supervisor</div>
-    </div>
-    <div class="journey-step">
-      <div class="journey-connector"></div>
-      <div class="journey-dot" style="border-color:#f39c12;color:#f39c12;">↓</div>
-      <div class="journey-label" style="color:#f39c12;">Reviewed</div>
-      <div class="journey-actor">Manager</div>
-    </div>
-    <div class="journey-step">
-      <div class="journey-connector"></div>
-      <div class="journey-dot" style="border-color:#2ecc71;color:#2ecc71;">2</div>
-      <div class="journey-label" style="color:#2ecc71;">Approved</div>
-      <div class="journey-actor">Manager</div>
-    </div>
-    <div class="journey-step">
-      <div class="journey-connector"></div>
-      <div class="journey-dot" style="border-color:#27ae60;color:#27ae60;">3</div>
-      <div class="journey-label" style="color:#27ae60;">Accepted</div>
-      <div class="journey-actor">Procurement</div>
-    </div>
-    <div class="journey-step">
-      <div class="journey-connector"></div>
-      <div class="journey-dot" style="border-color:#8B5CF6;color:#8B5CF6;">PR</div>
-      <div class="journey-label" style="color:#8B5CF6;">In PR</div>
-      <div class="journey-actor">Procurement</div>
-    </div>
-    <div class="journey-step">
-      <div class="journey-connector"></div>
-      <div class="journey-dot" style="border-color:#14B8A6;color:#14B8A6;">↓</div>
-      <div class="journey-label" style="color:#14B8A6;">GLD Recv.</div>
-      <div class="journey-actor">GLD</div>
-    </div>
-    <div class="journey-step">
-      <div class="journey-connector"></div>
-      <div class="journey-dot" style="border-color:#f39c12;color:#f39c12;">4</div>
-      <div class="journey-label" style="color:#f39c12;">Dispatched</div>
-      <div class="journey-actor">GLD</div>
-    </div>
-    <div class="journey-step">
-      <div class="journey-connector"></div>
-      <div class="journey-dot" style="border-color:#00D4FF;color:#00D4FF;">📄</div>
-      <div class="journey-label" style="color:#00D4FF;">Challan</div>
-      <div class="journey-actor">GLD</div>
-    </div>
-    <div class="journey-step">
-      <div class="journey-connector"></div>
-      <div class="journey-dot" style="border-color:#16a085;color:#16a085;">5</div>
-      <div class="journey-label" style="color:#16a085;">Received</div>
-      <div class="journey-actor">Supervisor</div>
-    </div>
-    <div class="journey-step">
-      <div class="journey-dot" style="border-color:#95a5a6;color:#95a5a6;">✓</div>
-      <div class="journey-label" style="color:#95a5a6;">Ledger</div>
-      <div class="journey-actor">Finance</div>
-    </div>
-  </div>
-
-  <div class="detail-card">
-    <div class="detail-card-header">⚠️ Exception Paths</div>
-    <div class="detail-card-body">
-      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap:12px; font-size:13px;">
-        <div style="padding:14px; background:rgba(231,76,60,0.06); border:1px solid rgba(231,76,60,0.2); border-radius:10px;">
-          <div style="color:#e74c3c; font-weight:600; margin-bottom:6px;">🚫 Manager Rejection (Status 6)</div>
-          <div style="color:var(--text-muted);">Item is rejected with a mandatory reason. Supervisor is informed. End of journey for this line.</div>
-        </div>
-        <div style="padding:14px; background:rgba(231,76,60,0.06); border:1px solid rgba(231,76,60,0.2); border-radius:10px;">
-          <div style="color:#e74c3c; font-weight:600; margin-bottom:6px;">🚫 Procurement Rejection (Status 6)</div>
-          <div style="color:var(--text-muted);">Even after manager approval, Procurement can reject at their stage with a reason. End of journey.</div>
-        </div>
-        <div style="padding:14px; background:rgba(255,47,47,0.06); border:1px solid rgba(255,47,47,0.2); border-radius:10px;">
-          <div style="color:rgb(255,47,47); font-weight:600; margin-bottom:6px;">⏳ GLD Pending (Status 9)</div>
-          <div style="color:var(--text-muted);">Adhoc stock insufficient. GLD marks pending with a remark. Resumes when stock is replenished.</div>
-        </div>
-        <div style="padding:14px; background:rgba(155,89,182,0.06); border:1px solid rgba(155,89,182,0.2); border-radius:10px;">
-          <div style="color:#9b59b6; font-weight:600; margin-bottom:6px;">↩️ Supervisor Return (Status 8)</div>
-          <div style="color:var(--text-muted);">After receipt, supervisor can return the item. Marked Returned in the ledger.</div>
-        </div>
+  <!-- ════════════════════════════════════
+       DONE
+  ════════════════════════════════════ -->
+  <div class="dept-page" id="dept-done">
+    <div class="dept-done">
+      <div class="done-icon">🎉</div>
+      <div class="done-title">Full Cycle Complete</div>
+      <div class="done-desc">You've walked through all four departments — from buying stock and racking it, to dispatching orders and closing deliveries. Every step creates a traceable record.</div>
+      <div class="flow-mini" style="justify-content:center; margin-bottom:32px;">
+        <div class="flow-mini-node" style="background:var(--d1-bg);border-color:var(--d1-bd);color:var(--d1);">1 · Procurement</div>
+        <div class="flow-mini-arrow">→</div>
+        <div class="flow-mini-node" style="background:var(--d2-bg);border-color:var(--d2-bd);color:var(--d2);">2 · Warehouse</div>
+        <div class="flow-mini-arrow">→</div>
+        <div class="flow-mini-node" style="background:var(--d3-bg);border-color:var(--d3-bd);color:var(--d3);">3 · Dispatch</div>
+        <div class="flow-mini-arrow">→</div>
+        <div class="flow-mini-node" style="background:var(--d4-bg);border-color:var(--d4-bd);color:var(--d4);">4 · Delivery</div>
       </div>
+      <button class="btn-nav primary" onclick="goTo(1)" style="margin:0 auto;">↺ &nbsp;Start Again</button>
     </div>
   </div>
-</section>
 
-<!-- ── DATABASE ── -->
-<div id="database" class="divider"></div>
-<section class="section fade-in">
-  <p class="section-eyebrow">Reference</p>
-  <h2 class="section-title">Database Tables</h2>
-  <p class="section-desc">Core tables that power the purchase and inventory flow system.</p>
-
-  <div class="db-grid">
-    <div class="db-card">
-      <div class="db-name">stc_cust_super_requisition_list</div>
-      <div class="db-desc">Requisition list header — the parent record for each requisition submission.</div>
-    </div>
-    <div class="db-card">
-      <div class="db-name">stc_cust_super_requisition_list_items</div>
-      <div class="db-desc">Line items per requisition — holds description, qty, unit, type, status, approved qty.</div>
-    </div>
-    <div class="db-card">
-      <div class="db-name">stc_cust_super_requisition_list_items_rec</div>
-      <div class="db-desc">Received quantity records per item — logged when supervisor confirms receipt.</div>
-    </div>
-    <div class="db-card">
-      <div class="db-name">stc_cust_pro_supervisor</div>
-      <div class="db-desc">Supervisor records — name, contact, project association.</div>
-    </div>
-    <div class="db-card">
-      <div class="db-name">stc_cust_project</div>
-      <div class="db-desc">Project records — title, assigned manager, collaboration links.</div>
-    </div>
-    <div class="db-card">
-      <div class="db-name">stc_agents</div>
-      <div class="db-desc">Manager/agent records — used across all phases for auth and attribution.</div>
-    </div>
-    <div class="db-card">
-      <div class="db-name">stc_tooldetails_track</div>
-      <div class="db-desc">Tools &amp; Tackles dispatch tracker — links tool serial/PPA ID to requisition and site.</div>
-    </div>
-    <div class="db-card">
-      <div class="db-name">stc_cust_super_requisition_list_items_acceptby</div>
-      <div class="db-desc">Records which agent approved each procurement item.</div>
-    </div>
-    <div class="db-card">
-      <div class="db-name">Adhoc table</div>
-      <div class="db-desc">Warehouse stock catalog — product details, PPA records, balance quantities, rack assignments.</div>
-    </div>
-  </div>
-</section>
-
-<!-- ── FOOTER ── -->
-<footer class="footer">
-  <p style="margin-bottom:8px; color:var(--text-secondary);">STC Purchase &amp; Inventory Management System</p>
-  <p>Generated from source analysis of <code style="color:var(--cyan); font-size:11px;">stc_sub_agent47 · stc_agent47 · stc_vikings</code> — 4 core files, ~3,850 lines of PHP</p>
-</footer>
+</main>
 
 <script>
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  }, { threshold: 0.08 });
+  let current = 1;
 
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+  function goTo(dept) {
+    // hide all pages
+    document.querySelectorAll('.dept-page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.dept-tab').forEach(t => t.classList.remove('active'));
 
-  const pills = document.querySelectorAll('.nav-pill');
-  const sections = ['actors','phase1','phase2','adhoc','statuses','journey','database'];
+    if (dept === 'done') {
+      document.getElementById('dept-done').classList.add('active');
+      document.getElementById('header-badge').textContent = 'Cycle Complete ✓';
+      // mark all tabs done
+      document.querySelectorAll('.dept-tab').forEach(t => t.classList.add('done'));
+      current = 'done';
+    } else {
+      current = dept;
+      document.getElementById('dept-' + dept).classList.add('active');
+      document.getElementById('header-badge').textContent = 'Department ' + dept + ' of 4';
 
-  const sectionObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        pills.forEach(p => {
-          p.classList.toggle('active', p.getAttribute('href') === '#' + id);
-        });
-      }
-    });
-  }, { threshold: 0.3 });
+      // update tabs
+      document.querySelectorAll('.dept-tab').forEach(t => {
+        const d = parseInt(t.getAttribute('data-dept'));
+        if (d === dept) t.classList.add('active');
+        if (d < dept) t.classList.add('done');
+      });
 
-  sections.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) sectionObserver.observe(el);
-  });
+      // scroll to top
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function toggleStep(head) {
+    const card = head.closest('.step-card');
+    card.classList.toggle('open');
+  }
 </script>
 </body>
 </html>

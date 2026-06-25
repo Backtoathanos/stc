@@ -169,9 +169,10 @@ class ImportSchoolStudents extends Command
         $father   = trim((string) $ws->getCell(self::COL_FATHER . $row)->getValue());
         $mother   = trim((string) $ws->getCell(self::COL_MOTHER . $row)->getValue());
         // Take only the first contact number; cells may use " / ", " ", or "," as separators
+        // Column is varchar(10) so cap at 10 characters
         $contactRaw   = trim((string) $ws->getCell(self::COL_CONTACT . $row)->getValue());
         $contactParts = preg_split('/[\s\/,]+/', $contactRaw, -1, PREG_SPLIT_NO_EMPTY);
-        $contact      = trim($contactParts[0] ?? '');
+        $contact      = substr(trim($contactParts[0] ?? ''), 0, 10);
         $aadhar   = trim((string) $ws->getCell(self::COL_AADHAR . $row)->getValue());
         $stuCode  = trim((string) $ws->getCell(self::COL_STU_CODE . $row)->getValue());
         $boarding = trim((string) $ws->getCell(self::COL_BOARDING . $row)->getValue());
@@ -187,23 +188,25 @@ class ImportSchoolStudents extends Command
         $remarks = implode(' | ', $remarkParts);
 
         return [
-            'stc_school_student_studid'        => $saraId,
-            'stc_school_student_firstname'     => $firstName,
-            'stc_school_student_lastname'      => $lastName,
-            'stc_school_student_dob'           => $dob,
-            'stc_school_student_gender'        => $gender,
-            'stc_school_student_bloodgroup'    => '',
-            'stc_school_student_email'         => '',
-            'stc_school_student_contact'       => $contact,
-            'stc_school_student_address'       => $address,
-            'stc_school_student_religion'      => $religion,
-            'stc_school_student_admissiondate' => $doa,
-            'stc_school_student_classroomid'   => $classId,
-            'stc_school_student_guardianname'  => $father,
-            'stc_school_student_remarks'       => $remarks,
-            'stc_school_student_status'        => '1',
-            'stc_school_student_createdate'    => now()->format('Y-m-d H:i:s'),
-            'stc_school_student_createdby'     => 0,
+            'stc_school_student_studid'         => $saraId,
+            'stc_school_student_firstname'      => $firstName,
+            'stc_school_student_lastname'       => $lastName,
+            'stc_school_student_dob'            => $dob,
+            'stc_school_student_gender'         => $gender,
+            'stc_school_student_bloodgroup'     => '',
+            'stc_school_student_email'          => '',
+            'stc_school_student_contact'        => $contact,
+            'stc_school_student_address'        => $address,
+            'stc_school_student_religion'       => $religion,
+            'stc_school_student_admissionno'    => $saraId,       // SARA.ID.NO
+            'stc_school_student_admissiondate'  => $doa,
+            'stc_school_student_admissionclass' => $classTitle,   // raw class label e.g. "V"
+            'stc_school_student_classroomid'    => $classId,
+            'stc_school_student_guardianname'   => $father,
+            'stc_school_student_remarks'        => $remarks,
+            'stc_school_student_status'         => '1',
+            'stc_school_student_createdate'     => now()->format('Y-m-d H:i:s'),
+            'stc_school_student_createdby'      => 0,
         ];
     }
 

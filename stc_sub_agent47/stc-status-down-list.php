@@ -449,6 +449,7 @@
                         $('#stc-agent-sup-std-sublocation').change();
                         $('#stc-agent-sup-std-equipment-status').val(response_sdl.stc_status_down_list_equipment_status);
                         $('#stc-agent-sup-std-job-plannning').val(response_sdl.stc_status_down_list_jobtype);
+                        toggle_daily_job_fields();
                         $(".stc-agent-sup-std-qty").val(response_sdl.stc_status_down_list_qty);
                         $(".stc-agent-sup-std-capacity").val(response_sdl.stc_status_down_list_capacity);
                         $("#stc-agent-sup-std-reasonattribite").val(response_sdl.stc_status_down_list_reasonattribute);
@@ -584,6 +585,25 @@
                     var status=$('#stc-agent-sup-std-jstatus-find').val();
                     std_list_call(location_id, month, status);
                 }
+            });
+
+            function toggle_daily_job_fields(){
+                var j_plannning = $('#stc-agent-sup-std-job-plannning').val();
+                if(j_plannning === 'DAILY JOB ACTIVITY'){
+                    $('#stc-std-qty-col').hide();
+                    $('#stc-std-capacity-col').hide();
+                    $('#stc-std-manpower-col').hide();
+                    $('#stc-agent-sup-std-manpower-req').removeAttr('required');
+                }else{
+                    $('#stc-std-qty-col').show();
+                    $('#stc-std-capacity-col').show();
+                    $('#stc-std-manpower-col').show();
+                    $('#stc-agent-sup-std-manpower-req').attr('required', 'required');
+                }
+            }
+
+            $('body').delegate('#stc-agent-sup-std-job-plannning', 'change', function(e){
+                toggle_daily_job_fields();
             });
 
             $('body').delegate('.stc-agent-sup-std-tools-req-btn', 'click', function(e){
@@ -1233,7 +1253,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 col-xl-3 stc-std-section-hideshow"> 
+                    <div id="stc-std-qty-col" class="col-md-3 col-xl-3 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Quantity :</h5><br>
@@ -1241,7 +1261,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3 col-xl-3 stc-std-section-hideshow"> 
+                    <div id="stc-std-capacity-col" class="col-md-3 col-xl-3 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Capacity :</h5><br>
@@ -1293,11 +1313,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
+                    <div id="stc-std-manpower-col" class="col-md-6 col-xl-6 stc-std-section-hideshow"> 
                         <div class="main-card mb-3 card">
                             <div class="card-body">
                                 <h5>Manpower Required :</h5><br>
-                                <input type="text" class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-manpower-req" placeholder="Manpower Required" required>
+                                <input type="text" class="form-control stc-std-update-on-focusout" id="stc-agent-sup-std-manpower-req" placeholder="Manpower Required">
                             </div>
                         </div>
                     </div>
