@@ -45,17 +45,7 @@ $greet = $h(isset($parent_name) && $parent_name !== '' ? $parent_name : 'Parent 
 					<tr>
 						<td style="padding:28px 28px 8px;">
 							<p style="margin:0 0 16px;font-size:16px;color:#1a1a1a;">Dear <?php echo $greet; ?>,</p>
-							<p style="margin:0 0 16px;font-size:15px;color:#444;">Thank you for contacting us through the official parent request form. We have received your message and our office will review it shortly.</p>
-							<p style="margin:0 0 16px;font-size:15px;color:#444;">A member of staff may reply to you using the email address or phone number you provided. Please allow normal working hours for a response.</p>
-							<table role="presentation" cellspacing="0" cellpadding="0" style="width:100%;background:#e3f2fd;border-left:4px solid #1565c0;border-radius:4px;margin:20px 0;">
-								<tr>
-									<td style="padding:14px 16px;font-size:13px;color:#0d47a1;">
-										<strong>Submitted</strong><br>
-										<?php echo $h((string) (isset($submitted_readable) ? $submitted_readable : '')); ?>
-									</td>
-								</tr>
-							</table>
-							<p style="margin:0 0 8px;font-size:15px;color:#444;">If your matter is urgent, you may also reach the school office by phone during school hours.</p>
+							<p style="margin:0 0 16px;font-size:15px;color:#444;">Thank you, dear parents, for your valuable feedback shared on the school portal. We sincerely appreciate your trust in SARA Group, and the school will review the points raised and revert soon.</p>
 							<p style="margin:24px 0 0;font-size:15px;color:#333;">With kind regards,<br><strong style="color:#1565c0;">STC School administration</strong></p>
 						</td>
 					</tr>

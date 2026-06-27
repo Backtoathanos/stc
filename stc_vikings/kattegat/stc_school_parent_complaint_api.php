@@ -1,7 +1,14 @@
 <?php
 /**
- * JSON API — school parent/guardian requests (`stc_school_parent_request`).
+ * JSON API — school parent/guardian complaints (`stc_school_parent_request`).
  * Same DB as MCU/db.php (e.g. stc_associate_go).
+ *
+ * Actions handled:
+ *   stc_list_parent_complaints      — list all (director view)
+ *   stc_get_parent_complaint        — single row detail
+ *   stc_mark_parent_complaint_read  — mark new→read
+ *   stc_close_parent_complaint      — director marks closed + action text
+ *   stc_pass_to_school_admin        — director forwards to school admin
  */
 declare(strict_types=1);
 
@@ -28,17 +35,22 @@ mysqli_set_charset($con, 'utf8mb4');
  */
 function stc_prc_map_row_full(array $r): array {
 	return [
-		'id' => (int) ($r['stc_school_parent_request_id'] ?? 0),
-		'parent_name' => (string) ($r['stc_school_parent_request_parent_name'] ?? ''),
-		'email' => (string) ($r['stc_school_parent_request_email'] ?? ''),
-		'phone' => (string) ($r['stc_school_parent_request_phone'] ?? ''),
-		'student_name' => (string) ($r['stc_school_parent_request_student_name'] ?? ''),
-		'student_id' => (string) ($r['stc_school_parent_request_student_id'] ?? ''),
-		'subject' => (string) ($r['stc_school_parent_request_subject'] ?? ''),
-		'message' => (string) ($r['stc_school_parent_request_message'] ?? ''),
-		'status' => (string) ($r['stc_school_parent_request_status'] ?? 'new'),
-		'action_taken' => (string) ($r['stc_school_parent_request_action_taken'] ?? ''),
-		'createdate' => (string) ($r['stc_school_parent_request_createdate'] ?? ''),
+		'id'                    => (int)    ($r['stc_school_parent_request_id']                   ?? 0),
+		'parent_name'           => (string) ($r['stc_school_parent_request_parent_name']           ?? ''),
+		'email'                 => (string) ($r['stc_school_parent_request_email']                 ?? ''),
+		'phone'                 => (string) ($r['stc_school_parent_request_phone']                 ?? ''),
+		'student_name'          => (string) ($r['stc_school_parent_request_student_name']          ?? ''),
+		'student_id'            => (string) ($r['stc_school_parent_request_student_id']            ?? ''),
+		'subject'               => (string) ($r['stc_school_parent_request_subject']               ?? ''),
+		'message'               => (string) ($r['stc_school_parent_request_message']               ?? ''),
+		'status'                => (string) ($r['stc_school_parent_request_status']                ?? 'new'),
+		'action_taken'          => (string) ($r['stc_school_parent_request_action_taken']          ?? ''),
+		'createdate'            => (string) ($r['stc_school_parent_request_createdate']            ?? ''),
+		'passed_to_school'      => (int)    ($r['stc_school_parent_request_passed_to_school']      ?? 0),
+		'passed_date'           => (string) ($r['stc_school_parent_request_passed_date']           ?? ''),
+		'school_note'           => (string) ($r['stc_school_parent_request_school_note']           ?? ''),
+		'school_status'         => (string) ($r['stc_school_parent_request_school_status']         ?? ''),
+		'school_resolved_date'  => (string) ($r['stc_school_parent_request_school_resolved_date']  ?? ''),
 	];
 }
 
@@ -61,6 +73,9 @@ function stc_prc_text_len(string $msg): int {
 	return strlen($msg);
 }
 
+/* ------------------------------------------------------------------ */
+/* LIST                                                                 */
+/* ------------------------------------------------------------------ */
 if (isset($_POST['stc_list_parent_complaints'])) {
 	$rows = [];
 	$sql = '
@@ -75,7 +90,12 @@ if (isset($_POST['stc_list_parent_complaints'])) {
 			`stc_school_parent_request_message`,
 			`stc_school_parent_request_status`,
 			`stc_school_parent_request_action_taken`,
-			`stc_school_parent_request_createdate`
+			`stc_school_parent_request_createdate`,
+			COALESCE(`stc_school_parent_request_passed_to_school`, 0) AS `stc_school_parent_request_passed_to_school`,
+			COALESCE(`stc_school_parent_request_passed_date`, \'\') AS `stc_school_parent_request_passed_date`,
+			COALESCE(`stc_school_parent_request_school_note`, \'\') AS `stc_school_parent_request_school_note`,
+			COALESCE(`stc_school_parent_request_school_status`, \'\') AS `stc_school_parent_request_school_status`,
+			COALESCE(`stc_school_parent_request_school_resolved_date`, \'\') AS `stc_school_parent_request_school_resolved_date`
 		FROM `stc_school_parent_request`
 		ORDER BY `stc_school_parent_request_createdate` DESC
 		LIMIT 500
@@ -84,7 +104,8 @@ if (isset($_POST['stc_list_parent_complaints'])) {
 		while ($r = mysqli_fetch_assoc($rs)) {
 			$full = stc_prc_map_row_full($r);
 			$full['message_preview'] = stc_prc_message_preview($full['message']);
-			$full['action_preview'] = stc_prc_message_preview($full['action_taken'], 80);
+			$full['action_preview']  = stc_prc_message_preview($full['action_taken'], 80);
+			$full['school_note_preview'] = stc_prc_message_preview($full['school_note'], 80);
 			unset($full['message']);
 			$rows[] = $full;
 		}
@@ -96,7 +117,7 @@ if (isset($_POST['stc_list_parent_complaints'])) {
 	if ($err !== '' && (stripos($err, 'Unknown column') !== false || stripos($err, "doesn't exist") !== false)) {
 		echo json_encode([
 			'success' => false,
-			'message' => 'Table or column missing. Run sql/stc_school_parent_request.sql and stc_school_parent_request_action_taken_alter.sql on this database.',
+			'message' => 'Table or column missing. Run sql/stc_school_parent_request.sql and stc_umbrella/sql/stc_parent_complaint_school_admin_alter.sql.',
 		]);
 		exit;
 	}
@@ -104,6 +125,9 @@ if (isset($_POST['stc_list_parent_complaints'])) {
 	exit;
 }
 
+/* ------------------------------------------------------------------ */
+/* GET SINGLE                                                           */
+/* ------------------------------------------------------------------ */
 if (isset($_POST['stc_get_parent_complaint'])) {
 	$id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 	if ($id <= 0) {
@@ -122,7 +146,12 @@ if (isset($_POST['stc_get_parent_complaint'])) {
 			`stc_school_parent_request_message`,
 			`stc_school_parent_request_status`,
 			`stc_school_parent_request_action_taken`,
-			`stc_school_parent_request_createdate`
+			`stc_school_parent_request_createdate`,
+			COALESCE(`stc_school_parent_request_passed_to_school`, 0) AS `stc_school_parent_request_passed_to_school`,
+			COALESCE(`stc_school_parent_request_passed_date`, \'\') AS `stc_school_parent_request_passed_date`,
+			COALESCE(`stc_school_parent_request_school_note`, \'\') AS `stc_school_parent_request_school_note`,
+			COALESCE(`stc_school_parent_request_school_status`, \'\') AS `stc_school_parent_request_school_status`,
+			COALESCE(`stc_school_parent_request_school_resolved_date`, \'\') AS `stc_school_parent_request_school_resolved_date`
 		FROM `stc_school_parent_request`
 		WHERE `stc_school_parent_request_id` = ?
 		LIMIT 1
@@ -140,46 +169,35 @@ if (isset($_POST['stc_get_parent_complaint'])) {
 	$r = null;
 	if (function_exists('mysqli_stmt_get_result')) {
 		$res = mysqli_stmt_get_result($stmt);
-		$r = $res ? mysqli_fetch_assoc($res) : null;
+		$r   = $res ? mysqli_fetch_assoc($res) : null;
 	} else {
-		$row_id = null;
-		$parent_name = null;
-		$email = null;
-		$phone = null;
-		$student_name = null;
-		$student_id = null;
-		$subject = null;
-		$message = null;
-		$status = null;
-		$action_taken = null;
-		$createdate = null;
+		$row_id = $parent_name = $email = $phone = $student_name = $student_id =
+		$subject = $message = $status = $action_taken = $createdate =
+		$passed_to_school = $passed_date = $school_note = $school_status = $school_resolved_date = null;
 		mysqli_stmt_bind_result(
 			$stmt,
-			$row_id,
-			$parent_name,
-			$email,
-			$phone,
-			$student_name,
-			$student_id,
-			$subject,
-			$message,
-			$status,
-			$action_taken,
-			$createdate
+			$row_id, $parent_name, $email, $phone, $student_name, $student_id,
+			$subject, $message, $status, $action_taken, $createdate,
+			$passed_to_school, $passed_date, $school_note, $school_status, $school_resolved_date
 		);
 		if (mysqli_stmt_fetch($stmt)) {
 			$r = [
-				'stc_school_parent_request_id' => $row_id,
-				'stc_school_parent_request_parent_name' => $parent_name,
-				'stc_school_parent_request_email' => $email,
-				'stc_school_parent_request_phone' => $phone,
-				'stc_school_parent_request_student_name' => $student_name,
-				'stc_school_parent_request_student_id' => $student_id,
-				'stc_school_parent_request_subject' => $subject,
-				'stc_school_parent_request_message' => $message,
-				'stc_school_parent_request_status' => $status,
-				'stc_school_parent_request_action_taken' => $action_taken,
-				'stc_school_parent_request_createdate' => $createdate,
+				'stc_school_parent_request_id'                  => $row_id,
+				'stc_school_parent_request_parent_name'          => $parent_name,
+				'stc_school_parent_request_email'                => $email,
+				'stc_school_parent_request_phone'                => $phone,
+				'stc_school_parent_request_student_name'         => $student_name,
+				'stc_school_parent_request_student_id'           => $student_id,
+				'stc_school_parent_request_subject'              => $subject,
+				'stc_school_parent_request_message'              => $message,
+				'stc_school_parent_request_status'               => $status,
+				'stc_school_parent_request_action_taken'         => $action_taken,
+				'stc_school_parent_request_createdate'           => $createdate,
+				'stc_school_parent_request_passed_to_school'     => $passed_to_school,
+				'stc_school_parent_request_passed_date'          => $passed_date,
+				'stc_school_parent_request_school_note'          => $school_note,
+				'stc_school_parent_request_school_status'        => $school_status,
+				'stc_school_parent_request_school_resolved_date' => $school_resolved_date,
 			];
 		}
 	}
@@ -192,6 +210,9 @@ if (isset($_POST['stc_get_parent_complaint'])) {
 	exit;
 }
 
+/* ------------------------------------------------------------------ */
+/* MARK READ                                                            */
+/* ------------------------------------------------------------------ */
 if (isset($_POST['stc_mark_parent_complaint_read'])) {
 	$id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 	if ($id <= 0) {
@@ -220,8 +241,11 @@ if (isset($_POST['stc_mark_parent_complaint_read'])) {
 	exit;
 }
 
+/* ------------------------------------------------------------------ */
+/* CLOSE (director marks done)                                          */
+/* ------------------------------------------------------------------ */
 if (isset($_POST['stc_close_parent_complaint'])) {
-	$id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+	$id     = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 	$action = isset($_POST['action_taken']) ? trim((string) $_POST['action_taken']) : '';
 	if ($id <= 0) {
 		echo json_encode(['success' => false, 'message' => 'Invalid id.']);
@@ -256,6 +280,44 @@ if (isset($_POST['stc_close_parent_complaint'])) {
 		exit;
 	}
 	echo json_encode(['success' => true, 'message' => 'Marked as closed.']);
+	exit;
+}
+
+/* ------------------------------------------------------------------ */
+/* PASS TO SCHOOL ADMIN (director forwards complaint)                  */
+/* ------------------------------------------------------------------ */
+if (isset($_POST['stc_pass_to_school_admin'])) {
+	$id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
+	if ($id <= 0) {
+		echo json_encode(['success' => false, 'message' => 'Invalid id.']);
+		exit;
+	}
+	$now = date('Y-m-d H:i:s');
+	$stmt = mysqli_prepare($con, '
+		UPDATE `stc_school_parent_request`
+		SET `stc_school_parent_request_passed_to_school` = 1,
+		    `stc_school_parent_request_passed_date` = ?
+		WHERE `stc_school_parent_request_id` = ?
+		  AND COALESCE(`stc_school_parent_request_passed_to_school`, 0) = 0
+	');
+	if (!$stmt) {
+		echo json_encode(['success' => false, 'message' => 'Prepare failed.', 'detail' => mysqli_error($con)]);
+		exit;
+	}
+	mysqli_stmt_bind_param($stmt, 'si', $now, $id);
+	if (!mysqli_stmt_execute($stmt)) {
+		$err = mysqli_stmt_error($stmt);
+		mysqli_stmt_close($stmt);
+		echo json_encode(['success' => false, 'message' => 'Could not pass complaint.', 'detail' => $err]);
+		exit;
+	}
+	$affected = mysqli_stmt_affected_rows($stmt);
+	mysqli_stmt_close($stmt);
+	if ($affected !== 1) {
+		echo json_encode(['success' => false, 'message' => 'Already passed to school admin or record not found.']);
+		exit;
+	}
+	echo json_encode(['success' => true, 'message' => 'Complaint forwarded to school admin.']);
 	exit;
 }
 

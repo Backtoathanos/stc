@@ -101,6 +101,12 @@ require_once __DIR__ . '/../includes/school_session_defaults.php';
                 <p>Questions Management</p>
             </a>
           </li>
+          <li class="nav-item complaint-register">
+            <a class="nav-link" href="./complaint-register.php?complaint-register=yes">
+                <i class="material-icons">report_problem</i>
+                <p>Complaint Register</p>
+            </a>
+          </li>
           <!-- <li class="nav-item syllabus">
             <a class="nav-link" href="./syllabus.php?syllabus=yes">
                 <i class="material-icons">menu_book</i>
