@@ -383,41 +383,41 @@ class transformers extends tesseract{
 		$head_hidden3 = '';
 		if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
 			$head_hidden1='				
-				<th class="text-center">EQUIPMENT STATUS</th>
-				<th class="text-center">JOB CATEGORIES</th>
-				<th class="text-center">JOB VARIETIES</th>
-				<th class="text-center">MATERIAL DESCRIPTION</th>
-				<th class="text-center">TARGET DATE</th>
-				<th class="text-center">PENDING REASON</th>
-				<th class="text-center">PROGRESS REPORT</th>
+				<th class="text-center" data-col="stc-col-eqstatus">EQUIPMENT STATUS</th>
+				<th class="text-center" data-col="stc-col-jobcategories">JOB CATEGORIES</th>
+				<th class="text-center" data-col="stc-col-jobvarieties">JOB VARIETIES</th>
+				<th class="text-center" data-col="stc-col-materialdesc">MATERIAL DESCRIPTION</th>
+				<th class="text-center" data-col="stc-col-targetdate">TARGET DATE</th>
+				<th class="text-center" data-col="stc-col-pendingreason">PENDING REASON</th>
+				<th class="text-center" data-col="stc-col-progressreport">PROGRESS REPORT</th>
 			';
 			$head_hidden3='		
-				<th class="text-center">ACTION</th>
+				<th class="text-center" data-col="stc-col-action">ACTION</th>
 			';		
 		}
 		if($_SESSION['stc_agent_sub_category']=='Site Incharge'){
 			$head_hidden2='
-			<th class="text-center">ANY COMMENT</th>
-			<th class="text-center">FAILURE ROOT CAUSE</th>
-			<th class="text-center">JOB DONE DETAILS</th>
-			<th class="text-center">REMARKS BY HOD</th>
-			<th class="text-center">TARGET DATE BY HOD</th>
+			<th class="text-center" data-col="stc-col-anycomment">ANY COMMENT</th>
+			<th class="text-center" data-col="stc-col-failurerootcause">FAILURE ROOT CAUSE</th>
+			<th class="text-center" data-col="stc-col-jobdonedetails">JOB DONE DETAILS</th>
+			<th class="text-center" data-col="stc-col-remarkshod">REMARKS BY HOD</th>
+			<th class="text-center" data-col="stc-col-targetdatehod">TARGET DATE BY HOD</th>
 			';
 		}
 		$optimusprime='
-			<table class="table table-bordered">
+			<table class="table table-bordered" id="stc-std-main-table">
 				<thead>
 					<tr>
-						<th class="text-center">DATE</th>
-						<th class="text-center">LOCATION</th>
-						<th class="text-center">DEPARTMENT</th>
-						<th class="text-center">AREA</th>
-						<th class="text-center">TYPE OF JOB</th>
-						<th class="text-center">REASON</th>
-						<th class="text-center">EQUIPMENT TYPE</th>
+						<th class="text-center" data-col="stc-col-date">DATE</th>
+						<th class="text-center" data-col="stc-col-location">LOCATION</th>
+						<th class="text-center" data-col="stc-col-department">DEPARTMENT</th>
+						<th class="text-center" data-col="stc-col-area">AREA</th>
+						<th class="text-center" data-col="stc-col-jobtype">TYPE OF JOB</th>
+						<th class="text-center" data-col="stc-col-reason">REASON</th>
+						<th class="text-center" data-col="stc-col-eqtype">EQUIPMENT TYPE</th>
 						'.$head_hidden1.'
-						<th class="text-center">CREATOR NAME & CONTACT NUMBER</th>
-						<th class="text-center">STATUS</th>
+						<th class="text-center" data-col="stc-col-creator">CREATOR NAME & CONTACT NUMBER</th>
+						<th class="text-center" data-col="stc-col-status">STATUS</th>
 						'.$head_hidden2.'
 						'.$head_hidden3.'
 					</tr>
@@ -563,10 +563,11 @@ class transformers extends tesseract{
 				$actionsec='';
 				if($_SESSION['stc_agent_sub_category']=="Supervisor" || $_SESSION['stc_agent_sub_category']=="Site Incharge"){
 					if($row['stc_status_down_list_status']==1){
+						// <a href="stc-consumption.php?page=consumption&sdl='.$row['stc_status_down_list_id'].'&status=add" class="btn bg-success text-white mb-3" title="Add Consumption"><i class="pe-7s-note2"></i></a>
 						$actionsec='
 							<a href="stc-safety.php?page=safety&sdl='.$row['stc_status_down_list_id'].'&status=update" class="btn bg-secondary text-white mb-3" title="Add TBM"><i class="pe-7s-news-paper"></i></a>
 							<a href="stc-requisition.php?page=requisition&sdl='.$row['stc_status_down_list_id'].'&status=add" class="btn bg-success text-white mb-3" title="Add Requisiton"><i class="pe-7s-note2"></i></a>
-							<a href="stc-consumption.php?page=consumption&sdl='.$row['stc_status_down_list_id'].'&status=add" class="btn bg-success text-white mb-3" title="Add Consumption"><i class="pe-7s-note2"></i></a>
+							
 							'.$viewmrd.'
 							<a href="javascript:void(0)" class="btn bg-danger text-white mb-3 stc-std-operation-btn" type="update" data-toggle="modal" data-target=".bd-create-std-modal" title="Edit Status Down List" id="'.$row['stc_status_down_list_id'].'"><i class="pe-7s-pen"></i></a>
 							<select class="stc-set-to-complete" id="'.$row['stc_status_down_list_id'].'">
@@ -633,16 +634,16 @@ class transformers extends tesseract{
 						$actionsec='#';
 					}
 				}
-				$eqstatus='
-						<td class="text-center" style="font-weight:bold;background: #5cd25c;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
-				';
+			$eqstatus='
+					<td class="text-center" data-col="stc-col-eqstatus" style="font-weight:bold;background: #5cd25c;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
+			';
 
 				$dperiod='0';
 
-				if($row['stc_status_down_list_equipment_status']=="Down"){
-					$eqstatus='
-							<td class="text-center" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
-					';
+			if($row['stc_status_down_list_equipment_status']=="Down"){
+				$eqstatus='
+						<td class="text-center" data-col="stc-col-eqstatus" style="font-weight:bold;background: #e91919;border-radius: 5px;">'.$row['stc_status_down_list_equipment_status'].'</td>
+				';
 				}
 				$eq_type=$row['stc_status_down_list_equipment_type'];
 				$eq_number='';
@@ -715,54 +716,54 @@ class transformers extends tesseract{
 				$hidden1 = '';
 				$hidden2 = '';
 				$hidden3 = '';
-				if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
-					$hidden1='	
-						'.$eqstatus.'
-						<td class="text-center">'.$job_type.'</td>
-						<td class="text-center">'.$job_varities.'</td>
-						<td>'.$row['stc_status_down_list_material_desc'].'</td>
-						<td>'.$tar_date.'</td>
-						<td>'.$row['stc_status_down_list_jobpending_details'].'</td>
-						<td>'.$row['stc_status_down_list_wipstatus'].'</td>
-					';
-					$hidden3='	
-						<td class="text-center">
-							'.$actionsec.'
-							<input type="hidden" class="stc-std-permit-no-hidden-call" value="'.$row['stc_status_down_list_permit_no'].'" id="'.$row['stc_cust_project_title'].'">
-						</td>
-					';
-				}
-				if($_SESSION['stc_agent_sub_category']=='Site Incharge'){
-					$updatedon='';
-					if(date('Y', strtotime($row['stc_status_down_list_updated_date']))!=1970){
-						$updatedon = date('d-m-Y', strtotime($row['stc_status_down_list_updated_date']));
-					}
-					$ftargetdate=$row['stc_status_down_list_ftarget_date']=='' ? "" : date('d-m-Y', strtotime($row['stc_status_down_list_ftarget_date']));
-					$hidden2='	
-						<td>'.$row['stc_status_down_list_remarks'].'</td>
-						<td>'.$row['stc_status_down_list_failurerootcost'].'</td>
-						<td>'.$row['stc_status_down_list_jobdone_details'].'</td>
-						<td>'.$row['stc_status_down_list_fremarks'].'</td>
-						<td>'.$ftargetdate.'</td>
-					';
-				}
-
-				$optimusprime.='
-					<tr>
-						<td>'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
-						<td>'.$row['stc_status_down_list_plocation'].'</td>
-						<td>'.$row['stc_status_down_list_sub_location'].'</td>
-						<td>'.$row['stc_status_down_list_area'].'</td>
-						<td>'.$row['stc_status_down_list_jobtype'].'</td>
-						<td>'.$row['stc_status_down_list_reason'].'</td>
-						<td>'.$eq_type.'</td>
-						'.$hidden1.'
-						<td>'.$row['stc_status_down_list_creator_details'].'</td>
-						<td class="text-center" '.$statusbgcolor.'>'.$status.'</td>
-						'.$hidden2.'
-						'.$hidden3.'
-					</tr>
+			if($_SESSION['stc_agent_sub_category']=='Supervisor' || $_SESSION['stc_agent_sub_category']=='Site Incharge'){
+				$hidden1='	
+					'.$eqstatus.'
+					<td class="text-center" data-col="stc-col-jobcategories">'.$job_type.'</td>
+					<td class="text-center" data-col="stc-col-jobvarieties">'.$job_varities.'</td>
+					<td data-col="stc-col-materialdesc">'.$row['stc_status_down_list_material_desc'].'</td>
+					<td data-col="stc-col-targetdate">'.$tar_date.'</td>
+					<td data-col="stc-col-pendingreason">'.$row['stc_status_down_list_jobpending_details'].'</td>
+					<td data-col="stc-col-progressreport">'.$row['stc_status_down_list_wipstatus'].'</td>
 				';
+				$hidden3='	
+					<td class="text-center" data-col="stc-col-action">
+						'.$actionsec.'
+						<input type="hidden" class="stc-std-permit-no-hidden-call" value="'.$row['stc_status_down_list_permit_no'].'" id="'.$row['stc_cust_project_title'].'">
+					</td>
+				';
+			}
+			if($_SESSION['stc_agent_sub_category']=='Site Incharge'){
+				$updatedon='';
+				if(date('Y', strtotime($row['stc_status_down_list_updated_date']))!=1970){
+					$updatedon = date('d-m-Y', strtotime($row['stc_status_down_list_updated_date']));
+				}
+				$ftargetdate=$row['stc_status_down_list_ftarget_date']=='' ? "" : date('d-m-Y', strtotime($row['stc_status_down_list_ftarget_date']));
+				$hidden2='	
+					<td data-col="stc-col-anycomment">'.$row['stc_status_down_list_remarks'].'</td>
+					<td data-col="stc-col-failurerootcause">'.$row['stc_status_down_list_failurerootcost'].'</td>
+					<td data-col="stc-col-jobdonedetails">'.$row['stc_status_down_list_jobdone_details'].'</td>
+					<td data-col="stc-col-remarkshod">'.$row['stc_status_down_list_fremarks'].'</td>
+					<td data-col="stc-col-targetdatehod">'.$ftargetdate.'</td>
+				';
+			}
+
+			$optimusprime.='
+				<tr>
+					<td data-col="stc-col-date">'.date('d-m-Y', strtotime($row['stc_status_down_list_date'])).'</td>
+					<td data-col="stc-col-location">'.$row['stc_status_down_list_plocation'].'</td>
+					<td data-col="stc-col-department">'.$row['stc_status_down_list_sub_location'].'</td>
+					<td data-col="stc-col-area">'.$row['stc_status_down_list_area'].'</td>
+					<td data-col="stc-col-jobtype">'.$row['stc_status_down_list_jobtype'].'</td>
+					<td data-col="stc-col-reason">'.$row['stc_status_down_list_reason'].'</td>
+					<td data-col="stc-col-eqtype">'.$eq_type.'</td>
+					'.$hidden1.'
+					<td data-col="stc-col-creator">'.$row['stc_status_down_list_creator_details'].'</td>
+					<td class="text-center" data-col="stc-col-status" '.$statusbgcolor.'>'.$status.'</td>
+					'.$hidden2.'
+					'.$hidden3.'
+				</tr>
+			';
 			}
 		}else{
 			$optimusprime.='
@@ -790,28 +791,95 @@ class transformers extends tesseract{
 
 	// change status
 	public function stc_sdl_status_update($status, $sld_id, $jobdonedetails, $work_permit_no){
-		$optimusprime='';
+		$optimusprime = [];
 		$date=date("Y-m-d H:i:s");
 		if($status==4){
-			$optimusprime_cqry=mysqli_query($this->stc_dbs, "
-				SELECT 
-					`stc_status_down_list_date`,
-					`stc_status_down_list_qty`,
-					`stc_status_down_list_capacity`,
-					`stc_status_down_list_reasonattribute`,
-					`stc_status_down_list_permit_no`
-				FROM `stc_status_down_list` 
-				WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."' 
-			");
-			$validated=1;
-			$created_date='';
-			foreach($optimusprime_cqry as $optimusprime_crow){
-				$created_date=$optimusprime_crow['stc_status_down_list_date'];
-				if(($optimusprime_crow['stc_status_down_list_qty']==0) || ($optimusprime_crow['stc_status_down_list_capacity']=='') || ($optimusprime_crow['stc_status_down_list_reasonattribute']=='')){
+		$optimusprime_cqry=mysqli_query($this->stc_dbs, "
+			SELECT 
+				`stc_status_down_list_date`,
+				`stc_status_down_list_jobtype`,
+				`stc_status_down_list_area`,
+				`stc_status_down_list_equipment_type`,
+				`stc_status_down_list_varities_id`,
+				`stc_status_down_list_equipment_status`,
+				`stc_status_down_list_permit_no`,
+				`stc_status_down_list_responsive_person`,
+				`stc_status_down_list_material_desc`,
+				`stc_status_down_list_target_date`,
+				`stc_status_down_list_tools_req`,
+				`stc_status_down_list_remarks`,
+				`stc_status_down_list_qty`,
+				`stc_status_down_list_capacity`,
+				`stc_status_down_list_reasonattribute`
+			FROM `stc_status_down_list` 
+			WHERE `stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."' 
+		");
+		$validated=1;
+		$created_date='';
+		$empty_fields=[];
+		foreach($optimusprime_cqry as $optimusprime_crow){
+			$jtype_check=strtoupper(trim($optimusprime_crow['stc_status_down_list_jobtype']));		
+
+			// qty / capacity / reason attribute — mandatory except for CALL ATTEND
+			if($jtype_check == 'CALL ATTEND'){
+				if($optimusprime_crow['stc_status_down_list_permit_no']==''){
+					$empty_fields[] = 'Permit No';
 					$validated=0;
-					break;
+				}
+				if(trim($optimusprime_crow['stc_status_down_list_equipment_status'])==''){
+					$empty_fields[] = 'Equipment Status';
+					$validated=0;
+				}
+			}else{	
+				$created_date=$optimusprime_crow['stc_status_down_list_date'];
+
+				// mandatory for ALL job types
+				if(trim($optimusprime_crow['stc_status_down_list_area'])==''){
+					$empty_fields[] = 'Area';
+					$validated=0;
+				}
+				if(trim($optimusprime_crow['stc_status_down_list_equipment_type'])==''){
+					$empty_fields[] = 'Equipment Type';
+					$validated=0;
+				}
+				if(empty($optimusprime_crow['stc_status_down_list_varities_id']) || $optimusprime_crow['stc_status_down_list_varities_id']==0){
+					$empty_fields[] = 'Job Varieties';
+					$validated=0;
+				}
+				if(trim($optimusprime_crow['stc_status_down_list_jobtype'])==''){
+					$empty_fields[] = 'Type of Job';
+					$validated=0;
+				}
+				if(trim($optimusprime_crow['stc_status_down_list_equipment_status'])==''){
+					$empty_fields[] = 'Equipment Status';
+					$validated=0;
+				}
+				if(trim($optimusprime_crow['stc_status_down_list_permit_no'])==''){
+					$empty_fields[] = 'Permit No';
+					$validated=0;
+				}
+				if(trim($optimusprime_crow['stc_status_down_list_responsive_person'])==''){
+					$empty_fields[] = 'Responsible Person';
+					$validated=0;
+				}
+				if(trim($optimusprime_crow['stc_status_down_list_material_desc'])==''){
+					$empty_fields[] = 'Material Description';
+					$validated=0;
+				}
+				if(trim($optimusprime_crow['stc_status_down_list_target_date'])==''){
+					$empty_fields[] = 'Work Completion Target Date';
+					$validated=0;
+				}
+				if(trim($optimusprime_crow['stc_status_down_list_tools_req'])==''){
+					$empty_fields[] = 'Tools Required';
+					$validated=0;
+				}
+				if(trim($optimusprime_crow['stc_status_down_list_remarks'])==''){
+					$empty_fields[] = 'Any Comment';
+					$validated=0;
 				}
 			}
+		}
 			if($validated==1){
 				$optimusprime_qry=mysqli_query($this->stc_dbs, "
 					UPDATE
@@ -861,9 +929,13 @@ class transformers extends tesseract{
 						mysqli_query($this->stc_dbs, "INSERT INTO `stc_cust_employee_rating`(`type`, `message`, `point`, `status`, `user_type`, `created_date`, `created_by`) VALUES ('".$jtype."', '".$jtype." done by ".$_SESSION['stc_agent_sub_name']."', '".$rating."', '1', '".$_SESSION['stc_agent_sub_category']."', '$date', '".$_SESSION['stc_agent_sub_id']."')");
 					}
 				}
-				$optimusprime = 'Status Updated!!!';
+				$optimusprime = ['success' => true, 'message' => 'Status Updated!'];
 			}else{
-				$optimusprime = 'Status not updated. Please fill all fields.';
+				$optimusprime = [
+					'success'      => false,
+					'message'      => 'Status not updated. The following required fields are empty for this record:',
+					'empty_fields' => $empty_fields,
+				];
 			}
 			
 		}else{
@@ -876,7 +948,11 @@ class transformers extends tesseract{
 				WHERE 
 					`stc_status_down_list_id`='".mysqli_real_escape_string($this->stc_dbs, $sld_id)."'
 			");
-			$optimusprime = 'Status Updated!!!';
+			if($optimusprime_qry){
+				$optimusprime = ['success' => true, 'message' => 'Status Updated!'];
+			}else{
+				$optimusprime = ['success' => false, 'message' => 'Status update failed. Please try again.', 'empty_fields' => []];
+			}
 		}
 		return $optimusprime;
 	}
@@ -1402,15 +1478,17 @@ if(isset($_POST['stc_down_list_hit'])){
 	echo $opmetabots;
 }
 
-// changee status
+// change status
 if(isset($_POST['stc_status_change_hit'])){
-	$sld_id=$_POST['sdl_id'];
-	$status=$_POST['status_id'];
-	$jobdonedetails=$_POST['jobdonedetails'];
-	$work_permit_no=@$_POST['work_permit_no'];
-	$sdl_status=new transformers();
-	$out_sdl_status=$sdl_status->stc_sdl_status_update($status, $sld_id, $jobdonedetails, $work_permit_no);
-	echo $out_sdl_status;
+	header('Content-Type: application/json; charset=UTF-8');
+	$sld_id        = $_POST['sdl_id'];
+	$status        = $_POST['status_id'];
+	$jobdonedetails= $_POST['jobdonedetails'];
+	$work_permit_no= isset($_POST['work_permit_no']) ? $_POST['work_permit_no'] : '';
+	$sdl_status    = new transformers();
+	$out_sdl_status= $sdl_status->stc_sdl_status_update($status, $sld_id, $jobdonedetails, $work_permit_no);
+	echo json_encode($out_sdl_status);
+	exit;
 }
 
 // save job pending

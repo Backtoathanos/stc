@@ -67,7 +67,7 @@
                                                 }
                                             ?>
                                             <div class="row">
-                                                <div class="col-lg-7 col-md-7">
+                                                <div class="col-lg-6 col-md-6">
                                                     <h5>Department :</h5>
                                                     <select class="form-control" id="stc-agent-sup-std-location-find">
                                                     <?php
@@ -98,9 +98,33 @@
                                                         <option value="6">Close</option>                                                   
                                                     </select>
                                                 </div>
-                                                <div class="col-lg-3 col-md-3">
+                                                <div class="col-lg-2 col-md-2">
                                                     <h5>Month :</h5>
                                                     <input type="month" class="form-control" id="stc-agent-sup-std-month-find">
+                                                </div>
+                                                <div class="col-lg-2 col-md-2">
+                                                    <h5>Column Selection :</h5>
+                                                    <div class="stc-col-toggle-wrap" style="position:relative;">
+                                                        <button type="button" id="stc-col-toggle-btn" class="form-control" style="text-align:left;background:#fff;cursor:pointer;">
+                                                            <i class="fa fa-table" style="margin-right:5px;"></i>Toggle Columns <span class="caret" style="float:right;margin-top:7px;"></span>
+                                                        </button>
+                                                        <div id="stc-col-toggle-dropdown" style="display:none;position:absolute;z-index:1060;background:#fff;border:1px solid #ccc;border-radius:4px;padding:10px 12px;min-width:230px;max-height:320px;overflow-y:auto;box-shadow:0 4px 14px rgba(0,0,0,.18);top:100%;left:0;">
+                                                            <div style="margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #eee;font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.5px;">Show / Hide Columns</div>
+                                                            <ul style="list-style:none;margin:0;padding:0;">
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-jobtype" checked style="margin-right:7px;"> Type of Job</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-reason" checked style="margin-right:7px;"> Reason</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-eqtype" checked style="margin-right:7px;"> Equipment Type</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-eqstatus" checked style="margin-right:7px;"> Equipment Status</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-jobcategories" checked style="margin-right:7px;"> Job Categories</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-jobvarieties" checked style="margin-right:7px;"> Job Varieties</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-materialdesc" checked style="margin-right:7px;"> Material Description</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-targetdate" checked style="margin-right:7px;"> Target Date</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-pendingreason" checked style="margin-right:7px;"> Pending Reason</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-progressreport" checked style="margin-right:7px;"> Progress Report</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-creator" checked style="margin-right:7px;"> Creator Name &amp; Contact</label></li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                                 <div class="col-lg-12 col-md-12">
                                                     <a href="#" class="form-control btn btn-success stc-std-list-show-hit">Search</a>
@@ -123,6 +147,7 @@
     </div>
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="text/javascript" src="./assets/scripts/loginopr.js"></script>
     <!-- <script src="http://maps.google.com/maps/api/js?sensor=true"></script> -->
     <script type="text/javascript" src="./assets/scripts/main.js"></script>
@@ -141,6 +166,88 @@
                 }
             });    
         });
+    </script>
+    <script>
+    /* ============================================================
+       Column visibility toggle with cookie persistence
+       ============================================================ */
+    var STC_COL_COOKIE = 'stc_std_col_vis';
+
+    function stcSetCookie(name, value, days){
+        var expires = '';
+        if(days){
+            var d = new Date();
+            d.setTime(d.getTime() + days*24*60*60*1000);
+            expires = '; expires=' + d.toUTCString();
+        }
+        document.cookie = name + '=' + encodeURIComponent(value) + expires + '; path=/';
+    }
+
+    function stcGetCookie(name){
+        var nameEQ = name + '=';
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++){
+            var c = ca[i].trim();
+            if(c.indexOf(nameEQ)===0) return decodeURIComponent(c.substring(nameEQ.length));
+        }
+        return null;
+    }
+
+    function stcSaveColPref(){
+        var prefs = {};
+        $('.stc-col-check').each(function(){
+            prefs[$(this).data('col')] = $(this).is(':checked') ? 1 : 0;
+        });
+        stcSetCookie(STC_COL_COOKIE, JSON.stringify(prefs), 365);
+    }
+
+    function stcLoadColPref(){
+        var raw = stcGetCookie(STC_COL_COOKIE);
+        if(!raw) return;
+        try {
+            var prefs = JSON.parse(raw);
+            $('.stc-col-check').each(function(){
+                var col = $(this).data('col');
+                if(typeof prefs[col] !== 'undefined'){
+                    $(this).prop('checked', prefs[col]==1);
+                }
+            });
+        } catch(e){}
+    }
+
+    function stcApplyColVisibility(){
+        $('.stc-col-check').each(function(){
+            var col = $(this).data('col');
+            var visible = $(this).is(':checked');
+            $('[data-col="' + col + '"]').toggle(visible);
+        });
+    }
+
+    $(document).ready(function(){
+        // Restore saved prefs from cookie, then apply
+        stcLoadColPref();
+
+        // Toggle dropdown panel
+        $('#stc-col-toggle-btn').on('click', function(e){
+            e.stopPropagation();
+            $('#stc-col-toggle-dropdown').toggle();
+        });
+
+        // Close dropdown when clicking outside
+        $(document).on('click', function(e){
+            if(!$(e.target).closest('.stc-col-toggle-wrap').length){
+                $('#stc-col-toggle-dropdown').hide();
+            }
+        });
+
+        // On checkbox change: apply visibility + save cookie
+        $(document).on('change', '.stc-col-check', function(){
+            var col = $(this).data('col');
+            var visible = $(this).is(':checked');
+            $('[data-col="' + col + '"]').toggle(visible);
+            stcSaveColPref();
+        });
+    });
     </script>
     <script>
         $(document).ready(function(){
@@ -351,21 +458,18 @@
                                 creator_details:creator_details
                             },
                             success     : function(response_std){
-                                // console.log(response_std);
                                 var response=response_std.trim();
                                 if(response=="Status Down List saved. Thankyou!!!"){
-                                    alert(response_std);
-                                    window.location.reload();
+                                    Swal.fire({icon:'success',title:'Saved!',text:response_std,timer:2000,showConfirmButton:false}).then(function(){window.location.reload();});
                                 }else if(response=="Please login!!!"){
-                                    alert(response_std);
-                                    window.location.reload();
+                                    Swal.fire({icon:'warning',title:'Session Expired',text:response_std}).then(function(){window.location.reload();});
                                 }else{
-                                    alert(response_std);
+                                    Swal.fire({icon:'error',title:'Error',text:response_std});
                                 }
                             }
                         });
                     }else{
-                        alert('Please select department.');
+                        Swal.fire({icon:'warning',title:'Required',text:'Please select department.',timer:2500,showConfirmButton:false});
                         $('#stc-agent-sup-std-dept').after('<p class="text-danger message-alert">Please select department.</p>');
                     }
                 }else{
@@ -385,18 +489,16 @@
                             stc_j_varities:j_varities,
                             stc_j_plannning:j_plannning
                         },
-                        success     : function(response_std){
-                            // console.log(response_std);
-                            var response=response_std.trim();
-                            if(response=="Status Down List updated. Thankyou!!!"){
-                                alert(response_std);
-                            }else if(response=="Please login!!!"){
-                                alert(response_std);
-                                window.location.reload();
-                            }else{
-                                alert(response_std);
+                            success     : function(response_std){
+                                var response=response_std.trim();
+                                if(response=="Status Down List updated. Thankyou!!!"){
+                                    Swal.fire({icon:'success',title:'Updated!',text:response_std,timer:2000,showConfirmButton:false});
+                                }else if(response=="Please login!!!"){
+                                    Swal.fire({icon:'warning',title:'Session Expired',text:response_std}).then(function(){window.location.reload();});
+                                }else{
+                                    Swal.fire({icon:'error',title:'Error',text:response_std});
+                                }
                             }
-                        }
                     });
                 }
             });
@@ -589,7 +691,7 @@
 
             function toggle_daily_job_fields(){
                 var j_plannning = $('#stc-agent-sup-std-job-plannning').val();
-                if(j_plannning === 'DAILY JOB ACTIVITY'){
+                if(j_plannning === 'CALL ATTEND'){
                     $('#stc-std-qty-col').hide();
                     $('#stc-std-capacity-col').hide();
                     $('#stc-std-manpower-col').hide();
@@ -637,6 +739,7 @@
                     success     : function(response_sdl){
                         // console.log(response_sdl);
                         $('.stc-std-search-result').html(response_sdl);
+                        stcApplyColVisibility();
                     }
                 });
             }
@@ -670,16 +773,42 @@
                     $.ajax({
                         url         : "nemesis/stc_std.php",
                         method      : "POST",
+                        dataType    : "json",
                         data        : {
                             stc_status_change_hit:1,
                             status_id:status_id,
                             jobdonedetails:jobdonedetails,
                             sdl_id:sdl_id
                         },
-                        success     : function(response_sdl){
-                            alert(response_sdl);
-                            var location_id=$('#stc-agent-sup-std-location-find').val();
-                            std_list_call(location_id, month, status);
+                        success     : function(res){
+                            if(res && res.success===true){
+                                Swal.fire({
+                                    icon : 'success',
+                                    title: 'Updated',
+                                    text : res.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                var location_id=$('#stc-agent-sup-std-location-find').val();
+                                std_list_call(location_id, month, status);
+                            }else{
+                                var fieldList = '';
+                                if(res.empty_fields && res.empty_fields.length>0){
+                                    fieldList = '<ul style="text-align:left;margin:10px 0 0 0;padding-left:22px;">';
+                                    $.each(res.empty_fields, function(i, f){
+                                        fieldList += '<li style="margin-bottom:4px;"><b>' + f + '</b></li>';
+                                    });
+                                    fieldList += '</ul>';
+                                }
+                                Swal.fire({
+                                    icon : 'error',
+                                    title: 'Cannot Update Status',
+                                    html : (res.message || 'Status not updated.') + fieldList,
+                                });
+                            }
+                        },
+                        error: function(){
+                            Swal.fire('Error','Could not reach the server. Please try again.','error');
                         }
                     });
                 }
@@ -691,11 +820,12 @@
                 var jobdonedetails=$(".stc-cust-ag-jobdonedetails").val();
                 var work_permit_no=$(".stc-agent-sup-std-upermit-no").val();
                 if(jobdonedetails==""){
-                    alert("Please provide job done details.");
+                    Swal.fire('Required','Please provide job done details.','warning');
                 }else if(jobdonedetails.length>15){
                     $.ajax({
                         url         : "nemesis/stc_std.php",
                         method      : "POST",
+                        dataType    : "json",
                         data        : {
                             stc_status_change_hit:1,
                             status_id:status_id,
@@ -703,10 +833,15 @@
                             work_permit_no:work_permit_no,
                             sdl_id:sdl_id
                         },
-                        success     : function(response_sdl){
-                            response_sdl=response_sdl.trim();
-                            if(response_sdl=="Status Updated!!!"){
-                                alert(response_sdl);
+                        success     : function(res){
+                            if(res && res.success===true){
+                                Swal.fire({
+                                    icon : 'success',
+                                    title: 'Status Updated!',
+                                    text : res.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
                                 $('.bd-std-jobdonedetails-modal-lg').modal('hide');
                                 $(".stc-cust-ag-jobdonedetails").val('');
                                 var location_id=$('#stc-agent-sup-std-location-find').val();
@@ -714,12 +849,29 @@
                                 var status=$('#stc-agent-sup-std-jstatus-find').val();
                                 std_list_call(location_id, month, status);
                             }else{
-                                alert(response_sdl);
+                                var fieldList = '';
+                                if(res.empty_fields && res.empty_fields.length>0){
+                                    fieldList = '<ul style="text-align:left;margin:10px 0 0 0;padding-left:22px;">';
+                                    $.each(res.empty_fields, function(i, f){
+                                        fieldList += '<li style="margin-bottom:4px;"><b>' + f + '</b></li>';
+                                    });
+                                    fieldList += '</ul>';
+                                }
+                                Swal.fire({
+                                    icon           : 'error',
+                                    title          : 'Cannot Update Status',
+                                    html           : (res.message || 'Status not updated.') + fieldList,
+                                    confirmButtonText: 'OK, I\'ll fill them',
+                                    confirmButtonColor: '#d33'
+                                });
                             }
+                        },
+                        error: function(){
+                            Swal.fire('Error','Could not reach the server. Please try again.','error');
                         }
                     });
                 }else{
-                    alert("Please write complete job done details.");
+                    Swal.fire('Too Short','Please write complete job done details (minimum 15 characters).','warning');
                 }
             });
 
@@ -754,7 +906,7 @@
                             sdl_id:pendsdl_id
                         },
                         success     : function(response_sdl){
-                            alert(response_sdl);
+                            Swal.fire({icon:'success',title:'Saved!',text:response_sdl,timer:2000,showConfirmButton:false});
                             $('.bd-std-jobpendingdetails-modal-lg').modal('hide');
                             $(".stc-cust-ag-jobpendingdetails").val('');
                         }
@@ -779,7 +931,7 @@
                             sdl_id:progresssdl_id
                         },
                         success     : function(response_sdl){
-                            alert(response_sdl);
+                            Swal.fire({icon:'success',title:'Saved!',text:response_sdl,timer:2000,showConfirmButton:false});
                             $('.bd-std-jobprogresssreport-modal-lg').modal('hide');
                             $(".stc-cust-ag-jobprogressreport").val('');
                         }
@@ -831,7 +983,12 @@
                 e.preventDefault();
                 var data_id = $(this).attr('data-id');
                 var actiontype = $(this).attr('actiontype');
-                if(confirm("Are you sure?")){
+                Swal.fire({
+                    icon:'question',title:'Are you sure?',text:'This action will update the job status.',
+                    showCancelButton:true,confirmButtonText:'Yes, update',cancelButtonText:'Cancel',
+                    confirmButtonColor:'#3085d6'
+                }).then(function(result){
+                    if(!result.isConfirmed) return;
                     $.ajax({
                         url         : "nemesis/stc_std.php",
                         method      : "POST",
@@ -843,9 +1000,9 @@
                         dataType : 'JSON',
                         success     : function(response_sdl){
                             if(response_sdl=="logout"){
-                                widnow.location.reload();
+                                window.location.reload();
                             }else{
-                                alert(response_sdl);
+                                Swal.fire({icon:'success',title:'Updated!',text:response_sdl,timer:2000,showConfirmButton:false});
                                 var location_id=$('#stc-agent-sup-std-location-find').val();
                                 var month=$('#stc-agent-sup-std-month-find').val();
                                 var status=$('#stc-agent-sup-std-jstatus-find').val();
@@ -853,7 +1010,7 @@
                             }
                         }
                     });
-                }
+                });
             });
 
             
@@ -899,11 +1056,11 @@
                         },
                         dataType    : "JSON",
                         success     : function(data){
-                            alert(data);
+                            Swal.fire({icon:'success',title:'Done!',text:data,timer:2000,showConfirmButton:false});
                         }
                     });
                 }else{
-                    alert("Invalid quantity.");
+                    Swal.fire({icon:'warning',title:'Invalid',text:'Invalid quantity.',timer:2000,showConfirmButton:false});
                 }
             });
 
@@ -918,16 +1075,20 @@
                     },
                     dataType    : "JSON",
                     success     : function(data){
-                        alert("Thankyou!!! Requisition placed successfully.");
-                        window.location.reload();
+                        Swal.fire({icon:'success',title:'Requisition Placed!',text:'Thankyou! Requisition placed successfully.',timer:2200,showConfirmButton:false}).then(function(){window.location.reload();});
                     }
                 });
             });
 
             $('body').delegate('.remove-to-proc', 'click', function(e){
                 var item_id=$(this).attr("id");
-                if(confirm("Are you sure want to remove this item?")){
-                    $(this).closest('tr').remove();
+                Swal.fire({
+                    icon:'warning',title:'Remove Item?',text:'Are you sure you want to remove this item?',
+                    showCancelButton:true,confirmButtonText:'Yes, remove',cancelButtonText:'Cancel',
+                    confirmButtonColor:'#d33'
+                }).then(function(result){
+                    if(!result.isConfirmed) return;
+                    $('#remove-row-'+item_id).closest('tr').remove();
                     $.ajax({
                         url         : "nemesis/stc_std.php",
                         method      : "POST",
@@ -937,10 +1098,10 @@
                         },
                         dataType    : "JSON",
                         success     : function(data){
-                            alert("Item removed successfully.");
+                            Swal.fire({icon:'success',title:'Removed!',text:'Item removed successfully.',timer:1800,showConfirmButton:false});
                         }
                     });
-                }
+                });
             });
             
         });
