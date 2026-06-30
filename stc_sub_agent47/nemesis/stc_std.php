@@ -377,7 +377,7 @@ class transformers extends tesseract{
 	}
 
 	// status down list
-	public function stc_call_status_down_list($location_id, $month, $status){
+	public function stc_call_status_down_list($location_id, $month, $status, $page=1){
 		$head_hidden1 = '';
 		$head_hidden2 = '';
 		$head_hidden3 = '';
@@ -404,8 +404,9 @@ class transformers extends tesseract{
 			<th class="text-center" data-col="stc-col-targetdatehod">TARGET DATE BY HOD</th>
 			';
 		}
-		$optimusprime='
-			<table class="table table-bordered" id="stc-std-main-table">
+	$optimusprime='
+		<div style="width:100%;">
+		<table class="table table-bordered" id="stc-std-main-table">
 				<thead>
 					<tr>
 						<th class="text-center" data-col="stc-col-date">DATE</th>
@@ -457,52 +458,71 @@ class transformers extends tesseract{
 			$manager .= ")";
 		}
 
-		$query = "
-			SELECT 		 	
-				`stc_status_down_list_id`,
-				`stc_status_down_list_date`,
-				`stc_status_down_list_plocation`,
-				`stc_cust_project_title`,
-				`stc_status_down_list_area`,
-				`stc_status_down_list_sub_location`,
-				`stc_status_down_list_jobtype`,
-				`stc_status_down_list_created_by_select`,
-				`stc_status_down_list_creator_details`,
-				`stc_status_down_list_equipment_status`,
-				`stc_status_down_list_reason`,
-				`stc_status_down_list_material_desc`,
-				`stc_status_down_list_jobtype`,
-				`stc_status_down_list_from_date`,
-				`stc_status_down_list_rect_date`,
-				`stc_status_down_list_remarks`,
-				`stc_status_down_list_responsive_person`,
-				`stc_status_down_list_target_date`,
-				`stc_status_down_list_permit_no`,
-				`stc_status_down_list_jobpending_details`,
-				`stc_status_down_list_jobdone_details`,
-				`stc_status_down_list_varities_id`,
-				`stc_status_down_list_equipment_type`,
-				`stc_status_down_list_equipment_number`,
-				`stc_status_down_list_status`,
-				`stc_status_down_list_updated_by`,
-				`stc_status_down_list_updated_date`,
-				`stc_cust_pro_supervisor_fullname`,
-				`stc_status_down_list_failurerootcost`,
-				`stc_status_down_list_fremarks`,
-				`stc_status_down_list_ftarget_date`,
-				`stc_status_down_list_wipstatus`
-			FROM `stc_status_down_list` 
-			LEFT JOIN `stc_cust_project` 
-			ON `stc_cust_project_id`=`stc_status_down_list_location` 
-			LEFT JOIN `stc_cust_pro_supervisor` 
-			ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
-			WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
-			AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' 
-			".$filter." 
-			".$manager."
-			ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
-		";
-		$optimusprimeqry=mysqli_query($this->stc_dbs, $query);
+	$per_page = 15;
+	$page     = max(1, (int)$page);
+	$offset   = ($page - 1) * $per_page;
+
+	$where_clause = "
+		FROM `stc_status_down_list` 
+		LEFT JOIN `stc_cust_project` 
+		ON `stc_cust_project_id`=`stc_status_down_list_location` 
+		LEFT JOIN `stc_cust_pro_supervisor` 
+		ON `stc_cust_pro_supervisor_id`=`stc_status_down_list_created_by` 
+		WHERE `stc_status_down_list_location`='".mysqli_real_escape_string($this->stc_dbs, $location_id)."'
+		AND `stc_status_down_list_status`='".mysqli_real_escape_string($this->stc_dbs, $status)."' 
+		".$filter." 
+		".$manager."
+	";
+
+	$count_result = mysqli_query($this->stc_dbs, "SELECT COUNT(*) AS total " . $where_clause);
+	$total_rows   = 0;
+	if($count_result){
+		$count_row  = mysqli_fetch_assoc($count_result);
+		$total_rows = (int)$count_row['total'];
+	}
+	$total_pages = max(1, (int)ceil($total_rows / $per_page));
+	$page        = min($page, $total_pages);
+	$offset      = ($page - 1) * $per_page;
+
+	$query = "
+		SELECT 		 	
+			`stc_status_down_list_id`,
+			`stc_status_down_list_date`,
+			`stc_status_down_list_plocation`,
+			`stc_cust_project_title`,
+			`stc_status_down_list_area`,
+			`stc_status_down_list_sub_location`,
+			`stc_status_down_list_jobtype`,
+			`stc_status_down_list_created_by_select`,
+			`stc_status_down_list_creator_details`,
+			`stc_status_down_list_equipment_status`,
+			`stc_status_down_list_reason`,
+			`stc_status_down_list_material_desc`,
+			`stc_status_down_list_jobtype`,
+			`stc_status_down_list_from_date`,
+			`stc_status_down_list_rect_date`,
+			`stc_status_down_list_remarks`,
+			`stc_status_down_list_responsive_person`,
+			`stc_status_down_list_target_date`,
+			`stc_status_down_list_permit_no`,
+			`stc_status_down_list_jobpending_details`,
+			`stc_status_down_list_jobdone_details`,
+			`stc_status_down_list_varities_id`,
+			`stc_status_down_list_equipment_type`,
+			`stc_status_down_list_equipment_number`,
+			`stc_status_down_list_status`,
+			`stc_status_down_list_updated_by`,
+			`stc_status_down_list_updated_date`,
+			`stc_cust_pro_supervisor_fullname`,
+			`stc_status_down_list_failurerootcost`,
+			`stc_status_down_list_fremarks`,
+			`stc_status_down_list_ftarget_date`,
+			`stc_status_down_list_wipstatus`
+		" . $where_clause . "
+		ORDER BY TIMESTAMP(`stc_status_down_list_date`) DESC
+		LIMIT ".$per_page." OFFSET ".$offset."
+	";
+	$optimusprimeqry=mysqli_query($this->stc_dbs, $query);
 		if(mysqli_num_rows($optimusprimeqry)>0){
 			foreach($optimusprimeqry as $row){
 
@@ -773,12 +793,50 @@ class transformers extends tesseract{
 			';
 		}
 
-		$optimusprime.='
-				</tbody>
-			</table>
-		';
-		return $optimusprime;
+	$optimusprime.='
+			</tbody>
+		</table>
+	';
+
+	// Pagination controls
+	$from_rec   = $total_rows > 0 ? $offset + 1 : 0;
+	$to_rec     = min($offset + $per_page, $total_rows);
+	$prev_page  = max(1, $page - 1);
+	$next_page  = min($total_pages, $page + 1);
+
+	$pag_html = '
+		<div style="display:flex;flex-direction:column;align-items:center;width:100%;padding:10px 4px 4px;">
+			<ul class="pagination pagination-sm" style="margin:0 0 4px;">
+				<li class="'.($page<=1 ? 'disabled' : '').'">
+					<a href="#" class="stc-std-page-btn" data-page="1" title="First">&laquo;</a>
+				</li>
+				<li class="'.($page<=1 ? 'disabled' : '').'">
+					<a href="#" class="stc-std-page-btn" data-page="'.$prev_page.'" title="Previous">&lsaquo;</a>
+				</li>';
+
+	$range = 2;
+	for($p = max(1, $page - $range); $p <= min($total_pages, $page + $range); $p++){
+		$pag_html .= '<li class="'.($p==$page ? 'active' : '').'">
+			<a href="#" class="stc-std-page-btn" data-page="'.$p.'">'.$p.'</a>
+		</li>';
 	}
+
+	$pag_html .= '
+				<li class="'.($page>=$total_pages ? 'disabled' : '').'">
+					<a href="#" class="stc-std-page-btn" data-page="'.$next_page.'" title="Next">&rsaquo;</a>
+				</li>
+				<li class="'.($page>=$total_pages ? 'disabled' : '').'">
+					<a href="#" class="stc-std-page-btn" data-page="'.$total_pages.'" title="Last">&raquo;</a>
+				</li>
+			</ul>
+			<small class="text-muted">Showing '.$from_rec.' – '.$to_rec.' of '.$total_rows.' records</small>
+		</div>
+	';
+	$optimusprime .= $pag_html;
+	$optimusprime .= '</div>';
+
+	return $optimusprime;
+}
 
 	public function stc_std_call_perticular($std_id){
 		$optimusprime='';
@@ -1473,8 +1531,9 @@ if(isset($_POST['stc_down_list_hit'])){
 	$location_id=$_POST['location_id'];
 	$month=$_POST['month'];
 	$status=$_POST['status'];
+	$page=isset($_POST['page']) ? (int)$_POST['page'] : 1;
 	$metabots=new transformers();
-	$opmetabots=$metabots->stc_call_status_down_list($location_id, $month, $status);
+	$opmetabots=$metabots->stc_call_status_down_list($location_id, $month, $status, $page);
 	echo $opmetabots;
 }
 

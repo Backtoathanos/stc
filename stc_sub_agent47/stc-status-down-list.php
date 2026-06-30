@@ -117,11 +117,11 @@
                                                                 <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-eqstatus" checked style="margin-right:7px;"> Equipment Status</label></li>
                                                                 <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-jobcategories" checked style="margin-right:7px;"> Job Categories</label></li>
                                                                 <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-jobvarieties" checked style="margin-right:7px;"> Job Varieties</label></li>
-                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-materialdesc" checked style="margin-right:7px;"> Material Description</label></li>
-                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-targetdate" checked style="margin-right:7px;"> Target Date</label></li>
-                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-pendingreason" checked style="margin-right:7px;"> Pending Reason</label></li>
-                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-progressreport" checked style="margin-right:7px;"> Progress Report</label></li>
-                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-creator" checked style="margin-right:7px;"> Creator Name &amp; Contact</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-materialdesc" style="margin-right:7px;"> Material Description</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-targetdate" style="margin-right:7px;"> Target Date</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-pendingreason" style="margin-right:7px;"> Pending Reason</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-progressreport" style="margin-right:7px;"> Progress Report</label></li>
+                                                                <li style="padding:4px 0;"><label style="font-weight:normal;margin:0;cursor:pointer;"><input type="checkbox" class="stc-col-check" data-col="stc-col-creator" style="margin-right:7px;"> Creator Name &amp; Contact</label></li>
                                                             </ul>
                                                         </div>
                                                     </div>
@@ -226,6 +226,7 @@
     $(document).ready(function(){
         // Restore saved prefs from cookie, then apply
         stcLoadColPref();
+        stcApplyColVisibility();
 
         // Toggle dropdown panel
         $('#stc-col-toggle-btn').on('click', function(e){
@@ -725,8 +726,12 @@
                 return filter;
             }
 
-            function std_list_call(location_id, month, status){
-                $('.stc-std-search-result').html("Loading..");
+            var stc_std_current_page = 1;
+
+            function std_list_call(location_id, month, status, page){
+                page = page || 1;
+                stc_std_current_page = page;
+                $('.stc-std-search-result').html('<p class="text-center text-muted" style="padding:20px;">Loading&hellip;</p>');
                 $.ajax({
                     url         : "nemesis/stc_std.php",
                     method      : "POST",
@@ -734,15 +739,27 @@
                         stc_down_list_hit:1,
                         location_id:location_id,
                         month:month,
-                        status:status
+                        status:status,
+                        page:page
                     },
                     success     : function(response_sdl){
-                        // console.log(response_sdl);
                         $('.stc-std-search-result').html(response_sdl);
                         stcApplyColVisibility();
                     }
                 });
             }
+
+            // pagination click handler
+            $('body').delegate('.stc-std-page-btn', 'click', function(e){
+                e.preventDefault();
+                var $li = $(this).closest('li');
+                if($li.hasClass('disabled') || $li.hasClass('active')) return;
+                var page = parseInt($(this).data('page'), 10);
+                var location_id = $('#stc-agent-sup-std-location-find').val();
+                var month       = $('#stc-agent-sup-std-month-find').val();
+                var status      = $('#stc-agent-sup-std-jstatus-find').val();
+                std_list_call(location_id, month, status, page);
+            });
 
             // call status down list
             $('body').delegate('.stc-std-list-show-hit', 'click', function(e){
