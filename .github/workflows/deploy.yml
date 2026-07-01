@@ -26,15 +26,33 @@ jobs:
           script: |
             export TERM=xterm
 
-            # Pull latest code
             cd ~/public_html
+
+            echo "--- Stash local server changes before pull ---"
+            git stash push -u -m "pre-deploy-$(date +%Y%m%d%H%M%S)" || true
+
+            PRE_PULL_HEAD=$(git rev-parse HEAD)
             git fetch origin
-            git reset --hard origin/main
+            git pull origin main
+
+            echo "--- Restore stashed server changes ---"
+            git stash pop || true
+
+            ZIP_CHANGED=0
+            if git diff --name-only "${PRE_PULL_HEAD}" HEAD | grep -q '^stc_gld/build-archive\.zip$'; then
+              ZIP_CHANGED=1
+            fi
+
+            if [ "$ZIP_CHANGED" -eq 0 ]; then
+              echo "No build-archive.zip update in pulled commits — skipping React unzip."
+              echo "✅ Deployed at $(date)"
+              exit 0
+            fi
 
             cd ~/public_html/stc_gld
 
             if [ ! -f build-archive.zip ]; then
-              echo "❌ build-archive.zip not found. Run deploy-stc-gld.ps1 (or deploy-stc-gld.sh) locally to build, zip, commit, and push."
+              echo "❌ build-archive.zip was updated in git but is missing on disk after pull."
               exit 1
             fi
 
