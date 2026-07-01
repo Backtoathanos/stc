@@ -9,6 +9,9 @@
 
 define('LARAVEL_START', microtime(true));
 
+// Suppress deprecation notices from vendor packages not yet updated for PHP 8.1+
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_NOTICE);
+
 /*
 |--------------------------------------------------------------------------
 | Register The Auto Loader

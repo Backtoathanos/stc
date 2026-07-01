@@ -41,19 +41,19 @@
         <div class="card card-primary card-outline card-tabs">
           <div class="card-header p-0 pt-1 border-bottom-0">
             <ul class="nav nav-tabs nav-usershub" id="usershub-tabs" role="tablist">
-              <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tab-electronics" role="tab">Electronics</a></li>
+              <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-electronics" role="tab">Electronics</a></li>
               <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-groceries" role="tab">Groceries</a></li>
               <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-manager" role="tab">Manager</a></li>
               <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-school" role="tab">School</a></li>
               <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-site" role="tab">Site</a></li>
               <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-trading" role="tab">Trading</a></li>
-              <li class="nav-item"><a class="nav-link" data-toggle="pill" href="#tab-uadmin" role="tab">User admin</a></li>
+              <li class="nav-item"><a class="nav-link active" data-toggle="pill" href="#tab-uadmin" role="tab">User admin</a></li>
             </ul>
           </div>
           <div class="card-body">
             <div class="tab-content" id="usershub-tab-content">
 
-              <div class="tab-pane fade show active" id="tab-electronics" role="tabpanel">
+              <div class="tab-pane fade" id="tab-electronics" role="tabpanel">
                 <button type="button" class="btn btn-primary mb-3 btn-create-electronics">Create electronics user</button>
                 <div class="usershub-table-wrap">
                   <table id="dt-electronics" class="table table-bordered table-striped">
@@ -313,7 +313,7 @@
                 </div>
               </div>
 
-              <div class="tab-pane fade" id="tab-uadmin" role="tabpanel">
+              <div class="tab-pane fade show active" id="tab-uadmin" role="tabpanel">
                 <button type="button" class="btn btn-primary mb-3 btn-create-uadmin">Create user admin</button>
                 <div class="usershub-table-wrap">
                   <table id="dt-uadmin" class="table table-bordered table-striped">
