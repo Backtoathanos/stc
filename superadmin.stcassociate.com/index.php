@@ -9,7 +9,7 @@
 
 define('LARAVEL_START', microtime(true));
 
-error_reporting(E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED & ~E_NOTICE);
+require __DIR__.'/bootstrap/php81_compat.php';
 
 /*
 |--------------------------------------------------------------------------
