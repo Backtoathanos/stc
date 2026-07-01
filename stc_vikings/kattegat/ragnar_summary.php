@@ -227,9 +227,9 @@ class ragnarSummary extends tesseract{
 					$img_path=$optimusprimeimgrow['stc_safetytbm_img_location'];
 				}
 
-				
+			    $tbm_img_url = htmlspecialchars(stc_tbm_image_url($img_path), ENT_QUOTES, 'UTF-8');
 			    $safety_image='
-			    		<a href="javascript:void(0)" class="btn btn-info stc-safety-tbm-image-show-btn" data-src="https://stcassociate.com/stc_sub_agent47/safety_img/'.$img_path.'">View</a>
+			    		<a href="javascript:void(0)" class="btn btn-info stc-safety-tbm-image-show-btn" data-src="'.$tbm_img_url.'">View</a>
 			    ';
 				if(trim($img_path)==""){
 					$safety_image="";

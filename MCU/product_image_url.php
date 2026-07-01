@@ -49,6 +49,23 @@ if (!function_exists('stc_nearmiss_image_url')) {
      */
     function stc_nearmiss_image_url($stored)
     {
+        return stc_safety_image_url($stored);
+    }
+}
+
+if (!function_exists('stc_tbm_image_url')) {
+    /**
+     * `stc_safetytbm_img_location`: full https URL (R2) unchanged; legacy filenames use safety_img base.
+     */
+    function stc_tbm_image_url($stored)
+    {
+        return stc_safety_image_url($stored);
+    }
+}
+
+if (!function_exists('stc_safety_image_url')) {
+    function stc_safety_image_url($stored)
+    {
         $stored = trim((string) $stored);
         if ($stored === '') {
             return '';

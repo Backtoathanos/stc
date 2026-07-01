@@ -3560,7 +3560,7 @@ class pirates_supervisor extends tesseract{
 								$imgLocation = $imgRow['stc_safetytbm_img_location'];
 								
 								// Create an anchor tag with the image
-								$imgTag = $imgLocation!='' ? '<a href="../stc_sub_agent47/safety_img/' . $imgLocation . '" target="_blank" title="click to view images"><span style="color:green;font-size: 35px;">P</span></a>' : '<span style="color:green">P</span>';
+								$imgTag = $imgLocation!='' ? '<a href="' . htmlspecialchars(stc_tbm_image_url($imgLocation), ENT_QUOTES, 'UTF-8') . '" target="_blank" title="click to view images"><span style="color:green;font-size: 35px;">P</span></a>' : '<span style="color:green">P</span>';
 							}else{
 								$imgTag='<span style="color:green">P</span>';
 							}
@@ -4241,9 +4241,10 @@ class pirates_supervisor extends tesseract{
 					$img_path=$optimusprimeimgrow['stc_safetytbm_img_location'];
 				}
 
+				$tbm_img_url = htmlspecialchars(stc_tbm_image_url($img_path), ENT_QUOTES, 'UTF-8');
 				$safety_image='
-						<img src="'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
-						<a href="javascript:void(0)" class="btn btn-info stc-safety-tbm-image-show-btn">View</a>
+						<img src="'.$tbm_img_url.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
+						<a href="javascript:void(0)" class="btn btn-info stc-safety-tbm-image-show-btn" data-src="'.$tbm_img_url.'">View</a>
 				';
 				if($img_path==""){
 					$safety_image="

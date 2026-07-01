@@ -3,6 +3,15 @@ session_start();
 require_once __DIR__ . '/../includes/agent_session_defaults.php';
 date_default_timezone_set('Asia/Kolkata');
 include "../../MCU/obdb.php";
+
+function stc_format_datetime($datetime, $format = 'd-m-Y') {
+	if ($datetime === null || $datetime === '') {
+		return '';
+	}
+	$timestamp = strtotime((string) $datetime);
+	return $timestamp !== false ? date($format, $timestamp) : '';
+}
+
 /*------------------------------------------------------------------------------------------------*/
 /*------------------------------------------For Safety--------------------------------------------*/
 /*------------------------------------------------------------------------------------------------*/
@@ -80,10 +89,9 @@ class witcher_supervisor extends tesseract{
 					$img_path=$optimusprimeimgrow['stc_safetytbm_img_location'];
 				}
 				}
-				// <img src="safety_img/'.$img_path.'" style="width: 190px;position: relative;left: 15%;padding: 0;margin: 0;">
-
+				$tbm_img_url = htmlspecialchars(stc_tbm_image_url($img_path), ENT_QUOTES, 'UTF-8');
 				$safety_image='
-						<a href="javascript:void(0)" class="btn btn-info stc-safety-tbm-image-show-btn" data-src="safety_img/'.$img_path.'">View</a>
+						<a href="javascript:void(0)" class="btn btn-info stc-safety-tbm-image-show-btn" data-src="'.$tbm_img_url.'">View</a>
 				';
 				if($img_path==""){
 					$safety_image="
@@ -102,8 +110,8 @@ class witcher_supervisor extends tesseract{
 
 				$optimusprime.='
 					<tr>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetytbm_date'])).'</td>
-						<td>'.date('h:i A', strtotime($optimusprimerow['stc_safetytbm_time'])).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['stc_safetytbm_date']).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['stc_safetytbm_time'], 'h:i A').'</td>
 						<td>'.$optimusprimerow['stc_safetytbm_place'].'</td>
 						<td>'.$safety_image.'</td>
 						<td>'.$optimusprimerow['stc_cust_pro_supervisor_fullname'].'</td>
@@ -259,7 +267,7 @@ class witcher_supervisor extends tesseract{
 			if (mysqli_num_rows($optimusprimequery) > 0) {
 				$date = date("Y-m-d H:i:s");
 				$result=mysqli_fetch_assoc($optimusprimequery);
-				$cdate = date("Y-m-d", strtotime($result['stc_safetytbm_date']));
+				$cdate = stc_format_datetime($result['stc_safetytbm_date'], 'Y-m-d');
 				// Check if an entry with the same date already exists
 				$checkQuery = mysqli_query($this->stc_dbs, "SELECT * FROM `stc_cust_employee_rating` WHERE DATE(`created_date`) = '$cdate' AND `created_by` = '".$_SESSION['stc_agent_sub_id']."'");
 				
@@ -499,10 +507,10 @@ class witcher_vhl extends tesseract{
 
 				$optimusprime.='
 					<tr>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyvehicle_date'])).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['stc_safetyvehicle_date']).'</td>
 						<td>'.$optimusprimerow['stc_safetyvehicle_desc'].'</td>
 						<td>'.$optimusprimerow['stc_safetyvehicle_reg_no'].'</td>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyvehicle_dateofinspection'])).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['stc_safetyvehicle_dateofinspection']).'</td>
 						<td>'.$optimusprimerow['stc_safetyvehicle_driversname'].'</td>
 						<td>'.$action_show.'
 						</td>
@@ -675,7 +683,7 @@ class witcher_ppem extends tesseract{
 
 				$optimusprime.='
 					<tr>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyppem_date'])).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['stc_safetyppem_date']).'</td>
 						<td>'.$optimusprimerow['stc_safetyppem_site_name'].'</td>
 						<td>'.$optimusprimerow['stc_safetyppem_supervisor_name'].'</td>
 						<td>'.$action_show.'</td>
@@ -938,7 +946,7 @@ class witcher_nearmiss extends tesseract{
 
 				$optimusprime.='
 					<tr>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetynearmiss_date'])).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['stc_safetynearmiss_date']).'</td>
 						<td>'.$optimusprimerow['stc_safetynearmiss_time'].'</td>
 						<td>'.$optimusprimerow['stc_safetynearmiss_location'].'</td>
 						<td>'.$safety_image.'</td>
@@ -1111,7 +1119,7 @@ class witcher_capa extends tesseract{
 
 				$optimusprime.='
 					<tr>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['capa_date'])).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['capa_date']).'</td>
 						<td>'.$optimusprimerow['sitename'].'</td>
 						<td>'.$optimusprimerow['place'].'</td>
 						<td>'.$optimusprimerow['branch'].'</td>
@@ -1292,7 +1300,7 @@ class witcher_hotwork extends tesseract{
 
 				$optimusprime.='
 					<tr>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyhotwork_startingdate'])).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['stc_safetyhotwork_startingdate']).'</td>
 						<td>'.$optimusprimerow['stc_safetyhotwork_wono'].'</td>
 						<td>'.$optimusprimerow['stc_safetyhotwork_jobssitename'].'</td>
 						<td>'.$action_show.'</td>
@@ -1464,7 +1472,7 @@ class witcher_ppec extends tesseract{
 
 				$optimusprime.='
 					<tr>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetyppec_date'])).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['stc_safetyppec_date']).'</td>
 						<td>'.$optimusprimerow['stc_safetyppec_wono'].'</td>
 						<td>'.$optimusprimerow['stc_safetyppec_sitename'].'</td>
 						<td>'.$action_show.'</td>
@@ -1751,7 +1759,7 @@ class witcher_toollist extends tesseract{
 
 				$optimusprime.='
 					<tr>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['stc_safetytoolslist_date'])).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['stc_safetytoolslist_date']).'</td>
 						<td>'.$optimusprimerow['stc_safetytoolslist_wono'].'</td>
 						<td>'.$optimusprimerow['stc_safetytoolslist_sitename'].'</td>
 						<td>'.$action_show.'</td>
@@ -1789,7 +1797,7 @@ class witcher_toollist extends tesseract{
 
 				$optimusprime.='
 					<tr>
-						<td>'.date('d-m-Y', strtotime($optimusprimerow['created_date'])).'</td>
+						<td>'.stc_format_datetime($optimusprimerow['created_date']).'</td>
 						<td>'.$optimusprimerow['work_orderno'].'</td>
 						<td>'.$optimusprimerow['sitename'].'</td>
 						<td>'.$optimusprimerow['stc_cust_pro_supervisor_fullname'].'</td>
