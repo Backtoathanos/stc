@@ -3303,7 +3303,7 @@ class ragnarPurchaseAdhoc extends tesseract{
 		$dateFrom=date('Y-m-d', strtotime($dateFrom));
 		$dateTo=date('Y-m-d', strtotime($dateTo));
 		$query = "
-			SELECT D.stc_cust_project_id, D.stc_cust_project_title, SUM(A.stc_cust_super_requisition_list_items_rec_recqty * E.stc_purchase_product_adhoc_rate) as total FROM `stc_cust_super_requisition_list_items_rec` A 
+			SELECT D.stc_cust_project_id, D.stc_cust_project_title, A.stc_cust_super_requisition_list_items_rec_recqty as qty, E.stc_purchase_product_adhoc_rate as rate FROM `stc_cust_super_requisition_list_items_rec` A 
 			INNER JOIN stc_cust_super_requisition_list_items B
 			ON A.stc_cust_super_requisition_list_items_rec_list_item_id=B.stc_cust_super_requisition_list_id
 			INNER JOIN stc_cust_super_requisition_list C
@@ -3313,20 +3313,35 @@ class ragnarPurchaseAdhoc extends tesseract{
 			INNER JOIN stc_purchase_product_adhoc E
 			ON A.stc_cust_super_requisition_list_items_rec_list_poaid=E.stc_purchase_product_adhoc_id
 			WHERE stc_cust_project_cust_id=$siteName AND DATE(A.stc_cust_super_requisition_list_items_rec_date) BETWEEN '$dateFrom' AND '$dateTo' 
-			GROUP BY D.stc_cust_project_title ORDER BY D.stc_cust_project_title
+			ORDER BY D.stc_cust_project_title
 		";
 		$result = mysqli_query($this->stc_dbs, $query);
-		// Fetch data
-		$odin = array();
-		if (mysqli_num_rows($result) > 0) {
+		$projects = array();
+		if ($result && mysqli_num_rows($result) > 0) {
 			while ($row = mysqli_fetch_assoc($result)) {
-				if($row['total']==0){ 
-					continue;
+				$projectId = $row['stc_cust_project_id'];
+				if (!isset($projects[$projectId])) {
+					$projects[$projectId] = array(
+						'stc_cust_project_id' => $projectId,
+						'stc_cust_project_title' => $row['stc_cust_project_title'],
+						'total' => 0,
+					);
 				}
-				$row['ltotal'] = $row['total'];
-				$row['total'] = number_format($row['total'], 2);
-				$odin[] = $row; // Add each row to the array
+				$rate = round((float) $row['rate'], 2);
+				$projects[$projectId]['total'] += round((float) $row['qty'] * $rate, 2);
 			}
+		}
+		$odin = array();
+		usort($projects, function ($a, $b) {
+			return strcmp($a['stc_cust_project_title'], $b['stc_cust_project_title']);
+		});
+		foreach ($projects as $row) {
+			if ($row['total'] == 0) {
+				continue;
+			}
+			$row['ltotal'] = $row['total'];
+			$row['total'] = number_format($row['total'], 2);
+			$odin[] = $row;
 		}
 		return $odin;
 	}

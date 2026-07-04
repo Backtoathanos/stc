@@ -394,7 +394,6 @@ if(isset($_GET['pro_id'])){
                                                         B.stc_cust_super_requisition_list_items_unit as unit,
                                                         A.stc_cust_super_requisition_list_items_rec_recqty as qty,
                                                         E.stc_purchase_product_adhoc_rate as rate,
-                                                        A.stc_cust_super_requisition_list_items_rec_recqty * E.stc_purchase_product_adhoc_rate as total,
                                                         A.stc_cust_super_requisition_list_items_rec_date as rec_date
                                                         FROM stc_cust_super_requisition_list_items_rec A 
                                                         INNER JOIN stc_cust_super_requisition_list_items B
@@ -417,8 +416,12 @@ if(isset($_GET['pro_id'])){
 
                                                     if ($requisition_query) {
                                                         while ($req_row = mysqli_fetch_assoc($requisition_query)) {
+                                                            $rate = round((float) $req_row['rate'], 2);
+                                                            $total = round((float) $req_row['qty'] * $rate, 2);
+                                                            $req_row['rate'] = $rate;
+                                                            $req_row['total'] = $total;
                                                             $rows[] = $req_row;
-                                                            $grand_total += (float) $req_row['total'];
+                                                            $grand_total += $total;
                                                         }
                                                     }
 

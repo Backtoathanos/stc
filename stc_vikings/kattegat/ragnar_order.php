@@ -6338,6 +6338,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 			return ['data' => [], 'requirement' => null];
 		}
 
+		$esc_item = mysqli_real_escape_string($this->stc_dbs, $item_id);
 		$requirement = null;
 		$req_q = mysqli_query($this->stc_dbs, "
 			SELECT
@@ -6346,7 +6347,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 				`stc_cust_super_requisition_list_items_unit` AS unit,
 				`stc_cust_super_requisition_items_type` AS item_type
 			FROM `stc_cust_super_requisition_list_items`
-			WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
+			WHERE `stc_cust_super_requisition_list_id` = '".$esc_item."'
 			LIMIT 1
 		");
 		if($req_q && mysqli_num_rows($req_q) > 0){
@@ -6360,19 +6361,76 @@ class ragnarCallDailyRequisitions extends tesseract{
 		}
 
 		$q = mysqli_query($this->stc_dbs, "
-			SELECT 
+			SELECT
 				P.`stc_product_id` AS product_id,
 				P.`stc_product_name` AS product_name,
 				P.`stc_product_unit` AS product_unit,
 				RP.`stc_cust_super_requisition_list_items_unit` AS item_unit,
-				SUM(RP.`stc_cust_super_requisition_items_finalqty`) AS connected_qty,
-				C.stc_sub_cat_name,
-				MAX(RP.`stc_cust_super_requisition_items_type`) AS item_type
+				MAX(RP.`stc_cust_super_requisition_list_items_approved_qty`) AS req_qty,
+				C.`stc_sub_cat_name`,
+				MAX(RP.`stc_cust_super_requisition_items_type`) AS item_type,
+				SUM(IFNULL(A.`stc_purchase_product_adhoc_qty`, 0)) AS adhoc_qty,
+				SUM(IFNULL(D.`dispatch_qty`, 0)) AS dispatch_qty,
+				SUM(IFNULL(GC.`gld_qty`, 0)) AS gld_qty,
+				SUM(
+					GREATEST(
+						IFNULL(A.`stc_purchase_product_adhoc_qty`, 0)
+						- (IFNULL(D.`dispatch_qty`, 0) - IFNULL(GC.`gld_qty`, 0)),
+						0
+					)
+				) AS balance_qty,
+				SUM(IFNULL(DI.`item_dispatch_qty`, 0)) AS item_dispatch_qty,
+				GROUP_CONCAT(
+					DISTINCT IF(RK.`stc_rack_name` IS NOT NULL AND RK.`stc_rack_name` <> '', RK.`stc_rack_name`, NULL)
+					ORDER BY RK.`stc_rack_name` SEPARATOR ', '
+				) AS racks,
+				GROUP_CONCAT(
+					DISTINCT CONCAT(
+						A.`stc_purchase_product_adhoc_id`, '::',
+						IFNULL(RK2.`stc_rack_name`, '-')
+					)
+					ORDER BY A.`stc_purchase_product_adhoc_id` DESC SEPARATOR '||'
+				) AS adhoc_opts
 			FROM `stc_cust_super_requisition_list_items` RP
-			INNER JOIN `stc_product` P ON P.`stc_product_id` = RP.`stc_cust_super_requisition_list_items_product_id`
-			INNER JOIN `stc_sub_category` C ON P.`stc_product_sub_cat_id` = C.`stc_sub_cat_id`
-			WHERE RP.`stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
-			GROUP BY P.`stc_product_id`, P.`stc_product_name`, P.`stc_product_unit`, RP.`stc_cust_super_requisition_list_items_unit`, C.stc_sub_cat_name
+			INNER JOIN `stc_product` P
+				ON P.`stc_product_id` = RP.`stc_cust_super_requisition_list_items_product_id`
+			INNER JOIN `stc_sub_category` C
+				ON P.`stc_product_sub_cat_id` = C.`stc_sub_cat_id`
+			LEFT JOIN `stc_purchase_product_adhoc` A
+				ON A.`stc_purchase_product_adhoc_productid` = P.`stc_product_id`
+				AND A.`stc_purchase_product_adhoc_status` = '1'
+			LEFT JOIN (
+				SELECT
+					`stc_cust_super_requisition_list_items_rec_list_poaid` AS adhoc_id,
+					SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatch_qty
+				FROM `stc_cust_super_requisition_list_items_rec`
+				GROUP BY `stc_cust_super_requisition_list_items_rec_list_poaid`
+			) D ON D.`adhoc_id` = A.`stc_purchase_product_adhoc_id`
+			LEFT JOIN (
+				SELECT `adhoc_id`, SUM(`qty`) AS gld_qty
+				FROM `gld_challan`
+				GROUP BY `adhoc_id`
+			) GC ON GC.`adhoc_id` = A.`stc_purchase_product_adhoc_id`
+			LEFT JOIN (
+				SELECT
+					A2.`stc_purchase_product_adhoc_productid` AS product_id,
+					SUM(R2.`stc_cust_super_requisition_list_items_rec_recqty`) AS item_dispatch_qty
+				FROM `stc_cust_super_requisition_list_items_rec` R2
+				INNER JOIN `stc_purchase_product_adhoc` A2
+					ON A2.`stc_purchase_product_adhoc_id` = R2.`stc_cust_super_requisition_list_items_rec_list_poaid`
+				WHERE R2.`stc_cust_super_requisition_list_items_rec_list_item_id` = '".$esc_item."'
+				GROUP BY A2.`stc_purchase_product_adhoc_productid`
+			) DI ON DI.`product_id` = P.`stc_product_id`
+			LEFT JOIN `stc_rack` RK
+				ON RK.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid`
+				AND RK.`stc_rack_status` <> '2'
+			LEFT JOIN `stc_rack` RK2
+				ON RK2.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid`
+			WHERE RP.`stc_cust_super_requisition_list_id` = '".$esc_item."'
+				AND RP.`stc_cust_super_requisition_list_items_product_id` > 0
+			GROUP BY
+				P.`stc_product_id`, P.`stc_product_name`, P.`stc_product_unit`,
+				RP.`stc_cust_super_requisition_list_items_unit`, C.`stc_sub_cat_name`
 			ORDER BY P.`stc_product_name` ASC
 		");
 
@@ -6380,96 +6438,32 @@ class ragnarCallDailyRequisitions extends tesseract{
 		if($q && mysqli_num_rows($q) > 0){
 			while($row = mysqli_fetch_assoc($q)){
 				$product_id = (int)$row['product_id'];
+				$balanceQty = (float)($row['balance_qty'] ?? 0);
+				$dispatchedForItemProduct = (float)($row['item_dispatch_qty'] ?? 0);
+				$reqBalanceQty = ((float)($row['req_qty'] ?? 0)) - $dispatchedForItemProduct;
+				if($reqBalanceQty < 0){ $reqBalanceQty = 0; }
 
-				$adhocQty = 0.0;
-				$gldQty = 0.0;
-				$directQty = 0.0;
-				$dispatchedForItemProduct = 0.0;
-				$rackNames = '-';
+				$rackNames = trim((string)($row['racks'] ?? ''));
+				if($rackNames === ''){ $rackNames = '-'; }
+
 				$adhocOptions = [];
-
-				$q1 = mysqli_query($this->stc_dbs, "SELECT SUM(`stc_purchase_product_adhoc_qty`) AS total_qty FROM `stc_purchase_product_adhoc` WHERE `stc_purchase_product_adhoc_productid` = '".$product_id."'");
-				if($q1){
-					$r1 = mysqli_fetch_assoc($q1);
-					$adhocQty = (float)($r1['total_qty'] ?? 0);
-				}
-
-				// Racks for this product (for display) - show all racks across adhoc lines
-				$rk_q = mysqli_query($this->stc_dbs, "
-					SELECT GROUP_CONCAT(DISTINCT RK.`stc_rack_name` ORDER BY RK.`stc_rack_name` SEPARATOR ', ') AS racks
-					FROM `stc_purchase_product_adhoc` A
-					LEFT JOIN `stc_rack` RK
-						ON RK.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid` AND RK.`stc_rack_status` <> '2'
-					WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
-				");
-				if($rk_q && $rk_row = mysqli_fetch_assoc($rk_q)){
-					$rackNames = trim((string)($rk_row['racks'] ?? ''));
-					if($rackNames === ''){ $rackNames = '-'; }
-				}
-
-				// Adhoc options for this product (for dropdown UI)
-				$ao_q = mysqli_query($this->stc_dbs, "
-					SELECT
-						A.`stc_purchase_product_adhoc_id` AS adhoc_id,
-						IFNULL(RK.`stc_rack_name`, '-') AS rack_name
-					FROM `stc_purchase_product_adhoc` A
-					LEFT JOIN `stc_rack` RK
-						ON RK.`stc_rack_id` = A.`stc_purchase_product_adhoc_rackid`
-					WHERE A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
-						AND A.`stc_purchase_product_adhoc_status` = '1'
-					ORDER BY A.`stc_purchase_product_adhoc_id` DESC
-				");
-				if($ao_q && mysqli_num_rows($ao_q) > 0){
-					while($ao = mysqli_fetch_assoc($ao_q)){
-						$adh = (int)($ao['adhoc_id'] ?? 0);
+				$adhocOptsRaw = trim((string)($row['adhoc_opts'] ?? ''));
+				if($adhocOptsRaw !== ''){
+					foreach(explode('||', $adhocOptsRaw) as $opt){
+						$parts = explode('::', $opt, 2);
+						$adh = (int)($parts[0] ?? 0);
 						if($adh <= 0){ continue; }
+						$rack_name = (string)($parts[1] ?? '-');
 						$adhocOptions[] = [
 							'adhoc_id' => $adh,
-							'rack_name' => (string)($ao['rack_name'] ?? '-'),
-							'label' => 'PPA '.$adh.' — Rack '.(string)($ao['rack_name'] ?? '-')
+							'rack_name' => $rack_name,
+							'label' => 'PPA '.$adh.' — Rack '.$rack_name
 						];
 					}
 				}
 
-				$q2 = mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = '".$product_id."'");
-				if($q2){
-					$r2 = mysqli_fetch_assoc($q2);
-					$gldQty = (float)($r2['total_qty'] ?? 0);
-				}
-
-				$q3 = mysqli_query($this->stc_dbs, "
-					SELECT SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`) AS total_qty
-					FROM `stc_cust_super_requisition_list_items_rec` R
-					WHERE R.`stc_cust_super_requisition_list_items_rec_list_poaid` IN (
-						SELECT `stc_purchase_product_adhoc_id`
-						FROM `stc_purchase_product_adhoc`
-						WHERE `stc_purchase_product_adhoc_productid` = '".$product_id."'
-					)
-				");
-				if($q3){
-					$r3 = mysqli_fetch_assoc($q3);
-					$directQty = (float)($r3['total_qty'] ?? 0);
-				}
-
-				// Dispatched for this requisition item + product (via adhoc ids)
-				$q4 = mysqli_query($this->stc_dbs, "
-					SELECT SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`) AS total_qty
-					FROM `stc_cust_super_requisition_list_items_rec` R
-					INNER JOIN `stc_purchase_product_adhoc` A
-						ON A.`stc_purchase_product_adhoc_id` = R.`stc_cust_super_requisition_list_items_rec_list_poaid`
-					WHERE R.`stc_cust_super_requisition_list_items_rec_list_item_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
-						AND A.`stc_purchase_product_adhoc_productid` = '".$product_id."'
-				");
-				if($q4){
-					$r4 = mysqli_fetch_assoc($q4);
-					$dispatchedForItemProduct = (float)($r4['total_qty'] ?? 0);
-				}
-
-				$balanceQty = $adhocQty - ($gldQty + $directQty);
-				$reqBalanceQty = ((float)($row['connected_qty'] ?? 0)) - $dispatchedForItemProduct;
-				if($reqBalanceQty < 0){ $reqBalanceQty = 0; }
 				$product_name = (string)($row['product_name'] ?? '');
-				if($row['stc_sub_cat_name'] != "OTHERS"){
+				if($row['stc_sub_cat_name'] != 'OTHERS'){
 					$product_name = $row['stc_sub_cat_name'] . ' ' . $product_name;
 				}
 				$item_type_row = (string)($row['item_type'] ?? '');
@@ -6486,10 +6480,10 @@ class ragnarCallDailyRequisitions extends tesseract{
 					'tools_track_options' => $tools_track_options,
 					'racks' => $rackNames,
 					'adhoc_options' => $adhocOptions,
-					'connected_qty' => number_format((float)($row['connected_qty'] ?? 0), 2),
-					'dispatched_qty' => number_format((float)$dispatchedForItemProduct, 2),
+					'connected_qty' => number_format((float)($row['req_qty'] ?? 0), 2),
+					'dispatched_qty' => number_format($dispatchedForItemProduct, 2),
 					'req_balance_qty' => number_format((float)$reqBalanceQty, 2),
-					'balance_qty' => number_format((float)$balanceQty, 2),
+					'balance_qty' => number_format($balanceQty, 2),
 					'can_dispatch' => ($reqBalanceQty > 0.0001 && $balanceQty > 0.0001) ? 1 : 0
 				];
 			}
