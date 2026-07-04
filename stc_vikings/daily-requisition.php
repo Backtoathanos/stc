@@ -80,6 +80,60 @@ include("kattegat/role_check.php");
     #dailyReqBalanceModal .dr-balance-cell {
       min-width: 140px;
     }
+    #dailyReqBalanceModal .dr-qtyunit-editor-panel {
+      margin-top: 12px;
+      width: 100%;
+    }
+    #dailyReqBalanceModal .dr-qtyunit-editor-box {
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
+      background: #f7fafc;
+      padding: 12px 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+    #dailyReqBalanceModal .dr-qtyunit-editor-labels,
+    #dailyReqBalanceModal .dr-qtyunit-editor-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 12px;
+      align-items: center;
+    }
+    #dailyReqBalanceModal .dr-qtyunit-editor-labels {
+      font-weight: 600;
+      font-size: 12px;
+      color: #4a5568;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    #dailyReqBalanceModal .dr-qtyunit-editor-fields .form-control {
+      width: 100%;
+    }
+    #dailyReqBalanceModal .dr-qtyunit-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+    #dailyReqBalanceModal .dr-balance-row.dr-qtyunit-row-active {
+      background: #ebf8ff !important;
+    }
+    #dailyReqBalanceModal .dr-itemcode-editor-panel {
+      margin-top: 12px;
+      width: 100%;
+    }
+    #dailyReqBalanceModal .dr-itemcode-editor-box {
+      border: 1px solid #cbd5e0;
+      border-radius: 8px;
+      background: #f7fafc;
+      padding: 12px 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+    #dailyReqBalanceModal .dr-itemcode-editor-title {
+      font-weight: 600;
+      font-size: 13px;
+      color: #2d3748;
+      margin-bottom: 10px;
+    }
     #dailyReqBalanceModal .dr-pending-reason-inline {
       max-width: 140px;
       display: inline-block !important;
@@ -307,46 +361,67 @@ include("kattegat/role_check.php");
                 <tr><td colspan="8" class="text-center">Loading...</td></tr>
               </tbody>
             </table>
-          </div>
-
-          <div class="dr-add-itemcode-form" style="display:none;margin-top:10px; white-space: normal;">
-            <input type="hidden" id="dr-itemcode-itemid" value="">
-            <input type="hidden" id="dr-itemcode-oldproductid" value="0">
-            <table class="table table-sm table-bordered mb-2">
-              <thead>
-                <tr>
-                  <th>By Category</th>
-                  <th>By Name</th>
-                  <th>By Sub Category</th>
-                  <th>Search</th>
-                  <th style="width:80px;"></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    <select class="form-control form-control-sm call_cat" id="dr-filterbycat" name="stcpdcategory">
-                      <option value="NA">-- Select --</option>
-                    </select>
-                  </td>
-                  <td>
-                    <input type="text" id="dr-searchbystcname" class="form-control form-control-sm" placeholder="Product Name">
-                  </td>
-                  <td>
-                    <select class="form-control form-control-sm call_sub_cat" id="dr-filterbysubcat" name="stcpdsubcategory">
-                      <option value="NA">-- Select --</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button type="button" class="btn btn-primary btn-sm btn-block dr-product-search-hit"><i class="fa fa-search"></i> Search</button>
-                  </td>
-                  <td>
-                    <button type="button" class="btn btn-default btn-sm btn-block dr-itemcode-cancel-btn"><i class="fa fa-times"></i> Close</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-            <div class="row dr-product-results" id="dr-product-results" style="max-height:280px;overflow-y:auto;"></div>
+            <div id="dr-qtyunit-editor-panel" class="dr-qtyunit-editor-panel" style="display:none;">
+              <div class="dr-qtyunit-editor-box">
+                <div class="dr-qtyunit-editor-labels">
+                  <span>Item Qty</span>
+                  <span>Item Unit</span>
+                  <span>Item Type</span>
+                  <span>Action</span>
+                </div>
+                <div class="dr-qtyunit-editor-fields dr-qtyunit-editor">
+                  <input type="number" step="0.01" min="0" class="form-control input-sm dr-qtyunit-input" placeholder="Qty">
+                  <select class="form-control input-sm dr-qtyunit-unit"></select>
+                  <select class="form-control input-sm dr-itemtype-unit"></select>
+                  <div class="dr-qtyunit-actions">
+                    <button type="button" class="btn btn-success btn-sm dr-qtyunit-update">Update</button>
+                    <button type="button" class="btn btn-default btn-sm dr-qtyunit-cancel">Cancel</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="dr-itemcode-editor-panel" class="dr-add-itemcode-form dr-itemcode-editor-panel" style="display:none;">
+              <div class="dr-itemcode-editor-box">
+                <div class="dr-itemcode-editor-title">Change / add item code</div>
+                <input type="hidden" id="dr-itemcode-itemid" value="">
+                <input type="hidden" id="dr-itemcode-oldproductid" value="0">
+                <table class="table table-sm table-bordered mb-2">
+                  <thead>
+                    <tr>
+                      <th>By Category</th>
+                      <th>By Name</th>
+                      <th>By Sub Category</th>
+                      <th>Search</th>
+                      <th style="width:80px;"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <select class="form-control form-control-sm call_cat" id="dr-filterbycat" name="stcpdcategory">
+                          <option value="NA">-- Select --</option>
+                        </select>
+                      </td>
+                      <td>
+                        <input type="text" id="dr-searchbystcname" class="form-control form-control-sm" placeholder="Product Name">
+                      </td>
+                      <td>
+                        <select class="form-control form-control-sm call_sub_cat" id="dr-filterbysubcat" name="stcpdsubcategory">
+                          <option value="NA">-- Select --</option>
+                        </select>
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-primary btn-sm btn-block dr-product-search-hit"><i class="fa fa-search"></i> Search</button>
+                      </td>
+                      <td>
+                        <button type="button" class="btn btn-default btn-sm btn-block dr-itemcode-cancel-btn"><i class="fa fa-times"></i> Close</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="row dr-product-results" id="dr-product-results" style="max-height:280px;overflow-y:auto;"></div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -745,13 +820,92 @@ include("kattegat/role_check.php");
         });
       });
 
+      var DR_PANEL_TOGGLE_MS = 250;
+
+      function hideDrQtyUnitEditor(instant) {
+        var $panel = $('#dr-qtyunit-editor-panel');
+        $panel.stop(true, true);
+        if (instant) {
+          $panel.hide();
+        } else if ($panel.is(':visible')) {
+          $panel.slideUp(DR_PANEL_TOGGLE_MS);
+        }
+        $('#dailyReqBalanceModal .dr-balance-row').removeClass('dr-qtyunit-row-active');
+      }
+
+      function showDrQtyUnitEditor($panel, onDone) {
+        onDone = typeof onDone === 'function' ? onDone : function () {};
+        $panel.stop(true, true);
+        if ($panel.is(':visible')) {
+          $panel.find('.dr-qtyunit-input').focus().select();
+          onDone();
+          return;
+        }
+        $panel.slideDown(DR_PANEL_TOGGLE_MS, function () {
+          $panel.find('.dr-qtyunit-input').focus().select();
+          onDone();
+        });
+      }
+
+      function hideDrItemcodeEditor(instant) {
+        var $panel = $('#dr-itemcode-editor-panel');
+        $panel.stop(true, true);
+        if (instant) {
+          $panel.hide();
+        } else if ($panel.is(':visible')) {
+          $panel.slideUp(DR_PANEL_TOGGLE_MS);
+        }
+        $('#dailyReqBalanceModal .dr-balance-row').removeClass('dr-qtyunit-row-active');
+      }
+
+      function showDrItemcodeEditor($panel, onDone) {
+        onDone = typeof onDone === 'function' ? onDone : function () {};
+        $panel.stop(true, true);
+        if ($panel.is(':visible')) {
+          onDone();
+          return;
+        }
+        $panel.slideDown(DR_PANEL_TOGGLE_MS, onDone);
+      }
+
+      function hideDrBalancePanels(instant) {
+        hideDrQtyUnitEditor(instant);
+        hideDrItemcodeEditor(instant);
+        $('#dailyReqBalanceModal .dr-balance-row').removeClass('dr-qtyunit-row-active');
+      }
+
+      function resetDrItemcodeSearch() {
+        $('#dr-filterbycat').val('NA');
+        $('#dr-filterbysubcat').val('NA');
+        $('#dr-searchbystcname').val('');
+        $('#dr-product-results').html('<p class="col-12 text-muted small">Select category, subcategory or type product name, then click Search.</p>');
+      }
+
+      function openDrItemcodeEditor(opts) {
+        opts = opts || {};
+        hideDrQtyUnitEditor(true);
+        var $panel = $('#dr-itemcode-editor-panel');
+        var oldProductId = parseInt(opts.oldProductId, 10) || 0;
+        $('#dr-itemcode-itemid').val(opts.itemId || 0);
+        $('#dr-itemcode-oldproductid').val(oldProductId);
+        resetDrItemcodeSearch();
+        $('#dailyReqBalanceModal .dr-balance-row').removeClass('dr-qtyunit-row-active');
+        if (opts.$row && opts.$row.length) opts.$row.addClass('dr-qtyunit-row-active');
+        $panel.find('.dr-itemcode-editor-title').text(oldProductId > 0 ? 'Change item code' : 'Add item code');
+        showDrItemcodeEditor($panel, function () {
+          if ($panel[0].scrollIntoView) {
+            $panel[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
+      }
+
       function loadBalanceModal(itemId) {
         $('#dr-itemcode-itemid').val(itemId);
         $('#dr-itemcode-oldproductid').val('0');
-        $('.dr-add-itemcode-form').hide();
         $('.dr-balance-main-wrap').show();
         $('#dr-balance-req-summary').hide();
         $('.stc-daily-req-balance-body').html('<tr><td colspan="8" class="text-center">Loading...</td></tr>');
+        hideDrBalancePanels(true);
         $.ajax({
           url: 'kattegat/ragnar_order.php',
           method: 'POST',
@@ -1124,14 +1278,9 @@ include("kattegat/role_check.php");
       });
 
       $('body').delegate('.dr-show-itemcode-form', 'click', function () {
-        var itemId = $(this).data('item-id');
-        $('#dr-itemcode-itemid').val(itemId);
-        $('#dr-filterbycat').val('NA');
-        $('#dr-filterbysubcat').val('NA');
-        $('#dr-searchbystcname').val('');
-        $('#dr-product-results').html('<p class="col-12 text-muted small">Select category, subcategory or type product name, then click Search.</p>');
-        $('.dr-balance-main-wrap').hide();
-        $('.dr-add-itemcode-form').show();
+        var itemId = parseInt($(this).data('item-id'), 10) || 0;
+        if (itemId <= 0) return;
+        openDrItemcodeEditor({ itemId: itemId, oldProductId: 0 });
       });
 
       $('body').delegate('.dr-product-search-hit', 'click', function (e) {
@@ -1159,8 +1308,7 @@ include("kattegat/role_check.php");
       });
 
       $('body').delegate('.dr-itemcode-cancel-btn', 'click', function () {
-        $('.dr-add-itemcode-form').hide();
-        $('.dr-balance-main-wrap').show();
+        hideDrBalancePanels();
       });
 
       $('body').delegate('.dr-select-product', 'click', function () {
@@ -1186,9 +1334,8 @@ include("kattegat/role_check.php");
           success: function (response) {
             if (response && response.reload) { window.location.reload(); return; }
             if (response && response.success) {
+              hideDrItemcodeEditor();
               showSwal('success', 'Updated', response.message || 'Item code added.');
-              $('.dr-add-itemcode-form').hide();
-              $('.dr-balance-main-wrap').show();
               loadBalanceModal(itemId);
             } else {
               showSwal('error', 'Failed', (response && response.message) ? response.message : 'Update failed.');
@@ -1209,14 +1356,11 @@ include("kattegat/role_check.php");
           showSwal('error', 'Invalid', 'Invalid item or product.');
           return;
         }
-        $('#dr-itemcode-itemid').val(itemId);
-        $('#dr-itemcode-oldproductid').val(oldProductId);
-        $('#dr-filterbycat').val('NA');
-        $('#dr-filterbysubcat').val('NA');
-        $('#dr-searchbystcname').val('');
-        $('#dr-product-results').html('<p class="col-12 text-muted small">Select category, subcategory or type product name, then click Search.</p>');
-        $('.dr-balance-main-wrap').hide();
-        $('.dr-add-itemcode-form').show();
+        openDrItemcodeEditor({
+          itemId: itemId,
+          oldProductId: oldProductId,
+          $row: $(this).closest('tr.dr-balance-row')
+        });
       });
 
       $('body').delegate('.dr-edit-qtyunit', 'click', function (e) {
@@ -1230,17 +1374,13 @@ include("kattegat/role_check.php");
         var itemType = String($a.data('item-type') || '').trim();
         if (itemId <= 0 || productId <= 0) return;
 
-        // Close any other open editor in modal
-        $('#dailyReqBalanceModal .dr-qtyunit-editor').each(function () {
-          var $ed = $(this);
-          var $tdOld = $ed.closest('td');
-          var originalHtml = $tdOld.data('drOriginalHtml');
-          if (originalHtml) $tdOld.html(originalHtml);
-        });
+        hideDrItemcodeEditor(true);
 
-        var $td = $a.closest('td');
-        var original = $td.html();
-        $td.data('drOriginalHtml', original);
+        var $panel = $('#dr-qtyunit-editor-panel');
+        var $row = $a.closest('tr.dr-balance-row');
+        $('#dailyReqBalanceModal .dr-balance-row').removeClass('dr-qtyunit-row-active');
+        if ($row.length) $row.addClass('dr-qtyunit-row-active');
+
         var units = ['NOS', 'KG', 'MTR', 'Bag', 'Box', 'Bundle', 'Case', 'Cft', 'CuMtr', 'Drum', 'Feet', 'Gm', 'Jar', 'Kgs', 'Ltr', 'Mtr', 'Mts', 'Pkt', 'Roll', 'Set', 'Sqft', 'Sqmm', 'Sqmt', 'Pair'];
         if (itemUnit) units.push(itemUnit);
         if (productUnit && productUnit.toLowerCase() !== itemUnit.toLowerCase()) units.push(productUnit);
@@ -1259,39 +1399,33 @@ include("kattegat/role_check.php");
           typeOptions += '<option value="' + escapeHtml(t) + '"' + sel + '>' + escapeHtml(t) + '</option>';
         });
 
-        var editor =
-          '<span class="dr-qtyunit-editor">' +
-          '<input type="number" step="0.01" min="0" class="form-control input-sm dr-qtyunit-input" ' +
-          'style="width:110px;display:inline-block;" value="' + escapeHtml(qty) + '">' +
-          '<select class="form-control input-sm dr-qtyunit-unit" style="width:90px;display:inline-block;margin-left:6px;">' +
-          options +
-          '</select>' +
-          '<select class="form-control input-sm dr-itemtype-unit" style="width:140px;display:inline-block;margin-left:6px;">' +
-          typeOptions +
-          '</select>' +
-          '<button type="button" class="btn btn-success btn-sm dr-qtyunit-update" ' +
-          'style="margin-left:6px;" data-item-id="' + escapeHtml(itemId) + '" data-product-id="' + escapeHtml(productId) + '">Update</button>' +
-          '<button type="button" class="btn btn-default btn-sm dr-qtyunit-cancel" style="margin-left:6px;">Cancel</button>' +
-          '</span>';
-
-        $td.html(editor);
-        $td.find('.dr-qtyunit-input').focus().select();
+        $panel.find('.dr-qtyunit-input').val(qty);
+        $panel.find('.dr-qtyunit-unit').html(options);
+        $panel.find('.dr-itemtype-unit').html(typeOptions);
+        $panel.find('.dr-qtyunit-update')
+          .prop('disabled', false)
+          .text('Update')
+          .data('item-id', itemId)
+          .data('product-id', productId);
+        showDrQtyUnitEditor($panel, function () {
+          if ($panel[0].scrollIntoView) {
+            $panel[0].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          }
+        });
       });
 
       $('body').delegate('.dr-qtyunit-cancel', 'click', function () {
-        var $td = $(this).closest('td');
-        var original = $td.data('drOriginalHtml') || '';
-        $td.html(original);
+        hideDrBalancePanels();
       });
 
       $('body').delegate('.dr-qtyunit-update', 'click', function () {
         var $btn = $(this);
         var itemId = parseInt($btn.data('item-id'), 10) || 0;
         var productId = parseInt($btn.data('product-id'), 10) || 0;
-        var $td = $btn.closest('td');
-        var qtyVal = String($td.find('.dr-qtyunit-input').val() || '').trim();
-        var unitVal = String($td.find('.dr-qtyunit-unit').val() || '').trim();
-        var typeVal = String($td.find('.dr-itemtype-unit').val() || '').trim();
+        var $panel = $('#dr-qtyunit-editor-panel');
+        var qtyVal = String($panel.find('.dr-qtyunit-input').val() || '').trim();
+        var unitVal = String($panel.find('.dr-qtyunit-unit').val() || '').trim();
+        var typeVal = String($panel.find('.dr-itemtype-unit').val() || '').trim();
         if (itemId <= 0 || productId <= 0) {
           showSwal('error', 'Invalid', 'Invalid item or product.');
           return;
@@ -1328,6 +1462,7 @@ include("kattegat/role_check.php");
               return;
             }
             if (response && response.success) {
+              hideDrBalancePanels();
               showSwal('success', 'Updated', response.message || 'Updated.');
               loadBalanceModal(itemId);
             } else {
