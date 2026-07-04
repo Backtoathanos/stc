@@ -758,33 +758,86 @@ class sceptor extends tesseract{
         return $result;
     }
 
+	/**
+	 * Sale totals aligned with customer ledger (REQ dispatch).
+	 * REQ: SUM(rec_qty * adhoc_rate) — same as stc_poadhoc_customerledger.
+	 * GLD challan is tracked separately in branch/location breakdown (not added here).
+	 */
+	private function stc_gld_compute_sale_totals($dateFilterRec, $dateFilterGld){
+		$req_sale = 0.0;
+		$gld_sale = 0.0;
+
+		$req_q = mysqli_query($this->stc_dbs, "
+			SELECT COALESCE(SUM(
+				r.stc_cust_super_requisition_list_items_rec_recqty
+				* COALESCE(a.stc_purchase_product_adhoc_rate, 0)
+			), 0) AS sold
+			FROM stc_cust_super_requisition_list_items_rec r
+			INNER JOIN stc_purchase_product_adhoc a
+				ON a.stc_purchase_product_adhoc_id = r.stc_cust_super_requisition_list_items_rec_list_poaid
+			WHERE ".$dateFilterRec."
+		");
+		if($req_q){
+			$row = mysqli_fetch_assoc($req_q);
+			$req_sale = (float)($row['sold'] ?? 0);
+		}
+
+		$gld_q = mysqli_query($this->stc_dbs, "
+			SELECT COALESCE(SUM(
+				g.qty * COALESCE(g.rate, 0) - COALESCE(g.discount, 0)
+			), 0) AS sold
+			FROM gld_challan g
+			WHERE ".$dateFilterGld."
+		");
+		if($gld_q){
+			$row = mysqli_fetch_assoc($gld_q);
+			$gld_sale = (float)($row['sold'] ?? 0);
+		}
+
+		return [
+			'req_sale' => $req_sale,
+			'gld_sale' => $gld_sale,
+			'total_sale' => $req_sale,
+		];
+	}
+
     // GLD summary for dashboard
     // $type: 'NA' (monthly), 'Y' (yearly), 'A' (all time), 'R' (date range)
     public function stc_gld($month, $year, $type, $date_from = '', $date_to = '') {
         // $year = date('Y');
 		$queryFilter="WHERE MONTH(stc_purchase_product_adhoc_created_date) = '$month' AND YEAR(stc_purchase_product_adhoc_created_date) = '$year'";
-		$queryFilter1="WHERE stc_purchase_product_adhoc_cherrypickby=0 AND MONTH(s.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
-		$queryFilter2="WHERE MONTH(A.created_date)='$month' AND YEAR(A.created_date)='$year'";
+		$dateFilterRec = "MONTH(r.stc_cust_super_requisition_list_items_rec_date) = '$month' AND YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'";
+		$dateFilterGld = "MONTH(g.created_date) = '$month' AND YEAR(g.created_date) = '$year'";
+		$gldChallanFilter = "WHERE MONTH(A.created_date)='$month' AND YEAR(A.created_date)='$year'";
+		$shopDateFilter = "WHERE MONTH(A.created_date)='$month' AND YEAR(A.created_date)='$year'";
 		if($type == 'Y') {
 			$queryFilter = "WHERE YEAR(stc_purchase_product_adhoc_created_date) = '$year'";
-			$queryFilter1="WHERE stc_purchase_product_adhoc_cherrypickby=0 AND YEAR(s.stc_cust_super_requisition_list_items_rec_date) = '$year'";
-			$queryFilter2="WHERE YEAR(A.created_date)='$year'";
+			$dateFilterRec = "YEAR(r.stc_cust_super_requisition_list_items_rec_date) = '$year'";
+			$dateFilterGld = "YEAR(g.created_date) = '$year'";
+			$gldChallanFilter = "WHERE YEAR(A.created_date)='$year'";
+			$shopDateFilter = "WHERE YEAR(A.created_date)='$year'";
 		} elseif($type == 'A') {
 			$queryFilter = "WHERE 1=1";
-			$queryFilter1 = "WHERE stc_purchase_product_adhoc_cherrypickby=0";
-			$queryFilter2 = "WHERE 1=1";
+			$dateFilterRec = "1=1";
+			$dateFilterGld = "1=1";
+			$gldChallanFilter = "WHERE 1=1";
+			$shopDateFilter = "WHERE 1=1";
 		} elseif($type == 'R') {
 			$df = mysqli_real_escape_string($this->stc_dbs, (string)$date_from);
 			$dt = mysqli_real_escape_string($this->stc_dbs, (string)$date_to);
 			// Expect YYYY-MM-DD, use inclusive range; if missing, fall back to 1=1
 			if($df != '' && $dt != ''){
 				$queryFilter = "WHERE DATE(stc_purchase_product_adhoc_created_date) BETWEEN '".$df."' AND '".$dt."'";
-				$queryFilter1 = "WHERE stc_purchase_product_adhoc_cherrypickby=0 AND DATE(s.stc_cust_super_requisition_list_items_rec_date) BETWEEN '".$df."' AND '".$dt."'";
-				$queryFilter2 = "WHERE DATE(A.created_date) BETWEEN '".$df."' AND '".$dt."'";
+				$dateFilterRec = "DATE(r.stc_cust_super_requisition_list_items_rec_date) BETWEEN '".$df."' AND '".$dt."'";
+				$dateFilterGld = "DATE(g.created_date) BETWEEN '".$df."' AND '".$dt."'";
+				$gldChallanFilter = "WHERE DATE(A.created_date) BETWEEN '".$df."' AND '".$dt."'";
+				$shopDateFilter = "WHERE DATE(A.created_date) BETWEEN '".$df."' AND '".$dt."'";
 			} else {
 				$queryFilter = "WHERE 1=1";
-				$queryFilter1 = "WHERE stc_purchase_product_adhoc_cherrypickby=0";
-				$queryFilter2 = "WHERE 1=1";
+				$dateFilterRec = "1=1";
+				$dateFilterGld = "1=1";
+				$gldChallanFilter = "WHERE 1=1";
+				$shopDateFilter = "WHERE 1=1";
 			}
 		}
 
@@ -815,24 +868,16 @@ class sceptor extends tesseract{
         ");
         $purchase = mysqli_fetch_assoc($purchase_q);
         $total_purchase = $purchase['purchased'] ? floatval($purchase['purchased']) : 0;
-        // Total Sold (join to get rate +5%)
-        $sold_q = mysqli_query($this->stc_dbs, "
-            SELECT SUM(s.stc_cust_super_requisition_list_items_rec_recqty * (a.stc_purchase_product_adhoc_rate)) as sold
-            FROM stc_cust_super_requisition_list_items_rec s
-            INNER JOIN stc_purchase_product_adhoc a ON s.stc_cust_super_requisition_list_items_rec_list_poaid = a.stc_purchase_product_adhoc_id
-            $queryFilter1
-        ");
-        $sold = mysqli_fetch_assoc($sold_q);
-        $total_sale = $sold['sold'] ? floatval($sold['sold']) : 0;
+        $saleTotals = $this->stc_gld_compute_sale_totals($dateFilterRec, $dateFilterGld);
+        $total_sale = (float)$saleTotals['total_sale'];
 
         $sale_locations = [];
 		$sale_amount_by_location = [];
-		$sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, COALESCE(SUM(A.qty * COALESCE(A.rate, 0) - COALESCE(A.discount, 0)), 0) AS amount FROM gld_challan A INNER JOIN stc_trading_user ON A.created_by=stc_trading_user_id $queryFilter2 GROUP BY stc_trading_user_location");
+		$sql = mysqli_query($this->stc_dbs, "SELECT stc_trading_user_location, COALESCE(SUM(A.qty * COALESCE(A.rate, 0) - COALESCE(A.discount, 0)), 0) AS amount FROM gld_challan A INNER JOIN stc_trading_user ON A.created_by=stc_trading_user_id $gldChallanFilter GROUP BY stc_trading_user_location");
 		if(mysqli_num_rows($sql)>0){
 			while($row = mysqli_fetch_assoc($sql)){
 				$loc = trim((string)($row['stc_trading_user_location'] ?? ''));
 				$amt = floatval($row['amount'] ?? 0);
-				$total_sale += $amt;
 				if ($loc !== '') {
 					$sale_amount_by_location[$loc] = $amt;
 				}
@@ -864,7 +909,7 @@ class sceptor extends tesseract{
 			FROM `stc_shop` A
 			INNER JOIN `stc_purchase_product_adhoc` B ON A.adhoc_id = B.stc_purchase_product_adhoc_id
 			INNER JOIN `stc_product` P ON P.stc_product_id = B.stc_purchase_product_adhoc_productid
-			$queryFilter2
+			$shopDateFilter
 			GROUP BY A.shopname
 		");
 		$purchase_amount_by_location = [];
@@ -1457,25 +1502,20 @@ class sceptor extends tesseract{
 			WHERE ".$dateFilterRec."
 		");
 
-		$soldArray = 0;
+		$saleTotals = $this->stc_gld_compute_sale_totals($dateFilterRec, $dateFilterGld);
+		$soldArray = (float)$saleTotals['total_sale'];
+
 		$profitArray = 0;
 		while ($row = mysqli_fetch_assoc($soldQuery)) {
-			// Calculate sold amount: rate from adhoc * qty from rec table
-			$soldAmount = $row['stc_purchase_product_adhoc_rate'] * $row['stc_cust_super_requisition_list_items_rec_recqty'];
-			$soldArray += $soldAmount;
-			
-			// Line margin ₹ = (basic for line) × sale % = prate × qty × sale_pct/100
 			$basicRec = (float)$row['stc_purchase_product_adhoc_prate'] * (float)$row['stc_cust_super_requisition_list_items_rec_recqty'];
 			$profitAmount = $basicRec * ((float)$row['sale_pct'] / 100.0);
 			$profitArray += $profitAmount;
 		}
 
-		// Step 3: Get GLD data from gld_challan table with adhoc table join
+		// Step 3: GLD profit margin (sale total already in $soldArray via challan rate)
 		$gldQuery = mysqli_query($this->stc_dbs, "
 			SELECT 
 				g.qty,
-				g.rate,
-				a.stc_purchase_product_adhoc_rate,
 				a.stc_purchase_product_adhoc_prate,
 				COALESCE(p.stc_product_sale_percentage, 0) AS sale_pct
 			FROM gld_challan g
@@ -1485,10 +1525,6 @@ class sceptor extends tesseract{
 		");
 
 		while ($row = mysqli_fetch_assoc($gldQuery)) {
-			// Calculate sold amount: rate from adhoc * qty from gld table
-			$gldSoldAmount = $row['stc_purchase_product_adhoc_rate'] * $row['qty'];
-			$soldArray += $gldSoldAmount;
-			
 			$basicGld = (float)$row['stc_purchase_product_adhoc_prate'] * (float)$row['qty'];
 			$gldProfitAmount = $basicGld * ((float)$row['sale_pct'] / 100.0);
 			$profitArray += $gldProfitAmount;

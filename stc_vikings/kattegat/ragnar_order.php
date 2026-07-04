@@ -6570,7 +6570,7 @@ class ragnarCallDailyRequisitions extends tesseract{
 			SELECT 
 				`stc_cust_super_requisition_list_items_req_id` AS list_id,
 				`stc_cust_super_requisition_list_items_unit` AS unit,
-				SUM(`stc_cust_super_requisition_items_finalqty`) AS required_qty
+				MAX(`stc_cust_super_requisition_list_items_approved_qty`) AS required_qty
 			FROM `stc_cust_super_requisition_list_items`
 			WHERE `stc_cust_super_requisition_list_id` = '".mysqli_real_escape_string($this->stc_dbs, $item_id)."'
 				AND `stc_cust_super_requisition_list_items_product_id` = '".$product_id."'
@@ -6610,41 +6610,44 @@ class ragnarCallDailyRequisitions extends tesseract{
 
 		// Build adhoc rows with remaining per adhoc_id (ignoring GLD for now, we subtract it from effective stock)
 		$adhoc_rows = [];
-		$adhoc_where = "A.`stc_purchase_product_adhoc_productid` = '".$product_id."'";
+		$adhoc_where = "A.`stc_purchase_product_adhoc_productid` = '".$product_id."' AND A.`stc_purchase_product_adhoc_status` = '1'";
 		if($only_adhoc_id > 0){
 			$adhoc_where .= " AND A.`stc_purchase_product_adhoc_id` = '".mysqli_real_escape_string($this->stc_dbs, $only_adhoc_id)."'";
 		}
 		$adhoc_q = mysqli_query($this->stc_dbs, "
-			SELECT 
+			SELECT
 				A.`stc_purchase_product_adhoc_id` AS adhoc_id,
-				A.`stc_purchase_product_adhoc_qty` AS adhoc_qty,
-				IFNULL(SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`),0) AS used_qty
+				GREATEST(
+					A.`stc_purchase_product_adhoc_qty`
+					- (IFNULL(D.`dispatch_qty`, 0) - IFNULL(GC.`gld_qty`, 0)),
+					0
+				) AS remaining
 			FROM `stc_purchase_product_adhoc` A
-			LEFT JOIN `stc_cust_super_requisition_list_items_rec` R
-				ON R.`stc_cust_super_requisition_list_items_rec_list_poaid` = A.`stc_purchase_product_adhoc_id`
+			LEFT JOIN (
+				SELECT `stc_cust_super_requisition_list_items_rec_list_poaid` AS adhoc_id,
+					SUM(`stc_cust_super_requisition_list_items_rec_recqty`) AS dispatch_qty
+				FROM `stc_cust_super_requisition_list_items_rec`
+				GROUP BY `stc_cust_super_requisition_list_items_rec_list_poaid`
+			) D ON D.`adhoc_id` = A.`stc_purchase_product_adhoc_id`
+			LEFT JOIN (
+				SELECT `adhoc_id`, SUM(`qty`) AS gld_qty
+				FROM `gld_challan`
+				GROUP BY `adhoc_id`
+			) GC ON GC.`adhoc_id` = A.`stc_purchase_product_adhoc_id`
 			WHERE ".$adhoc_where."
-			GROUP BY A.`stc_purchase_product_adhoc_id`
-			HAVING (A.`stc_purchase_product_adhoc_qty` - IFNULL(SUM(R.`stc_cust_super_requisition_list_items_rec_recqty`),0)) > 0
+			HAVING remaining > 0
 			ORDER BY A.`stc_purchase_product_adhoc_id` ASC
 		");
 		if($adhoc_q && mysqli_num_rows($adhoc_q) > 0){
 			while($r = mysqli_fetch_assoc($adhoc_q)){
 				$adhoc_rows[] = [
 					'adhoc_id' => (int)$r['adhoc_id'],
-					'remaining' => (float)$r['adhoc_qty'] - (float)$r['used_qty']
+					'remaining' => (float)$r['remaining']
 				];
 			}
 		}
 		if(count($adhoc_rows) === 0){
 			return ['success' => false, 'message' => ($only_adhoc_id > 0) ? 'Selected Adhoc has no balance.' : 'No Adhoc stock available for this product.'];
-		}
-
-		// Subtract GLD consumption from effective remaining
-		$gldQty = 0.0;
-		$gld_q = mysqli_query($this->stc_dbs, "SELECT SUM(`qty`) AS total_qty FROM `gld_challan` WHERE `product_id` = '".$product_id."'");
-		if($gld_q){
-			$gld_row = mysqli_fetch_assoc($gld_q);
-			$gldQty = (float)($gld_row['total_qty'] ?? 0);
 		}
 
 		$now = date("Y-m-d H:i:s");
@@ -6654,13 +6657,6 @@ class ragnarCallDailyRequisitions extends tesseract{
 			if($remaining_to_dispatch <= 0){ break; }
 			$adhoc_id = (int)$ar['adhoc_id'];
 			$effective_remaining = (float)$ar['remaining'];
-
-			// Apply GLD consumption first (not linked to adhoc ids; consume from oldest stock)
-			if($gldQty > 0){
-				$consume = $effective_remaining > $gldQty ? $gldQty : $effective_remaining;
-				$effective_remaining -= $consume;
-				$gldQty -= $consume;
-			}
 			if($effective_remaining <= 0){ continue; }
 
 			$qty_to_dispatch = $effective_remaining > $remaining_to_dispatch ? $remaining_to_dispatch : $effective_remaining;
