@@ -83,7 +83,7 @@
                                     <span>PPEC</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item" style="display:none;">
                                 <a role="tab" class="nav-link" id="tab-2" data-toggle="tab" href="#safetytab_2">
                                     <span>PPEM</span>
                                 </a>
@@ -93,7 +93,7 @@
                                     <span>T&T Hand ToolList</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item" style="display:none;">
                                 <a role="tab" class="nav-link" id="tab-4" data-toggle="tab" href="#safetytab_4">
                                     <span>T&T Equipment</span>
                                 </a>
@@ -108,17 +108,17 @@
                                     <span>VHL - Vehicle Checklist</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item" style="display:none;">
                                 <a role="tab" class="nav-link" id="tab-7" data-toggle="tab" href="#safetytab_7">
                                     <span>AUD 08 Hot Work</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item" style="display:none;">
                                 <a role="tab" class="nav-link" id="tab-8" data-toggle="tab" href="#safetytab_8">
                                     <span>Near Miss reporting</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
+                            <li class="nav-item" style="display:none;">
                                 <a role="tab" class="nav-link" id="tab-9" data-toggle="tab" href="#safetytab_9">
                                     <span>CAPA</span>
                                 </a>
@@ -195,7 +195,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane tabs-animation fade" id="safetytab_2" role="tabpanel">
+                            <div class="tab-pane tabs-animation fade" id="safetytab_2" role="tabpanel" style="display:none;">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
@@ -260,7 +260,7 @@
                                     </div>
                                 </div>                                
                             </div>
-                            <div class="tab-pane tabs-animation fade" id="safetytab_4" role="tabpanel">
+                            <div class="tab-pane tabs-animation fade" id="safetytab_4" role="tabpanel" style="display:none;">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
@@ -358,7 +358,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane tabs-animation fade" id="safetytab_7" role="tabpanel">
+                            <div class="tab-pane tabs-animation fade" id="safetytab_7" role="tabpanel" style="display:none;">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
@@ -392,7 +392,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane tabs-animation fade" id="safetytab_8" role="tabpanel">
+                            <div class="tab-pane tabs-animation fade" id="safetytab_8" role="tabpanel" style="display:none;">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
@@ -427,7 +427,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="tab-pane tabs-animation fade" id="safetytab_9" role="tabpanel">
+                            <div class="tab-pane tabs-animation fade" id="safetytab_9" role="tabpanel" style="display:none;">
                                 <div class="row">
                                     <div class="col-md-12">
                                         <div class="main-card mb-3 card">
