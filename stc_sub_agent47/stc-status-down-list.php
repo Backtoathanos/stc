@@ -691,6 +691,14 @@
             });
 
             function toggle_daily_job_fields(){
+                var operation = $('.stc-agent-sup-std-save').attr('operation');
+                if(operation === 'manual'){
+                    $('#stc-std-qty-col').hide();
+                    $('#stc-std-capacity-col').hide();
+                    $('#stc-std-manpower-col').hide();
+                    $('#stc-agent-sup-std-manpower-req').removeAttr('required');
+                    return;
+                }
                 var j_plannning = $('#stc-agent-sup-std-job-plannning').val();
                 if(j_plannning === 'CALL ATTEND'){
                     $('#stc-std-qty-col').hide();
@@ -983,6 +991,7 @@
                     $('.stc-agent-sup-std-save').attr('operation', 'manual');
                     $('.stc-std-section-hideshow').hide();
                     $('.stc-std-section-achideshow').show();
+                    toggle_daily_job_fields();
                     $('.stc-std-update-on-focusout').val();
                     $('.stc-std-update-on-focusout').val('');
                 }else{
