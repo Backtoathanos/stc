@@ -157,7 +157,7 @@ if($qry){
                         <td><?php echo htmlspecialchars($row['reviewed_by']); ?></td>
                         <td class="img-cell">
                             <?php if(dso_img($row['before_image'])){ ?>
-                                <img src="<?php echo dso_img($row['before_image']); ?>" alt="Before">
+                                    <img src="<?php echo dso_img($row['before_image']); ?>" alt="Before">
                             <?php } ?>
                         </td>
                         <td class="img-cell">
