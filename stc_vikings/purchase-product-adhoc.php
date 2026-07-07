@@ -520,7 +520,45 @@ include("kattegat/role_check.php");
           border-color: #e6ebf3;
       }
 
-      /* Horizontal scroll for wide result tables */
+      /* Results table frame: horizontal + vertical scroll with sticky header */
+      .stc-poa-results-frame {
+          display: block;
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+          max-height: min(72vh, 720px);
+          overflow: auto;
+          -webkit-overflow-scrolling: touch;
+          box-sizing: border-box;
+          border: 1px solid #c8e6c9;
+          border-radius: 8px;
+          background: #fff;
+      }
+      .stc-poa-results-frame table {
+          min-width: 1200px;
+          width: auto;
+          table-layout: auto;
+          margin-bottom: 0;
+      }
+      .stc-poa-results-frame thead th {
+          position: sticky;
+          top: 0;
+          z-index: 4;
+          background: #f8f9fa;
+          box-shadow: 0 1px 0 #dee2e6;
+      }
+      .stc-poa-sortable {
+          cursor: pointer;
+          user-select: none;
+      }
+      .stc-poa-sortable:hover {
+          background: #eef5ff !important;
+      }
+      .stc-poa-sort-icon {
+          font-size: 11px;
+          color: #aaa;
+          margin-left: 2px;
+      }
       .stc-table-scroll {
           display: block;
           width: 100%;
@@ -1129,47 +1167,47 @@ include("kattegat/role_check.php");
                                     <i class="fa fa-arrows-h" aria-hidden="true"></i>
                                   </button>
                                   <div class="row stc-view-purchase-row">
-                                  <div class="col-xl-12 col-lg-12 col-md-12">
-                                    <div class="card-border mb-3 card card-body border-success">
-                                      <form action="" class="stc-view-purchase-order-form">
-                                        <div class="stc-table-scroll">
-                                          <table class="table table-hover table-bordered stc-purchase-view-table" id="stc-poadhoc-results-table">
-                                            <thead>
-                                              <tr>
-                                              <th>
-                                                <input type="checkbox" id="selectAllCheckbox" class="form-control" style="width: 20px; height: 20px; margin: 0 auto; display: block;">
-                                                <br>Sl No.
-                                              </th>
-                                              <th>Adhoc_Id</th>
-                                              <th>Linked Product</th>
-                                              <th>Product ID<br> Product Name</th>
-                                              <th>Item Name</th>
-                                              <th>Rack</th>
-                                              <th>Unit</th>
-                                              <th>Quantity</th>
-                                              <th>Purchase Rate</br>Profit % / Sale Rate</th>
-                                              <th>Stock</th>
-                                              <th>Shop</th>
-                                              <th>Dispatch Details</th>
-                                              <th>From Source (Supplier/Location)<br>To Destination (Location)</th>
-                                              <th>Condition</th>
-                                              <th>Received_By</th>
-                                              <th>Created_By<br>Created_Date</th>
-                                              <th>Updated_By<br>Updated_Date</th>
-                                              <th>Status</th>
-                                              <th>Remarks</th>
-                                              <th>Action</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody class="stc-call-view-poadhoc-row">
-                                              <tr><td colspan="8">Search</td></tr>
-                                            </tbody>
-                                          </table>
-                                        </div>
-                                        <div id="pagination"></div>
-                                      </form>
+                                    <div class="col-xl-12 col-lg-12 col-md-12">
+                                      <div class="card-border mb-3 card card-body border-success">
+                                        <form action="" class="stc-view-purchase-order-form">
+                                          <div class="stc-poa-results-frame" role="region" aria-label="Purchase adhoc results">
+                                            <table class="table table-hover table-bordered stc-purchase-view-table" id="stc-poadhoc-results-table">
+                                              <thead>
+                                                <tr>
+                                                  <th>
+                                                    <input type="checkbox" id="selectAllCheckbox" class="form-control" style="width: 20px; height: 20px; margin: 0 auto; display: block;">
+                                                    <br>Sl No.
+                                                  </th>
+                                                  <th class="stc-poa-sortable" data-col="adhoc_id">Adhoc_Id <span class="stc-poa-sort-icon">&#8595;</span></th>
+                                                  <th>Linked Product</th>
+                                                  <th class="stc-poa-sortable" data-col="product_id">Product ID<br> Product Name <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="item_name">Item Name <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="rack">Rack <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="unit">Unit <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="quantity">Quantity <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="purchase_rate">Purchase Rate</br>Profit % / Sale Rate <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th>Stock</th>
+                                                  <th>Shop</th>
+                                                  <th>Dispatch Details</th>
+                                                  <th class="stc-poa-sortable" data-col="source">From Source (Supplier/Location)<br>To Destination (Location) <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="condition">Condition <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="received_by">Received_By <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="created_date">Created_By<br>Created_Date <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="updated_date">Updated_By<br>Updated_Date <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="status">Status <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th class="stc-poa-sortable" data-col="remarks">Remarks <span class="stc-poa-sort-icon">&#8645;</span></th>
+                                                  <th>Action</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody class="stc-call-view-poadhoc-row">
+                                                <tr><td colspan="20">Search</td></tr>
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                          <div id="pagination"></div>
+                                        </form>
+                                      </div>
                                     </div>
-                                  </div>
                                   </div>
                                 </div>
                             </div>
@@ -1755,6 +1793,18 @@ include("kattegat/role_check.php");
           }
 
           let pagenumber=0;
+          var stcPoaSortCol = 'adhoc_id';
+          var stcPoaSortDir = 'DESC';
+
+          function stcPoaUpdateSortIcons() {
+            $('.stc-poa-sort-icon').html('&#8645;').css('color', '#aaa');
+            var $active = $('.stc-poa-sortable[data-col="' + stcPoaSortCol + '"]');
+            if ($active.length) {
+              var icon = stcPoaSortDir === 'ASC' ? '&#8593;' : '&#8595;';
+              $active.find('.stc-poa-sort-icon').html(icon).css('color', '#333');
+            }
+          }
+
           // Pagination Module
           const Pagination = (function() {
               // Configuration
@@ -1847,7 +1897,9 @@ include("kattegat/role_check.php");
                               received_by: $('#stc-adv-received-by').val(),
                               remarks: $('#stc-adv-remarks').val(),
                               page: page,
-                              pageSize: config.pageSize
+                              pageSize: config.pageSize,
+                              sort_col: stcPoaSortCol,
+                              sort_dir: stcPoaSortDir
                           },
                           dataType: "JSON",
                           success: (data) => {
@@ -1934,6 +1986,21 @@ include("kattegat/role_check.php");
           })();
 
           Pagination.init();
+          stcPoaUpdateSortIcons();
+
+          $(document).on('click', '.stc-poa-sortable', function() {
+            var col = $(this).data('col');
+            if (!col) return;
+            if (stcPoaSortCol === col) {
+              stcPoaSortDir = stcPoaSortDir === 'ASC' ? 'DESC' : 'ASC';
+            } else {
+              stcPoaSortCol = col;
+              stcPoaSortDir = 'ASC';
+            }
+            stcPoaUpdateSortIcons();
+            currentPage = 1;
+            Pagination.loadData(1);
+          });
 
           // Example of how to refresh when search criteria changescurrentPage
           // $('#stc-poa-searchbyitem, #tc-poa-searchbydourcedestination, .tc-poa-searchbyrack, .stc-po-status-in').on('change', function() {
