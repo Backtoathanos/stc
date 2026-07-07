@@ -4581,6 +4581,76 @@ class pirates_supervisor extends tesseract{
 		return array('data'=>$html, 'total_count'=>$total);
 	}
 
+	// call daily safety observation (manager view)
+	public function stc_call_dso($month, $supervise_name, $keyword, $page=1, $pageSize=10){
+		$offset = ($page-1)*$pageSize;
+		$month_arr = explode('-', date('m-Y', strtotime($month)));
+		$m = $month_arr[0];
+		$y = $month_arr[1];
+		$supervise_rec = "`stc_cust_pro_supervisor_fullname` REGEXP '".mysqli_real_escape_string($this->stc_dbs, $supervise_name)."' AND";
+		if($supervise_name === ''){
+			$supervise_rec = '';
+		}
+		$kw = mysqli_real_escape_string($this->stc_dbs, $keyword);
+		$keyword_cond = '';
+		if($kw !== ''){
+			$keyword_cond = " AND (
+				d.area_location LIKE '%".$kw."%'
+				OR d.observation_type LIKE '%".$kw."%'
+				OR d.responsible_person LIKE '%".$kw."%'
+				OR d.compliance_status LIKE '%".$kw."%'
+			)";
+		}
+		$countq = mysqli_query($this->stc_dbs, "
+			SELECT COUNT(*) as total
+			FROM `stc_safety_dso` d
+			LEFT JOIN `stc_cust_pro_supervisor` s ON s.stc_cust_pro_supervisor_id = d.created_by
+			WHERE ".$supervise_rec." (
+				MONTH(d.observation_date)='".$m."' AND YEAR(d.observation_date)='".$y."'
+			) ".$keyword_cond."
+		");
+		$cr = mysqli_fetch_assoc($countq);
+		$total = (int)($cr['total'] ?? 0);
+		$website = ($_SERVER['SERVER_NAME']==='localhost') ? '' : 'https://stcassociate.com/stc_agent47/';
+		$html = '';
+		$q = mysqli_query($this->stc_dbs, "
+			SELECT d.*, s.stc_cust_pro_supervisor_fullname
+			FROM `stc_safety_dso` d
+			LEFT JOIN `stc_cust_pro_supervisor` s ON s.stc_cust_pro_supervisor_id = d.created_by
+			WHERE ".$supervise_rec." (
+				MONTH(d.observation_date)='".$m."' AND YEAR(d.observation_date)='".$y."'
+			) ".$keyword_cond."
+			ORDER BY d.observation_date DESC, d.id DESC
+			LIMIT ".(int)$offset.",".(int)$pageSize."
+		");
+		if($q && mysqli_num_rows($q) > 0){
+			$sl = $offset;
+			foreach($q as $row){
+				$sl++;
+				$obsDate = (!empty($row['observation_date']) && $row['observation_date'] !== '0000-00-00')
+					? $row['observation_date']
+					: date('Y-m-d', strtotime($row['created_date'] ?? 'now'));
+				$html .= '
+					<tr>
+						<td class="text-center">'.htmlspecialchars((string)$sl).'</td>
+						<td class="text-center">'.date('d-m-Y', strtotime($obsDate)).'</td>
+						<td>'.htmlspecialchars($row['area_location']).'</td>
+						<td>'.htmlspecialchars($row['observation_type']).'</td>
+						<td>'.htmlspecialchars($row['compliance_status']).'</td>
+						<td>'.htmlspecialchars($row['responsible_person']).'</td>
+						<td>'.htmlspecialchars($row['stc_cust_pro_supervisor_fullname'] ?? '').'</td>
+						<td class="text-center">
+							<a href="'.$website.'safety-dso-print-preview.php?from_date='.urlencode($obsDate).'&to_date='.urlencode($obsDate).'" target="_blank" class="btn btn-success btn-sm" title="Print"><i class="fa fa-print"></i></a>
+						</td>
+					</tr>
+				';
+			}
+		}else{
+			$html = '<tr><td colspan="8" class="text-center">No data found</td></tr>';
+		}
+		return array('data'=>$html, 'total_count'=>$total);
+	}
+
 	// call vhl
 	public function stc_call_vhl($month, $supervise_name){
 		$optimusprime='';
@@ -4988,6 +5058,17 @@ if(isset($_POST['stc_safety_callpowertools'])){
 	$pageSize = isset($_POST['pageSize']) ? (int)$_POST['pageSize'] : 10;
 	$objsearchreq = new pirates_supervisor();
 	echo json_encode($objsearchreq->stc_call_powertools($month, $keyword, $page, $pageSize));
+}
+
+// call daily safety observation (manager)
+if(isset($_POST['stc_safety_calldso_agent'])){
+	$month          = isset($_POST['month']) ? $_POST['month'] : date('Y-m');
+	$supervise_name = isset($_POST['supervise_name']) ? $_POST['supervise_name'] : '';
+	$keyword        = isset($_POST['keyword']) ? $_POST['keyword'] : '';
+	$page           = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+	$pageSize       = isset($_POST['pageSize']) ? (int)$_POST['pageSize'] : 10;
+	$objsearchreq = new pirates_supervisor();
+	echo json_encode($objsearchreq->stc_call_dso($month, $supervise_name, $keyword, $page, $pageSize));
 }
 
 // create project

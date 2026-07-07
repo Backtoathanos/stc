@@ -147,6 +147,11 @@ else {
                                     <span>T&T Data</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-11" data-toggle="tab" href="#safetytab_11">
+                                    <span>Daily Safety Observation</span>
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane tabs-animation fade show active" id="safetytab_0" role="tabpanel">
@@ -741,6 +746,71 @@ else {
                                                     </tbody>
                                                 </table>
                                                 <div class="stc-safety-toolsTable-pagination" style="margin-top: 20px; text-align: center;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane tabs-animation fade" id="safetytab_11" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Daily Safety Observation</h5>
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="position-relative form-group">
+                                                            <label>By Month</label>
+                                                            <input type="month" class="form-control safety-dso-filter-by-month" value="<?php echo date('Y-m'); ?>">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="position-relative form-group">
+                                                            <label>By Supervisor Name</label>
+                                                            <input type="text" class="form-control safety-dso-filter-by-supervisorname" placeholder="Enter Supervisor Name">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="position-relative form-group">
+                                                            <label>By Area / Location / Type</label>
+                                                            <input type="text" class="form-control safety-dso-filter-by-keyword" placeholder="Search area, type, person">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="position-relative form-group">
+                                                            <button class="form-control btn btn-primary safety-dso-filter-by-search">Search</button>
+                                                            <a href="safety-dso-print-preview.php" target="_blank" class="form-control btn btn-success mt-2 safety-dso-print-register">Print Register</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="mb-0 table table-hover table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center">Sl No</th>
+                                                                <th class="text-center">Date</th>
+                                                                <th class="text-center">Area/Location</th>
+                                                                <th class="text-center">Observation Type</th>
+                                                                <th class="text-center">Compliance Status</th>
+                                                                <th class="text-center">Responsible Person</th>
+                                                                <th class="text-center">Created By</th>
+                                                                <th width="12%" class="text-center">Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="stc-safety-dso-res-table">
+                                                            <tr><td colspan="8">Loading...</td></tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="stc-safety-dso-pagination" style="margin-top:15px;text-align:center;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -2063,6 +2133,100 @@ else {
                 ptMonth   = $('.safety-pt-filter-by-month').val();
                 ptKeyword = $('.safety-pt-filter-by-keyword').val();
                 call_powertools_agent(ptMonth, ptKeyword, pg);
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function(){
+            var dsoMonth = '<?php echo date("Y-m"); ?>';
+            var dsoSupervisor = '';
+            var dsoKeyword = '';
+            window.dsoAgentPage = 1;
+            window.dsoAgentPageSz = 10;
+
+            function dsoMonthRange(monthVal){
+                var parts = (monthVal || '').split('-');
+                if(parts.length < 2){ return {from:'', to:''}; }
+                var y = parseInt(parts[0], 10);
+                var m = parseInt(parts[1], 10);
+                var last = new Date(y, m, 0).getDate();
+                var mm = String(m).padStart(2, '0');
+                var dd = String(last).padStart(2, '0');
+                return {from: y + '-' + mm + '-01', to: y + '-' + mm + '-' + dd};
+            }
+
+            function updateDsoPrintRegisterLink(){
+                var range = dsoMonthRange($('.safety-dso-filter-by-month').val());
+                $('.safety-dso-print-register').attr('href', 'safety-dso-print-preview.php?from_date=' + encodeURIComponent(range.from) + '&to_date=' + encodeURIComponent(range.to));
+            }
+
+            function call_dso_agent(month, supervise_name, keyword, page){
+                window.dsoAgentPage = page || 1;
+                $.ajax({
+                    url      : 'nemesis/stc_project.php',
+                    method   : 'POST',
+                    dataType : 'JSON',
+                    data     : {
+                        stc_safety_calldso_agent : 1,
+                        month          : month,
+                        supervise_name : supervise_name,
+                        keyword        : keyword,
+                        page           : window.dsoAgentPage,
+                        pageSize       : window.dsoAgentPageSz
+                    },
+                    success  : function(res){
+                        $('.stc-safety-dso-res-table').html(res.data);
+                        renderDsoAgentPagination(res.total_count, month, supervise_name, keyword);
+                    },
+                    error    : function(){
+                        $('.stc-safety-dso-res-table').html('<tr><td colspan="8">Error loading data.</td></tr>');
+                    }
+                });
+            }
+
+            function renderDsoAgentPagination(total, month, supervise_name, keyword){
+                var totalPages = Math.ceil(total / window.dsoAgentPageSz) || 1;
+                var html = '';
+                if(totalPages > 1){
+                    html = '<nav><ul class="pagination justify-content-center">';
+                    if(window.dsoAgentPage > 1){
+                        html += '<li class="page-item"><a class="page-link stc-dso-page" data-page="'+(window.dsoAgentPage-1)+'" href="javascript:void(0)">Prev</a></li>';
+                    }
+                    var s = Math.max(1, window.dsoAgentPage - 2);
+                    var e = Math.min(totalPages, window.dsoAgentPage + 2);
+                    for(var i = s; i <= e; i++){
+                        var act = (i === window.dsoAgentPage) ? ' active' : '';
+                        html += '<li class="page-item'+act+'"><a class="page-link stc-dso-page" data-page="'+i+'" href="javascript:void(0)">'+i+'</a></li>';
+                    }
+                    if(window.dsoAgentPage < totalPages){
+                        html += '<li class="page-item"><a class="page-link stc-dso-page" data-page="'+(window.dsoAgentPage+1)+'" href="javascript:void(0)">Next</a></li>';
+                    }
+                    html += '</ul></nav>';
+                }
+                $('.stc-safety-dso-pagination').html(html);
+            }
+
+            call_dso_agent(dsoMonth, dsoSupervisor, dsoKeyword, 1);
+            updateDsoPrintRegisterLink();
+
+            $('body').delegate('.safety-dso-filter-by-search', 'click', function(){
+                dsoMonth = $('.safety-dso-filter-by-month').val();
+                dsoSupervisor = $('.safety-dso-filter-by-supervisorname').val();
+                dsoKeyword = $('.safety-dso-filter-by-keyword').val();
+                updateDsoPrintRegisterLink();
+                call_dso_agent(dsoMonth, dsoSupervisor, dsoKeyword, 1);
+            });
+
+            $('body').delegate('.safety-dso-filter-by-month', 'change', function(){
+                updateDsoPrintRegisterLink();
+            });
+
+            $('body').delegate('.stc-dso-page', 'click', function(){
+                var pg = parseInt($(this).data('page'), 10);
+                dsoMonth = $('.safety-dso-filter-by-month').val();
+                dsoSupervisor = $('.safety-dso-filter-by-supervisorname').val();
+                dsoKeyword = $('.safety-dso-filter-by-keyword').val();
+                call_dso_agent(dsoMonth, dsoSupervisor, dsoKeyword, pg);
             });
         });
     </script>

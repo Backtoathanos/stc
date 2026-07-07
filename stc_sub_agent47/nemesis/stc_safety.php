@@ -2957,37 +2957,11 @@ if(isset($_POST['stc_safety_deletepowertoolsitem'])){
 /*-------------------------------------For Daily Safety Observation (DSO)------------------------------------*/
 class witcher_dso extends tesseract{
 
-    private function ensure_tables(){
-        mysqli_query($this->stc_dbs, "
-            CREATE TABLE IF NOT EXISTS `stc_safety_dso` (
-                `id` int(11) NOT NULL AUTO_INCREMENT,
-                `observation_date` date DEFAULT NULL,
-                `area_location` varchar(500) NOT NULL DEFAULT '',
-                `observation_details` text,
-                `observation_type` varchar(255) NOT NULL DEFAULT '',
-                `immediate_action` text,
-                `responsible_person` varchar(255) NOT NULL DEFAULT '',
-                `target_date` date DEFAULT NULL,
-                `closure_date` date DEFAULT NULL,
-                `compliance_status` varchar(100) NOT NULL DEFAULT 'Open',
-                `verified_by` varchar(255) NOT NULL DEFAULT '',
-                `reviewed_by` varchar(255) NOT NULL DEFAULT '',
-                `before_image` varchar(500) NOT NULL DEFAULT '',
-                `after_image` varchar(500) NOT NULL DEFAULT '',
-                `created_date` datetime DEFAULT NULL,
-                `created_by` int(11) NOT NULL DEFAULT 0,
-                PRIMARY KEY (`id`),
-                KEY `idx_dso_created_by` (`created_by`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-        ");
-    }
-
     private function esc($val){
         return mysqli_real_escape_string($this->stc_dbs, (string)$val);
     }
 
     public function stc_hit_dso_call_no(){
-        $this->ensure_tables();
         $date = date('Y-m-d H:i:s');
         $sid  = $this->esc((string)$_SESSION['stc_agent_sub_id']);
         $q = mysqli_query($this->stc_dbs,
@@ -3004,7 +2978,6 @@ class witcher_dso extends tesseract{
     }
 
     public function stc_call_dso($page=1,$pageSize=10){
-        $this->ensure_tables();
         $offset = ($page-1)*$pageSize;
         $sid    = $this->esc((string)$_SESSION['stc_agent_sub_id']);
         $cq     = mysqli_query($this->stc_dbs,"SELECT COUNT(*) as total FROM `stc_safety_dso` WHERE `created_by`='".$sid."'");
@@ -3044,21 +3017,18 @@ class witcher_dso extends tesseract{
     }
 
     public function stc_delete_dso($id){
-        $this->ensure_tables();
         $id = (int)$id;
         $q  = mysqli_query($this->stc_dbs,"DELETE FROM `stc_safety_dso` WHERE `id`='".$id."'");
         return $q ? 'success' : 'error';
     }
 
     public function stc_call_dso_fields($id){
-        $this->ensure_tables();
         $id = (int)$id;
         $q  = mysqli_query($this->stc_dbs,"SELECT * FROM `stc_safety_dso` WHERE `id`='".$id."' LIMIT 1");
         return ($q && $r = mysqli_fetch_assoc($q)) ? $r : array();
     }
 
     public function stc_update_dso($request){
-        $this->ensure_tables();
         $id = (int)$request['dso_id'];
         $q = mysqli_query($this->stc_dbs, "
             UPDATE `stc_safety_dso` SET
@@ -3079,7 +3049,6 @@ class witcher_dso extends tesseract{
     }
 
     public function stc_save_dso_before_image($dso_id, $filename){
-        $this->ensure_tables();
         $q = mysqli_query($this->stc_dbs,
             "UPDATE `stc_safety_dso` SET `before_image`='".$this->esc($filename)."' WHERE `id`='".(int)$dso_id."'"
         );
@@ -3087,7 +3056,6 @@ class witcher_dso extends tesseract{
     }
 
     public function stc_save_dso_after_image($dso_id, $filename){
-        $this->ensure_tables();
         $q = mysqli_query($this->stc_dbs,
             "UPDATE `stc_safety_dso` SET `after_image`='".$this->esc($filename)."' WHERE `id`='".(int)$dso_id."'"
         );
@@ -3095,7 +3063,6 @@ class witcher_dso extends tesseract{
     }
 
     public function stc_upload_dso_image_r2($dso_id, $tmpPath, $tag){
-        $this->ensure_tables();
         require_once __DIR__ . '/../../MCU/product_r2_upload.php';
         if(!is_uploaded_file($tmpPath)){
             return ['ok' => false, 'error' => 'Invalid upload file.'];
