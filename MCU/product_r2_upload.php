@@ -197,27 +197,69 @@ if (!function_exists('stc_r2_sigv4_put_object')) {
 
         $url = $scheme . '://' . $host . $canonicalUri;
 
-        $fh = fopen($localPath, 'rb');
-        if ($fh === false) {
-            return ['ok' => false, 'http' => 0, 'error' => 'Could not open file for upload.'];
-        }
-
-        $ch = curl_init($url);
-        curl_setopt($ch, CURLOPT_PUT, true);
-        curl_setopt($ch, CURLOPT_INFILE, $fh);
-        curl_setopt($ch, CURLOPT_INFILESIZE, $size);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        $headers = [
             'Host: ' . $host,
             'x-amz-date: ' . $amzDate,
             'x-amz-content-sha256: ' . $payloadHash,
             'Authorization: ' . $authorization,
+        ];
+
+        if (function_exists('curl_init')) {
+            $fh = fopen($localPath, 'rb');
+            if ($fh === false) {
+                return ['ok' => false, 'http' => 0, 'error' => 'Could not open file for upload.'];
+            }
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_PUT, true);
+            curl_setopt($ch, CURLOPT_INFILE, $fh);
+            curl_setopt($ch, CURLOPT_INFILESIZE, $size);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+            curl_exec($ch);
+            $http = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+            fclose($fh);
+
+            if ($http >= 200 && $http < 300) {
+                return ['ok' => true, 'http' => $http];
+            }
+
+            return ['ok' => false, 'http' => $http, 'error' => 'R2 upload failed (HTTP ' . $http . ').'];
+        }
+
+        $body = file_get_contents($localPath);
+        if ($body === false) {
+            return ['ok' => false, 'http' => 0, 'error' => 'Could not read file for upload.'];
+        }
+
+        $streamHeaders = implode("\r\n", array_merge($headers, [
+            'Content-Length: ' . $size,
+            'Content-Type: application/octet-stream',
+        ]));
+
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'PUT',
+                'header' => $streamHeaders,
+                'content' => $body,
+                'ignore_errors' => true,
+                'timeout' => 120,
+            ],
+            'ssl' => [
+                'verify_peer' => true,
+                'verify_peer_name' => true,
+            ],
         ]);
 
-        curl_exec($ch);
-        $http = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
-        fclose($fh);
+        @file_get_contents($url, false, $context);
+        $http = 0;
+        if (!empty($http_response_header) && is_array($http_response_header)) {
+            if (preg_match('#HTTP/\S+\s+(\d+)#', $http_response_header[0], $m)) {
+                $http = (int) $m[1];
+            }
+        }
 
         if ($http >= 200 && $http < 300) {
             return ['ok' => true, 'http' => $http];
@@ -270,7 +312,7 @@ if (!function_exists('stc_r2_upload_safety_image_from_path')) {
      *
      * Object keys align with superadmin migrate prefixes: tbm/, nearmiss/, capa/.
      *
-     * @param string $folderOneOf One of: tbm, nearmiss, capa
+     * @param string $folderOneOf One of: tbm, nearmiss, capa, dso
      * @param int    $entityId    Row id for key naming (0 → literal "subagent")
      * @param string $tag         Optional key segment, e.g. before | after for CAPA photos
      *
@@ -278,9 +320,9 @@ if (!function_exists('stc_r2_upload_safety_image_from_path')) {
      */
     function stc_r2_upload_safety_image_from_path(string $absoluteLocalPath, string $folderOneOf, int $entityId = 0, string $tag = ''): array
     {
-        $allowed = ['tbm', 'nearmiss', 'capa'];
+        $allowed = ['tbm', 'nearmiss', 'capa', 'dso'];
         if (!in_array($folderOneOf, $allowed, true)) {
-            return ['ok' => false, 'error' => 'Invalid safety folder (use tbm, nearmiss, or capa).'];
+            return ['ok' => false, 'error' => 'Invalid safety folder (use tbm, nearmiss, capa, or dso).'];
         }
 
         $cfg = stc_mcu_r2_config();

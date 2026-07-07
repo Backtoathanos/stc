@@ -2953,4 +2953,213 @@ if(isset($_POST['stc_safety_deletepowertoolsitem'])){
     $obj=new witcher_powertools();
     echo $obj->stc_delete_powertools_item($_POST['item_id']);
 }
+
+/*-------------------------------------For Daily Safety Observation (DSO)------------------------------------*/
+class witcher_dso extends tesseract{
+
+    private function ensure_tables(){
+        mysqli_query($this->stc_dbs, "
+            CREATE TABLE IF NOT EXISTS `stc_safety_dso` (
+                `id` int(11) NOT NULL AUTO_INCREMENT,
+                `observation_date` date DEFAULT NULL,
+                `area_location` varchar(500) NOT NULL DEFAULT '',
+                `observation_details` text,
+                `observation_type` varchar(255) NOT NULL DEFAULT '',
+                `immediate_action` text,
+                `responsible_person` varchar(255) NOT NULL DEFAULT '',
+                `target_date` date DEFAULT NULL,
+                `closure_date` date DEFAULT NULL,
+                `compliance_status` varchar(100) NOT NULL DEFAULT 'Open',
+                `verified_by` varchar(255) NOT NULL DEFAULT '',
+                `reviewed_by` varchar(255) NOT NULL DEFAULT '',
+                `before_image` varchar(500) NOT NULL DEFAULT '',
+                `after_image` varchar(500) NOT NULL DEFAULT '',
+                `created_date` datetime DEFAULT NULL,
+                `created_by` int(11) NOT NULL DEFAULT 0,
+                PRIMARY KEY (`id`),
+                KEY `idx_dso_created_by` (`created_by`)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
+        ");
+    }
+
+    private function esc($val){
+        return mysqli_real_escape_string($this->stc_dbs, (string)$val);
+    }
+
+    public function stc_hit_dso_call_no(){
+        $this->ensure_tables();
+        $date = date('Y-m-d H:i:s');
+        $sid  = $this->esc((string)$_SESSION['stc_agent_sub_id']);
+        $q = mysqli_query($this->stc_dbs,
+            "INSERT INTO `stc_safety_dso`(`created_date`,`created_by`,`observation_date`) VALUES ('".$date."','".$sid."','".date('Y-m-d')."')"
+        );
+        $id = '';
+        if($q){
+            $q2 = mysqli_query($this->stc_dbs,
+                "SELECT `id` FROM `stc_safety_dso` WHERE `created_by`='".$sid."' ORDER BY `id` DESC LIMIT 1"
+            );
+            if($q2 && $r = mysqli_fetch_assoc($q2)){ $id = $r['id']; }
+        }
+        return $id;
+    }
+
+    public function stc_call_dso($page=1,$pageSize=10){
+        $this->ensure_tables();
+        $offset = ($page-1)*$pageSize;
+        $sid    = $this->esc((string)$_SESSION['stc_agent_sub_id']);
+        $cq     = mysqli_query($this->stc_dbs,"SELECT COUNT(*) as total FROM `stc_safety_dso` WHERE `created_by`='".$sid."'");
+        $cr     = mysqli_fetch_assoc($cq);
+        $total  = (int)($cr['total'] ?? 0);
+        $website = ($_SERVER['SERVER_NAME']==='localhost') ? '..' : 'https://stcassociate.com/';
+        $html   = '';
+        $q = mysqli_query($this->stc_dbs,
+            "SELECT * FROM `stc_safety_dso` WHERE `created_by`='".$sid."' ORDER BY `id` DESC LIMIT ".(int)$offset.",".(int)$pageSize
+        );
+        if($q && mysqli_num_rows($q)>0){
+            $sl = $offset;
+            foreach($q as $row){
+                $sl++;
+                $obsDate = (!empty($row['observation_date']) && $row['observation_date'] !== '0000-00-00')
+                    ? $row['observation_date']
+                    : date('Y-m-d', strtotime($row['created_date'] ?? 'now'));
+                $acts='
+                    <a href="'.$website.'/stc_agent47/safety-dso-print-preview.php?from_date='.urlencode($obsDate).'&to_date='.urlencode($obsDate).'" target="_blank" class="btn btn-success btn-sm" title="Print Preview"><i class="fa fa-print"></i></a>
+                    <a href="#" class="btn btn-secondary btn-sm stc-safetydso-edit" id="'.$row['id'].'" title="Edit"><i class="fa fa-edit"></i></a>
+                    <a href="#" class="btn btn-danger btn-sm stc-safetydso-delete" id="'.$row['id'].'" title="Delete"><i class="fa fa-trash"></i></a>
+                ';
+                $html.='<tr>
+                    <td class="text-center">'.htmlspecialchars((string)$sl).'</td>
+                    <td>'.htmlspecialchars(stc_format_datetime($row['observation_date'])).'</td>
+                    <td>'.htmlspecialchars($row['area_location']).'</td>
+                    <td>'.htmlspecialchars($row['observation_type']).'</td>
+                    <td>'.htmlspecialchars($row['compliance_status']).'</td>
+                    <td>'.htmlspecialchars($row['responsible_person']).'</td>
+                    <td class="text-center">'.$acts.'</td>
+                </tr>';
+            }
+        }else{
+            $html='<tr><td colspan="7" class="text-center">No data found</td></tr>';
+        }
+        return array('data'=>$html,'total_count'=>$total);
+    }
+
+    public function stc_delete_dso($id){
+        $this->ensure_tables();
+        $id = (int)$id;
+        $q  = mysqli_query($this->stc_dbs,"DELETE FROM `stc_safety_dso` WHERE `id`='".$id."'");
+        return $q ? 'success' : 'error';
+    }
+
+    public function stc_call_dso_fields($id){
+        $this->ensure_tables();
+        $id = (int)$id;
+        $q  = mysqli_query($this->stc_dbs,"SELECT * FROM `stc_safety_dso` WHERE `id`='".$id."' LIMIT 1");
+        return ($q && $r = mysqli_fetch_assoc($q)) ? $r : array();
+    }
+
+    public function stc_update_dso($request){
+        $this->ensure_tables();
+        $id = (int)$request['dso_id'];
+        $q = mysqli_query($this->stc_dbs, "
+            UPDATE `stc_safety_dso` SET
+                `observation_date`    = '".$this->esc($request['observation_date'])."',
+                `area_location`       = '".$this->esc($request['area_location'])."',
+                `observation_details` = '".$this->esc($request['observation_details'])."',
+                `observation_type`    = '".$this->esc($request['observation_type'])."',
+                `immediate_action`    = '".$this->esc($request['immediate_action'])."',
+                `responsible_person`  = '".$this->esc($request['responsible_person'])."',
+                `target_date`         = '".$this->esc($request['target_date'])."',
+                `closure_date`        = '".$this->esc($request['closure_date'])."',
+                `compliance_status`   = '".$this->esc($request['compliance_status'])."',
+                `verified_by`         = '".$this->esc($request['verified_by'])."',
+                `reviewed_by`         = '".$this->esc($request['reviewed_by'])."'
+            WHERE `id`='".$id."'
+        ");
+        return $q ? 'success' : 'error';
+    }
+
+    public function stc_save_dso_before_image($dso_id, $filename){
+        $this->ensure_tables();
+        $q = mysqli_query($this->stc_dbs,
+            "UPDATE `stc_safety_dso` SET `before_image`='".$this->esc($filename)."' WHERE `id`='".(int)$dso_id."'"
+        );
+        return $q ? 'success' : 'error';
+    }
+
+    public function stc_save_dso_after_image($dso_id, $filename){
+        $this->ensure_tables();
+        $q = mysqli_query($this->stc_dbs,
+            "UPDATE `stc_safety_dso` SET `after_image`='".$this->esc($filename)."' WHERE `id`='".(int)$dso_id."'"
+        );
+        return $q ? 'success' : 'error';
+    }
+
+    public function stc_upload_dso_image_r2($dso_id, $tmpPath, $tag){
+        $this->ensure_tables();
+        require_once __DIR__ . '/../../MCU/product_r2_upload.php';
+        if(!is_uploaded_file($tmpPath)){
+            return ['ok' => false, 'error' => 'Invalid upload file.'];
+        }
+        if(!function_exists('stc_r2_product_upload_configured') || !stc_r2_product_upload_configured()){
+            return ['ok' => false, 'error' => 'Cloudflare R2 is not configured.'];
+        }
+        $r2 = stc_r2_upload_safety_image_from_path($tmpPath, 'dso', (int)$dso_id, $tag);
+        if(empty($r2['ok']) || empty($r2['public_url'])){
+            return ['ok' => false, 'error' => $r2['error'] ?? 'Cloudflare upload failed.'];
+        }
+        $col = ($tag === 'after') ? 'after_image' : 'before_image';
+        $url = $this->esc($r2['public_url']);
+        $q = mysqli_query($this->stc_dbs,
+            "UPDATE `stc_safety_dso` SET `".$col."`='".$url."' WHERE `id`='".(int)$dso_id."'"
+        );
+        if(!$q){
+            return ['ok' => false, 'error' => 'Database update failed after cloud upload.'];
+        }
+        return ['ok' => true, 'public_url' => $r2['public_url']];
+    }
+}
+
+if(isset($_POST['stc_safety_adddso'])){
+    $obj = new witcher_dso();
+    if(!isset($_SESSION['stc_agent_sub_id'])){ echo 'login'; }
+    else{ echo $obj->stc_hit_dso_call_no(); }
+}
+
+if(isset($_POST['stc_safety_calldso'])){
+    $page = isset($_POST['page']) ? (int)$_POST['page'] : 1;
+    $pageSize = isset($_POST['pageSize']) ? (int)$_POST['pageSize'] : 10;
+    $obj = new witcher_dso();
+    echo json_encode($obj->stc_call_dso($page, $pageSize));
+}
+
+if(isset($_POST['stc_safety_deletedso'])){
+    $obj = new witcher_dso();
+    echo $obj->stc_delete_dso($_POST['dso_id']);
+}
+
+if(isset($_POST['stc_safety_calldsofields'])){
+    $obj = new witcher_dso();
+    echo json_encode($obj->stc_call_dso_fields($_POST['dso_id']));
+}
+
+if(isset($_POST['stc_safety_updatedso'])){
+    $obj = new witcher_dso();
+    echo $obj->stc_update_dso($_POST);
+}
+
+if(isset($_POST['stc-dsobefore-no'])){
+    $dso_id = (int)$_POST['stc-dsobefore-no'];
+    $stcsafetytmpname = $_FILES['before-image']['tmp_name'] ?? '';
+    $obj = new witcher_dso();
+    $result = $obj->stc_upload_dso_image_r2($dso_id, $stcsafetytmpname, 'before');
+    echo !empty($result['ok']) ? 'success' : ('error: '.($result['error'] ?? 'Upload failed'));
+}
+
+if(isset($_POST['stc-dsoafter-no'])){
+    $dso_id = (int)$_POST['stc-dsoafter-no'];
+    $stcsafetytmpname = $_FILES['after-image']['tmp_name'] ?? '';
+    $obj = new witcher_dso();
+    $result = $obj->stc_upload_dso_image_r2($dso_id, $stcsafetytmpname, 'after');
+    echo !empty($result['ok']) ? 'success' : ('error: '.($result['error'] ?? 'Upload failed'));
+}
 ?>

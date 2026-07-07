@@ -123,6 +123,11 @@
                                     <span>CAPA</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a role="tab" class="nav-link" id="tab-10" data-toggle="tab" href="#safetytab_10">
+                                    <span>Daily Safety Observation</span>
+                                </a>
+                            </li>
                         </ul>
                         <div class="tab-content">
                             <div class="tab-pane tabs-animation fade show active" id="safetytab_0" role="tabpanel">
@@ -458,6 +463,46 @@
                                                         </tr>
                                                     </tbody>
                                                 </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane tabs-animation fade" id="safetytab_10" role="tabpanel">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <h5 class="card-title">Daily Safety Observation</h5>
+                                                <a href="#" class="form-control btn btn-success add-dso-modal">Add Daily Safety Observation</a>
+                                                <a href="../stc_agent47/safety-dso-print-preview.php" target="_blank" class="form-control btn btn-primary mt-2">Print Register</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12">
+                                        <div class="main-card mb-3 card">
+                                            <div class="card-body">
+                                                <div class="table-responsive">
+                                                    <table class="mb-0 table table-hover table-bordered">
+                                                        <thead>
+                                                            <tr>
+                                                                <th class="text-center">Sl No</th>
+                                                                <th class="text-center">Date</th>
+                                                                <th class="text-center">Area/Location</th>
+                                                                <th class="text-center">Observation Type</th>
+                                                                <th class="text-center">Compliance Status</th>
+                                                                <th class="text-center">Responsible Person</th>
+                                                                <th width="12%" class="text-center">Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="stc-safety-dso-res-table">
+                                                            <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="stc-safety-dso-pagination" style="margin-top:20px;text-align:center;"></div>
                                             </div>
                                         </div>
                                     </div>
@@ -3052,7 +3097,181 @@
                     }
                 });
                 return false;
-            });            
+            });
+
+            /* Daily Safety Observation (DSO) */
+            window.dsoCurrentPage = 1;
+            window.dsoPageSize = 10;
+            window.call_dso = function(page){
+                page = page || 1;
+                window.dsoCurrentPage = page;
+                $.ajax({
+                    url      : "nemesis/stc_safety.php",
+                    method   : "POST",
+                    data     : {stc_safety_calldso:1, page:window.dsoCurrentPage, pageSize:window.dsoPageSize},
+                    dataType : "JSON",
+                    success  : function(res){
+                        $('.stc-safety-dso-res-table').html(res.data);
+                        renderDsoPagination(res.total_count);
+                    },
+                    error    : function(){
+                        $('.stc-safety-dso-res-table').html('<tr><td colspan="7">Error loading data.</td></tr>');
+                    }
+                });
+            };
+            function renderDsoPagination(total){
+                var totalPages = Math.ceil(total / window.dsoPageSize) || 1;
+                var html = '<ul class="pagination justify-content-center">';
+                if(window.dsoCurrentPage > 1){
+                    html += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_dso('+(window.dsoCurrentPage-1)+')">Prev</a></li>';
+                }
+                var start = Math.max(1, window.dsoCurrentPage - 2);
+                var end   = Math.min(totalPages, window.dsoCurrentPage + 2);
+                for(var i=start; i<=end; i++){
+                    var act = (i===window.dsoCurrentPage) ? ' active' : '';
+                    html += '<li class="page-item'+act+'"><a class="page-link" href="javascript:void(0)" onclick="call_dso('+i+')">'+i+'</a></li>';
+                }
+                if(window.dsoCurrentPage < totalPages){
+                    html += '<li class="page-item"><a class="page-link" href="javascript:void(0)" onclick="call_dso('+(window.dsoCurrentPage+1)+')">Next</a></li>';
+                }
+                html += '</ul>';
+                $('.stc-safety-dso-pagination').html(html);
+            }
+            call_dso(1);
+
+            $('body').delegate('.add-dso-modal', 'click', function(e){
+                e.preventDefault();
+                $.ajax({
+                    url    : "nemesis/stc_safety.php",
+                    method : "POST",
+                    data   : {stc_safety_adddso:1},
+                    success: function(response){
+                        if(response==="login"){ window.location.reload(); return; }
+                        $('.stc-dso-no').val(response);
+                        $('.bd-dso-modal-lg input[type=text], .bd-dso-modal-lg textarea').val('');
+                        $('.bd-dso-modal-lg input[type=date]').val('');
+                        $('.bd-dso-modal-lg select').prop('selectedIndex', 0);
+                        $('#stc-dso-compliance-status').val('Open');
+                        $('#stc-dso-observation-date').val(new Date().toISOString().slice(0,10));
+                        $('.bd-dso-modal-lg').modal('show');
+                        call_dso();
+                    }
+                });
+            });
+
+            $('body').delegate('.stc-safetydso-edit', 'click', function(e){
+                e.preventDefault();
+                $('.stc-dso-no').val($(this).attr('id'));
+                $('.bd-dso-modal-lg').modal('show');
+                call_dso_fields();
+            });
+
+            $('body').delegate('.stc-safetydso-delete', 'click', function(e){
+                e.preventDefault();
+                var dso_id = $(this).attr('id');
+                if(!confirm('Delete this observation?')) return;
+                $.ajax({
+                    url    : "nemesis/stc_safety.php",
+                    method : "POST",
+                    data   : {stc_safety_deletedso:1, dso_id:dso_id},
+                    success: function(res){
+                        if(res.trim()==='success'){ call_dso(window.dsoCurrentPage); }
+                    }
+                });
+            });
+
+            function call_dso_fields(){
+                var dso_id = $('.stc-dso-no').val();
+                $.ajax({
+                    url      : "nemesis/stc_safety.php",
+                    method   : "POST",
+                    data     : {stc_safety_calldsofields:1, dso_id:dso_id},
+                    dataType : "JSON",
+                    success  : function(r){
+                        $('#stc-dso-observation-date').val(r.observation_date);
+                        $('#stc-dso-area-location').val(r.area_location);
+                        $('#stc-dso-observation-details').val(r.observation_details);
+                        $('#stc-dso-observation-type').val(r.observation_type);
+                        $('#stc-dso-immediate-action').val(r.immediate_action);
+                        $('#stc-dso-responsible-person').val(r.responsible_person);
+                        $('#stc-dso-target-date').val(r.target_date);
+                        $('#stc-dso-closure-date').val(r.closure_date);
+                        $('#stc-dso-compliance-status').val(r.compliance_status || 'Open');
+                        $('#stc-dso-verified-by').val(r.verified_by);
+                        $('#stc-dso-reviewed-by').val(r.reviewed_by);
+                    }
+                });
+            }
+
+            function save_dso(){
+                var dso_id = $('.stc-dso-no').val();
+                if(!dso_id) return;
+                $.ajax({
+                    url    : "nemesis/stc_safety.php",
+                    method : "POST",
+                    data   : {
+                        stc_safety_updatedso:1,
+                        dso_id:dso_id,
+                        observation_date:$('#stc-dso-observation-date').val(),
+                        area_location:$('#stc-dso-area-location').val(),
+                        observation_details:$('#stc-dso-observation-details').val(),
+                        observation_type:$('#stc-dso-observation-type').val(),
+                        immediate_action:$('#stc-dso-immediate-action').val(),
+                        responsible_person:$('#stc-dso-responsible-person').val(),
+                        target_date:$('#stc-dso-target-date').val(),
+                        closure_date:$('#stc-dso-closure-date').val(),
+                        compliance_status:$('#stc-dso-compliance-status').val(),
+                        verified_by:$('#stc-dso-verified-by').val(),
+                        reviewed_by:$('#stc-dso-reviewed-by').val()
+                    }
+                });
+            }
+
+            $('body').delegate('.stc-dso-fields', 'focusout', function(){
+                save_dso();
+                call_dso(window.dsoCurrentPage);
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+            $('body').delegate('.stc-dso-dropdownfields', 'change', function(){
+                save_dso();
+                call_dso(window.dsoCurrentPage);
+                $('.saved-popup').remove();
+                $(this).after('<p class="saved-popup text-success">Record Saved</p>');
+            });
+
+            $(document).on('submit', '#safety-dsoimagebefore-upload-form', function(){
+                $.ajax({
+                    url: "nemesis/stc_safety.php", method: "post",
+                    data: new FormData(this), contentType: false, cache: false, processData: false,
+                    success: function(data){
+                        data = (data || '').trim();
+                        if(data==='success'){
+                            alert('Before image uploaded to Cloudflare.');
+                            $('#safety-dsoimagebefore-upload-form')[0].reset();
+                        }else{
+                            alert(data || 'Cloudflare upload failed.');
+                        }
+                    }
+                });
+                return false;
+            });
+            $(document).on('submit', '#safety-dsoimageafter-upload-form', function(){
+                $.ajax({
+                    url: "nemesis/stc_safety.php", method: "post",
+                    data: new FormData(this), contentType: false, cache: false, processData: false,
+                    success: function(data){
+                        data = (data || '').trim();
+                        if(data==='success'){
+                            alert('After image uploaded to Cloudflare.');
+                            $('#safety-dsoimageafter-upload-form')[0].reset();
+                        }else{
+                            alert(data || 'Cloudflare upload failed.');
+                        }
+                    }
+                });
+                return false;
+            });
         });
     </script>
 </body>
@@ -5006,6 +5225,108 @@
                             <tr><td colspan="11" class="text-center text-muted">No items yet</td></tr>
                         </tbody>
                     </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade bd-dso-modal-lg" tabindex="-1" role="dialog" aria-labelledby="dsoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="dsoModalLabel">Daily Safety Observation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="main-card mb-3 card">
+                            <div class="card-body">
+                                <label>* Fields are saved automatically when you switch</label>
+                                <input type="hidden" class="stc-dso-no">
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-12">
+                                        <h5 class="card-title">Date *</h5>
+                                        <input type="date" class="form-control stc-dso-fields" id="stc-dso-observation-date">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <h5 class="card-title">Area/Location *</h5>
+                                        <input type="text" class="form-control stc-dso-fields" id="stc-dso-area-location" placeholder="Area/Location">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12">
+                                        <h5 class="card-title">Observation Type *</h5>
+                                        <select class="form-control stc-dso-dropdownfields" id="stc-dso-observation-type">
+                                            <option value="">Select</option>
+                                            <option>Unsafe Act</option>
+                                            <option>Unsafe Condition</option>
+                                            <option>Safe Observation</option>
+                                            <option>Near Miss</option>
+                                            <option>Good Practice</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 mt-2">
+                                        <h5 class="card-title">Observation Details *</h5>
+                                        <textarea class="form-control stc-dso-fields" id="stc-dso-observation-details" rows="3" placeholder="Observation Details"></textarea>
+                                    </div>
+                                    <div class="col-md-12 col-sm-12 mt-2">
+                                        <h5 class="card-title">Immediate Action Taken *</h5>
+                                        <textarea class="form-control stc-dso-fields" id="stc-dso-immediate-action" rows="2" placeholder="Immediate Action Taken"></textarea>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Responsible Person *</h5>
+                                        <input type="text" class="form-control stc-dso-fields" id="stc-dso-responsible-person" placeholder="Responsible Person">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Target Date</h5>
+                                        <input type="date" class="form-control stc-dso-fields" id="stc-dso-target-date">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Closure Date</h5>
+                                        <input type="date" class="form-control stc-dso-fields" id="stc-dso-closure-date">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Compliance Status *</h5>
+                                        <select class="form-control stc-dso-dropdownfields" id="stc-dso-compliance-status">
+                                            <option>Open</option>
+                                            <option>In Progress</option>
+                                            <option>Closed</option>
+                                            <option>Pending</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Verified By</h5>
+                                        <input type="text" class="form-control stc-dso-fields" id="stc-dso-verified-by" placeholder="Verified By">
+                                    </div>
+                                    <div class="col-md-4 col-sm-12 mt-2">
+                                        <h5 class="card-title">Reviewed By</h5>
+                                        <input type="text" class="form-control stc-dso-fields" id="stc-dso-reviewed-by" placeholder="Reviewed By">
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 mt-2">
+                                        <h5 class="card-title" style="color:red;">BEFORE Image</h5>
+                                        <form id="safety-dsoimagebefore-upload-form">
+                                            <input type="hidden" class="stc-dso-no" name="stc-dsobefore-no">
+                                            <input type="file" class="form-control" name="before-image" accept="image/*">
+                                            <input type="submit" class="btn btn-primary mt-1" value="Upload">
+                                        </form>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12 mt-2">
+                                        <h5 class="card-title" style="color:red;">AFTER Image</h5>
+                                        <form id="safety-dsoimageafter-upload-form">
+                                            <input type="hidden" class="stc-dso-no" name="stc-dsoafter-no">
+                                            <input type="file" class="form-control" name="after-image" accept="image/*">
+                                            <input type="submit" class="btn btn-primary mt-1" value="Upload">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
