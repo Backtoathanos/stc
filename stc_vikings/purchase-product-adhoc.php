@@ -593,6 +593,26 @@ include("kattegat/role_check.php");
           z-index: 30;
           white-space: normal;
       }
+      /* Select-all column: keep checkbox visible (no hover popover over it) */
+      .stc-poa-results-frame thead th:hover .stc-poa-th-inner-check .stc-poa-th-text {
+          position: static;
+          transform: none;
+          left: auto;
+          top: auto;
+          min-width: 0;
+          width: auto;
+          max-width: none;
+          max-height: calc(1.3em * 2);
+          -webkit-line-clamp: 2;
+          display: -webkit-box;
+          overflow: hidden;
+          background: transparent;
+          padding: 0;
+          box-shadow: none;
+          border: none;
+          border-radius: 0;
+          z-index: auto;
+      }
       .stc-poa-th-inner .stc-poa-sort-icon {
           display: inline-block;
           vertical-align: top;
